@@ -5,18 +5,18 @@
 namespace {
 
 ROM_START( m68705p3 )
-    ROM_REGION(0x0073, "bootstrap", 0)
-    ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(696e1383) SHA1(45104fe1dbd683d251ed2b9411b1f4befbb5aff4))
+	ROM_REGION(0x0073, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(696e1383) SHA1(45104fe1dbd683d251ed2b9411b1f4befbb5aff4))
 ROM_END
 
 ROM_START( m68705p5 )
-    ROM_REGION(0x0073, "bootstrap", 0)
-    ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(f70a8620) SHA1(c154f78c23f10bb903a531cb19e99121d5f7c19c))
+	ROM_REGION(0x0073, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(f70a8620) SHA1(c154f78c23f10bb903a531cb19e99121d5f7c19c))
 ROM_END
 
 ROM_START( m68705u3 )
-    ROM_REGION(0x0078, "bootstrap", 0)
-    ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
+	ROM_REGION(0x0078, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
 } // anonymous namespace
@@ -479,9 +479,9 @@ m68705p_device::m68705p_device(
 		char const *source)
 	: m68705_new_device(mconfig, tag, owner, clock, type, name, 11, address_map_delegate(FUNC(m68705p_device::p_map), this), shortname, source)
 {
-	set_port_open_drain<0>(true);	// Port A is open drain with internal pull-ups
-	set_port_mask<2>(0xf0);			// Port C is four bits wide
-	set_port_mask<3>(0xff);			// Port D isn't present
+	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
+	set_port_mask<2>(0xf0);         // Port C is four bits wide
+	set_port_mask<3>(0xff);         // Port D isn't present
 }
 
 
@@ -546,7 +546,7 @@ ADDRESS_MAP_END
 m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: m68705_new_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", 11, address_map_delegate(FUNC(m68705u3_device::u_map), this), "m68705u3", __FILE__)
 {
-	set_port_open_drain<0>(true);	// Port A is open drain with internal pull-ups
+	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 }
 
 tiny_rom_entry const *m68705u3_device::device_rom_region() const

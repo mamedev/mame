@@ -133,7 +133,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(pcr_w);
 
 	TIMER_CALLBACK_MEMBER(timer_68705_increment);
-	
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device-level overrides
@@ -148,19 +148,19 @@ protected:
 	emu_timer *m_68705_timer;
 
 private:
-	required_region_ptr<u8>	m_user_rom;
+	required_region_ptr<u8> m_user_rom;
 
-	bool					m_port_open_drain[PORT_COUNT];
-	u8						m_port_mask[PORT_COUNT];
-	u8						m_port_input[PORT_COUNT];
-	u8						m_port_latch[PORT_COUNT];
-	u8						m_port_ddr[PORT_COUNT];
-	devcb_read8				m_port_cb_r[PORT_COUNT];
-	devcb_write8			m_port_cb_w[PORT_COUNT];
+	bool                    m_port_open_drain[PORT_COUNT];
+	u8                      m_port_mask[PORT_COUNT];
+	u8                      m_port_input[PORT_COUNT];
+	u8                      m_port_latch[PORT_COUNT];
+	u8                      m_port_ddr[PORT_COUNT];
+	devcb_read8             m_port_cb_r[PORT_COUNT];
+	devcb_write8            m_port_cb_w[PORT_COUNT];
 
-	u8						m_pcr;
-	u8						m_pl_data;
-	u16						m_pl_addr;
+	u8                      m_pcr;
+	u8                      m_pl_data;
+	u16                     m_pl_addr;
 };
 
 
@@ -238,6 +238,6 @@ protected:
 #define M68705_INT_MASK             0x03
 #define M68705_IRQ_LINE             (M6805_IRQ_LINE + 0)
 #define M68705_INT_TIMER            (M6805_IRQ_LINE + 1)
-#define M68705_VPP_LINE				(M6805_IRQ_LINE + 2)
+#define M68705_VPP_LINE             (M6805_IRQ_LINE + 2)
 
 #endif // MAME_CPU_M6805_M68705_H

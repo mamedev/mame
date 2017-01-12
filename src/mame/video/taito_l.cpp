@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state,taitol)
+VIDEO_START_MEMBER(taitol_state, taito_l)
 {
 	int i;
 
@@ -83,7 +83,7 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
+WRITE8_MEMBER(horshoes_state::bankg_w)
 {
 	if (m_horshoes_gfxbank != data)
 	{
