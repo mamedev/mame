@@ -266,8 +266,9 @@ INSTRUCTION( casc )
 
 INSTRUCTION( jid )
 {
-	uint16_t addr = (PC & 0x700) | (A << 4) | RAM_R(B);
-	PC = (PC & 0x700) | ROM(addr);
+	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
+    uint8_t operand = fetch();
+	PC = (PC & 0x700) | operand;
 }
 
 /*
@@ -286,9 +287,8 @@ INSTRUCTION( jid )
 
 INSTRUCTION( jmp )
 {
-	uint16_t a = ((opcode & 0x07) << 8) | ROM(PC);
-
-	PC = a;
+    uint8_t operand = fetch();
+	PC = ((opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -351,10 +351,9 @@ INSTRUCTION( jp )
 
 INSTRUCTION( jsr )
 {
-	uint16_t a = ((opcode & 0x07) << 8) | ROM(PC);
-
-	PUSH(PC + 1);
-	PC = a;
+    uint8_t operand = fetch();
+	PUSH(PC);
+    PC = ((opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -554,7 +553,8 @@ INSTRUCTION( lqid )
 {
 	PUSH(PC);
 	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
-	WRITE_Q(ROM(PC));
+    uint8_t operand = fetch();
+	WRITE_Q(operand);
 	POP();
 }
 
