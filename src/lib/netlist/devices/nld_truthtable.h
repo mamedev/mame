@@ -171,7 +171,7 @@ namespace netlist
 					m_desc.push_back(*desc);
 					desc++;
 				}
-			startxx();
+			init();
 		}
 
 		template <class C>
@@ -184,10 +184,10 @@ namespace netlist
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
-			startxx();
+			init();
 		}
 
-		void startxx()
+		void init()
 		{
 			set_hint_deactivate(true);
 
@@ -220,7 +220,7 @@ namespace netlist
 				const std::size_t idx = plib::container::indexof(inout, tmp);
 				if (idx != plib::container::npos)
 				{
-					connect_late(m_Q[i], m_I[idx]);
+					connect(m_Q[i], m_I[idx]);
 					// disable ignore for this inputs altogether.
 					// FIXME: This shouldn't be necessary
 					disabled_ignore |= (1<<idx);
@@ -251,7 +251,7 @@ namespace netlist
 			for (std::size_t i = 0; i < m_NI; i++)
 				m_I[i].activate();
 			for (std::size_t i=0; i<m_NO;i++)
-				if (this->m_Q[i].net().num_cons()>0)
+				if (this->m_Q[i].has_net() && this->m_Q[i].net().num_cons()>0)
 					m_active++;
 		}
 

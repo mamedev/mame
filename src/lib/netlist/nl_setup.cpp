@@ -580,6 +580,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
+		netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(anet, true));
 		t1.set_net(anet);
 		anet->add_terminal(t2);
 		anet->add_terminal(t1);
@@ -756,8 +757,10 @@ void setup_t::resolve_inputs()
 	for (auto & t : netlist().get_device_list<devices::NETLIB_NAME(twoterm)>())
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		{
 			log().warning("Found device {1} connected only to railterminals {2}/{3}\n",
 				t->name(), t->m_N.net().name(), t->m_P.net().name());
+		}
 	}
 }
 

@@ -850,7 +850,7 @@ public:
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
 	{
-		connect_late(m_feedback, m_Q);
+		connect(m_feedback, m_Q);
 		m_inc = netlist::netlist_time::from_nsec(1);
 
 

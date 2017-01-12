@@ -51,9 +51,9 @@ NETLIB_OBJECT(OPAMP)
 			register_subalias("MINUS", "G1.IN");
 			register_subalias("OUT", "G1.OP");
 
-			connect_late("G1.ON", "VREF");
-			connect_late("RP1.2", "VREF");
-			connect_late("RP1.1", "G1.OP");
+			connect("G1.ON", "VREF");
+			connect("RP1.2", "VREF");
+			connect("RP1.1", "G1.OP");
 
 		}
 		else if (m_type == 3)
@@ -70,21 +70,21 @@ NETLIB_OBJECT(OPAMP)
 			register_subalias("MINUS", "G1.IN");
 			register_subalias("OUT", "EBUF.OP");
 
-			connect_late("EBUF.ON", "VREF");
+			connect("EBUF.ON", "VREF");
 
-			connect_late("G1.ON", "VREF");
-			connect_late("RP1.2", "VREF");
-			connect_late("CP1.2", "VREF");
-			connect_late("EBUF.IN", "VREF");
+			connect("G1.ON", "VREF");
+			connect("RP1.2", "VREF");
+			connect("CP1.2", "VREF");
+			connect("EBUF.IN", "VREF");
 
-			connect_late("RP1.1", "G1.OP");
-			connect_late("CP1.1", "RP1.1");
+			connect("RP1.1", "G1.OP");
+			connect("CP1.1", "RP1.1");
 
-			connect_late("DP.K", "VH");
-			connect_late("VL", "DN.A");
-			connect_late("DP.A", "DN.K");
-			connect_late("DN.K", "RP1.1");
-			connect_late("EBUF.IP", "RP1.1");
+			connect("DP.K", "VH");
+			connect("VL", "DN.A");
+			connect("DP.A", "DN.K");
+			connect("DN.K", "RP1.1");
+			connect("EBUF.IP", "RP1.1");
 		}
 		else
 			netlist().log().fatal("Unknown opamp type: {1}", m_type);

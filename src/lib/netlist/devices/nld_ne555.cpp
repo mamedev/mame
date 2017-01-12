@@ -35,9 +35,9 @@ namespace netlist
 			register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 			register_subalias("VCC",  m_R1.m_P);    // Pin 8
 
-			connect_late(m_R1.m_N, m_R2.m_P);
-			connect_late(m_R2.m_N, m_R3.m_P);
-			connect_late(m_RDIS.m_N, m_R3.m_N);
+			connect(m_R1.m_N, m_R2.m_P);
+			connect(m_R2.m_N, m_R3.m_P);
+			connect(m_RDIS.m_N, m_R3.m_N);
 		}
 
 		NETLIB_UPDATEI();

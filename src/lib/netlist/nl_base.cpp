@@ -665,12 +665,12 @@ void device_t::register_subalias(const pstring &name, const pstring &aliased)
 	setup().register_alias_nofqn(alias, aliased_fqn);
 }
 
-void device_t::connect_late(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
+void device_t::connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	setup().register_link_fqn(t1.name(), t2.name());
 }
 
-void device_t::connect_late(const pstring &t1, const pstring &t2)
+void device_t::connect(const pstring &t1, const pstring &t2)
 {
 	setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 }
@@ -722,10 +722,6 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
 {
 	m_railterminal = mr;
-	if (mr != nullptr)
-		nl.m_nets.push_back(plib::owned_ptr<net_t>(this, false));
-	else
-		nl.m_nets.push_back(plib::owned_ptr<net_t>(this, true));
 }
 
 detail::net_t::~net_t()
@@ -908,7 +904,7 @@ void detail::core_terminal_t::set_net(net_t *anet)
 	m_net = anet;
 }
 
-	void detail::core_terminal_t::clear_net()
+void detail::core_terminal_t::clear_net()
 {
 	m_net = nullptr;
 }
@@ -970,6 +966,7 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
+	netlist().m_nets.push_back(plib::owned_ptr<logic_net_t>(&m_my_net, false));
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
 }
@@ -980,7 +977,8 @@ logic_output_t::~logic_output_t()
 
 void logic_output_t::initial(const netlist_sig_t val)
 {
-	net().initial(val);
+	if (has_net())
+		net().initial(val);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1005,6 +1003,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
+	netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
 	net().m_cur_Analog = NL_FCONST(0.0);

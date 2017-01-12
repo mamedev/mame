@@ -66,7 +66,7 @@ NETLIB_OBJECT(solver)
 	{
 		// internal staff
 
-		connect_late(m_fb_step, m_Q_step);
+		connect(m_fb_step, m_Q_step);
 	}
 
 	virtual ~NETLIB_NAME(solver)();

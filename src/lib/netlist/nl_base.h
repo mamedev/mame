@@ -1081,19 +1081,17 @@ namespace netlist
 
 		setup_t &setup();
 
-#if 1
 		template<class C>
 		void register_sub(const pstring &name, std::unique_ptr<C> &dev)
 		{
 			dev.reset(new C(*this, name));
 		}
-#endif
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
-		void connect_late(const pstring &t1, const pstring &t2);
-		void connect_late(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect(const pstring &t1, const pstring &t2);
+		void connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 	protected:
 
@@ -1246,7 +1244,7 @@ namespace netlist
 		plib::dynlib &lib() { return *m_lib; }
 
 		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
+		std::vector<plib::owned_ptr<detail::net_t>> m_nets;
 
 	protected:
 		void print_stats() const;
@@ -1445,11 +1443,11 @@ namespace netlist
 
 	inline void analog_output_t::set_Q(const nl_double newQ) NL_NOEXCEPT
 	{
-		if (newQ != net().Q_Analog())
+		if (newQ != m_my_net.Q_Analog())
 		{
-			net().m_cur_Analog = newQ;
-			net().toggle_new_Q();
-			net().push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.m_cur_Analog = newQ;
+			m_my_net.toggle_new_Q();
+			m_my_net.push_to_queue(NLTIME_FROM_NS(1));
 		}
 	}
 

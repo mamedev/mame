@@ -31,12 +31,12 @@ namespace netlist
 		, m_shift(*this, "m_shift", 0)
 		, m_is_timestep(false)
 		{
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 
 			/* output */
 			//register_term("_RV1", m_RV.m_P);
 			//register_term("_RV2", m_RV.m_N);
-			connect_late(m_RV.m_N, m_VDD);
+			connect(m_RV.m_N, m_VDD);
 
 			/* device */
 			register_subalias("3", m_RV.m_P);

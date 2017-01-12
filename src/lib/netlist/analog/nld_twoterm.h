@@ -216,7 +216,7 @@ NETLIB_OBJECT(POT)
 		register_subalias("2", m_R1.m_N);
 		register_subalias("3", m_R2.m_N);
 
-		connect_late(m_R2.m_P, m_R1.m_N);
+		connect(m_R2.m_P, m_R1.m_N);
 
 	}
 

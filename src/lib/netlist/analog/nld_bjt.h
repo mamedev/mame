@@ -114,10 +114,10 @@ NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 		//register_term("_B1", m_BC_dummy.m_P);
 		//register_term("_C1", m_BC_dummy.m_N);
 
-		connect_late(m_RB.m_N, m_RC.m_N);
+		connect(m_RB.m_N, m_RC.m_N);
 
-		connect_late(m_RB.m_P, m_BC_dummy.m_P);
-		connect_late(m_RC.m_P, m_BC_dummy.m_N);
+		connect(m_RB.m_P, m_BC_dummy.m_P);
+		connect(m_RC.m_P, m_BC_dummy.m_N);
 	}
 
 	NETLIB_RESETI();
@@ -169,9 +169,9 @@ public:
 		//register_term("_E1", m_D_EC.m_P);
 		//register_term("_C1", m_D_EC.m_N);
 
-		connect_late(m_D_EB.m_P, m_D_EC.m_P);
-		connect_late(m_D_EB.m_N, m_D_CB.m_N);
-		connect_late(m_D_CB.m_P, m_D_EC.m_N);
+		connect(m_D_EB.m_P, m_D_EC.m_P);
+		connect(m_D_EB.m_N, m_D_CB.m_N);
+		connect(m_D_CB.m_P, m_D_EC.m_N);
 	}
 
 protected:

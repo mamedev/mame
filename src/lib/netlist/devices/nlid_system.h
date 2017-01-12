@@ -92,7 +92,7 @@ namespace netlist
 		{
 			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 		}
 		NETLIB_UPDATEI();
 		//NETLIB_RESETI();
@@ -123,7 +123,7 @@ namespace netlist
 		{
 			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 			{
 				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
 				plib::pstring_vector_t pat(m_pattern(),",");
@@ -267,11 +267,11 @@ namespace netlist
 		{
 			register_subalias("I", m_RIN.m_P);
 			register_subalias("G", m_RIN.m_N);
-			connect_late(m_I, m_RIN.m_P);
+			connect(m_I, m_RIN.m_P);
 
 			register_subalias("_OP", m_ROUT.m_P);
 			register_subalias("Q", m_ROUT.m_N);
-			connect_late(m_Q, m_ROUT.m_P);
+			connect(m_Q, m_ROUT.m_P);
 		}
 
 		NETLIB_RESETI()

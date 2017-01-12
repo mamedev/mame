@@ -55,7 +55,7 @@ namespace netlist
 		, m_out(*this, "m_out", 0)
 		, m_inc(*this, "m_inc", netlist_time::zero())
 		{
-			connect_late(m_FB, m_Y);
+			connect(m_FB, m_Y);
 		}
 
 		NETLIB_RESETI()
@@ -89,9 +89,9 @@ namespace netlist
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
-			connect_late(m_FC, m_R_FC.m_P);
-			connect_late(m_RNG, m_R_RNG.m_P);
-			connect_late(m_R_FC.m_N, m_R_RNG.m_N);
+			connect(m_FC, m_R_FC.m_P);
+			connect(m_RNG, m_R_RNG.m_P);
+			connect(m_R_FC.m_N, m_R_RNG.m_N);
 
 			register_subalias("Y", m_clock.m_Y);
 		}
@@ -133,7 +133,7 @@ namespace netlist
 
 			register_subalias("8",  m_1.m_R_FC.m_N);
 			register_subalias("9",  m_1.m_R_FC.m_N);
-			connect_late(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+			connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
 
 			register_subalias("10",  m_2.m_clock.m_Y);
 
