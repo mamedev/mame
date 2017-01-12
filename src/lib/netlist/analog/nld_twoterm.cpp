@@ -119,24 +119,37 @@ NETLIB_UPDATE(R_base)
 NETLIB_UPDATE_PARAM(R)
 {
 	update_dev();
-	if (m_R() > 1e-9)
-		set_R(m_R());
-	else
-		set_R(1e-9);
+	set_R(std::max(m_R(), netlist().gmin()));
+}
+
+NETLIB_RESET(R)
+{
+	NETLIB_NAME(twoterm)::reset();
+	set_R(std::max(m_R(), netlist().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
 // nld_POT
 // ----------------------------------------------------------------------------------------
 
-NETLIB_UPDATE_PARAM(POT)
+NETLIB_RESET(POT)
 {
 	nl_double v = m_Dial();
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
+}
+
+NETLIB_UPDATE_PARAM(POT)
+{
 	m_R1.update_dev();
 	m_R2.update_dev();
+
+	nl_double v = m_Dial();
+	if (m_DialIsLog())
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
 	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
@@ -147,7 +160,7 @@ NETLIB_UPDATE_PARAM(POT)
 // nld_POT2
 // ----------------------------------------------------------------------------------------
 
-NETLIB_UPDATE_PARAM(POT2)
+NETLIB_RESET(POT2)
 {
 	nl_double v = m_Dial();
 
@@ -155,9 +168,20 @@ NETLIB_UPDATE_PARAM(POT2)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse())
 		v = 1.0 - v;
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+}
 
+
+NETLIB_UPDATE_PARAM(POT2)
+{
 	m_R1.update_dev();
 
+	nl_double v = m_Dial();
+
+	if (m_DialIsLog())
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+	if (m_Reverse())
+		v = 1.0 - v;
 	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
 }
 
@@ -187,7 +211,9 @@ NETLIB_TIMESTEP(C)
 	/* Gpar should support convergence */
 	const nl_double G = m_C() / step +  m_GParallel;
 	const nl_double I = -G * deltaV();
-	set(G, 0.0, I);
+	set_mat( G, -G, -I,
+			-G,  G,  I);
+	//set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -196,13 +222,16 @@ NETLIB_TIMESTEP(C)
 
 NETLIB_RESET(L)
 {
-	set(netlist().gmin(), 0.0, 5.0 / netlist().gmin());
+	m_GParallel = netlist().gmin();
+	m_I = 0.0;
+	m_G = m_GParallel;
+	set_mat( m_G, -m_G, -m_I,
+			-m_G,  m_G,  m_I);
 	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_UPDATE_PARAM(L)
 {
-	m_GParallel = netlist().gmin();
 }
 
 NETLIB_UPDATE(L)
@@ -215,12 +244,23 @@ NETLIB_TIMESTEP(L)
 	/* Gpar should support convergence */
 	m_I += m_I + m_G * deltaV();
 	m_G = step / m_L() + m_GParallel;
-	set(m_G, 0.0, m_I);
+	set_mat( m_G, -m_G, -m_I,
+			-m_G,  m_G,  m_I);
+	//set(m_G, 0.0, m_I);
 }
 
 // ----------------------------------------------------------------------------------------
 // nld_D
 // ----------------------------------------------------------------------------------------
+
+NETLIB_RESET(D)
+{
+	nl_double Is = m_model.model_value("IS");
+	nl_double n = m_model.model_value("N");
+
+	m_D.set_param(Is, n, netlist().gmin());
+	set(m_D.G(), 0.0, m_D.Ieq());
+}
 
 NETLIB_UPDATE_PARAM(D)
 {
@@ -238,7 +278,11 @@ NETLIB_UPDATE(D)
 NETLIB_UPDATE_TERMINALS(D)
 {
 	m_D.update_diode(deltaV());
-	set(m_D.G(), 0.0, m_D.Ieq());
+	const nl_double G = m_D.G();
+	const nl_double I = m_D.Ieq();
+	set_mat( G, -G, -I,
+			-G,  G,  I);
+	//set(m_D.G(), 0.0, m_D.Ieq());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -263,7 +307,11 @@ NETLIB_UPDATE(VS)
 NETLIB_RESET(CS)
 {
 	NETLIB_NAME(twoterm)::reset();
-	this->set(0.0, 0.0, m_I());
+	const nl_double I = m_I();
+
+	set_mat(0.0, 0.0, -I,
+			0.0, 0.0,  I);
+	//this->set(0.0, 0.0, m_I());
 }
 
 NETLIB_UPDATE(CS)

@@ -230,7 +230,7 @@ Interrupts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "rendlay.h"
 #include "includes/qix.h"
 #include "cpu/m6809/m6809.h"

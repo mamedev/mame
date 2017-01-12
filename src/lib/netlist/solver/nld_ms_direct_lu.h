@@ -146,7 +146,7 @@ protected:
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 	nl_double m_last_V[storage_N];
 
-	terms_t *m_rails_temp;
+	terms_for_net_t *m_rails_temp;
 
 private:
 	nl_ext_double m_A[storage_N][((storage_N + 7) / 8) * 8];
@@ -248,7 +248,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
 		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].net_other()[i], false);
+			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].connected_net_idx()[i], false);
 
 		m_rails_temp[k].clear(); // no longer needed
 		m_terms[k]->set_pointers();
@@ -290,7 +290,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		int *other = m_terms[k]->net_other();
+		int *other = m_terms[k]->connected_net_idx();
 		for (unsigned i = 0; i < m_terms[k]->count(); i++)
 			if (other[i] != -1)
 				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
@@ -304,9 +304,9 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	 */
 	for (unsigned k = 0; k < N(); k++)
 	{
-		terms_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k];
 		/* pretty brutal */
-		int *other = t->net_other();
+		int *other = t->connected_net_idx();
 
 		t->m_nz.clear();
 
@@ -384,7 +384,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 		const unsigned railstart =  m_terms[k]->m_railstart;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
 		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->net_other();
+		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
 
 		for (unsigned i = 0; i < terms_count; i++)
 			akk = akk + gt[i];
@@ -408,7 +408,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 		const int terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (int i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
@@ -607,7 +607,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const solver_para
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_rails_temp = palloc_array(terms_t, N());
+	m_rails_temp = palloc_array(terms_for_net_t, N());
 
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -621,11 +621,11 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_rails_temp = palloc_array(terms_t, N());
+	m_rails_temp = palloc_array(terms_for_net_t, N());
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k] = palloc(terms_t);
+		m_terms[k] = palloc(terms_for_net_t);
 		m_last_RHS[k] = 0.0;
 	}
 }

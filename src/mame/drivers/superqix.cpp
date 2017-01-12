@@ -168,7 +168,7 @@ code at z80:0093:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"

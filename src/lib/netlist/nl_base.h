@@ -139,8 +139,6 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_STOP(chip) void NETLIB_NAME(chip) :: stop(void)
-
 #define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params
 
@@ -235,7 +233,7 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		~logic_family_desc_t();
+		virtual ~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -372,7 +370,7 @@ namespace netlist
 	/*! The base class for netlist devices, terminals and parameters.
 	 *
 	 *  This class serves as the base class for all device, terminal and
-	 *  objects. It provides new and delete operators to supported e.g. pooled
+	 *  objects. It provides new and delete operators to support e.g. pooled
 	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
 	 *  well.
 	 */
@@ -441,9 +439,8 @@ namespace netlist
 		 *
 		 * \param dev  device owning the object.
 		 * \param name string holding the name of the device
-		 * \param type type   of this object.
 		 */
-		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		device_object_t(core_device_t &dev, const pstring &name);
 		/*! returns reference to owning device.
 		 * \returns reference to owning device.
 		 */
@@ -452,21 +449,21 @@ namespace netlist
 		/*! The object type.
 		 * \returns type of the object
 		 */
-		type_t type() const { return m_type; }
+		type_t type() const;
 		/*! Checks if object is of specified type.
-		 * \param type type to check object against.
+		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const type_t type) const { return (m_type == type); }
+		bool is_type(const type_t atype) const { return (type() == atype); }
 
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
 		netlist_t &netlist();
+		const netlist_t &netlist() const;
 
 	private:
 		core_device_t & m_device;
-		const type_t    m_type;
 	};
 
 
@@ -495,8 +492,7 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname,
-				const type_t type, const state_e state);
+		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
@@ -528,9 +524,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-		: core_terminal_t(dev, aname, type, state)
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
+		: core_terminal_t(dev, aname, state)
 		{
 		}
 		virtual ~analog_t();
@@ -609,9 +604,8 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-			: core_terminal_t(dev, aname, type, state)
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
+			: core_terminal_t(dev, aname, state)
 			, logic_family_t()
 			, m_proxy(nullptr)
 		{
@@ -870,10 +864,10 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(const param_type_t atype, device_t &device, const pstring &name);
+		param_t(device_t &device, const pstring &name);
 		virtual ~param_t();
 
-		param_type_t param_type() const { return m_param_type; }
+		param_type_t param_type() const;
 
 	protected:
 		void update_param();
@@ -888,8 +882,6 @@ namespace netlist
 			}
 		}
 
-	private:
-		const param_type_t m_param_type;
 	};
 
 	class param_ptr_t final: public param_t
@@ -1019,7 +1011,6 @@ namespace netlist
 		}
 
 		void set_delegate_pointer();
-		void stop_dev();
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1048,7 +1039,6 @@ namespace netlist
 		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
-		virtual void stop() { }
 		virtual void reset() { }
 
 	public:
@@ -1139,7 +1129,6 @@ namespace netlist
 
 	class detail::queue_t :
 			public timed_queue<net_t *, netlist_time>,
-			public detail::object_t,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1485,6 +1474,11 @@ namespace netlist
 	}
 
 	inline netlist_t &detail::device_object_t::netlist()
+	{
+		return m_device.netlist();
+	}
+
+	inline const netlist_t &detail::device_object_t::netlist() const
 	{
 		return m_device.netlist();
 	}

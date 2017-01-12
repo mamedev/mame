@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
@@ -21,6 +22,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_msm(*this, "msm"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -37,15 +39,14 @@ public:
 	tilemap_t    *m_bg_tilemap;
 
 	/* misc */
-	int        m_nmi_enable;
-	int        m_sound_nmi_enable;
-	int        m_msm_data;
-	int        m_msm_play_lo_nibble;
-	int        m_counter;
+	bool       m_nmi_enable;
+	bool       m_sound_nmi_enable;
+	bool       m_msm_play_lo_nibble;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<ls157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
 	optional_device<dac_8bit_r2r_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -54,7 +55,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_msm_w);
 	DECLARE_READ8_MEMBER(sound_reset_r);
 	DECLARE_WRITE8_MEMBER(kc_sound_control_w);

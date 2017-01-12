@@ -12,7 +12,7 @@ Tomasz Slanina
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/changela.h"

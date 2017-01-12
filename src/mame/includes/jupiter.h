@@ -17,43 +17,42 @@ class jupiter2_state : public driver_device
 {
 public:
 	jupiter2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, MCM6571AP_TAG)
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, MCM6571AP_TAG)
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-
-	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(jupiter);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	virtual void machine_start() override;
 };
 
 class jupiter3_state : public driver_device
 {
 public:
 	jupiter3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, Z80_TAG),
-	m_p_videoram(*this, "p_videoram"),
-	m_p_ram(*this, "p_ram")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_p_videoram(*this, "videoram")
+		, m_p_ram(*this, "p_ram")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(jupiter3);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
-	uint8_t m_term_data;
 
+private:
+	required_device<cpu_device> m_maincpu;
+	uint8_t m_term_data;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_ram;
 	const uint8_t *m_p_chargen;
-
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_DRIVER_INIT(jupiter3);
 };
 
 #endif

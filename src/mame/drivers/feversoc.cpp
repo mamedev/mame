@@ -83,6 +83,7 @@ public:
 		m_mainram2(*this, "workram2"),
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram"),
+		m_in(*this, {"IN1", "IN0"}),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
@@ -94,12 +95,14 @@ public:
 	required_shared_ptr<uint32_t> m_mainram2;
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
-	DECLARE_READ32_MEMBER(in0_r);
+	required_ioport_array<2> m_in;
+	DECLARE_READ16_MEMBER(in_r);
 	DECLARE_WRITE16_MEMBER(output_w);
 	DECLARE_WRITE16_MEMBER(output2_w);
 	DECLARE_DRIVER_INIT(feversoc);
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
+	DECLARE_WRITE16_MEMBER(feversoc_irq_ack);
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -143,11 +146,9 @@ uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(feversoc_state::in0_r)
+READ16_MEMBER(feversoc_state::in_r)
 {
-	uint32_t io0 = (ioport("IN1")->read()&0xffff) << 16;
-	uint32_t io1 = (ioport("IN0")->read()&0xffff) << 0;
-	return io0 | io1;
+	return m_in[offset]->read() & 0xffff;
 }
 
 WRITE16_MEMBER( feversoc_state::output_w )
@@ -193,8 +194,8 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output_w, 0xffff0000)
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output2_w, 0x0000ffff)
-	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
-	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
+	AM_RANGE(0x06000004, 0x06000007) AM_WRITE16(feversoc_irq_ack, 0x0000ffff)
+	AM_RANGE(0x06000008, 0x0600000b) AM_READ16(in_r, 0xffffffff)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
 	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP // sprite buffering
@@ -244,6 +245,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "DIP1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DIP1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DIP1:8" )
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 (BTN1)")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)")
@@ -258,7 +260,12 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
 {
-	m_maincpu->set_input_line(8, HOLD_LINE );
+	m_maincpu->set_input_line(8, ASSERT_LINE);
+}
+
+WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
+{
+	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( feversoc, feversoc_state )

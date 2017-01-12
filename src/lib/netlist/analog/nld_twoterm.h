@@ -137,13 +137,12 @@ public:
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	void set_mat(const nl_double a11, const nl_double a12,
-			     const nl_double a21, const nl_double a22,
-				 const nl_double r1, const nl_double r2)
+	void set_mat(const nl_double a11, const nl_double a12, const nl_double r1,
+			     const nl_double a21, const nl_double a22, const nl_double r2)
 	{
 		/*      GO, GT, I                */
-		m_P.set(-a12, a11, -r1);
-		m_N.set(-a21, a22, -r2);
+		m_P.set(-a12, a11, r1);
+		m_N.set(-a21, a22, r2);
 	}
 
 private:
@@ -169,7 +168,9 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 public:
 	inline void set_R(const nl_double R)
 	{
-		set(NL_FCONST(1.0) / R, 0.0, 0.0);
+		const nl_double G = NL_FCONST(1.0) / R;
+		set_mat( G, -G, 0.0,
+				-G,  G, 0.0);
 	}
 
 protected:
@@ -189,7 +190,7 @@ NETLIB_OBJECT_DERIVED(R, R_base)
 
 protected:
 
-	//NETLIB_RESETI() { }
+	NETLIB_RESETI();
 	//NETLIB_UPDATEI() { }
 	NETLIB_UPDATE_PARAMI();
 };
@@ -216,7 +217,7 @@ NETLIB_OBJECT(POT)
 	}
 
 	//NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -243,7 +244,7 @@ NETLIB_OBJECT(POT2)
 	}
 
 	//NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -375,7 +376,7 @@ public:
 	param_model_t m_model;
 
 protected:
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 

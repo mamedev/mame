@@ -2074,6 +2074,7 @@ astrof3                         // (c) [1980?]
 spfghmk2                        // (c) [1979] Data East Corporation
 spfghmk22                       // (c) [1979] Data East Corporation
 sstarbtl                        // bootleg
+strfight                        // bootleg (VGG)
 tomahawk                        // (c) 1980 Data East, Inc.
 tomahawk1                       // (c) 1980 Data East, Inc.
 
@@ -20375,6 +20376,9 @@ miniboy7a                       // (c) 1983, Bonanza Enterprises
 mcom4_02                        //
 minicom                         //
 
+@source:miniforce.cpp
+miniforce                       // D26 cabinet test board
+
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
@@ -20493,12 +20497,6 @@ megaiv                          // 1989 Mephisto Mega IV Schachcomputer
 milano                          // 1989 Mephisto Milano Schachcomputer
 monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 polgar                          // 1986 Mephisto Polgar Schachcomputer
-sexpertb                        // 1988 Novag Expert B Chess Computer
-sexpertc                        // 1989 Novag Super Expert C Chess Computer
-sfortea                         // 1987 Novag Super Forte A Chess Computer
-sforteb                         // 1988 Novag Super Forte B Chess Computer
-sforteba                        // 1988 Novag Super Forte B Chess Computer (ALT)
-sfortec                         // 1989 Novag Super Forte C Chess Computer
 van16                           // 1991 Mephisto Vancouver 68000
 van32                           // 1991 Mephisto Vancouver 68020
 
@@ -29200,6 +29198,14 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+sexpert                         //
+sexpertb                        //
+sexpertc                        //
+sexpertca                       //
+sforte                          //
+sforteb                         //
+sforteba                        //
+sfortec                         //
 supercon                        //
 
 @source:nsm.cpp
@@ -31372,6 +31378,9 @@ pv9234                          //
 
 @source:pve500.cpp
 pve500                          // SONY PVE-500
+
+@source:pwrview.cpp
+pwrview                         // Compugraphic MCS PowerView 10
 
 @source:px4.cpp
 px4                             // 1985 Epson PX-4

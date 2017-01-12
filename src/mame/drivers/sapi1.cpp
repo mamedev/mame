@@ -38,9 +38,6 @@ Unable to proceed due to no info available (& in English).
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
-#define KEYBOARD_TAG "keyboard"
-
 class sapi1_state : public driver_device
 {
 public:
@@ -226,7 +223,7 @@ static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
@@ -560,7 +557,7 @@ static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -600,7 +597,7 @@ static MACHINE_CONFIG_START( sapi3a, sapi1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
 
 	/* internal ram */

@@ -110,11 +110,11 @@ namespace netlist
 
 	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
 	{
-		unsigned out = m_buffer[0] & 1;
+		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());
 		for (std::size_t i=0; i < 5; i++)
 		{
-			uint16_t shift_in = (i == 4) ? in : m_buffer[i + 1];
+			uint32_t shift_in = (i == 4) ? in : m_buffer[i + 1];
 			m_buffer[i] >>= 1;
 			m_buffer[i] |= shift_in << 15;
 		}

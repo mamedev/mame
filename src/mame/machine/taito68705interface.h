@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood
 
-#include "cpu/m6805/m6805.h"
-
 class taito68705_mcu_device : public device_t
 {
 public:

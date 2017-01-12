@@ -154,47 +154,18 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 	}
 }
 
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_default)
+void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	return address;
-}
-/*
- * Handle NMI delay for single step instruction
- */
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
-{
-	m_nmi_delay_counter--;
-
-	if (!m_nmi_delay_counter)
+	switch (id)
 	{
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
+	case 0:
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		break;
+	case 1:
+		// switch to RAM bank at address 0x0000
+		m_bank1->set_entry(0);
+		break;
 	}
-	return address;
-}
-
-/*
- * Handle delayed ROM/RAM banking at RESET
- * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
- */
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/*
-	 * TODO: when debugger is active, his memory access causes this callback
-	 *
-	 */
-	if(!space.debugger_access())
-		m_reset_delay_counter--;
-
-	if (!m_reset_delay_counter)
-	{
-		/* remove this callback */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
-		/* and switch to RAM bank at address 0x0000 */
-		m_bank1->set_entry( 0 ); /* RAM at 0x0000 (bank 1) */
-	}
-	return address;
 }
 
 void z80ne_state::reset_lx388()
@@ -210,15 +181,13 @@ void z80ne_state::reset_lx382_banking()
 	m_bank2->set_entry(0);  /* ep382 at 0x8000 */
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
-	m_reset_delay_counter = 2;
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_reset_delay_count, this));
+	m_timer_reset->adjust(m_maincpu->cycles_to_attotime(2));
 }
 
 void z80ne_state::reset_lx390_banking()
 {
-	m_reset_delay_counter = 0;
-
-	switch (m_io_config->read() & 0x07) {
+	switch (m_io_config->read() & 0x07)
+	{
 	case 0x01: /* EP382 Hex Monitor */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep382\n");
@@ -226,9 +195,8 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400 */
 		m_bank3->set_entry(1);  /* ep382 at 0x8000 */
 		m_bank4->set_entry(0);  /* RAM   at 0xF000 */
-		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
-		m_reset_delay_counter = 2;
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_reset_delay_count, this));
+		// after the first 3 bytes have been read from ROM, switch the RAM back in
+		m_timer_reset->adjust(m_maincpu->cycles_to_attotime(2));
 		break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -237,7 +205,6 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(1);  /* ep548 at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(0);  /* RAM   at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
@@ -246,7 +213,6 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(1);  /* ep390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
@@ -255,7 +221,6 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(2);  /* ep1390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
@@ -264,7 +229,6 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(3);  /* ep2390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	}
 
@@ -321,7 +285,6 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_ay31015->set_receiver_clock(m_cass_data.speed * 16.0);
 	m_ay31015->set_transmitter_clock(m_cass_data.speed * 16.0);
 
-	m_nmi_delay_counter = 0;
 	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
 }
@@ -380,11 +343,14 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 MACHINE_START_MEMBER(z80ne_state,z80ne)
 {
 	LOG(("In MACHINE_START z80ne\n"));
+
+	m_timer_nmi = timer_alloc(0);
+	m_timer_reset = timer_alloc(1);
+
 	m_lx385_ctrl = 0x1f;
 	save_item(NAME(m_lx383_scan_counter));
 	save_item(NAME(m_lx383_downsampler));
 	save_item(NAME(m_lx383_key));
-	save_item(NAME(m_nmi_delay_counter));
 	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc),this));
 	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
 }
@@ -465,9 +431,8 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 		output().set_digit_value( offset, data ^ 0xff );
 	else
 	{
-		/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
-		m_nmi_delay_counter = 1;
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_nmi_delay_count, this));
+		// after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution
+		m_timer_reset->adjust(m_maincpu->cycles_to_attotime(1));
 	}
 }
 

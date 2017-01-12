@@ -787,7 +787,6 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "includes/arkanoid.h"
 #include "sound/ay8910.h"
-#include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 
 /***************************************************************************/
@@ -1322,7 +1321,7 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_state, mcu_porta_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_state, mcu_porta_w))
 	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_state, mcu_portb_r))

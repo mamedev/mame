@@ -105,7 +105,7 @@ $8000 - $ffff   ROM
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "sound/3526intf.h"
 #include "includes/renegade.h"
 

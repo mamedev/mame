@@ -57,6 +57,7 @@ f80b      ????
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "includes/tecmo.h"
 
@@ -230,7 +231,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
@@ -659,8 +660,8 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_4MHz) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
@@ -680,6 +681,10 @@ static MACHINE_CONFIG_DERIVED( gemini, rygar )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
+
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( geminib, gemini)

@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "a2bus.h"
 #include "machine/6821pia.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

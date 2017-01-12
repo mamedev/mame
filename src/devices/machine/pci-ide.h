@@ -53,6 +53,7 @@ private:
 	cpu_device *m_cpu;
 	int m_irq_num;
 	devcb_write_line m_irq_handler;
+	uint32_t pci_bar[6];
 
 	uint32_t m_config_data[0x10];
 	DECLARE_ADDRESS_MAP(chan1_data_command_map, 32);
@@ -60,6 +61,7 @@ private:
 	DECLARE_ADDRESS_MAP(chan2_data_command_map, 32);
 	DECLARE_ADDRESS_MAP(chan2_control_map, 32);
 	DECLARE_ADDRESS_MAP(bus_master_map, 32);
+	DECLARE_WRITE8_MEMBER(prog_if_w);
 	DECLARE_READ32_MEMBER(pcictrl_r);
 	DECLARE_WRITE32_MEMBER(pcictrl_w);
 	DECLARE_WRITE32_MEMBER(address_base_w);

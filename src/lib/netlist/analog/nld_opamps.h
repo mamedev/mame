@@ -63,6 +63,9 @@ NETLIB_OBJECT(OPAMP)
 			register_sub("DN", m_DN);
 			register_sub("DP", m_DP);
 
+			m_DP->m_model.setTo("D(IS=1e-15 N=1)");
+			m_DN->m_model.setTo("D(IS=1e-15 N=1)");
+
 			register_subalias("PLUS", "G1.IP");
 			register_subalias("MINUS", "G1.IN");
 			register_subalias("OUT", "EBUF.OP");

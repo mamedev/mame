@@ -38,12 +38,13 @@
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken/bad dump?
 
-    floppy issues TODO (certain fail)
+    floppy issues TODO (* denotes actually fixed)
     - Unsupported disk types: *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
     - AD&D Champions of Krynn
     - AI Shougi (asserts upon loading, 3'5 image?)
     - Aki no Tsukasa no Fushigi no Kabe (works in PC-9801RS only)
+	- alice
     - Aoki Ookami no Shiroki Mejika - Gengis Khan
     - Arcshu
     - Arcus 2
@@ -59,56 +60,52 @@
     - Bible Master 2 (at new game loading)
     - Birdy World
 
-    - Bokosuka Wars
+    * Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
+	- runners (size assert)
+	- Sorcerian (2dd image)
+	- Twilight Zone 3 (2dd image)
 
     List of per-game TODO:
-    - 38 Man Kilo no Kokuu: doesn't seem possible to skip the intro?
-    - 4D Boxing: inputs are unresponsive
-    - A Ressha de Ikou 2: missing text (PC-9801RS only);
+    - 4dboxing: inputs are unresponsive;
+	- 4dboxing: crashes after user disk creation (regression);
+	- agumixsl: non-interlace mode doesn't resize graphics, has rectangle selection bugs (note: needs GDC = 5 MHz to boot);
+    - agenesis: fails loading, attempting to read IDE RAM switch port;
+	- alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
+	- applecl1: can't pass hands apparently;
+	- arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
+    - atragon: HDD install disk swap doesn't work?
+	- asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
+    - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
+	- bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
+	- bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
+	- bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
+	
+    - deflektr: no sound, moans about a DIP-SW setting during loading, has timing issues (keyboard being too fast on PC-9801RS);
+	- edge: has gfx glitch when intro scrolls to top-left;
+	- edge: user disk creation is offset?
+    - idolsaga: Moans with a "(program) ended. remove the floppy disk and turn off the power."
+	- karateka: no sound;
+	- lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
+    - madoum1, madoum2, madoum3: doesn't display bitmap gfxs during gameplay;
+    - quarth: sound cuts off at title screen, doesn't work on 9801rs (bogus "corrupt .exe" detected);
+    - prinmak2, tim: cursor stays stuck when using mouse (works with keyboard);
+    - puyopuyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
+    - runners: wrong double height on the title screen;
+	- rusty: black stripes when scrolling;
+	- rusty: voice pitches are too slow (tested with -26 and -86);
+    - win211: EGC drawing issue (byte wide writes?)
+	- win31: doesn't boot at 
+	
+	per-game TODO (Dounjishi SW):
     - Absolutely Mahjong: Transitions are too fast.
-    - Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
-    - Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-    - Anniversary - Memories of Summer: thinks that a button is pressed;
-    - Another Genesis: fails loading;
-    - Apple Club 1: how to pass an hand?
-    - Arctic: keyboard doesn't work?
-    - Arcus 3: moans with a JP message "not enough memory (needs 640kb to start)";
-    - Armored Flagship Atragon: needs HDD install
-    - Arquephos: needs extra sound board(s)?
-    - Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
-    - Band-Kun: (how to run this without installing?)
-    - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
-    - Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
-    - Bishoujo Hunter ZX: Doesn't color cycle at intro (seems stuck?), doesn't clear text selection at new game screen;
-    - Bishoujo Shanshinkan: has white rectangles all over the place;
-    - Bishoujo Tsuushin: hangs with a beep while writing some intro text;
-
-    - Bomber Quest: beeps when speech is supposed to be played (0->1 to i/o port 0xfe8e?)
-    - Deflektor: no sound, moans about a DIP-sw during loading, very slow on non-pc9801rs machines;
-    - Dragon Buster: slight issue with window masking;
-    - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
-    - Jan Borg Suzume: gets stuck at a pic8259 read;
-    - Karateka: no sound?
-    - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
-    - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
-    - Quarth: title screen is broken after first attract play;
-    - Princess Maker 2: mouse is buggy;
-    - Princess Maker 2: screen transitions are very ugly (btanb?)
-    - Puyo Puyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
-    - Puzznic: trips illegal irq 0x41 (?), prints an error on screen. (PC-9801RS only, writes an 1 to 0x69d2f for whatever reason, almost surely a btanb)
-    - Runner's High: wrong double height on the title screen;
-    - Sokoban Perfect: hangs at title screen, after loading the menu;
-    - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
-    - The Incredible Machine: hangs at main menu (YM mis-fires irq?)
-    - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
-    - Windows 2: EGC drawing issue (byte wide writes?)
-
+	
     per-game TODO (PC-9821):
     - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
-    - Policenauts: EMS error at boot;
+    - Policenauts: CD-ROM drive not found;
 
     Notes:
+	- annivers: ALT key cycles through different color schemes (normal, b&w, legacy);
     - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS

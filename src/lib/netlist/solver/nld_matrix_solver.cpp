@@ -17,7 +17,7 @@ proxied_analog_output_t::~proxied_analog_output_t()
 {
 }
 
-terms_t::terms_t()
+terms_for_net_t::terms_for_net_t()
 	: m_railstart(0)
 	, m_last_V(0.0)
 	, m_DD_n_m_1(0.0)
@@ -25,46 +25,46 @@ terms_t::terms_t()
 {
 }
 
-void terms_t::clear()
+void terms_for_net_t::clear()
 {
-	m_term.clear();
-	m_net_other.clear();
+	m_terms.clear();
+	m_connected_net_idx.clear();
 	m_gt.clear();
 	m_go.clear();
 	m_Idr.clear();
-	m_other_curanalog.clear();
+	m_connected_net_V.clear();
 }
 
-void terms_t::add(terminal_t *term, int net_other, bool sorted)
+void terms_for_net_t::add(terminal_t *term, int net_other, bool sorted)
 {
 	if (sorted)
-		for (unsigned i=0; i < m_net_other.size(); i++)
+		for (unsigned i=0; i < m_connected_net_idx.size(); i++)
 		{
-			if (m_net_other[i] > net_other)
+			if (m_connected_net_idx[i] > net_other)
 			{
-				plib::container::insert_at(m_term, i, term);
-				plib::container::insert_at(m_net_other, i, net_other);
+				plib::container::insert_at(m_terms, i, term);
+				plib::container::insert_at(m_connected_net_idx, i, net_other);
 				plib::container::insert_at(m_gt, i, 0.0);
 				plib::container::insert_at(m_go, i, 0.0);
 				plib::container::insert_at(m_Idr, i, 0.0);
-				plib::container::insert_at(m_other_curanalog, i, nullptr);
+				plib::container::insert_at(m_connected_net_V, i, nullptr);
 				return;
 			}
 		}
-	m_term.push_back(term);
-	m_net_other.push_back(net_other);
+	m_terms.push_back(term);
+	m_connected_net_idx.push_back(net_other);
 	m_gt.push_back(0.0);
 	m_go.push_back(0.0);
 	m_Idr.push_back(0.0);
-	m_other_curanalog.push_back(nullptr);
+	m_connected_net_V.push_back(nullptr);
 }
 
-void terms_t::set_pointers()
+void terms_for_net_t::set_pointers()
 {
 	for (unsigned i = 0; i < count(); i++)
 	{
-		m_term[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_other_curanalog[i] = m_term[i]->m_otherterm->net().m_cur_Analog.ptr();
+		m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
+		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().m_cur_Analog.ptr();
 	}
 }
 
@@ -108,8 +108,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	for (auto & net : nets)
 	{
 		m_nets.push_back(net);
-		m_terms.push_back(plib::palloc<terms_t>());
-		m_rails_temp.push_back(plib::palloc<terms_t>());
+		m_terms.push_back(plib::palloc<terms_for_net_t>());
+		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
 	}
 
 	for (std::size_t k = 0; k < nets.size(); k++)
@@ -183,7 +183,7 @@ void matrix_solver_t::setup_matrix()
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
 		for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
+			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->connected_net_idx()[i], false);
 
 		m_rails_temp[k]->clear(); // no longer needed
 		m_terms[k]->set_pointers();
@@ -230,7 +230,7 @@ void matrix_solver_t::setup_matrix()
 
 		for (unsigned k = 0; k < iN; k++)
 		{
-			int *other = m_terms[k]->net_other();
+			int *other = m_terms[k]->connected_net_idx();
 			for (unsigned i = 0; i < m_terms[k]->count(); i++)
 				if (other[i] != -1)
 					other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
@@ -240,9 +240,9 @@ void matrix_solver_t::setup_matrix()
 	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k];
 		/* pretty brutal */
-		int *other = t->net_other();
+		int *other = t->connected_net_idx();
 
 		t->m_nz.clear();
 
@@ -262,9 +262,9 @@ void matrix_solver_t::setup_matrix()
 	 */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k];
 		/* pretty brutal */
-		int *other = t->net_other();
+		int *other = t->connected_net_idx();
 
 		if (k==0)
 			t->m_nzrd.clear();
@@ -425,7 +425,7 @@ void matrix_solver_t::solve_base()
 		{
 			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
 			m_Q_sync.net().toggle_new_Q();
-			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
+			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
 		}
 	}
 	else
@@ -449,7 +449,6 @@ const netlist_time matrix_solver_t::solve()
 	step(delta);
 	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
-
 	update_inputs();
 
 	return next_time_step;
@@ -498,7 +497,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
-			terms_t *t = m_terms[k];
+			terms_for_net_t *t = m_terms[k];
 
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;

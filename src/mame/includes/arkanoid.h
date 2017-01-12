@@ -1,3 +1,5 @@
+#include "cpu/m6805/m68705.h"
+
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Stephane Humbert
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -67,7 +69,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<m68705p_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

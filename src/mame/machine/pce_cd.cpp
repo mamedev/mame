@@ -229,7 +229,7 @@ void pce_cd_device::late_setup()
 	}
 
 	// MSM5205 might be initialized after PCE CD as well...
-	m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
+	m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
@@ -1180,7 +1180,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 			break;
 		case 0x0E:  /* ADPCM playback rate */
 			m_adpcm_clock_divider = 0x10 - (data & 0x0f);
-			m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
+			m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 			break;
 		case 0x0F:  /* ADPCM and CD audio fade timer */
 			/* TODO: timers needs HW tests */
