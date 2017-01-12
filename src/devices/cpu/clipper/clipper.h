@@ -205,8 +205,12 @@ protected:
 		} fields;
 		uint32_t all;
 	} m_ssw;
-	int32_t m_r[2][16];
-	double m_f[16];
+
+	int32_t *m_r;     // current register file
+	int32_t m_ru[16]; // user register file
+	int32_t m_rs[16]; // supervisor register file
+
+	double m_f[16];   // floating register file
 
 private:
 	address_space_config m_program_config;
