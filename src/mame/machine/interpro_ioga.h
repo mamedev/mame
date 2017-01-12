@@ -59,10 +59,10 @@
 #define IOGA_INTERRUPT_SOFT_HI  5
 
 #define IOGA_DMA_CHANNELS 4
-#define IOGA_DMA_CHANNEL_PLOTTER 0
-#define IOGA_DMA_CHANNEL_SCSI    1
-#define IOGA_DMA_CHANNEL_FLOPPY  2
-#define IOGA_DMA_CHANNEL_SERIAL  3
+#define IOGA_DMA_PLOTTER 0
+#define IOGA_DMA_SCSI    1
+#define IOGA_DMA_FLOPPY  2
+#define IOGA_DMA_SERIAL  3
 
 class interpro_ioga_device : public device_t
 {
@@ -73,8 +73,8 @@ public:
 	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_int_func.set_callback(object); }
 
-	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_r_func[channel].set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_w_func[channel].set_callback(object); }
+	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_r.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_w.set_callback(object); }
 
 	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
 
@@ -98,11 +98,15 @@ public:
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
-	DECLARE_WRITE_LINE_MEMBER(drq);
+	DECLARE_WRITE_LINE_MEMBER(drq_plotter) { drq(state, IOGA_DMA_PLOTTER); }
+	DECLARE_WRITE_LINE_MEMBER(drq_scsi) { drq(state, IOGA_DMA_SCSI); }
+	DECLARE_WRITE_LINE_MEMBER(drq_floppy) { drq(state, IOGA_DMA_FLOPPY); }
 
 	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; }
 	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; }
 	DECLARE_READ32_MEMBER(timer1_r);
+	DECLARE_READ16_MEMBER(arbctl_r) { return m_arbctl; }
+	DECLARE_WRITE16_MEMBER(arbctl_w) { m_arbctl = data; }
 	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
 	DECLARE_READ32_MEMBER(timer3_r);
 
@@ -133,14 +137,15 @@ public:
 	DECLARE_READ16_MEMBER(softint_vector_r) { return m_softint_vector[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
-	DECLARE_READ32_MEMBER(dma_fdc_real_address_r) { return m_dma_fdc_real_address; }
-	DECLARE_WRITE32_MEMBER(dma_fdc_real_address_w) { m_dma_fdc_real_address = data; }
-	DECLARE_READ32_MEMBER(dma_fdc_virtual_address_r) { return m_dma_fdc_virtual_address; }
-	DECLARE_WRITE32_MEMBER(dma_fdc_virtual_address_w) { m_dma_fdc_virtual_address = data; }
-	DECLARE_READ32_MEMBER(dma_fdc_transfer_count_r) { return m_dma_fdc_transfer_count; }
-	DECLARE_WRITE32_MEMBER(dma_fdc_transfer_count_w) { m_dma_fdc_transfer_count = data; }
-	DECLARE_READ32_MEMBER(dma_fdc_control_r) { return m_dma_fdc_control; }
-	DECLARE_WRITE32_MEMBER(dma_fdc_control_w) { m_dma_fdc_control = data; }
+	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_PLOTTER); }
+	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_PLOTTER); }
+	DECLARE_READ32_MEMBER(dma_scsi_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_SCSI); }
+	DECLARE_WRITE32_MEMBER(dma_scsi_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_SCSI); }
+	DECLARE_READ32_MEMBER(dma_floppy_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_FLOPPY); }
+	DECLARE_WRITE32_MEMBER(dma_floppy_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_FLOPPY); }
+
+	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) { return m_dma_plotter_eosl; }
+	DECLARE_WRITE32_MEMBER(dma_plotter_eosl_w) { m_dma_plotter_eosl = data; }
 
 protected:
 	// device-level overrides
@@ -165,11 +170,10 @@ private:
 
 	void update_interrupt(int state);
 
+	void drq(int state, int channel);
+
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
-
-	devcb_read8 m_dma_r_func[IOGA_DMA_CHANNELS];
-	devcb_write8 m_dma_w_func[IOGA_DMA_CHANNELS];
 
 	devcb_write_line m_fdc_tc_func;
 
@@ -191,14 +195,26 @@ private:
 
 	// dma state
 	emu_timer *m_dma_timer;
-	uint32_t m_dma_drq_state;
-	bool m_dma_active;
 
-	// dma fdc registers
-	uint32_t m_dma_fdc_real_address;
-	uint32_t m_dma_fdc_virtual_address;
-	uint32_t m_dma_fdc_transfer_count;
-	uint32_t m_dma_fdc_control;
+	// dma channels
+	struct dma
+	{
+		uint32_t real_address;
+		uint32_t virtual_address;
+		uint32_t transfer_count;
+		uint32_t control;
+
+		bool dma_active;
+		int drq_state;
+		devcb_read8 device_r;
+		devcb_write8 device_w;
+	} m_dma_channel[IOGA_DMA_CHANNELS];
+	uint32_t m_dma_plotter_eosl;
+
+	uint32_t dma_r(address_space &space, offs_t offset, uint32_t mem_mask, int channel);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask, int channel);
+
+	uint16_t m_arbctl;
 };
 
 // device type definition
