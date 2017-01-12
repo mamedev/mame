@@ -12,7 +12,6 @@
 
     TODO:
 
-    - Turtles music is monotonous
     - convert to discrete sound
     - screen pincushion distortion
 
@@ -67,7 +66,7 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
+	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*4) // COP411L-KCN/N, R11=82k, C8=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false)
 	MCFG_COP400_READ_L_CB(READ8(advision_state, sound_cmd_r))
 	MCFG_COP400_WRITE_G_CB(WRITE8(advision_state, sound_g_w))
