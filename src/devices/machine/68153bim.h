@@ -59,13 +59,13 @@
 
 // LOCAL IACK callbacks emulating the INTAL0 and INTAL1 outputs for INTAE requesting a vector from a sub device
 #define MCFG_BIM68153_OUT_IACK0_CB(_devcb)                              \
-	devcb = &bim68153::set_out_iack1_callback(*device, DEVCB_##_devcb);
+	devcb = &bim68153_device::set_out_iack0_callback(*device, DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK1_CB(_devcb)                              \
-	devcb = &bim68153::set_out_iack2_callback(*device, DEVCB_##_devcb);
+	devcb = &bim68153_device::set_out_iack1_callback(*device, DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK2_CB(_devcb)                              \
-	devcb = &bim68153::set_out_iack3_callback(*device, DEVCB_##_devcb);
+	devcb = &bim68153_device::set_out_iack2_callback(*device, DEVCB_##_devcb);
 #define MCFG_BIM68153_OUT_IACK3_CB(_devcb)                              \
-	devcb = &bim68153::set_out_iack3_callback(*device, DEVCB_##_devcb);
+	devcb = &bim68153_device::set_out_iack3_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
