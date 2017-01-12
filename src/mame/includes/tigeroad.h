@@ -8,7 +8,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "video/tigeroad_spr.h"
 
 class tigeroad_state : public driver_device

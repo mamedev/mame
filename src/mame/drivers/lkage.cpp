@@ -604,7 +604,7 @@ ROM_START( lkage )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -634,7 +634,7 @@ ROM_START( lkageo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -664,7 +664,7 @@ ROM_START( lkageoo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -847,7 +847,7 @@ ROM_START( bygone )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a53_07.ic54",   0x0000, 0x8000, CRC(72f69a77) SHA1(dfc1050a4123b3c83ae733ece1b6fe2836beb901) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a51_09.ic53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) /* the same as lkage */
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */

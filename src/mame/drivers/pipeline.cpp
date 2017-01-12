@@ -71,7 +71,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/2203intf.h"
 #include "machine/i8255.h"
 #include "cpu/z80/z80daisy.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 
 
 class pipeline_state : public driver_device

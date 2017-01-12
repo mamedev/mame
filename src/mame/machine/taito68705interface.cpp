@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "machine/taito68705interface.h"
+
+#include "cpu/m6805/m68705.h"
+#include "cpu/z80/z80.h"
 
 /*
    Most Taito 68705s share a similar (often identical) hookup.
@@ -79,7 +81,7 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 
 
 static MACHINE_CONFIG_FRAGMENT( taito68705 )
-	MCFG_CPU_ADD("mcu", M68705_NEW, DERIVED_CLOCK(1,1))
+	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1,1))
 	MCFG_M68705_PORTA_R_CB(READ8(taito68705_mcu_device, mcu_porta_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_porta_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))

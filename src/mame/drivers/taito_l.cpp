@@ -33,7 +33,7 @@ TODO:
 - plgirls doesn't work without a kludge because of an interrupt issue. This
   happens because the program enables interrupts before setting IM2, so the
   interrupt vector is interpreted as IM0, which is obviously bogus.
-- The  puzznic protection is worked around,  but I'm not happy with it
+- The puzznic protection is worked around,  but I'm not happy with it
   (the 68705-returned values are wrong, I'm sure of that).
 - A bunch of control registers are simply ignored
 - The source of   irqs 0 and  1 is  unknown, while  2 is vblank  (0 is
@@ -55,31 +55,37 @@ puzznici note
 */
 
 #include "emu.h"
+#include "includes/taito_l.h"
 #include "includes/taitoipt.h"
-#include "cpu/z80/z80.h"
+
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
+
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/msm5205.h"
-#include "includes/taito_l.h"
 
-static const char * const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
 
-static const struct
+namespace {
+
+char const *const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
+
+struct
 {
 	void (taitol_state::*notifier)(int);
-	uint32_t offset;
-} rambank_modify_notifiers[12] =
+	u32 offset;
+} const rambank_modify_notifiers[12] =
 {
 	{ &taitol_state::taitol_chardef14_m, 0x0000 }, // 14
 	{ &taitol_state::taitol_chardef15_m, 0x1000 }, // 15
 	{ &taitol_state::taitol_chardef16_m, 0x2000 }, // 16
 	{ &taitol_state::taitol_chardef17_m, 0x3000 }, // 17
 
-	{ &taitol_state::taitol_bg18_m, 0x8000 },      // 18
-	{ &taitol_state::taitol_bg19_m, 0x9000 },      // 19
-	{ &taitol_state::taitol_char1a_m, 0xa000 },    // 1a
-	{ &taitol_state::taitol_obj1b_m, 0xb000 },     // 1b
+	{ &taitol_state::taitol_bg18_m,      0x8000 }, // 18
+	{ &taitol_state::taitol_bg19_m,      0x9000 }, // 19
+	{ &taitol_state::taitol_char1a_m,    0xa000 }, // 1a
+	{ &taitol_state::taitol_obj1b_m,     0xb000 }, // 1b
 
 	{ &taitol_state::taitol_chardef1c_m, 0x4000 }, // 1c
 	{ &taitol_state::taitol_chardef1d_m, 0x5000 }, // 1d
@@ -87,29 +93,26 @@ static const struct
 	{ &taitol_state::taitol_chardef1f_m, 0x7000 }, // 1f
 };
 
+u8 const puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
+
+} // anonymous namespace
+
 
 void taitol_state::palette_notifier(int addr)
 {
-	uint8_t *p = m_palette_ram + (addr & ~1);
-	uint8_t byte0 = *p++;
-	uint8_t byte1 = *p;
+	u8 const *const p = m_palette_ram + (addr & ~1);
+	u8 const byte0 = p[0];
+	u8 const byte1 = p[1];
 
 	//  addr &= 0x1ff;
 
 	if (addr > 0x200)
-	{
 		logerror("%s:Large palette ? %03x\n", machine().describe_context(), addr);
-	}
 	else
-	{
-		//      r = g = b = ((addr & 0x1e) != 0)*255;
 		m_palette->set_pen_color(addr / 2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
-	}
 }
 
-static const uint8_t puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
-
-void taitol_state::state_register(  )
+void taitol_state::state_register()
 {
 	save_item(NAME(m_irq_adr_table));
 	save_item(NAME(m_irq_enable));
@@ -139,7 +142,7 @@ void taitol_state::state_register(  )
 	save_item(NAME(m_flipscreen));
 }
 
-MACHINE_START_MEMBER(taitol_state,taito_l)
+MACHINE_START_MEMBER(taitol_state, taito_l)
 {
 	save_item(NAME(m_rambanks));
 	save_item(NAME(m_palette_ram));
@@ -150,14 +153,12 @@ MACHINE_START_MEMBER(taitol_state,taito_l)
 
 void taitol_state::taito_machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		m_irq_adr_table[i] = 0;
 
 	m_irq_enable = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_cur_rambank[i] = 0x80;
 		m_current_notifier[i] = &taitol_state::palette_notifier;
@@ -421,7 +422,7 @@ READ8_MEMBER(taitol_state::rambankswitch_r)
 	return m_cur_rambank[offset];
 }
 
-void taitol_state::bank_w(address_space &space, offs_t offset, uint8_t data, int banknum )
+void taitol_state::bank_w(address_space &space, offs_t offset, u8 data, int banknum )
 {
 	if (m_current_base[banknum][offset] != data)
 	{
@@ -702,7 +703,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	uint8_t *RAM = memregion("audiocpu")->base();
+	u8 *RAM = memregion("audiocpu")->base();
 	int banknum = data & 0x03;
 
 	membank ("bank7")->set_base (&RAM [(banknum * 0x4000)]);
@@ -1715,7 +1716,7 @@ WRITE8_MEMBER(taitol_state::portA_w)
 	if (m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		uint8_t *RAM = memregion("audiocpu")->base();
+		u8 *RAM = memregion("audiocpu")->base();
 
 		m_cur_bank = data & 0x03;
 		bankaddress = m_cur_bank * 0x4000;
@@ -2561,8 +2562,8 @@ ROM_END
 // bits 7..0 => bits 0..7
 DRIVER_INIT_MEMBER(taitol_state,plottinga)
 {
-	uint8_t tab[256];
-	uint8_t *p;
+	u8 tab[256];
+	u8 *p;
 	int i;
 
 	for (i = 0; i < 256; i++)
