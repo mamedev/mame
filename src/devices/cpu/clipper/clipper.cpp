@@ -434,17 +434,33 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x30: 
 		// shaw: shift arithmetic word
 		if (m_r[m_ssw.fields.u][R1] > 0)
+		{
+			int32_t v = m_r[m_ssw.fields.u][R2] >> (31 - m_r[m_ssw.fields.u][R1]);
+
 			m_r[m_ssw.fields.u][R2] <<= m_r[m_ssw.fields.u][R1];
+			FLAGS(0, v != 0 && v != -1, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31))
+		}
 		else
+		{
 			m_r[m_ssw.fields.u][R2] >>= -m_r[m_ssw.fields.u][R1];
+			FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31))
+		}
 		// FLAGS: 0VZN
 		break;
 	case 0x31: 
 		// shal: shift arithmetic longword
 		if (m_r[m_ssw.fields.u][R1] > 0)
+		{
+			int64_t v = ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >> (63 - m_r[m_ssw.fields.u][R1]);
+
 			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] <<= m_r[m_ssw.fields.u][R1];
+			FLAGS(0, v != 0 && v != -1, ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63))
+		}
 		else
+		{
 			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -m_r[m_ssw.fields.u][R1];
+			FLAGS(0, 0, ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63))
+		}
 		// FLAGS: 0VZN
 		break;
 	case 0x32: 
@@ -487,18 +503,34 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x38: 
 		// shai: shift arithmetic immediate
 		if (m_info.op.imm > 0)
+		{
+			int32_t v = m_r[m_ssw.fields.u][R2] >> (31 - m_info.op.imm);
+
 			m_r[m_ssw.fields.u][R2] <<= m_info.op.imm;
+			FLAGS(0, v != 0 && v != -1, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31))
+		}
 		else
+		{
 			m_r[m_ssw.fields.u][R2] >>= -m_info.op.imm;
+			FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31))
+		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
 	case 0x39: 
 		// shali: shift arithmetic longword immediate
 		if (m_info.op.imm > 0)
+		{
+			int64_t v = ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >> (63 - m_info.op.imm);
+
 			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] <<= m_info.op.imm;
+			FLAGS(0, v != 0 && v != -1, ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63))
+		}
 		else
+		{
 			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -m_info.op.imm;
+			FLAGS(0, 0, ((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63))
+		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
