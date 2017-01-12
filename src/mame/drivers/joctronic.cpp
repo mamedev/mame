@@ -234,7 +234,7 @@ WRITE8_MEMBER(joctronic_state::resint_w)
 WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
 {
 	m_soundbank->set_entry((data & 0xc0) >> 6);
-	m_oki->playmode_w(BIT(data, 1) ? MSM5205_S48_4B : MSM5205_S96_4B); // to S1 on MSM5205
+	m_oki->s1_w(BIT(data, 1));
 	m_oki->reset_w(BIT(data, 0));
 }
 
