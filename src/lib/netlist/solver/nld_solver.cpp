@@ -95,13 +95,13 @@ NETLIB_UPDATE(solver)
 	const std::size_t t_cnt = m_mat_solvers.size();
 	if (m_parallel())
 	{
-		omp_set_num_threads(3);
+		//omp_set_num_threads(3);
 		//omp_set_dynamic(0);
 		#pragma omp parallel
 		{
 			#pragma omp for
 			for (int i = 0; i <  t_cnt; i++)
-				if (m_mat_solvers[i]->has_timestep_devices())
+				if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 				{
 					// Ignore return value
 					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
@@ -110,7 +110,7 @@ NETLIB_UPDATE(solver)
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
-			if (m_mat_solvers[i]->has_timestep_devices())
+			if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 			{
 				// Ignore return value
 				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();

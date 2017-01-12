@@ -113,6 +113,8 @@
 
 #if defined(OPENMP)
 #define HAS_OPENMP ( OPENMP >= 200805 )
+#elif defined(_OPENMP)
+#define HAS_OPENMP ( _OPENMP >= 200805 )
 #else
 #define HAS_OPENMP (0)
 #endif
