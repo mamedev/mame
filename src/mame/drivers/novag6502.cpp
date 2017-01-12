@@ -14,7 +14,6 @@
     - sforte/sexpert internal layout button panel
     - verify supercon IRQ and beeper frequency
     - why is sforte H and 1 leds always on?
-    - sforte/sexpert selectable 5/6MHz CPU speed
     - sforte/sexpert optional ACIA (only works in version C?)
     - printer port
 
@@ -29,8 +28,9 @@ Super Constellation Chess Computer (model 844):
 -------------------------------------------------------------------------------
 
 Super Expert (model 878/887/902):
-- 65C02 @ 5 or MHz (10 or 12MHz XTAL)
+- 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
+- HD44780 LCD controller (16x1)
 - beeper(32KHz/32), IRQ(32KHz/128) via MC14060
 - optional R65C51P2 ACIA @ 1.8432MHz, for IBM PC interface
 - printer port, magnetic sensors, 8*8 chessboard leds
@@ -119,6 +119,8 @@ public:
 	HD44780_PIXEL_UPDATE(sexpert_pixel_update);
 	DECLARE_MACHINE_RESET(sexpert);
 	DECLARE_DRIVER_INIT(sexpert);
+	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+	void sexpert_set_cpu_freq();
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
@@ -402,6 +404,12 @@ READ8_MEMBER(novag6502_state::sexpert_input2_r)
 	// d0-d2: printer port
 	// d5-d7: multiplexed inputs (side panel)
 	return ~read_inputs(8) >> 3 & 0xe0;
+}
+
+void novag6502_state::sexpert_set_cpu_freq()
+{
+	// machines were released with either 5MHz or 6MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (XTAL_12MHz/2) : (XTAL_10MHz/2));
 }
 
 MACHINE_RESET_MEMBER(novag6502_state, sexpert)
@@ -698,9 +706,7 @@ static INPUT_PORTS_START( supercon )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( sforte )
-	PORT_INCLUDE( cb_buttons )
-
+static INPUT_PORTS_START( sexy_shared )
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
@@ -740,51 +746,26 @@ static INPUT_PORTS_START( sforte )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, novag6502_state, sexpert_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "5MHz" )
+	PORT_CONFSETTING(    0x01, "6MHz" )
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(novag6502_state::sexpert_cpu_freq)
+{
+	sexpert_set_cpu_freq();
+}
 
 static INPUT_PORTS_START( sexpert )
 	PORT_INCLUDE( cb_magnets )
+	PORT_INCLUDE( sexy_shared )
+INPUT_PORTS_END
 
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
-
-	PORT_MODIFY("IN.1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
-
-	PORT_MODIFY("IN.2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Priority / Tournament Book / Pawn")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Yes/Start / Start of Game")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Trace Forward / AutoPlay")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pro-Op / Restore Game / Rook")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("No/End / End of Game")
-
-	PORT_MODIFY("IN.4")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Clear Board / Delete Pro-Op")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Best Move/Random / Review / Knight")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Print Book / Store Game")
-
-	PORT_MODIFY("IN.5")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Change Color")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Sound / Info / Bishop")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Print Moves / Print Evaluations")
-
-	PORT_MODIFY("IN.6")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Verify/Set Up / Pro-Op Book/Both Books")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Solve Mate / Infinite / Queen")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Print List / Acc. Time")
-
-	PORT_MODIFY("IN.7")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
+static INPUT_PORTS_START( sforte )
+	PORT_INCLUDE( cb_buttons )
+	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 
 
@@ -814,7 +795,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sexpert, novag6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
 	MCFG_CPU_PROGRAM_MAP(sexpert_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_nsec(21500)) // active for 21.5us
