@@ -229,10 +229,10 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MONITOR_RETRO);
 #endif
 
+#ifndef __LIBRETRO__
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
 #endif
-#ifndef __LIBRETRO__
 #ifndef OSD_MINI
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
