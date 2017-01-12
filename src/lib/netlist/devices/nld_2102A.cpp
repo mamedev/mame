@@ -38,7 +38,7 @@ namespace netlist
 
 		logic_output_t m_DO;
 
-		state_var<uint_fast8_t[128]> m_ram; // 1024x1 bits
+		state_var<uint8_t[128]> m_ram; // 1024x1 bits
 		param_ptr_t m_RAM;
 	};
 
@@ -81,8 +81,8 @@ namespace netlist
 
 			if (!m_RWQ())
 			{
-				m_ram[byte] &= ~(static_cast<uint_fast8_t>(1)      << bit);
-				m_ram[byte] |=  (static_cast<uint_fast8_t>(m_DI()) << bit);
+				m_ram[byte] &= ~(static_cast<uint8_t>(1)      << bit);
+				m_ram[byte] |=  (static_cast<uint8_t>(m_DI()) << bit);
 			}
 
 			m_DO.push((m_ram[byte] >> bit) & 1, max_delay);

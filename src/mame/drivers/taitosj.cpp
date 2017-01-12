@@ -168,7 +168,7 @@ TODO:
 #include "emu.h"
 #include "includes/taitosj.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/watchdog.h"
 
 

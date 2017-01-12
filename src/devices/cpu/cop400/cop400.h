@@ -191,6 +191,19 @@ protected:
 	devcb_write_line m_write_sk;
 	devcb_read_line m_read_cko;
 
+	enum {
+		COP410_FEATURE = 0x01,
+		COP420_FEATURE = 0x02,
+		COP444_FEATURE = 0x04,
+		COP440_FEATURE = 0x08
+	};
+
+	enum {
+		TIMER_SERIAL,
+		TIMER_COUNTER,
+		TIMER_INIL
+	};
+
 	cop400_cki_bond m_cki;
 	cop400_cko_bond m_cko;
 	bool m_has_microbus;
@@ -251,23 +264,17 @@ protected:
 
 	typedef void ( cop400_cpu_device::*cop400_opcode_func ) (uint8_t opcode);
 
-	/* The opcode table now is a combination of cycle counts and function pointers */
-	struct cop400_opcode_map {
-		uint32_t cycles;
-		cop400_opcode_func function;
-	};
+	const cop400_opcode_func *m_opcode_map;
 
-	const cop400_opcode_map *m_opcode_map;
-
-	static const cop400_opcode_map COP410_OPCODE_23_MAP[256];
-	static const cop400_opcode_map COP410_OPCODE_33_MAP[256];
-	static const cop400_opcode_map COP410_OPCODE_MAP[256];
-	static const cop400_opcode_map COP420_OPCODE_23_MAP[256];
-	static const cop400_opcode_map COP420_OPCODE_33_MAP[256];
-	static const cop400_opcode_map COP420_OPCODE_MAP[256];
-	static const cop400_opcode_map COP444_OPCODE_23_MAP[256];
-	static const cop400_opcode_map COP444_OPCODE_33_MAP[256];
-	static const cop400_opcode_map COP444_OPCODE_MAP[256];
+	static const cop400_opcode_func COP410_OPCODE_23_MAP[256];
+	static const cop400_opcode_func COP410_OPCODE_33_MAP[256];
+	static const cop400_opcode_func COP410_OPCODE_MAP[256];
+	static const cop400_opcode_func COP420_OPCODE_23_MAP[256];
+	static const cop400_opcode_func COP420_OPCODE_33_MAP[256];
+	static const cop400_opcode_func COP420_OPCODE_MAP[256];
+	static const cop400_opcode_func COP444_OPCODE_23_MAP[256];
+	static const cop400_opcode_func COP444_OPCODE_33_MAP[256];
+	static const cop400_opcode_func COP444_OPCODE_MAP[256];
 
 	void serial_tick();
 	void counter_tick();
@@ -277,6 +284,8 @@ protected:
 	void POP();
 	void WRITE_Q(uint8_t data);
 	void WRITE_G(uint8_t data);
+
+	uint8_t fetch();
 
 	void illegal(uint8_t opcode);
 	void asc(uint8_t opcode);

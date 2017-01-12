@@ -60,8 +60,6 @@ ToDo:
 #include "sound/speaker.h"
 #include "machine/wd_fdc.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class v6809_state : public driver_device
 {
 public:
@@ -323,7 +321,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(v6809_state, kbd_put))
 
 // port A = drive select and 2 control lines ; port B = keyboard

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "includes/arkanoid.h"
-#include "cpu/m6805/m6805.h"
 
 
 /* To log specific reads and writes of the bootlegs */

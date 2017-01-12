@@ -55,11 +55,10 @@ Notes:
 - sprtmtch and drgpunch are "clones", but the gfx are very different; sprtmtch
   is a trimmed down version, without all animations between levels.
 
-- according to the readme, mjfriday should have a M5205. However there don't seem to be
-  accesses to it, and looking at the ROMs I don't see ADPCM data. Note that apart from a
-  minor difference in the memory map mjfriday and mjdialq2 are identical, and mjdialq2
-  doesn't have a 5205 either. Therefore, I think it's either a mistake in the readme or
-  the chip is on the board but unused.
+- according to the readme, mjfriday should have a M5205. However the program ROMs don't
+  seem to make accesses to it or contain ADPCM data for it, and photos of the game's
+  PCB don't even show an unpopulated location for one. Note that gekisha and mjdialq2,
+  which run on similar hardware, also lack 5205s. Likely it's a mistake in the readme.
 
 TODO:
 
@@ -5287,7 +5286,7 @@ Mahjong Friday
 D2607198L1
 
 CPU  : Zilog Z0840006PSC (Z80)
-Sound: YM2413 M5205
+Sound: YM2413
 OSC  : 24MHz (X1)
 
 CRT Controller: HD46505SP (6845)

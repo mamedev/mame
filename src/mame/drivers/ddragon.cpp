@@ -55,7 +55,7 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
@@ -281,7 +281,6 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 
 		case 3: /* 380e - SND IRQ and latch */
 			m_soundlatch->write(space, 0, data);
-			m_soundcpu->set_input_line(m_sound_irq, ASSERT_LINE);
 			break;
 
 		case 4: /* 380f - MCU IRQ */
@@ -320,13 +319,6 @@ WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 WRITE_LINE_MEMBER(ddragon_state::irq_handler)
 {
 	m_soundcpu->set_input_line(m_ym_irq, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-READ8_MEMBER(ddragon_state::soundlatch_ack_r)
-{
-	m_soundcpu->set_input_line(m_sound_irq, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
 }
 
 
@@ -582,7 +574,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_ack_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(dd_adpcm_w)
@@ -595,7 +587,7 @@ static ADDRESS_MAP_START( dd2_sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_ack_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -977,6 +969,7 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
@@ -1046,6 +1039,7 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
@@ -1098,6 +1092,7 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
@@ -2082,7 +2077,6 @@ ROM_END
 DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 {
 	m_sprite_irq = INPUT_LINE_NMI;
-	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 }
@@ -2091,7 +2085,6 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 {
 	m_sprite_irq = INPUT_LINE_NMI;
-	m_sound_irq = INPUT_LINE_NMI;
 	m_ym_irq = 0;
 	m_technos_video_hw = 2;
 }
@@ -2100,7 +2093,6 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 {
 	m_sprite_irq = INPUT_LINE_NMI;
-	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),this));
@@ -2112,7 +2104,6 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 	int i, length;
 	uint8_t *rom;
 
-	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),this));
@@ -2167,7 +2158,6 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
 	}
 
 	m_sprite_irq = INPUT_LINE_NMI;
-	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 }

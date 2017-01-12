@@ -74,8 +74,6 @@ NETLIB_RESET(OPAMP)
 
 		m_EBUF->m_G.setTo(1.0);
 		m_EBUF->m_RO.setTo(m_model.model_value("RO"));
-		m_DP->m_model.setTo("D(IS=1e-15 N=1)");
-		m_DN->m_model.setTo("D(IS=1e-15 N=1)");
 
 		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");

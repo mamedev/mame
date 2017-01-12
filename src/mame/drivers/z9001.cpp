@@ -39,8 +39,6 @@ ToDo:
 // temporary
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class z9001_state : public driver_device
 {
 public:
@@ -227,7 +225,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 

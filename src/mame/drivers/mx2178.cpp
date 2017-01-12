@@ -26,8 +26,6 @@
 #include "machine/clock.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class mx2178_state : public driver_device
 {
 public:
@@ -181,7 +179,7 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 
 	/// TODO: hook up acia to keyboard and memory map
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mx2178_state, kbd_put))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 614400)

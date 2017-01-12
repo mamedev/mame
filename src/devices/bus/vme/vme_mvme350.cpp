@@ -214,14 +214,14 @@ const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 
 vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_vme_p1_card_interface(mconfig, *this)
+		device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VME_MVME350, "Motorola MVME-350 Intelligent Tape Controller", tag, owner, clock, "mvme350", __FILE__),
-	device_vme_p1_card_interface(mconfig, *this)
+	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
@@ -229,7 +229,7 @@ vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, 
 void vme_mvme350_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_p1_device();
+	set_vme_device();
 
 	/* Setup r/w handlers for shared memory area */
 #if 0
@@ -243,9 +243,9 @@ void vme_mvme350_card_device::device_start()
 	  ---------------------------------------------------
 	*/
 	uint32_t base = 0xFFFF5000;
-	m_vme_p1->install_device(base + 0, base + 1, // Channel B - Data
+	m_vme->install_device(base + 0, base + 1, // Channel B - Data
 							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("pit")), 0x00ff);
-	m_vme_p1->install_device(base + 2, base + 3, // Channel B - Control
+	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("pit")), 0x00ff);
 #endif
 

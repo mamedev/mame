@@ -925,35 +925,59 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	if (buffer.compare("rshift") == 0)
 		{ token.configure_operator(TVL_RSHIFT, 5); return; }
 
-	// if we have an 0x prefix, we must be a hex value
-	if (buffer[0] == '0' && buffer[1] == 'x')
-		return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
-
+	switch (buffer[0])
+	{
 	// if we have a # prefix, we must be a decimal value
-	if (buffer[0] == '#')
+	case '#':
 		return parse_number(token, buffer.c_str() + 1, 10, expression_error::INVALID_NUMBER);
 
 	// if we have a $ prefix, we are a hex value
-	if (buffer[0] == '$')
+	case '$':
 		return parse_number(token, buffer.c_str() + 1, 16, expression_error::INVALID_NUMBER);
 
-	// check for a symbol match
-	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
-	if (symbol != nullptr)
-	{
-		token.configure_symbol(*symbol);
-
-		// if this is a function symbol, synthesize an execute function operator
-		if (symbol->is_function())
+	case '0':
+		switch (buffer[1])
 		{
-			parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
-			newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
-		}
-		return;
-	}
+		// if we have an 0x prefix, we must be a hex value
+		case 'x':
+		case 'X':
+			return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
 
-	// attempt to parse as a number in the default base
-	parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+		// if we have an 0o prefix, we must be an octal value
+		case 'o':
+		case 'O':
+			return parse_number(token, buffer.c_str() + 2, 8, expression_error::INVALID_NUMBER);
+
+		// if we have an 0b prefix, we must be a binary value
+		case 'b':
+		case 'B':
+			return parse_number(token, buffer.c_str() + 2, 2, expression_error::INVALID_NUMBER);
+
+		// TODO: for octal address spaces, treat 0123 as octal
+		default:
+			; // fall through
+		}
+		// fall through
+
+	default:
+		// check for a symbol match
+		symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
+		if (symbol != nullptr)
+		{
+			token.configure_symbol(*symbol);
+
+			// if this is a function symbol, synthesize an execute function operator
+			if (symbol->is_function())
+			{
+				parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+				newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
+			}
+			return;
+		}
+
+		// attempt to parse as a number in the default base
+		parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+	}
 }
 
 

@@ -110,6 +110,9 @@ const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
 // ALPS 5.25" drives
 const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
 
+// IBM 8" drives
+const device_type IBM_6360 = &device_creator<ibm_6360>;
+
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -596,6 +599,7 @@ void floppy_image_device::index_resync()
 		if(idx && ready) {
 			ready_counter--;
 			if(!ready_counter) {
+				// logerror("Drive spun up\n");
 				ready = false;
 				if(!cur_ready_cb.isnull())
 					cur_ready_cb(this, ready);
@@ -627,6 +631,9 @@ bool floppy_image_device::twosid_r()
 
 void floppy_image_device::stp_w(int state)
 {
+	// Before spin-up is done, ignore step pulses
+	if (ready_counter > 0) return;
+
 	if ( stp != state ) {
 		stp = state;
 		if ( stp == 0 ) {
@@ -748,7 +755,8 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
-	if(!image || mon)
+	// If the drive is still spinning up, pretend that no transitions will come
+	if(!image || mon || ready_counter > 0)
 		return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
@@ -2253,3 +2261,34 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
+
+//-------------------------------------------------
+//  IBM 6360 -- 8" single-sided single density
+//-------------------------------------------------
+
+ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+{
+}
+
+ibm_6360::~ibm_6360()
+{
+}
+
+//ol ibm_6360::trk00_r() { return true; }
+
+void ibm_6360::setup_characteristics()
+{
+	form_factor = floppy_image::FF_8;
+	tracks = 77;
+	sides = 1;
+	motor_always_on = true;
+	set_rpm(360);
+}
+
+void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+}
+

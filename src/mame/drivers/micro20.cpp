@@ -55,9 +55,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(h4_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
+	
+	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_4, state);
+	}
 
 private:
 	u8 m_tin;
+	u8 m_h4;
 };
 
 void micro20_state::machine_start()
@@ -80,13 +86,18 @@ void micro20_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 {
-	m_pit->update_tin(m_tin);
+	m_pit->update_tin(m_tin ? ASSERT_LINE : CLEAR_LINE);
+	if ((!m_h4) && (m_tin))
+	{
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
 	m_tin ^= 1;
 }
 
 WRITE_LINE_MEMBER(micro20_state::h4_w)
 {
 	printf("h4_w: %d\n", state);
+	m_h4 = state ^ 1;
 }
 
 WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
@@ -155,6 +166,7 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
+	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE(micro20_state, timerirq_w))
 	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w))
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(micro20_state, portb_w))
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(micro20_state, portc_w))

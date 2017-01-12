@@ -37,45 +37,48 @@ Stephh's notes (based on the game Z80 code and some tests) :
  *
  *************************************/
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_nmi_enable_w)
+WRITE8_MEMBER(munchmo_state::nmi_enable_w)
 {
 	m_nmi_enable = data;
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
-INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
+void munchmo_state::vblank_irq(screen_device &screen, bool vblank_state)
 {
-	if (m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (vblank_state)
+	{
+		if (m_nmi_enable)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
 }
 
-INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
+IRQ_CALLBACK_MEMBER(munchmo_state::generic_irq_ack)
 {
-	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	device.execute().set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
+WRITE8_MEMBER(munchmo_state::nmi_ack_w)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
-
 
 WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(munchmo_state::munchmo_ay1reset_r)
+READ8_MEMBER(munchmo_state::ay1reset_r)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	ay8910->reset_w(space,0,0);
 	return 0;
 }
 
-READ8_MEMBER(munchmo_state::munchmo_ay2reset_r)
+READ8_MEMBER(munchmo_state::ay2reset_r)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	ay8910->reset_w(space,0,0);
@@ -96,19 +99,20 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
 	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_SHARE("status_vram")
-	AM_RANGE(0xbe00, 0xbe00) AM_WRITE(mnchmobl_soundlatch_w)
-	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(mnchmobl_palette_bank_w)
+	AM_RANGE(0xbe00, 0xbe00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(palette_bank_w)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
 	AM_RANGE(0xbe03, 0xbe03) AM_READ_PORT("DSW2")
 	AM_RANGE(0xbe11, 0xbe11) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe21, 0xbe21) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
-	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
-	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_SHARE("vreg") /* MY0 1-8C */
+	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(nmi_enable_w) // ENI 1-10C
+	AM_RANGE(0xbf00, 0xbf00) AM_WRITE(nmi_ack_w) // CNI 1-8C
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
+	AM_RANGE(0xbf04, 0xbf07) AM_WRITEONLY AM_SHARE("vreg") // MY0 1-8C
 ADDRESS_MAP_END
 
 /* memory map provided thru schematics */
@@ -119,9 +123,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(munchmo_ay1reset_r) AM_DEVWRITE("ay1", ay8910_device, reset_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(munchmo_ay2reset_r) AM_DEVWRITE("ay2", ay8910_device, reset_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(sound_nmi_ack_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(ay1reset_r) AM_DEVWRITE("ay1", ay8910_device, reset_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READ(ay2reset_r) AM_DEVWRITE("ay2", ay8910_device, reset_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(sound_nmi_ack_w) // NCL 1-8H
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM // is mirror ok?
 ADDRESS_MAP_END
 
@@ -320,14 +324,13 @@ void munchmo_state::machine_reset()
 static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) // from pin 13 of XTAL-driven 163
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", munchmo_state,  mnchmobl_vblank_irq)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/8) // from pin 12 of XTAL-driven 163
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", munchmo_state,  mnchmobl_sound_irq)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,7 +338,8 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256+32+32, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update_mnchmobl)
+	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(munchmo_state, vblank_irq)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)
@@ -346,12 +350,15 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_15MHz/4/2)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_15MHz/8)
+	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_15MHz/4/2)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_15MHz/8)
+	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

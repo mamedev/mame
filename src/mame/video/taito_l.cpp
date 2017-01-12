@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state,taitol)
+VIDEO_START_MEMBER(taitol_state, taito_l)
 {
 	int i;
 
@@ -83,7 +83,7 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
+WRITE8_MEMBER(horshoes_state::bankg_w)
 {
 	if (m_horshoes_gfxbank != data)
 	{
@@ -231,7 +231,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 	int offs;
 
 	/* at spriteram + 0x3f0 and 03f8 are the tilemap control registers; spriteram + 0x3e8 seems to be unused */
-	for (offs = 0; offs < TAITOL_SPRITERAM_SIZE - 3 * 8; offs += 8)
+	for (offs = 0; offs < SPRITERAM_SIZE - 3 * 8; offs += 8)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
@@ -315,6 +315,6 @@ void taitol_state::screen_eof_taitol(screen_device &screen, bool state)
 	{
 		uint8_t *spriteram = m_rambanks + 0xb000;
 
-		memcpy(m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
+		memcpy(m_buff_spriteram, spriteram, SPRITERAM_SIZE);
 	}
 }

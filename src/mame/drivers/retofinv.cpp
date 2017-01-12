@@ -32,7 +32,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/retofinv.h"

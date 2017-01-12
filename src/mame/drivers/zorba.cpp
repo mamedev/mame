@@ -56,7 +56,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 #include "machine/i8251.h"
 #include "machine/6821pia.h"
 #include "machine/z80dma.h"

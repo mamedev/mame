@@ -7,14 +7,15 @@
 #include "plib/plists.h"
 #include "plib/pstream.h"
 #include "nl_setup.h"
+#include <memory>
 
 class nlwav_options_t : public plib::options
 {
 public:
 	nlwav_options_t() :
 		plib::options(),
-		opt_inp(*this,  "i", "input",       "",      "input file"),
-		opt_out(*this,  "o", "output",      "",      "output file"),
+		opt_inp(*this,  "i", "input",       "-",      "input file"),
+		opt_out(*this,  "o", "output",      "-",      "output file"),
 		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction"),
 		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
 		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
@@ -30,12 +31,24 @@ public:
 	plib::option_bool   opt_help;
 };
 
+plib::pstdin pin_strm;
 plib::pstdout pout_strm;
 plib::pstderr perr_strm;
 
 plib::pstream_fmt_writer_t pout(pout_strm);
 plib::pstream_fmt_writer_t perr(perr_strm);
 
+nlwav_options_t opts;
+
+/* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
+ * The most compatible way to make a wav header for unknown length is to put
+ * 0xffffffff in the header. 0 as the RIFF length and 0 as the data chunk length
+ * is a common agreement in serious recording applications while
+ * still recording the file. So a playback application can determine that the
+ * given file is still being recorded. As soon as the recording application
+ * finishes the ongoing recording, it writes the correct values for RIFF lenth
+ * and data chunk length to the file.
+ */
 /* http://de.wikipedia.org/wiki/RIFF_WAVE */
 class wav_t
 {
@@ -49,12 +62,16 @@ public:
 	}
 	~wav_t()
 	{
-		m_f.seek(0);
-		m_f.write(&m_fh, sizeof(m_fh));
-		m_f.write(&m_fmt, sizeof(m_fmt));
+		if (m_f.seekable())
+		{
+			m_fh.filelen = m_data.len + sizeof(m_data) + sizeof(m_fh) + sizeof(m_fmt) - 8;
+			m_f.seek(0);
+			m_f.write(&m_fh, sizeof(m_fh));
+			m_f.write(&m_fmt, sizeof(m_fmt));
 
-		//data.len = fmt.block_align * n;
-		m_f.write(&m_data, sizeof(m_data));
+			//data.len = fmt.block_align * n;
+			m_f.write(&m_data, sizeof(m_data));
+		}
 	}
 
 	unsigned channels() { return m_fmt.channels; }
@@ -63,44 +80,44 @@ public:
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
-		short ps = static_cast<short>(sample); /* 16 bit sample, FIXME: Endianess? */
+		int16_t ps = static_cast<int16_t>(sample); /* 16 bit sample, FIXME: Endianess? */
 		m_f.write(&ps, sizeof(ps));
 	}
 
 private:
 	struct riff_chunk_t
 	{
-		char        group_id[4];
-		unsigned    filelen;
-		char        rifftype[4];
+		uint8_t    group_id[4];
+		uint32_t   filelen;
+		uint8_t    rifftype[4];
 	};
 
 	struct riff_format_t
 	{
-		char                signature[4];
-		unsigned            fmt_length;
-		short               format_tag;
-		unsigned short      channels;
-		unsigned            sample_rate;
-		unsigned            bytes_per_second;
-		unsigned short      block_align;
-		unsigned short      bits_sample;
+		uint8_t             signature[4];
+		uint32_t            fmt_length;
+		uint16_t            format_tag;
+		uint16_t            channels;
+		uint32_t            sample_rate;
+		uint32_t            bytes_per_second;
+		uint16_t            block_align;
+		uint16_t            bits_sample;
 	};
 
 	struct riff_data_t
 	{
-		char        signature[4];
-		unsigned    len;
+		uint8_t     signature[4];
+		uint32_t    len;
 		// data follows
 	};
 
 	void initialize(unsigned sr)
 	{
-		std::strncpy(m_fh.group_id, "RIFF", 4);
-		m_fh.filelen = 0; // Fixme
-		std::strncpy(m_fh.rifftype, "WAVE", 4);
+		std::memcpy(m_fh.group_id, "RIFF", 4);
+		m_fh.filelen = 0x0; // Fixme
+		std::memcpy(m_fh.rifftype, "WAVE", 4);
 
-		std::strncpy(m_fmt.signature, "fmt ", 4);
+		std::memcpy(m_fmt.signature, "fmt ", 4);
 		m_fmt.fmt_length = 16;
 		m_fmt.format_tag = 0x0001; //PCM
 		m_fmt.channels = 1;
@@ -109,8 +126,10 @@ private:
 		m_fmt.block_align = m_fmt.channels * ((m_fmt.bits_sample + 7) / 8);
 		m_fmt.bytes_per_second = m_fmt.sample_rate * m_fmt.block_align;
 
-		std::strncpy(m_data.signature, "data", 4);
-		m_data.len = m_fmt.bytes_per_second * 2 * 0;
+		std::memcpy(m_data.signature, "data", 4);
+		//m_data.len = m_fmt.bytes_per_second * 2 * 0;
+		/* force "play" to play and warn about eof instead of being silent */
+		m_data.len = (m_f.seekable() ? 0 : 0xffffffff);
 
 	}
 
@@ -122,14 +141,13 @@ private:
 
 };
 
-static void convert(nlwav_options_t &opts)
+static void convert()
 {
-	plib::pofilestream fo(opts.opt_out());
-	wav_t wo(fo, 48000);
+	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : new plib::pofilestream(opts.opt_out()));
+	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : new plib::pifilestream(opts.opt_inp()));
+	wav_t *wo = new wav_t(*fo, 48000);
 
-	plib::pifilestream fin(opts.opt_inp());
-
-	double dt = 1.0 / static_cast<double>(wo.sample_rate());
+	double dt = 1.0 / static_cast<double>(wo->sample_rate());
 	double ct = dt;
 	//double mean = 2.4;
 	double amp = opts.opt_amp();
@@ -144,7 +162,7 @@ static void convert(nlwav_options_t &opts)
 	//short sample = 0;
 	pstring line;
 
-	while(fin.readline(line))
+	while(fin->readline(line))
 	{
 #if 1
 		double t = 0.0; double v = 0.0;
@@ -160,12 +178,12 @@ static void convert(nlwav_options_t &opts)
 				minsam = std::min(minsam, outsam);
 				n++;
 				//mean = means / (double) n;
-				mean += 5.0 / static_cast<double>(wo.sample_rate()) * (outsam - mean);
+				mean += 5.0 / static_cast<double>(wo->sample_rate()) * (outsam - mean);
 			}
 			outsam = (outsam - mean) * amp;
 			outsam = std::max(-32000.0, outsam);
 			outsam = std::min(32000.0, outsam);
-			wo.write_sample(static_cast<int>(outsam));
+			wo->write_sample(static_cast<int>(outsam));
 			outsam = 0.0;
 			lt = ct;
 			ct += dt;
@@ -194,13 +212,22 @@ static void convert(nlwav_options_t &opts)
 		//printf("%f %f\n", t, v);
 #endif
 	}
-	pout("Mean (low freq filter): {}\n", mean);
-	pout("Mean (static):          {}\n", means / static_cast<double>(n));
-	pout("Amp + {}\n", 32000.0 / (maxsam- mean));
-	pout("Amp - {}\n", -32000.0 / (minsam- mean));
+	delete wo;
+	if (opts.opt_inp() != "-")
+		delete fin;
+	if (opts.opt_out() != "-")
+		delete fo;
+
+	if (!opts.opt_quiet())
+	{
+		perr("Mean (low freq filter): {}\n", mean);
+		perr("Mean (static):          {}\n", means / static_cast<double>(n));
+		perr("Amp + {}\n", 32000.0 / (maxsam- mean));
+		perr("Amp - {}\n", -32000.0 / (minsam- mean));
+	}
 }
 
-static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
+static void usage(plib::pstream_fmt_writer_t &fw)
 {
 	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
 			"nltool [options]").c_str());
@@ -209,19 +236,18 @@ static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
 
 int main(int argc, char *argv[])
 {
-	nlwav_options_t opts;
 	int ret;
 
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		perr("Error parsing {}\n", argv[ret]);
-		usage(perr, opts);
+		usage(perr);
 		return 1;
 	}
 
 	if (opts.opt_help())
 	{
-		usage(pout, opts);
+		usage(pout);
 		return 0;
 	}
 
@@ -237,7 +263,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	convert(opts);
+	convert();
 
 	return 0;
 }

@@ -64,14 +64,18 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8, vcs80_state )
-	AM_RANGE(0x0000, 0x01ff) AM_ROM
+static ADDRESS_MAP_START( vcs80_bd_mem, AS_PROGRAM, 8, vcs80_state )
+	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8, vcs80_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vcs80_io, AS_IO, 8, vcs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(pio_r, pio_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -226,6 +230,13 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
+	
+	/* bankdev */
+	MCFG_DEVICE_ADD("bdmem", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vcs80_bd_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -235,23 +246,7 @@ ROM_START( vcs80 )
 	ROM_LOAD( "monitor.rom", 0x0000, 0x0200, CRC(44aff4e9) SHA1(3472e5a9357eaba3ed6de65dee2b1c6b29349dd2) )
 ROM_END
 
-/* Driver Initialization */
-
-DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
-{
-	/* _A0 is connected to PIO PB7 */
-	m_pio->port_b_write((!BIT(address, 0)) << 7);
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(vcs80_state,vcs80)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&vcs80_state::vcs80_direct_update_handler, this));
-	m_maincpu->space(AS_IO).set_direct_update_handler(direct_update_delegate(&vcs80_state::vcs80_direct_update_handler, this));
-}
-
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME    FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80, vcs80_state,  vcs80, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80, driver_device, 0, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

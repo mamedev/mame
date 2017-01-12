@@ -48,11 +48,6 @@
 
     TODO:
 
-    - remove InstLen
-    - run interrupt test suite
-    - run production test suite
-    - run microbus test suite
-    - when is the microbus int cleared?
     - opcode support for 2048x8 and 128x4/160x4 memory sizes
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
@@ -87,12 +82,6 @@ const device_type COP445 = &device_creator<cop445_cpu_device>;
 ***************************************************************************/
 
 #define LOG_MICROBUS 0
-
-/* feature masks */
-#define COP410_FEATURE  0x01
-#define COP420_FEATURE  0x02
-#define COP444_FEATURE  0x04
-#define COP440_FEATURE  0x08
 
 
 /***************************************************************************
@@ -348,7 +337,7 @@ void cop400_cpu_device::WRITE_G(uint8_t data)
 ***************************************************************************/
 
 #define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(uint8_t opcode)
-#define INST(mnemonic) &cop400_cpu_device::mnemonic
+#define OP(mnemonic) &cop400_cpu_device::mnemonic
 
 INSTRUCTION(illegal)
 {
@@ -361,398 +350,399 @@ INSTRUCTION(illegal)
     OPCODE TABLES
 ***************************************************************************/
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_23_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP410_OPCODE_23_MAP[256] =
 {
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(xad)       },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(xad)       ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
 void cop400_cpu_device::cop410_op23(uint8_t opcode)
 {
-	uint8_t opcode23 = ROM(PC++);
+	uint8_t opcode23 = fetch();
 
-	(this->*COP410_OPCODE_23_MAP[opcode23].function)(opcode23);
+	(this->*COP410_OPCODE_23_MAP[opcode23])(opcode23);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_33_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP410_OPCODE_33_MAP[256] =
 {
-	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(halt)        },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(illegal)   },
+	OP(illegal)     , OP(skgbz0)    , OP(illegal)   , OP(skgbz2)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgbz1)    , OP(illegal)   , OP(skgbz3)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgz)      , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(ing)       , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(inl)       , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(halt)        , OP(illegal)   , OP(omg)       , OP(illegal)   , OP(camq)      , OP(illegal)   , OP(obd)       , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
 void cop400_cpu_device::cop410_op33(uint8_t opcode)
 {
-	uint8_t opcode33 = ROM(PC++);
+	uint8_t opcode33 = fetch();
 
-	(this->*COP410_OPCODE_33_MAP[opcode33].function)(opcode33);
+	(this->*COP410_OPCODE_33_MAP[opcode33])(opcode33);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP410_OPCODE_MAP[256] =
 {
-	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{0, INST(illegal)     },{1, INST(skmbz1)    },{0, INST(illegal)   },{1, INST(skmbz3)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop410_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop410_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(clra)        , OP(skmbz0)    , OP(xor_)      , OP(skmbz2)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(illegal)     , OP(skmbz1)    , OP(illegal)   , OP(skmbz3)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop410_op23)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(asc)         , OP(add)       , OP(rc)        , OP(cop410_op33)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
-	{1, INST(comp)        },{0, INST(illegal)   },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
-	{1, INST(ret)         },{1, INST(retsk)     },{0, INST(illegal)   },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
-	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{2, INST(jmp)         },{2, INST(jmp)       },{0, INST(illegal)   },{0, INST(illegal)       },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
-	{2, INST(jsr)         },{2, INST(jsr)       },{0, INST(illegal)   },{0, INST(illegal)       },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	OP(comp)        , OP(illegal)   , OP(rmb2)      , OP(rmb3)          , OP(nop)       , OP(rmb1)      , OP(smb2)      , OP(smb1)      ,
+	OP(ret)         , OP(retsk)     , OP(illegal)   , OP(smb3)          , OP(rmb0)      , OP(smb0)      , OP(cba)       , OP(xas)       ,
+	OP(cab)         , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(aisc)        , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(jmp)         , OP(jmp)       , OP(illegal)   , OP(illegal)       , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(jsr)         , OP(jsr)       , OP(illegal)   , OP(illegal)       , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(lqid)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jid)
 };
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_23_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP420_OPCODE_23_MAP[256] =
 {
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
 void cop400_cpu_device::cop420_op23(uint8_t opcode)
 {
-	uint8_t opcode23 = ROM(PC++);
+	uint8_t opcode23 = fetch();
 
-	(this->*COP420_OPCODE_23_MAP[opcode23].function)(opcode23);
+	(this->*COP420_OPCODE_23_MAP[opcode23])(opcode23);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_33_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP420_OPCODE_33_MAP[256] =
 {
-	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(inin)        },{1, INST(inil)      },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(cqma)      },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(illegal)   },
+	OP(illegal)     , OP(skgbz0)    , OP(illegal)   , OP(skgbz2)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgbz1)    , OP(illegal)   , OP(skgbz3)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgz)      , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(inin)        , OP(inil)      , OP(ing)       , OP(illegal)   , OP(cqma)      , OP(illegal)   , OP(inl)       , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(omg)       , OP(illegal)   , OP(camq)      , OP(illegal)   , OP(obd)       , OP(illegal)   ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
-	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(ogi)         , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       ,
+	OP(ogi)         , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)
 };
 
 void cop400_cpu_device::cop420_op33(uint8_t opcode)
 {
-	uint8_t opcode33 = ROM(PC++);
+	uint8_t opcode33 = fetch();
 
-	(this->*COP420_OPCODE_33_MAP[opcode33].function)(opcode33);
+	(this->*COP420_OPCODE_33_MAP[opcode33])(opcode33);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP420_OPCODE_MAP[256] =
 {
-	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(casc)        },{1, INST(skmbz1)    },{1, INST(xabr)      },{1, INST(skmbz3)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop420_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop420_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(clra)        , OP(skmbz0)    , OP(xor_)      , OP(skmbz2)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(casc)        , OP(skmbz1)    , OP(xabr)      , OP(skmbz3)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop420_op23)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(asc)         , OP(add)       , OP(rc)        , OP(cop420_op33)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
-	{1, INST(comp)        },{1, INST(skt)       },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
-	{1, INST(cop420_ret)  },{1, INST(retsk)     },{1, INST(adt)       },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
-	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{2, INST(jmp)         },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)           },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
-	{2, INST(jsr)         },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)           },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	OP(comp)        , OP(skt)       , OP(rmb2)      , OP(rmb3)          , OP(nop)       , OP(rmb1)      , OP(smb2)      , OP(smb1)      ,
+	OP(cop420_ret)  , OP(retsk)     , OP(adt)       , OP(smb3)          , OP(rmb0)      , OP(smb0)      , OP(cba)       , OP(xas)       ,
+	OP(cab)         , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(aisc)        , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(jmp)         , OP(jmp)       , OP(jmp)       , OP(jmp)           , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(jsr)         , OP(jsr)       , OP(jsr)       , OP(jsr)           , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(lqid)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jid)
 };
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_23_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444_OPCODE_23_MAP[256] =
 {
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
 
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
-	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
+	OP(ldd)         , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       , OP(ldd)       ,
 
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
 
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
-	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       ,
+	OP(xad)         , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)       , OP(xad)
 };
 
 void cop400_cpu_device::cop444_op23(uint8_t opcode)
 {
-	uint8_t opcode23 = ROM(PC++);
+	uint8_t opcode23 = fetch();
 
-	(this->*COP444_OPCODE_23_MAP[opcode23].function)(opcode23);
+	(this->*COP444_OPCODE_23_MAP[opcode23])(opcode23);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_33_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444_OPCODE_33_MAP[256] =
 {
-	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(inin)        },{1, INST(inil)      },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(cqma)      },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(ctma)      },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(it)          },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(camt)      },
+	OP(illegal)     , OP(skgbz0)    , OP(illegal)   , OP(skgbz2)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgbz1)    , OP(illegal)   , OP(skgbz3)    , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(skgz)      , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(inin)        , OP(inil)      , OP(ing)       , OP(illegal)   , OP(cqma)      , OP(illegal)   , OP(inl)       , OP(ctma)      ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(it)          , OP(illegal)   , OP(omg)       , OP(illegal)   , OP(camq)      , OP(illegal)   , OP(obd)       , OP(camt)      ,
 
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
-	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
-	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(ogi)         , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       ,
+	OP(ogi)         , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       , OP(ogi)       ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(lei)         , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       , OP(lei)       ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
+	OP(illegal)     , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   , OP(illegal)   ,
 
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)
 };
 
 void cop400_cpu_device::cop444_op33(uint8_t opcode)
 {
-	uint8_t opcode33 = ROM(PC++);
+	uint8_t opcode33 = fetch();
 
-	(this->*COP444_OPCODE_33_MAP[opcode33].function)(opcode33);
+	(this->*COP444_OPCODE_33_MAP[opcode33])(opcode33);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_MAP[256] =
+const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444_OPCODE_MAP[256] =
 {
-	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(casc)        },{1, INST(skmbz1)    },{1, INST(cop444_xabr)},{1, INST(skmbz3)       },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop444_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
-	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop444_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
-	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	OP(clra)        , OP(skmbz0)    , OP(xor_)      , OP(skmbz2)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(casc)        , OP(skmbz1)    , OP(cop444_xabr), OP(skmbz3)       , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop444_op23)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
+	OP(asc)         , OP(add)       , OP(rc)        , OP(cop444_op33)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
-	{1, INST(comp)        },{1, INST(skt)       },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
-	{1, INST(cop420_ret)  },{1, INST(retsk)     },{1, INST(adt)       },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
-	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
-	{2, INST(jmp)         },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)           },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)       },
-	{2, INST(jsr)         },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)           },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)       },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
-	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	OP(comp)        , OP(skt)       , OP(rmb2)      , OP(rmb3)          , OP(nop)       , OP(rmb1)      , OP(smb2)      , OP(smb1)      ,
+	OP(cop420_ret)  , OP(retsk)     , OP(adt)       , OP(smb3)          , OP(rmb0)      , OP(smb0)      , OP(cba)       , OP(xas)       ,
+	OP(cab)         , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(aisc)        , OP(aisc)      , OP(aisc)      , OP(aisc)          , OP(aisc)      , OP(aisc)      , OP(aisc)      , OP(aisc)      ,
+	OP(jmp)         , OP(jmp)       , OP(jmp)       , OP(jmp)           , OP(jmp)       , OP(jmp)       , OP(jmp)       , OP(jmp)       ,
+	OP(jsr)         , OP(jsr)       , OP(jsr)       , OP(jsr)           , OP(jsr)       , OP(jsr)       , OP(jsr)       , OP(jsr)       ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
+	OP(stii)        , OP(stii)      , OP(stii)      , OP(stii)          , OP(stii)      , OP(stii)      , OP(stii)      , OP(stii)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(lqid)      ,
 
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
-	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jp)        ,
+	OP(jp)          , OP(jp)        , OP(jp)        , OP(jp)            , OP(jp)        , OP(jp)        , OP(jp)        , OP(jid)
 };
+
 
 /***************************************************************************
     TIMER CALLBACKS
@@ -833,17 +823,24 @@ void cop400_cpu_device::serial_tick()
 
 void cop400_cpu_device::counter_tick()
 {
-	T++;
+	if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
+	{
+		T++;
 
-	if (T == 0)
+		if (T == 0)
+		{
+			m_skt_latch = 1;
+
+			if (m_idle)
+			{
+				m_idle = 0;
+				m_halt = 0;
+			}
+		}
+	}
+	else
 	{
 		m_skt_latch = 1;
-
-		if (m_idle)
-		{
-			m_idle = 0;
-			m_halt = 0;
-		}
 	}
 }
 
@@ -868,12 +865,6 @@ void cop400_cpu_device::inil_tick()
 /***************************************************************************
     INITIALIZATION
 ***************************************************************************/
-
-enum {
-	TIMER_SERIAL,
-	TIMER_COUNTER,
-	TIMER_INIL
-};
 
 void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -919,7 +910,7 @@ void cop400_cpu_device::device_start()
 	/* allocate serial timer */
 
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
+	m_serial_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki, clock()));
 
 	/* allocate counter timer */
 
@@ -927,7 +918,15 @@ void cop400_cpu_device::device_start()
 	if (m_has_counter)
 	{
 		m_counter_timer = timer_alloc(TIMER_COUNTER);
-		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(16 * 4, clock()));
+
+		if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
+		{
+			m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
+		}
+		else
+		{
+			m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 1024, clock()));
+		}
 	}
 
 	/* allocate IN latch timer */
@@ -936,7 +935,7 @@ void cop400_cpu_device::device_start()
 	if (m_has_inil)
 	{
 		m_inil_timer = timer_alloc(TIMER_INIL);
-		m_inil_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
+		m_inil_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki, clock()));
 	}
 
 	/* register for state saving */
@@ -1007,7 +1006,7 @@ void cop400_cpu_device::device_start()
 	state_add(COP400_SIO,      "SIO",       m_sio).mask(0xf);
 	state_add(COP400_SKL,      "SKL",       m_skl).mask(0x1);
 
-	if (m_featuremask & (COP420_FEATURE | COP444_FEATURE | COP440_FEATURE))
+	if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
 	{
 		state_add(COP400_T,    "T",         m_t);
 	}
@@ -1058,43 +1057,39 @@ void cop400_cpu_device::device_reset()
     EXECUTION
 ***************************************************************************/
 
+uint8_t cop400_cpu_device::fetch()
+{
+	m_icount--;
+
+	return ROM(PC++);
+}
+
 void cop400_cpu_device::execute_run()
 {
 	do
 	{
+		// debugger hook
 		m_prevpc = PC;
-
 		debugger_instruction_hook(this, PC);
 
-		if (m_cko == COP400_CKO_HALT_IO_PORT)
-		{
+		// halt logic
+		if (m_cko == COP400_CKO_HALT_IO_PORT) {
 			m_halt = IN_CKO();
 		}
 
-		if (m_halt)
-		{
-			m_icount -= 1;
+		if (m_halt) {
+			m_icount--;
 			continue;
 		}
 
-		uint8_t opcode = ROM(PC);
-		int inst_cycles = m_opcode_map[opcode].cycles;
-
-		PC++;
-
-		(this->*(m_opcode_map[opcode].function))(opcode);
-		m_icount -= inst_cycles;
-		if (m_skip_lbi > 0) m_skip_lbi--;
+		// fetch opcode
+		uint8_t opcode = fetch();
+		cop400_opcode_func function = m_opcode_map[opcode];
 
 		// check for interrupt
-
-		if (BIT(EN, 1) && BIT(IL, 1))
-		{
-			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
+		if (BIT(EN, 1) && BIT(IL, 1)) {
 			// all successive transfer of control instructions and successive LBIs have been completed
-			if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)) && !m_skip_lbi)
-			{
+			if ((function != OP(jp)) && (function != OP(jmp)) && (function != OP(jsr)) && !m_skip_lbi) {
 				// store skip logic
 				m_last_skip = m_skip;
 				m_skip = 0;
@@ -1112,29 +1107,27 @@ void cop400_cpu_device::execute_run()
 			IL &= ~2;
 		}
 
-		// skip next instruction?
-
-		if (m_skip)
-		{
-			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
-			opcode = ROM(PC);
-
-			if ((function == INST(lqid)) || (function == INST(jid)))
-			{
-				m_icount -= 1;
+		if (m_skip) {
+			// skip instruction
+			if (m_InstLen[opcode] == 2) {
+				// fetch second byte
+				opcode = fetch();
 			}
-			else
-			{
-				m_icount -= m_opcode_map[opcode].cycles;
-			}
-
-			PC += m_InstLen[opcode];
 
 			m_skip = 0;
+			continue;
+		}
+
+		// execute instruction
+		(this->*(function))(opcode);
+
+		// LBI skip logic
+		if (m_skip_lbi > 0) {
+			m_skip_lbi--;
 		}
 	} while (m_icount > 0);
 }
+
 
 
 /***************************************************************************

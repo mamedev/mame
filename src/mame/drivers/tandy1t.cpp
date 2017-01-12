@@ -621,6 +621,9 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
@@ -647,7 +650,6 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END

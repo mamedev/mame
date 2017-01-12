@@ -10,7 +10,7 @@ extern const device_type VME_MZR8300;
 
 class vme_mzr8300_card_device : 
 	public device_t
-	,public device_vme_p1_card_interface
+	,public device_vme_card_interface
 {
 public:
 	vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

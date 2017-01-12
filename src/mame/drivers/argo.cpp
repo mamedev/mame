@@ -36,14 +36,19 @@ public:
 	};
 
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(argo);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	const uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
@@ -53,8 +58,6 @@ public:
 	uint8_t m_scroll_ctrl;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(argo);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -143,7 +146,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 

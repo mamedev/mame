@@ -3552,6 +3552,293 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="winword2">
+		<description>Word for Windows 2.0c (3.5")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="cc84c6c2" sha1="8f175e961adcb95ae38b8c1f4934bc1d905dd4f1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02.img" size="1474560" crc="3d3849b7" sha1="ac7f50eb3fc33356a6995edf5c4fc3ec4105dbca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03.img" size="1474560" crc="c8702fd5" sha1="6d0eb17a54ede4803571d607593274dfe992735e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="a4b9bae8" sha1="94d38d803a6def6b37b997f6f5a3d59874db7eb3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="69105238" sha1="be379c3ea95d184fbcb59e4d880c4ebf40a8d17a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06.img" size="1474560" crc="7aa5254c" sha1="92687a36db2cca40548950fef5e6f2d105ce5858" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2_525" cloneof="winword2">
+		<description>Word for Windows 2.0c (5.25")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk01_2.0c_525.img" size="1228800" crc="50492e1f" sha1="069c5a35c8cdd0b1fe16cba0441ade22d9d9ff32" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02_2.0c_525.img" size="1228800" crc="2ab4ed35" sha1="eb4fe02a5eeedc6b03e2f1433174405da92856df" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03_2.0c_525.img" size="1228800" crc="e64d1550" sha1="5b60c9301097745b787bd2f804404d51aabeb5a8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk04_2.0c_525.img" size="1228800" crc="a89719c0" sha1="17c2d56d5e50cdefe56c1e6dd7d63fe2b3529e97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk05_2.0c_525.img" size="1228800" crc="4952d934" sha1="24a9f71e306ed0fee3df8e998825abbe731670de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk06_2.0c_525.img" size="1228800" crc="f3345f09" sha1="a1ee64585f1104fc575eb8b623ad2d238c4ac0e2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk07_2.0c_525.img" size="1228800" crc="40a9ee0c" sha1="ad924d4c79d0d7c3a3faaecb70a0eb6bb49e4803" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2a" cloneof="winword2">
+		<description>Word for Windows 2.0a (3.5")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01 - Setup.img" size="1474560" crc="c1a20ea9" sha1="f469a6e63672891c2fa8c1646689e731974bbc32" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02 - Program.img" size="1474560" crc="510b5a0a" sha1="9244bc791968238921ea21d230bc1e03748aaeda" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Drawing, Equation Editor"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03 - Drawing, Equation Editor.img" size="1474560" crc="c8a26400" sha1="d2942f8cca81bf4257045ff3803dbea0c893cc27" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk04 - Proofing Tools.img" size="1474560" crc="c8807e3f" sha1="9cc1398b83c28f5b2b25a954f24a0f68d312f971" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk05 - Conversions.img" size="1474560" crc="77018608" sha1="8eb809b3ad55ad6d94d01c1e0e6d89b5ea97e48b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Online Help"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk06 - Online Help.img" size="1474560" crc="165ca0bd" sha1="39ff90b8f07a0f5ff0fc92c8e0aeb173befe018e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2b" cloneof="winword2">
+		<description>Word for Windows 2.0 (3.5")</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup - Disk 1"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-509" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-1.img" size="1474560" crc="16b22ae5" sha1="0bc6b567bb63f2b93cddef072a3dfbe30d485aff" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program - Disk 2"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-510" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-2.img" size="1474560" crc="3baf11b2" sha1="0a22eafd1870fc7b8ae031a6a567eb9ca5da1551" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Drawing/Equation Editor - Disk 3"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-511" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-3.img" size="1474560" crc="90efe1d2" sha1="de7d5531593493cde28e06c88b3413d3f5366615" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools - Disk 4"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-512" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-4.img" size="1474560" crc="d78979a6" sha1="05933331b83a81f38a0df78814cdd9f3b1a14052" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions - Disk 5"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-513" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-5.img" size="1474560" crc="dcde6ea9" sha1="5e0d6463f3f92fffb1a7d8d8c6c66faf943b207a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Online Help - Disk 6"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-522" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-6.img" size="1474560" crc="3b642f1d" sha1="fa4b08ee25860d3aa10085644a53447d28d60433" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2b_525" cloneof="winword2">
+		<!-- bad dump - disks have files and folders modified in 1999 and 2010 -->
+		<description>Word for Windows 2.0 (5.25")</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk01_525.img" size="1228800" crc="bbb94fe1" sha1="8337072add284e1993267d56b94548940dd9c12d" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk02_525.img" size="1228800" crc="b6d6584f" sha1="91e11376c95fc59d33eb2a03c59082ac069d009d" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk03_525.img" size="1228800" crc="961980e5" sha1="5e3c163ee606dba15d04bee92ae363ecd9e92b0b" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk04_525.img" size="1228800" crc="814e93cf" sha1="f9f2992b1a3a0981baa0fd9783c457df3e7cb65b" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk05_525.img" size="1228800" crc="6474b694" sha1="1b7f63f9bdd80360dc328d8417a256d2f85488bd" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk06_525.img" size="1228800" crc="7ae96b5b" sha1="bbe2d370c6e4ae1938ccd0709181d6cba4899940" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk07_525.img" size="1228800" crc="790cbc16" sha1="310cfdca7b19795c86e04586d48d7b1e4afede21" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2it" cloneof="winword2">
+		<description>Word for Windows 2.0 (3.5", Italian)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<!-- 1024-byte footer removed from 1475584-byte images -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1.img" size="1474560" crc="d9d9ef21" sha1="3d019394f0468053b05478d7dbb944100dc8ce88" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2.img" size="1474560" crc="9e5c86c0" sha1="2f0e7a8f0ceb0ad9fc3a5e64f7a46e6e96937c71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3.img" size="1474560" crc="298e4c62" sha1="93017d2e94717ae3c93acbf5a623f2772433ab66" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk4.img" size="1474560" crc="4eb5caec" sha1="55fa0fe14bc3149b041814d3a6d8e3c89f84bdcf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk5.img" size="1474560" crc="c50ddd5b" sha1="fdad6fc0afc475aef1634ac7f603dd51f5bcf410" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk6.img" size="1474560" crc="02d83ae4" sha1="97b8700834f236e882be2c4bfdb6405fab1712c8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk7.img" size="1474560" crc="f4ac68b9" sha1="f1aeb7217beafebd6934e7c23f2a1c5e54519071" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk8.img" size="1474560" crc="332cd1ff" sha1="8b3960e8fc87549df5b79e2909e6869d1dd149ad" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2tr" cloneof="winword2">
+		<description>Word for Windows 2.0c (3.5", Turkish)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01tr.img" size="1474560" crc="5ac376cd" sha1="1c5dec19a91a95ae95ab402b621cbf55e4385f53" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02tr.img" size="1474560" crc="2d9db19e" sha1="4a6c49ec0d9902bba7ba33d57921b7dbbda8e94c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03tr.img" size="1474560" crc="d0eae336" sha1="0d080ad7624032832198ce145f8a31e9aa0feafa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk04tr.img" size="1474560" crc="805a32d2" sha1="916cc34bf277864cef3e27931184c92e7526166e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk05tr.img" size="1474560" crc="975d57c4" sha1="bb7c49b9aa57c9e47f026e795f9cc17ad9c00dc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wp60">
 		<description>WordPerfect 6.0 for DOS</description>
 		<year>1993</year>
@@ -4317,11 +4604,43 @@ Missing files come here
 		<!-- from a registered version ordered circa 2004 -->
 		<description>Duke Nukum (V 2.0)</description>
 		<year>1991</year>
-		<publisher>Apogee</publisher>
+		<publisher>Apogee Software</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="duke nukum.img" size="1474560" crc="3332d232" sha1="306b2802adbdbfe6655679c01a187582a05255ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duke2">
+		<description>Duke Nukem II (v1.0, re-issue)</description>
+		<year>1993</year>
+		<publisher>Apogee Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Duke Nukem II (USA) (Re-release) (Disk 1).img" size="1474560" crc="e8ff13c7" sha1="97b82903ec2725e8eba50b00084474ed890a4daf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Duke Nukem II (USA) (Re-release) (Disk 2).img" size="1474560" crc="2d0c4ecc" sha1="d3376349a7a26ef906d51b74d93c84310afe1906" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duke2a" cloneof="duke2">
+		<description>Duke Nukem II</description>
+		<year>1993</year>
+		<publisher>Apogee Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Duke Nukem II (USA) (Disk 1).img" size="1474560" crc="1bd5a714" sha1="149486014a05f47987e7c2974ff07b0cdab8ab10" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Duke Nukem II (USA) (Disk 2).img" size="1474560" crc="07a5265f" sha1="2b7e949dd818263153dcd2874e772d89e95b092f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4589,7 +4908,7 @@ Missing files come here
 	<software name="raptor12">
 		<description>Raptor - Call of the Shadows</description>
 		<year>1994</year>
-		<publisher>Apogee Software, Ltd.</publisher>
+		<publisher>Apogee Software</publisher>
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">

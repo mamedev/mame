@@ -192,6 +192,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nlid_system.h",
     MAME_DIR .. "src/lib/netlist/devices/nlid_proxy.cpp",
     MAME_DIR .. "src/lib/netlist/devices/nlid_proxy.h",
+    MAME_DIR .. "src/lib/netlist/macro/nlm_base.cpp",
+    MAME_DIR .. "src/lib/netlist/macro/nlm_base.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_ttl74xx.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_ttl74xx.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_cd4xxx.cpp",

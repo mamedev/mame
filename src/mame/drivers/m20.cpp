@@ -68,7 +68,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -312,13 +312,13 @@ B/W, 128K cards, 3 cards => 512K of memory:
 
 static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 

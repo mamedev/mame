@@ -166,6 +166,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -325,24 +326,29 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  * Original HBUG configuration word: 0x003D = 0000 0000 0011 1101
  */
 
+static SLOT_INTERFACE_START(hk68_vme_cards)
+SLOT_INTERFACE_END
+
 /*
  * Machine configuration
  */
 static MACHINE_CONFIG_START (hk68v10, hk68v10_state)
-/* basic machine hardware */
-MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
-MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
 
-/* Terminal Port config */
-MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+	/* Terminal Port config */
+	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 
-MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
-MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
 
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", "slot1", hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

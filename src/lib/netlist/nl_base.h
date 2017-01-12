@@ -139,8 +139,6 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_STOP(chip) void NETLIB_NAME(chip) :: stop(void)
-
 #define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params
 
@@ -355,15 +353,15 @@ namespace netlist
 	// State variables - predefined and c++11 non-optional
 	// -----------------------------------------------------------------------------
 
-	/*! predefined state variable type for uint_fast8_t */
-	using state_var_u8 = state_var<std::uint_fast8_t>;
-	/*! predefined state variable type for int_fast8_t */
-	using state_var_s8 = state_var<std::int_fast8_t>;
+	/*! predefined state variable type for uint8_t */
+	using state_var_u8 = state_var<std::uint8_t>;
+	/*! predefined state variable type for int8_t */
+	using state_var_s8 = state_var<std::int8_t>;
 
-	/*! predefined state variable type for uint_fast32_t */
-	using state_var_u32 = state_var<std::uint_fast32_t>;
-	/*! predefined state variable type for int_fast32_t */
-	using state_var_s32 = state_var<std::int_fast32_t>;
+	/*! predefined state variable type for uint32_t */
+	using state_var_u32 = state_var<std::uint32_t>;
+	/*! predefined state variable type for int32_t */
+	using state_var_s32 = state_var<std::int32_t>;
 
 	// -----------------------------------------------------------------------------
 	// object_t
@@ -372,7 +370,7 @@ namespace netlist
 	/*! The base class for netlist devices, terminals and parameters.
 	 *
 	 *  This class serves as the base class for all device, terminal and
-	 *  objects. It provides new and delete operators to supported e.g. pooled
+	 *  objects. It provides new and delete operators to support e.g. pooled
 	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
 	 *  well.
 	 */
@@ -386,7 +384,7 @@ namespace netlist
 		 *  Every class derived from the object_t class must have a name.
 		 */
 		object_t(const pstring &aname /*!< string containing name of the object */);
-		~object_t();
+		virtual ~object_t();
 
 		/*! return name of the object
 		 *
@@ -406,6 +404,7 @@ namespace netlist
 	struct detail::netlist_ref
 	{
 		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
+		~netlist_ref() {}
 
 		netlist_t & netlist() { return m_netlist; }
 		const netlist_t & netlist() const { return m_netlist; }
@@ -440,9 +439,8 @@ namespace netlist
 		 *
 		 * \param dev  device owning the object.
 		 * \param name string holding the name of the device
-		 * \param type type   of this object.
 		 */
-		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		device_object_t(core_device_t &dev, const pstring &name);
 		/*! returns reference to owning device.
 		 * \returns reference to owning device.
 		 */
@@ -451,21 +449,21 @@ namespace netlist
 		/*! The object type.
 		 * \returns type of the object
 		 */
-		type_t type() const { return m_type; }
+		type_t type() const;
 		/*! Checks if object is of specified type.
-		 * \param type type to check object against.
+		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const type_t type) const { return (m_type == type); }
+		bool is_type(const type_t atype) const { return (type() == atype); }
 
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
 		netlist_t &netlist();
+		const netlist_t &netlist() const;
 
 	private:
 		core_device_t & m_device;
-		const type_t    m_type;
 	};
 
 
@@ -494,8 +492,7 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname,
-				const type_t type, const state_e state);
+		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
@@ -527,9 +524,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-		: core_terminal_t(dev, aname, type, state)
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
+		: core_terminal_t(dev, aname, state)
 		{
 		}
 		virtual ~analog_t();
@@ -548,6 +544,7 @@ namespace netlist
 	public:
 
 		terminal_t(core_device_t &dev, const pstring &aname);
+		virtual ~terminal_t();
 
 		nl_double operator ()() const;
 
@@ -607,9 +604,8 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-			: core_terminal_t(dev, aname, type, state)
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
+			: core_terminal_t(dev, aname, state)
 			, logic_family_t()
 			, m_proxy(nullptr)
 		{
@@ -670,6 +666,9 @@ namespace netlist
 		analog_input_t(core_device_t &dev, /*!< owning device */
 				const pstring &aname       /*!< name of terminal */
 		);
+
+		/*! Destructor */
+		virtual ~analog_input_t();
 
 		/*! returns voltage at terminal.
 		 *  \returns voltage at terminal.
@@ -865,10 +864,10 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(const param_type_t atype, device_t &device, const pstring &name);
+		param_t(device_t &device, const pstring &name);
 		virtual ~param_t();
 
-		param_type_t param_type() const { return m_param_type; }
+		param_type_t param_type() const;
 
 	protected:
 		void update_param();
@@ -883,14 +882,13 @@ namespace netlist
 			}
 		}
 
-	private:
-		const param_type_t m_param_type;
 	};
 
 	class param_ptr_t final: public param_t
 	{
 	public:
 		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		virtual ~param_ptr_t();
 		std::uint8_t * operator()() const { return m_param; }
 		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
@@ -901,6 +899,7 @@ namespace netlist
 	{
 	public:
 		param_logic_t(device_t &device, const pstring name, const bool val);
+		virtual ~param_logic_t();
 		bool operator()() const { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
@@ -911,6 +910,7 @@ namespace netlist
 	{
 	public:
 		param_int_t(device_t &device, const pstring name, const int val);
+		virtual ~param_int_t();
 		int operator()() const { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
@@ -921,6 +921,7 @@ namespace netlist
 	{
 	public:
 		param_double_t(device_t &device, const pstring name, const double val);
+		virtual ~param_double_t();
 		double operator()() const { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
@@ -931,6 +932,7 @@ namespace netlist
 	{
 	public:
 		param_str_t(device_t &device, const pstring name, const pstring val);
+		virtual ~param_str_t();
 		const pstring operator()() const { return Value(); }
 		void setTo(const pstring &param)
 		{
@@ -1009,7 +1011,6 @@ namespace netlist
 		}
 
 		void set_delegate_pointer();
-		void stop_dev();
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1038,7 +1039,6 @@ namespace netlist
 		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
-		virtual void stop() { }
 		virtual void reset() { }
 
 	public:
@@ -1129,7 +1129,6 @@ namespace netlist
 
 	class detail::queue_t :
 			public timed_queue<net_t *, netlist_time>,
-			public detail::object_t,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1475,6 +1474,11 @@ namespace netlist
 	}
 
 	inline netlist_t &detail::device_object_t::netlist()
+	{
+		return m_device.netlist();
+	}
+
+	inline const netlist_t &detail::device_object_t::netlist() const
 	{
 		return m_device.netlist();
 	}

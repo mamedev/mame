@@ -332,6 +332,9 @@ protected:
 	uint8_t m_padr;           // Port A Data register
 	uint8_t m_pbdr;           // Port B Data register
 	uint8_t m_pcdr;           // Port C Data register
+	uint8_t m_pail;           // Port A input lines
+	uint8_t m_pbil;           // Port B input lines
+	uint8_t m_pcil;           // Port C input lines
 	uint8_t m_psr;            // Port Status Register
 	uint8_t m_tcr;            // Timer Control Register
 	uint8_t m_tivr;           // Timer Interrupt Vector register

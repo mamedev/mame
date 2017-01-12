@@ -1335,7 +1335,10 @@ if (CPUS["M6805"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
+		MAME_DIR .. "src/devices/cpu/m6805/6805defs.h",
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
+		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 	}
 end
 

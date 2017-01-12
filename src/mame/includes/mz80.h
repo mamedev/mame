@@ -21,20 +21,16 @@ class mz80_state : public driver_device
 {
 public:
 	mz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit8253"),
-		m_ppi(*this, "ppi8255"),
-		m_cassette(*this, "cassette"),
-		m_speaker(*this, "speaker"),
-		m_p_ram(*this, "p_ram"),
-		m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit8253")
+		, m_ppi(*this, "ppi8255")
+		, m_cassette(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_p_ram(*this, "p_ram")
+		, m_p_videoram(*this, "videoram")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pit8253_device> m_pit;
-	required_device<i8255_device> m_ppi;
-	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER(mz80k_strobe_r);
 	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
 	DECLARE_READ8_MEMBER(mz80k_8255_portb_r);
@@ -43,6 +39,18 @@ public:
 	DECLARE_WRITE8_MEMBER(mz80k_8255_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	DECLARE_DRIVER_INIT(mz80k);
+	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;
 	uint8_t m_speaker_level;
@@ -52,13 +60,8 @@ public:
 	required_shared_ptr<uint8_t> m_p_ram;
 	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_DRIVER_INIT(mz80k);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 };
 
 
