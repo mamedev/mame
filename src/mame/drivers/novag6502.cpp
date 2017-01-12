@@ -80,23 +80,26 @@ public:
 	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 	// Super Constellation	
-	DECLARE_WRITE8_MEMBER(supercon_1e_w);
-	DECLARE_WRITE8_MEMBER(supercon_1f_w);
-	DECLARE_READ8_MEMBER(supercon_1e_r);
-	DECLARE_READ8_MEMBER(supercon_1f_r);
+	DECLARE_WRITE8_MEMBER(supercon_mux_w);
+	DECLARE_WRITE8_MEMBER(supercon_control_w);
+	DECLARE_READ8_MEMBER(supercon_input1_r);
+	DECLARE_READ8_MEMBER(supercon_input2_r);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
 	DECLARE_WRITE8_MEMBER(sexpert_mux_w);
 	DECLARE_WRITE8_MEMBER(sexpert_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sexpert_lcd_data_w);
-	DECLARE_READ8_MEMBER(sexpert_lcd_data_r);
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_PALETTE_INIT(sexpert);
 	HD44780_PIXEL_UPDATE(sexpert_pixel_update);
 	DECLARE_MACHINE_RESET(sexpert);
 	DECLARE_DRIVER_INIT(sexpert);
+
+	// Super Forte
+	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
+	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
 
 protected:
 	virtual void machine_start() override;
@@ -269,14 +272,14 @@ uint16_t novag6502_state::read_inputs(int columns)
 
 // TTL
 
-WRITE8_MEMBER(novag6502_state::supercon_1e_w)
+WRITE8_MEMBER(novag6502_state::supercon_mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
 	display_matrix(8, 3, m_led_data, m_led_select);
 }
 
-WRITE8_MEMBER(novag6502_state::supercon_1f_w)
+WRITE8_MEMBER(novag6502_state::supercon_control_w)
 {
 	// d0-d3: ?
 	// d4-d6: select led row
@@ -287,17 +290,17 @@ WRITE8_MEMBER(novag6502_state::supercon_1f_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(novag6502_state::supercon_1e_r)
+READ8_MEMBER(novag6502_state::supercon_input1_r)
+{
+	// d0-d7: multiplexed inputs (chessboard squares)
+	return ~read_inputs(8) & 0xff;
+}
+
+READ8_MEMBER(novag6502_state::supercon_input2_r)
 {
 	// d0-d5: ?
 	// d6,d7: multiplexed inputs (side panel)
 	return (read_inputs(8) >> 2 & 0xc0) ^ 0xff;
-}
-
-READ8_MEMBER(novag6502_state::supercon_1f_r)
-{
-	// d0-d7: multiplexed inputs (chessboard squares)
-	return ~read_inputs(8) & 0xff;
 }
 
 
@@ -338,14 +341,9 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
 {
+	// d0-d7: HD44780 data
 	if (m_lcd_control & 4 && ~m_lcd_control & 2)
 		m_lcd->write(space, m_lcd_control & 1, data);
-}
-
-READ8_MEMBER(novag6502_state::sexpert_lcd_data_r)
-{
-	// unused?
-	return 0;
 }
 
 // TTL/generic
@@ -366,6 +364,8 @@ WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 	
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
+	display_matrix(8, 8, m_led_data, m_inp_mux);
+	m_led_data = 0; // ?
 }
 
 READ8_MEMBER(novag6502_state::sexpert_input1_r)
@@ -378,7 +378,7 @@ READ8_MEMBER(novag6502_state::sexpert_input2_r)
 {
 	// d0-d2: printer port
 	// d5-d7: multiplexed inputs (side panel)
-	return (read_inputs(8) >> 3 & 0xc0) ^ 0xff;
+	return ~read_inputs(8) >> 3 & 0xe0;
 }
 
 MACHINE_RESET_MEMBER(novag6502_state, sexpert)
@@ -395,36 +395,76 @@ DRIVER_INIT_MEMBER(novag6502_state, sexpert)
 
 
 /******************************************************************************
+    Super Forte
+******************************************************************************/
+
+WRITE8_MEMBER(novag6502_state::sforte_lcd_control_w)
+{
+	// d3: rom bankswitch
+	membank("bank1")->set_entry(data >> 3 & 1);
+
+	// assume same as sexpert
+	sexpert_lcd_control_w(space, 0, data);
+}
+
+WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
+{
+	// d0-d2: input mux/led select
+	m_inp_mux = 1 << (data & 7);
+
+	// if lcd is disabled, misc control
+	if (~m_lcd_control & 4)
+	{
+		// d5,d6: led data
+		display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
+		
+		// d7: enable beeper
+		m_beeper->set_state(data >> 7 & 1);
+	}
+
+	// assume same as sexpert
+	sexpert_lcd_data_w(space, 0, data);
+}
+
+
+
+/******************************************************************************
     Address Maps
 ******************************************************************************/
 
 // Super Constellation
 
-static ADDRESS_MAP_START( supercon_mem, AS_PROGRAM, 8, novag6502_state )
+static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITENOP // printer/clock?
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITENOP // printer/clock?
-	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_1e_r, supercon_1e_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_1f_r, supercon_1f_w)
+	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, supercon_mux_w)
+	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, supercon_control_w)
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-// Super Expert
+// Super Expert / Super Forte
 
-static ADDRESS_MAP_START( sexpert_mem, AS_PROGRAM, 8, novag6502_state )
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x0000, 0x1fef) AM_RAM // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
 	AM_RANGE(0x1ff0, 0x1ff0) AM_READ(sexpert_input1_r)
 	AM_RANGE(0x1ff1, 0x1ff1) AM_READ(sexpert_input2_r)
-	AM_RANGE(0x1ff2, 0x1ff2) AM_WRITENOP // printer port
-	AM_RANGE(0x1ff3, 0x1ff3) AM_WRITENOP // printer port
+	AM_RANGE(0x1ff2, 0x1ff2) AM_WRITENOP // printer
+	AM_RANGE(0x1ff3, 0x1ff3) AM_WRITENOP // printer
+	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sforte_lcd_control_w)
+	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sforte_lcd_data_w)
+	AM_RANGE(0x1ffc, 0x1fff) AM_NOP // ACIA
+	AM_RANGE(0x2000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sexpert_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x1ff4, 0x1ff4) AM_WRITE(sexpert_leds_w)
 	AM_RANGE(0x1ff5, 0x1ff5) AM_WRITE(sexpert_mux_w)
 	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sexpert_lcd_control_w)
-	AM_RANGE(0x1ff7, 0x1ff7) AM_READWRITE(sexpert_lcd_data_r, sexpert_lcd_data_w)
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sexpert_lcd_data_w)
+	AM_IMPORT_FROM( sforte_map )
 ADDRESS_MAP_END
 
 
@@ -603,27 +643,27 @@ static INPUT_PORTS_START( supercon )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("King / Multi Move / Player/Player")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Multi Move / Player/Player / King")
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Verify / Set Up")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Queen / Best Move/Random / Training Level")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Best Move/Random / Training Level / Queen")
 
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Change Color")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Bishop / Sound / Depth Search")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Depth Search / Bishop")
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Clear Board")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Knight / Solve Mate")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Solve Mate / Knight")
 
 	PORT_MODIFY("IN.4")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Rook / Print Board")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Print Board / Rook")
 
 	PORT_MODIFY("IN.5")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Form Size")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Pion / Print List / Acc. Time")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_MODIFY("IN.6")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
@@ -635,48 +675,93 @@ static INPUT_PORTS_START( supercon )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sforte )
+	PORT_INCLUDE( cb_buttons )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Priority / Tournament Book / Pawn")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Yes/Start / Start of Game")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Trace Forward / AutoPlay")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pro-Op / Restore Game / Rook")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("No/End / End of Game")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Clear Board / Delete Pro-Op")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Best Move/Random / Review / Knight")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Print Book / Store Game")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Change Color")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Sound / Info / Bishop")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Print Moves / Print Evaluations")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Verify/Set Up / Pro-Op Book/Both Books")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Solve Mate / Infinite / Queen")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Print List / Acc. Time")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sexpert )
 	PORT_INCLUDE( cb_magnets )
 
 	PORT_MODIFY("IN.0")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
 
 	PORT_MODIFY("IN.1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Priority / Tournament Book / Pawn")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Yes/Start / Start of Game")
 
 	PORT_MODIFY("IN.3")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Trace Forward / AutoPlay")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pro-Op / Restore Game / Rook")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("No/End / End of Game")
 
 	PORT_MODIFY("IN.4")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Clear Board / Delete Pro-Op")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Best Move/Random / Review / Knight")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Print Book / Store Game")
 
 	PORT_MODIFY("IN.5")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Change Color")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Sound / Info / Bishop")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Print Moves / Print Evaluations")
 
 	PORT_MODIFY("IN.6")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Verify/Set Up / Pro-Op Book/Both Books")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Solve Mate / Infinite / Queen")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Print List / Acc. Time")
 
 	PORT_MODIFY("IN.7")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
 INPUT_PORTS_END
 
 
@@ -690,7 +775,7 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
-	MCFG_CPU_PROGRAM_MAP(supercon_mem)
+	MCFG_CPU_PROGRAM_MAP(supercon_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -708,7 +793,7 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, XTAL_32_768kHz/128)
-	MCFG_CPU_PROGRAM_MAP(sexpert_mem)
+	MCFG_CPU_PROGRAM_MAP(sexpert_map)
 	
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 
@@ -728,7 +813,7 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_HD44780_LCD_SIZE(2, 8)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novag6502_state, sexpert_pixel_update)
 
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_sexpert)
 
 
@@ -737,6 +822,13 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sforte, sexpert )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sforte_map)
 MACHINE_CONFIG_END
 
 
@@ -804,10 +896,10 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1984, supercon, 0,      0,      supercon, supercon, driver_device, 0, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, sfortea,  0,       0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1988, sforteb,  sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1988, sforteba, sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1989, sfortec,  sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1987, sfortea,  0,       0,      sforte,   sforte, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, sforteb,  sfortea, 0,      sforte,   sforte, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, sforteba, sfortea, 0,      sforte,   sforte, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, sfortec,  sfortea, 0,      sforte,   sforte, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1989, sexpertc, 0, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1988, sexpertb, sexpertc, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
