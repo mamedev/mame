@@ -10,7 +10,6 @@
 
 #include "includes/newbrain.h"
 #include "rendlay.h"
-#include "newbrain.lh"
 
 #define LOG 0
 
@@ -62,6 +61,10 @@ WRITE8_MEMBER( newbrain_state::tvtl_w )
 
 void newbrain_state::video_start()
 {
+	// set timer
+	m_clkint_timer = timer_alloc(TIMER_ID_CLKINT);
+	m_clkint_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+
 	// state saving
 	save_item(NAME(m_rv));
 	save_item(NAME(m_fs));
@@ -182,8 +185,6 @@ GFXDECODE_END
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
-
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)

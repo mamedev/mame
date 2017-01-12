@@ -57,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER( iorq_r );
 	DECLARE_WRITE8_MEMBER( iorq_w );
 
-	DECLARE_WRITE8_MEMBER( enrg1_w );
+	DECLARE_WRITE8_MEMBER( enrg_w );
 	DECLARE_WRITE8_MEMBER( tvtl_w );
 	DECLARE_READ8_MEMBER( ust_a_r );
 	DECLARE_READ8_MEMBER( ust_b_r );
@@ -70,8 +70,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
 
-	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
-
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
@@ -82,7 +80,8 @@ protected:
 	enum
 	{
 		TIMER_ID_RESET,
-		TIMER_ID_PWRUP
+		TIMER_ID_PWRUP,
+		TIMER_ID_CLKINT
 	};
 
 	void check_interrupt();
@@ -133,6 +132,8 @@ protected:
 	int m_ucr;
 	int m_80l;
 	uint16_t m_tvl;
+
+	emu_timer *m_clkint_timer;
 };
 
 
