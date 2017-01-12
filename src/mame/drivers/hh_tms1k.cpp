@@ -25,7 +25,8 @@
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
- *MP0907   TMS1000   1979, Conic/Cardinal Basketball
+ @MP0907   TMS1000   1979, Conic Basketball (101-006)
+ *MP0910   TMS1000   1979, Conic Basketball (101-003)
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
@@ -141,6 +142,7 @@
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
 #include "cmsport.lh"
+#include "cnbaskb.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
@@ -1760,9 +1762,118 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Conic Electronic Basketball
+  * TMS1000NLL MP0907 (die label 1000B MP0907)
+  * PCB label: CONIC 101-006
+  * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
+
+  There are 3 known versions of Conic Basketball: MP0910(101-003) and
+  MP0907(101-006) are nearly identical. MP0168 is found in Conic Multisport.
+
+  known releases:
+  - Hong Kong: Electronic Basketball
+  - USA: Electronic Basketball, distributed by Cardinal
+
+***************************************************************************/
+
+class cnbaskb_state : public hh_tms1k_state
+{
+public:
+	cnbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void cnbaskb_state::prepare_display()
+{
+	// R7,R8 are 7segs
+	set_display_segmask(0x180, 0x7f);
+	display_matrix(7, 9, m_o, m_r & 0x1fc);
+}
+
+WRITE16_MEMBER(cnbaskb_state::write_r)
+{
+	// R9: speaker out
+	m_speaker->level_w(data >> 9 & 1);
+
+	// R0,R1: input mux
+	// R10 is also tied to K1 (locks up at boot if it's not handled)
+	m_inp_mux = (data >> 8 & 4) | (data & 3);
+
+	// R2-R8: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(cnbaskb_state::write_o)
+{
+	// O0-O6: led/digit data
+	// O7: N/C
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(cnbaskb_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( cnbaskb )
+	PORT_START("IN.0") // R0
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x01, "2" ) // professional
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.2") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( cnbaskb, cnbaskb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(cnbaskb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnbaskb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnbaskb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnbaskb)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Conic Electronic Multisport
   * TMS1000 MP0168 (die label same)
-  * PCB label: 101-027(1979), or 101-021 REV A(1980, with DS8871N)
+  * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * 2 7seg LEDs, 33 other LEDs, 1-bit sound
 
   This handheld includes 3 games: Basketball, Ice Hockey, Soccer.
@@ -1813,7 +1924,7 @@ WRITE16_MEMBER(cmsport_state::write_r)
 
 WRITE16_MEMBER(cmsport_state::write_o)
 {
-	// O0-O7: led data
+	// O0-O7: led/digit data
 	m_o = data;
 	prepare_display();
 }
@@ -7594,6 +7705,17 @@ ROM_START( tc4 )
 ROM_END
 
 
+ROM_START( cnbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0907", 0x0000, 0x0400, CRC(35f84f0f) SHA1(744ca60bb853a2785184042e747530a9e02488f8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cnbaskb_output.pla", 0, 365, CRC(b4e28956) SHA1(8356112da71b351420a88d7e394e7d03e429368c) )
+ROM_END
+
+
 ROM_START( cmsport )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0168.u1", 0x0000, 0x0400, CRC(0712a268) SHA1(bd4e23e5c17b28c52e7e769e44773cc9c8839bed) )
@@ -8145,6 +8267,7 @@ CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Col
 CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
+CONS( 1979, cnbaskb,   0,        0, cnbaskb,   cnbaskb,   driver_device, 0, "Conic", "Electronic Basktetball (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cmsport,   0,        0, cmsport,   cmsport,   driver_device, 0, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
