@@ -16,7 +16,7 @@ ROM_END
 
 ROM_START( m68705u3 )
 	ROM_REGION(0x0078, "bootstrap", 0)
-	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
 } // anonymous namespace
