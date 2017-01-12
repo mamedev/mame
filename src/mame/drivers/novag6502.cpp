@@ -11,12 +11,16 @@
     such as Arena(in editmode).
 
     TODO:
-    - move other Novag sets here when applicable
+    - verify supercon IRQ and beeper frequency
+    - why is sforte H and 1 leds always on?
+    - sforte/sexpert selectable 5/6MHz CPU speed
+    - sforte/sexpert optional ACIA (only works in version C?)
+    - printer port
 
 -------------------------------------------------------------------------------
 
 Super Constellation Chess Computer (model 844):
-- UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz IRQ(source unknown?)
+- UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
 - 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 - external ports for clock and printer, not emulated here
@@ -31,7 +35,9 @@ Super Constellation Chess Computer (model 844):
 #include "video/hd44780.h"
 
 // internal artwork
-#include "supercon.lh" // clickable
+#include "novag_sexpert.lh" // clickable
+#include "novag_sforte.lh" // clickable
+#include "novag_supercon.lh" // clickable
 
 
 class novag6502_state : public driver_device
@@ -53,6 +59,9 @@ public:
 	optional_device<beep_device> m_beeper;
 	optional_device<hd44780_device> m_lcd;
 	optional_ioport_array<8> m_inp_matrix;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
 	// misc common
 	uint16_t m_inp_mux;                   // multiplexed keypad mask
@@ -447,7 +456,7 @@ ADDRESS_MAP_END
 // Super Expert / Super Forte
 
 static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
-	AM_RANGE(0x0000, 0x1fef) AM_RAM // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
+	AM_RANGE(0x0000, 0x1fef) AM_RAM AM_SHARE("nvram") // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
 	AM_RANGE(0x1ff0, 0x1ff0) AM_READ(sexpert_input1_r)
 	AM_RANGE(0x1ff1, 0x1ff1) AM_READ(sexpert_input2_r)
 	AM_RANGE(0x1ff2, 0x1ff2) AM_WRITENOP // printer
@@ -780,7 +789,7 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_supercon)
+	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -792,9 +801,13 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, XTAL_32_768kHz/128)
 	MCFG_CPU_PROGRAM_MAP(sexpert_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_nsec(21500)) // active for 21.5us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
 	
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 
 	/* video hardware */
@@ -808,15 +821,12 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(novag6502_state, sexpert)
 
-
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)
 	MCFG_HD44780_PIXEL_UPDATE_CB(novag6502_state, sexpert_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_sexpert)
-
-
+	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -829,6 +839,8 @@ static MACHINE_CONFIG_DERIVED( sforte, sexpert )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
+	
+	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END
 
 
