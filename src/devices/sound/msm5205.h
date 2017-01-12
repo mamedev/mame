@@ -90,8 +90,8 @@ protected:
 	bool m_s1;                  // prescaler selector S1
 	bool m_s2;                  // prescaler selector S2
 	u8 m_bitwidth;              // bit width selector -3B/4B
-	int32_t m_signal;           // current ADPCM signal
-	int32_t m_step;             // current ADPCM step
+	s32 m_signal;               // current ADPCM signal
+	s32 m_step;                 // current ADPCM step
 	int m_diff_lookup[49*16];
 	devcb_write_line m_vclk_cb;
 };
