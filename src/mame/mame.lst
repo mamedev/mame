@@ -29198,9 +29198,11 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+sexpert                         //
 sexpertb                        //
 sexpertc                        //
-sfortea                         //
+sexpertca                       //
+sforte                          //
 sforteb                         //
 sforteba                        //
 sfortec                         //
