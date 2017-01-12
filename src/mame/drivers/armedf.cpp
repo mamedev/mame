@@ -317,6 +317,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -810,6 +811,15 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x6, 0x6) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_3526_portmap, AS_IO, 8, armedf_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3526_device, write)
+	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0x3, 0x3) AM_DEVWRITE("dac2", dac_byte_interface, write)
+	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
+	AM_RANGE(0x6, 0x6) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -1224,17 +1234,32 @@ MACHINE_RESET_MEMBER(armedf_state,armedf)
 }
 
 
+static MACHINE_CONFIG_FRAGMENT( terraf_sound )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // 10-pin SIP with 74HC374P latch
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // 10-pin SIP with 74HC374P latch
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
-
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1261,18 +1286,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( terrafjb, armedf_state )
@@ -1338,11 +1352,6 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
-
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
@@ -1367,18 +1376,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( armedf, armedf_state )
@@ -1469,7 +1467,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1488,7 +1486,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_IO_MAP(sound_3526_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
@@ -1519,11 +1517,11 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
@@ -1567,7 +1565,7 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1582,11 +1580,6 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
-
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)   // verified
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
 	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
@@ -1611,18 +1604,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)   // verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
 /*************************************
