@@ -51,7 +51,7 @@
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
- *MP2139   TMS1370   1982, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
+ @MP2139   TMS1370   1982, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
@@ -3634,8 +3634,109 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Gakken Galaxy Invader 1000
+  * TMS1370 MP2139 (die label 1170 MP2139)
+  * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
+
+  known releases:
+  - World: Galaxy Invader 1000
+  - Japan: Invader 1000
+  - USA(2): Galaxy Invader 1000, published by CGL
+  - USA(1): Cosmic 1000 Fire Away, published by Tandy
+
+***************************************************************************/
+
+class ginv1000_state : public hh_tms1k_state
+{
+public:
+	ginv1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ginv1000_state::prepare_display()
+{
+}
+
+WRITE16_MEMBER(ginv1000_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R8,R15: input mux
+	m_inp_mux = (data >> 8 & 1) | (data >> 14 & 2);
+	
+	// R1-R10: VFD matrix grid
+	// R11-R14: VFD matrix plate
+	
+	prepare_display();
+}
+
+WRITE16_MEMBER(ginv1000_state::write_o)
+{
+	// O0-O7: VFD matrix plate
+	
+	prepare_display();
+}
+
+READ8_MEMBER(ginv1000_state::read_k)
+{
+	// K: multiplexed inputs (K8 is fire button)
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+
+// config
+
+static INPUT_PORTS_START( ginv1000 )
+	PORT_START("IN.0") // R8
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFSETTING(    0x02, "3" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R15
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ginv1000, ginv1000_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1370, 325000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(ginv1000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ginv1000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ginv1000_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Gakken FX-Micom R-165
-  * TMS1100 MCU, label MP1312, die label MP1312A
+  * TMS1100 MCU, label MP1312 (die label MP1312A)
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
@@ -5301,7 +5402,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Dark Tower
-  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die label MP7332
+  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label MP7332)
     (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
   * motorized rotating reel + lightsensor, 1bit-sound
@@ -7870,6 +7971,17 @@ ROM_START( gjackpot )
 ROM_END
 
 
+ROM_START( ginv1000 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2139", 0x0000, 0x0800, CRC(036eab37) SHA1(0795878ad89296f7a6a0314c6e4db23c1cc3673e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
+ROM_END
+
+
 ROM_START( fxmcr165 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1312", 0x0000, 0x0800, CRC(6efc8bcc) SHA1(ced8a02b472a3178073691d3dccc0f19f57428fd) )
@@ -8284,6 +8396,7 @@ CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Ent
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, ginv1000,  0,        0, ginv1000,  ginv1000,  driver_device, 0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1983, fxmcr165,  0,        0, fxmcr165,  fxmcr165,  driver_device, 0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
