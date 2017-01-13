@@ -8,7 +8,7 @@
 
     TODO:
     - proper 8251 uart hook-up on keyboard
-    - SASI /SCSI support;
+    - SASI/SCSI support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
     - Finish DIP-Switches support
     - text scrolling
@@ -17,7 +17,7 @@
     - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
     - investigate on POR bit
     - test 2dd more
-
+	
     TODO (PC-9801RS):
     - extra features;
     - keyboard shift doesn't seem to disable properly;
@@ -39,7 +39,6 @@
     - No way to exit the initial loop. Code looks broken/bad dump?
 
     floppy issues TODO (* denotes actually fixed)
-    - Unsupported disk types: *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
     - AD&D Champions of Krynn
     - AI Shougi (asserts upon loading, 3'5 image?)
@@ -105,10 +104,11 @@
     - Policenauts: CD-ROM drive not found;
 
     Notes:
-	- annivers: ALT key cycles through different color schemes (normal, b&w, legacy);
+	- annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
     - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS
+	- fhtag2: product key is 001J0283TA 100001
     - To deprotect BASIC modules set 0xcd7 in ram to 0
 
 ========================================================================================
