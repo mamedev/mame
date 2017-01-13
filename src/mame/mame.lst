@@ -14099,7 +14099,7 @@ orbit1                          //
 shark                           //
 
 @source:hapyfish.cpp
-hapyfsh2						// bootleg
+hapyfsh2                        // bootleg
 
 @source:harddriv.cpp
 harddriv                        // 136052           (c) 1988
@@ -17426,6 +17426,11 @@ wilytowr                        // M63 (c) 1984
 
 @source:m6805evs.cpp
 m6805evs                        //
+
+@source:m68705prg.cpp
+705p3prg                        //
+705p5prg                        //
+705u3prg                        //
 
 @source:m72.cpp
 airduel                         // (c) 1990 (World)
@@ -29597,7 +29602,7 @@ pbaction4                       // (c) 1985 Tehkan
 pbaction5                       // (c) 1985 Tehkan
 
 @source:pc.cpp
-ataripc1						// Atari PC1 
+ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
@@ -35939,7 +35944,7 @@ tekipaki                        // TP-020 (c) 1991 Toaplan
 truxton2                        // TP-024 (c) 1992 Toaplan
 vfive                           // TP-027 (c) 1993 Toaplan (Japan)
 whoopee                         // TP-025
-enmadaio						// TP-031
+enmadaio                        // TP-031
 
 @source:toki.cpp
 juju                            // (c) 1989 Tad (Japan)
