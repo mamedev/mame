@@ -127,6 +127,13 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
+#ifndef NO_USE_PORTAUDIO
+	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
+	{ OSDOPTION_PA_API,                       OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio API" },
+	{ OSDOPTION_PA_DEVICE,                    OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio device" },
+	{ OSDOPTION_PA_LATENCY "(0.001-0.25)",    "0",              OPTION_FLOAT,     "suggested latency in seconds, 0 for default" },
+#endif
+
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
 	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "Audio output device" },
@@ -213,6 +220,9 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#ifndef NO_USE_PORTAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);

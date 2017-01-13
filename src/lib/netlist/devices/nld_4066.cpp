@@ -24,16 +24,24 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI() { }
+		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
 	public:
 		NETLIB_SUB(vdd_vss) m_supply;
-		NETLIB_SUB(R) m_R;
+		NETLIB_SUB(R_base) m_R;
 
 		analog_input_t m_control;
 		param_double_t m_base_r;
 	};
+
+	NETLIB_RESET(CD4066_GATE)
+	{
+		// Start in off condition
+		// FIXME: is ROFF correct?
+		m_R.set_R(NL_FCONST(1.0) / netlist().gmin());
+
+	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{

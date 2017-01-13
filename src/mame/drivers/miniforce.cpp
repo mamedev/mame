@@ -47,7 +47,7 @@
  *
  * Misc links about Force Computes and this board:
  *------------------------------------------------
- * http://bitsavers.trailing-edge.com/pdf/forceComputers/
+ * http://bitsavers.org/pdf/forceComputers/
  *
  * Description, from datasheets etc
  * --------------------------------
@@ -66,6 +66,34 @@
  * - One 5 1/4" full height space for the winchester drive
  * - Up to 6 free slots for system expansion
  *
+ * Features per version
+ * --------------------------------------------------------------------------
+ *  Description             miniFORCE 2P21A  miniFORCE 2P21   miniFORCE 2P21S
+ * --------------------------------------------------------------------------
+ *  CPU 68020                20 MHz           16.7 MHz         12.5 MHz
+ *  FPU 68881                20 MHz           16.7 MHz         12.5 MHz
+ *  Memory SRAM              512KB            512KB            512KB
+ *  Serial 68561 MPSC        2 RS232 ports    2 RS232 ports    2 RS232 ports
+ *  Winchester HDD           51 MB            51 MB            20 MB
+ *  Floppy                   1 MB             1 MB             1 MB
+ *  Timer 68230 PIT          1                1                1
+ *  RTOS                     PDOS             PDOS             PDOS
+ * --------------------------------------------------------------------------
+ *
+ * Address Map from CPU-21 board perspective
+ * --------------------------------------------------------------------------
+ *  Range                   Decscription
+ * --------------------------------------------------------------------------
+ * 00000000-0007FFFF        Local 512KB SRAM CPU-21 CPU board
+ * 00080000-000FFFFF        VME A32 512KB SRAM CPU-22 SRAM board (optional)
+ * 00080000-FAFFFFFF        VME A32 Memory if no CPU-22 installed
+ * 00100000-FAFFFFFF        VME A32 Memory if CPU-22 installed
+ * FCB00000-FCB001FF        VME A24 First SIO-1 card (optional)
+ * FCB01000-FCB0100F        VME A24 WFC-l card
+ * FCB02000-FCB022FF        VME A24 ASCU-l/2 card (optional)
+ * FF000000-FF07FFFF        EPROM Area 1
+ * FF080000-FFFFFFFF        Local I/O devices
+ * --------------------------------------------------------------------------
  */
 #include "emu.h"
 #include "bus/vme/vme.h"

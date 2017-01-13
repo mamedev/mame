@@ -84,7 +84,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_UPDATE(solver)
 {
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 		return;
 
 	/* force solving during start up if there are no time-step devices */
@@ -95,13 +95,13 @@ NETLIB_UPDATE(solver)
 	const std::size_t t_cnt = m_mat_solvers.size();
 	if (m_parallel())
 	{
-		omp_set_num_threads(3);
+		//omp_set_num_threads(3);
 		//omp_set_dynamic(0);
 		#pragma omp parallel
 		{
 			#pragma omp for
 			for (int i = 0; i <  t_cnt; i++)
-				if (m_mat_solvers[i]->has_timestep_devices())
+				if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 				{
 					// Ignore return value
 					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
@@ -110,7 +110,7 @@ NETLIB_UPDATE(solver)
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
-			if (m_mat_solvers[i]->has_timestep_devices())
+			if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 			{
 				// Ignore return value
 				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
@@ -256,14 +256,14 @@ void NETLIB_NAME(solver)::post_start()
 	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
 	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
 	m_params.m_nr_recalc_delay = netlist_time::from_double(m_nr_recalc_delay());
-	m_params.m_lte = m_dynamic_lte();
-	m_params.m_sor = m_gs_sor();
+	m_params.m_dynamic_lte = m_dynamic_lte();
+	m_params.m_gs_sor = m_gs_sor();
 
 	m_params.m_min_timestep = m_dynamic_min_ts();
-	m_params.m_dynamic = (m_dynamic_ts() == 1 ? true : false);
+	m_params.m_dynamic_ts = (m_dynamic_ts() == 1 ? true : false);
 	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
 		m_params.m_max_timestep *= 1;//NL_FCONST(1000.0);
 	}

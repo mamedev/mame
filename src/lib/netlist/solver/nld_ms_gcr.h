@@ -22,6 +22,9 @@
 #include "plib/pstream.h"
 
 #define NL_USE_SSE 0
+#if NL_USE_SSE
+#include <mmintrin.h>
+#endif
 
 namespace netlist
 {
@@ -263,16 +266,16 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const * RESTRICT other_cur_analog = t->connected_net_V();
 
 #if (0 ||NL_USE_SSE)
-		__m128d mg = mm_set_pd(0.0, 0.0);
-		__m128d mr = mm_set_pd(0.0, 0.0);
+		__m128d mg = _mm_set_pd(0.0, 0.0);
+		__m128d mr = _mm_set_pd(0.0, 0.0);
 		unsigned i = 0;
 		for (; i < term_count - 1; i+=2)
 		{
-			mg = mm_add_pd(mg, mm_loadu_pd(&gt[i]));
-			mr = mm_add_pd(mr, mm_loadu_pd(&Idr[i]));
+			mg = _mm_add_pd(mg, _mm_loadu_pd(&gt[i]));
+			mr = _mm_add_pd(mr, _mm_loadu_pd(&Idr[i]));
 		}
-		gtot_t = mm_cvtsd_f64(mg) + mm_cvtsd_f64(mm_unpackhi_pd(mg,mg));
-		RHS_t = mm_cvtsd_f64(mr) + mm_cvtsd_f64(mm_unpackhi_pd(mr,mr));
+		gtot_t = _mm_cvtsd_f64(mg) + _mm_cvtsd_f64(_mm_unpackhi_pd(mg,mg));
+		RHS_t = _mm_cvtsd_f64(mr) + _mm_cvtsd_f64(_mm_unpackhi_pd(mr,mr));
 		for (; i < term_count; i++)
 		{
 			gtot_t += gt[i];
@@ -356,16 +359,16 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		//__builtin_prefetch(&new_V[j-1], 1);
 		//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
 #if (NL_USE_SSE)
-		__m128d tmp = mm_set_pd1(0.0);
+		__m128d tmp = _mm_set_pd1(0.0);
 		const unsigned e = mat.ia[j+1];
 		unsigned pk = mat.diag[j] + 1;
 		for (; pk < e - 1; pk+=2)
 		{
 			//tmp += m_A[pk] * new_V[mat.ja[pk]];
-			tmp = mm_add_pd(tmp, mm_mul_pd(mm_set_pd(m_A[pk], m_A[pk+1]),
+			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(m_A[pk], m_A[pk+1]),
 					_mm_set_pd(new_V[mat.ja[pk]], new_V[mat.ja[pk+1]])));
 		}
-		double tmpx = mm_cvtsd_f64(tmp) + mm_cvtsd_f64(mm_unpackhi_pd(tmp,tmp));
+		double tmpx = _mm_cvtsd_f64(tmp) + _mm_cvtsd_f64(_mm_unpackhi_pd(tmp,tmp));
 		for (; pk < e; pk++)
 		{
 			tmpx += m_A[pk] * new_V[mat.ja[pk]];

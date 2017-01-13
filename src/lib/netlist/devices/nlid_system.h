@@ -175,7 +175,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().setup().family_from_model(m_FAMILY()));
+			set_logic_family(netlist().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
@@ -311,39 +311,7 @@ namespace netlist
 		{
 			for (int i=0; i < m_N(); i++)
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
-
-			plib::pstring_vector_t cmds(m_func(), " ");
-			m_precompiled.clear();
-
-			for (std::size_t i=0; i < cmds.size(); i++)
-			{
-				pstring cmd = cmds[i];
-				rpn_inst rc;
-				if (cmd == "+")
-					rc.m_cmd = ADD;
-				else if (cmd == "-")
-					rc.m_cmd = SUB;
-				else if (cmd == "*")
-					rc.m_cmd = MULT;
-				else if (cmd == "/")
-					rc.m_cmd = DIV;
-				else if (cmd.startsWith("A"))
-				{
-					rc.m_cmd = PUSH_INPUT;
-					rc.m_param = cmd.substr(1).as_long();
-				}
-				else
-				{
-					bool err = false;
-					rc.m_cmd = PUSH_CONST;
-					rc.m_param = cmd.as_double(&err);
-					if (err)
-						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
-				}
-				m_precompiled.push_back(rc);
-			}
-
-
+			compile();
 		}
 
 	protected:
@@ -359,6 +327,7 @@ namespace netlist
 			MULT,
 			SUB,
 			DIV,
+			POW,
 			PUSH_CONST,
 			PUSH_INPUT
 		};
@@ -369,6 +338,8 @@ namespace netlist
 			rpn_cmd m_cmd;
 			nl_double m_param;
 		};
+
+		void compile();
 
 		param_int_t m_N;
 		param_str_t m_func;
@@ -386,7 +357,7 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
-		, m_R(*this, "R")
+		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
@@ -396,16 +367,12 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_SUB(R) m_R;
+		NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI()
-		{
-			m_last_state = 0;
-			m_R.set_R(m_ROFF());
-		}
+		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
 

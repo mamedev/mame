@@ -34,12 +34,12 @@ namespace netlist
  *     SLEW = unity gain slew rate in V/s
  *     RI = input resistance in Ohms
  *     RO = output resistance in Ohms
- *     DAB = quiescent supply current in A
- */
-
-/* .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
+ *     DAB = Differential Amp Bias ~ op amp's total quiescent current.
  *
- * Differential Amp Bias ~ op amp's total quiescent current.
+ * .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
+ *
+ * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
+ *
  * */
 
 NETLIB_UPDATE(OPAMP)
@@ -78,6 +78,8 @@ NETLIB_RESET(OPAMP)
 		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
+
+		//printf("Min Freq %s: %f\n", name().c_str(), 1.0 / (CP*RP / (G*RP)));
 
 		m_CP->m_C.setTo(CP);
 		m_RP.set_R(RP);

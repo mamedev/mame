@@ -66,26 +66,47 @@
  *
  * History of Force Computers
  *---------------------------
+ * see fccpu30.cpp
  *
  * Misc links about Force Computes and this board:
  *------------------------------------------------
- * http://bitsavers.trailing-edge.com/pdf/forceComputers/
+ * http://bitsavers.org/pdf/forceComputers/
  *
  * Description(s)
  * -------------
- * CPU-20 has the following feature set
+ * CPU-20 has the following feature set:
+ * - 68020 CPU with l6.7MHz Clock Frequency
+ * - 68881 Floating Point Coprocessor with l6.7MHz Clock Frequency
+ * - Static RAM 5l2Kbyte with 55ns access time
+ * - 5l2Kbyte (max) of ROM/EPROM for the system
+ * - 2 RS232 Multi Protocol Communication Interfaces (110-38400 Baud)
+ * - Parallel Interface and Timer Chip provides local control and timer function
+ * - VMXbus Primary Master Interface to p2 connector
+ * - Local Interrupt handling via interrupt vectors
+ * - Each VMEbus IRQ level can be enabled/disabled via software
+ * - Address range for the short I/O address modifies (AM4)
+ * - Address range for the standard address modifier
+ * - Single level bus arbiter
+ * - One level slave bus arbitration
+ * - Power monitor
+ * - RESET and SOFTWARE ABORT function switches
+ * - Fully VMEbus, VMXbus and IEEE Pl~14 compatible
  *
  * Address Map
  * --------------------------------------------------------------------------
  *  Range                   Decscription
  * --------------------------------------------------------------------------
+Basadressen av I / O-enheter:
  * 00000000-0xxFFFFF        Shared DRAM D8-D32
  * 0yy00000-FAFFFFFF        VME A32 D8-D32     yy=xx+1
  * FB000000-FBFEFFFF        VME A24 D8-D32
  * FBFF0000-FBFFFFFF        VME A16 D8-D32
  * FC000000-FCFEFFFF        VME A24 D8-D16
  * FCFF0000-FCFFFFFF        VME A16 D8-D16
- *  .... TBC
+ * FF800800                 BIM
+ * FF800C00                 PIT
+ * FF800000                 MPCC
+ * FF800A00                 RTC
  * --------------------------------------------------------------------------
  *
  * PIT #1 hardware wiring
@@ -121,10 +142,8 @@
  *---------------------------------------------------------------------------
  *  TODO:
  *  - Find accurate documentation and adjust memory map
- *  - Add layouts and system description(s)
+ *  - Add layout
  *  - Write & add 68561 UART
- *  - Write & add VME device
- *  - Write & add 68153 BIM
  *  - Add 68230 PIT
  *  - Add variants of boards in the CPU-20 and CPU-21 family
  *  - Add FGA, DUSCC devices and CPU-22 variants
@@ -137,19 +156,23 @@
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 #include "bus/rs232/rs232.h"
+#include "machine/68230pit.h"
+#include "machine/68153bim.h"
 #include "machine/clock.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
+#define LOG_INT     0x08
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL | LOG_INT)
 
 #define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
 #define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
 
 #define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
 #define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
 
 #if VERBOSE & LOG_PRINTF
 #define logerror printf
@@ -167,20 +190,33 @@ public:
 cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device (mconfig, type, tag)
 		, m_maincpu (*this, "maincpu")
+		, m_pit (*this, "pit")
+		, m_bim  (*this, "bim")
 	{
 	}
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
+
+	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
+	uint8_t bim_irq_state;
+	int bim_irq_level;
+
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
 private:
 	required_device<m68000_base_device> m_maincpu;
+	required_device<pit68230_device> m_pit;
+	required_device<bim68153_device> m_bim;
+
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint32_t  *m_sysrom;
 	uint32_t  m_sysram[2];
+	void update_irq_to_maincpu();
 };
 
+/*
+*/
 static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, cpu20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)   /* ROM mirror just during reset */
@@ -188,6 +224,11 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, cpu20_state)
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
+//	AM_RANGE (0xff800000, 0xff80000f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0x00ff00ff)
+//	AM_RANGE (0xff800200, 0xff80020f) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
+	AM_RANGE (0xff800800, 0xff80080f) AM_DEVREADWRITE8("bim", bim68153_device, read, write, 0xff00ff00)
+//	AM_RANGE (0xff800a00, 0xff800a0f) AM_DEVREADWRITE8("rtc", rtc_device, read, write, 0x00ff00ff)
+	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -241,25 +282,33 @@ WRITE32_MEMBER (cpu20_state::bootvect_w){
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
 }
 
-#if 0
+WRITE_LINE_MEMBER(cpu20_state::bim_irq_callback)
+{
+	LOGINT("%s(%02x)\n", FUNCNAME, state);
+
+	bim_irq_state = state;
+	bim_irq_level = m_bim->get_irq_level();
+	LOGINT(" - BIM irq level  %02x\n", bim_irq_level);
+	update_irq_to_maincpu();
+}
+
 void cpu20_state::update_irq_to_maincpu()
 {
-	LOGINT(("%s()\n", FUNCNAME);
-	LOGINT((" - fga_irq_level: %02x\n", fga_irq_level));
-	LOGINT((" - fga_irq_state: %02x\n", fga_irq_state));
-	switch (fga_irq_level & 0x07)
+	LOGINT("%s()\n", FUNCNAME);
+	LOGINT(" - bim_irq_level: %02x\n", bim_irq_level);
+	LOGINT(" - bim_irq_state: %02x\n", bim_irq_state);
+	switch (bim_irq_level & 0x07)
 	{
-	case 1: m_maincpu->set_input_line(M68K_IRQ_1, fga_irq_state); break;
-	case 2: m_maincpu->set_input_line(M68K_IRQ_2, fga_irq_state); break;
-	case 3: m_maincpu->set_input_line(M68K_IRQ_3, fga_irq_state); break;
-	case 4: m_maincpu->set_input_line(M68K_IRQ_4, fga_irq_state); break;
-	case 5: m_maincpu->set_input_line(M68K_IRQ_5, fga_irq_state); break;
-	case 6: m_maincpu->set_input_line(M68K_IRQ_6, fga_irq_state); break;
-	case 7: m_maincpu->set_input_line(M68K_IRQ_7, fga_irq_state); break;
+	case 1: m_maincpu->set_input_line(M68K_IRQ_1, bim_irq_state); break;
+	case 2: m_maincpu->set_input_line(M68K_IRQ_2, bim_irq_state); break;
+	case 3: m_maincpu->set_input_line(M68K_IRQ_3, bim_irq_state); break;
+	case 4: m_maincpu->set_input_line(M68K_IRQ_4, bim_irq_state); break;
+	case 5: m_maincpu->set_input_line(M68K_IRQ_5, bim_irq_state); break;
+	case 6: m_maincpu->set_input_line(M68K_IRQ_6, bim_irq_state); break;
+	case 7: m_maincpu->set_input_line(M68K_IRQ_7, bim_irq_state); break;
 	default: logerror("Programmatic error in %s, please report\n", FUNCNAME);
 	}
 }
-#endif
 
 static SLOT_INTERFACE_START(fccpu20_vme_cards)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
@@ -273,9 +322,23 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68020, XTAL_16MHz) /* Crytstal not verified */
 	MCFG_CPU_PROGRAM_MAP (cpu20_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
 
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu20_vme_cards, nullptr)
+
+	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_8_664MHz)
+	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("bim", bim68153_device, int2_w))
+
+//	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL_8_664MHz)
+
+	MCFG_MC68153_ADD("bim", XTAL_16MHz / 2)	
+	MCFG_BIM68153_OUT_INT_CB(WRITELINE(cpu20_state, bim_irq_callback))
+		/*INT0 - Abort switch */
+		/*INT1 - MPCC@8.064 MHz aswell */
+		/*INT2 - PI/T timer */
+		/*INT3 - SYSFAIL/IRQVMX/ACFAIL/MPCC2/3 */
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -292,7 +355,37 @@ ROM_END
  * System ROM information
  *
  * xxxxxxx bootprom version xxx is released mmm dd, yyyy, coprighted by FORCE Computers Gmbh
+ *
+ * BIM setup: (reordered for improved reading)
+ * : 0 Reg vector <- 1f
+ * : 1 Reg vector <- 1c
+ * : 2 Reg vector <- 1d
+ * : 3 Reg vector <- 1c
+ * : 0 Reg control <- 57 - Lev:7 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
+ * : 1 Reg control <- 54 - Lev:4 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
+ * : 2 Reg control <- 55 - Lev:5 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
+ * : 3 Reg control <- 54 - Lev:4 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0 
+ *
+ * PIT setup:
+ * :pit Reg 0a -> 00
+ * :pit Reg 00 <- 30 - PGCR  - Mode 0, H34:enabled, H12:enabled, Sense assert H4:Lo, H3:Lo, H2:Lo, H1:Lo
+ * :pit Reg 01 <- 08 - PSSR - PC4 pin activated, PC5 pin support no interrupts, H prio mode:0
+ * :pit Reg 06 <- 84 - PACR
+ * :pit Reg 02 <- 00 - PADDR: 00
+ * :pit Reg 07 <- 84 - PBCR
+ * :pit Reg 09 <- ff - PBDR
+ * :pit Reg 03 <- ff - PBDDR: ff
+ * :pit Reg 0c <- 07 - PCDR
+ * :pit Reg 04 <- 87 - PCDDR: 87
+ * :pit Reg 15 <- d8 - CPRL
+ * :pit Reg 14 <- 09 - CPRM
+ * :pit Reg 13 <- 00 - CPRH
+ * :pit Reg 10 <- e1 - TCR - PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled
+                           - PC2 used as I/O pin,CLK and x32 prescaler are used
+						   - Timer reload the preload values when reaching 0 (zero)
+						   - Timer is enabled
  */
+
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
 COMP (1986, fccpu20,      0,       0,      cpu20,          cpu20,    driver_device,      0,      "Force Computers Gmbh",   "SYS68K/CPU-20",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.25" blue="0.28" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.1" green="0.025" blue="0.028" /></disk>
+		<disk state="1"><color red="1.0" green="0.25" blue="0.28" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="30" top="0" bottom="30" />
+
+		<bezel name="6.0" element="led"><bounds x="3"  y="5" width="1" height="1" /></bezel>
+		<bezel name="6.1" element="led"><bounds x="6"  y="5" width="1" height="1" /></bezel>
+		<bezel name="6.2" element="led"><bounds x="9"  y="5" width="1" height="1" /></bezel>
+		<bezel name="6.3" element="led"><bounds x="12" y="5" width="1" height="1" /></bezel>
+		<bezel name="6.4" element="led"><bounds x="15" y="5" width="1" height="1" /></bezel>
+		<bezel name="6.5" element="led"><bounds x="18" y="5" width="1" height="1" /></bezel>
+
+		<bezel name="5.0" element="led"><bounds x="3"  y="7.5" width="1" height="1" /></bezel>
+		<bezel name="5.1" element="led"><bounds x="6"  y="7.5" width="1" height="1" /></bezel>
+		<bezel name="5.2" element="led"><bounds x="9"  y="7.5" width="1" height="1" /></bezel>
+		<bezel name="5.3" element="led"><bounds x="12" y="7.5" width="1" height="1" /></bezel>
+		<bezel name="5.4" element="led"><bounds x="15" y="7.5" width="1" height="1" /></bezel>
+		<bezel name="5.5" element="led"><bounds x="18" y="7.5" width="1" height="1" /></bezel>
+
+		<bezel name="4.0" element="led"><bounds x="3"  y="10" width="1" height="1" /></bezel>
+		<bezel name="4.1" element="led"><bounds x="6"  y="10" width="1" height="1" /></bezel>
+		<bezel name="4.2" element="led"><bounds x="9"  y="10" width="1" height="1" /></bezel>
+		<bezel name="4.3" element="led"><bounds x="12" y="10" width="1" height="1" /></bezel>
+		<bezel name="4.4" element="led"><bounds x="15" y="10" width="1" height="1" /></bezel>
+		<bezel name="4.5" element="led"><bounds x="18" y="10" width="1" height="1" /></bezel>
+
+		<bezel name="3.0" element="led"><bounds x="3"  y="12.5" width="1" height="1" /></bezel>
+		<bezel name="3.1" element="led"><bounds x="6"  y="12.5" width="1" height="1" /></bezel>
+		<bezel name="3.2" element="led"><bounds x="9"  y="12.5" width="1" height="1" /></bezel>
+		<bezel name="3.3" element="led"><bounds x="12" y="12.5" width="1" height="1" /></bezel>
+		<bezel name="3.4" element="led"><bounds x="15" y="12.5" width="1" height="1" /></bezel>
+		<bezel name="3.5" element="led"><bounds x="18" y="12.5" width="1" height="1" /></bezel>
+
+		<bezel name="2.0" element="led"><bounds x="3"  y="15" width="1" height="1" /></bezel>
+		<bezel name="2.1" element="led"><bounds x="6"  y="15" width="1" height="1" /></bezel>
+		<bezel name="2.2" element="led"><bounds x="9"  y="15" width="1" height="1" /></bezel>
+		<bezel name="2.3" element="led"><bounds x="12" y="15" width="1" height="1" /></bezel>
+		<bezel name="2.4" element="led"><bounds x="15" y="15" width="1" height="1" /></bezel>
+		<bezel name="2.5" element="led"><bounds x="18" y="15" width="1" height="1" /></bezel>
+
+		<bezel name="digit8" element="digit"><bounds x="9" y="0" width="2" height="3" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="11" y="0" width="2" height="3" /></bezel>
+
+	</view>
+</mamelayout>

@@ -379,7 +379,7 @@ void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
+	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
 		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
@@ -390,7 +390,7 @@ void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices())
+	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
 		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
@@ -488,7 +488,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
 		/*
 		 * FIXME: We should extend the logic to use either all nets or
@@ -509,7 +509,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
 			if (std::fabs(DD2) > NL_FCONST(1e-60)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_lte / std::fabs(NL_FCONST(0.5)*DD2));
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 

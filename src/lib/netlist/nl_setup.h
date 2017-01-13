@@ -238,6 +238,7 @@ namespace netlist
 		/* parse a source */
 
 		void include(const pstring &netlist_name);
+
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring name);
 
 		bool parse_stream(plib::pistream &istrm, const pstring &name);
@@ -257,7 +258,6 @@ namespace netlist
 
 		/* model / family related */
 
-		const logic_family_desc_t *family_from_model(const pstring &model);
 		const pstring model_value_str(model_map_t &map, const pstring &entity);
 		nl_double model_value(model_map_t &map, const pstring &entity);
 

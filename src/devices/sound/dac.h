@@ -277,6 +277,7 @@ public: \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class)
 
 // DAC chips
+DAC_GENERATOR(AD7224, ad7224_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7224", "ad7224")
 DAC_GENERATOR(AD7521, ad7521_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7521", "ad7521")
 DAC_GENERATOR(AD7524, ad7524_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7524", "ad7524")
 DAC_GENERATOR(AD7528, ad7528_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7528", "ad7528") /// 2 x vin + 2 x vout

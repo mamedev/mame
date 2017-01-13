@@ -14264,6 +14264,7 @@ bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
 cmsport                         // Conic
+cnbaskb                         // Conic
 cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
@@ -14283,6 +14284,7 @@ elecdet                         // Ideal
 esbattle                        // Entex
 esoccer                         // Entex
 fxmcr165                        // Gakken
+ginv1000                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
@@ -29198,9 +29200,11 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+sexpert                         //
 sexpertb                        //
 sexpertc                        //
-sfortea                         //
+sexpertca                       //
+sforte                          //
 sforteb                         //
 sforteba                        //
 sfortec                         //
@@ -31004,6 +31008,7 @@ poly880                         //
 
 @source:polyplay.cpp
 polyplay                        //
+polyplay2                       //
 
 @source:pong.cpp
 breakout                        // (c) 1976 Atari

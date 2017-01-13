@@ -408,7 +408,6 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 		m_icount(0),
 		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
-		m_setup(nullptr),
 		m_setup_func(nullptr)
 {
 }
@@ -418,7 +417,6 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, devi
 		m_icount(0),
 		m_old(netlist::netlist_time::zero()),
 		m_netlist(nullptr),
-		m_setup(nullptr),
 		m_setup_func(nullptr)
 {
 }
@@ -442,7 +440,6 @@ void netlist_mame_device_t::device_start()
 	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
-	m_setup = global_alloc(netlist::setup_t(*m_netlist));
 
 	// register additional devices
 
@@ -455,11 +452,11 @@ void netlist_mame_device_t::device_start()
 		if( sdev != nullptr )
 		{
 			LOG_DEV_CALLS(("Preparse subdevice %s/%s\n", d.name(), d.shortname()));
-			sdev->pre_parse_action(*m_setup);
+			sdev->pre_parse_action(setup());
 		}
 	}
 
-	m_setup_func(*m_setup);
+	m_setup_func(setup());
 
 	/* let sub-devices tweak the netlist */
 	for (device_t &d : subdevices())
@@ -468,12 +465,11 @@ void netlist_mame_device_t::device_start()
 		if( sdev != nullptr )
 		{
 			LOG_DEV_CALLS(("Found subdevice %s/%s\n", d.name(), d.shortname()));
-			sdev->custom_netlist_additions(*m_setup);
+			sdev->custom_netlist_additions(setup());
 		}
 	}
 
-	m_setup->start_devices();
-	m_setup->resolve_inputs();
+	netlist().start();
 
 	netlist().save(*this, m_rem, "m_rem");
 	netlist().save(*this, m_div, "m_div");
@@ -505,12 +501,8 @@ void netlist_mame_device_t::device_reset()
 void netlist_mame_device_t::device_stop()
 {
 	LOG_DEV_CALLS(("device_stop\n"));
-	netlist().print_stats();
-
 	netlist().stop();
 
-	global_free(m_setup);
-	m_setup = nullptr;
 	global_free(m_netlist);
 	m_netlist = nullptr;
 }

@@ -182,7 +182,7 @@ protected:
 NETLIB_OBJECT_DERIVED(R, R_base)
 {
 	NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
-	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_R(*this, "R", 1e9)
 	{
 	}
 
@@ -193,6 +193,10 @@ protected:
 	NETLIB_RESETI();
 	//NETLIB_UPDATEI() { }
 	NETLIB_UPDATE_PARAMI();
+
+private:
+	/* protect set_R ... it's a recipe to desaster when used to bypass the parameter */
+	using NETLIB_NAME(R_base)::set_R;
 };
 
 // -----------------------------------------------------------------------------
@@ -202,9 +206,9 @@ protected:
 NETLIB_OBJECT(POT)
 {
 	NETLIB_CONSTRUCTOR(POT)
-	, m_R1(*this, "R1")
-	, m_R2(*this, "R2")
-	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_R1(*this, "_R1")
+	, m_R2(*this, "_R2")
+	, m_R(*this, "R", 10000)
 	, m_Dial(*this, "DIAL", 0.5)
 	, m_DialIsLog(*this, "DIALLOG", 0)
 	{
@@ -232,8 +236,8 @@ private:
 NETLIB_OBJECT(POT2)
 {
 	NETLIB_CONSTRUCTOR(POT2)
-	, m_R1(*this, "R1")
-	, m_R(*this, "R", 1.0 / netlist().gmin())
+	, m_R1(*this, "_R1")
+	, m_R(*this, "R", 10000)
 	, m_Dial(*this, "DIAL", 0.5)
 	, m_DialIsLog(*this, "DIALLOG", 0)
 	, m_Reverse(*this, "REVERSE", 0)

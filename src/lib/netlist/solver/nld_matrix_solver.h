@@ -24,11 +24,11 @@ namespace netlist
 	{
 		int m_pivot;
 		nl_double m_accuracy;
-		nl_double m_lte;
+		nl_double m_dynamic_lte;
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
-		nl_double m_sor;
-		bool m_dynamic;
+		nl_double m_gs_sor;
+		bool m_dynamic_ts;
 		unsigned m_gs_loops;
 		unsigned m_nr_loops;
 		netlist_time m_nr_recalc_delay;

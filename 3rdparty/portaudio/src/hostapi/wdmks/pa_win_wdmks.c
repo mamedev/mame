@@ -1,5 +1,5 @@
 /*
-* $Id: pa_win_wdmks.c 1945 2015-01-21 06:24:32Z rbencina $
+* $Id$
 * PortAudio Windows WDM-KS interface
 *
 * Author: Andrew Baldwin, Robert Bielik (WaveRT)
@@ -61,6 +61,12 @@ of a device for the duration of active stream using those devices
 #define PA_LOGE_
 #define PA_LOGL_
 
+#ifdef __GNUC__
+#include <initguid.h>
+#define _WIN32_WINNT 0x0501
+#define WINVER 0x0501
+#endif
+
 #include <string.h> /* strlen() */
 #include <assert.h>
 #include <wchar.h>  /* iswspace() */
@@ -88,7 +94,9 @@ of a device for the duration of active stream using those devices
 #endif
 
 #include <windows.h>
+#ifndef __GNUC__ /* Fix for ticket #257: MinGW-w64: Inclusion of <winioctl.h> triggers multiple redefinition errors. */
 #include <winioctl.h>
+#endif
 #include <process.h>
 
 #include <math.h>

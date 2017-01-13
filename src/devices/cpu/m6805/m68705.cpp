@@ -16,7 +16,7 @@ ROM_END
 
 ROM_START( m68705u3 )
 	ROM_REGION(0x0078, "bootstrap", 0)
-	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
 } // anonymous namespace
@@ -279,9 +279,7 @@ template <std::size_t N> WRITE8_MEMBER(m68705_new_device::port_ddr_w)
 
 template <std::size_t N> void m68705_new_device::port_cb_w()
 {
-	u8 const data(m_port_open_drain[N]
-			? m_port_latch[N] | ~m_port_ddr[N]
-			: (m_port_latch[N] & m_port_ddr[N]) | (m_port_input[N] & ~m_port_ddr[N]));
+	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
 	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
 }

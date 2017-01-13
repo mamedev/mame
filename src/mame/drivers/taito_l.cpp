@@ -33,8 +33,6 @@ TODO:
 - plgirls doesn't work without a kludge because of an interrupt issue. This
   happens because the program enables interrupts before setting IM2, so the
   interrupt vector is interpreted as IM0, which is obviously bogus.
-- The puzznic protection is worked around,  but I'm not happy with it
-  (the 68705-returned values are wrong, I'm sure of that).
 - A bunch of control registers are simply ignored
 - The source of   irqs 0 and  1 is  unknown, while  2 is vblank  (0 is
   usually   ignored  by the  program,    1   leads  to  reading    the
@@ -57,6 +55,7 @@ puzznici note
 #include "emu.h"
 #include "includes/taito_l.h"
 #include "includes/taitoipt.h"
+#include "machine/taito68705interface.h"
 
 #include "audio/taitosnd.h"
 
@@ -90,8 +89,6 @@ struct
 	{ &taitol_state::taitol_chardef1e_m, 0x6000 }, // 1e
 	{ &taitol_state::taitol_chardef1f_m, 0x7000 }, // 1f
 };
-
-u8 const puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
 
 } // anonymous namespace
 
@@ -155,16 +152,6 @@ void taitol_1cpu_state::state_register()
 	taitol_state::state_register();
 
 	save_item(NAME(m_extport));
-}
-
-void puzznic_state::state_register()
-{
-	taitol_1cpu_state::state_register();
-
-	save_item(NAME(m_mcu_pos));
-	save_item(NAME(m_mcu_reply_len));
-	save_item(NAME(m_last_data_adr));
-	save_item(NAME(m_last_data));
 }
 
 void horshoes_state::state_register()
@@ -244,15 +231,6 @@ void taitol_1cpu_state::taito_machine_reset()
 	taitol_state::taito_machine_reset();
 
 	m_extport = 0;
-}
-
-void puzznic_state::taito_machine_reset()
-{
-	taitol_1cpu_state::taito_machine_reset();
-
-	m_mcu_reply = puzznic_mcu_reply;
-	m_mcu_pos = m_mcu_reply_len = 0;
-	m_last_data_adr = m_last_data = 0;
 }
 
 void horshoes_state::taito_machine_reset()
@@ -504,32 +482,9 @@ READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 	return m_ymsnd->read(space, offset & 1);
 }
 
-WRITE8_MEMBER(puzznic_state::mcu_data_w)
-{
-	m_last_data = data;
-	m_last_data_adr = space.device().safe_pc();
-//  logerror("mcu write %02x (%04x)\n", data, space.device().safe_pc());
-	switch (data)
-	{
-	case 0x43:
-		m_mcu_pos = 0;
-		m_mcu_reply_len = ARRAY_LENGTH(puzznic_mcu_reply);
-		break;
-	}
-}
-
 WRITE8_MEMBER(taitol_state::mcu_control_w)
 {
 //  logerror("mcu control %02x (%04x)\n", data, space.device().safe_pc());
-}
-
-READ8_MEMBER(puzznic_state::mcu_data_r)
-{
-//  logerror("mcu read (%04x) [%02x, %04x]\n", space.device().safe_pc(), last_data, last_data_adr);
-	if (m_mcu_pos == m_mcu_reply_len)
-		return 0;
-
-	return m_mcu_reply[m_mcu_pos++];
 }
 
 READ8_MEMBER(taitol_state::mcu_control_r)
@@ -810,12 +765,11 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, puzznic_state )
+static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM     // Wrong, used to overcome protection
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("mcu", arkanoid_68705p3_device, data_r, data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // Control register, function unknown
 ADDRESS_MAP_END
@@ -825,8 +779,6 @@ static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM     // Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // Control register, function unknown
@@ -1931,11 +1883,13 @@ static MACHINE_CONFIG_START( plotting, taitol_1cpu_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( puzznic, plotting, puzznic_state )
+static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznic_map)
+
+	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL_13_33056MHz / 4) /* clock is complete guess */
 
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, puzznic)
 MACHINE_CONFIG_END
@@ -2344,7 +2298,7 @@ ROM_START( puzznic )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -2359,7 +2313,7 @@ ROM_START( puzznicj )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "c20-04.ic11",  0x00000, 0x20000, CRC(a4150b6c) SHA1(27719b8993735532cd59f4ed5693ff3143ee2336) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
