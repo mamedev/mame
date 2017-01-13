@@ -2206,7 +2206,7 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	if (basetype==ADDR_IN_DECHL) util::stream_format(stream, " %s", type_x[7]);
 
 	if (basetype==REG_16BIT) util::stream_format(stream, " %s", reg16[val&3]);
-	if (basetype==REG_8BIT) util::stream_format(stream, " %s", reg8[val&3]);
+	if (basetype==REG_8BIT) util::stream_format(stream, " %s", reg8[val&7]);
 	if (basetype==CONDITIONAL) util::stream_format(stream, " %s", conditions[val]);
 	if (basetype==STACKPOINTER) util::stream_format(stream, " SP");
 	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
