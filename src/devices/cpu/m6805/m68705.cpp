@@ -279,9 +279,7 @@ template <std::size_t N> WRITE8_MEMBER(m68705_new_device::port_ddr_w)
 
 template <std::size_t N> void m68705_new_device::port_cb_w()
 {
-	u8 const data(m_port_open_drain[N]
-			? m_port_latch[N] | ~m_port_ddr[N]
-			: (m_port_latch[N] & m_port_ddr[N]) | (m_port_input[N] & ~m_port_ddr[N]));
+	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
 	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
 }

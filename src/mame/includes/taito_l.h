@@ -248,34 +248,6 @@ protected:
 };
 
 
-class puzznic_state : public taitol_1cpu_state
-{
-public:
-	puzznic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taitol_1cpu_state(mconfig, type, tag)
-		, m_mcu_reply(nullptr)
-		, m_mcu_pos(0)
-		, m_mcu_reply_len(0)
-		, m_last_data_adr(0)
-		, m_last_data(0)
-	{
-	}
-
-	DECLARE_READ8_MEMBER(mcu_data_r);
-	DECLARE_WRITE8_MEMBER(mcu_data_w);
-
-protected:
-	virtual void state_register() override;
-	virtual void taito_machine_reset() override;
-
-	u8 const *  m_mcu_reply;
-	int         m_mcu_pos;
-	int         m_mcu_reply_len;
-	int         m_last_data_adr;
-	int         m_last_data;
-};
-
-
 class horshoes_state : public taitol_1cpu_state
 {
 public:

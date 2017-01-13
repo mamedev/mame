@@ -3,53 +3,86 @@
 #include "emu.h"
 #include "machine/taito68705interface.h"
 
-#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 
 /*
    Most Taito 68705s share a similar (often identical) hookup.
    This file encapsulates that.
 
-	used by:
-	buggychl.cpp - buggychl
-	bking.cpp - bking3
-	40love.cpp - 40love
-	bublbobl.cpp - tokio
-	flstory.cpp - flstory
-	nycaptor.cpp - nycaptor
-	lsasquad.cpp - lsasquad
-	             - daikaiju
-	lkage.cpp    - lkage
+    used by:
+    buggychl.cpp - buggychl
+    bking.cpp - bking3
+    40love.cpp - 40love
+    bublbobl.cpp - tokio
+    flstory.cpp - flstory
+    nycaptor.cpp - nycaptor
+    lsasquad.cpp - lsasquad
+                 - daikaiju
+    lkage.cpp    - lkage
 
-	and the following with slight changes:
-	slapfght.cpp - tigerh (inverted status bits read on portC)
-	             - slapfght (extended outputs for scrolling)
- 	bigevglf.cpp - writes to mcu aren't latched(?)f
+    and the following with slight changes:
+    slapfght.cpp - tigerh (inverted status bits read on portC)
+                 - slapfght (extended outputs for scrolling)
+    bigevglf.cpp - writes to mcu aren't latched(?)f
 
 
-	not hooked up here, but possible (needs investigating)
-	pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
-	taitosj.cpp - ^^
-	changela.cpp - ^^
-	arkanoid.cpp - uses 68705 timers (they need to be moved to the 68705 core) and also some portB differences?
-	xain.cpp - not a Taito game (licensed to Taito?) but MCU hookup looks almost the same
-	renegade.cpp - ^^
-	matmania.cpp - ^^
+    not hooked up here, but possible (needs investigating)
+    pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
+    taitosj.cpp - ^^
+    changela.cpp - ^^
+    xain.cpp - not a Taito game (licensed to Taito?) but MCU hookup looks almost the same
+    renegade.cpp - ^^
+    matmania.cpp - ^^
 
-	68705 sets in Taito drivers that are NOT suitable for hookup here?
-	bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
-	mexico86.cpp - knightb, mexico86 - bootleg 68705s
-	retofinv.cpp - the current MCU dump is a bootleg at least
-	sqix.cpp - hotsmash - kaneko hookup, different from Taito ones.
+    68705 sets in Taito drivers that are NOT suitable for hookup here?
+    bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
+    mexico86.cpp - knightb, mexico86 - bootleg 68705s
+    retofinv.cpp - the current MCU dump is a bootleg at least
+    sqix.cpp - hotsmash - kaneko hookup, different from Taito ones.
 
-	there are other drivers (and games in existing drivers) that could hookup here, but currently lack MCU dumps.
+    there are other drivers (and games in existing drivers) that could hookup here, but currently lack MCU dumps.
 
 */
+
+
+namespace {
+
+MACHINE_CONFIG_FRAGMENT( taito68705 )
+	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTA_R_CB(READ8(taito68705_mcu_device, mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( arkanoid_68705p3 )
+	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_mcu_device_base, mcu_pa_r))
+	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pc_w))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( arkanoid_68705p5 )
+	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_mcu_device_base, mcu_pa_r))
+	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pc_w))
+MACHINE_CONFIG_END
+
+} // anonymous namespace
+
 
 const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
 const device_type TAITO68705_MCU_SLAP = &device_creator<taito68705_mcu_slap_device>;
 const device_type TAITO68705_MCU_TIGER = &device_creator<taito68705_mcu_tiger_device>;
 const device_type TAITO68705_MCU_BEG = &device_creator<taito68705_mcu_beg_device>;
+const device_type ARKANOID_68705P3 = &device_creator<arkanoid_68705p3_device>;
+const device_type ARKANOID_68705P5 = &device_creator<arkanoid_68705p5_device>;
+
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO68705_MCU, "Taito M68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__),
@@ -79,14 +112,6 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 
 
 
-
-static MACHINE_CONFIG_FRAGMENT( taito68705 )
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1,1))
-	MCFG_M68705_PORTA_R_CB(READ8(taito68705_mcu_device, mcu_porta_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_porta_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
-	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
-MACHINE_CONFIG_END
 
 machine_config_constructor taito68705_mcu_device::device_mconfig_additions() const
 {
@@ -325,22 +350,22 @@ taito68705_mcu_beg_device::taito68705_mcu_beg_device(const machine_config &mconf
 WRITE8_MEMBER(taito68705_mcu_beg_device::mcu_portb_w)
 {
 	// transitions are reversed
-    if ((mem_mask & 0x02) && (data & 0x02) && (~m_old_portB & 0x02) ) /* positive going transition of the clock */
-    {
+	if ((mem_mask & 0x02) && (data & 0x02) && (~m_old_portB & 0x02) ) /* positive going transition of the clock */
+	{
 		//if (m_main_sent)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
 		//m_to_mcu_latch = m_from_main; // this is weird, no latching?!
 		m_main_sent = false;
-    }
-    if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04)  ) /* positive going transition of the clock */
-    {
+	}
+	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04)  ) /* positive going transition of the clock */
+	{
 		m_from_mcu = m_from_mcu_latch;
 		m_mcu_sent = true;
 	//  logerror("sent %02x\n", m_from_mcu);
-    }
+	}
 
-   	m_old_portB = data;
+	m_old_portB = data;
 }
 
 WRITE8_MEMBER(taito68705_mcu_beg_device::mcu_w)
@@ -354,3 +379,159 @@ WRITE8_MEMBER(taito68705_mcu_beg_device::mcu_w)
 }
 
 
+// Arkanoid/Puzznic (completely different)
+
+READ8_MEMBER(arkanoid_mcu_device_base::data_r)
+{
+	// clear MCU semaphore flag and return data
+	u8 const result(m_mcu_latch);
+	m_mcu_flag = false;
+	m_semaphore_cb(CLEAR_LINE);
+	return result;
+}
+
+WRITE8_MEMBER(arkanoid_mcu_device_base::data_w)
+{
+	// set host semaphore flag and latch data
+	m_host_flag = true;
+	m_host_latch = data;
+	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+}
+
+CUSTOM_INPUT_MEMBER(arkanoid_mcu_device_base::semaphore_r)
+{
+	// bit 0 is host semaphore flag, bit 1 is MCU semaphore flag (both active low)
+	return (m_host_flag ? 0x00 : 0x01) | (m_mcu_flag ? 0x00 : 0x02) | 0xfc;
+}
+
+WRITE_LINE_MEMBER(arkanoid_mcu_device_base::reset_w)
+{
+	m_mcu->set_input_line(INPUT_LINE_RESET, state);
+	// TODO: determine whether host CPU controlled reset also clears the semaphore flags
+}
+
+READ8_MEMBER(arkanoid_mcu_device_base::mcu_pa_r)
+{
+	// PC2 controls whether host host latch drives the port
+	return BIT(m_pc_output, 2) ? 0xff : m_host_latch;
+}
+
+READ8_MEMBER(arkanoid_mcu_device_base::mcu_pb_r)
+{
+	return m_portb_r_cb(space, offset, mem_mask);
+}
+
+READ8_MEMBER(arkanoid_mcu_device_base::mcu_pc_r)
+{
+	// PC0 is the host semaphore flag (active high)
+	// PC1 is the MCU semaphoe flag (active low)
+	return (m_host_flag ? 0x01 : 0x00) | (m_mcu_flag ? 0x00 : 0x02) | 0xfc;
+}
+
+WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pa_w)
+{
+	m_pa_output = data;
+}
+
+WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
+{
+	// rising edge on PC2 clears the host semaphore flag
+	if (BIT(data, 2) && !BIT(m_pc_output, 2))
+	{
+		m_host_flag = false;
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	}
+
+	// PC3 sets the MCU semaphore when low
+	if (!BIT(data, 3))
+	{
+		m_mcu_flag = true;
+
+		// data is latched on falling edge
+		if (BIT(m_pc_output, 3))
+			m_mcu_latch = m_pa_output & (BIT(m_pc_output, 2) ? 0xff : m_host_latch);
+	}
+
+	m_pc_output = data;
+	if (!BIT(data, 3))
+		m_semaphore_cb(ASSERT_LINE);
+}
+
+arkanoid_mcu_device_base::arkanoid_mcu_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *name,
+		char const *tag,
+		device_t *owner,
+		uint32_t clock,
+		char const *shortname,
+		char const *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_mcu(*this, "mcu")
+	, m_semaphore_cb(*this)
+	, m_portb_r_cb(*this)
+	, m_host_flag(false)
+	, m_mcu_flag(false)
+	, m_host_latch(0xff)
+	, m_mcu_latch(0xff)
+	, m_pa_output(0xff)
+	, m_pc_output(0xff)
+{
+}
+
+void arkanoid_mcu_device_base::device_start()
+{
+	m_semaphore_cb.resolve_safe();
+	m_portb_r_cb.resolve_safe(0xff);
+
+	save_item(NAME(m_host_flag));
+	save_item(NAME(m_mcu_flag));
+	save_item(NAME(m_host_latch));
+	save_item(NAME(m_mcu_latch));
+	save_item(NAME(m_pa_output));
+	save_item(NAME(m_pc_output));
+
+	m_host_latch = 0xff;
+	m_mcu_latch = 0xff;
+	m_pa_output = 0xff;
+	m_pc_output = 0xff;
+}
+
+void arkanoid_mcu_device_base::device_reset()
+{
+	m_host_flag = false;
+	m_mcu_flag = false;
+
+	m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	m_semaphore_cb(CLEAR_LINE);
+}
+
+
+arkanoid_68705p3_device::arkanoid_68705p3_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		uint32_t clock)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P3, "Arkanoid MC68705P3 Interface", tag, owner, clock, "arkanoid_68705p3", __FILE__)
+{
+}
+
+machine_config_constructor arkanoid_68705p3_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(arkanoid_68705p3);
+}
+
+
+arkanoid_68705p5_device::arkanoid_68705p5_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		uint32_t clock)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P5, "Arkanoid MC68705P5 Interface", tag, owner, clock, "arkanoid_68705p5", __FILE__)
+{
+}
+
+machine_config_constructor arkanoid_68705p5_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(arkanoid_68705p5);
+}
