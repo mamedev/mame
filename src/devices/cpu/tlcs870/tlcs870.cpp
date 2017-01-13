@@ -1853,7 +1853,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 		m_op = LD;
 
 		m_param1_type = REG_8BIT;
-		m_param2 = bx & 0x7;
+		m_param1 = bx & 0x7;
 
 		m_param2_type = type;
 		m_param2 = val;
