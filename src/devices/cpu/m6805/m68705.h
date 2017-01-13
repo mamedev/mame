@@ -158,6 +158,7 @@ private:
 	devcb_read8             m_port_cb_r[PORT_COUNT];
 	devcb_write8            m_port_cb_w[PORT_COUNT];
 
+	u8                      m_vihtp;
 	u8                      m_pcr;
 	u8                      m_pl_data;
 	u16                     m_pl_addr;
@@ -239,5 +240,6 @@ protected:
 #define M68705_IRQ_LINE             (M6805_IRQ_LINE + 0)
 #define M68705_INT_TIMER            (M6805_IRQ_LINE + 1)
 #define M68705_VPP_LINE             (M6805_IRQ_LINE + 2)
+#define M68705_VIHTP_LINE           (M6805_IRQ_LINE + 3)
 
 #endif // MAME_CPU_M6805_M68705_H

@@ -23,9 +23,9 @@
  -------------------------------------------------------------------------
 
 */
-
-#include "cpu/m68000/m68000.h"
+#include "emu.h"
 #include "68153bim.h"
+#include "cpu/m68000/m68000.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02

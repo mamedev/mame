@@ -41,6 +41,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
+		m_sound_z80(*this, "soundz80bl"),
 		m_namco_sound(*this, "namco"),
 		m_tms(*this, "tms"),
 		m_sprite16_memory(*this, "sprite16_memory"),
@@ -54,6 +55,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
+	optional_device<cpu_device> m_sound_z80;
 	optional_device<namco_device> m_namco_sound;
 	optional_device<tms5220_device> m_tms;
 	uint8_t m_steer_last;
@@ -114,6 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(namco_53xx_k_r);
 	DECLARE_READ8_MEMBER(steering_changed_r);
 	DECLARE_READ8_MEMBER(steering_delta_r);
+	DECLARE_READ8_MEMBER(sound_z80_nmi_ack_r);
 	DECLARE_DRIVER_INIT(topracern);
 	DECLARE_DRIVER_INIT(polepos2);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

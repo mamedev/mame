@@ -38,6 +38,8 @@
 
 #include "debugger.h"
 
+#include <algorithm>
+
 #define IRQ_LEVEL_DETECT 0
 
 const uint8_t m6805_base_device::m_flags8i[256]=   /* increment */
@@ -304,6 +306,8 @@ void m6805_base_device::device_start()
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_state));
+
+	std::fill(std::begin(m_irq_state), std::end(m_irq_state), 0);
 }
 
 
@@ -320,7 +324,6 @@ void m6805_base_device::device_reset()
 	m_cc = 0;
 	m_pending_interrupts = 0;
 
-	memset(m_irq_state, 0, sizeof(int) * 9);
 	m_nmi_state = 0;
 
 	m_program = &space(AS_PROGRAM);

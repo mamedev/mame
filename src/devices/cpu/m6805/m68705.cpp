@@ -92,12 +92,10 @@ void m68705_device::execute_set_input(int inputnum, int state)
 {
 	if (m_irq_state[inputnum] != state)
 	{
-		m_irq_state[inputnum] = state;
+		m_irq_state[inputnum] = (state == ASSERT_LINE) ? ASSERT_LINE : CLEAR_LINE;
 
 		if (state != CLEAR_LINE)
-		{
 			m_pending_interrupts |= 1 << inputnum;
-		}
 	}
 }
 
@@ -214,7 +212,10 @@ m68705_new_device::m68705_new_device(
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_cb_r{ { *this }, { *this }, { *this }, { *this } }
 	, m_port_cb_w{ { *this }, { *this }, { *this }, { *this } }
+	, m_vihtp(CLEAR_LINE)
 	, m_pcr(0xff)
+	, m_pl_data(0xff)
+	, m_pl_addr(0xffff)
 {
 }
 
@@ -293,10 +294,7 @@ WRITE8_MEMBER(m68705_new_device::pcr_w)
 {
 	data |= ((data & 0x01) << 1); // lock out /PGE if /PLE is not asserted
 	if (!BIT(m_pcr, 2) && (0x20 & ((m_pcr ^ data) & ~data)))
-	{
-		logerror("warning: unimplemented EPROM write %x |= %x\n", m_pl_addr, m_pl_data);
-		popmessage("%s: EPROM write", tag());
-	}
+		m_user_rom[m_pl_addr] |= m_pl_data;
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
 }
 
@@ -388,14 +386,16 @@ void m68705_new_device::device_start()
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_ddr));
 
+	save_item(NAME(m_vihtp));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_pl_data));
 	save_item(NAME(m_pl_addr));
 
 	for (u8 &input : m_port_input) input = 0xff;
-	for (devcb_read8 &cb : m_port_cb_r) cb.resolve_safe(0xff);
+	for (devcb_read8 &cb : m_port_cb_r) cb.resolve();
 	for (devcb_write8 &cb : m_port_cb_w) cb.resolve_safe();
 
+	m_vihtp = CLEAR_LINE;
 	m_pcr = 0xff;
 	m_pl_data = 0xff;
 	m_pl_addr = 0xffff;
@@ -408,6 +408,9 @@ void m68705_new_device::device_start()
 void m68705_new_device::device_reset()
 {
 	m68705_device::device_reset();
+
+	if (CLEAR_LINE != m_vihtp)
+		RM16(0xfff6, &m_pc);
 
 	port_ddr_w<0>(space(AS_PROGRAM), 0, 0x00, 0xff);
 	port_ddr_w<1>(space(AS_PROGRAM), 0, 0x00, 0xff);
@@ -431,7 +434,11 @@ void m68705_new_device::execute_set_input(int inputnum, int state)
 		if (ASSERT_LINE == state)
 			m_pcr &= 0xfb;
 		else
-			m_pcr |= 0x40;
+			m_pcr |= 0x04;
+		break;
+	case M68705_VIHTP_LINE:
+		// TODO: this is actually the same physical pin as the timer input, so they should be tied up
+		m_vihtp = (ASSERT_LINE == state) ? ASSERT_LINE : CLEAR_LINE;
 		break;
 	default:
 		m68705_device::execute_set_input(inputnum, state);
@@ -542,7 +549,7 @@ DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u3_device )
 ADDRESS_MAP_END
 
 m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705_new_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", 11, address_map_delegate(FUNC(m68705u3_device::u_map), this), "m68705u3", __FILE__)
+	: m68705_new_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", 12, address_map_delegate(FUNC(m68705u3_device::u_map), this), "m68705u3", __FILE__)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 }
