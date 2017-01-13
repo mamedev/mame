@@ -6,7 +6,7 @@
 #define __CLIPPER_H__
 
 // enumerate registers
-enum
+enum clipper_registers
 {
 	CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
 	CLIPPER_R8, CLIPPER_R9, CLIPPER_R10, CLIPPER_R11, CLIPPER_R12, CLIPPER_R13, CLIPPER_R14, CLIPPER_R15,
@@ -18,7 +18,7 @@ enum
 	CLIPPER_PC
 };
 
-enum
+enum clipper_addressing_modes
 {
 	ADDR_MODE_PC32 = 0x10,
 	ADDR_MODE_ABS32 = 0x30,
@@ -53,7 +53,7 @@ enum
 #define C_SUB(a, b) ((uint32_t)a < (uint32_t)b)
 #define V_SUB(a, b) (OF_SUB((int32_t)a, (int32_t)b) || UF_SUB((int32_t)a, (int32_t)b))
 
-enum psw
+enum clipper_psw
 {
 	PSW_N   = 0x00000001, // negative
 	PSW_Z   = 0x00000002, // zero
@@ -79,7 +79,7 @@ enum psw
 	PSW_MTS = 0xf0000000  // memory trap status (4 bits)
 };
 
-enum ssw
+enum clipper_ssw
 {
 	SSW_IN  = 0x0000000f, // interrupt number (4 bits)
 	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
@@ -99,7 +99,7 @@ enum ssw
 };
 
 // branch conditions
-enum
+enum clipper_branch_conditions
 {
 	BRANCH_T   = 0x0,
 	BRANCH_LT  = 0x1,
@@ -119,7 +119,7 @@ enum
 	BRANCH_FN  = 0xf
 };
 
-enum
+enum clipper_exception_vectors
 {
 	// data memory trap group
 	EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
@@ -160,7 +160,7 @@ enum
 	EXCEPTION_INTERRUPT_BASE               = 0x800,
 };
 
-enum
+enum clipper_cpu_trap_sources
 {
 	CTS_NO_CPU_TRAP            = 0 << 24,
 	CTS_DIVIDE_BY_ZERO         = 2 << 24,
@@ -169,7 +169,7 @@ enum
 	CTS_TRACE_TRAP             = 7 << 24,
 };
 
-enum
+enum clipper_memory_trap_sources
 {
 	MTS_NO_MEMORY_TRAP                = 0 << 28,
 	MTS_CORRECTED_MEMORY_ERROR        = 1 << 28,
@@ -217,11 +217,13 @@ protected:
 	uint32_t m_psw;
 	uint32_t m_ssw;
 
-	int32_t *m_r;     // current register file
-	int32_t m_ru[16]; // user register file
-	int32_t m_rs[16]; // supervisor register file
+	// integer registers
+	int32_t *m_r;     // active registers
+	int32_t m_ru[16]; // user registers
+	int32_t m_rs[16]; // supervisor registers
 
-	double m_f[16];   // floating register file
+	// floating registers
+	double m_f[16];
 
 private:
 	address_space_config m_program_config;

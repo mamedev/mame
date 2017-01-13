@@ -7,14 +7,16 @@
 #define INTERPRO_H_
 
 #include "emu.h"
+
 #include "cpu/clipper/clipper.h"
 
 #include "machine/z80scc.h"
 #include "machine/mc146818.h"
-#include "bus/rs232/rs232.h"
 #include "machine/upd765.h"
 #include "machine/interpro_ioga.h"
 #include "machine/ncr539x.h"
+
+#include "bus/rs232/rs232.h"
 
 #include "formats/pc_dsk.h"
 
@@ -30,7 +32,6 @@
 #define INTERPRO_IOGA_TAG "ioga"
 
 // TODO: RTC is actually a DS12887, but the only difference is the 128 byte NVRAM, same as the DS12885
-// TODO: not sure what the LED is, but the DM9368 seems close enough
 
 class interpro_state : public driver_device
 {
