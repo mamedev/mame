@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-    - sforte/sexpert internal layout button panel
     - verify supercon IRQ and beeper frequency
     - why is sforte H and 1 leds always on?
     - sforte/sexpert optional ACIA (only works in version C?)
