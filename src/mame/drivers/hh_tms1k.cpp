@@ -133,6 +133,7 @@
 #include "sound/beep.h"
 #include "sound/sn76477.h"
 #include "sound/s14001a.h"
+#include "rendlay.h"
 
 // internal artwork
 #include "amaztron.lh" // clickable
@@ -3663,6 +3664,9 @@ public:
 
 void ginv1000_state::prepare_display()
 {
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,3, 4, 7, 8, 9,10,11, 2, 6, 5, 1, 0);
+	display_matrix(12, 10, plate, grid);
 }
 
 WRITE16_MEMBER(ginv1000_state::write_r)
@@ -3675,14 +3679,15 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 	
 	// R1-R10: VFD matrix grid
 	// R11-R14: VFD matrix plate
-	
+	m_grid = data >> 1 & 0x3ff;
+	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
 	prepare_display();
 }
 
 WRITE16_MEMBER(ginv1000_state::write_o)
 {
 	// O0-O7: VFD matrix plate
-	
+	m_plate = (m_plate & ~0xff) | data;
 	prepare_display();
 }
 
@@ -3697,7 +3702,7 @@ READ8_MEMBER(ginv1000_state::read_k)
 
 static INPUT_PORTS_START( ginv1000 )
 	PORT_START("IN.0") // R8
-	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_CONFSETTING(    0x02, "3" )
@@ -3720,8 +3725,13 @@ static MACHINE_CONFIG_START( ginv1000, ginv1000_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ginv1000_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ginv1000_state, write_o))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(226, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7979,6 +7989,9 @@ ROM_START( ginv1000 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
+
+	ROM_REGION( 226185, "svg", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) ) // by kevtris, ver. 13 jan 2017
 ROM_END
 
 
@@ -8396,7 +8409,7 @@ CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Ent
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, ginv1000,  0,        0, ginv1000,  ginv1000,  driver_device, 0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, ginv1000,  0,        0, ginv1000,  ginv1000,  driver_device, 0, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, fxmcr165,  0,        0, fxmcr165,  fxmcr165,  driver_device, 0, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
