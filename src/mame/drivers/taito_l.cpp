@@ -779,8 +779,6 @@ static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM     // Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // Control register, function unknown

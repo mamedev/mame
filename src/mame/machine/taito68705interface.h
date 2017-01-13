@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood
+// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood, Vas Crabb
 
 #include "cpu/m6805/m68705.h"
 
