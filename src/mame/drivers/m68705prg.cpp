@@ -104,7 +104,7 @@ public:
 		m_pb_val = data;
 
 		u8 const *const ptr(m_eprom_image->get_rom_base());
-		m_mcu->pa_w(space, 0, ptr ? ptr[m_addr] : 0xff);
+		m_mcu->pa_w(space, 0, ptr ? ptr[m_addr & m_mcu_region.mask()] : 0xff);
 
 		output().set_digit_value(0, s_7seg[(m_addr >> 0) & 0x0f]);
 		output().set_digit_value(1, s_7seg[(m_addr >> 4) & 0x0f]);
