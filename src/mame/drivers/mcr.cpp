@@ -21,7 +21,7 @@
         * Timber
         * Discs of Tron (Squawk n' Talk)
         * NFL Football (Squawk n' Talk + laserdisk)
-        * Demolition Derby (Turbo Chip Squeak)
+        * Demolition Derby (Turbo Cheap Squeak)
 
 ****************************************************************************
 
@@ -211,7 +211,7 @@
     91673 = Lamp Driver (SpyHunt)
     91695 = IPU laserdisk controller (NFLFoot)
     91794 = Optical Encoder Deluxe (DemoDerb)
-    91799 = Turbo Chip Squeak (DemoDerb)
+    91799 = Turbo Cheap Squeak (DemoDerb)
 
 ****************************************************************************
 
@@ -691,7 +691,7 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -1903,11 +1903,11 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 MACHINE_CONFIG_END
 
 
-/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Chip Squeak sound board */
+/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
 static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2964,6 +2964,6 @@ GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone, mcr_state,  dotrone,   O
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
 GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Chip Squeak */
+/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Cheap Squeak */
 GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )
