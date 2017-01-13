@@ -135,6 +135,7 @@ protected:
 	devcb_write_line                m_semaphore_cb;
 	devcb_read8                     m_portb_r_cb;
 
+	bool    m_reset_input;
 	bool    m_host_flag;
 	bool    m_mcu_flag;
 	u8      m_host_latch;

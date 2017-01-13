@@ -393,7 +393,8 @@ READ8_MEMBER(arkanoid_mcu_device_base::data_r)
 WRITE8_MEMBER(arkanoid_mcu_device_base::data_w)
 {
 	// set host semaphore flag and latch data
-	m_host_flag = true;
+	if (!m_reset_input)
+		m_host_flag = true;
 	m_host_latch = data;
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
@@ -406,8 +407,14 @@ CUSTOM_INPUT_MEMBER(arkanoid_mcu_device_base::semaphore_r)
 
 WRITE_LINE_MEMBER(arkanoid_mcu_device_base::reset_w)
 {
+	m_reset_input = ASSERT_LINE == state;
+	if (CLEAR_LINE != state)
+	{
+		m_host_flag = false;
+		m_mcu_flag = false;
+		m_semaphore_cb(CLEAR_LINE);
+	}
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
-	// TODO: determine whether host CPU controlled reset also clears the semaphore flags
 }
 
 READ8_MEMBER(arkanoid_mcu_device_base::mcu_pa_r)
@@ -445,7 +452,8 @@ WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
 	// PC3 sets the MCU semaphore when low
 	if (!BIT(data, 3))
 	{
-		m_mcu_flag = true;
+		if (!m_reset_input)
+			m_mcu_flag = true;
 
 		// data is latched on falling edge
 		if (BIT(m_pc_output, 3))
@@ -470,6 +478,7 @@ arkanoid_mcu_device_base::arkanoid_mcu_device_base(
 	, m_mcu(*this, "mcu")
 	, m_semaphore_cb(*this)
 	, m_portb_r_cb(*this)
+	, m_reset_input(false)
 	, m_host_flag(false)
 	, m_mcu_flag(false)
 	, m_host_latch(0xff)
@@ -484,6 +493,7 @@ void arkanoid_mcu_device_base::device_start()
 	m_semaphore_cb.resolve_safe();
 	m_portb_r_cb.resolve_safe(0xff);
 
+	save_item(NAME(m_reset_input));
 	save_item(NAME(m_host_flag));
 	save_item(NAME(m_mcu_flag));
 	save_item(NAME(m_host_latch));
@@ -491,6 +501,7 @@ void arkanoid_mcu_device_base::device_start()
 	save_item(NAME(m_pa_output));
 	save_item(NAME(m_pc_output));
 
+	m_reset_input = false;
 	m_host_latch = 0xff;
 	m_mcu_latch = 0xff;
 	m_pa_output = 0xff;
