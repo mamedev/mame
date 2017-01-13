@@ -83,6 +83,7 @@ CPUS["RSP"] = true
 CPUS["ALPHA8201"] = true
 CPUS["COP400"] = true
 CPUS["TLCS90"] = true
+CPUS["TLCS870"] = true
 CPUS["TLCS900"] = true
 CPUS["MB88XX"] = true
 CPUS["MB86233"] = true
