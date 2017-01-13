@@ -3641,8 +3641,8 @@ MACHINE_CONFIG_END
   known releases:
   - World: Galaxy Invader 1000
   - Japan: Invader 1000
-  - USA(2): Galaxy Invader 1000, published by CGL
-  - USA(1): Cosmic 1000 Fire Away, published by Tandy
+  - USA(1): Galaxy Invader 1000, published by CGL
+  - USA(2): Cosmic 1000 Fire Away, published by Tandy
 
 ***************************************************************************/
 
