@@ -2295,6 +2295,8 @@ READ16_MEMBER(pc9801_state::timestamp_r)
 }
 
 /* basically a read-back of various registers */
+// bit 1: GDC clock select (port 0x6a, selects with 0x84 & bit 0)
+// bit 0: 
 READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 {
 	uint8_t res;
@@ -2303,9 +2305,12 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 
 	switch(m_ext2_ff)
 	{
-		case 3: res = m_video_ff[DISPLAY_REG]; break; // display reg
+		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
+		case 0x0a: res = m_ex_video_ff[ANALOG_256_MODE]; break; // 256 color mode
 		default:
-			logerror("PC-9821: read ext2 f/f with value %02x\n",m_ext2_ff);
+			if(m_ext2_ff < 0x20)
+				popmessage("PC-9821: read ext2 f/f with value %02x",m_ext2_ff);
+			break;
 	}
 
 	return res;
