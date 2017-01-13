@@ -626,4 +626,4 @@ GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, driver_device,    0, R
 GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
-GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, driver_device,    0, ROT0, "Gaelco", "Smashing Drive", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, driver_device,    0, ROT0, "Gaelco", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
