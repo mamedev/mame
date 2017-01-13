@@ -3665,7 +3665,7 @@ public:
 void ginv1000_state::prepare_display()
 {
 	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
-	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,3, 4, 7, 8, 9,10,11, 2, 6, 5, 1, 0);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
 	display_matrix(12, 10, plate, grid);
 }
 
