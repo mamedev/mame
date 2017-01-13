@@ -5,7 +5,6 @@
 #ifndef __CLIPPER_H__
 #define __CLIPPER_H__
 
-// enumerate registers
 enum clipper_registers
 {
 	CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
@@ -14,88 +13,21 @@ enum clipper_registers
 	CLIPPER_F0, CLIPPER_F1, CLIPPER_F2, CLIPPER_F3, CLIPPER_F4, CLIPPER_F5, CLIPPER_F6, CLIPPER_F7,
 	CLIPPER_F8, CLIPPER_F9, CLIPPER_F10, CLIPPER_F11, CLIPPER_F12, CLIPPER_F13, CLIPPER_F14, CLIPPER_F15,
 
-	CLIPPER_PSW, CLIPPER_SSW,
-	CLIPPER_PC
+	CLIPPER_PSW, 
+	CLIPPER_SSW,
+	CLIPPER_PC,
 };
 
 enum clipper_addressing_modes
 {
-	ADDR_MODE_PC32 = 0x10,
+	ADDR_MODE_PC32  = 0x10,
 	ADDR_MODE_ABS32 = 0x30,
 	ADDR_MODE_REL32 = 0x60,
-	ADDR_MODE_PC16 = 0x90,
+	ADDR_MODE_PC16  = 0x90,
 	ADDR_MODE_REL12 = 0xa0,
 	ADDR_MODE_ABS16 = 0xb0,
-	ADDR_MODE_PCX = 0xd0,
-	ADDR_MODE_RELX = 0xe0
-};
-
-#define PSW(mask) (m_psw & PSW_##mask)
-#define SSW(mask) (m_ssw & SSW_##mask)
-
-// macros for setting psw flags
-#define FLAGS(C,V,Z,N) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
-#define FLAGS_CV(C,V) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V)) | (((C) << 3) | ((V) << 2));
-#define FLAGS_ZN(Z,N) \
-	m_psw = (m_psw & ~(PSW_Z | PSW_N)) | (((Z) << 1) | ((N) << 0));
-
-// over/underflow for addition/subtraction from here: http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c
-#define OF_ADD(a, b) ((b > 0) && (a > INT_MAX - b))
-#define UF_ADD(a, b) ((b < 0) && (a < INT_MIN - b))
-#define OF_SUB(a, b) ((b < 0) && (a > INT_MAX + b))
-#define UF_SUB(a, b) ((b > 0) && (a < INT_MIN + b))
-
-// CLIPPER logic for carry and overflow flags
-#define C_ADD(a, b) ((uint32_t)a + (uint32_t)b < (uint32_t)a)
-#define V_ADD(a, b) (OF_ADD((int32_t)a, (int32_t)b) || UF_ADD((int32_t)a, (int32_t)b))
-#define C_SUB(a, b) ((uint32_t)a < (uint32_t)b)
-#define V_SUB(a, b) (OF_SUB((int32_t)a, (int32_t)b) || UF_SUB((int32_t)a, (int32_t)b))
-
-enum clipper_psw
-{
-	PSW_N   = 0x00000001, // negative
-	PSW_Z   = 0x00000002, // zero
-	PSW_V   = 0x00000004, // overflow
-	PSW_C   = 0x00000008, // carry out or borrow in
-	PSW_FX  = 0x00000010, // floating inexact
-	PSW_FU  = 0x00000020, // floating underflow
-	PSW_FD  = 0x00000040, // floating divide by zero
-	PSW_FV  = 0x00000080, // floating overflow
-	PSW_FI  = 0x00000100, // floating invalid operation
-	PSW_EFX = 0x00000200, // enable floating inexact trap
-	PSW_EFU = 0x00000400, // enable floating underflow trap
-	PSW_EFD = 0x00000800, // enable floating divide by zero trap
-	PSW_EFV = 0x00001000, // enable floating overflow trap
-	PSW_EFI = 0x00002000, // enable floating invalid operation trap
-	PSW_EFT = 0x00004000, // enable floating trap
-	PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
-	PSW_GAP = 0x000e0000, // unused (3 bits)
-	PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
-	PSW_BIG = 0x00400000, // c400 - big endian (hardware)
-	PSW_T   = 0x00800000, // trace trap
-	PSW_CTS = 0x0f000000, // cpu trap status (4 bits)
-	PSW_MTS = 0xf0000000  // memory trap status (4 bits)
-};
-
-enum clipper_ssw
-{
-	SSW_IN  = 0x0000000f, // interrupt number (4 bits)
-	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
-	SSW_EI  = 0x00000100, // enable interrupts
-	SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
-	SSW_GAP = 0x003e0000, // unused (5 bits)
-	SSW_FRD = 0x00400000, // floating registers dirty
-	SSW_TP  = 0x00800000, // trace trap pending
-	SSW_ECM = 0x01000000, // enabled corrected memory error
-	SSW_DF  = 0x02000000, // fpu disabled
-	SSW_M   = 0x04000000, // mapped mode
-	SSW_KU  = 0x08000000, // user protect key
-	SSW_UU  = 0x10000000, // user data mode
-	SSW_K   = 0x20000000, // protect key
-	SSW_U   = 0x40000000, // user mode
-	SSW_P   = 0x80000000, // previous mode
+	ADDR_MODE_PCX   = 0xd0,
+	ADDR_MODE_RELX  = 0xe0,
 };
 
 // branch conditions
@@ -116,7 +48,52 @@ enum clipper_branch_conditions
 	BRANCH_NV  = 0xc,
 	BRANCH_N   = 0xd,
 	BRANCH_NN  = 0xe,
-	BRANCH_FN  = 0xf
+	BRANCH_FN  = 0xf,
+};
+
+enum clipper_psw
+{
+	PSW_N   = 0x00000001, // negative
+	PSW_Z   = 0x00000002, // zero
+	PSW_V   = 0x00000004, // overflow
+	PSW_C   = 0x00000008, // carry out or borrow in
+	PSW_FX  = 0x00000010, // floating inexact
+	PSW_FU  = 0x00000020, // floating underflow
+	PSW_FD  = 0x00000040, // floating divide by zero
+	PSW_FV  = 0x00000080, // floating overflow
+	PSW_FI  = 0x00000100, // floating invalid operation
+	PSW_EFX = 0x00000200, // enable floating inexact trap
+	PSW_EFU = 0x00000400, // enable floating underflow trap
+	PSW_EFD = 0x00000800, // enable floating divide by zero trap
+	PSW_EFV = 0x00001000, // enable floating overflow trap
+	PSW_EFI = 0x00002000, // enable floating invalid operation trap
+	PSW_EFT = 0x00004000, // enable floating trap
+	PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
+                          // unused (3 bits)
+	PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
+	PSW_BIG = 0x00400000, // c400 - big endian (hardware)
+	PSW_T   = 0x00800000, // trace trap
+	PSW_CTS = 0x0f000000, // cpu trap status (4 bits)
+	PSW_MTS = 0xf0000000, // memory trap status (4 bits)
+};
+
+enum clipper_ssw
+{
+	SSW_IN  = 0x0000000f, // interrupt number (4 bits)
+	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
+	SSW_EI  = 0x00000100, // enable interrupts
+	SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
+                          // unused (5 bits)
+	SSW_FRD = 0x00400000, // floating registers dirty
+	SSW_TP  = 0x00800000, // trace trap pending
+	SSW_ECM = 0x01000000, // enabled corrected memory error
+	SSW_DF  = 0x02000000, // fpu disabled
+	SSW_M   = 0x04000000, // mapped mode
+	SSW_KU  = 0x08000000, // user protect key
+	SSW_UU  = 0x10000000, // user data mode
+	SSW_K   = 0x20000000, // protect key
+	SSW_U   = 0x40000000, // user mode
+	SSW_P   = 0x80000000, // previous mode
 };
 
 enum clipper_exception_vectors
@@ -179,6 +156,30 @@ enum clipper_memory_trap_sources
 	MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6 << 28,
 	MTS_WRITE_PROTECT_FAULT           = 7 << 28,
 };
+
+// convenience macros for dealing with the psw
+#define PSW(mask) (m_psw & PSW_##mask)
+#define SSW(mask) (m_ssw & SSW_##mask)
+
+// macros for setting psw condition codes
+#define FLAGS(C,V,Z,N) \
+	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
+#define FLAGS_CV(C,V) \
+	m_psw = (m_psw & ~(PSW_C | PSW_V)) | (((C) << 3) | ((V) << 2));
+#define FLAGS_ZN(Z,N) \
+	m_psw = (m_psw & ~(PSW_Z | PSW_N)) | (((Z) << 1) | ((N) << 0));
+
+// over/underflow for addition/subtraction from here: http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c
+#define OF_ADD(a, b) ((b > 0) && (a > INT_MAX - b))
+#define UF_ADD(a, b) ((b < 0) && (a < INT_MIN - b))
+#define OF_SUB(a, b) ((b < 0) && (a > INT_MAX + b))
+#define UF_SUB(a, b) ((b > 0) && (a < INT_MIN + b))
+
+// CLIPPER logic for carry and overflow flags
+#define C_ADD(a, b) ((uint32_t)a + (uint32_t)b < (uint32_t)a)
+#define V_ADD(a, b) (OF_ADD((int32_t)a, (int32_t)b) || UF_ADD((int32_t)a, (int32_t)b))
+#define C_SUB(a, b) ((uint32_t)a < (uint32_t)b)
+#define V_SUB(a, b) (OF_SUB((int32_t)a, (int32_t)b) || UF_SUB((int32_t)a, (int32_t)b))
 
 class clipper_device : public cpu_device
 {
