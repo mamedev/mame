@@ -3,6 +3,9 @@
 
 #include "emu.h"
 
+// enable C400 instruction decoding
+#define C400
+
 enum
 {
 	ADDR_MODE_PC32 = 0x10,
@@ -132,12 +135,27 @@ CPU_DISASSEMBLE(clipper)
 
 	case 0x44: util::stream_format(stream, "call    r%d,(r%d)", R2, R1); bytes = 2; flags |= DASMFLAG_STEP_OVER; break;
 	case 0x45: util::stream_format(stream, "call    r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; flags |= DASMFLAG_STEP_OVER; break;
-
+#ifdef C400
+	case 0x46: util::stream_format(stream, "loadd2  (r%d),f%d", R1, R2); bytes = 2; break;
+	case 0x47: util::stream_format(stream, "loadd2  %s,f%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
+#endif
 	case 0x48: util::stream_format(stream, "b%-4s   (r%d)", cc[R2], R1); bytes = 2; break;
 	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
-
+#ifdef C400
+	// delayed branches
+	case 0x4a: util::stream_format(stream, "cdb     r%d,(r%d)", R2, R1); bytes = 2; break;
+	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4c: util::stream_format(stream, "cdbeq   r%d,(r%d)", R2, R1); bytes = 2; break;
+	case 0x4d: util::stream_format(stream, "cdbeq   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4e: util::stream_format(stream, "cdbne   r%d,(r%d)", R2, R1); bytes = 2; break;
+	case 0x4f: util::stream_format(stream, "cdbne   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+	case 0x50: util::stream_format(stream, "db%-4s  (r%d)", cc[R2], R1); bytes = 2; break;
+	case 0x51: util::stream_format(stream, "db%-4s  %s", cc[ADDR_R2], address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+#else
+	// these instructions are in the C300 documentation, but appear to be replaced in the C400
 	case 0x4c: util::stream_format(stream, "bf%s   (r%d)", R2 == 0 ? "any" : "bad", R1); bytes = 2; break;
 	case 0x4d: util::stream_format(stream, "bf%s   %s", ADDR_R2 == 0 ? "any" : "bad", address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
+#endif
 
 	case 0x60: util::stream_format(stream, "loadw   (r%d),r%d", R1, R2); bytes = 2; break;
 	case 0x61: util::stream_format(stream, "loadw   %s,r%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
@@ -214,6 +232,12 @@ CPU_DISASSEMBLE(clipper)
 
 	case 0xae: util::stream_format(stream, "notq    $%d,r%d", R1, R2); bytes = 2; break;
 
+#ifdef C400
+	case 0xb0: util::stream_format(stream, "abss    f%d,f%d", R1, R2); bytes = 2; break;
+	case 0xb2: util::stream_format(stream, "absd    f%d,f%d", R1, R2); bytes = 2; break;
+#endif
+
+
 	case 0xb4:
 	case 0xb5:
 		// unprivileged macro instructions
@@ -281,7 +305,9 @@ CPU_DISASSEMBLE(clipper)
 		case 0x03: util::stream_format(stream, "restur  r%d", (insn[1] & 0xf0) >> 4); break;
 		case 0x04: util::stream_format(stream, "reti    r%d", (insn[1] & 0xf0) >> 4); flags |= DASMFLAG_STEP_OUT; break;
 		case 0x05: util::stream_format(stream, "wait"); break;
-
+#ifdef C400
+		case 0x07: util::stream_format(stream, "loadts  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
+#endif
 		default:
 			util::stream_format(stream, "macro   0x%04x %04x", insn[0], insn[1]);
 			break;
@@ -289,8 +315,13 @@ CPU_DISASSEMBLE(clipper)
 		bytes = 4;
 		break;
 
+#ifdef C400
+	case 0xbc: util::stream_format(stream, "waitd"); bytes = 2; break;
+	case 0xc0: util::stream_format(stream, "s%-4s   r%d", cc[R2], R1); bytes = 2; break;
+#endif
+
 	default:
-		util::stream_format(stream, ".word 0x%04x ; invalid", insn[0]);
+		util::stream_format(stream, ".word   0x%04x", insn[0]);
 		bytes = 2;
 		break;
 	}
