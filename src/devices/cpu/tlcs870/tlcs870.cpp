@@ -1594,7 +1594,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		// b0 & 4 would be invalid?
 
 		m_param1_type = STACKPOINTER;
-	//	m_param2 = 0;
+	//	m_param1 = 0;
 
 		break;
 
@@ -1979,7 +1979,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 		m_op = XCH;
 
 		m_param1_type = REG_8BIT;
-		m_param2 = bx & 0x7;
+		m_param1 = bx & 0x7;
 
 		m_param2_type = type;
 		m_param2 = val;
