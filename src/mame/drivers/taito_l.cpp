@@ -2532,22 +2532,11 @@ ROM_END
 DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 {
 	u8 tab[256];
-	u8 *p;
+	for (unsigned i = 0; i < sizeof(tab); i++)
+		tab[i] = BITSWAP8(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
-	for (int i = 0; i < 256; i++)
-	{
-		int v = 0;
-		for (int j = 0; j < 8; j++)
-			if (i & (1 << j))
-				v |= 1 << (7 - j);
-		tab[i] = v;
-	}
-	p = memregion("maincpu")->base();
-	for (int i = 0; i < 0x10000; i++)
-	{
-		*p = tab[*p];
-		p++;
-	}
+	for (unsigned i = 0; i < m_main_prg.length(); i++)
+		m_main_prg[i] = tab[m_main_prg[i]];
 }
 
 
