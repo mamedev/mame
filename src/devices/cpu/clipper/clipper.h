@@ -30,98 +30,154 @@ enum
 	ADDR_MODE_RELX = 0xe0
 };
 
-enum
+#define PSW(mask) (m_psw & PSW_##mask)
+#define SSW(mask) (m_ssw & SSW_##mask)
+
+// macros for setting psw flags
+#define FLAGS(C,V,Z,N) \
+	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
+#define FLAGS_CV(C,V) \
+	m_psw = (m_psw & ~(PSW_C | PSW_V)) | (((C) << 3) | ((V) << 2));
+#define FLAGS_ZN(Z,N) \
+	m_psw = (m_psw & ~(PSW_Z | PSW_N)) | (((Z) << 1) | ((N) << 0));
+
+// over/underflow for addition/subtraction from here: http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c
+#define OF_ADD(a, b) ((b > 0) && (a > INT_MAX - b))
+#define UF_ADD(a, b) ((b < 0) && (a < INT_MIN - b))
+#define OF_SUB(a, b) ((b < 0) && (a > INT_MAX + b))
+#define UF_SUB(a, b) ((b > 0) && (a < INT_MIN + b))
+
+// CLIPPER logic for carry and overflow flags
+#define C_ADD(a, b) ((uint32_t)a + (uint32_t)b < (uint32_t)a)
+#define V_ADD(a, b) (OF_ADD((int32_t)a, (int32_t)b) || UF_ADD((int32_t)a, (int32_t)b))
+#define C_SUB(a, b) ((uint32_t)a < (uint32_t)b)
+#define V_SUB(a, b) (OF_SUB((int32_t)a, (int32_t)b) || UF_SUB((int32_t)a, (int32_t)b))
+
+enum psw
 {
-	FLAG_N = 0x1,
-	FLAG_Z = 0x2,
-	FLAG_V = 0x4,
-	FLAG_C = 0x8
+	PSW_N   = 0x00000001, // negative
+	PSW_Z   = 0x00000002, // zero
+	PSW_V   = 0x00000004, // overflow
+	PSW_C   = 0x00000008, // carry out or borrow in
+	PSW_FX  = 0x00000010, // floating inexact
+	PSW_FU  = 0x00000020, // floating underflow
+	PSW_FD  = 0x00000040, // floating divide by zero
+	PSW_FV  = 0x00000080, // floating overflow
+	PSW_FI  = 0x00000100, // floating invalid operation
+	PSW_EFX = 0x00000200, // enable floating inexact trap
+	PSW_EFU = 0x00000400, // enable floating underflow trap
+	PSW_EFD = 0x00000800, // enable floating divide by zero trap
+	PSW_EFV = 0x00001000, // enable floating overflow trap
+	PSW_EFI = 0x00002000, // enable floating invalid operation trap
+	PSW_EFT = 0x00004000, // enable floating trap
+	PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
+	PSW_GAP = 0x000e0000, // unused (3 bits)
+	PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
+	PSW_BIG = 0x00400000, // c400 - big endian (hardware)
+	PSW_T   = 0x00800000, // trace trap
+	PSW_CTS = 0x0f000000, // cpu trap status (4 bits)
+	PSW_MTS = 0xf0000000  // memory trap status (4 bits)
 };
 
-#define FLAGS_ZN   FLAG_Z | FLAG_N
-#define FLAGS_CZN  FLAG_C | FLAG_Z | FLAG_N
-#define FLAGS_CVZN FLAG_C | FLAG_V | FLAG_Z | FLAG_N
+enum ssw
+{
+	SSW_IN  = 0x0000000f, // interrupt number (4 bits)
+	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
+	SSW_EI  = 0x00000100, // enable interrupts
+	SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
+	SSW_GAP = 0x003e0000, // unused (5 bits)
+	SSW_FRD = 0x00400000, // floating registers dirty
+	SSW_TP  = 0x00800000, // trace trap pending
+	SSW_ECM = 0x01000000, // enabled corrected memory error
+	SSW_DF  = 0x02000000, // fpu disabled
+	SSW_M   = 0x04000000, // mapped mode
+	SSW_KU  = 0x08000000, // user protect key
+	SSW_UU  = 0x10000000, // user data mode
+	SSW_K   = 0x20000000, // protect key
+	SSW_U   = 0x40000000, // user mode
+	SSW_P   = 0x80000000, // previous mode
+};
 
 // branch conditions
 enum
 {
-	BRANCH_T = 0x0,
-	BRANCH_LT = 0x1,
-	BRANCH_LE = 0x2,
-	BRANCH_EQ = 0x3,
-	BRANCH_GT = 0x4,
-	BRANCH_GE = 0x5,
-	BRANCH_NE = 0x6,
+	BRANCH_T   = 0x0,
+	BRANCH_LT  = 0x1,
+	BRANCH_LE  = 0x2,
+	BRANCH_EQ  = 0x3,
+	BRANCH_GT  = 0x4,
+	BRANCH_GE  = 0x5,
+	BRANCH_NE  = 0x6,
 	BRANCH_LTU = 0x7,
 	BRANCH_LEU = 0x8,
 	BRANCH_GTU = 0x9,
 	BRANCH_GEU = 0xa,
-	BRANCH_V = 0xb,
-	BRANCH_NV = 0xc,
-	BRANCH_N = 0xd,
-	BRANCH_NN = 0xe,
-	BRANCH_FN = 0xf
+	BRANCH_V   = 0xb,
+	BRANCH_NV  = 0xc,
+	BRANCH_N   = 0xd,
+	BRANCH_NN  = 0xe,
+	BRANCH_FN  = 0xf
 };
 
 enum
 {
 	// data memory trap group
-	EXCEPTION_D_CORRECTED_MEMORY_ERROR = 0x108,
+	EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
 	EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
-	EXCEPTION_D_ALIGNMENT_FAULT = 0x120,
-	EXCEPTION_D_PAGE_FAULT = 0x128,
-	EXCEPTION_D_READ_PROTECT_FAULT = 0x130,
-	EXCEPTION_D_WRITE_PROTECT_FAULT = 0x138,
+	EXCEPTION_D_ALIGNMENT_FAULT            = 0x120,
+	EXCEPTION_D_PAGE_FAULT                 = 0x128,
+	EXCEPTION_D_READ_PROTECT_FAULT         = 0x130,
+	EXCEPTION_D_WRITE_PROTECT_FAULT        = 0x138,
 
 	// floating-point arithmetic trap group
-	EXCEPTION_FLOATING_INEXACT = 0x180,
-	EXCEPTION_FLOATING_UNDERFLOW = 0x188,
-	EXCEPTION_FLOATING_DIVIDE_BY_ZERO = 0x190,
-	EXCEPTION_FLOATING_OVERFLOW = 0x1a0,
-	EXCEPTION_FLOATING_INVALID_OPERATION = 0x1c0,
+	EXCEPTION_FLOATING_INEXACT             = 0x180,
+	EXCEPTION_FLOATING_UNDERFLOW           = 0x188,
+	EXCEPTION_FLOATING_DIVIDE_BY_ZERO      = 0x190,
+	EXCEPTION_FLOATING_OVERFLOW            = 0x1a0,
+	EXCEPTION_FLOATING_INVALID_OPERATION   = 0x1c0,
 
 	// integer arithmetic trap group
-	EXCEPTION_INTEGER_DIVIDE_BY_ZERO = 0x208,
+	EXCEPTION_INTEGER_DIVIDE_BY_ZERO       = 0x208,
 
 	// instruction memory trap group
-	EXCEPTION_I_CORRECTED_MEMORY_ERROR = 0x288,
+	EXCEPTION_I_CORRECTED_MEMORY_ERROR     = 0x288,
 	EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
-	EXCEPTION_I_ALIGNMENT_FAULT = 0x2a0,
-	EXCEPTION_I_PAGE_FAULT = 0x2a8,
-	EXCEPTION_I_EXECUTE_PROTECT_FAULT = 0x2b0,
+	EXCEPTION_I_ALIGNMENT_FAULT            = 0x2a0,
+	EXCEPTION_I_PAGE_FAULT                 = 0x2a8,
+	EXCEPTION_I_EXECUTE_PROTECT_FAULT      = 0x2b0,
 
 	// illegal operation trap group
-	EXCEPTION_ILLEGAL_OPERATION = 0x300,
-	EXCEPTION_PRIVILEGED_INSTRUCTION = 0x308,
+	EXCEPTION_ILLEGAL_OPERATION            = 0x300,
+	EXCEPTION_PRIVILEGED_INSTRUCTION       = 0x308,
 
 	// diagnostic trap group
-	EXCEPTION_TRACE = 0x380,
+	EXCEPTION_TRACE                        = 0x380,
 
 	// supervisor calls (0x400-0x7f8)
-	EXCEPTION_SUPERVISOR_CALL_BASE = 0x400,
+	EXCEPTION_SUPERVISOR_CALL_BASE         = 0x400,
 
 	// prioritized interrupts (0x800-0xff8)
-	EXCEPTION_INTERRUPT_BASE = 0x800,
+	EXCEPTION_INTERRUPT_BASE               = 0x800,
 };
 
 enum
 {
-	CTS_NO_CPU_TRAP = 0,
-	CTS_DIVIDE_BY_ZERO = 2,
-	CTS_ILLEGAL_OPERATION = 4,
-	CTS_PRIVILEGED_INSTRUCTION = 5,
-	CTS_TRACE_TRAP = 7,
+	CTS_NO_CPU_TRAP            = 0 << 24,
+	CTS_DIVIDE_BY_ZERO         = 2 << 24,
+	CTS_ILLEGAL_OPERATION      = 4 << 24,
+	CTS_PRIVILEGED_INSTRUCTION = 5 << 24,
+	CTS_TRACE_TRAP             = 7 << 24,
 };
 
 enum
 {
-	MTS_NO_MEMORY_TRAP = 0,
-	MTS_CORRECTED_MEMORY_ERROR = 1,
-	MTS_UNCORRECTABLE_MEMORY_ERROR = 2,
-	MTS_ALIGNMENT_FAULT = 4,
-	MTS_PAGE_FAULT = 5,
-	MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6,
-	MTS_WRITE_PROTECT_FAULT = 7,
+	MTS_NO_MEMORY_TRAP                = 0 << 28,
+	MTS_CORRECTED_MEMORY_ERROR        = 1 << 28,
+	MTS_UNCORRECTABLE_MEMORY_ERROR    = 2 << 28,
+	MTS_ALIGNMENT_FAULT               = 4 << 28,
+	MTS_PAGE_FAULT                    = 5 << 28,
+	MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6 << 28,
+	MTS_WRITE_PROTECT_FAULT           = 7 << 28,
 };
 
 class clipper_device : public cpu_device
@@ -158,53 +214,8 @@ protected:
 
 	// core registers
 	uint32_t m_pc;
-	union psw {
-		struct fields {
-			uint32_t n : 1; // negative
-			uint32_t z : 1; // zero
-			uint32_t v : 1; // overflow
-			uint32_t c : 1; // carry out or borrow in
-			uint32_t fx : 1; // floating inexact
-			uint32_t fu : 1; // floating underflow
-			uint32_t fd : 1; // floating divide by zero
-			uint32_t fv : 1; // floating overflow
-			uint32_t fi : 1; // floating invalid operation
-			uint32_t efx : 1; // enable floating inexact trap
-			uint32_t efu : 1; // enable floating underflow trap
-			uint32_t efd : 1; // enable floating divide by zero trap
-			uint32_t efv : 1; // enable floating overflow trap
-			uint32_t efi : 1; // enable floating invalid operation trap
-			uint32_t eft : 1; // enable floating trap
-			uint32_t fr : 2; // floating rounding mode
-			uint32_t : 3;
-			uint32_t dsp : 2; // c400 - delay slot pointer
-			uint32_t big : 1; // c400 - big endian (hardware)
-			uint32_t t : 1; // trace trap
-			uint32_t cts : 4; // cpu trap status
-			uint32_t mts : 4; // memory trap status
-		} fields;
-		uint32_t all;
-	} m_psw;
-	union ssw {
-		struct fields {
-			uint32_t in : 4; // interrupt number
-			uint32_t il : 4; // interrupt level
-			uint32_t ei : 1; // enable interrupts
-			uint32_t id : 8; // cpu rev # and type
-			uint32_t : 5;
-			uint32_t frd : 1; // floating registers dirty
-			uint32_t tp : 1; // trace trap pending
-			uint32_t ecm : 1; // enable corrected memory error
-			uint32_t df : 1; // fpu disabled
-			uint32_t m : 1; // mapped mode
-			uint32_t ku : 1; // user protect key
-			uint32_t uu : 1; // user data mode
-			uint32_t k : 1; // protect key
-			uint32_t u : 1; // user mode
-			uint32_t p : 1; // previous mode
-		} fields;
-		uint32_t all;
-	} m_ssw;
+	uint32_t m_psw;
+	uint32_t m_ssw;
 
 	int32_t *m_r;     // current register file
 	int32_t m_ru[16]; // user register file
@@ -244,7 +255,6 @@ private:
 	int clipper_device::execute_instruction(uint16_t insn);
 
 	// condition code evaluation
-	void clipper_device::evaluate_cc2(int32_t v0, int32_t v1, uint32_t flags);
 	void clipper_device::evaluate_cc2f(double v0, double v1);
 
 	bool clipper_device::evaluate_branch(uint32_t condition);
