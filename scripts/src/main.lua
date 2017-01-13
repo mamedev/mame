@@ -284,6 +284,16 @@ if (STANDALONE~=true) then
 	}
 end
 
+	if _OPTIONS["NO_USE_PORTAUDIO"]~="1" then
+		links {
+			ext_lib("portaudio"),
+		}
+		if _OPTIONS["targetos"]=="windows" then
+			links {
+				"setupapi",
+			}
+		end
+	end
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
 			ext_lib("portmidi"),
