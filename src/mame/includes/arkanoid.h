@@ -54,7 +54,7 @@ public:
 	uint8_t m_hexaa_from_sub;
 
 	/* devices */
-	required_ioport_array<2> m_muxports;
+	optional_ioport_array<2> m_muxports;
 	required_device<cpu_device> m_maincpu;
 	optional_device<arkanoid_mcu_device_base> m_mcuintf;
 	required_device<gfxdecode_device> m_gfxdecode;
