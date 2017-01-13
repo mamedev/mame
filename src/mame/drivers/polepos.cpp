@@ -228,6 +228,7 @@ Todo:
 #include "audio/namco54.h"
 #include "includes/polepos.h"
 #include "sound/tms5220.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
@@ -986,13 +987,22 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 MACHINE_CONFIG_END
 
 
+READ8_MEMBER(polepos_state::sound_z80_nmi_ack_r)
+{
+	m_sound_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return 0xff;
+}
+
 static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x6000, 0x6000) AM_READ(sound_z80_nmi_ack_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
@@ -1000,6 +1010,9 @@ static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
 	MCFG_CPU_IO_MAP(sound_z80_bootleg_iomap)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("soundz80bl", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("tms", TMS5220, 600000) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
@@ -2252,7 +2265,7 @@ ROM_START( polepos2bs )
 
 	/* this is used for the spanish speech with a TMS5220, not properly hooked up */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
-	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, CRC(269c1af4) SHA1(73acb28f1cf8eae26838835aef1566fea18b4138) )
+	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, BAD_DUMP CRC(269c1af4) SHA1(73acb28f1cf8eae26838835aef1566fea18b4138) ) // D6 stuck high
 
 //  ROM_REGION( 0x2000, "pals", 0 )
 //  ...not dumped yet...
