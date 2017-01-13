@@ -99,6 +99,7 @@ public:
 			m_addr = (m_addr + 1) & 0x0fff;
 		output().set_led_value(0, !BIT(data, 2));
 		output().set_led_value(1, !BIT(data, 1));
+		output().set_led_value(3, !BIT(data, 0) && BIT(m_sw->read(), 1));
 		m_mcu->set_input_line(M68705_VPP_LINE, (!BIT(data, 0) && BIT(m_sw->read(), 1)) ? ASSERT_LINE : CLEAR_LINE);
 
 		m_pb_val = data;
@@ -129,9 +130,11 @@ public:
 
 	DECLARE_MACHINE_RESET(m68705prg)
 	{
-		// FIXME: how do we set toggling inputs to desired value on reset?  This doesn't work.
-		m_sw->field(0x01)->set_value(0);
-		m_sw->field(0x02)->set_value(0);
+		m_sw->field(0x01)->live().value = 0;
+		m_sw->field(0x02)->live().value = 0;
+
+		output().set_led_value(2, 1);
+		output().set_led_value(3, 0);
 
 		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		m_mcu->set_input_line(M68705_VPP_LINE, CLEAR_LINE);
@@ -160,8 +163,14 @@ protected:
 	TIMER_CALLBACK_MEMBER(input_poll_callback)
 	{
 		ioport_value const switches(m_sw->read());
-		m_mcu->set_input_line(M68705_VPP_LINE, (BIT(switches, 1) && !BIT(m_pb_val, 0)) ? ASSERT_LINE : CLEAR_LINE);
-		m_mcu->set_input_line(INPUT_LINE_RESET, BIT(switches, 0) ? ASSERT_LINE : CLEAR_LINE);
+		bool const reset(!BIT(switches, 0));
+		bool const vpp(BIT(switches, 1) && !BIT(m_pb_val, 0));
+
+		output().set_led_value(2, reset);
+		output().set_led_value(3, vpp);
+
+		m_mcu->set_input_line(M68705_VPP_LINE, vpp ? ASSERT_LINE : CLEAR_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, reset ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	required_ioport                         m_sw;
