@@ -810,7 +810,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cforte, novag6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 5000000) // 5MHz
+	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 250) // guessed
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
 
@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
 	MCFG_CPU_PROGRAM_MAP(sexpert_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
 	
@@ -858,7 +858,7 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32)
+	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
