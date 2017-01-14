@@ -11,6 +11,7 @@
 #include "nl_factory.h"
 #include "nl_setup.h"
 #include "plib/putil.h"
+#include "nl_errstr.h"
 
 namespace netlist { namespace factory
 {
@@ -40,9 +41,12 @@ list_t::~list_t()
 	clear();
 }
 
-void list_t::error(const pstring &s)
+void list_t::register_device(std::unique_ptr<element_t> factory)
 {
-	m_setup.log().fatal("{1}", s);
+	for (auto & e : *this)
+		if (e->name() == factory->name())
+			m_setup.log().fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
+	push_back(std::move(factory));
 }
 
 factory::element_t * list_t::factory_by_name(const pstring &devname)
@@ -53,7 +57,7 @@ factory::element_t * list_t::factory_by_name(const pstring &devname)
 			return e.get();
 	}
 
-	m_setup.log().fatal("Class <{1}> not found!\n", devname);
+	m_setup.log().fatal(MF_1_CLASS_1_NOT_FOUND, devname);
 	return nullptr; // appease code analysis
 }
 

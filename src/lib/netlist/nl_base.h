@@ -464,7 +464,7 @@ namespace netlist
 
 	private:
 		core_device_t & m_device;
-	};
+};
 
 
 	// -----------------------------------------------------------------------------
@@ -1278,7 +1278,7 @@ namespace netlist
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
-	};
+};
 
 	// -----------------------------------------------------------------------------
 	// Support classes for devices
