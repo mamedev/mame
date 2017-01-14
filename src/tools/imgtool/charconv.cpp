@@ -69,7 +69,7 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *sr
 	std::string normalized_src = normalize_unicode(src, src_length, m_norm);
 
 	auto iter = normalized_src.begin();
-	while(iter != normalized_src.end())
+	while (iter != normalized_src.end())
 	{
 		// get the next character
 		char32_t ch;
