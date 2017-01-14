@@ -188,25 +188,45 @@ Enables or disables the reading of the config files. When enabled
 .br
 the main configuration file
 .br
-2. \fIname\fB.ini\fR
+2. \fBdebug.ini\fR
 .br
-where \fIname\fR is your executable name, i.e. mame unless you changed it
-(e.g. if you renamed mame to mame0137, the parsed file will be
-\fImame0137.ini\fR)
+if the debugger is enabled
 .br
-3. \fBdebug.ini\fR, if the debugger is enabled
+3. \fBvertical.ini\fR or \fBhorizont.ini\fR
 .br
-4. \fBvector.ini\fR, for vector games only
+depending on monitor orientation
 .br
-5. \fI[driver]\fB.ini\fR
+4. \fBarcade.ini\fR or \fBconsole.ini\fR or \fBcomputer.ini\fR or \fBothersys.ini\fR
+.br
+depending on system type
+.br
+5. \fBraster.ini\fR or \fBvector.ini\fR or \fBlcd.ini\fR
+.br
+depending on screen type
+.br
+6. \fI[width]x[height][orientation]\fB.ini\fR
+.br
+based on screen size and orientation for raster games only.
+.br
+e.g. 640x480H.ini 
+.br
+7. \fI[width]x[height][orientation]@[refreshrate]\fB.ini\fR
+.br
+based on the screen size, orientation and refreshrate of raster games.
+.br
+refreshrate is rounded to nearest whole number
+.br
+e.g. 288x224V@60.ini
+.br
+8. \fI[driver]\fB.ini\fR
 .br
 based on the source filename of the game driver
 .br
-6. \fI[parent]\fB.ini\fR
+9. \fI[parent]\fB.ini\fR
 .br
 for clones only, may be called recursively
 .br
-7. \fI[gamename]\fB.ini\fR
+10. \fI[gamename]\fB.ini\fR
 .br
 note this sometimes resolves to the same of the source driver
 .br

@@ -13,19 +13,19 @@ Order of Config Loading
     The first pass may change various path settings, so the second pass is done to see if there is a valid config file at that new location (and if so, change settings using that file)
 3. **DEBUG.INI** if in debug mode.
     This is an advanced config file, most people won't need to use it or be concerned by it. 
-4. System-specific INI files where appropriate (e.g. **NEOGEO_NOSLOT.INI** or **CPS2.INI**)
-    As an example, Street Fighter Alpha is a CPS2 game, and so **CPS2.INI** would be loaded here.
-5. Monitor orientation INI file (either **HORIZONT.INI** or **VERTICAL.INI**)
+4. Monitor orientation INI file (either **HORIZONT.INI** or **VERTICAL.INI**)
     Pac-Man, for one example, is a vertical monitor setup, so it would load **VERTICAL.INI**. Street Fighter Alpha is a horizontal game, so it loads **HORIZONT.INI**.
-6. System-type INI files (**ARCADE.INI**, **CONSOLE.INI**, **COMPUTER.INI**, or **OTHERSYS.INI**)
+5. System-type INI files (**ARCADE.INI**, **CONSOLE.INI**, **COMPUTER.INI**, or **OTHERSYS.INI**)
     Both Pac-Man and Street Fighter Alpha are arcade games, so **ARCADE.INI** would be loaded here. Atari 2600 would load **CONSOLE.INI**.
-7. Screen-type INI file  (**VECTOR.INI** for vector games, **RASTER.INI** for raster games, **LCD.INI** for LCD games)
+6. Screen-type INI file  (**VECTOR.INI** for vector games, **RASTER.INI** for raster games, **LCD.INI** for LCD games)
     Pac-Man and Street Fighter Alpha are raster, so **RASTER.INI** gets loaded here. Tempest is a vector monitor game, and **VECTOR.INI** would be loaded here.
+7. Screen size INI files (for raster games only)
+	An ini file **[Width]X[Height][Orientation].INI** gets loded first and then an inifile **[Width]X[Height][Orientation]@[Refreshrate].INI** is loaded
+	For example **768X576H.INI** and **768X576H@50.INI** or **224X288V.INI** and **224X288V@60.INI**
 8. Source INI files. 
     This is an advanced config file, most people won't need to use it and it can be safely ignored.
     MAME will attempt to load **SOURCE/SOURCEFILE.INI** and **SOURCEFILE.INI**, where sourcefile is the actual filename of the source code file.
     *mame -listsource <game>* will show the source file for a given game.
-
     For instance, Banpresto's Sailor Moon, Atlus's Dodonpachi, and Nihon System's Dangun Feveron all share a large amount of hardware and are grouped into the CAVE.C file, meaning they all parse **source/cave.ini**
 9. Parent INI file.
     For example, if running Pac-Man, which is a clone of Puck-Man, it'd be **PUCKMAN.INI**
@@ -37,10 +37,10 @@ Examples of Config Loading Order
 --------------------------------
 
 1. Alcon, which is the US clone of Slap Fight. (*mame alcon*)
-    Command line, MAME.INI, VERTICAL.INI, ARCADE.INI, RASTER.INI, SLAPFGHT.INI, and lastly ALCON.INI (*remember command line parameters take precedence over all else!*)
+    Command line, MAME.INI, VERTICAL.INI, ARCADE.INI, RASTER.INI, 280X240V.INI, 280X240V@60.INI, SLAPFGHT.INI, and lastly ALCON.INI (*remember command line parameters take precedence over all else!*)
 
 2. Super Street Fighter 2 Turbo (*mame ssf2t*)
-    Command line, MAME.INI, HORIZONT.INI, ARCADE.INI, RASTER.INI, CPS2.INI, and lastly SSF2T.INI (*remember command line parameters take precedence over all else!*)
+    Command line, MAME.INI, HORIZONT.INI, ARCADE.INI, RASTER.INI, 384X224H.INI, 384X224H@60.INI, CPS2.INI, and lastly SSF2T.INI (*remember command line parameters take precedence over all else!*)
 
 
 Tricks to Make Life Easier
