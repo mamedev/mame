@@ -299,6 +299,20 @@ void netlist_t::register_dev(plib::owned_ptr<core_device_t> dev)
 	m_devices.push_back(std::move(dev));
 }
 
+void netlist_t::remove_dev(core_device_t *dev)
+{
+    m_devices.erase(
+        std::remove_if(
+            m_devices.begin(),
+			m_devices.end(),
+            [&] (plib::owned_ptr<core_device_t> const& p)
+            {
+    			return p.get() == dev;
+            }),
+			m_devices.end()
+        );
+}
+
 const logic_family_desc_t *netlist_t::family_from_model(const pstring &model)
 {
 	model_map_t map;
@@ -838,6 +852,19 @@ void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 
 	if (terminal.state() != logic_t::STATE_INP_PASSIVE)
 		m_active++;
+}
+
+void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
+{
+	if (plib::container::contains(m_core_terms, &terminal))
+	{
+		terminal.set_net(nullptr);
+		plib::container::remove(m_core_terms, &terminal);
+	}
+	else
+		netlist().log().fatal("Can not remove terminal {1} from net {2}.", terminal.name(), this->name());
+	if (terminal.state() != logic_t::STATE_INP_PASSIVE)
+		m_active--;
 }
 
 void detail::net_t::move_connections(detail::net_t &dest_net)

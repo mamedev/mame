@@ -699,6 +699,7 @@ namespace netlist
 		void reset();
 
 		void add_terminal(core_terminal_t &terminal);
+		void remove_terminal(core_terminal_t &terminal);
 
 		bool is_logic() const NL_NOEXCEPT;
 		bool is_analog() const NL_NOEXCEPT;
@@ -1185,6 +1186,7 @@ namespace netlist
 		setup_t &setup() { return *m_setup; }
 
 		void register_dev(plib::owned_ptr<core_device_t> dev);
+		void remove_dev(core_device_t *dev);
 
 		detail::net_t *find_net(const pstring &name);
 		const logic_family_desc_t *family_from_model(const pstring &model);

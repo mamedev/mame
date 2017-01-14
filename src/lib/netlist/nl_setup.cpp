@@ -753,13 +753,16 @@ void setup_t::resolve_inputs()
 		log().fatal("{1}", errstr);
 
 
-	log().verbose("looking for two terms connected to rail nets ...\n");
+	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : netlist().get_device_list<devices::NETLIB_NAME(twoterm)>())
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			log().warning("Found device {1} connected only to railterminals {2}/{3}\n",
+			log().warning("Found device {1} connected only to railterminals {2}/{3}. Will be removed",
 				t->name(), t->m_N.net().name(), t->m_P.net().name());
+			t->m_N.net().remove_terminal(t->m_N);
+			t->m_P.net().remove_terminal(t->m_P);
+			netlist().remove_dev(t);
 		}
 	}
 }
@@ -770,7 +773,7 @@ void setup_t::start_devices()
 
 	if (env != "")
 	{
-		log().debug("Creating dynamic logs ...\n");
+		log().debug("Creating dynamic logs ...");
 		plib::pstring_vector_t loglist(env, ":");
 		for (pstring ll : loglist)
 		{
