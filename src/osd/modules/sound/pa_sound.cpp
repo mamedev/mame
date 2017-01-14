@@ -272,6 +272,7 @@ int sound_pa::init(osd_options const &options)
     return 0;
 
 pa_error:
+    delete m_ab;
     osd_printf_verbose("PortAudio error: %s\n", Pa_GetErrorText(err));
     Pa_Terminate();
 error:
@@ -406,17 +407,15 @@ void sound_pa::exit()
         return;
 
 #if LOG_BUFCNT
-    if (m_log.good())
-    {
-        std::ofstream m_logfile(LOG_FILE);
+    std::ofstream m_logfile(LOG_FILE);
 
-        if (m_logfile.is_open()) {
-            m_logfile << m_log.str();
-            m_logfile.close();
-        } else {
-            osd_printf_verbose("PortAudio: Could not write log.\n");
-        }
+    if (m_log.good() && m_logfile.is_open()) {
+        m_logfile << m_log.str();
+        m_logfile.close();
     }
+
+    if (!m_log.good() || m_logfile.fail())
+        osd_printf_verbose("PortAudio: Error writing log.\n");
 #endif
 
     Pa_StopStream(m_pa_stream);
