@@ -2233,24 +2233,24 @@ ROM_START( polepos2bs )
 	ROM_REGION( 0x1000, "gfx6", 0 )     /* sprite scaling */
 	ROM_LOAD( "cboard-11f.9c",   0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) )    /* vertical scaling */
 
-	/* graphics (P)ROM data (borrowed from other set, need to be dumped) */
+	/* graphics (P)ROM data */
 	ROM_REGION( 0x1040, "proms", 0 )
-	ROM_LOAD( "7611-5-e.bin",   0x0000, 0x0100, BAD_DUMP CRC(16d69c31) SHA1(f24b345448e4f4ef4e2f3b057b81d399cf427f88) )    /* red palette */
-	ROM_LOAD( "7611-5-d.bin",   0x0100, 0x0100, BAD_DUMP CRC(07340311) SHA1(3820d1fa99013ed18de5d9400ad376cc446d1217) )    /* green palette */
-	ROM_LOAD( "7611-5-c.bin",   0x0200, 0x0100, BAD_DUMP CRC(1efc84d7) SHA1(6946e1c209eec0a4b75778ae88111e6cb63c63fb) )    /* blue palette */
-	ROM_LOAD( "7611-5-b.bin",   0x0300, 0x0100, BAD_DUMP CRC(064d51a0) SHA1(d5baa29930530a8930b44a374e285de849c2a6ce) )    /* alpha color */
-	ROM_LOAD( "7611-5-a.bin",   0x0400, 0x0100, BAD_DUMP CRC(7880c5af) SHA1(e4388e354420be3f99594a10c091e3d2f745cc04) )    /* background color */
-	ROM_LOAD( "7611-5-h.bin",   0x0500, 0x0100, BAD_DUMP CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) )    /* vertical position low */
-	ROM_LOAD( "7611-5-g.bin",   0x0600, 0x0100, BAD_DUMP CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) )    /* vertical position med */
-	ROM_LOAD( "7611-5-f.bin",   0x0700, 0x0100, BAD_DUMP CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) )    /* vertical position hi */
-	ROM_LOAD( "7643-5-b.bin",   0x0800, 0x0400, BAD_DUMP CRC(8b270902) SHA1(27b3ebc92d3a2a5c0432bde018a0e43669041d50) )    /* road color */
-	ROM_LOAD( "7643-5-a.bin",   0x0c00, 0x0400, BAD_DUMP CRC(a079ed19) SHA1(134b3d156a1ed0fa21cc5dc3cc84ea16ef7f84f7) )    /* sprite color - bad?*/
-	ROM_LOAD( "6331-1-b.bin",   0x1000, 0x0020, BAD_DUMP CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
-	ROM_LOAD( "6331-1-a.bin",   0x1020, 0x0020, BAD_DUMP CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
+	ROM_LOAD( "cboard-f1-82s129.2u",    0x0000, 0x0100, CRC(16d69c31) SHA1(f24b345448e4f4ef4e2f3b057b81d399cf427f88) )    /* red palette */
+	ROM_LOAD( "cboard-f2-82s129.2t",    0x0100, 0x0100, CRC(07340311) SHA1(3820d1fa99013ed18de5d9400ad376cc446d1217) )    /* green palette */
+	ROM_LOAD( "cboard-f3-82s129.2s",    0x0200, 0x0100, CRC(1efc84d7) SHA1(6946e1c209eec0a4b75778ae88111e6cb63c63fb) )    /* blue palette */
+	ROM_LOAD( "cboard-f4-82s129.2p",    0x0300, 0x0100, CRC(064d51a0) SHA1(d5baa29930530a8930b44a374e285de849c2a6ce) )    /* alpha color */
+	ROM_LOAD( "cboard-f5-82s129.2n",    0x0400, 0x0100, CRC(7880c5af) SHA1(e4388e354420be3f99594a10c091e3d2f745cc04) )    /* background color */
+	ROM_LOAD( "cboard-f8-82s129.13f",   0x0500, 0x0100, CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) )    /* vertical position low */
+	ROM_LOAD( "cboard-f9-82s129.13e",   0x0600, 0x0100, CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) )    /* vertical position med */
+	ROM_LOAD( "cboard-f10-82s129.13d",  0x0700, 0x0100, CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) )    /* vertical position hi */
+	ROM_LOAD( "cboard-f6-82s137.5p",    0x0800, 0x0400, CRC(8b270902) SHA1(27b3ebc92d3a2a5c0432bde018a0e43669041d50) )    /* road color */
+	ROM_LOAD( "cboard-f7-82s137.7h",    0x0c00, 0x0400, CRC(a079ed19) SHA1(134b3d156a1ed0fa21cc5dc3cc84ea16ef7f84f7) )    /* sprite color */
+	ROM_LOAD( "cboard-xx-82s123.15s",   0x1000, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
+	ROM_LOAD( "cboard-xx-82s123.15t",   0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
 
-	/* sound (P)ROM data (borrowed from other set, need to be dumped) */
+	/* sound (P)ROM data */
 	ROM_REGION( 0x0100, "namco", 0 )
-	ROM_LOAD( "74s287-b.bin",   0x0000, 0x0100, BAD_DUMP CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
+	ROM_LOAD( "bboard-2p.9e",    0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
 
 	ROM_REGION( 0x4000, "engine", 0 )
 	ROM_LOAD( "bboard-8p.8a",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
@@ -2260,14 +2260,14 @@ ROM_START( polepos2bs )
 	/* the bootleg has a TMS5220, NOT the Namco 52xx */
 
 	/* unknown or unused (P)ROM data */
-//  ROM_REGION( 0x0100, "user1", 0 )
-//  ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "bboard-1p.14c",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
 	/* this is used for the spanish speech with a TMS5220, not properly hooked up */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
-	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, BAD_DUMP CRC(269c1af4) SHA1(73acb28f1cf8eae26838835aef1566fea18b4138) ) // D6 stuck high
+	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, CRC(47226cda) SHA1(03115ead04b11e7ef3ef08d32d4d61a56dc35190) )    /* redumped. the former one has bit6 stuck */
 
-//  ROM_REGION( 0x2000, "pals", 0 )
+//	ROM_REGION( 0x2000, "pals", 0 )
 //  ...not dumped yet...
 ROM_END
 
