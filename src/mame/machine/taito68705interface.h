@@ -111,7 +111,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	// MCU callbacks
-	DECLARE_READ8_MEMBER(mcu_pa_r);
 	DECLARE_READ8_MEMBER(mcu_pb_r);
 	DECLARE_READ8_MEMBER(mcu_pc_r);
 	DECLARE_WRITE8_MEMBER(mcu_pa_w);

@@ -57,7 +57,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( arkanoid_68705p3 )
 	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_mcu_device_base, mcu_pa_r))
 	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
 	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
@@ -66,7 +65,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( arkanoid_68705p5 )
 	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_mcu_device_base, mcu_pa_r))
 	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
 	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
@@ -195,7 +193,8 @@ void taito68705_mcu_device::device_reset()
 
 READ8_MEMBER(taito68705_mcu_device::mcu_r)
 {
-	m_mcu_sent = false;
+	if (!space.debugger_access())
+		m_mcu_sent = false;
 
 //  logerror("%s: mcu_r %02x\n", space.machine().describe_context(), m_from_mcu);
 
@@ -385,8 +384,11 @@ READ8_MEMBER(arkanoid_mcu_device_base::data_r)
 {
 	// clear MCU semaphore flag and return data
 	u8 const result(m_mcu_latch);
-	m_mcu_flag = false;
-	m_semaphore_cb(CLEAR_LINE);
+	if (!space.debugger_access())
+	{
+		m_mcu_flag = false;
+		m_semaphore_cb(CLEAR_LINE);
+	}
 	return result;
 }
 
@@ -417,12 +419,6 @@ WRITE_LINE_MEMBER(arkanoid_mcu_device_base::reset_w)
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-READ8_MEMBER(arkanoid_mcu_device_base::mcu_pa_r)
-{
-	// PC2 controls whether host host latch drives the port
-	return BIT(m_pc_output, 2) ? 0xff : m_host_latch;
-}
-
 READ8_MEMBER(arkanoid_mcu_device_base::mcu_pb_r)
 {
 	return m_portb_r_cb(space, offset, mem_mask);
@@ -443,10 +439,18 @@ WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pa_w)
 WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
 {
 	// rising edge on PC2 clears the host semaphore flag
-	if (BIT(data, 2) && !BIT(m_pc_output, 2))
+	if (BIT(data, 2))
 	{
-		m_host_flag = false;
-		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_mcu->pa_w(space, 0, 0xff);
+		if (!BIT(m_pc_output, 2))
+		{
+			m_host_flag = false;
+			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		}
+	}
+	else
+	{
+		m_mcu->pa_w(space, 0, m_host_latch);
 	}
 
 	// PC3 sets the MCU semaphore when low
