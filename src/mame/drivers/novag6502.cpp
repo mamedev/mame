@@ -11,10 +11,10 @@
     such as Arena(in editmode).
 
     TODO:
-    - cforteb emulation (was first thought to be an sforteb romset)
+    - cforteb emulation (was initially sforteba romset)
     - verify supercon IRQ and beeper frequency
     - why is sforte H and 1 leds always on?
-    - sforte/sexpert optional ACIA (only works in version C?)
+    - sforte/sexpert RS232 port (only works in version C?)
     - printer port
 
 ******************************************************************************
@@ -30,6 +30,10 @@ Super Constellation Chess Computer (model 844):
 
 Constellation Forte:
 - x
+
+When it was first added to MAME as skeleton driver in mmodular.c, this romset
+was assumed to be Super Forte B, but it definitely isn't. I/O is similar to
+Super Constellation, let's assume for now it's a Constellation Forte B.
 
 
 ******************************************************************************
@@ -51,6 +55,7 @@ instead of magnet sensors.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
+#include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
@@ -485,6 +490,7 @@ ADDRESS_MAP_END
 // Constellation Forte
 
 static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -500,7 +506,7 @@ static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x1ff3, 0x1ff3) AM_WRITENOP // printer
 	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sforte_lcd_control_w)
 	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sforte_lcd_data_w)
-	AM_RANGE(0x1ffc, 0x1fff) AM_NOP // ACIA
+	AM_RANGE(0x1ffc, 0x1fff) AM_DEVREADWRITE("rs232", mos6551_device, read, write)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -833,6 +839,11 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
+
+	MCFG_DEVICE_ADD("rs232", MOS6551, 0) // R65C51P2
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", mos6551_device, write_cts))
 	
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
