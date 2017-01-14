@@ -17,7 +17,7 @@
     - sforte/sexpert optional ACIA (only works in version C?)
     - printer port
 
--------------------------------------------------------------------------------
+******************************************************************************
 
 Super Constellation Chess Computer (model 844):
 - UMC UM6502C @ 4 MHz (8MHz XTAL), 600Hz? IRQ(source unknown?)
@@ -25,12 +25,14 @@ Super Constellation Chess Computer (model 844):
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 - external ports for clock and printer, not emulated here
 
--------------------------------------------------------------------------------
+
+******************************************************************************
 
 Constellation Forte:
 - x
 
--------------------------------------------------------------------------------
+
+******************************************************************************
 
 Super Expert (model 878/887/902):
 - 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)

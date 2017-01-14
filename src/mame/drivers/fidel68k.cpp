@@ -576,7 +576,9 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(XTAL_4_9152MHz/0x2000))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_4_9152MHz/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(XTAL_4_9152MHz/0x2000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -605,7 +607,6 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 
 	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
@@ -615,7 +616,6 @@ static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
@@ -623,7 +623,6 @@ static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
@@ -631,7 +630,6 @@ static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 
