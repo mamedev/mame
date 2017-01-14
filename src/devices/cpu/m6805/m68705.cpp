@@ -4,6 +4,22 @@
 
 namespace {
 
+std::pair<u16, char const *> const m68705p_syms[] = {
+	{ 0x0000, "PORTA" }, { 0x0001, "PORTB" }, { 0x0002, "PORTC" },
+	{ 0x0004, "DDRA"  }, { 0x0005, "DDRB"  }, { 0x0006, "DDRC"  },
+	{ 0x0008, "TDR"   }, { 0x0009, "TCR"   },
+	{ 0x000b, "PCR"   },
+	{ 0x0784, "MOR"   } };
+
+std::pair<u16, char const *> const m68705u_syms[] = {
+	{ 0x0000, "PORTA" }, { 0x0001, "PORTB" }, { 0x0002, "PORTC" }, { 0x0003, "PORTD" },
+	{ 0x0004, "DDRA"  }, { 0x0005, "DDRB"  }, { 0x0006, "DDRC"  },
+	{ 0x0008, "TDR"   }, { 0x0009, "TCR"   },
+	{ 0x000a, "MISC"  },
+	{ 0x000b, "PCR"   },
+	{ 0x0f38, "MOR"   } };
+
+
 ROM_START( m68705p3 )
 	ROM_REGION(0x0073, "bootstrap", 0)
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(696e1383) SHA1(45104fe1dbd683d251ed2b9411b1f4befbb5aff4))
@@ -462,7 +478,7 @@ void m68705_new_device::nvram_write(emu_file &file)
 
 
 /****************************************************************************
- * M68705P3x family
+ * M68705Px family
  ****************************************************************************/
 
 DEVICE_ADDRESS_MAP_START( p_map, 8, m68705p_device )
@@ -502,6 +518,16 @@ m68705p_device::m68705p_device(
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
 	set_port_mask<3>(0xff);         // Port D isn't present
+}
+
+offs_t m68705p_device::disasm_disassemble(
+		std::ostream &stream,
+		offs_t pc,
+		const uint8_t *oprom,
+		const uint8_t *opram,
+		uint32_t options)
+{
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705p_syms);
 }
 
 
@@ -572,4 +598,14 @@ m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag,
 tiny_rom_entry const *m68705u3_device::device_rom_region() const
 {
 	return ROM_NAME(m68705u3);
+}
+
+offs_t m68705u3_device::disasm_disassemble(
+		std::ostream &stream,
+		offs_t pc,
+		const uint8_t *oprom,
+		const uint8_t *opram,
+		uint32_t options)
+{
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705u_syms);
 }

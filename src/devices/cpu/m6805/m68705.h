@@ -189,6 +189,13 @@ protected:
 			char const *name,
 			char const *shortname,
 			char const *source);
+
+	virtual offs_t disasm_disassemble(
+			std::ostream &stream,
+			offs_t pc,
+			const uint8_t *oprom,
+			const uint8_t *opram,
+			uint32_t options) override;
 };
 
 
@@ -232,6 +239,12 @@ protected:
 	DECLARE_ADDRESS_MAP(u_map, 8);
 
 	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual offs_t disasm_disassemble(
+			std::ostream &stream,
+			offs_t pc,
+			const uint8_t *oprom,
+			const uint8_t *opram,
+			uint32_t options) override;
 };
 
 

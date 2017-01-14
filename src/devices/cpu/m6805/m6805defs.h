@@ -128,4 +128,27 @@
 /* pre-clear a PAIR union; clearing h2 and h3 only might be faster? */
 #define CLEAR_PAIR(p)   p->d = 0
 
+offs_t CPU_DISASSEMBLE_NAME(m6805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count);
+
+template <size_t N>
+inline offs_t CPU_DISASSEMBLE_NAME(m6805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const (&symbols)[N])
+{
+	return CPU_DISASSEMBLE_NAME(m6805)(device, stream, pc, oprom, opram, options, symbols, N);
+}
+
 #endif // MAME_CPU_M6805_M6805DEFS_H
