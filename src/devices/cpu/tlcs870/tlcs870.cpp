@@ -219,6 +219,8 @@ void tlcs870_device::decode()
 	uint8_t b1;
 //	uint8_t b2;
 	
+	int tmppc = m_addr;
+
 	b0 = READ8();
 
 
@@ -780,7 +782,7 @@ void tlcs870_device::decode()
 		int val = b0 & 0x1f;
 		if (val & 0x10) val -= 0x20;
 
-		m_param2 = m_addr -1 + 2 + val;
+		m_param2 = tmppc + 2 + val;
 
 		break;
 	}
@@ -828,7 +830,7 @@ void tlcs870_device::decode()
 		int val = b0 & 0x1f;
 		if (val & 0x10) val -= 0x20;
 
-		m_param2 = m_addr -1 + 2 + val;
+		m_param2 = tmppc + 2 + val;
 
 		break;
 	}
@@ -877,9 +879,9 @@ void tlcs870_device::decode()
 		m_param2_type = ABSOLUTE_VAL_16;
 
 		int val = READ8();
-		if (val & 0x80) b0 -= 0x100;
+		if (val & 0x80) val -= 0x100;
 
-		m_param2 = m_addr - 2 + 2 + val;
+		m_param2 = tmppc+ 2 + val;
 
 		break;
 	}
@@ -995,9 +997,9 @@ void tlcs870_device::decode()
 		m_param2_type = ABSOLUTE_VAL_16;
 
 		int val = READ8();
-		if (val & 0x80) b0 -= 0x100;
+		if (val & 0x80) val -= 0x100;
 
-		m_param2 = m_addr - 2 + 2 + val;
+		m_param2 = tmppc + 2 + val;
 
 		break;
 	}
