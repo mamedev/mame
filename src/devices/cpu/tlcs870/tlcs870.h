@@ -62,6 +62,24 @@ protected:
 		pREG_HL
 	};
 
+	enum _regs_debugger {
+		DEBUGGER_REG_A,
+		DEBUGGER_REG_W,
+		DEBUGGER_REG_C,
+		DEBUGGER_REG_B,
+		DEBUGGER_REG_E,
+		DEBUGGER_REG_D,
+		DEBUGGER_REG_L,
+		DEBUGGER_REG_H,
+		DEBUGGER_REG_WA,
+		DEBUGGER_REG_BC,
+		DEBUGGER_REG_DE,
+		DEBUGGER_REG_HL
+	};
+
+	uint32_t m_debugger_temp;
+
+
 #define ADDR_8BIT 1
 #define ABSOLUTE_VAL_8 3
 #define ADDR_IN_16BITREG 4
@@ -105,13 +123,14 @@ protected:
 	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void execute_burn(int32_t cycles) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
@@ -124,6 +143,7 @@ private:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	required_shared_ptr<uint8_t> m_intram;
 
 	PAIR        m_prvpc, m_pc, m_sp;
 
@@ -145,6 +165,9 @@ private:
 	
 	uint16_t m_F;
 
+	/* CPU registers */
+	uint8_t m_RBS; // register base (4-bits)
+
 	inline uint8_t  RM8 (uint32_t a);
 	inline uint16_t RM16(uint32_t a);
 	inline void WM8 (uint32_t a, uint8_t  v);
@@ -159,6 +182,9 @@ private:
 	void decode_register_prefix(uint8_t b0);
 	void decode_source(int type, uint16_t val);
 	void decode_dest(uint8_t b0);
+
+	uint8_t get_reg8(int reg);
+	void set_reg8(int reg, uint8_t val);
 
 	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb);
 };

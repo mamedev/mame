@@ -108,6 +108,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, 
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_intram(*this, "intram")
 {
 }
 
@@ -2288,7 +2289,9 @@ void tlcs870_device::execute_run()
 		switch ( m_op )
 		{
 			default:
-				logerror("%04x: unimplemented opcode, op=%02x\n",pc(),m_op);
+			{
+			//	logerror("%04x: unimplemented opcode, op=%02x\n", pc(), m_op);
+			}
 		}
 
 		m_icount--;
@@ -2301,11 +2304,113 @@ void tlcs870_device::device_reset()
 {
 	// todo, read from top address
 	m_pc.d = 0xc030;
+
+	m_RBS = 0;
+
 }
 
-void tlcs870_device::execute_burn(int32_t cycles)
+uint8_t tlcs870_device::get_reg8(int reg)
 {
-	m_icount -= cycles;
+	return m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)];
+}
+
+void tlcs870_device::set_reg8(int reg, uint8_t val)
+{
+	m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)] = val;
+}
+
+
+
+
+void tlcs870_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case DEBUGGER_REG_A:
+			set_reg8(REG_A, m_debugger_temp);
+			break;
+		
+		case DEBUGGER_REG_W:
+			set_reg8(REG_W, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_C:
+			set_reg8(REG_C, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_B:
+			set_reg8(REG_B, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_E:
+			set_reg8(REG_E, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_D:
+			set_reg8(REG_D, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_L:
+			set_reg8(REG_L, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_H:
+			set_reg8(REG_H, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_WA:
+		case DEBUGGER_REG_BC:
+		case DEBUGGER_REG_DE:
+		case DEBUGGER_REG_HL:
+			break;
+
+	}
+}
+
+
+void tlcs870_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case DEBUGGER_REG_A:
+			m_debugger_temp = get_reg8(REG_A);
+			break;
+
+		case DEBUGGER_REG_W:
+			m_debugger_temp = get_reg8(REG_W);
+			break;
+
+		case DEBUGGER_REG_C:
+			m_debugger_temp = get_reg8(REG_C);
+			break;
+
+		case DEBUGGER_REG_B:
+			m_debugger_temp = get_reg8(REG_B);
+			break;
+
+		case DEBUGGER_REG_E:
+			m_debugger_temp = get_reg8(REG_E);
+			break;
+
+		case DEBUGGER_REG_D:
+			m_debugger_temp = get_reg8(REG_D);
+			break;
+
+		case DEBUGGER_REG_L:
+			m_debugger_temp = get_reg8(REG_L);
+			break;
+
+		case DEBUGGER_REG_H:
+			m_debugger_temp = get_reg8(REG_H);
+			break;
+
+		case DEBUGGER_REG_WA:
+		case DEBUGGER_REG_BC:
+		case DEBUGGER_REG_DE:
+		case DEBUGGER_REG_HL:
+			m_debugger_temp = 0;
+			break;
+	}
 }
 
 
@@ -2317,8 +2422,20 @@ void tlcs870_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 
-	//state_add( T90_PC, "PC", m_pc.w.l).formatstr("%04X");
-	//state_add( T90_SP, "SP", m_sp.w.l).formatstr("%04X");
+	state_add(DEBUGGER_REG_A, "A", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_W, "W", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_C, "C", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_B, "B", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_E, "E", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_D, "D", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_L, "L", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_H, "H", m_debugger_temp).callimport().callexport().formatstr("%02X");
+
+	state_add(DEBUGGER_REG_WA, "WA", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_BC, "BC", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_DE, "DE", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_HL, "HL", m_debugger_temp).callimport().callexport().formatstr("%02X");
+
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
@@ -2331,22 +2448,19 @@ void tlcs870_device::device_start()
 
 void tlcs870_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	/*
+	int F = 0;
+
 	switch (entry.index())
 	{
 		
 		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c%c%c%c%c",
-				F & 0x80 ? 'S':'.',
+			str = string_format("%c%c%c%c",
+				F & 0x80 ? 'J':'.',
 				F & 0x40 ? 'Z':'.',
-				F & 0x20 ? 'I':'.',
-				F & 0x10 ? 'H':'.',
-				F & 0x08 ? 'X':'.',
-				F & 0x04 ? 'P':'.',
-				F & 0x02 ? 'N':'.',
-				F & 0x01 ? 'C':'.'
+				F & 0x20 ? 'C':'.',
+				F & 0x10 ? 'H':'.'
 			);
 			break;
 	}
-	/*/
+	
 }
