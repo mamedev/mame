@@ -227,8 +227,9 @@ Todo:
 #include "audio/namco52.h"
 #include "audio/namco54.h"
 #include "includes/polepos.h"
+#include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "machine/gen_latch.h"
+#include "sound/volt_reg.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
@@ -923,12 +924,46 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 MACHINE_CONFIG_END
 
 
+WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
+{
+	if (m_soundlatch.found()) // topracern also uses this; no idea what it should do there
+		m_soundlatch->write(space, 0, data | 0xfc);
+}
+
+READ8_MEMBER(polepos_state::sound_z80_nmi_ack_r)
+{
+	m_sound_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return 0xff;
+}
+
+static ADDRESS_MAP_START( topracern_io, AS_IO, 8, polepos_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_IMPORT_FROM(z80_io)
+	// extra direct mapped inputs read
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("STEER") AM_WRITENOP
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0") AM_DEVWRITE("dac", dac_byte_interface, write)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWA") AM_WRITENOP
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSWB") /* ??? */ AM_WRITE(bootleg_soundlatch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2700, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x6000, 0x6000) AM_READ(sound_z80_nmi_ack_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_IO_MAP(topracern_io)
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
@@ -984,26 +1019,13 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_SOUND_ADD("polepos", POLEPOS, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
+
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) // unknown resistor configuration
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.12)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-
-READ8_MEMBER(polepos_state::sound_z80_nmi_ack_r)
-{
-	m_sound_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return 0xff;
-}
-
-static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2700, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6000) AM_READ(sound_z80_nmi_ack_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w)
-ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 
@@ -2115,7 +2137,7 @@ ROM_START( polepos2bi )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
-	/* this is used for the italian speech with a TMS5220, not properly hooked up */
+	/* this is used for the Italian speech with a TMS5220 */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
 	ROM_LOAD( "20.bin",       0x0000, 0x2000, CRC(1771fe1b) SHA1(da74ca85dfd4f5ad5a9dbfe6f7668d93105e3575) )
 
@@ -2129,8 +2151,7 @@ ROM_END
 /*
   Gran Premio F1 (Spanish bootleg of Pole Position II)
 
-  This bootleg has a TMS5220 for spanish voices
-  instead of the Namco 52xx. Needs proper implementation.
+  This bootleg has a TMS5220 for Spanish voices instead of the Namco 52xx.
 
   DIP Switches reference (to be implemented):
 
@@ -2263,7 +2284,7 @@ ROM_START( polepos2bs )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "bboard-1p.14c",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
-	/* this is used for the spanish speech with a TMS5220, not properly hooked up */
+	/* this is used for the Spanish speech with a TMS5220 */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
 	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, CRC(47226cda) SHA1(03115ead04b11e7ef3ef08d32d4d61a56dc35190) )    /* redumped. the former one has bit6 stuck */
 
@@ -2276,14 +2297,6 @@ ROM_END
 /*********************************************************************
  * Initialization routines
  *********************************************************************/
-
-DRIVER_INIT_MEMBER(polepos_state,topracern)
-{
-	/* extra direct mapped inputs read */
-	m_maincpu->space(AS_IO).install_read_port(0x02, 0x02, "STEER");
-	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "IN0");
-	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSWA");
-}
 
 DRIVER_INIT_MEMBER(polepos_state,polepos2)
 {
@@ -2304,10 +2317,10 @@ GAME( 1982, poleposa2,  polepos,  polepos,    poleposa,  driver_device, 0,      
 GAME( 1984, topracer,   polepos,  polepos,    polepos,   driver_device, 0,         ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1984)",               0 ) // the NAMCO customs have been cloned on these bootlegs
 GAME( 1983, topracera,  polepos,  polepos,    polepos,   driver_device, 0,         ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1983)",               0 ) // the only difference between them is the year displayed on the title screen
 GAME( 1983, ppspeed,    polepos,  polepos,    polepos,   driver_device, 0,         ROT0, "bootleg",                 "Speed Up (Spanish bootleg of Pole Position)",          0 ) // very close to topracer / topracera
-GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state, topracern, ROT0, "bootleg",                 "Top Racer (no MB8841 + MB8842)",                       0 )
+GAME( 1982, topracern,  polepos,  topracern,  topracern, driver_device, 0,         ROT0, "bootleg",                 "Top Racer (no MB8841 + MB8842)",                       MACHINE_IMPERFECT_SOUND ) // is there any explosion sound generator here?
 
 GAME( 1983, polepos2,   0,        polepos,    polepos2j, polepos_state, polepos2,  ROT0, "Namco",                   "Pole Position II (Japan)",                             0 )
 GAME( 1983, polepos2a,  polepos2, polepos,    polepos2,  polepos_state, polepos2,  ROT0, "Namco (Atari license)",   "Pole Position II (Atari)",                             0 )
 GAME( 1983, polepos2b,  polepos2, polepos,    polepos2,  driver_device, 0,         ROT0, "bootleg",                 "Pole Position II (bootleg)",                           0 )
-GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, polepos_state, topracern, ROT0, "bootleg",                 "Gran Premio F1 (Italian bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND ) // should have italian voices
-GAME( 1984, polepos2bs, polepos2, polepos2bi, topracern, polepos_state, topracern, ROT0, "BCN Internacional S.A.)", "Gran Premio F1 (Spanish bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND ) // should have spanish voices
+GAME( 1984, polepos2bi, polepos2, polepos2bi, topracern, driver_device, 0,         ROT0, "bootleg",                 "Gran Premio F1 (Italian bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, polepos2bs, polepos2, polepos2bi, topracern, driver_device, 0,         ROT0, "BCN Internacional S.A.)", "Gran Premio F1 (Spanish bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
