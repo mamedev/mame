@@ -418,6 +418,10 @@ Core performance options
 
 	This option can be used for benchmarking and automated testing. It tells MAME to stop execution after a fixed number of seconds. By combining this with a fixed set of other command line options, you can set up a consistent environment for benchmarking MAME performance. In addition, upon exit, the **-str** option will write a screenshot called *final.png* to the game's snapshot directory.
 
+**-seconds_to_skip** / **-sts** *<seconds>*
+
+    This option can be used to skip a fixed number of seconds at game start. It tells MAME to run the emulation as fast as possible until the specified number of seconds has been emulated. This can be used to speed up the start of games with long power on test sequences.
+
 **-[no]throttle**
 
 	Configures the default thottling setting. When throttling is on, MAME attempts to keep the game running at the game's intended speed. When throttling is off, MAME runs the game as fast as it can. Note that the fastest speed is more often than not limited by your graphics card, especially for older games. The default is ON (*-throttle*).

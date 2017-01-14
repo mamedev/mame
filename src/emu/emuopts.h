@@ -72,6 +72,7 @@
 #define OPTION_AUTOFRAMESKIP        "autoframeskip"
 #define OPTION_FRAMESKIP            "frameskip"
 #define OPTION_SECONDS_TO_RUN       "seconds_to_run"
+#define OPTION_SECONDS_TO_SKIP      "seconds_to_skip"
 #define OPTION_THROTTLE             "throttle"
 #define OPTION_SLEEP                "sleep"
 #define OPTION_SPEED                "speed"
@@ -266,6 +267,7 @@ public:
 	bool auto_frameskip() const { return bool_value(OPTION_AUTOFRAMESKIP); }
 	int frameskip() const { return int_value(OPTION_FRAMESKIP); }
 	int seconds_to_run() const { return int_value(OPTION_SECONDS_TO_RUN); }
+	int seconds_to_skip() const { return int_value(OPTION_SECONDS_TO_SKIP); }
 	bool throttle() const { return bool_value(OPTION_THROTTLE); }
 	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }

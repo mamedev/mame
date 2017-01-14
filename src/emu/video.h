@@ -161,6 +161,7 @@ private:
 	float               m_throttle_rate;            // target rate for throttling
 	bool                m_fastforward;              // flag: true if we're currently fast-forwarding
 	u32                 m_seconds_to_run;           // number of seconds to run before quitting
+	u32                 m_seconds_to_skip;          // number of seconds to run unthrottled
 	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	u32                 m_speed;                    // overall speed (*1000)
 
