@@ -204,6 +204,7 @@ m68705_new_device::m68705_new_device(
 		char const *shortname,
 		char const *source)
 	: m68705_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source)
+	, device_nvram_interface(mconfig, *this)
 	, m_user_rom(*this, DEVICE_SELF, u32(1) << addr_width)
 	, m_port_open_drain{ false, false, false, false }
 	, m_port_mask{ 0x00, 0x00, 0x00, 0x00 }
@@ -443,6 +444,20 @@ void m68705_new_device::execute_set_input(int inputnum, int state)
 	default:
 		m68705_device::execute_set_input(inputnum, state);
 	}
+}
+
+void m68705_new_device::nvram_default()
+{
+}
+
+void m68705_new_device::nvram_read(emu_file &file)
+{
+	file.read(&m_user_rom[0], m_user_rom.bytes());
+}
+
+void m68705_new_device::nvram_write(emu_file &file)
+{
+	file.write(&m_user_rom[0], m_user_rom.bytes());
 }
 
 

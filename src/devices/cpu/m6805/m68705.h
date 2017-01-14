@@ -81,7 +81,7 @@ protected:
 	devcb = &m68705_new_device::set_port_cb_w<2>(*device, DEVCB_##obj);
 
 
-class m68705_new_device : public m68705_device
+class m68705_new_device : public m68705_device, public device_nvram_interface
 {
 public:
 	// static configuration helpers
@@ -140,6 +140,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	u8 m_tdr;
 	u8 m_tcr;
