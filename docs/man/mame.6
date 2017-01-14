@@ -948,8 +948,9 @@ signal will be ignored. The default is ON (\-coin_lockout).
 .B \-ctrlr \fIcontroller
 Enables support for special controllers. Configuration files are
 loaded from the ctrlrpath. They are in the same format as the .cfg
-files that are saved, but only control configuration data is read
-from the file. The default is NULL (no controller file).
+files that are saved, but only control configuration data and aliases
+is read from the file. Multiple files are separated with semicolon.
+The default is NULL (no controller file).
 .TP
 .B \-[no]mouse
 Controls whether or not MAME looks for a mouse controller to use. Note

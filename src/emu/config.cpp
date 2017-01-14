@@ -68,14 +68,19 @@ int configuration_manager::load_settings()
 	{
 		/* open the config file */
 		emu_file file(machine().options().ctrlr_path(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open(controller, ".cfg");
+		path_iterator ctrlriter(controller);
+		std::string filename;
 
-		if (filerr != osd_file::error::NONE)
-			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+		while (ctrlriter.next(filename, nullptr))
+		{
+			osd_file::error filerr = file.open(filename, ".cfg");
 
-		/* load the XML */
-		if (!load_xml(file, config_type::CONTROLLER))
-			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+			if (filerr != osd_file::error::NONE)
+				throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+
+			if (!load_xml(file, config_type::CONTROLLER))
+				throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+		}
 	}
 
 	/* next load the defaults file */

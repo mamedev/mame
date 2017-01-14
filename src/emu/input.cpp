@@ -1021,6 +1021,12 @@ std::string input_manager::code_name(input_code code) const
 		devindex.clear();
 	}
 
+	// if item got an alias we don't need class nor index
+	if (item->has_alias()) {
+		devclass = "";
+		devindex.clear();
+	}
+
 	// devcode part comes from the item name
 	const char *devcode = item->name();
 

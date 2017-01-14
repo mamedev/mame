@@ -1769,6 +1769,8 @@ time_t ioport_manager::initialize()
 	// register callbacks for when we load configurations
 	machine().configuration().config_register("input", config_load_delegate(&ioport_manager::load_config, this), config_save_delegate(&ioport_manager::save_config, this));
 
+	machine().configuration().config_register("aliases", config_load_delegate(&ioport_manager::load_alias, this), config_save_delegate(&ioport_manager::save_alias, this));
+
 	// open playback and record files if specified
 	time_t basetime = playback_init();
 	record_init();
@@ -2094,6 +2096,69 @@ s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 	return oldval + (s64(newval - oldval) * nsec_since_last / m_last_delta_nsec);
 }
 
+
+//-----------------------------------------------------------------
+//  load_alias - callback to extract alias data from the XML nodes
+//-----------------------------------------------------------------
+void ioport_manager::load_alias(config_type cfg_type, util::xml::data_node const *parentnode)
+{
+	if (cfg_type == config_type::INIT)
+		return;
+
+	if (cfg_type == config_type::FINAL)
+		return;
+
+	if (parentnode == nullptr)
+		return;
+
+	for (util::xml::data_node const *alias_node = parentnode->get_child("alias"); alias_node != nullptr; alias_node = alias_node->get_next_sibling("alias"))
+	{
+		if (cfg_type != config_type::CONTROLLER)
+		{
+			osd_printf_error("Alias can not be used in default.cfg nor game.cfg");
+			break;
+		}
+
+		const char *codename = alias_node->get_attribute_string("code", nullptr);
+		const char *alias = alias_node->get_value();
+
+		if (codename == nullptr || codename[0] == '\0')
+			continue;
+		if (alias == nullptr || alias[0] == '\0')
+		{
+			osd_printf_error("Alias can not be empty. code: %s", codename);
+			continue;
+		}
+		
+		input_code code = machine().input().code_from_token(codename);
+		if (code == INPUT_CODE_INVALID)
+		{
+			osd_printf_error("Invalid code '%s' for alias '%s'\n", codename, alias);
+			continue;
+		}
+
+		input_device *device = machine().input().device_from_code(code);
+		if (device == nullptr)
+		{
+			osd_printf_error("No device for code '%s' for alias '%s'\n", codename, alias);
+			continue;
+		}
+
+		input_device_item *item = device->item(code.item_id());
+		if (item == nullptr)
+		{
+			osd_printf_error("Device '%s' has no code '%s' to alias '%s'\n", device->name(), codename, alias);
+			continue;
+		}
+
+		item->set_alias(alias);
+	}
+}
+
+void ioport_manager::save_alias(config_type cfg_type, util::xml::data_node *parentnode)
+{
+	// Alias can only be used in controller files and they are not saved
+}
 
 //-------------------------------------------------
 //  load_config - callback to extract configuration

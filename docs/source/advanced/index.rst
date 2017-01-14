@@ -11,3 +11,4 @@ Advanced configuration
 	hlsl
 	glsl
 	devicemap
+	controlleralias
