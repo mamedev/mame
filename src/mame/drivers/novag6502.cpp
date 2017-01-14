@@ -11,6 +11,7 @@
     such as Arena(in editmode).
 
     TODO:
+    - cforteb emulation (was first thought to be an sforteb romset)
     - verify supercon IRQ and beeper frequency
     - why is sforte H and 1 leds always on?
     - sforte/sexpert optional ACIA (only works in version C?)
@@ -23,6 +24,11 @@ Super Constellation Chess Computer (model 844):
 - 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 - external ports for clock and printer, not emulated here
+
+-------------------------------------------------------------------------------
+
+Constellation Forte:
+- x
 
 -------------------------------------------------------------------------------
 
@@ -474,6 +480,14 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 
+// Constellation Forte
+
+static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x2000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
 // Super Expert / Super Forte
 
 static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
@@ -787,7 +801,25 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guessed
+	MCFG_SOUND_ADD("beeper", BEEP, 1000) // guessed
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( cforte, novag6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502, 5000000) // 5MHz
+	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 250) // guessed
+	MCFG_CPU_PROGRAM_MAP(cforte_map)
+
+	//MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 1000) // guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -850,6 +882,13 @@ ROM_START( supercon )
 ROM_END
 
 
+ROM_START( cforteb )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("forte_b_l.u3", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
+	ROM_LOAD("forte_b_h.u1", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
+ROM_END
+
+
 ROM_START( sfortea )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("sfalo.u3", 0x0000, 0x8000, CRC(86e0230a) SHA1(0d6e18a17e636b8c7292c8f331349d361892d1a8) )
@@ -869,13 +908,6 @@ ROM_START( sforteb )
 	ROM_LOAD("forte_b_lo.u3", 0x0000, 0x8000, CRC(48bfe5d6) SHA1(323642686b6d2fb8db2b7d50c6cd431058078ce1) )
 	ROM_LOAD("forte_b_hi1.u1", 0x8000, 0x8000, CRC(9778ca2c) SHA1(d8b88b9768a1a9171c68cbb0892b817d68d78351) )
 	ROM_LOAD("forte_b_hi0.u2", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
-ROM_END
-
-ROM_START( sforteb1 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("forte_b_l.u3", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
-	ROM_LOAD("forte_b_h.u1", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
-	ROM_LOAD("forte_b_hi0.u2", 0x10000, 0x8000, BAD_DUMP CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
 ROM_END
 
 ROM_START( sfortec )
@@ -923,10 +955,11 @@ ROM_END
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     INIT                      COMPANY, FULLNAME, FLAGS */
 CONS( 1984, supercon,  0,        0,      supercon, supercon, driver_device,   0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1986, cforteb,   0,        0,      cforte,   supercon, driver_device,   0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
 CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sforteb1,  sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING ) // bad dump
+CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, sfortec,   sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, sexperta,  0,        0,      sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
