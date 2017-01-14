@@ -82,9 +82,9 @@ NETLIB_UPDATE(QBJT_switch)
 
 NETLIB_UPDATE_PARAM(QBJT_switch)
 {
-	nl_double IS = m_model.model_value("IS");
-	nl_double BF = m_model.model_value("BF");
-	nl_double NF = m_model.model_value("NF");
+	nl_double IS = m_model.m_IS;
+	nl_double BF = m_model.m_BF;
+	nl_double NF = m_model.m_NF;
 	//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 	set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
@@ -176,11 +176,11 @@ NETLIB_UPDATE_TERMINALS(QBJT_EB)
 
 NETLIB_UPDATE_PARAM(QBJT_EB)
 {
-	nl_double IS = m_model.model_value("IS");
-	nl_double BF = m_model.model_value("BF");
-	nl_double NF = m_model.model_value("NF");
-	nl_double BR = m_model.model_value("BR");
-	nl_double NR = m_model.model_value("NR");
+	nl_double IS = m_model.m_IS;
+	nl_double BF = m_model.m_BF;
+	nl_double NF = m_model.m_NF;
+	nl_double BR = m_model.m_BR;
+	nl_double NR = m_model.m_NR;
 	//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 	set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);

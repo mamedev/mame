@@ -32,6 +32,24 @@ namespace netlist
 // nld_Q - Base classes
 // -----------------------------------------------------------------------------
 
+	class bjt_model_t : public param_model_t
+	{
+	public:
+		bjt_model_t(device_t &device, const pstring name, const pstring val)
+		: param_model_t(device, name, val)
+		, m_IS(*this, "IS")
+		, m_BF(*this, "BF")
+		, m_NF(*this, "NF")
+		, m_BR(*this, "BR")
+		, m_NR(*this, "NR")
+		{}
+
+		value_t m_IS;
+		value_t m_BF;
+		value_t m_NF;
+		value_t m_BR;
+		value_t m_NR;
+	};
 // Have a common start for transistors
 
 NETLIB_OBJECT(Q)
@@ -58,7 +76,7 @@ public:
 	inline void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
 
-	param_model_t m_model;
+	bjt_model_t m_model;
 private:
 	q_type m_qtype;
 };

@@ -45,22 +45,22 @@ namespace netlist
 NETLIB_UPDATE(OPAMP)
 {
 	const double cVt = 0.0258 * 1.0; // * m_n;
-	const double cId = m_model.model_value("DAB"); // 3 mA
+	const double cId = m_model.m_DAB; // 3 mA
 	const double cVd = cVt * std::log(cId / 1e-15 + 1.0);
-	m_VH.push(m_VCC() - m_model.model_value("VLH") - cVd);
-	m_VL.push(m_GND() + m_model.model_value("VLL") + cVd);
+	m_VH.push(m_VCC() - m_model.m_VLH - cVd);
+	m_VL.push(m_GND() + m_model.m_VLL + cVd);
 	m_VREF.push((m_VCC() + m_GND()) / 2.0);
 }
 
 NETLIB_RESET(OPAMP)
 {
 	m_G1.do_reset();
-	m_G1.m_RI.setTo(m_model.model_value("RI"));
+	m_G1.m_RI.setTo(m_model.m_RI);
 
 	if (m_type == 1)
 	{
-		double RO = m_model.model_value("RO");
-		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RO;
+		double RO = m_model.m_RO;
+		double G = m_model.m_UGF / m_model.m_FPF / RO;
 		m_RP.set_R(RO);
 		m_G1.m_G.setTo(G);
 	}
@@ -73,11 +73,11 @@ NETLIB_RESET(OPAMP)
 		m_RP.do_reset();
 
 		m_EBUF->m_G.setTo(1.0);
-		m_EBUF->m_RO.setTo(m_model.model_value("RO"));
+		m_EBUF->m_RO.setTo(m_model.m_RO);
 
-		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
-		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
-		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
+		double CP = m_model.m_DAB / m_model.m_SLEW;
+		double RP = 0.5 / 3.1459 / CP / m_model.m_FPF;
+		double G = m_model.m_UGF / m_model.m_FPF / RP;
 
 		//printf("Min Freq %s: %f\n", name().c_str(), 1.0 / (CP*RP / (G*RP)));
 

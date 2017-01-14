@@ -358,6 +358,20 @@ private:
 	nl_double m_Vcrit;
 };
 
+class diode_model_t : public param_model_t
+{
+public:
+	diode_model_t(device_t &device, const pstring name, const pstring val)
+	: param_model_t(device, name, val)
+	, m_IS(*this, "IS")
+	, m_N(*this, "N")
+	{}
+
+	value_t m_IS;
+	value_t m_N;
+};
+
+
 // -----------------------------------------------------------------------------
 // nld_D
 // -----------------------------------------------------------------------------
@@ -373,11 +387,22 @@ public:
 		register_subalias("K", m_N);
 	}
 
+	template <class CLASS>
+	NETLIB_NAME(D)(CLASS &owner, const pstring name, const pstring model)
+	: NETLIB_NAME(twoterm)(owner, name)
+	, m_model(*this, "MODEL", model)
+	, m_D(*this, "m_D")
+	{
+		register_subalias("A", m_P);
+		register_subalias("K", m_N);
+	}
+
+
 	NETLIB_IS_DYNAMIC()
 
 	NETLIB_UPDATE_TERMINALSI();
 
-	param_model_t m_model;
+	diode_model_t m_model;
 
 protected:
 	NETLIB_RESETI();

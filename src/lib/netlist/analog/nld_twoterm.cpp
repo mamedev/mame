@@ -255,8 +255,8 @@ NETLIB_TIMESTEP(L)
 
 NETLIB_RESET(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 	set(m_D.G(), 0.0, m_D.Ieq());
@@ -264,8 +264,8 @@ NETLIB_RESET(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 }

@@ -31,6 +31,34 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	class opamp_model_t : public param_model_t
+	{
+	public:
+		opamp_model_t(device_t &device, const pstring name, const pstring val)
+		: param_model_t(device, name, val)
+		, m_TYPE(*this, "TYPE")
+		, m_FPF(*this, "FPF")
+		, m_SLEW(*this, "TYPE")
+		, m_RI(*this, "VLL")
+		, m_RO(*this, "VLL")
+		, m_UGF(*this, "VLL")
+		, m_VLL(*this, "VLL")
+		, m_VLH(*this, "VLH")
+		, m_DAB(*this, "DAB")
+		{}
+
+		value_t m_TYPE;
+		value_t m_FPF;
+		value_t m_SLEW;
+		value_t m_RI;
+		value_t m_RO;
+		value_t m_UGF;
+		value_t m_VLL;
+		value_t m_VLH;
+		value_t m_DAB;
+	};
+
 NETLIB_OBJECT(OPAMP)
 {
 	NETLIB_CONSTRUCTOR(OPAMP)
@@ -43,7 +71,7 @@ NETLIB_OBJECT(OPAMP)
 	, m_VL(*this, "VL")
 	, m_VREF(*this, "VREF")
 	{
-		m_type = static_cast<int>(m_model.model_value("TYPE"));
+		m_type = static_cast<int>(m_model.m_TYPE);
 
 		if (m_type == 1)
 		{
@@ -60,11 +88,11 @@ NETLIB_OBJECT(OPAMP)
 		{
 			register_sub("CP1", m_CP);
 			register_sub("EBUF", m_EBUF);
-			register_sub("DN", m_DN);
-			register_sub("DP", m_DP);
+			register_sub("DN", m_DN, "D(IS=1e-15 N=1)");
+			register_sub("DP", m_DP, "D(IS=1e-15 N=1)");
 
-			m_DP->m_model.setTo("D(IS=1e-15 N=1)");
-			m_DN->m_model.setTo("D(IS=1e-15 N=1)");
+			//m_DP->m_model.setTo("D(IS=1e-15 N=1)");
+			//m_DN->m_model.setTo("D(IS=1e-15 N=1)");
 
 			register_subalias("PLUS", "G1.IP");
 			register_subalias("MINUS", "G1.IN");
@@ -109,7 +137,7 @@ private:
 	analog_input_t m_VCC;
 	analog_input_t m_GND;
 
-	param_model_t m_model;
+	opamp_model_t m_model;
 	analog_output_t m_VH;
 	analog_output_t m_VL;
 	analog_output_t m_VREF;

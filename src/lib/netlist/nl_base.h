@@ -951,21 +951,40 @@ namespace netlist
 		pstring m_param;
 	};
 
-	class param_model_t final : public param_str_t
+	class param_model_t : public param_str_t
 	{
 	public:
+
+		class value_t
+		{
+		public:
+			value_t(param_model_t &param, const pstring name)
+			{
+				printf("Looking for %s %s\n", param.name().c_str(), name.c_str());
+				m_value = param.model_value(name);
+			}
+			const double operator()() const { return m_value; }
+			operator double() const { return m_value; }
+		private:
+			double m_value;
+		};
+
+		friend class value_t;
+
 		param_model_t(device_t &device, const pstring name, const pstring val)
 		: param_str_t(device, name, val) { }
 
-		/* these should be cached! */
-		nl_double model_value(const pstring &entity);
-		const pstring model_value_str(const pstring &entity);
-		const pstring model_type();
+		const pstring model_value_str(const pstring &entity) /*const*/;
+		const pstring model_type() /*const*/;
 	protected:
 		virtual void changed() override;
+		nl_double model_value(const pstring &entity) /*const*/;
 	private:
+		/* hide this */
+		void setTo(const pstring &param) = delete;
 		model_map_t m_map;
 	};
+
 
 	class param_data_t : public param_str_t
 	{
@@ -1082,10 +1101,10 @@ namespace netlist
 
 		setup_t &setup();
 
-		template<class C>
-		void register_sub(const pstring &name, std::unique_ptr<C> &dev)
+		template<class C, typename... Args>
+		void register_sub(const pstring &name, std::unique_ptr<C> &dev, const Args&... args)
 		{
-			dev.reset(new C(*this, name));
+			dev.reset(new C(*this, name, args...));
 		}
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);

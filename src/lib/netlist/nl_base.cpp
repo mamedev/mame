@@ -1173,6 +1173,7 @@ param_ptr_t::~param_ptr_t()
 
 void param_model_t::changed()
 {
+	netlist().log().fatal("Models can not be changed at runtime");
 	m_map.clear();
 }
 
