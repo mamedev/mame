@@ -36,7 +36,6 @@ protected:
 		ALU_XOR,
 		ALU_OR,
 		ALU_CMP
-
 	};
 
 	enum _regs8 {
@@ -185,6 +184,8 @@ private:
 
 	uint8_t get_reg8(int reg);
 	void set_reg8(int reg, uint8_t val);
+	uint16_t get_reg16(int reg);
+	void set_reg16(int reg, uint16_t val);
 
 	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb);
 };

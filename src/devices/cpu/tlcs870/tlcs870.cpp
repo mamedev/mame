@@ -97,7 +97,80 @@ static const char *const reg16p[] = {
 const device_type TMP87PH40AN = &device_creator<tmp87ph40an_device>;
 
 static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
-	AM_RANGE(0x0000, 0x003f) AM_RAM
+#if 0
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port0_r,port0_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port1_r,port1_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port2_r,port2_w)
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port3_r,port3_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r,port4_w)
+	AM_RANGE(0x0005, 0x0005) AM_READWRITE(port5_r,port5_w)
+	AM_RANGE(0x0006, 0x0006) AM_READWRITE(port6_r,port6_w)
+	AM_RANGE(0x0007, 0x0007) AM_READWRITE(port7_r,port7_w)
+	// 0x8 reserved
+	// 0x9 reserved
+	AM_RANGE(0x000a, 0x000a) AM_WRITE(p0cr_w) // Port 0 I/O control
+	AM_RANGE(0x000b, 0x000b) AM_WRITE(p1cr_w) // Port 1 I/O control
+	AM_RANGE(0x000c, 0x000c) AM_WRITE(p6cr_w) // Port 6 I/O control
+	AM_RANGE(0x000d, 0x000d) AM_WRITE(p7cr_w) // Port 7 I/O control
+	AM_RANGE(0x000e, 0x000e) AM_READWRITE(adccr_r,adccr_w) // A/D converter control
+	AM_RANGE(0x000f, 0x000f) AM_READ(adcdr_r) // A/D converter result
+
+	AM_RANGE(0x0010, 0x0010) AM_WRITE(treg1a_l_w) // Timer register 1A
+	AM_RANGE(0x0011, 0x0011) AM_WRITE(treg1a_h_w) //
+	AM_RANGE(0x0012, 0x0012) AM_READWRITE(treg1b_l_r, treg1b_l_w) // Timer register 1B
+	AM_RANGE(0x0013, 0x0013) AM_READWRITE(treg1b_h_r, treg1b_h_w) //
+	AM_RANGE(0x0014, 0x0014) AM_WRITE(tc1cr_w) // TC1 control
+	AM_RANGE(0x0015, 0x0015) AM_WRITE(tc2cr_w) // TC2 control
+	AM_RANGE(0x0016, 0x0016) AM_WRITE(treg2_l_w) // Timer register 2
+	AM_RANGE(0x0017, 0x0017) AM_WRITE(treg2_h_w) //
+	AM_RANGE(0x0018, 0x0018) AM_READWRITE(treg3a_r, treg3a_w) // Timer register 3A
+	AM_RANGE(0x0019, 0x0019) AM_READ(treg3b_r) // Timer register 3B
+	AM_RANGE(0x001a, 0x001a) AM_WRITE(tc3cr_w) // TC3 control
+	AM_RANGE(0x001b, 0x001b) AM_READ(treg4_r) // Timer register 4
+	AM_RANGE(0x001c, 0x001c) AM_WRITE(tc4cr_w) // TC4 control
+	// 0x1d reserved
+	// 0x1e reserved
+	// 0x1f reserved
+
+	AM_RANGE(0x0020, 0x0020) AM_READWRITE(sio1sr_r, sio1cr1_w) // SIO1 status / SIO1 control
+	AM_RANGE(0x0021, 0x0021) AM_WRITE(sio1cr2_w) // SIO1 control
+	AM_RANGE(0x0022, 0x0022) AM_READWRITE(sio2sr_r, sio2cr1_w) // SIO2 status / SIO2 control
+	AM_RANGE(0x0023, 0x0023) AM_WRITE(sio2cr2_w) // SIO2 control
+	// 0x24 reserved
+	// 0x25 reserved
+	// 0x26 reserved
+	// 0x27 reserved
+	// 0x28 reserved
+	// 0x29 reserved
+	// 0x2a reserved
+	// 0x2b reserved
+	// 0x2c reserved
+	// 0x2d reserved
+	// 0x2e reserved
+	// 0x2f reserved
+
+	// 0x30 reserved
+	// 0x31 reserved
+	// 0x32 reserved
+	// 0x33 reserved
+	AM_RANGE(0x0034, 0x0034) AM_WRITE(wdtcr1_w) // WDT control
+	AM_RANGE(0x0035, 0x0035) AM_WRITE(wdtcr2_w) //
+	
+	AM_RANGE(0x0036, 0x0036) AM_READWRITE(tbtcr_r, tbtcr_w) // TBT / TG / DVO control
+	AM_RANGE(0x0037, 0x0037) AM_READWRITE(eintcr_r, eintcr_w) // External interrupt control
+	
+	AM_RANGE(0x0038, 0x0038) AM_READWRITE(syscr1_r, syscr1_w) // System Control
+	AM_RANGE(0x0039, 0x0039) AM_READWRITE(syscr2_r, syscr2_w) //
+	
+	AM_RANGE(0x003a, 0x003a) AM_READWRITE(eir_l_r, eir_l_w) // Interrupt enable register
+	AM_RANGE(0x003b, 0x003b) AM_READWRITE(eir_h_r, eir_h_w) //
+
+	AM_RANGE(0x003c, 0x003c) AM_READWRITE(il_l_r, il_l_w) // Interrupt latch
+	AM_RANGE(0x003d, 0x003d) AM_READWRITE(il_h_r, il_h_w) //
+	// 0x3e reserved
+	AM_RANGE(0x003f, 0x003f) AM_READWRITE(psw_r, rbs_w) // Program status word / Register bank selector
+#endif
+
 	AM_RANGE(0x0040, 0x023f) AM_RAM AM_SHARE("intram") // register banks + internal RAM, not, code execution NOT allowed here
 	AM_RANGE(0x0f80, 0x0fff) AM_RAM // DBR
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -2213,7 +2286,7 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
 	if (basetype==PROGRAMSTATUSWORD) util::stream_format(stream, " PSW");
 	if (basetype==CARRYFLAG) util::stream_format(stream, " CF");
-	if (basetype==MEMVECTOR_16BIT)  util::stream_format(stream, " (%04x)", val);
+	if (basetype==MEMVECTOR_16BIT) util::stream_format(stream, " (%04x)", val);
 	if (basetype==ABSOLUTE_VAL_8)
 	{
 		if (type&0x80) util::stream_format(stream, "$%04x", val);
@@ -2221,8 +2294,6 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	}
 
 	if (type&BITPOS) util::stream_format(stream, ".BIT%d", m_bitpos);
-
-
 }
 
 offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
@@ -2230,7 +2301,6 @@ offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 	m_addr = pc;
 
 	decode();
-//	m_op &= ~OP_16;
 
 	util::stream_format         (stream, "%-5s",                op_names[ m_op ] );
 
@@ -2246,9 +2316,6 @@ offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 		disasm_disassemble_param(stream, pc, oprom, opram, options, m_param2_type, m_param2);
 
 	}
-
-//	bool streamed = stream_arg  (stream, pc,       " ",         m_mode1, m_r1, m_r1b );
-//	stream_arg                  (stream, pc, streamed ?",":"",  m_mode2, m_r2, m_r2b );
 
 	return (m_addr - pc) | DASMFLAG_SUPPORTED;
 }
@@ -2286,12 +2353,110 @@ void tlcs870_device::execute_run()
 		decode();
 		m_pc.d = m_addr;
 
-		switch ( m_op )
+		switch (m_op)
 		{
-			default:
-			{
-			//	logerror("%04x: unimplemented opcode, op=%02x\n", pc(), m_op);
-			}
+		case UNKNOWN:
+			// invalid instruction
+			break;
+
+		case CALL:
+			break;
+		case CALLP:
+			break;
+		case CALLV:
+			break;
+		case CLR:
+			break;
+		case CPL:
+			break;
+		case DAA:
+			break;
+		case DAS:
+			break;
+		case DEC:
+			break;
+		/*
+		case DI:
+			break;
+		*/
+		case DIV:
+			break;
+		/*
+		case EI:
+			break;
+		*/
+		case INC:
+			break;
+		/*
+		case J:
+			break;
+		*/
+		case JP:
+			break;
+		case JR:
+			break;
+		case JRS:
+			break;
+		case LD:
+			break;
+		case LDW:
+			break;
+		case MCMP:
+			break;
+		case MUL:
+			break;
+		case NOP:
+			break;
+		case POP:
+			break;
+		case PUSH:
+			break;
+		case RET:
+			break;
+		case RETI:
+			break;
+		case RETN:
+			break;
+		case ROLC:
+			break;
+		case ROLD:
+			break;
+		case RORC:
+			break;
+		case RORD:
+			break;
+		case SET:
+			break;
+		case SHLC:
+			break;
+		case SHRC:
+			break;
+		case SWAP:
+			break;
+		case SWI:
+			break;
+		/*
+		case TEST:
+			break;
+		*/
+		case XCH:
+			break;
+		case ALU_ADDC:
+			break;
+		case ALU_ADD:
+			break;
+		case ALU_SUBB:
+			break;
+		case ALU_SUB:
+			break;
+		case ALU_AND:
+			break;
+		case ALU_XOR:
+			break;
+		case ALU_OR:
+			break;
+		case ALU_CMP:
+			break;
 		}
 
 		m_icount--;
@@ -2319,6 +2484,19 @@ void tlcs870_device::set_reg8(int reg, uint8_t val)
 	m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)] = val;
 }
 
+uint16_t tlcs870_device::get_reg16(int reg)
+{
+	uint16_t res = 0;
+	res |= get_reg8(((reg & 0x3) * 2) + 1) << 8;
+	res |= get_reg8(((reg & 0x3) * 2) + 0) << 0;
+	return res;
+}
+
+void tlcs870_device::set_reg16(int reg, uint16_t val)
+{
+	set_reg8(((reg & 0x3) * 2) + 1, (val & 0xff00) >> 8);
+	set_reg8(((reg & 0x3) * 2) + 0, (val & 0x00ff) >> 0);
+}
 
 
 
@@ -2359,11 +2537,20 @@ void tlcs870_device::state_import(const device_state_entry &entry)
 			break;
 
 		case DEBUGGER_REG_WA:
-		case DEBUGGER_REG_BC:
-		case DEBUGGER_REG_DE:
-		case DEBUGGER_REG_HL:
+			set_reg16(REG_WA, m_debugger_temp);
 			break;
 
+		case DEBUGGER_REG_BC:
+			set_reg16(REG_BC, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_DE:
+			set_reg16(REG_DE, m_debugger_temp);
+			break;
+
+		case DEBUGGER_REG_HL:
+			set_reg16(REG_HL, m_debugger_temp);
+			break;
 	}
 }
 
@@ -2405,11 +2592,21 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 			break;
 
 		case DEBUGGER_REG_WA:
-		case DEBUGGER_REG_BC:
-		case DEBUGGER_REG_DE:
-		case DEBUGGER_REG_HL:
-			m_debugger_temp = 0;
+			m_debugger_temp = get_reg16(REG_WA);
 			break;
+
+		case DEBUGGER_REG_BC:
+			m_debugger_temp = get_reg16(REG_BC);
+			break;
+
+		case DEBUGGER_REG_DE:
+			m_debugger_temp = get_reg16(REG_DE);
+			break;
+
+		case DEBUGGER_REG_HL:
+			m_debugger_temp = get_reg16(REG_HL);
+			break;
+
 	}
 }
 
@@ -2431,10 +2628,10 @@ void tlcs870_device::device_start()
 	state_add(DEBUGGER_REG_L, "L", m_debugger_temp).callimport().callexport().formatstr("%02X");
 	state_add(DEBUGGER_REG_H, "H", m_debugger_temp).callimport().callexport().formatstr("%02X");
 
-	state_add(DEBUGGER_REG_WA, "WA", m_debugger_temp).callimport().callexport().formatstr("%02X");
-	state_add(DEBUGGER_REG_BC, "BC", m_debugger_temp).callimport().callexport().formatstr("%02X");
-	state_add(DEBUGGER_REG_DE, "DE", m_debugger_temp).callimport().callexport().formatstr("%02X");
-	state_add(DEBUGGER_REG_HL, "HL", m_debugger_temp).callimport().callexport().formatstr("%02X");
+	state_add(DEBUGGER_REG_WA, "WA", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add(DEBUGGER_REG_BC, "BC", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add(DEBUGGER_REG_DE, "DE", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add(DEBUGGER_REG_HL, "HL", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
