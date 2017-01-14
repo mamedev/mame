@@ -1054,7 +1054,10 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// first draw the FPS counter
 	if (show_fps_counter())
+	{
 		draw_fps_counter(container);
+		show_analog_controls(container);
+	}
 
 	// Show the duration of current part (intro or gameplay or extra)
 	if (show_timecode_counter())
@@ -1270,6 +1273,53 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	return 0;
 }
 
+void mame_ui_manager::show_analog_controls(render_container &container)
+{
+	float y2 = 1.0f;
+	float y1 = y2;
+	float x1 = UI_BOX_LR_BORDER;
+	float x2 = 1.0f - UI_BOX_LR_BORDER;
+
+	auto &ports = machine().ioport().ports();
+	for (auto &port : ports)
+	{
+		for (auto &field : port.second->fields())
+		{
+			if (!field.is_analog())
+				continue;
+			if (!field.enabled())
+				continue;
+			if (field.name() == nullptr)
+				continue;
+
+			ioport_value min = field.minval();
+			ioport_value max = field.maxval();
+			ioport_value range = max - min;
+			if (range == 0)
+				continue;
+
+			ioport_value value = 0;
+			field.live().analog->read(value);
+			ioport_value zero = field.defvalue();
+
+			float percentage = (x2 - x1) * (value - min) / (float)range;
+			float zeropercentage = (x2 - x1) * (zero - min) / (float)range;
+			if (field.analog_reverse())
+			{
+				percentage = 1 - percentage;
+				zeropercentage = 1 - zeropercentage;
+			}
+
+			y1 -= UI_LINE_WIDTH * 4;
+			container.add_rect(x1, y1 + UI_LINE_WIDTH, 
+			                   x1 + percentage, y1 + UI_LINE_WIDTH * 3,
+			                   UI_SLIDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container.add_rect(x1 + zeropercentage - UI_LINE_WIDTH / 2, y1,
+			                   x1 + zeropercentage + UI_LINE_WIDTH / 2, y1 + UI_LINE_WIDTH * 4, 
+			                   UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		}
+	}
+}
 
 //-------------------------------------------------
 //  handler_load_save - leads the user through

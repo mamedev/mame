@@ -84,6 +84,10 @@ All the keys below are fully configurable in the user interface. This list shows
 **F9**            | Increase frame skip on the fly.
 **F10**           | Toggle speed throttling.
 **F11**           | Toggles speed display.
+                  | For games with at least one analog control it will also display a series of
+                  | lines at the bottom of the display. The lines represents MAME's view of
+                  | each control's current position. Can make it easier to calibrate
+                  | analog controllers.
 **Shift+F11**     | Toggles internal profiler display (if compiled in).
 **Alt+F11**       | Record HLSL Rendered Video.
 **F12**           | Saves a screen snapshot.

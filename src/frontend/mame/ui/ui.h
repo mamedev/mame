@@ -265,6 +265,8 @@ private:
 	uint32_t handler_load_save(render_container &container, uint32_t state);
 	uint32_t handler_confirm_quit(render_container &container);
 
+	void show_analog_controls(render_container &container);
+
 	// private methods
 	void exit();
 	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
