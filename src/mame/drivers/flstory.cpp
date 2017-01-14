@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)

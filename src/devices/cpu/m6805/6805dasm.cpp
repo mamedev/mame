@@ -197,7 +197,7 @@ offs_t CPU_DISASSEMBLE_NAME(m6805)(
 {
 	u8 const code = oprom[0];
 
-	uint32_t flags = 0;
+	u32 flags = 0;
 	switch (disasm[code].op)
 	{
 	case bsr:
@@ -223,7 +223,7 @@ offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		bit = (code >> 1) & 7;
 		util::stream_format(stream, "%d,", bit);
 		format_address(stream, opram[1], symbols, symbol_count);
-		util::stream_format(stream, ",$%03X", pc + 3 + (int8_t)opram[2]);
+		util::stream_format(stream, ",$%03X", pc + 3 + s8(opram[2]));
 		return 3 | flags | DASMFLAG_SUPPORTED;
 
 	case md::BIT:   // bit test
@@ -233,7 +233,7 @@ offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		return 2 | flags | DASMFLAG_SUPPORTED;
 
 	case md::REL:   // relative
-		util::stream_format(stream, "$%03X", pc + 2 + (int8_t)opram[1]);
+		util::stream_format(stream, "$%03X", pc + 2 + s8(opram[1]));
 		return 2 | flags | DASMFLAG_SUPPORTED;
 
 	case md::IMM:   // immediate

@@ -229,5 +229,8 @@ private:
 // device type definition
 extern const device_type PIA6821;
 
+extern template class device_finder<pia6821_device, false>;
+extern template class device_finder<pia6821_device, true>;
+
 
 #endif /* __6821PIA_H__ */

@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_map_mcu, AS_PROGRAM, 8, lkage_state )
 	AM_IMPORT_FROM(lkage_map)
-	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xf087, 0xf087) AM_DEVREAD("bmcu", taito68705_mcu_device, mcu_status_r)
 ADDRESS_MAP_END
 

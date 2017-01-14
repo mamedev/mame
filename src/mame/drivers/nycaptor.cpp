@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)   /* bit 3 - memory bank at 0x8000-0xbfff */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)

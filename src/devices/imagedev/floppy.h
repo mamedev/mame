@@ -343,4 +343,7 @@ extern const device_type TEAC_FD_55G;
 extern const device_type ALPS_3255190x;
 extern const device_type IBM_6360;
 
+extern template class device_finder<floppy_connector, false>;
+extern template class device_finder<floppy_connector, true>;
+
 #endif /* FLOPPY_H */

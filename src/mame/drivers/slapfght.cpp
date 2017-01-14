@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfigh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 

@@ -8,10 +8,19 @@
 
 #pragma once
 
-#ifndef __GEN_LATCH_H__
-#define __GEN_LATCH_H__
+#ifndef MAME_DEVICES_MACHINE_GEN_LATCH_H
+#define MAME_DEVICES_MACHINE_GEN_LATCH_H
 
 #include "emu.h"
+
+
+//**************************************************************************
+//  DEVICE TYPE DECLARATIONS
+//**************************************************************************
+
+extern const device_type GENERIC_LATCH_8;
+extern const device_type GENERIC_LATCH_16;
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -25,6 +34,7 @@
 
 #define MCFG_GENERIC_LATCH_DATA_PENDING_CB(_devcb) \
 	devcb = &generic_latch_base_device::set_data_pending_callback(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -84,9 +94,6 @@ private:
 	u8                      m_latched_value;
 };
 
-// device type definition
-extern const device_type GENERIC_LATCH_8;
-
 
 // ======================> generic_latch_16_device
 
@@ -115,8 +122,14 @@ private:
 	u16                     m_latched_value;
 };
 
-// device type definition
-extern const device_type GENERIC_LATCH_16;
 
+//**************************************************************************
+//  TEMPALTE INSTANTIATIONS
+//**************************************************************************
 
-#endif  /* __GEN_LATCH_H__ */
+extern template class device_finder<generic_latch_8_device, false>;
+extern template class device_finder<generic_latch_8_device, true>;
+extern template class device_finder<generic_latch_16_device, false>;
+extern template class device_finder<generic_latch_16_device, true>;
+
+#endif  // MAME_DEVICES_MACHINE_GEN_LATCH_H

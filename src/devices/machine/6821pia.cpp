@@ -57,6 +57,9 @@
 // device type definition
 const device_type PIA6821 = &device_creator<pia6821_device>;
 
+template class device_finder<pia6821_device, false>;
+template class device_finder<pia6821_device, true>;
+
 
 //-------------------------------------------------
 //  pia6821_device - constructor

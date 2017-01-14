@@ -114,6 +114,10 @@ const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
 const device_type IBM_6360 = &device_creator<ibm_6360>;
 
 
+template class device_finder<floppy_connector, false>;
+template class device_finder<floppy_connector, true>;
+
+
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_DFI_FORMAT,

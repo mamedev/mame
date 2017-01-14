@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
 	AM_IMPORT_FROM(tokio_map)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_bootleg, AS_PROGRAM, 8, bublbobl_state )
@@ -709,8 +709,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, main_sent_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_sent_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_flag_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_flag_r, nullptr)
 INPUT_PORTS_END
 
 /*************************************
