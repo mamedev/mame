@@ -21,10 +21,13 @@
     lkage.cpp    - lkage
     bigevglf.cpp - bigevglf
     xain.cpp - xsleena
+    matmania.cpp - maniach
 
     and the following with slight changes:
-    slapfght.cpp - tigerh (inverted status bits read on portC)
+    slapfght.cpp - tigerh (inverted status bits read on port C)
                  - slapfght (extended outputs for scrolling)
+    arkanoid.cpp - arkanoid (latch control on port C, inputs on port B)
+    taito_l.cpp - puzznic (latch control on port C)
 
 
     not hooked up here, but possible (needs investigating)
@@ -32,7 +35,6 @@
     taitosj.cpp - ^^
     changela.cpp - ^^
     renegade.cpp - ^^
-    matmania.cpp - ^^
 
     68705 sets in Taito drivers that are NOT suitable for hookup here?
     bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
@@ -193,6 +195,9 @@ u8 taito68705_mcu_device_base::pa_value() const
 
 void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host_bit, unsigned mcu_bit)
 {
+	// save this here to simulate latch propagation delays
+	u8 const old_pa_value(pa_value());
+
 	// rising edge clears the host semaphore flag
 	if (BIT(data, host_bit))
 	{
@@ -218,7 +223,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 
 		// data is latched on falling edge
 		if (BIT(value, mcu_bit))
-			m_mcu_latch = pa_value();
+			m_mcu_latch = old_pa_value;
 	}
 
 	value = data;

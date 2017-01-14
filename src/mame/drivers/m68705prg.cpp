@@ -273,7 +273,7 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT      STATE                 INIT       COMPANY     FULLNAME                FLAGS
-COMP( 1984, 705p3prg, 0,      0,      m68705p3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705p5prg, 0,      0,      m68705p5prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, 705u3prg, 0,      0,      m68705u3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE                 INIT       COMPANY     FULLNAME                FLAGS
+COMP( 1984, 705p5prg, 0,        0,      m68705p5prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705p3prg, 705p5prg, 0,      m68705p3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705u3prg, 705p5prg, 0,      m68705u3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
