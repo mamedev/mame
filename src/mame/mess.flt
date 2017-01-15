@@ -346,6 +346,7 @@ mikromik.cpp
 mikrosha.cpp
 mini2440.cpp
 minicom.cpp
+miniforce.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
