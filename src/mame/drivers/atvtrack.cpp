@@ -299,7 +299,7 @@ WRITE64_MEMBER(atvtrack_state::nand_addr_w)
 void atvtrack_state::gpu_irq_test()
 {
 	if (gpu_irq_pending & ~gpu_irq_mask)
-		m_subcpu->sh4_set_irln_input(14);	// there hacky looking ASSERT+CLEAR pulse in SH4 core ?
+		m_subcpu->sh4_set_irln_input(15 - 14);	// there hacky looking ASSERT+CLEAR pulse in SH4 core ?
 	else
 		m_subcpu->set_input_line(SH4_IRLn, CLEAR_LINE);
 }
