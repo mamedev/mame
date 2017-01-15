@@ -182,7 +182,7 @@ void machine_manager::start_http_server()
 		endpoint.on_open = [&](auto connection) {
 			auto send_stream = std::make_shared<webpp::ws_server::SendStream>();
 			*send_stream << "update_machine";
-			m_wsserver->send(connection, send_stream, [](const std::error_code& ec) { });
+			m_wsserver->send(connection, send_stream);
 		};
 	
 		m_server->on_upgrade = [this](auto socket, auto request) {
