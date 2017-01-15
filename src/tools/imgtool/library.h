@@ -59,6 +59,10 @@ namespace imgtool
 {
 	struct dirent
 	{
+		dirent() = default;
+		dirent(const dirent &that) = default;
+		dirent(dirent &&that) = default;
+
 		std::string filename;
 		std::string attr;
 		uint64_t filesize;
@@ -71,10 +75,10 @@ namespace imgtool
 		std::string comment;
 
 		// flags
-		bool eof : 1;
-		bool corrupt : 1;
-		bool directory : 1;
-		bool hardlink : 1;
+		bool eof;
+		bool corrupt;
+		bool directory;
+		bool hardlink;
 	};
 };
 
