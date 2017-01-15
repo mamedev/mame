@@ -299,9 +299,9 @@ WRITE64_MEMBER(atvtrack_state::nand_addr_w)
 void atvtrack_state::gpu_irq_test()
 {
 	if (gpu_irq_pending & ~gpu_irq_mask)
-		m_subcpu->sh4_set_irln_input(15 - 14);	// there hacky looking ASSERT+CLEAR pulse in SH4 core ?
+		m_subcpu->sh4_set_irln_input(14);
 	else
-		m_subcpu->set_input_line(SH4_IRLn, CLEAR_LINE);
+		m_subcpu->sh4_set_irln_input(15);
 }
 
 void atvtrack_state::gpu_irq_set(int bit)
@@ -371,6 +371,24 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 
 WRITE64_MEMBER(atvtrack_state::ioport_w)
 {
+	// SH4 GPIO port A used in this way:
+	// bits 15-11  O - port select: F002 (In)  E802 (In)  F800 (Out)        7800 (Out)
+	//                              JP10 conn  JP8 conn   ADC/DAC control   System Control and/or diagnostics
+	// bit  10    IO - data bit                 *1        GPO JP3           motion enabled indicator ?
+	// bit  9     IO - data bit     ADC data    *1        GPO JP3           sound (AMP) enable ? (ATV - set/res then music starts/ends, SD - always set)
+	// bit  8     IO - data bit     Coin        *1        GPO JP3            \ slave CPU start/stop/reset related
+	// bit  7     IO - data bit                 *1        always 1           / set to 30 during slave CPU test, then to 10
+	// bit  6     IO - data bit     Test                  ADC CS, ~DAC CS    unused
+	// bit  5     IO - data bit     Down                  ADC CLK, ~DAC CLK  unused
+	// bit  4     IO - data bit     Service               DAC data JP6       lamp 
+	// bit  3     IO - data bit     Up                    ADC data JP5       coin counter
+	// bit  2     I  - unk, (SD: 1 = FPGA ready after config)
+	// bit  1      O - data bits operation direction: 0 - output, 1 - input (SD: FPGA config data)
+	// bit  0      O - unk (SD: FPGA config clock)
+	// ADC and DAC is 4-channel SPI devices
+	// Switch inputs is active low, *1 - game specific inputs
+	// All above IO multiplexig, ADC and DAC implemented in FPGA
+
 #ifdef SPECIALMODE
 	uint64_t d;
 	static int cnt=0;
