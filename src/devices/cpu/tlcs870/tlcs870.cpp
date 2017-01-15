@@ -2350,245 +2350,118 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 #endif
 }
 
-void tlcs870_device::set_dest_val(int temppc, uint16_t dest_val)
+uint16_t tlcs870_device::get_addr(int temppc, uint16_t param_type, uint16_t param_val)
 {
-	if (m_param1_type & IS16BIT)
+	uint16_t addr = 0x0000;
+
+	switch (param_type&MODE_MASK)
 	{
-		switch (m_param1_type)
+	case ADDR_IN_IMM_X:
+		addr = param_val;
+		break;
+	case ADDR_IN_PC_PLUS_REG_A:
+		addr = temppc + 2 + get_reg8(REG_A);
+		break;
+	case ADDR_IN_DE:
+		addr = get_reg16(REG_DE);
+		break;
+	case ADDR_IN_HL:
+		addr = get_reg16(REG_HL);
+		break;
+	case ADDR_IN_HL_PLUS_IMM_D:
+		addr = get_reg16(REG_HL) + param_val;
+		break;
+	case ADDR_IN_HL_PLUS_REG_C:
+		addr = get_reg16(REG_HL) + get_reg16(REG_C);
+		break;
+	case ADDR_IN_HLINC:
+	{
+		uint16_t tmpHL = get_reg16(REG_HL);
+		addr = tmpHL;
+		tmpHL++;
+		set_reg16(REG_HL, tmpHL);
+		break;
+	}
+	case ADDR_IN_DECHL:
+	{
+		uint16_t tmpHL = get_reg16(REG_HL);
+		tmpHL--;
+		set_reg16(REG_HL, tmpHL);
+		addr = tmpHL;
+		break;
+	}
+	}
+
+	return addr;
+}
+
+void tlcs870_device::set_dest_val(uint16_t param_type, uint16_t param_val, uint16_t dest_val)
+{
+	if (param_type & IS16BIT)
+	{
+		switch (param_type)
 		{
 		case ABSOLUTE_VAL_16:
 			logerror("illegal dest ABSOLUTE_VAL_16\n");
 			break;
 
 		case REG_16BIT:
-			set_reg16(m_param1, dest_val);
+			set_reg16(param_val, dest_val);
 			break;
 
-		case (ADDR_IN_IMM_X|IS16BIT):
-		{
-			uint16_t addr = m_param1;
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_PC_PLUS_REG_A|IS16BIT):
-		{
-			uint16_t addr = temppc + 2 + get_reg8(REG_A);
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_DE|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_DE);
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_HL|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_HL);
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_HL_PLUS_IMM_D|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_HL) + m_param1;
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_HL_PLUS_REG_C|IS16BIT):
-		{	
-			uint16_t addr = get_reg16(REG_HL) + get_reg16(REG_C);
-			WM16(addr, dest_val);
-			break;
-		}
-		case (ADDR_IN_HLINC|IS16BIT):
-			// illegal?
-			logerror("illegal ADDR_IN_HLINC|IS16BIT\n");
-			break;
-		case (ADDR_IN_DECHL|IS16BIT):
-			// illegal?
-			logerror("illegal ADDR_IN_DECHL|IS16BIT\n");
-			break;
 		case (STACKPOINTER):
 			m_sp.d = dest_val;
 			break;
-
-		}
-
-	//	logerror("source_val is %04x\n", source_val);
-						
+		}				
 	}
 	else
 	{
-		switch (m_param1_type & MODE_MASK)
+		switch (param_type & MODE_MASK)
 		{
 		case ABSOLUTE_VAL_8:
 			logerror("illegal dest ABSOLUTE_VAL_8\n");
 			break;
 		case REG_8BIT:
-			set_reg8(m_param1, dest_val);
-			break;
-		case ADDR_IN_IMM_X:
-			WM8(m_param1, dest_val);
-			break;
-		case ADDR_IN_PC_PLUS_REG_A:
-			WM8(temppc + 2 + get_reg8(REG_A), dest_val); // sign extend A?
-			break;
-		case ADDR_IN_DE:
-			WM8(get_reg16(REG_DE), dest_val);
-			break;
-		case ADDR_IN_HL:
-			WM8(get_reg16(REG_HL), dest_val);
-			break;
-		case ADDR_IN_HL_PLUS_IMM_D:
-			WM8(get_reg16(REG_HL) + m_param1, dest_val); // sign extend D?
-			break;
-		case ADDR_IN_HL_PLUS_REG_C:
-			WM8(get_reg16(REG_HL) + get_reg16(REG_C), dest_val); // sign extend C?
-			break;
-		case ADDR_IN_HLINC:
-		{
-			uint16_t tmpHL = get_reg16(REG_HL);
-			WM8(tmpHL, dest_val);
-			tmpHL++;
-			set_reg16(REG_HL, tmpHL);
+			set_reg8(param_val, dest_val);
 			break;
 		}
-		case ADDR_IN_DECHL:
-		{
-			uint16_t tmpHL = get_reg16(REG_HL);
-			tmpHL--;
-			set_reg16(REG_HL, tmpHL);
-			WM8(tmpHL, dest_val);
-			break;
-		}
-
-		}
-
-	//	logerror("source_val is %02x\n", source_val);
 	}
-
 }
 
-uint16_t tlcs870_device::get_source_val(int temppc)
+uint16_t tlcs870_device::get_source_val(uint16_t param_type, uint16_t param_val)
 {
-	uint16_t source_val = 0x0000;
+	uint16_t ret_val = 0x0000;
 
-	if (m_param2_type & IS16BIT)
+	if (param_type & IS16BIT)
 	{
-		switch (m_param2_type)
+		switch (param_type)
 		{
 		case ABSOLUTE_VAL_16:
-			source_val = m_param2;
+			ret_val = param_val;
 			break;
 
 		case REG_16BIT:
-			source_val = get_reg16(m_param2);
+			ret_val = get_reg16(param_val);
 			break;
 
-		case (ADDR_IN_IMM_X|IS16BIT):
-		{
-			uint16_t addr = m_param2;
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_PC_PLUS_REG_A|IS16BIT):
-		{
-			uint16_t addr = temppc + 2 + get_reg8(REG_A);
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_DE|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_DE);
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_HL|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_HL);
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_HL_PLUS_IMM_D|IS16BIT):
-		{
-			uint16_t addr = get_reg16(REG_HL) + m_param2;
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_HL_PLUS_REG_C|IS16BIT):
-		{	
-			uint16_t addr = get_reg16(REG_HL) + get_reg16(REG_C);
-			source_val = RM16(addr);
-			break;
-		}
-		case (ADDR_IN_HLINC|IS16BIT):
-			// illegal?
-			logerror("illegal ADDR_IN_HLINC|IS16BIT\n");
-			break;
-		case (ADDR_IN_DECHL|IS16BIT):
-			// illegal?
-			logerror("illegal ADDR_IN_DECHL|IS16BIT\n");
-			break;
 		case (STACKPOINTER):
-			source_val = m_sp.d;
+			ret_val = m_sp.d;
 			break;
-
 		}
-
-	//	logerror("source_val is %04x\n", source_val);
-						
 	}
 	else
 	{
-		switch (m_param2_type & MODE_MASK)
+		switch (param_type & MODE_MASK)
 		{
 		case ABSOLUTE_VAL_8:
-			source_val = m_param2;
+			ret_val = param_val;
 			break;
 		case REG_8BIT:
-			source_val = get_reg8(m_param2);
-			break;
-		case ADDR_IN_IMM_X:
-			source_val = RM8(m_param2);
-			break;
-		case ADDR_IN_PC_PLUS_REG_A:
-			source_val = RM8(temppc + 2 + get_reg8(REG_A)); // sign extend A?
-			break;
-		case ADDR_IN_DE:
-			source_val = RM8(get_reg16(REG_DE));
-			break;
-		case ADDR_IN_HL:
-			source_val = RM8(get_reg16(REG_HL));
-			break;
-		case ADDR_IN_HL_PLUS_IMM_D:
-			source_val = RM8(get_reg16(REG_HL) + m_param2); // sign extend D?
-			break;
-		case ADDR_IN_HL_PLUS_REG_C:
-			source_val = RM8(get_reg16(REG_HL) + get_reg16(REG_C)); // sign extend C?
-			break;
-		case ADDR_IN_HLINC:
-		{
-			uint16_t tmpHL = get_reg16(REG_HL);
-			source_val = RM8(tmpHL);
-			tmpHL++;
-			set_reg16(REG_HL, tmpHL);
+			ret_val = get_reg8(param_val);
 			break;
 		}
-		case ADDR_IN_DECHL:
-		{
-			uint16_t tmpHL = get_reg16(REG_HL);
-			tmpHL--;
-			set_reg16(REG_HL, tmpHL);
-			source_val = RM8(tmpHL);
-			break;
-		}
-
-		}
-
-	//	logerror("source_val is %02x\n", source_val);
 	}
-
-	return source_val;
+	return ret_val;
 }
 
 void tlcs870_device::execute_run()
@@ -2663,8 +2536,33 @@ void tlcs870_device::execute_run()
 			}
 			else
 			{
-				uint16_t val = get_source_val(temppc);
-				set_dest_val(temppc, val);
+				uint16_t addr = 0x0000;
+				uint16_t val = 0;
+				if (m_param2_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(temppc, m_param2_type,m_param2);
+					if (m_param2_type & IS16BIT)
+						val = RM16(addr);
+					else
+						val = RM8(addr);
+				}
+				else
+				{
+					val = get_source_val(m_param2_type,m_param2);
+				}
+
+				if (m_param1_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(temppc, m_param1_type,m_param1);
+					if (m_param1_type & IS16BIT)
+						WM16(addr, val);
+					else
+						WM8(addr, val);
+				}
+				else
+				{
+					set_dest_val(m_param1_type,m_param1, val);
+				}
 			}
 			break;
 		}
@@ -2883,7 +2781,7 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 void tlcs870_device::device_start()
 {
 //	int i, p;
-	m_pc.d = 0x0000;
+	m_sp.d = 0x0000;
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);

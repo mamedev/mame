@@ -187,9 +187,10 @@ private:
 	void decode_register_prefix(uint8_t b0);
 	void decode_source(int type, uint16_t val);
 	void decode_dest(uint8_t b0);
-
-	uint16_t get_source_val(int temppc);
-	void set_dest_val(int temppc, uint16_t dest_val);
+	
+	uint16_t get_addr(int temppc, uint16_t param_type, uint16_t param_val);
+	uint16_t get_source_val(uint16_t param_type, uint16_t param_val);
+	void set_dest_val(uint16_t param_type, uint16_t param_val, uint16_t dest_val);
 
 	uint8_t get_reg8(int reg);
 	void set_reg8(int reg, uint8_t val);
