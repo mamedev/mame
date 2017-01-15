@@ -80,11 +80,12 @@ then it becomes (I suppose half) empty - SH4 IRL5 IRQ generated
 "control registers" (Smashing Drive)
 0 - read - various statuses, returning -1 is OK
 write - enable slave CPU, gpu, etc most of bits is unclear
-4 - r/w - communication port (for cabinet linking), returning 0 is OK
-also there some bits on SH4 PDTRA port, I'll hook it later by myself
+4 - w - RS422/485 communication port (for cabinet linking)
 
-about clocks - SH4s is clocked at 33000000*6
-but unlike to DC/AW/Naomi SH4 'peripheral clock' (at which works TMU timers and other internal stuff) is 1/6 from CPU clock, not 1/4
+SH4 XTAL is 33MHz, SH4 MD0-2 pins is 001 or 011 (CPU core clk = XTAL*6, preipheral clk = XTAL, bus clk is XTAL or XTAL*2)
+
+TODO:
+   currently ATV Track dies during texture data upload to GPU RAM, most likely due to some SH4 core bugs
 
 */
 
@@ -105,14 +106,14 @@ public:
 
 	DECLARE_READ64_MEMBER(control_r);
 	DECLARE_WRITE64_MEMBER(control_w);
-	DECLARE_READ64_MEMBER(area2_r);
-	DECLARE_WRITE64_MEMBER(area2_w);
-	DECLARE_READ64_MEMBER(area3_r);
-	DECLARE_WRITE64_MEMBER(area3_w);
-	DECLARE_READ64_MEMBER(area4_r);
-	DECLARE_WRITE64_MEMBER(area4_w);
+	DECLARE_READ64_MEMBER(nand_data_r);
+	DECLARE_WRITE64_MEMBER(nand_data_w);
+	DECLARE_WRITE64_MEMBER(nand_cmd_w);
+	DECLARE_WRITE64_MEMBER(nand_addr_w);
 	DECLARE_READ64_MEMBER(ioport_r);
 	DECLARE_WRITE64_MEMBER(ioport_w);
+	DECLARE_READ32_MEMBER(gpu_r);
+	DECLARE_WRITE32_MEMBER(gpu_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -126,6 +127,11 @@ public:
 
 	required_device<sh4_device> m_maincpu;
 	required_device<sh4_device> m_subcpu;
+
+	u16 gpu_irq_pending;
+	u16 gpu_irq_mask;
+	void gpu_irq_test();
+	void gpu_irq_set(int);
 protected:
 	bool m_slaverun;
 };
@@ -198,12 +204,12 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 		else
 			m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-	logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
-	logbinary(dat);
-	logerror("\n");
+//	logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
+//	logbinary(dat);
+//	logerror("\n");
 }
 
-READ64_MEMBER(atvtrack_state::area2_r)
+READ64_MEMBER(atvtrack_state::nand_data_r)
 {
 	uint32_t addr, dat;
 	int c;
@@ -227,32 +233,12 @@ READ64_MEMBER(atvtrack_state::area2_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::area2_w)
+WRITE64_MEMBER(atvtrack_state::nand_data_w)
 {
-//  uint32_t addr, dat;
-
-//  addr = 0;
-//  dat = decode64_32(offset, data, mem_mask, addr);
-//  if (addr == 0)
-//      ;
-//  else
-//      ;
+	// not implemented
 }
 
-READ64_MEMBER(atvtrack_state::area3_r)
-{
-//  uint32_t addr, dat;
-
-//  addr = 0;
-//  dat = decode64_32(offset, 0, mem_mask, addr);
-//  if (addr == 0)
-//      ;
-//  else
-//      ;
-	return 0;
-}
-
-WRITE64_MEMBER(atvtrack_state::area3_w)
+WRITE64_MEMBER(atvtrack_state::nand_cmd_w)
 {
 	uint32_t addr; //, dat;
 	int c;
@@ -286,20 +272,7 @@ WRITE64_MEMBER(atvtrack_state::area3_w)
 	}
 }
 
-READ64_MEMBER(atvtrack_state::area4_r)
-{
-//  uint32_t addr, dat;
-
-//  addr = 0;
-//  dat = decode64_32(offset, 0, mem_mask, addr);
-//  if (addr == 0)
-//      ;
-//  else
-//      ;
-	return 0;
-}
-
-WRITE64_MEMBER(atvtrack_state::area4_w)
+WRITE64_MEMBER(atvtrack_state::nand_addr_w)
 {
 	uint32_t addr; //, dat;
 	int c;
@@ -323,18 +296,75 @@ WRITE64_MEMBER(atvtrack_state::area4_w)
 	}
 }
 
+void atvtrack_state::gpu_irq_test()
+{
+	if (gpu_irq_pending & ~gpu_irq_mask)
+		m_subcpu->sh4_set_irln_input(14);	// there hacky looking ASSERT+CLEAR pulse in SH4 core ?
+	else
+		m_subcpu->set_input_line(SH4_IRLn, CLEAR_LINE);
+}
+
+void atvtrack_state::gpu_irq_set(int bit)
+{
+	gpu_irq_pending |= 1 << bit;
+	gpu_irq_test();
+}
+
+READ32_MEMBER(atvtrack_state::gpu_r)
+{
+	switch (offset)
+	{
+	case 0x70/4:
+		return gpu_irq_pending;
+	case 0x74/4:
+		return gpu_irq_mask;
+	default:
+		logerror("GPU: unhandled reg read @ %04X\n", offset * 4);
+		return 0;
+	}
+}
+
+WRITE32_MEMBER(atvtrack_state::gpu_w)
+{
+	switch (offset)
+	{
+	case 0x00/4:
+		// not really required, game code will go even if GPU CPU shows no sings of live
+		if (data)	// internal CPU start ?
+			m_subcpu->space(AS_PROGRAM).write_byte(0x18001350, 1); // simulate GPUs internal CPU reply to skip busy loop
+		break;
+	case 0x70/4:
+		gpu_irq_pending &= ~data;
+		gpu_irq_test();
+		break;
+	case 0x74/4:
+		gpu_irq_mask = data;
+		gpu_irq_test();
+		break;
+	case 0xb0/4:
+		if (data == 0x0001)
+		{
+			// GPU render happens here
+			gpu_irq_set(7);
+		}
+		// not really required, game code will go even if GPU CPU shows no sings of live
+		if (data == 0x8001)
+			m_subcpu->space(AS_PROGRAM).write_byte(0x18814804, 1); // simulate GPUs internal CPU reply to skip busy loop
+		break;
+	default:
+		logerror("GPU: unhandled reg write @ %04X data %08X\n", offset * 4, data);
+		break;
+	}
+}
+
 READ64_MEMBER(atvtrack_state::ioport_r)
 {
 	if (offset == SH4_IOPORT_16/8) {
-		// much simplified way
-		if (strcmp(space.device().tag(), ":maincpu") == 0)
 #ifndef SPECIALMODE
-			return -1; // normal
+		return -1; // normal
 #else
-			return 0; // testing
+		return 0; // testing
 #endif
-		else
-			return 0; // unknown
 	}
 	return 0;
 }
@@ -352,9 +382,9 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 			if (data & 0x0100)
 				m_slaverun = true;
 		}
-		logerror("SH4 16bit i/o port write ");
-		logbinary((uint32_t)data,15,0);
-		logerror("\n");
+//		logerror("SH4 16bit i/o port write ");
+//		logbinary((uint32_t)data,15,0);
+//		logerror("\n");
 	}
 #ifdef SPECIALMODE
 	if (offset == SH4_IOPORT_DMA/8) {
@@ -405,7 +435,7 @@ void get_altera10ke_eab(u8* dst, u8 *pof, int eab)
 void atvtrack_state::machine_start()
 {
 	m_nandaddressstep = 0;
-	m_nandregion = memregion("maincpu");
+	m_nandregion = memregion("nand");
 }
 
 void atvtrack_state::machine_reset()
@@ -433,6 +463,8 @@ void atvtrack_state::machine_reset()
 	}
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	gpu_irq_pending = 0;
+	gpu_irq_mask = 0xFFFF;
 }
 
 
@@ -444,6 +476,8 @@ void smashdrv_state::machine_reset()
 {
 	m_slaverun = false;
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	gpu_irq_pending = 0;
+	gpu_irq_mask = 0xFFFF;
 }
 
 // ATV Track
@@ -452,9 +486,9 @@ static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(control_r, control_w) // control registers
 //  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
-	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(area2_r, area2_w) // data
-	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE(area3_r, area3_w) // command
-	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE(area4_r, area4_w) // address
+	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(nand_data_r, nand_data_w)
+	AM_RANGE(0x14100000, 0x14100007) AM_WRITE(nand_cmd_w)
+	AM_RANGE(0x14200000, 0x14200007) AM_WRITE(nand_addr_w)
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -484,29 +518,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
-// 0x14000000 - 0x1400xxxx GPU registers
+	AM_RANGE(0x14000000, 0x14003fff) AM_READWRITE32(gpu_r, gpu_w, 0xffffffffffffffffU)
+// 0x14004xxx GPU PCI CONFIG registers
 	AM_RANGE(0x18000000, 0x19ffffff) AM_RAM
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_sub_port, AS_IO, 64, atvtrack_state )
-	/*AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w) */
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( atvtrack )
 INPUT_PORTS_END
 
-// ?
-#define ATV_CPU_CLOCK 200000000
-// ?
+#define ATV_CPU_CLOCK XTAL_33MHz*6
 
 static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD1(1)
+	MCFG_SH4_MD2(0)
 	MCFG_SH4_MD3(0)
 	MCFG_SH4_MD4(0)
 	MCFG_SH4_MD5(1)
@@ -519,8 +551,8 @@ static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 
 	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD1(1)
+	MCFG_SH4_MD2(0)
 	MCFG_SH4_MD3(0)
 	MCFG_SH4_MD4(0)
 	MCFG_SH4_MD5(1)
@@ -551,7 +583,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( atvtrack )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
+	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
 	ROM_LOAD32_BYTE("15.bin", 0x0000000, 0x1080000, CRC(84eaede7) SHA1(6e6230165c3bb35e49c660dfd0d07c132ed89e6a) )
 	ROM_LOAD32_BYTE("20.bin", 0x0000001, 0x1080000, CRC(649dc331) SHA1(0cac2d0c15dd564c7fdebdf4365422958f453d63) )
 	ROM_LOAD32_BYTE("14.bin", 0x0000002, 0x1080000, CRC(67983453) SHA1(05389a0ffc1a1bae9bac16a53a97d78b6eccc626) )
@@ -562,7 +594,7 @@ ROM_START( atvtrack )
 ROM_END
 
 ROM_START( atvtracka )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
+	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
 	ROM_LOAD32_BYTE("k9f2808u0b.ic15", 0x0000000, 0x1080000, CRC(10730001) SHA1(48c685a6ff7135abd074dc7fb7d10834c44da58f) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic20", 0x0000001, 0x1080000, CRC(b0c34433) SHA1(852c79bb3d7082cd2c056140071ae7d71679ec1d) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic14", 0x0000002, 0x1080000, CRC(02a12085) SHA1(acb112c9c7b29d92610465fb92268ce787ca06f4) )
