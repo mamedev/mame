@@ -101,7 +101,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 // -----------------------------------------------------------------------------
 // nld_twoterm

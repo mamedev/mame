@@ -132,7 +132,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
+#define NETLIB_SUBXX(ns, chip) std::unique_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
 #define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
@@ -960,7 +960,6 @@ namespace netlist
 		public:
 			value_t(param_model_t &param, const pstring name)
 			{
-				printf("Looking for %s %s\n", param.name().c_str(), name.c_str());
 				m_value = param.model_value(name);
 			}
 			double operator()() const { return m_value; }

@@ -12,7 +12,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 // ----------------------------------------------------------------------------------------
 // generic_diode

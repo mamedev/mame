@@ -18,6 +18,7 @@
 #include "nl_base.h"
 
 #define NETLIB_DEVICE_IMPL(chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< NETLIB_NAME(chip) >;
+#define NETLIB_DEVICE_IMPL_NS(ns, chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< ns :: NETLIB_NAME(chip) >;
 
 namespace netlist { namespace factory
 {

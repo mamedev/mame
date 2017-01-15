@@ -27,11 +27,12 @@ namespace netlist { namespace devices {
 		NETLIB_UPDATEI();
 
 	public:
-		NETLIB_SUB(vdd_vss) m_supply;
-		NETLIB_SUB(R_base) m_R;
+		NETLIB_SUB(vdd_vss)        m_supply;
+		analog::NETLIB_SUB(R_base) m_R;
 
-		logic_input_t m_S, m_E;
-		param_double_t m_base_r;
+		logic_input_t              m_S;
+		logic_input_t              m_E;
+		param_double_t             m_base_r;
 	};
 
 	NETLIB_RESET(CD4316_GATE)

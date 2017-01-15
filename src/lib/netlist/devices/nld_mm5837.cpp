@@ -47,7 +47,7 @@ namespace netlist
 		NETLIB_UPDATE_PARAMI();
 
 	protected:
-		NETLIB_SUB(twoterm) m_RV;
+		analog::NETLIB_SUB(twoterm) m_RV;
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;

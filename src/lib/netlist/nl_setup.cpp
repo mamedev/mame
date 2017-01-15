@@ -754,7 +754,7 @@ void setup_t::resolve_inputs()
 
 
 	log().verbose("looking for two terms connected to rail nets ...");
-	for (auto & t : netlist().get_device_list<devices::NETLIB_NAME(twoterm)>())
+	for (auto & t : netlist().get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{

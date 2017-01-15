@@ -24,6 +24,8 @@
 
 namespace netlist
 {
+	using namespace netlist::analog;
+
 	namespace devices
 	{
 static void initialize_factory(factory::list_t &factory)
@@ -40,7 +42,7 @@ static void initialize_factory(factory::list_t &factory)
 	ENTRY(LVCCS,                LVCCS,                  "")
 	ENTRY(VS,                   VS,                     "V")
 	ENTRY(CS,                   CS,                     "I")
-	ENTRY(OPAMP,                OPAMP,                  "MODEL")
+	ENTRYX(opamp,                OPAMP,                  "MODEL")
 	ENTRYX(dummy_input,         DUMMY_INPUT,            "")
 	ENTRYX(frontier,            FRONTIER_DEV,           "+I,+G,+Q")   // not intended to be used directly
 	ENTRYX(function,            AFUNC,                  "N,FUNC")   // only for macro devices - NO FEEDBACK loops
@@ -58,8 +60,8 @@ static void initialize_factory(factory::list_t &factory)
 	ENTRYX(netlistparams,       PARAMETER,              "")
 	ENTRY(solver,               SOLVER,                 "FREQ")
 	ENTRYX(res_sw,              RES_SWITCH,             "+IN,+P1,+P2")
-	ENTRY(switch1,              SWITCH,                 "")
-	ENTRY(switch2,              SWITCH2,                "")
+	ENTRYX(switch1,             SWITCH,                 "")
+	ENTRYX(switch2,             SWITCH2,                "")
 	ENTRYX(nicRSFF,             NETDEV_RSFF,            "+S,+R")
 	ENTRYX(nicDelay,            NETDEV_DELAY,           "")
 	ENTRYX(2716,                EPROM_2716,             "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")

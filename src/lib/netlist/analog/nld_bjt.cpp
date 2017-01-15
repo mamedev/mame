@@ -11,7 +11,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 class diode
 {

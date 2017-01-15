@@ -286,9 +286,9 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_NAME(twoterm) m_RIN;
+		analog::NETLIB_NAME(twoterm) m_RIN;
 		/* Fixme: only works if the device is time-stepped - need to rework */
-		NETLIB_NAME(twoterm) m_ROUT;
+		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
@@ -367,7 +367,7 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_SUB(R_base) m_R;
+		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
