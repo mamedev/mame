@@ -85,7 +85,9 @@ write - enable slave CPU, gpu, etc most of bits is unclear
 SH4 XTAL is 33MHz, SH4 MD0-2 pins is 001 or 011 (CPU core clk = XTAL*6, preipheral clk = XTAL, bus clk is XTAL or XTAL*2)
 
 TODO:
-   currently ATV Track dies during texture data upload to GPU RAM, most likely due to some SH4 core bugs
+	devicify NAND
+	somehow hook PVR2 renderer here
+	add sound
 
 */
 
@@ -211,89 +213,76 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 
 READ64_MEMBER(atvtrack_state::nand_data_r)
 {
-	uint32_t addr, dat;
-	int c;
-
-	addr = 0;
-	dat = decode64_32(offset, 0, mem_mask, addr);
-	if (addr == 0) {
-		dat = 0;
-		for (c = 3;c >= 0;c--) {
-			if (m_nandcommand[c] <= 0x50) {
-				addr = m_nandaddress[c]+m_nandoffset[c];
-				dat = (dat << 8) | m_nandregion->as_u8(addr+c);
-				m_nandoffset[c] += 4;
-			} else
-				dat = (dat << 8) | 0xc0;
+	u32 dat = 0;
+	for (int c = 3; c >= 0; c--) {
+		if (m_nandcommand[c] <= 0x50) {
+			u32 addr = m_nandaddress[c] + m_nandoffset[c];
+			dat = (dat << 8) | m_nandregion->as_u8(addr + c);
+			m_nandoffset[c] += 4;
 		}
-		return dat;
-	} else {
-		/* nothing */
+		else
+			dat = (dat << 8) | 0xc0;
 	}
-	return 0;
+	return dat;
 }
 
 WRITE64_MEMBER(atvtrack_state::nand_data_w)
 {
-	// not implemented
+	for (int c = 0; c < 4; c++) {
+		if (m_nandcommand[c] == 0x80) {
+			u8 *ptr = m_nandregion->base();
+			u32 addr = m_nandaddress[c] + m_nandoffset[c] + c;
+			ptr[addr] &= data & 0xff;
+			m_nandoffset[c] += 4;
+		}
+		data >>= 8;
+	}
 }
 
 WRITE64_MEMBER(atvtrack_state::nand_cmd_w)
 {
-	uint32_t addr; //, dat;
-	int c;
-
-	addr = 0;
-//  dat = decode64_32(offset, data, mem_mask, addr);
-	if (addr == 0) {
-		for (c = 0;c < 4;c++) {
-			m_nandcommand[c] = data & 0xff;
-			if (m_nandcommand[c] == 0x00) {
-				m_nandoffset[c] = 0;
-			} else if (m_nandcommand[c] == 0x01) {
-				m_nandoffset[c] = 256*4;
-			} else if (m_nandcommand[c] == 0x50) {
-				m_nandoffset[c] = 512*4;
-			} else if (m_nandcommand[c] == 0x90) {
-			} else if (m_nandcommand[c] == 0xff) {
-			} else if (m_nandcommand[c] == 0x80) {
-			} else if (m_nandcommand[c] == 0x60) {
-			} else if (m_nandcommand[c] == 0x70) {
-			} else if (m_nandcommand[c] == 0x10) {
-			} else if (m_nandcommand[c] == 0xd0) {
-			} else {
-				m_nandcommand[c] = 0xff;
-			}
-			data=data >> 8;
+	m_nandaddressstep = 0;
+	for (int c = 0;c < 4;c++) {
+		m_nandcommand[c] = data & 0xff;
+		if (m_nandcommand[c] == 0x00) {
+			m_nandoffset[c] = 0;
+		} else if (m_nandcommand[c] == 0x01) {
+			m_nandoffset[c] = 256*4;
+		} else if (m_nandcommand[c] == 0x50) {
+			m_nandoffset[c] = 512*4;
+		} else if (m_nandcommand[c] == 0x90) {
+		} else if (m_nandcommand[c] == 0xff) {
+		} else if (m_nandcommand[c] == 0x80) {
+		} else if (m_nandcommand[c] == 0x60) {
+			m_nandaddressstep = 1;
+			m_nandaddress[c] = 0;
+		} else if (m_nandcommand[c] == 0x70) {
+		} else if (m_nandcommand[c] == 0x10) {
+		} else if (m_nandcommand[c] == 0xd0) {
+			u8 *ptr = m_nandregion->base();
+			u32 addr = m_nandaddress[c] + c;
+			for (int i = 0; i < 32 * 528; i++)
+				ptr[addr + i * 4] = 0xff;
+		} else {
+			m_nandcommand[c] = 0xff;
 		}
-		m_nandaddressstep = 0;
-	} else {
-		/* nothing */
+		data=data >> 8;
 	}
 }
 
 WRITE64_MEMBER(atvtrack_state::nand_addr_w)
 {
-	uint32_t addr; //, dat;
-	int c;
-
-	addr = 0;
-//  dat = decode64_32(offset, data, mem_mask, addr);
-	if (addr == 0) {
-		for (c = 0;c < 4;c++) {
-			if (m_nandaddressstep == 0) {
-				m_nandaddress[c] = (data & 0xff)*4;
-			} else if (m_nandaddressstep == 1) {
-				m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x840;
-			} else if (m_nandaddressstep == 2) {
-				m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x84000;
-			}
-			data = data >> 8;
+	for (int c = 0;c < 4;c++) {
+		if (m_nandaddressstep == 0) {
+			m_nandaddress[c] = (data & 0xff)*4;
+		} else if (m_nandaddressstep == 1) {
+			m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x840;
+		} else if (m_nandaddressstep == 2) {
+			m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x84000;
 		}
-		m_nandaddressstep++;
-	} else {
-		/* nothing */
+		data = data >> 8;
 	}
+	m_nandaddressstep++;
 }
 
 void atvtrack_state::gpu_irq_test()
@@ -329,7 +318,7 @@ WRITE32_MEMBER(atvtrack_state::gpu_w)
 	switch (offset)
 	{
 	case 0x00/4:
-		// not really required, game code will go even if GPU CPU shows no sings of live
+		// not really required, game code will go even if GPU CPU shows no signs of live
 		if (data)	// internal CPU start ?
 			m_subcpu->space(AS_PROGRAM).write_byte(0x18001350, 1); // simulate GPUs internal CPU reply to skip busy loop
 		break;
@@ -347,7 +336,7 @@ WRITE32_MEMBER(atvtrack_state::gpu_w)
 			// GPU render happens here
 			gpu_irq_set(7);
 		}
-		// not really required, game code will go even if GPU CPU shows no sings of live
+		// not really required, game code will go even if GPU CPU shows no signs of live
 		if (data == 0x8001)
 			m_subcpu->space(AS_PROGRAM).write_byte(0x18814804, 1); // simulate GPUs internal CPU reply to skip busy loop
 		break;
@@ -387,7 +376,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 	// bit  0      O - unk (SD: FPGA config clock)
 	// ADC and DAC is 4-channel SPI devices
 	// Switch inputs is active low, *1 - game specific inputs
-	// All above IO multiplexig, ADC and DAC implemented in FPGA
+	// All above IO multiplexing, ADC and DAC implemented in FPGA
 
 #ifdef SPECIALMODE
 	uint64_t d;
