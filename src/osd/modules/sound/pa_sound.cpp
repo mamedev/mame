@@ -2,9 +2,9 @@
 // copyright-holders:intealls, R.Belmont
 /***************************************************************************
 
-    pa_sound.c
+	pa_sound.c
 
-    PortAudio interface.
+	PortAudio interface.
 
 *******************************************************************c********/
 
@@ -52,7 +52,7 @@ private:
 	/* Lock free SPSC ring buffer */
 	template <typename T>
 	struct audio_buffer {
-		T*				 buf;
+		T*               buf;
 		int              size;
 		int              reserve;
 		std::atomic<int> rd_pos, wr_pos;
@@ -190,7 +190,7 @@ int sound_pa::init(osd_options const &options)
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
 	} catch (std::bad_alloc&) {
-		osd_printf_verbose("PortAudio: Unable to allocate audio buffer, sound is disabled\n");
+		osd_printf_error("PortAudio: Unable to allocate audio buffer, sound is disabled\n");
 		goto error;
 	}
 
@@ -272,7 +272,8 @@ int sound_pa::init(osd_options const &options)
 	return 0;
 
 pa_error:
-	osd_printf_verbose("PortAudio error: %s\n", Pa_GetErrorText(err));
+	delete m_ab;
+	osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 	Pa_Terminate();
 error:
 	m_sample_rate = 0;
@@ -406,24 +407,22 @@ void sound_pa::exit()
 		return;
 
 #if LOG_BUFCNT
-	if (m_log.good())
-	{
-		std::ofstream m_logfile(LOG_FILE);
+	std::ofstream m_logfile(LOG_FILE);
 
-		if (m_logfile.is_open()) {
-			m_logfile << m_log.str();
-			m_logfile.close();
-		} else {
-			osd_printf_verbose("PortAudio: Could not write log.\n");
-		}
+	if (m_log.good() && m_logfile.is_open()) {
+		m_logfile << m_log.str();
+		m_logfile.close();
 	}
+
+	if (!m_log.good() || m_logfile.fail())
+		osd_printf_error("PortAudio: Error writing log.\n");
 #endif
 
 	Pa_StopStream(m_pa_stream);
 	err = Pa_Terminate();
-	
+
 	if (err != paNoError)
-		osd_printf_verbose("PortAudio error: %s\n", Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 
 	delete m_ab;
 
