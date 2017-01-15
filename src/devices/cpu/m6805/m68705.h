@@ -14,6 +14,7 @@
 extern device_type const M68705;
 extern device_type const M68705P3;
 extern device_type const M68705P5;
+extern device_type const M68705R3;
 extern device_type const M68705U3;
 
 
@@ -129,8 +130,16 @@ protected:
 	DECLARE_READ8_MEMBER(internal_68705_tcr_r);
 	DECLARE_WRITE8_MEMBER(internal_68705_tcr_w);
 
+	DECLARE_READ8_MEMBER(misc_r);
+	DECLARE_WRITE8_MEMBER(misc_w);
+
 	DECLARE_READ8_MEMBER(pcr_r);
 	DECLARE_WRITE8_MEMBER(pcr_w);
+
+	DECLARE_READ8_MEMBER(acr_r);
+	DECLARE_WRITE8_MEMBER(acr_w);
+	DECLARE_READ8_MEMBER(arr_r);
+	DECLARE_WRITE8_MEMBER(arr_w);
 
 	TIMER_CALLBACK_MEMBER(timer_68705_increment);
 
@@ -199,6 +208,77 @@ protected:
 };
 
 
+// ======================> m68705u_device
+
+class m68705u_device : public m68705_new_device
+{
+public:
+	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
+	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
+	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
+	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
+
+protected:
+	DECLARE_ADDRESS_MAP(u_map, 8);
+
+	m68705u_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock,
+			device_type type,
+			char const *name,
+			address_map_delegate internal_map,
+			char const *shortname,
+			char const *source);
+	m68705u_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock,
+			device_type type,
+			char const *name,
+			char const *shortname,
+			char const *source);
+
+	virtual offs_t disasm_disassemble(
+			std::ostream &stream,
+			offs_t pc,
+			const uint8_t *oprom,
+			const uint8_t *opram,
+			uint32_t options) override;
+};
+
+
+// ======================> m68705r_device
+
+class m68705r_device : public m68705u_device
+{
+public:
+	// TODO: voltage inputs for ADC (shared with digital port D pins)
+
+protected:
+	DECLARE_ADDRESS_MAP(r_map, 8);
+
+	m68705r_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock,
+			device_type type,
+			char const *name,
+			char const *shortname,
+			char const *source);
+
+	virtual offs_t disasm_disassemble(
+			std::ostream &stream,
+			offs_t pc,
+			const uint8_t *oprom,
+			const uint8_t *opram,
+			uint32_t options) override;
+};
+
+
 // ======================> m68705p3_device
 
 class m68705p3_device : public m68705p_device
@@ -223,28 +303,27 @@ protected:
 };
 
 
+// ======================> m68705r3_device
+
+class m68705r3_device : public m68705r_device
+{
+public:
+	m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual tiny_rom_entry const *device_rom_region() const override;
+};
+
+
 // ======================> m68705u3_device
 
-class m68705u3_device : public m68705_new_device
+class m68705u3_device : public m68705u_device
 {
 public:
 	m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pb_w) { port_input_w<1>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pc_w) { port_input_w<2>(space, offset, data, mem_mask); }
-	DECLARE_WRITE8_MEMBER(pd_w) { port_input_w<3>(space, offset, data, mem_mask); } // TODO: PD6 is also /INT2
-
 protected:
-	DECLARE_ADDRESS_MAP(u_map, 8);
-
 	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual offs_t disasm_disassemble(
-			std::ostream &stream,
-			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
 };
 
 

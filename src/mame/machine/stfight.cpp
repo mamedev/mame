@@ -79,21 +79,12 @@ void stfight_state::machine_start()
 	membank("mainbank")->set_entry(0);
 
 	save_item(NAME(m_fm_data));
-	save_item(NAME(m_cpu_to_mcu_data));
 	save_item(NAME(m_cpu_to_mcu_empty));
 	save_item(NAME(m_adpcm_data_offs));
 	save_item(NAME(m_adpcm_nibble));
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_coin_state));
-	save_item(NAME(m_portA_out));
-	save_item(NAME(m_portA_in));
-	save_item(NAME(m_portB_out));
-	save_item(NAME(m_portB_in));
 	save_item(NAME(m_portC_out));
-	save_item(NAME(m_portC_in));
-	save_item(NAME(m_ddrA));
-	save_item(NAME(m_ddrB));
-	save_item(NAME(m_ddrC));
 }
 
 
@@ -229,78 +220,38 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
 
 WRITE8_MEMBER(stfight_state::stfight_mcu_w)
 {
-	m_cpu_to_mcu_data = data;
+	m_cpu_to_mcu_data = data & 0x0f;
 	m_cpu_to_mcu_empty = 0;
-}
-
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_a_w)
-{
-	m_ddrA = data;
-}
-
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_b_w)
-{
-	m_ddrB = data;
-}
-
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_c_w)
-{
-	m_ddrC = data;
-}
-
-
-READ8_MEMBER(stfight_state::stfight_68705_port_a_r)
-{
-	m_portA_in = m_cpu_to_mcu_data;
-
-	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
 WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
 {
 	m_adpcm_data_offs = data << 8;
-	m_portA_out = data;
 }
 
 READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
 {
-	m_portB_in = (ioport("COIN")->read() << 6) | (m_cpu_to_mcu_empty << 4) | m_cpu_to_mcu_data;
-
-	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	return (ioport("COIN")->read() << 6) | (m_cpu_to_mcu_empty << 4) | m_cpu_to_mcu_data;
 }
 
 WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
 {
-	if ((m_ddrB & 0x20) && (~data & 0x20))
-	{
-		// Acknowledge Z80 command
+	// Acknowledge Z80 command
+	if (BIT(mem_mask, 5) && !BIT(data, 5))
 		m_cpu_to_mcu_empty = 1;
-	}
-
-	m_portB_out = data;
-}
-
-READ8_MEMBER(stfight_state::stfight_68705_port_c_r)
-{
-	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
 WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
 {
 	// Signal a valid coin on the falling edge
-	if ((m_ddrC & 0x01) && (m_portC_out & 0x01) && !(data & 0x01))
-	{
+	if (BIT(mem_mask, 0) && BIT(m_portC_out, 0) && !BIT(data, 0))
 		m_coin_state &= ~1;
-	}
-
-	if ((m_ddrC & 0x02) && (m_portC_out & 0x02) && !(data & 0x02))
-	{
+	if (BIT(mem_mask, 1) && BIT(m_portC_out, 1) && !BIT(data, 1))
 		m_coin_state &= ~2;
-	}
 
-	if (m_ddrC & 0x04)
+	if (BIT(mem_mask, 2))
 	{
-		if (data & 0x04)
+		if (BIT(data, 2))
 		{
 			m_adpcm_reset = 1;
 			m_adpcm_nibble = 0;
@@ -313,8 +264,8 @@ WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
 		}
 	}
 
-	if (m_ddrC & 0x08)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, data & 0x08 ? CLEAR_LINE : ASSERT_LINE);
+	if (BIT(mem_mask, 3))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_portC_out = data;
 }

@@ -207,6 +207,7 @@ protected:
 
 typedef m68705prg_state<m68705p3_device> p3prg_state;
 typedef m68705prg_state<m68705p5_device> p5prg_state;
+typedef m68705prg_state<m68705u3_device> r3prg_state;
 typedef m68705prg_state<m68705u3_device> u3prg_state;
 
 
@@ -247,6 +248,13 @@ MACHINE_CONFIG_DERIVED_CLASS(m68705p5prg, m68705prg, p5prg_state)
 	MCFG_MACHINE_RESET_OVERRIDE(p5prg_state, m68705prg)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED_CLASS(m68705r3prg, m68705prg, r3prg_state)
+	MCFG_CPU_ADD("mcu", M68705R3, XTAL_1MHz)
+	MCFG_M68705_PORTB_W_CB(WRITE8(r3prg_state, pb_w))
+
+	MCFG_MACHINE_RESET_OVERRIDE(r3prg_state, m68705prg)
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_DERIVED_CLASS(m68705u3prg, m68705prg, u3prg_state)
 	MCFG_CPU_ADD("mcu", M68705U3, XTAL_1MHz)
 	MCFG_M68705_PORTB_W_CB(WRITE8(u3prg_state, pb_w))
@@ -265,6 +273,11 @@ ROM_START( 705p5prg )
 	ROM_FILL(0x0000, 0x0800, 0x00)
 ROM_END
 
+ROM_START( 705r3prg )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_FILL(0x0000, 0x1000, 0x00)
+ROM_END
+
 ROM_START( 705u3prg )
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_FILL(0x0000, 0x1000, 0x00)
@@ -276,4 +289,5 @@ ROM_END
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE                 INIT       COMPANY     FULLNAME                FLAGS
 COMP( 1984, 705p5prg, 0,        0,      m68705p5prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P5 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1984, 705p3prg, 705p5prg, 0,      m68705p3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705P3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, 705r3prg, 705p5prg, 0,      m68705r3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705R3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1984, 705u3prg, 705p5prg, 0,      m68705u3prg, m68705prg, m68705prg_state_base, m68705prg, "Motorola", "MC68705U3 Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

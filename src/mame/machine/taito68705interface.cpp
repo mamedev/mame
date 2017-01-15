@@ -10,19 +10,19 @@
    This file encapsulates that.
 
     used by:
-    buggychl.cpp - buggychl
-    bking.cpp - bking3
-    40love.cpp - 40love
-    bublbobl.cpp - tokio
-    flstory.cpp - flstory
-    nycaptor.cpp - nycaptor
-    lsasquad.cpp - lsasquad
-                 - daikaiju
-    lkage.cpp    - lkage
+    40love.cpp   - 40love
     bigevglf.cpp - bigevglf
-    xain.cpp - xsleena
+    bking.cpp    - bking3
+    bublbobl.cpp - tokio
+    buggychl.cpp - buggychl
+    flstory.cpp  - flstory
+    lkage.cpp    - lkage
+    lsasquad.cpp - lsasquad, daikaiju
     matmania.cpp - maniach
+    nycaptor.cpp - nycaptor
+    renegade.cpp - renegade
     slapfght.cpp - slapfght
+    xain.cpp     - xsleena
 
     and the following with slight changes:
     slapfght.cpp - tigerh (inverted status bits read on port C)
@@ -32,7 +32,6 @@
     not hooked up here, but possible (needs investigating)
     pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
     taitosj.cpp - ^^
-    renegade.cpp - ^^
 
     68705 sets in Taito drivers that are NOT suitable for hookup here?
     bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
@@ -210,7 +209,7 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: taito68705_mcu_device(mconfig, TAITO68705_MCU, "Taito M68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU, "Taito MC68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__)
 {
 }
 
@@ -286,7 +285,7 @@ WRITE8_MEMBER(taito68705_mcu_device::mcu_portb_w)
 /* The Tiger Heli interface has some extensions, handle them here */
 
 taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, "Taito M68705 MCU Interface (Tiger Heli)", tag, owner, clock, "taito68705tiger", __FILE__)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, "Taito MC68705 MCU Interface (Tiger Heli)", tag, owner, clock, "taito68705tiger", __FILE__)
 {
 }
 
@@ -350,7 +349,7 @@ arkanoid_68705p3_device::arkanoid_68705p3_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock)
-	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P3, "Arkanoid MC68705P3 Interface", tag, owner, clock, "arkanoid_68705p3", __FILE__)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P3, "Arkanoid MC68705P3 Interface", tag, owner, clock, "arkanoid68705p3", __FILE__)
 {
 }
 
@@ -365,7 +364,7 @@ arkanoid_68705p5_device::arkanoid_68705p5_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock)
-	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P5, "Arkanoid MC68705P5 Interface", tag, owner, clock, "arkanoid_68705p5", __FILE__)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P5, "Arkanoid MC68705P5 Interface", tag, owner, clock, "arkanoid68705p5", __FILE__)
 {
 }
 

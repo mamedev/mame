@@ -22,7 +22,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_stfight_video(*this, "stfight_vid"),
 		m_airraid_video(*this, "airraid_vid")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -68,25 +68,13 @@ public:
 
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 
-	/*
-	    MCU specifics
-	*/
-
-	DECLARE_READ8_MEMBER(stfight_68705_port_a_r);
+	// MCU specifics
 	DECLARE_READ8_MEMBER(stfight_68705_port_b_r);
-	DECLARE_READ8_MEMBER(stfight_68705_port_c_r);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_a_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
 
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_c_w);
-
-	uint8_t m_portA_out, m_portA_in;
-	uint8_t m_portB_out, m_portB_in;
-	uint8_t m_portC_out, m_portC_in;
-	uint8_t m_ddrA, m_ddrB, m_ddrC;
+	uint8_t m_portC_out;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

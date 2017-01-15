@@ -11,6 +11,15 @@ std::pair<u16, char const *> const m68705p_syms[] = {
 	{ 0x000b, "PCR"   },
 	{ 0x0784, "MOR"   } };
 
+std::pair<u16, char const *> const m68705r_syms[] = {
+	{ 0x0000, "PORTA" }, { 0x0001, "PORTB" }, { 0x0002, "PORTC" }, { 0x0003, "PORTD" },
+	{ 0x0004, "DDRA"  }, { 0x0005, "DDRB"  }, { 0x0006, "DDRC"  },
+	{ 0x0008, "TDR"   }, { 0x0009, "TCR"   },
+	{ 0x000a, "MISC"  },
+	{ 0x000b, "PCR"   },
+	{ 0x000e, "ACR"   }, { 0x000f, "ARR"   },
+	{ 0x0f38, "MOR"   } };
+
 std::pair<u16, char const *> const m68705u_syms[] = {
 	{ 0x0000, "PORTA" }, { 0x0001, "PORTB" }, { 0x0002, "PORTC" }, { 0x0003, "PORTD" },
 	{ 0x0004, "DDRA"  }, { 0x0005, "DDRB"  }, { 0x0006, "DDRC"  },
@@ -30,6 +39,11 @@ ROM_START( m68705p5 )
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0073, CRC(f70a8620) SHA1(c154f78c23f10bb903a531cb19e99121d5f7c19c))
 ROM_END
 
+ROM_START( m68705r3 )
+	ROM_REGION(0x0078, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37) BAD_DUMP)
+ROM_END
+
 ROM_START( m68705u3 )
 	ROM_REGION(0x0078, "bootstrap", 0)
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
@@ -41,6 +55,7 @@ ROM_END
 device_type const M68705 = &device_creator<m68705_device>;
 device_type const M68705P3 = &device_creator<m68705p3_device>;
 device_type const M68705P5 = &device_creator<m68705p5_device>;
+device_type const M68705R3 = &device_creator<m68705r3_device>;
 device_type const M68705U3 = &device_creator<m68705u3_device>;
 
 
@@ -302,6 +317,17 @@ template <std::size_t N> void m68705_new_device::port_cb_w()
 	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
 }
 
+READ8_MEMBER(m68705_new_device::misc_r)
+{
+	logerror("unsupported read MISC\n");
+	return 0xff;
+}
+
+WRITE8_MEMBER(m68705_new_device::misc_w)
+{
+	logerror("unsupported write MISC = %02X\n", data);
+}
+
 READ8_MEMBER(m68705_new_device::pcr_r)
 {
 	return m_pcr;
@@ -309,10 +335,68 @@ READ8_MEMBER(m68705_new_device::pcr_r)
 
 WRITE8_MEMBER(m68705_new_device::pcr_w)
 {
-	data |= ((data & 0x01) << 1); // lock out /PGE if /PLE is not asserted
+	// 7  1
+	// 6  1
+	// 5  1
+	// 4  1
+	// 3  1
+	// 2  /VPON  R   Vpp On
+	// 1  /PGE   RW  Program Enable
+	// 0  /PLE   RW  Programming Latch Enable
+
+	// lock out /PGE if /PLE is not asserted
+	data |= ((data & 0x01) << 1);
+
+	// write EPROM if /PGE is asserted (erase requires UV so don't clear bits)
 	if (!BIT(m_pcr, 2) && (0x20 & ((m_pcr ^ data) & ~data)))
 		m_user_rom[m_pl_addr] |= m_pl_data;
+
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
+}
+
+READ8_MEMBER(m68705_new_device::acr_r)
+{
+	logerror("unsupported read ACR\n");
+	return 0xff;
+}
+
+WRITE8_MEMBER(m68705_new_device::acr_w)
+{
+	// 7  conversion complete
+	// 6
+	// 5
+	// 4
+	// 3
+	// 2  MUX
+	// 1  MUX
+	// 0  MUX
+
+	// MUX=0  AN0 (PD0)
+	// MUX=1  AN1 (PD1)
+	// MUX=2  AN2 (PD2)
+	// MUX=3  AN3 (PD3)
+	// MUX=4  VRH (PD5)  $FF+0/-1
+	// MUX=5  VRL (PD4)  $00+1/-0
+	// MUX=6  VRH/4      $40+/-1
+	// MUX=7  VRH/2      $80+/-1
+
+	// on-board ratiometric successive approximation ADC
+	// 30 machine cycle conversion time (input sampled during first 5 cycles)
+	// on completion, ACR7 is set, result is placed in ARR, and new conversion starts
+	// writing to ACR aborts current conversion, clears ACR7, and starts new conversion
+
+	logerror("unsupported write ACR = %02X\n", data);
+}
+
+READ8_MEMBER(m68705_new_device::arr_r)
+{
+	logerror("unsupported read ARR\n");
+	return 0xff;
+}
+
+WRITE8_MEMBER(m68705_new_device::arr_w)
+{
+	logerror("unsupported write ARR = %02X\n", data);
 }
 
 READ8_MEMBER(m68705_new_device::internal_68705_tdr_r)
@@ -532,6 +616,127 @@ offs_t m68705p_device::disasm_disassemble(
 
 
 /****************************************************************************
+ * M68705Ux family
+ ****************************************************************************/
+
+DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
+	ADDRESS_MAP_UNMAP_HIGH
+
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port_r<3>, port_latch_w<3>)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
+	// 0x0007 not used (port D is input only)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
+	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
+	// 0x000c-0x000f not used
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0f38) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
+	// 0x0f39-0x0f7f not used
+	AM_RANGE(0x0f80, 0x0ff7) AM_ROM AM_REGION("bootstrap", 0)
+	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(eprom_r<0x0ff8>, eprom_w<0x0ff8>) // Interrupt vectors
+ADDRESS_MAP_END
+
+m68705u_device::m68705u_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		u32 clock,
+		device_type type,
+		char const *name,
+		address_map_delegate internal_map,
+		char const *shortname,
+		char const *source)
+	: m68705_new_device(mconfig, tag, owner, clock, type, name, 12, internal_map, shortname, source)
+{
+	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
+}
+
+m68705u_device::m68705u_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		u32 clock,
+		device_type type,
+		char const *name,
+		char const *shortname,
+		char const *source)
+	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705u_device::u_map), this), shortname, source)
+{
+}
+
+offs_t m68705u_device::disasm_disassemble(
+		std::ostream &stream,
+		offs_t pc,
+		const uint8_t *oprom,
+		const uint8_t *opram,
+		uint32_t options)
+{
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705u_syms);
+}
+
+
+/****************************************************************************
+ * M68705Rx family
+ ****************************************************************************/
+
+DEVICE_ADDRESS_MAP_START( r_map, 8, m68705r_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
+	ADDRESS_MAP_UNMAP_HIGH
+
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port_r<3>, port_latch_w<3>)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
+	// 0x0007 not used (port D is input only)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
+	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
+	// 0x000c-0x000d not used
+	AM_RANGE(0x000e, 0x000e) AM_READWRITE(acr_r, acr_w)
+	AM_RANGE(0x000f, 0x000f) AM_READWRITE(arr_r, arr_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0f38) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
+	// 0x0f39-0x0f7f not used
+	AM_RANGE(0x0f80, 0x0ff7) AM_ROM AM_REGION("bootstrap", 0)
+	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(eprom_r<0x0ff8>, eprom_w<0x0ff8>) // Interrupt vectors
+ADDRESS_MAP_END
+
+m68705r_device::m68705r_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		u32 clock,
+		device_type type,
+		char const *name,
+		char const *shortname,
+		char const *source)
+	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705r_device::r_map), this), shortname, source)
+{
+}
+
+offs_t m68705r_device::disasm_disassemble(
+		std::ostream &stream,
+		offs_t pc,
+		const uint8_t *oprom,
+		const uint8_t *opram,
+		uint32_t options)
+{
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705r_syms);
+}
+
+
+/****************************************************************************
  * M68705P3 device
  ****************************************************************************/
 
@@ -562,50 +767,30 @@ tiny_rom_entry const *m68705p5_device::device_rom_region() const
 
 
 /****************************************************************************
+ * M68705R3 device
+ ****************************************************************************/
+
+m68705r3_device::m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: m68705r_device(mconfig, tag, owner, clock, M68705R3, "MC68705R3", "m68705r3", __FILE__)
+{
+}
+
+tiny_rom_entry const *m68705r3_device::device_rom_region() const
+{
+	return ROM_NAME(m68705r3);
+}
+
+
+/****************************************************************************
  * M68705U3 device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u3_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	ADDRESS_MAP_UNMAP_HIGH
-
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port_r<0>, port_latch_w<0>)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port_r<1>, port_latch_w<1>)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port_r<2>, port_latch_w<2>)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port_r<3>, port_latch_w<3>)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(port_ddr_w<0>)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
-	// 0x0007 not used (port D is input only)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
-	// 0x000a TODO: miscellaneous register
-	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
-	// 0x000c-0x000f not used
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0f38) AM_READWRITE(eprom_r<0x0080>, eprom_w<0x0080>) // User EPROM
-	// 0x0f39-0x0f7f not used
-	AM_RANGE(0x0f80, 0x0ff7) AM_ROM AM_REGION("bootstrap", 0)
-	AM_RANGE(0x0ff8, 0x0fff) AM_READWRITE(eprom_r<0x0ff8>, eprom_w<0x0ff8>) // Interrupt vectors
-ADDRESS_MAP_END
-
 m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705_new_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", 12, address_map_delegate(FUNC(m68705u3_device::u_map), this), "m68705u3", __FILE__)
+	: m68705u_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", "m68705u3", __FILE__)
 {
-	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 }
 
 tiny_rom_entry const *m68705u3_device::device_rom_region() const
 {
 	return ROM_NAME(m68705u3);
-}
-
-offs_t m68705u3_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
-{
-	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options, m68705u_syms);
 }
