@@ -113,7 +113,7 @@ public:
 
 	bool wpt_r() { return wpt; }
 	int dskchg_r() { return dskchg; }
-	bool trk00_r() { return cyl != 0; }
+	bool trk00_r() { return (has_trk00_sensor ? (cyl != 0) : 1); }
 	int idx_r() { return idx; }
 	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
@@ -124,6 +124,7 @@ public:
 	void dir_w(int state) { dir = state; }
 	void ss_w(int state) { ss = state; }
 	void inuse_w(int state) { }
+	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 
 	void index_resync();
 	attotime time_next_index();
@@ -162,6 +163,8 @@ protected:
 	int sides;  /* number of heads */
 	uint32_t form_factor; /* 3"5, 5"25, etc */
 	bool motor_always_on;
+	bool dskchg_writable;
+	bool has_trk00_sensor;
 
 	/* state of input lines */
 	int dir;  /* direction */
