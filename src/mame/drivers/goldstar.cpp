@@ -11346,7 +11346,7 @@ ROM_END
   Dumped by Team Europe.
 
 */
-ROM_START( mbgeuro )
+ROM_START( mbs2euro )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mbgeu_or_v.3.5.5.bin",   0x0000, 0x10000, CRC(b468a62f) SHA1(011536b08eb7cd42dd83826b195bbce314effda0) )
 
@@ -15781,7 +15781,7 @@ GAME(  1991, megaline,  0,        megaline, megaline, driver_device,  0,        
 GAMEL( 1993, bingowng,  0,        bingowng, bingowng, driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
 GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  2002, mbgeuro,   0,        mbstar,   lucky8,   driver_device,  0,         ROT0, "Auto-Data Graz",    "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
+GAME(  2002, mbs2euro,  0,        mbstar,   lucky8,   driver_device,  0,         ROT0, "Auto-Data Graz",    "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
