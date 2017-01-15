@@ -963,7 +963,7 @@ namespace netlist
 				printf("Looking for %s %s\n", param.name().c_str(), name.c_str());
 				m_value = param.model_value(name);
 			}
-			const double operator()() const { return m_value; }
+			double operator()() const { return m_value; }
 			operator double() const { return m_value; }
 		private:
 			double m_value;
