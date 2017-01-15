@@ -8,6 +8,11 @@ Tandy 1000 machines are similar to the IBM 5160s with CGA graphics. Tandy
 added some additional graphic capabilities similar, but not equal, to
 those added for the IBM PC Jr.
 
+The Tandy 1000's features include a pair of 6-pin mini-DIN connectors for
+analog joysticks. They are compatible with CoCo joysticks but not standard
+PC joysticks, though the software interface is identical. This difference
+is not accurately reflected in the current slot device configuration.
+
 Tandy 1000 (8088) variations:
 1000                128KB-640KB RAM     4.77 MHz        v01.00.00, v01.01.00
 1000A/1000HD        128KB-640KB RAM     4.77 MHz        v01.01.00
