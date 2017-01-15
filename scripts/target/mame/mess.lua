@@ -827,6 +827,7 @@ FORMATS["PC98_DSK"] = true
 FORMATS["PC_DSK"] = true
 FORMATS["PHC25_CAS"] = true
 FORMATS["PK8020_DSK"] = true
+FORMATS["PPG_DSK"] = true
 FORMATS["PMD_CAS"] = true
 FORMATS["PRIMOPTP"] = true
 FORMATS["PYLDIN_DSK"] = true
@@ -3347,6 +3348,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
+	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",

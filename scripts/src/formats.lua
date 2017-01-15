@@ -1279,6 +1279,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/ppg_dsk.h,FORMATS["PPG_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["PPG_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/ppg_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ppg_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/primoptp.h,FORMATS["PRIMOPTP"] = true
 --------------------------------------------------
 

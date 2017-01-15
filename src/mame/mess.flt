@@ -179,6 +179,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurocom2.cpp
 europc.cpp
 evmbug.cpp
 excali64.cpp
