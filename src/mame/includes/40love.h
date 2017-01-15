@@ -53,8 +53,6 @@ public:
 
 	/* fake mcu */
 	uint8_t       m_from_mcu;
-	int         m_mcu_sent;
-	int         m_main_sent;
 	uint8_t       m_mcu_in[2][16];
 	uint8_t       m_mcu_out[2][16];
 	int         m_mcu_cmd;
@@ -93,6 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_READ8_MEMBER(fortyl_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
 	DECLARE_READ8_MEMBER(fortyl_pixram_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);

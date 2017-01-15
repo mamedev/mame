@@ -22,22 +22,21 @@
     bigevglf.cpp - bigevglf
     xain.cpp - xsleena
     matmania.cpp - maniach
+    slapfght.cpp - slapfght
 
     and the following with slight changes:
     slapfght.cpp - tigerh (inverted status bits read on port C)
-                 - slapfght (extended outputs for scrolling)
     arkanoid.cpp - arkanoid (latch control on port C, inputs on port B)
     taito_l.cpp - puzznic (latch control on port C)
-
 
     not hooked up here, but possible (needs investigating)
     pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
     taitosj.cpp - ^^
-    changela.cpp - ^^
     renegade.cpp - ^^
 
     68705 sets in Taito drivers that are NOT suitable for hookup here?
     bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
+    changela.cpp - changela - looks like an ancestor of arkanoid without automatic semaphores
     mexico86.cpp - knightb, mexico86 - bootleg 68705s
     retofinv.cpp - the current MCU dump is a bootleg at least
     sqix.cpp - hotsmash - kaneko hookup, different from Taito ones.
@@ -76,7 +75,6 @@ MACHINE_CONFIG_END
 
 
 device_type const TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
-device_type const TAITO68705_MCU_SLAP = &device_creator<taito68705_mcu_slap_device>;
 device_type const TAITO68705_MCU_TIGER = &device_creator<taito68705_mcu_tiger_device>;
 device_type const ARKANOID_68705P3 = &device_creator<arkanoid_68705p3_device>;
 device_type const ARKANOID_68705P5 = &device_creator<arkanoid_68705p5_device>;
@@ -117,22 +115,6 @@ WRITE_LINE_MEMBER(taito68705_mcu_device_base::reset_w)
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-CUSTOM_INPUT_MEMBER(taito68705_mcu_device_base::semaphore_r)
-{
-	// bit 0 is host semaphore flag, bit 1 is MCU semaphore flag (both active low)
-	return (m_host_flag ? 0x00 : 0x01) | (m_mcu_flag ? 0x00 : 0x02) | 0xfc;
-}
-
-CUSTOM_INPUT_MEMBER(taito68705_mcu_device_base::host_flag_r)
-{
-	return m_host_flag ? 1 : 0;
-}
-
-CUSTOM_INPUT_MEMBER(taito68705_mcu_device_base::mcu_flag_r)
-{
-	return m_mcu_flag ? 1 : 0;
-}
-
 WRITE8_MEMBER(taito68705_mcu_device_base::mcu_pa_w)
 {
 	m_pa_output = data;
@@ -149,11 +131,11 @@ taito68705_mcu_device_base::taito68705_mcu_device_base(
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_mcu(*this, "mcu")
-	, m_host_flag(false)
-	, m_mcu_flag(false)
 	, m_semaphore_cb(*this)
 	, m_latch_driven(false)
 	, m_reset_input(false)
+	, m_host_flag(false)
+	, m_mcu_flag(false)
 	, m_host_latch(0xff)
 	, m_mcu_latch(0xff)
 	, m_pa_output(0xff)
@@ -164,10 +146,10 @@ void taito68705_mcu_device_base::device_start()
 {
 	m_semaphore_cb.resolve_safe();
 
-	save_item(NAME(m_host_flag));
-	save_item(NAME(m_mcu_flag));
 	save_item(NAME(m_latch_driven));
 	save_item(NAME(m_reset_input));
+	save_item(NAME(m_host_flag));
+	save_item(NAME(m_mcu_flag));
 	save_item(NAME(m_host_latch));
 	save_item(NAME(m_mcu_latch));
 	save_item(NAME(m_pa_output));
@@ -186,11 +168,6 @@ void taito68705_mcu_device_base::device_reset()
 
 	m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	m_semaphore_cb(CLEAR_LINE);
-}
-
-u8 taito68705_mcu_device_base::pa_value() const
-{
-	return m_pa_output & (m_latch_driven ? m_host_latch : 0xff);
 }
 
 void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host_bit, unsigned mcu_bit)
@@ -239,6 +216,7 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, cons
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: taito68705_mcu_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_aux_strobe_cb(*this)
 	, m_pb_output(0xff)
 {
 }
@@ -252,19 +230,12 @@ void taito68705_mcu_device::device_start()
 {
 	taito68705_mcu_device_base::device_start();
 
+	m_aux_strobe_cb.resolve_safe();
+
 	save_item(NAME(m_pb_output));
 
 	m_pb_output = 0xff;
 }
-
-
-/***************************************************************************
-
- Buggy Challenge 68705 protection interface
-
- This is accurate. FairyLand Story seems to be identical.
-
-***************************************************************************/
 
 
 /*
@@ -290,49 +261,25 @@ READ8_MEMBER(taito68705_mcu_device::mcu_portc_r)
 {
 	// PC0 is the host semaphore flag (active high)
 	// PC1 is the MCU semaphore flag (active low)
-	return (m_host_flag ? 0x01 : 0x00) | (m_mcu_flag ? 0x00 : 0x02) | 0xfc;
+	return (host_flag() ? 0x01 : 0x00) | (mcu_flag() ? 0x00 : 0x02) | 0xfc;
 }
 
 WRITE8_MEMBER(taito68705_mcu_device::mcu_portb_w)
 {
+	// some games have additional peripherals strobed on falling edge
+	u8 const old_pa_value(pa_value());
+	u8 const aux_strobes((mem_mask & ~data & m_pb_output) >> 2);
+
 	// rising edge on PB1 clears the host semaphore flag
 	// PB2 sets the MCU semaphore when low
 	latch_control(data, m_pb_output, 1, 2);
-}
 
-/* Status readbacks for MAIN cpu - these hook up in various ways depending on the host (provide 2 lines instead?) */
-
-READ8_MEMBER( taito68705_mcu_device::mcu_status_r )
-{
-	// bit 0 = when 1, MCU is ready to receive data from main CPU
-	// bit 1 = when 1, MCU has sent data to the main CPU
-	return (m_host_flag ? 0x00 : 0x01) | (m_mcu_flag ? 0x02 : 0x00);
-}
-
-/* The Slap Fight interface has some extensions, handle them here */
-
-taito68705_mcu_slap_device::taito68705_mcu_slap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: taito68705_mcu_device(mconfig, TAITO68705_MCU_SLAP, "Taito M68705 MCU Interface (Slap Fight)", tag, owner, clock, "taito68705slap", __FILE__)
-	, m_extension_cb_w(*this)
-{
-}
-
-WRITE8_MEMBER(taito68705_mcu_slap_device::mcu_portb_w)
-{
-	if (BIT(mem_mask, 3) && !BIT(data, 3) && BIT(m_pb_output, 3))
-		m_extension_cb_w(0, pa_value(), 0xff); // m_scrollx_lo
-
-	if (BIT(mem_mask, 4) && !BIT(data, 4) && BIT(m_pb_output, 4))
-		m_extension_cb_w(1, pa_value(), 0xff); // m_scrollx_hi
-
-	taito68705_mcu_device::mcu_portb_w(space, offset, data, mem_mask);
-}
-
-void taito68705_mcu_slap_device::device_start()
-{
-	taito68705_mcu_device::device_start();
-
-	m_extension_cb_w.resolve_safe();
+	// callbacks for other peripherals
+	for (unsigned i = 0; i < 6; ++i)
+	{
+		if (BIT(aux_strobes, i))
+			m_aux_strobe_cb(i, old_pa_value, 0xff);
+	}
 }
 
 
@@ -361,7 +308,7 @@ READ8_MEMBER(arkanoid_mcu_device_base::mcu_pc_r)
 {
 	// PC0 is the host semaphore flag (active high)
 	// PC1 is the MCU semaphore flag (active low)
-	return (m_host_flag ? 0x01 : 0x00) | (m_mcu_flag ? 0x00 : 0x02) | 0xfc;
+	return (host_flag() ? 0x01 : 0x00) | (mcu_flag() ? 0x00 : 0x02) | 0xfc;
 }
 
 WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)

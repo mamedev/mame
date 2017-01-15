@@ -244,6 +244,18 @@ WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
+{
+	/* bit 1 = when 1, mcu has sent data to the main cpu */
+	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
+}
+
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
+{
+	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
+	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
+}
+
 
 MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
 {

@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
 	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
 	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 	DECLARE_DRIVER_INIT(block2);
 	DECLARE_DRIVER_INIT(arkblock);

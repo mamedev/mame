@@ -332,7 +332,11 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 
 	*/
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
+	return
+		(ioport("PORT04")->read() & 0x03) |
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x08 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x10 : 0x00) |
+		m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )

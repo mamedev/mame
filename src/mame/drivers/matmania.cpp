@@ -50,8 +50,9 @@ The driver has been updated accordingly.
 
 READ8_MEMBER(matmania_state::maniach_mcu_status_r)
 {
-	// semaphore bits swapped compared to other games
-	return (m_mcu->get_main_sent() ? 0x00 : 0x02) | (m_mcu->get_mcu_sent() ? 0x00 : 0x01);
+	return
+			((CLEAR_LINE == m_mcu->mcu_semaphore_r()) ? 0x01 : 0x00) |
+			((CLEAR_LINE == m_mcu->host_semaphore_r()) ? 0x02 : 0x00);
 }
 
 WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
@@ -346,9 +347,9 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
 
-	MCFG_CPU_ADD("mcu", TAITO68705_MCU, 1500000)  /* (don't know really how fast, but it doesn't need to even be this fast) */
+	MCFG_CPU_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
 
-	MCFG_QUANTUM_PERFECT_CPU("mcu:mcu") /* high interleaving to sync main and mcu */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

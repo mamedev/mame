@@ -17,6 +17,14 @@
 #define ARKANOID_BOOTLEG_VERBOSE 1
 
 
+CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
+{
+	// bit 0 is host semaphore flag, bit 1 is MCU semaphore flag (both active low)
+	return
+			((CLEAR_LINE != m_mcuintf->host_semaphore_r()) ? 0x00 : 0x01) |
+			((CLEAR_LINE != m_mcuintf->mcu_semaphore_r()) ? 0x00 : 0x02);
+}
+
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
 {
 	return m_muxports[(0 == m_paddle_select) ? 0 : 1]->read();

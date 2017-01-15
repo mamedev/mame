@@ -271,10 +271,10 @@ CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
 
 CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
-	if (m_mcu)
-		return bitswap(m_mcu->semaphore_r(field, param), 0, 1);
-	else
-		return 3;
+	// bit 0 is host MCU flag, bit 1 is host semaphore flag (both active low)
+	return
+			((m_mcu && (CLEAR_LINE != m_mcu->mcu_semaphore_r())) ? 0x00 : 0x01) |
+			((m_mcu && (CLEAR_LINE != m_mcu->host_semaphore_r())) ? 0x00 : 0x02);
 }
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)

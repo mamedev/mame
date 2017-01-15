@@ -355,28 +355,17 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
  The following is ENTIRELY GUESSWORK!!!
 
 ***************************************************************************/
-INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
+INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 	timer_set(attotime::from_msec(1000/60), TIMER_M68705_IRQ_ACK); /* TODO: understand how this is ack'ed */
 }
 
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_a_r)
-{
-	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_a_w)
+WRITE8_MEMBER(bub68705_state::port_a_w)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
-{
-	m_ddr_a = data;
 }
 
 
@@ -400,37 +389,30 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
  *  7   W  not used?
  */
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
+WRITE8_MEMBER(bub68705_state::port_b_w)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
-	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
-	if ((m_ddr_b & 0x01) && (~data & 0x01) && (m_port_b_out & 0x01))
-	{
-		m_port_a_in = m_latch;
-	}
-	if ((m_ddr_b & 0x02) && (data & 0x02) && (~m_port_b_out & 0x02)) /* positive edge trigger */
+	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
+		m_mcu->pa_w(space, 0, m_latch);
+
+	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{
 		m_address = (m_address & 0xff00) | m_port_a_out;
 		//logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
 	}
-	if ((m_ddr_b & 0x04) && (data & 0x04) && (~m_port_b_out & 0x04)) /* positive edge trigger */
-	{
+
+	if (BIT(mem_mask, 2) && BIT(data, 2) && !BIT(m_port_b_out, 2)) /* positive edge trigger */
 		m_address = (m_address & 0x00ff) | ((m_port_a_out & 0x0f) << 8);
-	}
-	if ((m_ddr_b & 0x10) && (~data & 0x10) && (m_port_b_out & 0x10))
+
+	if (BIT(mem_mask, 4) && !BIT(data, 4) && BIT(m_port_b_out, 4))
 	{
-		if (data & 0x08)    /* read */
+		if (BIT(data, 3)) /* read */
 		{
 			if ((m_address & 0x0800) == 0x0000)
 			{
 				//logerror("%04x: 68705 read input port %02x\n", space.device().safe_pc(), m_address);
-				m_latch = ioport(portnames[m_address & 3])->read();
+				m_latch = m_mux_ports[m_address & 3]->read();
 			}
 			else if ((m_address & 0x0c00) == 0x0c00)
 			{
@@ -438,9 +420,11 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 				m_latch = m_mcu_sharedram[m_address & 0x03ff];
 			}
 			else
+			{
 				logerror("%04x: 68705 unknown read address %04x\n", space.device().safe_pc(), m_address);
+			}
 		}
-		else    /* write */
+		else /* write */
 		{
 			if ((m_address & 0x0c00) == 0x0c00)
 			{
@@ -448,10 +432,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 				m_mcu_sharedram[m_address & 0x03ff] = m_port_a_out;
 			}
 			else
+			{
 				logerror("%04x: 68705 unknown write to address %04x\n", space.device().safe_pc(), m_address);
+			}
 		}
 	}
-	if ((m_ddr_b & 0x20) && (~data & 0x20) && (m_port_b_out & 0x20))
+
+	if (BIT(mem_mask, 5) && !BIT(data, 5) && BIT(m_port_b_out, 5))
 	{
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
@@ -459,19 +446,12 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-	if ((m_ddr_b & 0x40) && (~data & 0x40) && (m_port_b_out & 0x40))
-	{
+
+	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
 		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
-	if ((m_ddr_b & 0x80) && (~data & 0x80) && (m_port_b_out & 0x80))
-	{
+
+	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
 		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
 
 	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_b_w)
-{
-	m_ddr_b = data;
 }
