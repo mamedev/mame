@@ -330,9 +330,9 @@ void tlcs870_device::decode()
 
 	case 0x0f:
 		// LD RBS,n
-		m_op = LD;
+		m_op = LD;      // Flags / Cycles  1--- / 2
 
-		m_param1_type = REGISTERBANK; // 16-bit register
+		m_param1_type = REGISTERBANK; // 4-bit register
 		//m_param1 = 0;
 
 		m_param2_type = ABSOLUTE_VAL_8;
@@ -357,7 +357,7 @@ void tlcs870_device::decode()
 	case 0x16:
 	case 0x17:
 		// LD rr,mn
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1--- / 3
 
 		m_param1_type = REG_16BIT; // 16-bit register
 		m_param1 = b0&3;
@@ -427,7 +427,7 @@ void tlcs870_device::decode()
 
 	case 0x22:
 		// LD A,(x)
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1Z-- / 3
 		m_param2_type = ADDR_IN_IMM_X;
 		m_param2 = READ8();
 
@@ -437,7 +437,7 @@ void tlcs870_device::decode()
 
 	case 0x23:
 		// LD A,(HL)
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1Z-- / 2
 		m_param2_type = ADDR_IN_HL;
 		//m_param2 = 0;
 
@@ -467,7 +467,7 @@ void tlcs870_device::decode()
 
 
 	case 0x26:		
-		// LD (x),(y)
+		// LD (x),(y)  // Flags / Cycles  1Z-- / 5
 		m_op = LD;
 		m_param2_type = ADDR_8BIT;
 		m_param2 = READ8();
@@ -495,7 +495,7 @@ void tlcs870_device::decode()
 		break;
 
 	case 0x2a:
-		// LD (x),A
+		// LD (x),A  // Flags / Cycles  1Z-- / 3
 		m_op = LD;
 		m_param1_type = ADDR_IN_IMM_X;
 		m_param1 = READ8();
@@ -506,7 +506,7 @@ void tlcs870_device::decode()
 		break;
 
 	case 0x2b:
-		// LD (HL),A
+		// LD (HL),A  // Flags / Cycles  1--- / 2
 		m_op = LD;
 		m_param1_type = ADDR_IN_HL;
 		//m_param1 = 0;
@@ -517,7 +517,7 @@ void tlcs870_device::decode()
 
 	case 0x2c:
 		// LD (x),n
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1--- / 4
 		m_param1_type = ADDR_8BIT; // 8-bit memory address
 		m_param1 = READ8();
 
@@ -528,7 +528,7 @@ void tlcs870_device::decode()
 
 	case 0x2d:
 		// LD (HL),n
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / 3
 
 		m_param1_type = ADDR_IN_16BITREG; // memory address in 16-bit register
 		m_param1 = 3; // (HL)
@@ -564,7 +564,7 @@ void tlcs870_device::decode()
 	case 0x37:
 		// LD r,n
 
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / 2
 
 		m_param1_type = REG_8BIT; // 8-bit register register
 		m_param1 = b0&7;
@@ -646,7 +646,7 @@ void tlcs870_device::decode()
 	case 0x56:
 	case 0x57:
 		// LD A,r  0101 0rrr
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1Z-- / 1
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
 
@@ -664,7 +664,7 @@ void tlcs870_device::decode()
 	case 0x5e:
 	case 0x5f:
 		// LD r,A  0101 1rrr
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1Z-- / 1
 		m_param2_type = REG_8BIT;
 		m_param2 = 0; // A
 
@@ -894,7 +894,7 @@ void tlcs870_device::decode()
 	case 0xde:
 	case 0xdf:
 		// LD CF, (x).b  aka TEST (x).b
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  %-*- / 4
 
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
@@ -979,7 +979,7 @@ void tlcs870_device::decode()
 
 	case 0xfa:
 		// LD SP,mn
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / 3
 
 		m_param1_type = STACKPOINTER;
 		//m_param1 = 0;
@@ -1158,7 +1158,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x16:
 	case 0x17:
 		// LD rr,gg
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / 2
 		
 		m_param1_type = REG_16BIT;
 		m_param1 = bx & 0x3;
@@ -1322,7 +1322,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x5e:
 	case 0x5f:
 		// LD r,g
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1Z-- / 2
 		
 		m_param1_type = REG_8BIT;
 		m_param1 = bx & 0x7;
@@ -1403,17 +1403,10 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x82:
-		// SET (x).g
-		m_op = SET;
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = READ8();
-		m_bitpos = b0 & 7;
-		break;
-
 	case 0x83:
-		// SET (HL).g
+		// SET (pp).g
 		m_op = SET;
-		m_param1_type = ADDR_IN_HL | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1429,17 +1422,10 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x8a:
-		// CLR (x).g
-		m_op = CLR;
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = READ8();
-		m_bitpos = b0 & 7;
-		break;
-
 	case 0x8b:
-		// CLR (HL).g
+		// CLR (pp).g
 		m_op = CLR;
-		m_param1_type = ADDR_IN_HL | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1456,16 +1442,10 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x92:
-		// CPL (x).g
-		m_op = CPL;
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = READ8();
-		m_bitpos = b0 & 7;
-
 	case 0x93:
-		// CPL (HL).g
+		// CPL (pp).g
 		m_op = CPL;
-		m_param1_type = ADDR_IN_HL | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1477,20 +1457,10 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x9a:
-		// LD (x).g,CF
-		m_op = LD;
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = READ8();
-		m_bitpos = b0 & 7;
-
-		m_param2_type = CARRYFLAG;
-		//m_param2 = 0;
-		break;
-
-	case 0x9b:
-		// LD (HL).g,CF
-		m_op = LD;
-		m_param1_type = ADDR_IN_HL | BITPOS;
+	case 0x9b: 
+		// LD (pp).g,CF
+		m_op = LD;  // Flags / Cycles  1--- / 5
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_para1 = 0;
 		m_bitpos = b0 & 7;
 
@@ -1503,24 +1473,13 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x9e:
-		// LD CF,(x).g  aka TEST (x).g
-		m_op = LD;
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = ADDR_IN_IMM_X | BITPOS;
-		m_param2 = READ8();
-		m_bitpos = b0 & 7;
-
-		break;
-
 	case 0x9f:
-		// LD CF,(HL).g   aka TEST (HL).g
+		// LD CF,(pp).g   aka TEST (pp).g
 		m_op = LD;
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
 
-		m_param2_type = ADDR_IN_HL | BITPOS;
+		m_param2_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_param2 = 0;
 		m_bitpos = b0 & 7;
 		break;
