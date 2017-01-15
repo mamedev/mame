@@ -207,7 +207,7 @@ protected:
 
 typedef m68705prg_state<m68705p3_device> p3prg_state;
 typedef m68705prg_state<m68705p5_device> p5prg_state;
-typedef m68705prg_state<m68705u3_device> r3prg_state;
+typedef m68705prg_state<m68705r3_device> r3prg_state;
 typedef m68705prg_state<m68705u3_device> u3prg_state;
 
 
