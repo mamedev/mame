@@ -71,9 +71,9 @@ void setup_t::namespace_pop()
 	m_namespace_stack.pop();
 }
 
-void setup_t::register_lib_entry(const pstring &name)
+void setup_t::register_lib_entry(const pstring &name, const pstring &sourcefile)
 {
-	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, ""));
+	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, "", sourcefile));
 }
 
 void setup_t::register_dev(const pstring &classname, const pstring &name)
@@ -892,9 +892,9 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 	return tmp.as_double() * factor;
 }
 
-void setup_t::tt_factory_create(tt_desc &desc)
+void setup_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
-	devices::tt_factory_create(*this, desc);
+	devices::tt_factory_create(*this, desc, sourcefile);
 }
 
 

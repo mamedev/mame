@@ -371,7 +371,7 @@ namespace netlist
 		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 	public:
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
-				const pstring &def_param);
+				const pstring &def_param, const pstring &sourcefile);
 
 		virtual ~netlist_base_factory_truthtable_t();
 
@@ -379,7 +379,7 @@ namespace netlist
 		const logic_family_desc_t *m_family;
 	};
 
-	void tt_factory_create(setup_t &setup, tt_desc &desc);
+	void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile);
 
 	} //namespace devices
 } // namespace netlist

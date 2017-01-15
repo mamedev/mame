@@ -19,8 +19,8 @@ namespace netlist
 		P_PREVENT_COPYING(netlist_factory_truthtable_t)
 	public:
 		netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: netlist_base_factory_truthtable_t(name, classname, def_param)
+				const pstring &def_param, const pstring  &sourcefile)
+		: netlist_base_factory_truthtable_t(name, classname, def_param, sourcefile)
 		{ }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
@@ -260,8 +260,8 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 }
 
 netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
-		const pstring &def_param)
-: factory::element_t(name, classname, def_param), m_family(family_TTL())
+		const pstring &def_param, const pstring &sourcefile)
+: factory::element_t(name, classname, def_param, sourcefile), m_family(family_TTL())
 {
 }
 
@@ -270,28 +270,29 @@ netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
 }
 
 
-#define ENTRYY(n, m)    case (n * 100 + m): \
+#define ENTRYY(n, m, s)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \
-		ret = new xtype(desc.name, desc.classname, desc.def_param); } break
+		ret = new xtype(desc.name, desc.classname, desc.def_param, s); } break
 
-#define ENTRY(n) ENTRYY(n, 1); ENTRYY(n, 2); ENTRYY(n, 3); ENTRYY(n, 4); ENTRYY(n, 5); ENTRYY(n, 6)
+#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
+	                ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s)
 
-void tt_factory_create(setup_t &setup, tt_desc &desc)
+void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 {
 	netlist_base_factory_truthtable_t *ret;
 
 	switch (desc.ni * 100 + desc.no)
 	{
-		ENTRY(1);
-		ENTRY(2);
-		ENTRY(3);
-		ENTRY(4);
-		ENTRY(5);
-		ENTRY(6);
-		ENTRY(7);
-		ENTRY(8);
-		ENTRY(9);
-		ENTRY(10);
+		ENTRY(1, sourcefile);
+		ENTRY(2, sourcefile);
+		ENTRY(3, sourcefile);
+		ENTRY(4, sourcefile);
+		ENTRY(5, sourcefile);
+		ENTRY(6, sourcefile);
+		ENTRY(7, sourcefile);
+		ENTRY(8, sourcefile);
+		ENTRY(9, sourcefile);
+		ENTRY(10, sourcefile);
 		default:
 			pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
 			nl_assert_always(false, msg);

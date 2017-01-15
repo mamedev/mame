@@ -17,7 +17,18 @@
 #include "plib/putil.h"
 #include "nl_base.h"
 
+#if 1
+#define NETLIB_DEVICE_IMPL(chip) \
+	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
+			const pstring &name, const pstring &classname, const pstring &def_param) \
+	{ \
+		return std::unique_ptr<factory::element_t>(new factory::device_element_t<NETLIB_NAME(chip)>(name, classname, def_param, pstring(__FILE__))); \
+	} \
+	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+#else
 #define NETLIB_DEVICE_IMPL(chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< NETLIB_NAME(chip) >;
+#endif
+
 #define NETLIB_DEVICE_IMPL_NS(ns, chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< ns :: NETLIB_NAME(chip) >;
 
 namespace netlist { namespace factory
@@ -32,6 +43,8 @@ namespace netlist { namespace factory
 	public:
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param);
+		element_t(const pstring &name, const pstring &classname,
+				const pstring &def_param, const pstring &sourcefile);
 		virtual ~element_t();
 
 		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
@@ -40,11 +53,13 @@ namespace netlist { namespace factory
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
 		const pstring &param_desc() const { return m_def_param; }
+		const pstring &sourcefile() const { return m_sourcefile; }
 
 	protected:
 		pstring m_name;                             /* device name */
 		pstring m_classname;                        /* device class name */
 		pstring m_def_param;                        /* default parameter */
+		pstring m_sourcefile;                       /* source file */
 	};
 
 	template <class C>
@@ -55,6 +70,9 @@ namespace netlist { namespace factory
 		device_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: element_t(name, classname, def_param) { }
+		device_element_t(const pstring &name, const pstring &classname,
+				const pstring &def_param, const pstring &sourcefile)
+		: element_t(name, classname, def_param, sourcefile) { }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
@@ -125,8 +143,8 @@ namespace netlist { namespace factory
 	public:
 
 		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: element_t(name, classname, def_param), m_setup(setup) {  }
+				const pstring &def_param, const pstring &source)
+		: element_t(name, classname, def_param, source), m_setup(setup) {  }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
 

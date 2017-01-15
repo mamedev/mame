@@ -365,8 +365,17 @@ static void create_header(tool_options_t &opts)
 	pout(" * ---------------------------------------------------------------------------*/\n");
 	pout("\n");
 
+	pstring last_source("");
+
 	for (auto &e : nt.setup().factory())
 	{
+		if (last_source != e->sourcefile())
+		{
+			last_source = e->sourcefile();
+			pout("{1}\n", pstring("// ").rpad("-", 72));
+			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
+			pout("{1}\n", pstring("// ").rpad("-", 72));
+		}
 		auto v = plib::pstring_vector_t(e->param_desc(), ",");
 		pstring vs;
 		for (auto s : v)

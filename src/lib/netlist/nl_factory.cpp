@@ -17,8 +17,16 @@ namespace netlist { namespace factory
 {
 
 element_t::element_t(const pstring &name, const pstring &classname,
+		const pstring &def_param, const pstring &sourcefile)
+	: m_name(name), m_classname(classname), m_def_param(def_param),
+	  m_sourcefile(sourcefile)
+{
+}
+
+element_t::element_t(const pstring &name, const pstring &classname,
 		const pstring &def_param)
-	: m_name(name), m_classname(classname), m_def_param(def_param)
+	: m_name(name), m_classname(classname), m_def_param(def_param),
+	  m_sourcefile("<unknown>")
 {
 }
 
