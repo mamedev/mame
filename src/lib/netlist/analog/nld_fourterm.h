@@ -15,6 +15,7 @@
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
+#ifndef NL_AUTO_DEVICES
 
 #define VCCS(name)                                                            \
 		NET_REGISTER_DEV(VCCS, name)
@@ -27,6 +28,8 @@
 
 #define LVCCS(name)                                                           \
 		NET_REGISTER_DEV(LVCCS, name)
+
+#endif
 
 namespace netlist
 {

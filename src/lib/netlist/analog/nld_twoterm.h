@@ -39,6 +39,8 @@
 // Macros
 // -----------------------------------------------------------------------------
 
+#ifndef NL_AUTO_DEVICES
+
 #define RES(name, p_R)                                                         \
 		NET_REGISTER_DEV(RES, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
@@ -73,6 +75,8 @@
 #define CS(name, pI)                                                           \
 		NET_REGISTER_DEV(CS, name)                                             \
 		NETDEV_PARAMI(name, I, pI)
+
+#endif
 
 // -----------------------------------------------------------------------------
 // Generic macros

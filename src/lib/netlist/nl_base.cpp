@@ -433,7 +433,8 @@ void netlist_t::stop()
 	log().debug("Printing statistics ...\n");
 	print_stats();
 	log().debug("Stopping solver device ...\n");
-	m_solver->stop();
+	if (m_solver != nullptr)
+		m_solver->stop();
 }
 
 detail::net_t *netlist_t::find_net(const pstring &name)

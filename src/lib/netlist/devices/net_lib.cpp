@@ -9,7 +9,6 @@
 ****************************************************************************/
 
 #include "net_lib.h"
-#include "nld_system.h"
 #include "nl_factory.h"
 #include "solver/nld_solver.h"
 
@@ -54,7 +53,7 @@ static void initialize_factory(factory::list_t &factory)
 	ENTRYX(log,                 LOG,                    "+I")
 	ENTRYX(logD,                LOGD,                   "+I,+I2")
 	ENTRYX(clock,               CLOCK,                  "FREQ")
-	ENTRYX(extclock,            EXTCLOCK,               "FREQ")
+	ENTRYX(extclock,            EXTCLOCK,               "FREQ,PATTERN")
 	ENTRYX(mainclock,           MAINCLOCK,              "FREQ")
 	ENTRYX(gnd,                 GND,                    "")
 	ENTRYX(netlistparams,       PARAMETER,              "")
@@ -62,7 +61,7 @@ static void initialize_factory(factory::list_t &factory)
 	ENTRYX(res_sw,              RES_SWITCH,             "+IN,+P1,+P2")
 	ENTRYX(switch1,             SWITCH,                 "")
 	ENTRYX(switch2,             SWITCH2,                "")
-	ENTRYX(nicRSFF,             NETDEV_RSFF,            "+S,+R")
+	ENTRYX(nicRSFF,             NETDEV_RSFF,            "")
 	ENTRYX(nicDelay,            NETDEV_DELAY,           "")
 	ENTRYX(2716,                EPROM_2716,             "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
 	ENTRYX(2102A,               RAM_2102A,              "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")

@@ -15,6 +15,8 @@
 // Macros
 // -----------------------------------------------------------------------------
 
+#ifndef NL_AUTO_DEVICES
+
 #define QBJT_SW(name, model)                                                 \
 		NET_REGISTER_DEV(QBJT_SW, name)                                       \
 		NETDEV_PARAMI(name,  MODEL, model)
@@ -23,6 +25,7 @@
 		NET_REGISTER_DEV(QBJT_EB, name)                                       \
 		NETDEV_PARAMI(name,  MODEL, model)
 
+#endif
 
 namespace netlist
 {

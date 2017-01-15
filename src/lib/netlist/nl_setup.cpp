@@ -7,8 +7,6 @@
 
 #include <cstdio>
 
-#include "solver/nld_solver.h"
-
 #include "plib/palloc.h"
 #include "plib/putil.h"
 #include "nl_base.h"

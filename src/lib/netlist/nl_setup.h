@@ -81,6 +81,9 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		NETLIST_NAME(model)(setup);                                            \
 		setup.namespace_pop();
 
+#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                  \
+		setup.register_frontier(# attach, r_in, r_out);
+
 // -----------------------------------------------------------------------------
 // truthtable defines
 // -----------------------------------------------------------------------------

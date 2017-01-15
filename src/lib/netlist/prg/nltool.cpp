@@ -30,7 +30,7 @@ public:
 	tool_options_t() :
 		plib::options(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static", "run|convert|listdevices|static"),
+		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header", "run|convert|listdevices|static|header"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for files"),
@@ -325,6 +325,72 @@ static void static_compile(tool_options_t &opts)
 
 }
 
+static void mac_out(const pstring s, const bool cont = true)
+{
+	static const unsigned RIGHT = 72;
+	if (cont)
+	{
+		unsigned adj = 0;
+		for (auto x : s)
+			adj += (x == '\t' ? 3 : 0);
+		pout("{1}\\\n", s.rpad(" ", RIGHT-1-adj));
+	}
+	else
+		pout("{1}\n", s);
+}
+
+static void create_header(tool_options_t &opts)
+{
+	netlist_tool_t nt("netlist");
+
+	nt.init();
+
+	nt.log().verbose.set_enabled(false);
+	nt.log().warning.set_enabled(false);
+
+	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
+			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().include("dummy");
+
+	pout("// license:GPL-2.0+\n");
+	pout("// copyright-holders:Couriersud\n");
+	pout("#ifndef NLD_DEVINC_H\n");
+	pout("#define NLD_DEVINC_H\n");
+	pout("\n");
+	pout("#include \"nl_setup.h\"\n");
+	pout("#ifndef __PLIB_PREPROCESSOR__\n");
+	pout("\n");
+	pout("/* ----------------------------------------------------------------------------\n");
+	pout(" *  Netlist Macros\n");
+	pout(" * ---------------------------------------------------------------------------*/\n");
+	pout("\n");
+
+	for (auto &e : nt.setup().factory())
+	{
+		auto v = plib::pstring_vector_t(e->param_desc(), ",");
+		pstring vs;
+		for (auto s : v)
+			vs += ", p" + s.replace("+","").replace(".","_");
+		mac_out("#define " + e->name() + "(name" + vs + ")");
+		mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");                                        \
+
+		for (auto s : v)
+		{
+			pstring r(s.replace("+","").replace(".","_"));
+			if (s.startsWith("+"))
+				mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
+			else
+				mac_out("\tNETDEV_PARAMI(name, " + r + ", p" + r + ")");
+		}
+		mac_out("", false);
+	}
+	pout("#endif // __PLIB_PREPROCESSOR__\n");
+	pout("#endif\n");
+	nt.stop();
+
+}
+
+
 /*-------------------------------------------------
     listdevices - list all known devices
 -------------------------------------------------*/
@@ -472,6 +538,8 @@ int main(int argc, char *argv[])
 			run(opts);
 		else if (cmd == "static")
 			static_compile(opts);
+		else if (cmd == "header")
+			create_header(opts);
 		else if (cmd == "convert")
 		{
 			pstring contents;

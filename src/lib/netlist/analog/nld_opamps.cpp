@@ -5,8 +5,9 @@
  *
  */
 
-#include "nld_opamps.h"
 #include "devices/net_lib.h"
+
+#include "nld_opamps.h"
 
 
 namespace netlist
