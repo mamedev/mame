@@ -25,11 +25,20 @@
 		return std::unique_ptr<factory::element_t>(new factory::device_element_t<NETLIB_NAME(chip)>(name, classname, def_param, pstring(__FILE__))); \
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+
+#define NETLIB_DEVICE_IMPL_NS(ns, chip) \
+	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
+			const pstring &name, const pstring &classname, const pstring &def_param) \
+	{ \
+		return std::unique_ptr<factory::element_t>(new factory::device_element_t<ns :: NETLIB_NAME(chip)>(name, classname, def_param, pstring(__FILE__))); \
+	} \
+	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
+
 #else
 #define NETLIB_DEVICE_IMPL(chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< NETLIB_NAME(chip) >;
+#define NETLIB_DEVICE_IMPL_NS(ns, chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< ns :: NETLIB_NAME(chip) >;
 #endif
 
-#define NETLIB_DEVICE_IMPL_NS(ns, chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< ns :: NETLIB_NAME(chip) >;
 
 namespace netlist { namespace factory
 {

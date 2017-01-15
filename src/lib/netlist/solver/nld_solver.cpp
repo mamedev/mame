@@ -402,6 +402,7 @@ void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
 		s->create_solver_code(strm);
 }
 
+	NETLIB_DEVICE_IMPL(solver)
 
 	} //namespace devices
 } // namespace netlist

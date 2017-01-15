@@ -12,9 +12,13 @@
 #include "nl_factory.h"
 #include "solver/nld_solver.h"
 
+
 #define xstr(s) # s
+
+#if 0
 #define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
 #define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
+#endif
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip;
 
@@ -29,24 +33,24 @@ namespace netlist
 	{
 static void initialize_factory(factory::list_t &factory)
 {
-	ENTRY(R,                    RES,                    "R")
-	ENTRY(POT,                  POT,                    "R")
-	ENTRY(POT2,                 POT2,                   "R")
-	ENTRY(C,                    CAP,                    "C")
-	ENTRY(L,                    IND,                    "L")
-	ENTRY(D,                    DIODE,                  "MODEL")
-	ENTRY(VCVS,                 VCVS,                   "")
-	ENTRY(VCCS,                 VCCS,                   "")
-	ENTRY(CCCS,                 CCCS,                   "")
-	ENTRY(LVCCS,                LVCCS,                  "")
-	ENTRY(VS,                   VS,                     "V")
-	ENTRY(CS,                   CS,                     "I")
-	ENTRYX(opamp,                OPAMP,                  "MODEL")
+	ENTRYX(R,                   RES,                    "R")
+	ENTRYX(POT,                 POT,                    "R")
+	ENTRYX(POT2,                POT2,                   "R")
+	ENTRYX(C,                   CAP,                    "C")
+	ENTRYX(L,                   IND,                    "L")
+	ENTRYX(D,                   DIODE,                  "MODEL")
+	ENTRYX(VS,                  VS,                     "V")
+	ENTRYX(CS,                  CS,                     "I")
+	ENTRYX(VCVS,                VCVS,                   "")
+	ENTRYX(VCCS,                VCCS,                   "")
+	ENTRYX(CCCS,                CCCS,                   "")
+	ENTRYX(LVCCS,               LVCCS,                  "")
+	ENTRYX(opamp,               OPAMP,                  "MODEL")
 	ENTRYX(dummy_input,         DUMMY_INPUT,            "")
 	ENTRYX(frontier,            FRONTIER_DEV,           "+I,+G,+Q")   // not intended to be used directly
 	ENTRYX(function,            AFUNC,                  "N,FUNC")   // only for macro devices - NO FEEDBACK loops
-	ENTRY(QBJT_EB,              QBJT_EB,                "MODEL")
-	ENTRY(QBJT_switch,          QBJT_SW,                "MODEL")
+	ENTRYX(QBJT_EB,             QBJT_EB,                "MODEL")
+	ENTRYX(QBJT_switch,         QBJT_SW,                "MODEL")
 	ENTRYX(logic_input,         TTL_INPUT,              "IN")
 	ENTRYX(logic_input,         LOGIC_INPUT,            "IN,FAMILY")
 	ENTRYX(analog_input,        ANALOG_INPUT,           "IN")
@@ -57,7 +61,7 @@ static void initialize_factory(factory::list_t &factory)
 	ENTRYX(mainclock,           MAINCLOCK,              "FREQ")
 	ENTRYX(gnd,                 GND,                    "")
 	ENTRYX(netlistparams,       PARAMETER,              "")
-	ENTRY(solver,               SOLVER,                 "FREQ")
+	ENTRYX(solver,              SOLVER,                 "FREQ")
 	ENTRYX(res_sw,              RES_SWITCH,             "+IN,+P1,+P2")
 	ENTRYX(switch1,             SWITCH,                 "")
 	ENTRYX(switch2,             SWITCH2,                "")

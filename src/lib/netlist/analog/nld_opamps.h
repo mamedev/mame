@@ -52,15 +52,15 @@ namespace netlist
 	 *
 	 *   |Type|name  |parameter                                      |units|default| example|
 	 *   |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
-	 *   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
-	 *   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
-	 *   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
-	 *   |1,3 |RI    |input resistance 	                             |Ohm  |       |1M      |
-	 *   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
-	 *   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
-	 *   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
-	 *   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
-	 *   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
+	 *   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
+	 *   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
+	 *   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
+	 *   |1,3 |RI    |input resistance 	                             |Ohm  |       |1M      |
+	 *   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
+	 *   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
+	 *   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
+	 *   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
+	 *   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
 	 */
 
 	class opamp_model_t : public param_model_t

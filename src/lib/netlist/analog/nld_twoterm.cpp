@@ -319,5 +319,17 @@ NETLIB_UPDATE(CS)
 	NETLIB_NAME(twoterm)::update();
 }
 
-	} //namespace devices
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, R)
+		NETLIB_DEVICE_IMPL_NS(analog, POT)
+		NETLIB_DEVICE_IMPL_NS(analog, POT2)
+		NETLIB_DEVICE_IMPL_NS(analog, C)
+		NETLIB_DEVICE_IMPL_NS(analog, L)
+		NETLIB_DEVICE_IMPL_NS(analog, D)
+		NETLIB_DEVICE_IMPL_NS(analog, VS)
+		NETLIB_DEVICE_IMPL_NS(analog, CS)
+	}
+
 } // namespace netlist

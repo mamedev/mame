@@ -119,5 +119,12 @@ NETLIB_RESET(VCVS)
 	m_ON2.set(NL_FCONST(1.0) / m_RO());
 }
 
-	} //namespace devices
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS)
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS)
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS)
+		NETLIB_DEVICE_IMPL_NS(analog, LVCCS)
+	}
 } // namespace netlist

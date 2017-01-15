@@ -192,5 +192,11 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	m_gD_BC.set_param(IS / m_alpha_r, NR, netlist().gmin());
 }
 
-	} //namespace devices
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB)
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch)
+	}
+
 } // namespace netlist

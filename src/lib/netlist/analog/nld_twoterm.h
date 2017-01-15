@@ -367,17 +367,17 @@ private:
  *  the following parameters. A "Y" in the first column indicates that the
  *  parameter is actually used in netlist.
  *
- *   |NL? |name  |parameter                        |units|default| example|area  |
+ *   |NL? |name  |parameter                        |units|default| example|area  |
  *   |:--:|:-----|:--------------------------------|:----|------:|-------:|:----:|
- *   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
- *   |    |RS    |ohmic resistanc                  |Ohm  |      0|      10|   *  |
+ *   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
+ *   |    |RS    |ohmic resistanc                  |Ohm  |      0|      10|   *  |
  *   | Y  |N     |emission coefficient             |-    |      1|       1|      |
  *   |    |TT    |transit-time                     |sec  |      0|   0.1ns|      |
- *   |    |CJO   |zero-bias junction capacitance   |F    |      0|     2pF|   *  |
+ *   |    |CJO   |zero-bias junction capacitance   |F    |      0|     2pF|   *  |
  *   |    |VJ    |junction potential               |V    |      1|     0.6|      |
  *   |    |M     |grading coefficient              |-    |    0.5|     0.5|      |
  *   |    |EG    |band-gap energy                  |eV   |   1.11| 1.11 Si|      |
- *   |    |XTI   |saturation-current temp.exp      |-    |      3|3.0 pn. 2.0 Schottky| |
+ *   |    |XTI   |saturation-current temp.exp      |-    |      3|3.0 pn. 2.0 Schottky| |
  *   |    |KF    |flicker noise coefficient        |-    |      0|        |      |
  *   |    |AF    |flicker noise exponent           |-    |      1|        |      |
  *   |    |FC    |coefficient for forward-bias depletion capacitance formula|-|0.5|| |
