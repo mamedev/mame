@@ -11418,6 +11418,9 @@ ROM_START( mbs2euro )
 
 	ROM_REGION( 0x800, "timekeeper", 0 )  // just for preservation and further analysis...
 	ROM_LOAD( "m48t12.bin",  0x0000, 0x07f8, CRC(11e61f97) SHA1(57d4744747b9d75b3ac31da8fc621f1a00ff1de3) )  // shouldn't be 0x800?
+
+	ROM_REGION( 0x1000, "plds", 0 )
+	ROM_LOAD( "gal16v8d.bin",  0x0000, 0x0892, CRC(1687b8da) SHA1(63c0bd119ec67c8033d08e03a6e6c86e0cab2884) )  // protected?... the first 0x800 are 1's
 ROM_END
 
 
