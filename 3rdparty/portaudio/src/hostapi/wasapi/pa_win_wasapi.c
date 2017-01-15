@@ -56,9 +56,9 @@
 // WASAPI
 #include <mmreg.h>  // must be before other Wasapi headers
 #if defined(_MSC_VER) && (_MSC_VER >= 1400) || (defined(__MINGW64_VERSION_MAJOR) && (__MINGW64_VERSION_MAJOR >= 4))
-	#include <Avrt.h>
+	#include <avrt.h>
 	#define COBJMACROS
-	#include <Audioclient.h>
+	#include <audioclient.h>
 	#include <endpointvolume.h>
 	#define INITGUID // Avoid additional linkage of static libs, excessive code will be optimized out by the compiler
 	#include <mmdeviceapi.h>
