@@ -80,23 +80,23 @@ protected:
 
 #define IS16BIT 0x80
 #define BITPOS 0x40
-
+#define BITPOS_INDIRECT 0x20
 
 #define ABSOLUTE_VAL_8 0x01
 #define REG_8BIT 0x02
 
 // special
-#define CONDITIONAL 0x10
-#define STACKPOINTER (0x11 | IS16BIT) // this is a 16-bit reg
-#define CARRYFLAG 0x12 // also flag as BITPOS since it's a bit operation?
-#define MEMVECTOR_16BIT 0x13
-#define REGISTERBANK 0x14
-#define PROGRAMSTATUSWORD 0x15
+#define CONDITIONAL 0x03
+#define STACKPOINTER (0x04 | IS16BIT) // this is a 16-bit reg
+#define CARRYFLAG 0x5 // also flag as BITPOS since it's a bit operation?
+#define MEMVECTOR_16BIT 0x6
+#define REGISTERBANK 0x7
+#define PROGRAMSTATUSWORD 0x8
 
 #define ABSOLUTE_VAL_16 (ABSOLUTE_VAL_8|IS16BIT)
 #define REG_16BIT (REG_8BIT|IS16BIT)
 
-#define ADDR_IN_BASE 0x20
+#define ADDR_IN_BASE 0x10
 #define ADDR_IN_IMM_X (ADDR_IN_BASE+0x0)
 #define ADDR_IN_PC_PLUS_REG_A (ADDR_IN_BASE+0x1)
 #define ADDR_IN_DE (ADDR_IN_BASE+0x2)
@@ -106,7 +106,7 @@ protected:
 #define ADDR_IN_HLINC (ADDR_IN_BASE+0x6)
 #define ADDR_IN_DECHL (ADDR_IN_BASE+0x7)
 
-#define MODE_MASK 0x3f
+#define MODE_MASK 0x1f
 
 
 #define FLAG_J (0x80)

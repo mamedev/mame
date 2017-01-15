@@ -1431,7 +1431,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x83:
 		// SET (pp).g
 		m_op = SET;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1450,7 +1450,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x8b:
 		// CLR (pp).g
 		m_op = CLR;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1470,7 +1470,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x93:
 		// CPL (pp).g
 		m_op = CPL;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
 		//m_param1 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -1487,7 +1487,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		m_op = LD;  // Flags / Cycles  1--- / 5
 		m_flagsaffected |= FLAG_J;
 
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
+		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
 		//m_para1 = 0;
 		m_bitpos = b0 & 7;
 
@@ -1508,7 +1508,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
 
-		m_param2_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
+		m_param2_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
 		//m_param2 = 0;
 		m_bitpos = b0 & 7;
 		break;
@@ -2303,7 +2303,11 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 		else util::stream_format(stream, "$%02x", val);
 	}
 
-	if (type&BITPOS) util::stream_format(stream, ".BIT%d", m_bitpos);
+	if (type&BITPOS)
+	{
+		if (type & BITPOS_INDIRECT) util::stream_format(stream, ".BIT_%s", reg8[m_bitpos&7]);
+		else util::stream_format(stream, ".BIT_%d", m_bitpos);
+	}
 }
 
 offs_t tlcs870_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
