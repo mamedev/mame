@@ -214,10 +214,11 @@ void tlcs870_device::decode()
 	m_param2_type = 0;
 	m_param2 = 0;
 	m_bitpos = 0;
+	m_cycles = 1;
+	m_flagsaffected = 0; // needed to signal which flags to change and which to leave alone in some cases (LD operations at least)
 
 	uint8_t b0;
 	uint8_t b1;
-//	uint8_t b2;
 	
 	int tmppc = m_addr;
 
@@ -331,6 +332,7 @@ void tlcs870_device::decode()
 	case 0x0f:
 		// LD RBS,n
 		m_op = LD;      // Flags / Cycles  1--- / 2
+		m_flagsaffected |= FLAG_J;
 
 		m_param1_type = REGISTERBANK; // 4-bit register
 		//m_param1 = 0;
@@ -358,6 +360,7 @@ void tlcs870_device::decode()
 	case 0x17:
 		// LD rr,mn
 		m_op = LD;   // Flags / Cycles  1--- / 3
+		m_flagsaffected |= FLAG_J;
 
 		m_param1_type = REG_16BIT; // 16-bit register
 		m_param1 = b0&3;
@@ -428,27 +431,31 @@ void tlcs870_device::decode()
 	case 0x22:
 		// LD A,(x)
 		m_op = LD;   // Flags / Cycles  1Z-- / 3
-		m_param2_type = ADDR_IN_IMM_X;
-		m_param2 = READ8();
+		m_flagsaffected |= FLAG_J | FLAG_Z;
 
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
+
+		m_param2_type = ADDR_IN_IMM_X;
+		m_param2 = READ8();
 		break;
 
 	case 0x23:
 		// LD A,(HL)
 		m_op = LD;  // Flags / Cycles  1Z-- / 2
-		m_param2_type = ADDR_IN_HL;
-		//m_param2 = 0;
+		m_flagsaffected |= FLAG_J | FLAG_Z;
 
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
+
+		m_param2_type = ADDR_IN_HL;
+		//m_param2 = 0;
 		break;
 
 	case 0x24:
 		// LDW (x),mn
 		m_op = LDW;
-		m_param1_type = ADDR_8BIT; // 8-bit memory address
+		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
 		m_param1 = READ8();
 
 		m_param2_type = ABSOLUTE_VAL_16; // absolute value
@@ -469,10 +476,12 @@ void tlcs870_device::decode()
 	case 0x26:		
 		// LD (x),(y)  // Flags / Cycles  1Z-- / 5
 		m_op = LD;
-		m_param2_type = ADDR_8BIT;
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
+		m_param2_type = ADDR_IN_IMM_X;
 		m_param2 = READ8();
 
-		m_param1_type = ADDR_8BIT;
+		m_param1_type = ADDR_IN_IMM_X;
 		m_param1 = READ8();
 		break;
 
@@ -497,6 +506,8 @@ void tlcs870_device::decode()
 	case 0x2a:
 		// LD (x),A  // Flags / Cycles  1Z-- / 3
 		m_op = LD;
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
 		m_param1_type = ADDR_IN_IMM_X;
 		m_param1 = READ8();
 
@@ -508,6 +519,8 @@ void tlcs870_device::decode()
 	case 0x2b:
 		// LD (HL),A  // Flags / Cycles  1--- / 2
 		m_op = LD;
+		m_flagsaffected |= FLAG_J;
+
 		m_param1_type = ADDR_IN_HL;
 		//m_param1 = 0;
 
@@ -518,7 +531,9 @@ void tlcs870_device::decode()
 	case 0x2c:
 		// LD (x),n
 		m_op = LD;   // Flags / Cycles  1--- / 4
-		m_param1_type = ADDR_8BIT; // 8-bit memory address
+		m_flagsaffected |= FLAG_J;
+
+		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
 		m_param1 = READ8();
 
 		m_param2_type = ABSOLUTE_VAL_8; // absolute value
@@ -529,9 +544,10 @@ void tlcs870_device::decode()
 	case 0x2d:
 		// LD (HL),n
 		m_op = LD;  // Flags / Cycles  1--- / 3
+		m_flagsaffected |= FLAG_J;
 
-		m_param1_type = ADDR_IN_16BITREG; // memory address in 16-bit register
-		m_param1 = 3; // (HL)
+		m_param1_type = ADDR_IN_HL; // memory address in 16-bit register
+		//m_param1 = 3; // (HL)
 
 		m_param2_type = ABSOLUTE_VAL_8; // absolute value
 		m_param2 = READ8();
@@ -541,7 +557,7 @@ void tlcs870_device::decode()
 	case 0x2e:
 		// CLR (x)
 		m_op = CLR;
-		m_param1_type = ADDR_8BIT; // 8-bit memory address
+		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
 		m_param1 = READ8();
 
 		break;
@@ -549,8 +565,8 @@ void tlcs870_device::decode()
 	case 0x2f:
 		// CLR (HL)
 		m_op = CLR;
-		m_param1_type = ADDR_IN_16BITREG; // memory address in 16-bit register
-		m_param1 = 3; // (HL)
+		m_param1_type = ADDR_IN_HL; // memory address in 16-bit register
+		//m_param1 = 3; // (HL)
 
 		break;
 
@@ -565,6 +581,7 @@ void tlcs870_device::decode()
 		// LD r,n
 
 		m_op = LD;  // Flags / Cycles  1--- / 2
+		m_flagsaffected |= FLAG_J;
 
 		m_param1_type = REG_8BIT; // 8-bit register register
 		m_param1 = b0&7;
@@ -647,6 +664,8 @@ void tlcs870_device::decode()
 	case 0x57:
 		// LD A,r  0101 0rrr
 		m_op = LD;   // Flags / Cycles  1Z-- / 1
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
 
@@ -665,6 +684,8 @@ void tlcs870_device::decode()
 	case 0x5f:
 		// LD r,A  0101 1rrr
 		m_op = LD;  // Flags / Cycles  1Z-- / 1
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
 		m_param2_type = REG_8BIT;
 		m_param2 = 0; // A
 
@@ -895,6 +916,7 @@ void tlcs870_device::decode()
 	case 0xdf:
 		// LD CF, (x).b  aka TEST (x).b
 		m_op = LD;  // Flags / Cycles  %-*- / 4
+		m_flagsaffected |= FLAG_J | FLAG_C;
 
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
@@ -980,6 +1002,7 @@ void tlcs870_device::decode()
 	case 0xfa:
 		// LD SP,mn
 		m_op = LD;  // Flags / Cycles  1--- / 3
+		m_flagsaffected |= FLAG_J;
 
 		m_param1_type = STACKPOINTER;
 		//m_param1 = 0;
@@ -1159,7 +1182,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x17:
 		// LD rr,gg
 		m_op = LD;  // Flags / Cycles  1--- / 2
-		
+		m_flagsaffected |= FLAG_J;
+
 		m_param1_type = REG_16BIT;
 		m_param1 = bx & 0x3;
 
@@ -1323,7 +1347,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x5f:
 		// LD r,g
 		m_op = LD;   // Flags / Cycles  1Z-- / 2
-		
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
 		m_param1_type = REG_8BIT;
 		m_param1 = bx & 0x7;
 
@@ -1460,6 +1485,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x9b: 
 		// LD (pp).g,CF
 		m_op = LD;  // Flags / Cycles  1--- / 5
+		m_flagsaffected |= FLAG_J;
+
 		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS;
 		//m_para1 = 0;
 		m_bitpos = b0 & 7;
@@ -1475,7 +1502,9 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x9e:
 	case 0x9f:
 		// LD CF,(pp).g   aka TEST (pp).g
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  %-*- / 4
+		m_flagsaffected |= FLAG_J | FLAG_C;
+
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
 
@@ -1537,7 +1566,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0xce:
 	case 0xcf:
 		// LD g.b,CF
-		m_op = LD;
+		m_op = LD;    // Flags / Cycles  1--- / 2
+		m_flagsaffected |= FLAG_J;
 
 		m_param2_type = CARRYFLAG;
 		//m_param2 = 0;
@@ -1577,7 +1607,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0xde:
 	case 0xdf:
 		// LD CF,g.b   aka TEST g.b
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  %-*- / 2
+		m_flagsaffected |= FLAG_J | FLAG_C;
 
 		m_param1_type = CARRYFLAG;
 		//m_param1 = 0;
@@ -1622,7 +1653,8 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 
 	case 0xfa:
 		// LD SP,gg
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / 3
+		m_flagsaffected |= FLAG_J;
 
 		m_param2_type = REG_16BIT;
 		m_param2 = b0 & 3;
@@ -1635,8 +1667,9 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 
 	case 0xfb:
 		// LD gg,SP
-		m_op = LD;
-		
+		m_op = LD;  // Flags / Cycles  1--- / 3
+		m_flagsaffected |= FLAG_J;
+	
 		m_param1_type = REG_16BIT;
 		m_param1 = b0 & 3;
 		// b0 & 4 would be invalid?
@@ -1735,11 +1768,13 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0x16:
 	case 0x17:
 		// LD rr, (src)
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / x
+		m_flagsaffected |= FLAG_J;
+
 		m_param1_type = REG_16BIT;
 		m_param1 = bx & 0x3;
 
-		m_param2_type = type;
+		m_param2_type = type | IS16BIT;
 		m_param2 = val;
 		break;
 
@@ -1768,9 +1803,11 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0x25:
 		break;
 
-	case 0x26:
+	case 0x26:  // invalid if (src) is also (x) ? (not specified)
 		// LD (x),(src)
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1U-- / x
+		m_flagsaffected |= FLAG_J /*| FLAG_Z*/; // Z is undefined!
+
 		m_param1_type = ADDR_IN_IMM_X;
 		m_param1 = READ8();
 
@@ -1780,7 +1817,9 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 
 	case 0x27:
 		// LD (HL),(src)
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1Z-- / x
+		m_flagsaffected |= FLAG_J | FLAG_Z;
+
 		m_param1_type = ADDR_IN_HL;
 		//m_param1 = 0;
 		
@@ -1885,7 +1924,8 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0x5e:
 	case 0x5f:
 		// LD r, (src)
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1Z-- / x
+		m_flagsaffected |= FLAG_J | FLAG_Z;
 
 		m_param1_type = REG_8BIT;
 		m_param1 = bx & 0x7;
@@ -2064,7 +2104,9 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0xce:
 	case 0xcf:
 		// LD (src).b,CF
-		m_op = LD;
+		m_op = LD;  // Flags / Cycles  1--- / x
+		m_flagsaffected |= FLAG_J;
+
 		m_param1_type = type | BITPOS;
 		m_param1 = val;
 		m_bitpos = bx & 0x7;
@@ -2101,7 +2143,9 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0xde:
 	case 0xdf:
 		// LD CF,(src).b  aka  TEST (src).b
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  %-*- / x
+		m_flagsaffected |= FLAG_J | FLAG_C;
+
 		m_param2_type = type | BITPOS;
 		m_param2 = val;
 		m_bitpos = bx & 0x7;
@@ -2182,15 +2226,22 @@ void tlcs870_device::decode_dest(uint8_t b0)
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		// LD (dst),rr
-		m_op = LD;
+		// LD (dst),rr    // (dst) can only be  (x) (pp) or (HL+d) ?  not (HL+) or (-HL) ?
+		m_op = LD;  // Flags / Cycles  1--- / x
+		m_flagsaffected |= FLAG_J;
+
+		m_param1_type |= IS16BIT;
+
+
 		m_param2_type = REG_16BIT;
 		m_param2 = bx&0x3;
 		break;
 
-	case 0x2c:
-		// LD (dst),n
-		m_op = LD;
+	case 0x2c: 
+		// LD (dst),n   // (dst) can only be (DE), (HL+), (-HL), or (HL+d)  because (x) and (HL) are redundant encodings?
+		m_op = LD;  // Flags / Cycles  1--- / x
+		m_flagsaffected |= FLAG_J;
+
 		m_param2_type = ABSOLUTE_VAL_8;
 		m_param2 = READ8();
 		break;
@@ -2204,7 +2255,9 @@ void tlcs870_device::decode_dest(uint8_t b0)
 	case 0x56:
 	case 0x57:
 		// LD (dst),r
-		m_op = LD;
+		m_op = LD;   // Flags / Cycles  1--- / x
+		m_flagsaffected |= FLAG_J;
+
 		m_param2_type = REG_8BIT;
 		m_param2 = bx&0x7;
 		break;
@@ -2223,34 +2276,30 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 {
 	int basetype = type & MODE_MASK;
 
-	if ((basetype) == ADDR_8BIT)
-	{
-		if (type&0x80) util::stream_format(stream, " ($%04x)", val);
-		else util::stream_format(stream, " ($%02x)", val);
-	}
-
-	if (basetype==ADDR_IN_16BITREG) util::stream_format(stream, " %s", type_x[val&7]);
-
 	if (basetype==ADDR_IN_IMM_X) util::stream_format(stream, " ($%02x)", val); // direct
 	if (basetype==ADDR_IN_PC_PLUS_REG_A) util::stream_format(stream, " %s", type_x[1]);
 	if (basetype==ADDR_IN_DE) util::stream_format(stream, " %s", type_x[2]);
 	if (basetype==ADDR_IN_HL) util::stream_format(stream, " %s", type_x[3]);
-	if (basetype==ADDR_IN_HL_PLUS_IMM_D) util::stream_format(stream, " (HL+%04x)", val); // todo, sign extend
+	if (basetype==ADDR_IN_HL_PLUS_IMM_D) util::stream_format(stream, " (HL+$%04x)", val); // todo, sign extend
 	if (basetype==ADDR_IN_HL_PLUS_REG_C) util::stream_format(stream, " %s", type_x[5]);
 	if (basetype==ADDR_IN_HLINC) util::stream_format(stream, " %s", type_x[6]);
 	if (basetype==ADDR_IN_DECHL) util::stream_format(stream, " %s", type_x[7]);
 
-	if (basetype==REG_16BIT) util::stream_format(stream, " %s", reg16[val&3]);
-	if (basetype==REG_8BIT) util::stream_format(stream, " %s", reg8[val&7]);
+	if (basetype==REG_8BIT)
+	{
+		if (type&IS16BIT) util::stream_format(stream, " %s", reg16[val&3]);
+		util::stream_format(stream, " %s", reg8[val & 7]);
+	}
+
 	if (basetype==CONDITIONAL) util::stream_format(stream, " %s", conditions[val]);
 	if (basetype==STACKPOINTER) util::stream_format(stream, " SP");
 	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
 	if (basetype==PROGRAMSTATUSWORD) util::stream_format(stream, " PSW");
 	if (basetype==CARRYFLAG) util::stream_format(stream, " CF");
-	if (basetype==MEMVECTOR_16BIT) util::stream_format(stream, " (%04x)", val);
+	if (basetype==MEMVECTOR_16BIT) util::stream_format(stream, " ($%04x)", val);
 	if (basetype==ABSOLUTE_VAL_8)
 	{
-		if (type&0x80) util::stream_format(stream, "$%04x", val);
+		if (type&IS16BIT) util::stream_format(stream, "$%04x", val);
 		else util::stream_format(stream, "$%02x", val);
 	}
 
@@ -2359,7 +2408,56 @@ void tlcs870_device::execute_run()
 		case JRS:
 			break;
 		case LD:
+		{
+			// this 'get val' should be in a function
+			if (m_param1_type == CARRYFLAG)
+			{
+				// 'TEST' style bit instruction
+
+			}
+			else if (m_param2_type == CARRYFLAG)
+			{
+				// other bit-type operation
+			}
+			else
+			{
+				if (m_param2_type & IS16BIT)
+				{
+
+				}
+				else
+				{
+					switch (m_param2_type & MODE_MASK)
+					{
+					case ABSOLUTE_VAL_8:
+						break;
+					case REG_8BIT:
+						break;
+					case ADDR_IN_IMM_X:
+						break;
+					case ADDR_IN_PC_PLUS_REG_A:
+						break;
+					case ADDR_IN_DE:
+						break;
+					case ADDR_IN_HL:
+						break;
+					case ADDR_IN_HL_PLUS_IMM_D:
+						break;
+					case ADDR_IN_HL_PLUS_REG_C:
+						break;
+					case ADDR_IN_HLINC:
+						break;
+					case ADDR_IN_DECHL:
+						break;
+					//case STACKPOINTER:
+					//	break;
+					}
+				}
+
+			}
+
 			break;
+		}
 		case LDW:
 			break;
 		case MCMP:
@@ -2420,7 +2518,7 @@ void tlcs870_device::execute_run()
 			break;
 		}
 
-		m_icount--;
+		m_icount-=m_cycles;
 
 
 	} while( m_icount > 0 );

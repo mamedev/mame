@@ -78,25 +78,23 @@ protected:
 
 	uint32_t m_debugger_temp;
 
-
-#define ADDR_8BIT 1
-#define ABSOLUTE_VAL_8 3
-#define ADDR_IN_16BITREG 4
-#define REG_16BIT 5
-#define REG_8BIT 6
-
-
-#define CONDITIONAL 10
-#define STACKPOINTER 11
-
-#define CARRYFLAG 12
-
-#define MEMVECTOR_16BIT 13
-#define REGISTERBANK 14
-#define PROGRAMSTATUSWORD 15
-
-#define ABSOLUTE_VAL_16 (3|0x80)
+#define IS16BIT 0x80
 #define BITPOS 0x40
+
+
+#define ABSOLUTE_VAL_8 0x01
+#define REG_8BIT 0x02
+
+// special
+#define CONDITIONAL 0x10
+#define STACKPOINTER (0x11 | IS16BIT) // this is a 16-bit reg
+#define CARRYFLAG 0x12 // also flag as BITPOS since it's a bit operation?
+#define MEMVECTOR_16BIT 0x13
+#define REGISTERBANK 0x14
+#define PROGRAMSTATUSWORD 0x15
+
+#define ABSOLUTE_VAL_16 (ABSOLUTE_VAL_8|IS16BIT)
+#define REG_16BIT (REG_8BIT|IS16BIT)
 
 #define ADDR_IN_BASE 0x20
 #define ADDR_IN_IMM_X (ADDR_IN_BASE+0x0)
@@ -110,6 +108,12 @@ protected:
 
 #define MODE_MASK 0x3f
 
+
+#define FLAG_J (0x80)
+#define FLAG_Z (0x40)
+#define FLAG_C (0x20)
+#define FLAG_H (0x10)
+	
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -159,6 +163,8 @@ private:
 	uint16_t m_param1;
 
 	uint8_t m_bitpos;
+	uint8_t m_flagsaffected;
+	uint8_t m_cycles;
 
 	uint32_t  m_addr;
 	
