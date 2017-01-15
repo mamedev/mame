@@ -199,14 +199,14 @@ static int read8(uint8_t* data)
 		return data[0] | (data[1] << 4);
 }
 
-static void readstring(char* dst, uint8_t* data, int nb)
+static void readstring(std::string &dst, uint8_t* data, int nb)
 {
-		int i;
-		for ( i = 0; i < nb; i++ )
-		{
-				dst[i] = read8( data + 2*i );
-		}
-		dst[nb] = 0;
+	dst.clear();
+	int i;
+	for ( i = 0; i < nb; i++ )
+	{
+		dst += (char) read8( data + 2*i );
+	}
 }
 
 static void write20(uint8_t* data, int v)
@@ -277,12 +277,12 @@ static int find_file(hp48_partition* p, const char* filename, int *ptotalsize, i
 				{
 						/* get name */
 						int namelen = read8( data + pos + 10 );
-						char name[257];
+						std::string name;
 						if ( 9 + 2*namelen > totalsize ) return -1;
 						readstring( name, data + pos + 12, namelen );
 
 						/* check name */
-						if ( !strcmp( name, filename ) )
+						if ( !strcmp( name.c_str(), filename ) )
 						{
 								/* found! */
 								if ( ptotalsize ) *ptotalsize = totalsize;
@@ -468,7 +468,7 @@ static imgtoolerr_t hp48_beginenum(imgtool::directory &enumeration, const char *
 
 
 
-static imgtoolerr_t hp48_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t hp48_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtool::partition &part(enumeration.partition());
 	//imgtool::image &img(part.image());
@@ -508,9 +508,9 @@ static imgtoolerr_t hp48_nextenum(imgtool::directory &enumeration, imgtool_diren
 
 				switch (prolog)
 				{
-				case PROLOG_LIBRARY:  strncpy( ent.attr, "LIB", sizeof(ent.attr) ); break;
-				case PROLOG_BACKUP:   strncpy( ent.attr, "BAK", sizeof(ent.attr) ); break;
-				default:              strncpy( ent.attr, "?", sizeof(ent.attr) );
+				case PROLOG_LIBRARY:  ent.attr = "LIB"; break;
+				case PROLOG_BACKUP:   ent.attr = "BAK"; break;
+				default:              ent.attr = "?";
 				}
 
 				d->pos = d->pos + totalsize + 5;

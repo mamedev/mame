@@ -333,49 +333,40 @@ enum
     using the "%00" sequence.  To avoid any ambiguity, '%' is escaped with
     '%25'.
 
-    dst (O): C string
-    n (I): length of buffer pointed to by dst
+    dst (O): C++ string
     src (I): macintosh string (first byte is length)
 */
-static void mac_to_c_strncpy(char *dst, int n, uint8_t *src)
+static void mac_to_c_strncpy(std::ostream &stream, const uint8_t *src)
 {
 	size_t len = src[0];
-	int i, j;
+	int i;
 
-	i = j = 0;
-	while ((i < len) && (j < n-1))
+	i = 0;
+	while (i < len)
 	{
 		switch (src[i+1])
 		{
 		case '\0':
-			if (j >= n-3)
-				goto exit;
-			dst[j] = '%';
-			dst[j+1] = '0';
-			dst[j+2] = '0';
-			j += 3;
+			stream << "%00";
 			break;
 
 		case '%':
-			if (j >= n-3)
-				goto exit;
-			dst[j] = '%';
-			dst[j+1] = '2';
-			dst[j+2] = '5';
-			j += 3;
+			stream << "%25";
 			break;
 
 		default:
-			dst[j] = src[i+1];
-			j++;
+			stream << src[i+1];
 			break;
 		}
 		i++;
 	}
+}
 
-exit:
-	if (n > 0)
-		dst[j] = '\0';
+static std::string mac_to_c_strncpy(const uint8_t *src)
+{
+	std::stringstream stream;
+	mac_to_c_strncpy(stream, src);
+	return stream.str();
 }
 
 /*
@@ -5275,7 +5266,7 @@ static void mac_image_exit(imgtool::image *img);
 #endif
 static void mac_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t mac_image_beginenum(imgtool::directory &enumeration, const char *path);
-static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
+static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent);
 static imgtoolerr_t mac_image_freespace(imgtool::partition &partition, uint64_t *size);
 static imgtoolerr_t mac_image_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf);
 static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
@@ -5299,21 +5290,18 @@ static void mac_image_exit(imgtool::image *img)
 */
 static void mac_image_info(imgtool::image &img, std::ostream &stream)
 {
-	char buffer[256] = { 0, };
 	struct mac_l2_imgref *image = get_imgref(img);
 
 	switch (image->format)
 	{
 	case L2I_MFS:
-		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.mfs.volname);
+		mac_to_c_strncpy(stream, image->u.mfs.volname);
 		break;
 
 	case L2I_HFS:
-		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.hfs.volname);
+		mac_to_c_strncpy(stream, image->u.hfs.volname);
 		break;
 	}
-
-	stream << buffer;
 }
 
 /*
@@ -5368,7 +5356,7 @@ static imgtoolerr_t mac_image_beginenum(imgtool::directory &enumeration, const c
 /*
     Enumerate disk catalog next entry (MFS)
 */
-static imgtoolerr_t mfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
+static imgtoolerr_t mfs_image_nextenum(mac_iterator *iter, imgtool::dirent &ent)
 {
 	mfs_dir_entry *cur_dir_entry;
 	imgtoolerr_t err;
@@ -5394,7 +5382,7 @@ static imgtoolerr_t mfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 	}
 
 	/* copy info */
-	mac_to_c_strncpy(ent.filename, ARRAY_LENGTH(ent.filename), cur_dir_entry->name);
+	ent.filename = mac_to_c_strncpy(cur_dir_entry->name);
 	ent.filesize = get_UINT32BE(cur_dir_entry->dataPhysicalSize)
 						+ get_UINT32BE(cur_dir_entry->rsrcPhysicalSize);
 
@@ -5436,7 +5424,7 @@ static void concat_fname(char *dest, int *dest_cur_pos, int dest_max_len, const 
 /*
     Enumerate disk catalog next entry (HFS)
 */
-static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
+static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool::dirent &ent)
 {
 	hfs_catKey *catrec_key;
 	hfs_catData *catrec_data;
@@ -5444,7 +5432,6 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 	imgtoolerr_t err;
 	/* currently, the mac->C conversion transcodes one mac char with at most 3
 	C chars */
-	int cur_name_head;
 
 	assert(iter->format == L2I_HFS);
 
@@ -5485,16 +5472,8 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 			break;
 	}
 
-	/* initialize file path buffer */
-	cur_name_head = ARRAY_LENGTH(ent.filename);
-	if (cur_name_head > 0)
-	{
-		cur_name_head--;
-		ent.filename[cur_name_head] = '\0';
-	}
-
 	/* insert folder/file name in buffer */
-	mac_to_c_strncpy(ent.filename, ARRAY_LENGTH(ent.filename), catrec_key->cName);
+	ent.filename = mac_to_c_strncpy(catrec_key->cName);
 //  concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, buf);
 
 #if 0
@@ -5548,7 +5527,7 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 	mac_iterator *iter = (mac_iterator *) enumeration.extra_bytes();

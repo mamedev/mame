@@ -894,7 +894,7 @@ static imgtoolerr_t thom_begin_enum(imgtool::directory &enumeration,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t thom_next_enum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtool::partition &part(enumeration.partition());
 	int head = *( (int*) part.extra_bytes() );
@@ -903,30 +903,34 @@ static imgtoolerr_t thom_next_enum(imgtool::directory &enumeration, imgtool_dire
 	int* n = (int*) enumeration.extra_bytes();
 	thom_dirent d;
 
-	do {
-	thom_get_dirent( f, head, *n, &d );
-	(*n) ++;
+	do
+	{
+		thom_get_dirent( f, head, *n, &d );
+		(*n) ++;
 	}
 	while ( d.type == THOM_DIRENT_FREE );
 	if ( d.type == THOM_DIRENT_END ) ent.eof = 1;
-	else if ( d.type == THOM_DIRENT_INVALID ) {
-	ent.corrupt = 1;
+	else if ( d.type == THOM_DIRENT_INVALID )
+	{
+		ent.corrupt = 1;
 	}
-	else {
-	int size;
-	snprintf( ent.filename, sizeof(ent.filename), "%s.%s", d.name, d.ext );
-	snprintf( ent.attr, sizeof(ent.attr), "%c %c %s",
+	else
+	{
+		int size;
+		ent.filename = util::string_format("%s.%s", d.name, d.ext);
+		ent.attr = util::string_format("%c %c %s",
 			(d.ftype == 0) ? 'B' :  (d.ftype == 1) ? 'D' :
 			(d.ftype == 2) ? 'M' :  (d.ftype == 3) ? 'A' : '?',
 			(d.format == 0) ? 'B' : (d.format == 0xff) ? 'A' : '?',
-			d.comment );
-	ent.creation_time = thom_crack_time( &d );
-	size  = thom_get_file_size( f, head, &d );
-	if ( size >= 0 ) ent.filesize = size;
-	else {
-		ent.filesize = 0;
-		ent.corrupt = 1;
-	}
+			d.comment);
+		ent.creation_time = thom_crack_time( &d );
+		size  = thom_get_file_size( f, head, &d );
+		if ( size >= 0 ) ent.filesize = size;
+		else
+		{
+			ent.filesize = 0;
+			ent.corrupt = 1;
+		}
 	}
 	return IMGTOOLERR_SUCCESS;
 }

@@ -398,7 +398,7 @@ static imgtoolerr_t vzdos_diskimage_beginenum(imgtool::directory &enumeration, c
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	vz_iterator *iter = (vz_iterator *) enumeration.extra_bytes();
 
@@ -429,7 +429,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, im
 			}
 		}
 
-		memcpy(ent.filename, &dirent.fname, len + 1);
+		ent.filename = std::string(dirent.fname, len);
 		ent.filesize = dirent.end_address - dirent.start_address;
 
 		switch (dirent.ftype)
@@ -445,7 +445,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, im
 		default:   type = "Unknown";
 		}
 
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
+		ent.attr = type;
 
 		iter->index++;
 	}

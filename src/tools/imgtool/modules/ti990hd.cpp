@@ -395,7 +395,7 @@ static imgtoolerr_t ti990_image_init(imgtool::image &img, imgtool::stream::ptr &
 static void ti990_image_exit(imgtool::image &img);
 static void ti990_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t ti990_image_beginenum(imgtool::directory &enumeration, const char *path);
-static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent);
 static void ti990_image_closeenum(imgtool::directory &enumeration);
 static imgtoolerr_t ti990_image_freespace(imgtool::partition &partition, uint64_t *size);
 #ifdef UNUSED_FUNCTION
@@ -1218,7 +1218,7 @@ static imgtoolerr_t ti990_image_beginenum(imgtool::directory &enumeration, const
 /*
     Enumerate disk catalog next entry
 */
-static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	ti990_iterator *iter = (ti990_iterator *) enumeration.extra_bytes();
 	int flag;
@@ -1257,15 +1257,15 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtoo
 			int i;
 			char buf[9];
 
-			ent.filename[0] = '\0';
+			ent.filename.clear();
 			for (i=0; i<iter->level; i++)
 			{
 				fname_to_str(buf, iter->xdr[i].fdr.fnm, 9);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
-				strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+				ent.filename += buf;
+				ent.filename += ".";
 			}
 			fname_to_str(buf, iter->xdr[iter->level].fdr.fnm, 9);
-			strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+			ent.filename += buf;
 		}
 #endif
 
@@ -1273,7 +1273,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtoo
 		flag = get_UINT16BE(iter->xdr[iter->level].fdr.flg);
 		if (flag & fdr_flg_cdr)
 		{
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "CHANNEL");
+			ent.attr = "CHANNEL";
 
 			ent.filesize = 0;
 		}
@@ -1291,7 +1291,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtoo
 
 			fname_to_str(buf, target_fdr.fnm, 9);
 
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "ALIAS OF %s", buf);
+			ent.attr = util::string_format("ALIAS OF %s", buf);
 
 			ent.filesize = 0;
 		}
@@ -1341,7 +1341,7 @@ static imgtoolerr_t ti990_image_nextenum(imgtool::directory &enumeration, imgtoo
 				}
 				break;
 			}
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr),
+			ent.attr = util::string_format(
 						"%s %c %s%s%s%s%s", fmt, (flag & fdr_flg_all) ? 'N' : 'C', type,
 							(flag & fdr_flg_blb) ? "" : " BLK",
 							(flag & fdr_flg_tmp) ? " TMP" : "",

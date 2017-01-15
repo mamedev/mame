@@ -285,7 +285,7 @@ static imgtoolerr_t prepare_dirent(rsdos_dirent &ent, const char *fname)
 //  rsdos_diskimage_nextenum
 //-------------------------------------------------
 
-static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t rsdos_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -338,10 +338,8 @@ eof:
 		}
 		ent.eof = 0;
 
-		std::string fname = get_dirent_fname(rsent);
-
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		ent.filename = get_dirent_fname(rsent);
+		ent.attr = util::string_format("%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

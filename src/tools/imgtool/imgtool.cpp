@@ -61,24 +61,6 @@ void rtrim(char *buf)
 
 
 //-------------------------------------------------
-//  strncpyz
-//-------------------------------------------------
-
-char *strncpyz(char *dest, const char *source, size_t len)
-{
-	char *s;
-	if (len) {
-		s = strncpy(dest, source, len - 1);
-		dest[len-1] = '\0';
-	}
-	else {
-		s = dest;
-	}
-	return s;
-}
-
-
-//-------------------------------------------------
 //  extract_padded_string
 //-------------------------------------------------
 
@@ -267,7 +249,7 @@ static imgtoolerr_t evaluate_module(const char *fname,
 	imgtool::image::ptr image;
 	imgtool::partition::ptr partition;
 	imgtool::directory::ptr imageenum;
-	imgtool_dirent ent;
+	imgtool::dirent ent;
 	float current_result;
 
 	*result = 0.0;
@@ -605,7 +587,7 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 	m_supports_lastmodified_time = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME) ? 1 : 0;
 	m_supports_bootblock = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_BOOTBLOCK) ? 1 : 0;
 	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
-	m_next_enum = (imgtoolerr_t(*)(imgtool::directory &, imgtool_dirent &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
+	m_next_enum = (imgtoolerr_t(*)(imgtool::directory &, imgtool::dirent &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
 	m_close_enum = (void(*)(imgtool::directory &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
 	m_free_space = (imgtoolerr_t(*)(imgtool::partition &, uint64_t *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
 	m_read_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
@@ -1232,7 +1214,7 @@ imgtoolerr_t imgtool::partition::cannonicalize_fork(const char **fork)
 //  the nth directory entry within a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_directory_entry(const char *path, int index, imgtool_dirent &ent)
+imgtoolerr_t imgtool::partition::get_directory_entry(const char *path, int index, imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 	imgtool::directory::ptr imgenum;
@@ -1263,7 +1245,7 @@ imgtoolerr_t imgtool::partition::get_directory_entry(const char *path, int index
 
 done:
 	if (err)
-		memset(ent.filename, 0, sizeof(ent.filename));
+		ent.filename.clear();
 	return err;
 }
 
@@ -1277,7 +1259,7 @@ imgtoolerr_t imgtool::partition::get_file_size(const char *fname, uint64_t &file
 {
 	imgtoolerr_t err;
 	imgtool::directory::ptr imgenum;
-	imgtool_dirent ent;
+	imgtool::dirent ent;
 	const char *path;
 
 	path = nullptr;    /* TODO: Need to parse off the path */
@@ -1295,7 +1277,7 @@ imgtoolerr_t imgtool::partition::get_file_size(const char *fname, uint64_t &file
 		if (err)
 			goto done;
 
-		if (!core_stricmp(fname, ent.filename))
+		if (!core_stricmp(fname, ent.filename.c_str()))
 		{
 			filesize = ent.filesize;
 			goto done;
@@ -2503,7 +2485,7 @@ imgtool::directory::~directory()
 //  enumerating files within a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
+imgtoolerr_t imgtool::directory::get_next(imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 
@@ -2518,16 +2500,14 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 	imgtool::charconverter *charconverter = (imgtool::charconverter *) m_partition.get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
 	if (charconverter)
 	{
-		std::string new_fname;
 		try
 		{
-			new_fname = charconverter->to_utf8(ent.filename);
+			ent.filename = charconverter->to_utf8(ent.filename);
 		}
 		catch (charconverter_exception)
 		{
 			return imgtoolerr_t(IMGTOOLERR_BADFILENAME);
 		}
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname.c_str());
 	}
 
 	// don't trust the module!

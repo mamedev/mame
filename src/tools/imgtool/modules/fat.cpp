@@ -1826,7 +1826,7 @@ static imgtoolerr_t fat_partition_beginenum(imgtool::directory &enumeration, con
 
 
 
-static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 	fat_file *file;
@@ -1838,8 +1838,7 @@ static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgt
 		return err;
 
 	/* copy stuff from the FAT dirent to the Imgtool dirent */
-	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fatent.long_filename[0]
-		? fatent.long_filename : fatent.short_filename);
+	ent.filename = fatent.long_filename[0] ? fatent.long_filename : fatent.short_filename;
 	ent.filesize = fatent.filesize;
 	ent.directory = fatent.directory;
 	ent.eof = fatent.eof;

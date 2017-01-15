@@ -348,18 +348,18 @@ static void amiga_setup_time(time_t time, amiga_date *dest)
 
 
 /* convert flags to human readable form */
-static void amiga_decode_flags(uint32_t flags, char *dest)
+static void amiga_decode_flags(uint32_t flags, std::string &dest)
 {
 	/* test for flags */
-	dest[0] = (flags & 0x80) ? 'h' : '-';
-	dest[1] = (flags & 0x40) ? 's' : '-';
-	dest[2] = (flags & 0x20) ? 'p' : '-';
-	dest[3] = (flags & 0x10) ? 'a' : '-';
-	dest[4] = (flags & 0x08) ? '-' : 'r';
-	dest[5] = (flags & 0x04) ? '-' : 'w';
-	dest[6] = (flags & 0x02) ? '-' : 'e';
-	dest[7] = (flags & 0x01) ? '-' : 'd';
-	dest[8] = '\0';
+	dest = util::string_format("%c%c%c%c%c%c%c%c",
+		(flags & 0x80) ? 'h' : '-',
+		(flags & 0x40) ? 's' : '-',
+		(flags & 0x20) ? 'p' : '-',
+		(flags & 0x10) ? 'a' : '-',
+		(flags & 0x08) ? '-' : 'r',
+		(flags & 0x04) ? '-' : 'w',
+		(flags & 0x02) ? '-' : 'e',
+		(flags & 0x01) ? '-' : 'd');
 }
 
 
@@ -1884,7 +1884,7 @@ static imgtoolerr_t amiga_image_beginenum(imgtool::directory &enumeration, const
 }
 
 
-static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	amiga_iterator *iter = (amiga_iterator *) enumeration.extra_bytes();
 	imgtoolerr_t ret;
@@ -1928,11 +1928,11 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent.filename, (char *)file.filename, file.name_len + 1);
+		ent.filename.assign((const char *)file.filename);
 		ent.filesize = file.byte_size;
 		ent.lastmodified_time = amiga_crack_time(&file.date);
 		amiga_decode_flags(file.protect, ent.attr);
-		strncpyz(ent.comment, (char *)file.comment, file.comm_len + 1);
+		ent.comment.assign((const char *)file.comment);
 
 		iter->next_block = file.hash_chain;
 
@@ -1948,10 +1948,10 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent.filename, (char *)dir.dirname, dir.name_len + 1);
+		ent.filename = std::string((const char *)dir.dirname, dir.name_len + 1);
 		ent.lastmodified_time = amiga_crack_time(&dir.date);
 		amiga_decode_flags(dir.protect, ent.attr);
-		strncpyz(ent.comment, (char *)dir.comment, dir.comm_len + 1);
+		ent.comment = std::string((const char *)dir.comment, dir.comm_len + 1);
 		ent.directory = 1;
 
 		iter->next_block = dir.hash_chain;
@@ -1968,11 +1968,11 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 		if (ret) return ret;
 
 		/* fill directory entry */
-		strncpyz(ent.filename, (char *)sl.slname, sl.name_len + 1);
+		ent.filename = std::string((const char *) sl.slname, sl.name_len + 1);
 		ent.lastmodified_time = amiga_crack_time(&sl.date);
 		amiga_decode_flags(sl.protect, ent.attr);
-		strncpyz(ent.comment, (char *)sl.comment, sl.comm_len + 1);
-		strcpy(ent.softlink, (char *)sl.symbolic_name);
+		ent.comment = std::string((const char *) sl.comment, sl.comm_len + 1);
+		ent.softlink = std::string((const char *) sl.symbolic_name);
 
 		iter->next_block = sl.hash_chain;
 
@@ -2001,10 +2001,10 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 		}
 
 		/* fill directory entry */
-		strncpyz(ent.filename, (char *)hl.hlname, hl.name_len + 1);
+		ent.filename = std::string((const char *)hl.hlname, hl.name_len + 1);
 		ent.lastmodified_time = amiga_crack_time(&hl.date);
 		amiga_decode_flags(hl.protect, ent.attr);
-		strncpyz(ent.comment, (char *)hl.comment, hl.comm_len + 1);
+		ent.comment = std::string((const char *) hl.comment, hl.comm_len + 1);
 		ent.hardlink = 1;
 
 		iter->next_block = hl.hash_chain;

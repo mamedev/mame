@@ -548,7 +548,7 @@ static imgtoolerr_t bml3_diskimage_open(imgtool::image &image, imgtool::stream::
 
 
 
-static imgtoolerr_t bml3_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t bml3_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -604,8 +604,8 @@ eof:
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		ent.filename = fname;
+		ent.attr = util::string_format("%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

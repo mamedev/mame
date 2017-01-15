@@ -389,7 +389,7 @@ static imgtoolerr_t cybiko_image_begin_enum(imgtool::directory &enumeration, con
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtool::image &image(enumeration.image());
 	cybiko_file_system *cfs = get_cfs(image);
@@ -410,7 +410,7 @@ static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgt
 	// get file information
 	if ((file_id != INVALID_FILE_ID) && cfs_file_info(cfs, file_id, &file))
 	{
-		strcpy(ent.filename, file.name);
+		ent.filename = file.name;
 		ent.filesize = file.size;
 		ent.lastmodified_time = time_crack(file.date);
 		ent.filesize = file.size;

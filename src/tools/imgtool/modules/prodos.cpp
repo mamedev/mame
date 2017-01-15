@@ -1520,7 +1520,7 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory &enumeration, 
 
 
 
-static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(enumeration.image());
@@ -1547,10 +1547,10 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, i
 		return IMGTOOLERR_SUCCESS;
 	}
 
-	strcpy(ent.filename, pd_ent.filename);
-	ent.directory          = is_dir_storagetype(pd_ent.storage_type);
-	ent.creation_time      = prodos_crack_time(pd_ent.creation_time);
-	ent.lastmodified_time  = prodos_crack_time(pd_ent.lastmodified_time);
+	ent.filename			= pd_ent.filename;
+	ent.directory			= is_dir_storagetype(pd_ent.storage_type);
+	ent.creation_time		= prodos_crack_time(pd_ent.creation_time);
+	ent.lastmodified_time	= prodos_crack_time(pd_ent.lastmodified_time);
 
 	if (!ent.directory)
 	{

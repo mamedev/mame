@@ -151,7 +151,7 @@ namespace imgtool
 		imgtool::image &image() { return m_image; }
 
 		// ----- partition operations -----
-		imgtoolerr_t get_directory_entry(const char *path, int index, imgtool_dirent &ent);
+		imgtoolerr_t get_directory_entry(const char *path, int index, imgtool::dirent &ent);
 		imgtoolerr_t get_file_size(const char *filename, uint64_t &filesize);
 		imgtoolerr_t get_free_space(uint64_t &sz);
 		imgtoolerr_t read_file(const char *filename, const char *fork, imgtool::stream &destf, filter_getinfoproc filter);
@@ -204,7 +204,7 @@ namespace imgtool
 		unsigned int m_supports_bootblock : 1;            /* this module supports loading/storing the boot block */
 
 		std::function<imgtoolerr_t(imgtool::directory &enumeration, const char *path)> m_begin_enum;
-		std::function<imgtoolerr_t(imgtool::directory &enumeration, imgtool_dirent &ent)> m_next_enum;
+		std::function<imgtoolerr_t(imgtool::directory &enumeration, imgtool::dirent &ent)> m_next_enum;
 		std::function<void(imgtool::directory &enumeration)> m_close_enum;
 		std::function<imgtoolerr_t(imgtool::partition &partition, uint64_t *size)> m_free_space;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)> m_read_file;
@@ -245,7 +245,7 @@ namespace imgtool
 
 		// methods
 		static imgtoolerr_t open(imgtool::partition &partition, const std::string &path, ptr &outenum);
-		imgtoolerr_t get_next(imgtool_dirent &ent);
+		imgtoolerr_t get_next(imgtool::dirent &ent);
 
 		// accessors
 		imgtool::partition &partition() { return m_partition; }
@@ -264,7 +264,6 @@ namespace imgtool
 int imgtool_validitychecks(void);
 void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
 
-char *strncpyz(char *dest, const char *source, size_t len);
 void rtrim(char *buf);
 std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length);
 

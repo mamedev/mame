@@ -55,24 +55,27 @@ union filterinfo
 
 typedef void (*filter_getinfoproc)(uint32_t state, union filterinfo *info);
 
-struct imgtool_dirent
+namespace imgtool
 {
-	char filename[1024];
-	char attr[64];
-	uint64_t filesize;
+	struct dirent
+	{
+		std::string filename;
+		std::string attr;
+		uint64_t filesize;
 
-	time_t creation_time;
-	time_t lastmodified_time;
-	time_t lastaccess_time;
+		time_t creation_time;
+		time_t lastmodified_time;
+		time_t lastaccess_time;
 
-	char softlink[1024];
-	char comment[256];
+		std::string softlink;
+		std::string comment;
 
-	/* flags */
-	unsigned int eof : 1;
-	unsigned int corrupt : 1;
-	unsigned int directory : 1;
-	unsigned int hardlink : 1;
+		// flags
+		bool eof : 1;
+		bool corrupt : 1;
+		bool directory : 1;
+		bool hardlink : 1;
+	};
 };
 
 struct imgtool_chainent
@@ -283,7 +286,7 @@ union imgtoolinfo
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, uint64_t first_block, uint64_t block_count);
 	void            (*info)             (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
-	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool_dirent &ent);
+	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool::dirent &ent);
 	void            (*close_enum)       (imgtool::directory &enumeration);
 	imgtoolerr_t    (*open_partition)   (imgtool::partition &partition, uint64_t first_block, uint64_t block_count);
 	imgtoolerr_t    (*free_space)       (imgtool::partition &partition, uint64_t *size);
