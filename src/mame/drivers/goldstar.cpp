@@ -11327,23 +11327,59 @@ ROM_END
 
 
 /*
-  Mega Bonus Star II
+  Mega Bonus Star II (Millennium Edition, Euro)
   Auto-Data Graz, 2002.
   
   W4 derivative hardware...
-  
+
   PCB has a daughterboard with:
   - Z80.
   - Unknown DIP40 IC
-  - M48T12 NVRAM.
+  - M48T12 Timekeeper NVRAM.
   - HM6116L-70
   - GAL16V8D.
   - DS1232.
   - 74LS374N
-  - SN74LS0xx
-  - Unknown Xtal.
+  - SN74LS08N
+  - 8 MHz Xtal.
 
-  Dumped by Team Europe.
+  Here the DB layout...
+  +-----------------------------+
+  |        +-----------+ +----+ |
+  |    +-+ |MBGEU_OR   | |U   | |
+  |    | | |V.3.5.5    | |N   | |
+  |+-+ |B| +-----------+ |K   | |
+  || | | | +----+ +----+ |O   | |
+  || | +-+ |HM61| |M48T| |W   | |
+  ||A| +-+ |16L-| |12  | |N  Z| |
+  || | | | |70  | |    | |   I| |
+  || | |C| |    | |TIME| |   L| |
+  || | | | |    | |KEEP| |   O| |
+  |+-+ | | |    | |RAM | |   G| |
+  |    +-+ +----+ +----+ +----+ |
+  |    +----------------+       |
+  |    |ZILOG           | XTAL  |
+  |+-+ |Z0840006P       | 8.000 |
+  ||D| +----------------+       |
+  |+-+                          |
+  +-----------------------------+
+
+  A: GAL16V8D
+  B: SN74LS08N
+  C: DM74LS374N
+  D: DS1232
+
+  
+  BASE Board (based on WING W4):
+
+  XTAL: 11.98135MHZ
+  4x DIP-SWITCH
+
+  1x YAMAHA YM2149F
+  3x NEC D8255AC-2
+  6x HY6116ALP-12
+
+  Daughterboard is inserted in the Z80 Socket of the main board...
 
 */
 ROM_START( mbs2euro )
@@ -11372,13 +11408,16 @@ ROM_START( mbs2euro )
 	ROM_LOAD( "am27s21.g14", 0x0100, 0x0100, CRC(0dcaa791) SHA1(69c68a22002b57d03b90e82b5a33d1df66c39362) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(eacb8b76) SHA1(30cdd169a45b87c4262eea03ae28f910b091b100) )
+	ROM_LOAD( "82s123.d13",  0x0000, 0x0020, CRC(eacb8b76) SHA1(30cdd169a45b87c4262eea03ae28f910b091b100) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
 	ROM_LOAD( "am27s21.f3",  0x0000, 0x0100, CRC(169cbb68) SHA1(1062e84c4b4208be9aa400e236579dc5b83e9f83) )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "82s123.d12",  0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION( 0x800, "timekeeper", 0 )  // just for preservation and further analysis...
+	ROM_LOAD( "m48t12.bin",  0x0000, 0x07f8, CRC(11e61f97) SHA1(57d4744747b9d75b3ac31da8fc621f1a00ff1de3) )  // shouldn't be 0x800?
 ROM_END
 
 
