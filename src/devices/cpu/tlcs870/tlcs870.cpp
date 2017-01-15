@@ -2288,11 +2288,11 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	if (basetype==REG_8BIT)
 	{
 		if (type&IS16BIT) util::stream_format(stream, " %s", reg16[val&3]);
-		util::stream_format(stream, " %s", reg8[val & 7]);
+		else util::stream_format(stream, " %s", reg8[val & 7]);
 	}
 
 	if (basetype==CONDITIONAL) util::stream_format(stream, " %s", conditions[val]);
-	if (basetype==STACKPOINTER) util::stream_format(stream, " SP");
+	if (basetype==(STACKPOINTER & MODE_MASK)) util::stream_format(stream, " SP");
 	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
 	if (basetype==PROGRAMSTATUSWORD) util::stream_format(stream, " PSW");
 	if (basetype==CARRYFLAG) util::stream_format(stream, " CF");
@@ -2358,6 +2358,7 @@ void tlcs870_device::execute_run()
 		debugger_instruction_hook(this, m_pc.d);
 
 		//check_interrupts();
+		int temppc = m_pc.d;
 
 		m_addr = m_pc.d;
 		decode();
@@ -2421,6 +2422,8 @@ void tlcs870_device::execute_run()
 			}
 			else
 			{
+				uint16_t source_val = 0x0000;
+
 				if (m_param2_type & IS16BIT)
 				{
 
@@ -2430,28 +2433,49 @@ void tlcs870_device::execute_run()
 					switch (m_param2_type & MODE_MASK)
 					{
 					case ABSOLUTE_VAL_8:
+						source_val = m_param2;
 						break;
 					case REG_8BIT:
+						source_val = get_reg8(m_param2);
 						break;
 					case ADDR_IN_IMM_X:
+						source_val = RM8(m_param2);
 						break;
 					case ADDR_IN_PC_PLUS_REG_A:
+						source_val = RM8(temppc + 2 + get_reg8(REG_A)); // sign extend A?
 						break;
 					case ADDR_IN_DE:
+						source_val = RM8(get_reg16(REG_DE));
 						break;
 					case ADDR_IN_HL:
+						source_val = RM8(get_reg16(REG_HL));
 						break;
 					case ADDR_IN_HL_PLUS_IMM_D:
+						source_val = RM8(get_reg16(REG_HL) + m_param2); // sign extend D?
 						break;
 					case ADDR_IN_HL_PLUS_REG_C:
+						source_val = RM8(get_reg16(REG_HL) + get_reg16(REG_C)); // sign extend C?
 						break;
 					case ADDR_IN_HLINC:
+					{
+						uint16_t tmpHL = get_reg16(REG_HL);
+						source_val = RM8(tmpHL);
+						tmpHL++;
+						set_reg16(REG_HL, tmpHL);
 						break;
-					case ADDR_IN_DECHL:
-						break;
-					//case STACKPOINTER:
-					//	break;
 					}
+					case ADDR_IN_DECHL:
+					{
+						uint16_t tmpHL = get_reg16(REG_HL);
+						tmpHL--;
+						set_reg16(REG_HL, tmpHL);
+						source_val = RM8(tmpHL);
+						break;
+					}
+
+					}
+
+					logerror("source_val is %02x\n", source_val);
 				}
 
 			}
