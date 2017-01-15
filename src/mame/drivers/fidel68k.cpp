@@ -630,6 +630,10 @@ static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
+
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq2_line_hold, 600)
+	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
+	MCFG_DEVICE_REMOVE("irq_off")
 MACHINE_CONFIG_END
 
 
