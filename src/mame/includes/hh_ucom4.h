@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Kevin Horton
+// copyright-holders:hap
 /*
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,

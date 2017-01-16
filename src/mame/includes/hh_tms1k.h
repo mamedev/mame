@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle, Kevin Horton
+// copyright-holders:hap
 /*
 
   TMS1000 MCU series tabletops/handhelds or other simple devices.
