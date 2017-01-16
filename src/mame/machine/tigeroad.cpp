@@ -124,39 +124,71 @@ WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 }
 
 
-READ16_MEMBER(tigeroad_state::pushman_68705_r)
+READ16_MEMBER(pushman_state::mcu_data_r)
 {
-	if (offset == 0)
-		return m_latch;
-
-	if (offset == 3 && m_new_latch)
-	{
-		m_new_latch = 0;
-		return 0;
-	}
-	if (offset == 3 && !m_new_latch)
-		return 0xff;
-
-	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
+	return m_mcu_latch;
 }
 
-WRITE16_MEMBER(tigeroad_state::pushman_68705_w)
+READ16_MEMBER(pushman_state::mcu_ack_r)
 {
-	if (ACCESSING_BITS_8_15)
-		m_shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[2 * offset + 1] = data & 0xff;
-
-	if (offset == 1)
+	if (m_mcu_semaphore)
 	{
-		m_mcu->set_input_line(M68705_IRQ_LINE, HOLD_LINE);
-		space.device().execute().spin();
-		m_new_latch = 0;
+		m_mcu_semaphore = false;
+		return 0x0000;
+	}
+	else
+	{
+		return 0x00ff;
 	}
 }
+
+WRITE16_MEMBER(pushman_state::mcu_data_w)
+{
+	COMBINE_DATA(&m_host_latch);
+}
+
+WRITE16_MEMBER(pushman_state::mcu_cmd_w)
+{
+	m_mcu->pd_w(space, 0, data & 0x00ff);
+	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pa_w)
+{
+	m_mcu_output = (m_mcu_output & 0xff00) | (u16(data) & 0x00ff);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pb_w)
+{
+	m_mcu_output = (m_mcu_output & 0x00ff) | (u16(data) << 8);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pc_w)
+{
+	if (BIT(data, 0))
+	{
+		m_mcu->pa_w(space, 0, 0xff);
+		m_mcu->pb_w(space, 0, 0xff);
+	}
+	else
+	{
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_mcu->pa_w(space, 0, (m_host_latch >> 8) & 0x00ff);
+		m_mcu->pb_w(space, 0, (m_host_latch >> 0) & 0x00ff);
+	}
+
+	if (BIT(m_mcu_latch_ctl, 1) && !BIT(data, 1))
+	{
+		m_mcu_latch = m_mcu_output & (BIT(m_mcu_latch_ctl, 0) ? 0xffff : m_host_latch);
+		m_mcu_semaphore = true;
+	}
+
+	m_mcu_latch_ctl = data;
+}
+
 
 /* ElSemi - Bouncing balls protection. */
-READ16_MEMBER(tigeroad_state::bballs_68705_r)
+READ16_MEMBER(bballs_state::bballs_68705_r)
 {
 	if (offset == 0)
 		return m_latch;
@@ -171,7 +203,7 @@ READ16_MEMBER(tigeroad_state::bballs_68705_r)
 	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
 }
 
-WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
+WRITE16_MEMBER(bballs_state::bballs_68705_w)
 {
 	if (ACCESSING_BITS_8_15)
 		m_shared_ram[2 * offset] = data >> 8;
@@ -195,20 +227,4 @@ WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
 			m_new_latch = 1;
 		}
 	}
-}
-
-
-READ8_MEMBER(tigeroad_state::pushman_68000_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE8_MEMBER(tigeroad_state::pushman_68000_w)
-{
-	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
-	{
-		m_latch = (m_shared_ram[1] << 8) | m_shared_ram[0];
-		m_new_latch = 1;
-	}
-	m_shared_ram[offset] = data;
 }

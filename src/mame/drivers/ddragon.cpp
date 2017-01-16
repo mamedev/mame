@@ -55,7 +55,6 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6805/m68705.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
@@ -183,7 +182,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 }
 
 
-WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
+WRITE8_MEMBER(toffy_state::toffy_bankswitch_w)
 {
 	m_scrollx_hi = data & 0x01;
 	m_scrolly_hi = (data & 0x02) >> 1;
@@ -195,7 +194,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 }
 
 
-READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
+READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 {
 	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
 
@@ -216,26 +215,27 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 	}
 
 	if (offset == 0x1401 || offset == 1)
-		return m_darktowr_mcu_ports[0];
+		return m_mcu_port_a_out;
 
 	logerror("Unmapped mcu bank read %04x\n",offset);
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
+WRITE8_MEMBER(darktowr_state::darktowr_mcu_bank_w)
 {
 	logerror("BankWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
-		m_darktowr_mcu_ports[1] = BITSWAP8(data,0,1,2,3,4,5,6,7);
-		logerror("MCU PORT 1 -> %04x (from %04x)\n", BITSWAP8(data,0,1,2,3,4,5,6,7), data);
+		uint8_t const value(BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+		m_mcu->pb_w(space, 0, value);
+		logerror("MCU PORT 1 -> %04x (from %04x)\n", value, data);
 	}
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
+WRITE8_MEMBER(darktowr_state::darktowr_bankswitch_w)
 {
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
@@ -250,7 +250,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
-		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(ddragon_state::darktowr_mcu_bank_w),this));
+		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_w),this));
 	else if (newbank != 4 && oldbank == 4)
 		space.install_readwrite_bank(0x4000, 0x7fff, "bank1");
 }
@@ -351,10 +351,10 @@ CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_mcu_w)
+WRITE8_MEMBER(darktowr_state::mcu_port_a_w)
 {
-	logerror("McuWrite %05x %08x %08x\n",space.device().safe_pc(), offset, data);
-	m_darktowr_mcu_ports[offset] = data;
+	logerror("McuWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
+	m_mcu_port_a_out = data;
 }
 
 
@@ -588,21 +588,6 @@ static ADDRESS_MAP_START( dd2_sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_device, read, write)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  MCU memory maps
- *
- *************************************/
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, ddragon_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(darktowr_mcu_w) AM_SHARE("darktowr_mcu")
-	AM_RANGE(0x0008, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1104,17 +1089,17 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
+static MACHINE_CONFIG_DERIVED_CLASS( darktowr, ddragon, darktowr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705,XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
+	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
 
 	/* video hardware */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( toffy, ddragon )
+static MACHINE_CONFIG_DERIVED_CLASS( toffy, ddragon, toffy_state )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("sub")
@@ -1809,7 +1794,7 @@ ROM_START( tstrike )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1853,7 +1838,7 @@ ROM_START( tstrikea )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1897,7 +1882,7 @@ ROM_START( ddungeon )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "dd30.30",    0x08000, 0x08000, CRC(ef1af99a) SHA1(7ced695b81ca9efbb7b28b78013e112edac85672) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1936,7 +1921,7 @@ ROM_START( ddungeone )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1973,7 +1958,7 @@ ROM_START( darktowr )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 ) /* chars */
@@ -2090,23 +2075,26 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,darktowr)
+DRIVER_INIT_MEMBER(darktowr_state, darktowr)
 {
+	save_item(NAME(m_mcu_port_a_out));
+
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::darktowr_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(darktowr_state::darktowr_bankswitch_w), this));
+	m_mcu_port_a_out = 0xff;
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,toffy)
+DRIVER_INIT_MEMBER(toffy_state, toffy)
 {
 	int i, length;
 	uint8_t *rom;
 
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(ddragon_state::toffy_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(toffy_state::toffy_bankswitch_w), this));
 
 	/* the program rom has a simple bitswap encryption */
 	rom = memregion("maincpu")->base();
@@ -2170,32 +2158,32 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
  *
  *************************************/
 
-GAME( 1987, ddragon,     0,        ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan", "Double Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonw,    ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan (Taito license)", "Double Dragon (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonw1,   ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan (Taito license)", "Double Dragon (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonu,    ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonua,   ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonub,   ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonb2,   ddragon,  ddragon,  ddragon, ddragon_state,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonb,    ddragon,  ddragonb, ddragon, ddragon_state,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", MACHINE_SUPPORTS_SAVE ) // according to dump notes
-GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon, ddragon_state,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragon6809, ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
-GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon,     0,        ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonw,    ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonw1,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonu,    ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonua,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonub,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonb2,   ddragon,  ddragon,     ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonb,    ddragon,  ddragonb,    ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with HD6309)",         MACHINE_SUPPORTS_SAVE ) // according to dump notes
+GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon,  ddragon_state,  ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with M6803)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragon6809, ddragon,  ddragon6809, ddragon,  ddragon_state,  ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon,  ddragon_state,  ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
-GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "bootleg", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2,    0,        ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1988, ddragon2b,   ddragon2, ddragon2,    ddragon2, ddragon_state,  ddragon2,    ROT0, "bootleg",       "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
-GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
-GAME( 1991, tstrikea, tstrike,  darktowr, tstrike, ddragon_state,  darktowr, ROT0, "The Game Room", "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeon, 0,        darktowr, ddungeon, ddragon_state, darktowr, ROT0, "The Game Room", "Dangerous Dungeons (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeone,ddungeon, darktowr, ddungeon, ddragon_state, darktowr, ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, darktowr, 0,        darktowr, darktowr, ddragon_state, darktowr, ROT0, "The Game Room", "Dark Tower", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tstrike,    0,         darktowr,    tstrike,  darktowr_state, darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
+GAME( 1991, tstrikea,   tstrike,   darktowr,    tstrike,  darktowr_state, darktowr,    ROT0, "The Game Room",           "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeon,   0,         darktowr,    ddungeon, darktowr_state, darktowr,    ROT0, "The Game Room",           "Dangerous Dungeons (set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeone,  ddungeon,  darktowr,    ddungeon, darktowr_state, darktowr,    ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, darktowr,   0,         darktowr,    darktowr, darktowr_state, darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
-GAME( 1993, toffy,    0,        toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas", "Toffy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffy,      0,         toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas",                   "Toffy",                         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, stoffy,   0,        toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas", "Super Toffy", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stoffyu,  stoffy,   toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas (Unico license)", "Super Toffy (Unico license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffy,     0,         toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffyu,    stoffy,    toffy,       toffy,    toffy_state,    toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
