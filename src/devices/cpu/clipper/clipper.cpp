@@ -30,7 +30,6 @@ clipper_device::clipper_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, CLIPPER, "c400", tag, owner, clock, "c400", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_program(nullptr),
-	m_direct(nullptr),
 	m_pc(0),
 	m_r(m_rs),
 	m_icount(0),
@@ -42,7 +41,6 @@ void clipper_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -163,7 +161,7 @@ void clipper_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 
 		// fetch instruction word
-		insn = m_direct->read_word(m_pc + 0);
+		insn = m_program->read_word(m_pc + 0);
 
 		// decode and execute instruction, return next pc
 		m_pc = execute_instruction(insn);
@@ -207,13 +205,13 @@ void clipper_device::decode_instruction (uint16_t insn)
 		if (insn & 0x0080)
 		{
 			// fetch 16 bit immediate and sign extend
-			m_info.op.imm = (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.op.imm = (int16_t)m_program->read_word(m_pc + 2);
 			m_info.size = 4;
 		}
 		else
 		{
 			// fetch 32 bit immediate and sign extend
-			m_info.op.imm = (int32_t)m_direct->read_dword(m_pc + 2);
+			m_info.op.imm = (int32_t)m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 		}
 	}
@@ -227,30 +225,30 @@ void clipper_device::decode_instruction (uint16_t insn)
 		{
 		case ADDR_MODE_PC32:
 			m_info.op.r2 = R2;
-			m_info.address = m_pc + (int32_t)m_direct->read_dword(m_pc + 2);
+			m_info.address = m_pc + (int32_t)m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_ABS32:
 			m_info.op.r2 = R2;
-			m_info.address = m_direct->read_dword(m_pc + 2);
+			m_info.address = m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_REL32:
-			m_info.op.r2 = m_direct->read_word(m_pc + 2) & 0xf;
-			m_info.address = m_r[R2] + (int32_t)m_direct->read_dword(m_pc + 4);
+			m_info.op.r2 = m_program->read_word(m_pc + 2) & 0xf;
+			m_info.address = m_r[R2] + (int32_t)m_program->read_dword(m_pc + 4);
 			m_info.size = 8;
 			break;
 
 		case ADDR_MODE_PC16:
 			m_info.op.r2 = R2;
-			m_info.address = m_pc + (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.address = m_pc + (int16_t)m_program->read_word(m_pc + 2);
 			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_REL12:
-			temp = m_direct->read_word(m_pc + 2);
+			temp = m_program->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_r[R2] + ((int16_t)temp >> 4);
@@ -259,12 +257,12 @@ void clipper_device::decode_instruction (uint16_t insn)
 
 		case ADDR_MODE_ABS16:
 			m_info.op.r2 = R2;
-			m_info.address = (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.address = (int16_t)m_program->read_word(m_pc + 2);
 			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_PCX:
-			temp = m_direct->read_word(m_pc + 2);
+			temp = m_program->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_pc + m_r[(temp >> 4) & 0xf];
@@ -272,7 +270,7 @@ void clipper_device::decode_instruction (uint16_t insn)
 			break;
 
 		case ADDR_MODE_RELX:
-			temp = m_direct->read_word(m_pc + 2);
+			temp = m_program->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_r[R2] + m_r[(temp >> 4) & 0xf];
@@ -288,7 +286,7 @@ void clipper_device::decode_instruction (uint16_t insn)
 	else if ((insn & 0xfd00) == 0xb400)
 	{
 		// macro instructions
-		m_info.op.macro = m_direct->read_word(m_pc + 2);
+		m_info.op.macro = m_program->read_word(m_pc + 2);
 		m_info.size = 4;
 	}
 	else

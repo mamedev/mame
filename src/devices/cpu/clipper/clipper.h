@@ -230,7 +230,6 @@ private:
 	address_space_config m_program_config;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
 
 	int m_icount;
 	int m_interrupt_cycles;
