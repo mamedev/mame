@@ -234,9 +234,11 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 			? "<DIR>"
 			: string_format("%u", (unsigned int) ent.filesize);
 
-		if (ent.lastmodified_time != 0)
-			strftime(last_modified, sizeof(last_modified), "%d-%b-%y %H:%M:%S",
-				localtime(&ent.lastmodified_time));
+		if (!ent.lastmodified_time.empty())
+		{
+			time_t t = ent.lastmodified_time.to_time_t();
+			strftime(last_modified, sizeof(last_modified), "%d-%b-%y %H:%M:%S", localtime(&t));
+		}
 
 		if (ent.hardlink)
 			ent.filename += " <hl>";

@@ -19,6 +19,7 @@
 
 #include <time.h>
 #include <list>
+#include <chrono>
 
 #include "corestr.h"
 #include "opresolv.h"
@@ -57,6 +58,55 @@ typedef void (*filter_getinfoproc)(uint32_t state, union filterinfo *info);
 
 namespace imgtool
 {
+	class datetime
+	{
+	public:
+		enum datetime_type
+		{
+			NONE,
+			LOCAL,
+			GMT
+		};
+
+		datetime()
+			: m_type(datetime_type::NONE)
+		{
+		}
+
+		datetime(datetime_type type, time_t t)
+			: m_type(type)
+			, m_clock(std::chrono::system_clock::from_time_t(t))
+		{
+		}
+
+		datetime(datetime_type type, tm *t)
+			: datetime(type, mktime(t))
+		{
+		}
+
+		datetime(const datetime &that) = default;
+		datetime(datetime &&that) = default;
+
+		// accessors
+		datetime_type type() const { return m_type; }
+		bool empty() const { return type() == datetime_type::NONE; }
+		time_t to_time_t() const { return std::chrono::system_clock::to_time_t(m_clock); }
+
+		// operators
+		datetime &operator =(const datetime &that)
+		{
+			m_type = that.m_type;
+			m_clock = that.m_clock;
+			return *this;
+		}
+
+	private:
+		typedef std::chrono::system_clock imgtool_clock;
+
+		datetime_type							m_type;
+		std::chrono::time_point<imgtool_clock>	m_clock;
+	};
+
 	struct dirent
 	{
 		dirent() = default;
@@ -67,9 +117,9 @@ namespace imgtool
 		std::string attr;
 		uint64_t filesize;
 
-		time_t creation_time;
-		time_t lastmodified_time;
-		time_t lastaccess_time;
+		datetime creation_time;
+		datetime lastmodified_time;
+		datetime lastaccess_time;
 
 		std::string softlink;
 		std::string comment;
@@ -142,7 +192,7 @@ enum
 union imgtool_attribute
 {
 	int64_t   i;
-	time_t  t;
+	time_t t;
 };
 
 struct imgtool_iconinfo

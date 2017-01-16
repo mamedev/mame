@@ -2511,12 +2511,12 @@ imgtoolerr_t imgtool::directory::get_next(imgtool::dirent &ent)
 	}
 
 	// don't trust the module!
-	if (!m_partition.m_supports_creation_time && (ent.creation_time != 0))
+	if (!m_partition.m_supports_creation_time && (ent.creation_time.type() != imgtool::datetime::datetime_type::NONE))
 	{
 		internal_error(nullptr, "next_enum() specified creation_time, which is marked as unsupported by this module");
 		return IMGTOOLERR_UNEXPECTED;
 	}
-	if (!m_partition.m_supports_lastmodified_time && (ent.lastmodified_time != 0))
+	if (!m_partition.m_supports_lastmodified_time && (ent.lastmodified_time.type() != imgtool::datetime::datetime_type::NONE))
 	{
 		internal_error(nullptr, "next_enum() specified lastmodified_time, which is marked as unsupported by this module");
 		return IMGTOOLERR_UNEXPECTED;

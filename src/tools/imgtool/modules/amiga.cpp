@@ -290,7 +290,7 @@ static int is_leap(int year)
 
 
 /* Convert amiga time to standard time */
-static time_t amiga_crack_time(amiga_date *date)
+static imgtool::datetime amiga_crack_time(amiga_date *date)
 {
 	int month_days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	int year = 1978, month = 1, year_days = 365; /* base date */
@@ -324,7 +324,7 @@ static time_t amiga_crack_time(amiga_date *date)
 	t.tm_min  = date->mins % 60;
 	t.tm_sec  = date->ticks / 50;
 
-	return mktime(&t);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, &t);
 }
 
 
@@ -1785,9 +1785,9 @@ static void amiga_image_info(imgtool::image &img, std::ostream &stream)
 	ret = read_root_block(img, &root);
 	if (ret) return;
 
-	t_c = amiga_crack_time(&root.c);
-	t_v = amiga_crack_time(&root.v);
-	t_r = amiga_crack_time(&root.r);
+	t_c = amiga_crack_time(&root.c).to_time_t();
+	t_v = amiga_crack_time(&root.v).to_time_t();
+	t_r = amiga_crack_time(&root.r).to_time_t();
 
 	strftime(c, sizeof(c), "%d-%b-%y %H:%M:%S", localtime(&t_c));
 	strftime(v, sizeof(v), "%d-%b-%y %H:%M:%S", localtime(&t_v));

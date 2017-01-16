@@ -1842,8 +1842,8 @@ static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgt
 	ent.filesize = fatent.filesize;
 	ent.directory = fatent.directory;
 	ent.eof = fatent.eof;
-	ent.creation_time = fatent.creation_time;
-	ent.lastmodified_time = fatent.lastmodified_time;
+	ent.creation_time = imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, fatent.creation_time);
+	ent.lastmodified_time = imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, fatent.lastmodified_time);
 	return IMGTOOLERR_SUCCESS;
 }
 

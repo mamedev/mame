@@ -57,9 +57,9 @@ static cybiko_file_system *get_cfs(imgtool::image &image)
 
 // 2208988800 is the number of seconds between 1900/01/01 and 1970/01/01
 
-static time_t time_crack( uint32_t cfs_time)
+static imgtool::datetime time_crack( uint32_t cfs_time)
 {
-	return (time_t)(cfs_time - 2208988800UL);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, (time_t)(cfs_time - 2208988800UL));
 }
 
 static uint32_t time_setup( time_t ansi_time)

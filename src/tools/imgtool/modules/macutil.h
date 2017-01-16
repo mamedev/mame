@@ -29,7 +29,8 @@ enum mac_filecategory_t
 
 
 /* converting Classic Mac OS time <==> Imgtool time */
-time_t mac_crack_time(uint32_t t);
+imgtool::datetime mac_crack_time(uint32_t t);
+uint32_t mac_setup_time(const imgtool::datetime &t);
 uint32_t mac_setup_time(time_t t);
 uint32_t mac_time_now(void);
 
