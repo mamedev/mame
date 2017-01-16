@@ -43,7 +43,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<5> m_inp_matrix; // max 5
+	optional_ioport_array<6> m_inp_matrix; // max 6
 
 	// misc common
 	u8 m_l;                         // MCU port L write data
@@ -794,8 +794,11 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Mattel Dalla$
-  * x
+  Mattel Dalla$ (J.R. handheld)
+  * COP444 MCU label COP444L-HYN/N
+  * 8-digit 7seg display, 1-bit sound
+  
+  This is a board game, only the handheld device is emulated here.
 
 ***************************************************************************/
 
@@ -809,38 +812,99 @@ public:
 
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_WRITE8_MEMBER(write_d);
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_READ8_MEMBER(read_in);
 };
 
 // handlers
 
-WRITE8_MEMBER(mdallas_state::write_d)
+void mdallas_state::prepare_display()
 {
+	set_display_segmask(0xff, 0xff);
+	display_matrix(8, 8, m_l, ~(m_d << 4 | m_g));
 }
 
 WRITE8_MEMBER(mdallas_state::write_l)
 {
+	// L: digit segment data
+	m_l = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(mdallas_state::write_d)
+{
+	// D: select digit, input mux high
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 3);
+	m_d = data & 0xf;
+	prepare_display();
 }
 
 WRITE8_MEMBER(mdallas_state::write_g)
 {
+	// G: select digit, input mux low
+	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
+	m_g = data & 0xf;
+	prepare_display();
 }
 
 READ8_MEMBER(mdallas_state::read_in)
 {
 	// IN: multiplexed inputs
-	return 0;
+	return read_inputs(6) & 0xf;
 }
 
 
 // config
 
+/* physical button layout and labels is like this:
+
+    <  ON>  [YES]   [NO]   [NEXT]
+    [W]     [N]     [S]    [E]
+    [7]     [8]     [9]    [STATUS]
+    [4]     [5]     [6]    [ASSETS]
+    [1]     [2]     [3]    [START]
+    [CLEAR] [0]     [MOVE] [ENTER]
+*/
+
 static INPUT_PORTS_START( mdallas )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Move")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Start")
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Assets")
+
+	PORT_START("IN.3") // G3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Status")
+
+	PORT_START("IN.4") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("West") // W
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Next")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("East") // E
+
+	PORT_START("IN.5") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("No")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Yes")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("South") // S
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mdallas, mdallas_state )
@@ -848,9 +912,10 @@ static MACHINE_CONFIG_START( mdallas, mdallas_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(mdallas_state, write_g))
+	MCFG_COP400_READ_IN_CB(READ8(mdallas_state, read_in))
 	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("dac", dac_bit_interface, write))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
@@ -1388,7 +1453,7 @@ ROM_END
 
 ROM_START( mdallas )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "copl444l-htn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
 ROM_END
 
 
@@ -1426,7 +1491,7 @@ CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Ent
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   driver_device, 0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   driver_device, 0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
