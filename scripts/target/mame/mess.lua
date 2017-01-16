@@ -1896,7 +1896,7 @@ files {
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
 	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
-	MAME_DIR .. "src/mame/includes/fidelz80.h",
+	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel68k.cpp",
 }

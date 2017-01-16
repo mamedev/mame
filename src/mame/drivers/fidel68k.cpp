@@ -154,7 +154,7 @@ B0000x-xxxxxx: see V7, -800000
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelz80.h"
+#include "includes/fidelbase.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
@@ -165,11 +165,11 @@ B0000x-xxxxxx: see V7, -800000
 #include "fidel_eag_68k.lh" // clickable
 
 
-class fidel68k_state : public fidelz80base_state
+class fidel68k_state : public fidelbase_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag),
+		: fidelbase_state(mconfig, type, tag),
 		m_ram(*this, "ram")
 	{ }
 
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
 
 	/* sound hardware */
@@ -582,7 +582,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
 
 	MCFG_RAM_ADD("ram")
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -631,7 +631,7 @@ static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq2_line_hold, 600)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq2_line_hold, 600)
 	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
 	MCFG_DEVICE_REMOVE("irq_off")
 MACHINE_CONFIG_END

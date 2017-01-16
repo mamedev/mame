@@ -490,7 +490,7 @@ expect that the software reads these once on startup only.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelz80.h"
+#include "includes/fidelbase.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
@@ -507,11 +507,11 @@ expect that the software reads these once on startup only.
 #include "fidel_vsc.lh" // clickable
 
 
-class fidelz80_state : public fidelz80base_state
+class fidelz80_state : public fidelbase_state
 {
 public:
 	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag),
+		: fidelbase_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
@@ -570,7 +570,7 @@ public:
 
 // machine start/reset
 
-void fidelz80base_state::machine_start()
+void fidelbase_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
@@ -603,7 +603,7 @@ void fidelz80base_state::machine_start()
 	save_item(NAME(m_speech_bank));
 }
 
-void fidelz80base_state::machine_reset()
+void fidelbase_state::machine_reset()
 {
 }
 
@@ -618,7 +618,7 @@ void fidelz80base_state::machine_reset()
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-void fidelz80base_state::display_update()
+void fidelbase_state::display_update()
 {
 	u32 active_state[0x20];
 
@@ -671,7 +671,7 @@ void fidelz80base_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidelz80base_state::display_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(fidelbase_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -682,13 +682,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(fidelz80base_state::display_decay_tick)
 	display_update();
 }
 
-void fidelz80base_state::set_display_size(int maxx, int maxy)
+void fidelbase_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 }
 
-void fidelz80base_state::set_display_segmask(u32 digits, u32 mask)
+void fidelbase_state::set_display_segmask(u32 digits, u32 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -699,7 +699,7 @@ void fidelz80base_state::set_display_segmask(u32 digits, u32 mask)
 	}
 }
 
-void fidelz80base_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
+void fidelbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
@@ -715,7 +715,7 @@ void fidelz80base_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, 
 
 // generic input handlers
 
-u16 fidelz80base_state::read_inputs(int columns)
+u16 fidelbase_state::read_inputs(int columns)
 {
 	u16 ret = 0;
 
@@ -739,7 +739,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(fidelbase_state, scc_cartridge)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -1452,7 +1452,7 @@ static MACHINE_CONFIG_START( bcc, fidelz80_state )
 	MCFG_CPU_PROGRAM_MAP(bcc_map)
 	MCFG_CPU_IO_MAP(bcc_io)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
 
 	/* sound hardware */
@@ -1476,7 +1476,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
 
 	/* sound hardware */
@@ -1500,7 +1500,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
 
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
@@ -1518,7 +1518,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3900000) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vsc_ppi_porta_w))
@@ -1530,7 +1530,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
 
 	/* sound hardware */
@@ -1553,7 +1553,7 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
 
 	/* sound hardware */

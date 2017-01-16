@@ -384,7 +384,7 @@ I/O is via TTL, very similar to Designer Display
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelz80.h"
+#include "includes/fidelbase.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
@@ -409,11 +409,11 @@ I/O is via TTL, very similar to Designer Display
 #include "fidel_su9.lh" // clickable
 
 
-class fidel6502_state : public fidelz80base_state
+class fidel6502_state : public fidelbase_state
 {
 public:
 	fidel6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag),
+		: fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_cart(*this, "cartslot")
 	{ }
@@ -1554,7 +1554,7 @@ static MACHINE_CONFIG_START( rsc, fidel6502_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_rsc_v2)
 
 	/* sound hardware */
@@ -1569,7 +1569,7 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // 38400kHz/64
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // 38400kHz/64
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, csc_pia0_pb_r))
@@ -1586,7 +1586,7 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
 
 	/* sound hardware */
@@ -1614,7 +1614,7 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz)
 	MCFG_CPU_PROGRAM_MAP(eas_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidel6502_state, eas_ppi_porta_w))
@@ -1623,7 +1623,7 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
 
 	/* sound hardware */
@@ -1639,7 +1639,7 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -1648,7 +1648,7 @@ static MACHINE_CONFIG_DERIVED( eag, eas )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
@@ -1662,7 +1662,7 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
 
 	/* sound hardware */
@@ -1674,7 +1674,7 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -1703,7 +1703,7 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(596) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
 
 	/* sound hardware */
@@ -1715,7 +1715,7 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_ex)
 
 	/* sound hardware */
@@ -1791,7 +1791,7 @@ static MACHINE_CONFIG_START( fdes2100d, fidel6502_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis)
 
 	/* sound hardware */
@@ -1817,7 +1817,7 @@ static MACHINE_CONFIG_START( chesster, fidel6502_state )
 	MCFG_TIMER_START_DELAY(attotime::from_hz(9615) - attotime::from_nsec(2600)) // active for 2.6us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(9615))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_chesster)
 
 	/* sound hardware */

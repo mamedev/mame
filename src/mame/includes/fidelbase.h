@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 *
-*  Fidelity Electronics Z80 based board driver
+*  Fidelity Electronics chess machines base class
 *
 ******************************************************************************/
 
@@ -13,10 +13,10 @@
 #include "bus/generic/carts.h"
 #include "softlist.h"
 
-class fidelz80base_state : public driver_device
+class fidelbase_state : public driver_device
 {
 public:
-	fidelz80base_state(const machine_config &mconfig, device_type type, const char *tag)
+	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
