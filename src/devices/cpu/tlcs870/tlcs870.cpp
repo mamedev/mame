@@ -2471,31 +2471,31 @@ uint16_t tlcs870_device::get_source_val(uint16_t param_type, uint16_t param_val)
 	return ret_val;
 }
 
-void tlcs870_device::setbit_param1(uint8_t bit)
+void tlcs870_device::setbit_param(uint16_t param_type, uint16_t param, uint8_t bit)
 {
-	if (m_param1_type & BITPOS)
+	if (param_type & BITPOS)
 	{
-		uint8_t bitpos;
+		uint8_t bitpos = 0;
 
 		// need to read param 1
 		uint16_t addr = 0x0000;
 		uint16_t val = 0;
 
 		// READ
-		if (m_param1_type & ADDR_IN_BASE)
+		if (param_type & ADDR_IN_BASE)
 		{
-			addr = get_addr(m_param1_type, m_param1); // any pre/post HL address adjustments happen here
-			if (m_param1_type & IS16BIT)
+			addr = get_addr(param_type, param); // any pre/post HL address adjustments happen here
+			if (param_type & IS16BIT)
 				val = RM16(addr);
 			else
 				val = RM8(addr);
 		}
 		else
 		{
-			val = get_source_val(m_param1_type, m_param1);
+			val = get_source_val(param_type, param);
 		}
 
-		if (m_param1_type & BITPOS_INDIRECT)
+		if (param_type & BITPOS_INDIRECT)
 		{
 			bitpos = get_reg8(m_bitpos & 7) & 0x7;
 		}
@@ -2505,21 +2505,23 @@ void tlcs870_device::setbit_param1(uint8_t bit)
 		}
 
 		// MODIFY
-		int bitused = (1 << bitpos) & 1;
+		int bitused = (1 << bitpos);
 		bit ? (val |= bitused) : (val &= ~bitused);
 
+		printf("bit to set is %d, value is %02x", bitused, val);
+
 		// WRITE
-		if (m_param1_type & ADDR_IN_BASE)
+		if (param_type & ADDR_IN_BASE)
 		{
-			//addr = get_addr(m_param1_type,m_param1); // already have addr, don't want to cause any further HL decrements/increments.
-			if (m_param1_type & IS16BIT)
+			//addr = get_addr(param_type,param); // already have addr, don't want to cause any further HL decrements/increments.
+			if (param_type & IS16BIT)
 				WM16(addr, val);
 			else
 				WM8(addr, val);
 		}
 		else
 		{
-			set_dest_val(m_param1_type, m_param1, val);
+			set_dest_val(param_type, param, val);
 		}
 	}
 	else
@@ -2528,31 +2530,31 @@ void tlcs870_device::setbit_param1(uint8_t bit)
 	}
 }
 
-uint8_t tlcs870_device::getbit_param2()
+uint8_t tlcs870_device::getbit_param(uint16_t param_type, uint16_t param)
 {
 	uint8_t bit = 0;
 
-	if (m_param2_type & BITPOS)
+	if (param_type & BITPOS)
 	{
 		uint8_t bitpos;
 
 		// need to read param 2
 		uint16_t addr = 0x0000;
 		uint16_t val = 0;
-		if (m_param2_type & ADDR_IN_BASE)
+		if (param_type & ADDR_IN_BASE)
 		{
-			addr = get_addr(m_param2_type, m_param2);
-			if (m_param2_type & IS16BIT)
+			addr = get_addr(param_type, param);
+			if (param_type & IS16BIT)
 				val = RM16(addr);
 			else
 				val = RM8(addr);
 		}
 		else
 		{
-			val = get_source_val(m_param2_type, m_param2);
+			val = get_source_val(param_type, param);
 		}
 
-		if (m_param2_type & BITPOS_INDIRECT)
+		if (param_type & BITPOS_INDIRECT)
 		{
 			bitpos = get_reg8(m_bitpos & 7) & 0x7;
 		}
@@ -2597,8 +2599,43 @@ void tlcs870_device::execute_run()
 			break;
 		case CALLV:
 			break;
+
 		case CLR:
+			if ((m_param1_type & BITPOS))
+			{
+				printf("clr on bit\n");
+
+				if (m_param1_type == CARRYFLAG)
+				{
+					CLEAR_CF;
+				}
+				else
+				{
+					setbit_param(m_param1_type, m_param1, 0);
+				}
+			}
+			else
+			{
+				uint16_t addr = 0x0000;
+				uint16_t val = 0;
+
+				if (m_param1_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(m_param1_type,m_param1);
+					if (m_param1_type & IS16BIT)
+						WM16(addr, val);
+					else
+						WM8(addr, val);
+				}
+				else
+				{
+					set_dest_val(m_param1_type,m_param1, val);
+				}
+
+			}
 			break;
+
+
 		case CPL:
 			break;
 		case DAA:
@@ -2631,7 +2668,6 @@ void tlcs870_device::execute_run()
 			break;
 		case LD:
 		{
-			// this 'get val' should be in a function
 			if ((m_param1_type & BITPOS) || (m_param2_type & BITPOS))
 			{
 				// bit operations, including the 'TEST' style bit instruction
@@ -2641,7 +2677,7 @@ void tlcs870_device::execute_run()
 				{
 					bit = IS_CF;
 
-					setbit_param1(bit);
+					setbit_param(m_param1_type,m_param1,bit);
 				
 					// for this type of operation ( LD *.b, CF ) the Jump Flag always ends up being 1
 					SET_JF;
@@ -2649,7 +2685,7 @@ void tlcs870_device::execute_run()
 				}
 				else if (m_param1_type == CARRYFLAG)
 				{
-					getbit_param2();
+					getbit_param(m_param2_type,m_param2);
 
 					bit ? SET_CF : CLEAR_CF;
 					// for this type of operation ( LD CF, *.b ) the Jump Flag always ends up the inverse of the Carry Flag
@@ -2727,8 +2763,46 @@ void tlcs870_device::execute_run()
 			break;
 		case RORD:
 			break;
+		
+		
 		case SET:
+			if ((m_param1_type & BITPOS))
+			{
+				printf("set on bit\n");
+
+				if (m_param1_type == CARRYFLAG)
+				{
+					SET_CF;
+				}
+				else
+				{
+					printf("set with setbit_param\n");
+
+					setbit_param(m_param1_type, m_param1, 1);
+				}
+			}
+			else
+			{
+				uint16_t addr = 0x0000;
+				uint16_t val = 1;
+
+				if (m_param1_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(m_param1_type,m_param1);
+					if (m_param1_type & IS16BIT)
+						WM16(addr, val);
+					else
+						WM8(addr, val);
+				}
+				else
+				{
+					set_dest_val(m_param1_type,m_param1, val);
+				}
+
+			}
 			break;
+
+
 		case SHLC:
 			break;
 		case SHRC:
