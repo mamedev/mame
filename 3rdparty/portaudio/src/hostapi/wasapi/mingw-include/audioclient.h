@@ -93,7 +93,7 @@ typedef interface IChannelAudioVolume IChannelAudioVolume;
 /* header files for imported files */
 #include "wtypes.h"
 #include "unknwn.h"
-#include "AudioSessionTypes.h"
+#include "audiosessiontypes.h"
 
 #ifdef __cplusplus
 extern "C"{
