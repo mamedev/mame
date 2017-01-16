@@ -2932,6 +2932,60 @@ void tlcs870_device::execute_run()
 		case ALU_OR:
 			break;
 		case ALU_CMP:
+
+				uint16_t addr = 0x0000;
+				uint16_t val = 0;
+				if (m_param2_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(m_param2_type,m_param2);
+					if (m_param2_type & IS16BIT)
+						val = RM16(addr);
+					else
+						val = RM8(addr);
+				}
+				else
+				{
+					val = get_source_val(m_param2_type,m_param2);
+				}
+
+				uint16_t val2 = val;
+
+				if (m_param1_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(m_param1_type,m_param1);
+					if (m_param1_type & IS16BIT)
+						val = RM16(addr);
+					else
+						val = RM8(addr);
+				}
+				else
+				{
+					val = get_source_val(m_param1_type,m_param1);
+				}
+
+				if (val < val2)
+				{
+					SET_CF;
+				}
+				else
+				{
+					CLEAR_CF;
+				}
+
+				if (val == val2)
+				{
+					SET_ZF;
+					SET_JF;
+				}
+				else
+				{
+					CLEAR_ZF;
+					CLEAR_JF;
+				}
+
+				// TODO: HF (how to calculate it?)
+
+
 			break;
 		}
 
