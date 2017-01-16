@@ -14201,6 +14201,7 @@ funjacks                        // Mattel
 funrlgl                         // Mattel
 h2hbaskb                        // Coleco
 lightfgt                        // Milton Bradley
+mdallas                         // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
 
@@ -20497,7 +20498,6 @@ alm16                           // 1988 Mephisto Almeria 68000
 alm32                           // 1988 Mephisto Alimera 68020
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 bpl32                           // 1996 Mephisto Berlin Pro London Upgrade V5.00
-diablo68                        // 1991 Novag Diablo 68000 Chess Computer
 gen32                           // 1993 Mephisto Genius030 V4.00
 gen32_41                        // 1993 Mephisto Genius030 V4.01
 lond020                         // 1996 Mephisto London 68020 32 Bit

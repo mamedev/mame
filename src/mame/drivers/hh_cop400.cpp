@@ -23,6 +23,7 @@
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
 #include "lightfgt.lh" // clickable
+#include "mdallas.lh"
 #include "qkracer.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
@@ -770,7 +771,7 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
 	MCFG_COP400_READ_L_TRISTATE_CB(READ8(funrlgl_state, read_l_tristate))
@@ -779,6 +780,81 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Dalla$
+  * x
+
+***************************************************************************/
+
+class mdallas_state : public hh_cop400_state
+{
+public:
+	mdallas_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag),
+		m_dac(*this, "dac")
+	{ }
+
+	required_device<dac_bit_interface> m_dac;
+
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_READ8_MEMBER(read_in);
+};
+
+// handlers
+
+WRITE8_MEMBER(mdallas_state::write_d)
+{
+}
+
+WRITE8_MEMBER(mdallas_state::write_l)
+{
+}
+
+WRITE8_MEMBER(mdallas_state::write_g)
+{
+}
+
+READ8_MEMBER(mdallas_state::read_in)
+{
+	// IN: multiplexed inputs
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( mdallas )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mdallas, mdallas_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=57K, C=101pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
+	MCFG_COP400_WRITE_G_CB(WRITE8(mdallas_state, write_g))
+	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mdallas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1310,6 +1386,12 @@ ROM_START( funrlgl )
 ROM_END
 
 
+ROM_START( mdallas )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "copl444l-htn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
+ROM_END
+
+
 ROM_START( plus1 )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, BAD_DUMP CRC(8626fdb8) SHA1(fd241b6dde0e4e86b439cb2c5bb3a82fb257d7e1) ) // still need to verify
@@ -1344,6 +1426,7 @@ CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Ent
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   driver_device, 0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
