@@ -336,7 +336,8 @@ House of the Dead 2 (prototype)                 no cart  A1E2    21 (64Mb)   pre
 Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Samba de Amigo (prototype)                      no cart  *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
 Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   present  315-6206  not present
-Star Horse (server)                           840-0055C  23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
+Star Horse (live and backup)                  840-0055B  23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
+Star Horse Data                               840-0034B  -        2 (64Mb)   present  315-6206  not present   not contain game data, used in stack with 840-0121(sound&backup) ROM board as player saves storage, have JP3 and JP4 in position 2-3
 The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   present  315-6206  not present   content is the same as regular 171-8132A cart
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
@@ -597,11 +598,15 @@ Giga Wing 2                                     841-0014C  22270    5 (128Mb)  3
 Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM  not present
 Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
 MushiKing - The King Of Beetle 2K5 1ST          840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
-Oinori-daimyoujin Matsuri                       840-0126C  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
+Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
 Samba de Amigo Ver. 2000                        840-0047C  23600   11 (128Mb)  315-6319A  315-6213  317-0295-COM  ?
 Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  315-6319   315-6213  not present   present      requires 837-13785 ARCNET&IO BD
 Star Horse (satellite)                          840-0056C  23627    6 (128Mb)* 315-6319   315-6213  not present   present      * +1 (64Mb), requires 837-13785 ARCNET&IO BD
-Star Horse Progress (satellite) (Rev A)         840-0123C  24122A   7 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
+Star Horse 2001 (satellite) (Rev B)             840-0078B  23739B   7 (128Mb)  315-6319   315-6213  not present   present      requires 837-13785 ARCNET&IO BD
+Star Horse Progress (main screen) (Rev B)       840-0120B  24087B   6 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
+Star Horse Progress (sound & backup) (Rev A)    840-0121B  24097A   6 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
+Star Horse Progress (live) (Rev A)              840-0122B  24107A  11 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
+Star Horse Progress (satellite) (Rev A)         840-0123B  24122A   7 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-13785 ARCNET&IO BD
 The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  315-6213  not present   present
 Virtua Fighter 4                                840-0080C  23785   11 (128Mb)  ?          ?         317-0324-COM  ?
 Virtua Striker 3                                840-0061C  23663   11 (128Mb)  315-6319A  315-6213  317-0310-COM  ?
@@ -716,7 +721,7 @@ Notes:
 /Shin Nihon Prowrestling Toukon                                                                                                             /FL0 & FL1 have pin55 raised from PCB.
 \Retsuden 4 Arcade Edition (Japan, Ver.A)  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1        \They are connected together and go to pin89 on 2K.
 World Kicks PCB (Japan, WKC1 Ver.A)        F2    25509801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  WKC1        uses Namco V226 JVS I/O (not dumped)
-World Kicks (Japan, WK1 Ver.A)             F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK1         not dumped, FL1.2D sums E8F1 B057
+World Kicks (Japan, WK1 Ver.A)             F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK1
 World Kicks (Asia, WK2 Ver.A)              F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2
 World Kicks (US, WK3 Ver.A)                F2    25209801  2 (64Mb)   9 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3
 
@@ -6299,6 +6304,28 @@ ROM_START( gunsur2 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000680d0" )
 ROM_END
 
+ROM_START( wldkicksj )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "wk1vera.2d",  0x0800000, 0x800000, CRC(eb4d7fe1) SHA1(14378c3f6926b7709902a3073ed4274c7ac5ead8) )
+	ROM_LOAD( "wk2vera.2c",  0x1000000, 0x800000, CRC(ad2577d5) SHA1(f7b6bab001c5f5cf0b33a70cd0dfdca8f7d25921) )
+
+	ROM_LOAD( "wk1ma2.4m",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
+	ROM_LOAD( "wk1ma3.4l",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
+	ROM_LOAD( "wk1ma4.4k",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
+	ROM_LOAD( "wk1ma5.4j",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
+	ROM_LOAD( "wk1ma6.4h",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
+	ROM_LOAD( "wk1ma7.4f",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
+	ROM_LOAD( "wk1ma8.4e",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
+	ROM_LOAD( "wk1ma9.4d",   0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
+	ROM_LOAD( "wk1ma10.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
+
+	// 25209801    2000     317-5040-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "052e2901" )
+ROM_END
+
 ROM_START( wldkicksa )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -6343,7 +6370,7 @@ ROM_START( wldkicks )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "052e2901" )
 ROM_END
 
-ROM_START( wldkicksj )
+ROM_START( wldkickspj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -9733,18 +9760,19 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* HMG016007 */  GAME( 2001, hmgeo,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Heavy Metal Geomatrix (Rev B)", GAME_FLAGS )
 
 /* Cart games on Namco custom ROM board */
-/* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Asia, WK2 Ver.A)", GAME_FLAGS )
-/* 25209801 */ GAME( 2000, wldkicks, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (US, WK3 Ver.A)", GAME_FLAGS )
-/* 25349801 */ GAME( 2000, toukon4,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (Japan, TRF1 Ver.A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjasltj,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Japan, NJA1 Ver.A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslta,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Asia, NJA2 Ver.A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjasltu,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (US, NJA3 Ver.A)", GAME_FLAGS )
-/* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (World, NJA4 Ver.A)", GAME_FLAGS )
-/* 25509801 */ GAME( 2000, wldkicksj,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )    // "PCB" means upright version, uses analog button on control panel to kick the ball
-/* 25709801 */ GAME( 2001, gunsur2j, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
-/* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)", GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazana,   mazan,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)", GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazan,    naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (US, MAZ3 Ver.A)", GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicksj,  wldkicks, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Japan, WK1 Ver.A)", GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicksa,  wldkicks, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Asia, WK2 Ver.A)", GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicks,   naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (US, WK3 Ver.A)", GAME_FLAGS )
+/* 25349801 */ GAME( 2000, toukon4,    naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (Japan, TRF1 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjasltj,  ninjaslt, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Japan, NJA1 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjaslta,  ninjaslt, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (Asia, NJA2 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjasltu,  ninjaslt, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (US, NJA3 Ver.A)", GAME_FLAGS )
+/* 25469801 */ GAME( 2000, ninjaslt,   naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Ninja Assault (World, NJA4 Ver.A)", GAME_FLAGS )
+/* 25509801 */ GAME( 2000, wldkickspj, wldkicks, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks PCB (Japan, WKC1 Ver.A)", GAME_FLAGS )    // "PCB" means upright version, uses analog button on control panel to kick the ball
+/* 25709801 */ GAME( 2001, gunsur2j,   gunsur2,  naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
+/* 25709801 */ GAME( 2001, gunsur2,    naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazana,     mazan,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazan,      naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (US, MAZ3 Ver.A)", GAME_FLAGS )
 
 /* GDS-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2000, confmiss, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_FLAGS )
