@@ -25,7 +25,7 @@ protected:
 		NOP,
 		POP, PUSH,
 		RET, RETI, RETN, ROLC, ROLD, RORC, RORD,
-		SET, SHLC, SHRC,SWAP, SWI,
+		SET, SHLC, SHRC, SWAP, SWI,
 		/*TEST,*/ XCH,
 
 		ALU_ADDC,
@@ -74,6 +74,17 @@ protected:
 		DEBUGGER_REG_BC,
 		DEBUGGER_REG_DE,
 		DEBUGGER_REG_HL
+	};
+
+	enum _conditions {
+		COND_EQ_Z,
+		COND_NE_NZ,
+		COND_LT_CS,
+		COND_GE_CC,
+		COND_LE,
+		COND_GT,
+		COND_T,
+		COND_F
 	};
 
 	uint32_t m_debugger_temp;

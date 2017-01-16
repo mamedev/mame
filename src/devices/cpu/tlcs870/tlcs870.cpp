@@ -1050,8 +1050,8 @@ void tlcs870_device::decode()
 		// JP mn
 		m_op = JP;
 
-		m_param1_type = ABSOLUTE_VAL_16;
-		m_param1 = READ16();
+		m_param2_type = ABSOLUTE_VAL_16;
+		m_param2 = READ16();
 
 		break;
 
@@ -2200,8 +2200,8 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0xfe:
 		// JP (src)
 		m_op = JP;
-		m_param1_type = type;
-		m_param1 = val;
+		m_param2_type = type | IS16BIT;
+		m_param2 = val;
 		break;
 
 	case 0xff:
@@ -2682,11 +2682,86 @@ void tlcs870_device::execute_run()
 			break;
 		*/
 		case JP:
-			break;
 		case JR:
-			break;
 		case JRS:
+		{
+			bool takejump = true;
+
+			if (m_param1_type == CONDITIONAL)
+			{
+				switch (m_param1)
+				{
+				case COND_EQ_Z:
+					if (IS_ZF == 1) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_NE_NZ:
+					if (IS_ZF == 0) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_LT_CS:
+					if (IS_CF == 1) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_GE_CC:
+					if (IS_CF == 0) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_LE:
+					if ((IS_CF || IS_ZF) == 1) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_GT:
+					if ((IS_CF || IS_ZF) == 0) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_T:
+					if (IS_JF == 1) takejump = true;
+					else takejump = false;
+					break;
+
+				case COND_F:
+					if (IS_JF == 0) takejump = true;
+					else takejump = false;
+					break;
+
+				}
+			}
+
+			if (takejump)
+			{
+				// would the address / register be read even if the jump isn't going to be taken?
+				uint16_t addr = 0x0000;
+				uint16_t val = 0;
+				if (m_param2_type & ADDR_IN_BASE)
+				{
+					addr = get_addr(m_param2_type,m_param2);
+					if (m_param2_type & IS16BIT)
+						val = RM16(addr);
+					else
+					{
+						fatalerror("8-bit jump destination?");
+						//	val = RM8(addr);
+					}
+				}
+				else
+				{
+					val = get_source_val(m_param2_type,m_param2);
+				}
+
+				m_pc.d = val;
+			}
+			
+			SET_JF;
+
 			break;
+		}
 		case LD:
 		{
 			if ((m_param1_type & BITPOS) || (m_param2_type & BITPOS))
