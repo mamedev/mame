@@ -204,7 +204,7 @@ private:
 	void decode_source(int type, uint16_t val);
 	void decode_dest(uint8_t b0);
 
-	void setbit_param(uint16_t param_type, uint16_t param, uint8_t bit);
+	void setbit_param(uint16_t param_type, uint16_t param, uint8_t bit, bool do_flag);
 	uint8_t getbit_param(uint16_t param_type, uint16_t param);
 
 	uint16_t get_addr(uint16_t param_type, uint16_t param_val);

@@ -2471,7 +2471,7 @@ uint16_t tlcs870_device::get_source_val(uint16_t param_type, uint16_t param_val)
 	return ret_val;
 }
 
-void tlcs870_device::setbit_param(uint16_t param_type, uint16_t param, uint8_t bit)
+void tlcs870_device::setbit_param(uint16_t param_type, uint16_t param, uint8_t bit, bool do_flag)
 {
 	if (param_type & BITPOS)
 	{
@@ -2506,9 +2506,27 @@ void tlcs870_device::setbit_param(uint16_t param_type, uint16_t param, uint8_t b
 
 		// MODIFY
 		int bitused = (1 << bitpos);
+
+		// this is the flag behavior for the set/clr bit opcodes
+		if (do_flag)
+		{
+			int existingbit = (val & bitused);
+			if (existingbit)
+			{
+				CLEAR_ZF;
+				CLEAR_JF; // 'Z' (so copy Z flag?)
+			}
+			else
+			{
+				SET_ZF;
+				SET_JF;  // 'Z'
+			}
+		}
+
+
 		bit ? (val |= bitused) : (val &= ~bitused);
 
-		printf("bit to set is %d, value is %02x", bitused, val);
+		//printf("bit to set is %d, value is %02x", bitused, val);
 
 		// WRITE
 		if (param_type & ADDR_IN_BASE)
@@ -2603,19 +2621,22 @@ void tlcs870_device::execute_run()
 		case CLR:
 			if ((m_param1_type & BITPOS))
 			{
-				printf("clr on bit\n");
+				//printf("clr on bit\n");
 
 				if (m_param1_type == CARRYFLAG)
 				{
 					CLEAR_CF;
+					SET_JF;
 				}
 				else
 				{
-					setbit_param(m_param1_type, m_param1, 0);
+					setbit_param(m_param1_type, m_param1, 0, true);
 				}
 			}
 			else
 			{
+				// grouped with the LD operations in the manual but with CLR name, so probably internally just calling LD with 0 value
+
 				uint16_t addr = 0x0000;
 				uint16_t val = 0;
 
@@ -2631,7 +2652,7 @@ void tlcs870_device::execute_run()
 				{
 					set_dest_val(m_param1_type,m_param1, val);
 				}
-
+				SET_JF;
 			}
 			break;
 
@@ -2677,7 +2698,7 @@ void tlcs870_device::execute_run()
 				{
 					bit = IS_CF;
 
-					setbit_param(m_param1_type,m_param1,bit);
+					setbit_param(m_param1_type,m_param1,bit, false);
 				
 					// for this type of operation ( LD *.b, CF ) the Jump Flag always ends up being 1
 					SET_JF;
@@ -2768,21 +2789,24 @@ void tlcs870_device::execute_run()
 		case SET:
 			if ((m_param1_type & BITPOS))
 			{
-				printf("set on bit\n");
+				//printf("set on bit\n");
 
 				if (m_param1_type == CARRYFLAG)
 				{
 					SET_CF;
+					CLEAR_JF;
 				}
 				else
 				{
-					printf("set with setbit_param\n");
+					//printf("set with setbit_param\n");
 
-					setbit_param(m_param1_type, m_param1, 1);
+					setbit_param(m_param1_type, m_param1, 1, true);
 				}
 			}
 			else
 			{
+				fatalerror("all SET opcode should be bit operations\n");
+				/*
 				uint16_t addr = 0x0000;
 				uint16_t val = 1;
 
@@ -2798,6 +2822,7 @@ void tlcs870_device::execute_run()
 				{
 					set_dest_val(m_param1_type,m_param1, val);
 				}
+				*/
 
 			}
 			break;
