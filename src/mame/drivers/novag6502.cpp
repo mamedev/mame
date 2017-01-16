@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag6502_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
 
 	/* sound hardware */
@@ -864,8 +864,8 @@ ROM_END
 
 ROM_START( cforteb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("forte_b_l.u3", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
-	ROM_LOAD("forte_b_h.u1", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
+	ROM_LOAD("forte_b_l.bin", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
+	ROM_LOAD("forte_b_h.bin", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
 ROM_END
 
 

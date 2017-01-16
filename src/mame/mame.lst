@@ -29221,6 +29221,9 @@ sforteb                         //
 sfortec                         //
 supercon                        //
 
+@source:novag68k.cpp
+diablo68                        //
+
 @source:nsm.cpp
 firebird                        //
 
