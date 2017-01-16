@@ -2,9 +2,9 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    cop440ds.c
+    cop444ds.c
 
-    National Semiconductor COP440 Emulator.
+    National Semiconductor COP444 Emulator.
 
 ***************************************************************************/
 

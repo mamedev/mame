@@ -48,12 +48,11 @@
 
     TODO:
 
-    - opcode support for 2048x8 and 128x4/160x4 memory sizes
+    - COP444/445 opcode support for 2048x8 and 128x4 memory size
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
     - COP413/COP414/COP415/COP405
     - COP404 opcode map switching, dual timer, microbus enable
-    - COP440/COP441/COP442 (new registers: 2-bit N, 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
 
 */
 
@@ -152,12 +151,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( data_128b, AS_DATA, 8, cop400_cpu_device )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
-
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( data_160b, AS_DATA, 8, cop400_cpu_device )
-	AM_RANGE(0x00, 0x9f) AM_RAM
-ADDRESS_MAP_END
-#endif
 
 
 cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
@@ -823,25 +816,7 @@ void cop400_cpu_device::serial_tick()
 
 void cop400_cpu_device::counter_tick()
 {
-	if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
-	{
-		T++;
-
-		if (T == 0)
-		{
-			m_skt_latch = 1;
-
-			if (m_idle)
-			{
-				m_idle = 0;
-				m_halt = 0;
-			}
-		}
-	}
-	else
-	{
-		m_skt_latch = 1;
-	}
+	m_skt_latch = 1;
 }
 
 void cop400_cpu_device::inil_tick()
@@ -918,15 +893,7 @@ void cop400_cpu_device::device_start()
 	if (m_has_counter)
 	{
 		m_counter_timer = timer_alloc(TIMER_COUNTER);
-
-		if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
-		{
-			m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
-		}
-		else
-		{
-			m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 1024, clock()));
-		}
+		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 1024, clock()));
 	}
 
 	/* allocate IN latch timer */
@@ -942,7 +909,6 @@ void cop400_cpu_device::device_start()
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prevpc));
-	save_item(NAME(m_n));
 	save_item(NAME(m_sa));
 	save_item(NAME(m_sb));
 	save_item(NAME(m_sc));
@@ -950,9 +916,7 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
 	save_item(NAME(m_g));
-	save_item(NAME(m_h));
 	save_item(NAME(m_q));
-	save_item(NAME(m_r));
 	save_item(NAME(m_en));
 	save_item(NAME(m_sio));
 	save_item(NAME(m_skl));
@@ -968,7 +932,6 @@ void cop400_cpu_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_n).mask(0x3).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).mask(0x3).callimport().callexport().noshow().formatstr("%3s");
 
 	state_add(COP400_PC,       "PC",        m_pc).mask(0xfff);
@@ -982,10 +945,6 @@ void cop400_cpu_device::device_start()
 			state_add(COP400_SC, "SC",      m_sc).mask(0xfff);
 		}
 	}
-	if (m_featuremask & COP440_FEATURE)
-	{
-		state_add(COP400_N,    "N",         m_n).mask(0x3);
-	}
 
 	state_add(COP400_A,        "A",         m_a).mask(0xf);
 	state_add(COP400_B,        "B",         m_b);
@@ -993,34 +952,18 @@ void cop400_cpu_device::device_start()
 
 	state_add(COP400_EN,       "EN",        m_en).mask(0xf);
 	state_add(COP400_G,        "G",         m_g).mask(0xf);
-	if (m_featuremask & COP440_FEATURE)
-	{
-		state_add(COP400_H,    "H",         m_h).mask(0xf);
-	}
 	state_add(COP400_Q,        "Q",         m_q);
-	if (m_featuremask & COP440_FEATURE)
-	{
-		state_add(COP400_R,    "R",         m_r);
-	}
 
 	state_add(COP400_SIO,      "SIO",       m_sio).mask(0xf);
 	state_add(COP400_SKL,      "SKL",       m_skl).mask(0x1);
 
-	if (m_featuremask & (COP444_FEATURE | COP440_FEATURE))
-	{
-		state_add(COP400_T,    "T",         m_t);
-	}
-
 	m_icountptr = &m_icount;
 
-	m_n = 0;
 	m_q = 0;
 	m_sa = 0;
 	m_sb = 0;
 	m_sc = 0;
 	m_sio = 0;
-	m_h = 0;
-	m_r = 0;
 	m_flags = 0;
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;

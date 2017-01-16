@@ -64,18 +64,14 @@ enum
 	COP400_SA,
 	COP400_SB,
 	COP400_SC,
-	COP400_N,
 	COP400_A,
 	COP400_B,
 	COP400_C,
 	COP400_G,
-	COP400_H,
 	COP400_Q,
-	COP400_R,
 	COP400_EN,
 	COP400_SIO,
-	COP400_SKL,
-	COP400_T
+	COP400_SKL
 };
 
 /* input lines */
@@ -194,8 +190,7 @@ protected:
 	enum {
 		COP410_FEATURE = 0x01,
 		COP420_FEATURE = 0x02,
-		COP444_FEATURE = 0x04,
-		COP440_FEATURE = 0x08
+		COP444_FEATURE = 0x04
 	};
 
 	enum {
@@ -223,15 +218,12 @@ protected:
 	uint8_t   m_a;              /* 4-bit accumulator */
 	uint8_t   m_b;              /* 5/6/7-bit RAM address register */
 	int     m_c;              /* 1-bit carry register */
-	uint8_t   m_n;              /* 2-bit stack pointer (COP440 only) */
 	uint8_t   m_en;             /* 4-bit enable register */
 	uint8_t   m_g;              /* 4-bit general purpose I/O port */
 	uint8_t   m_q;              /* 8-bit latch for L port */
-	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers (not present in COP440) */
+	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
 	uint8_t   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
-	uint8_t   m_h;              /* 4-bit general purpose I/O port (COP440 only) */
-	uint8_t   m_r;              /* 8-bit general purpose I/O port (COP440 only) */
 	uint8_t   m_flags;          // used for I/O only
 
 	/* counter */

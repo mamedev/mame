@@ -425,7 +425,7 @@ end
 if (CPUS["COP400"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop410ds.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop420ds.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop440ds.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop444ds.cpp")
 end
 
 --------------------------------------------------
