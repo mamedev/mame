@@ -52,6 +52,9 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
+	// for devices with timing-sensitive peripherals
+	virtual void burn_cycles(unsigned count) { }
+
 private:
 	// opcode/condition tables
 	static const uint8_t m_flags8i[256];

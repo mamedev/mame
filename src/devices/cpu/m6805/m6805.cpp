@@ -235,6 +235,7 @@ void m6805_base_device::interrupt()
 		m_pending_interrupts &= ~(1 << HD63705_INT_NMI);
 
 		m_icount -= 11;
+		burn_cycles(11);
 	}
 	else if((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0)
 	{
@@ -254,6 +255,7 @@ void m6805_base_device::interrupt()
 			m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
 		}
 		m_icount -= 11;
+		burn_cycles(11);
 	}
 }
 
@@ -498,9 +500,9 @@ void m6805_base_device::execute_run()
 
 		debugger_instruction_hook(this, PC);
 
-		ireg=M_RDOP(PC++);
+		ireg = M_RDOP(PC++);
 
-		switch( ireg )
+		switch (ireg)
 		{
 			case 0x00: brset(0x01); break;
 			case 0x01: brclr(0x01); break;
@@ -764,7 +766,9 @@ void m6805_base_device::execute_run()
 			case 0xff: stx_ix(); break;
 		}
 		m_icount -= m_cycles1[ireg];
-	} while( m_icount > 0 );
+		burn_cycles(m_cycles1[ireg]);
+	}
+	while (m_icount > 0);
 }
 
 /****************************************************************************

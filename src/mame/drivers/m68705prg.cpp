@@ -22,7 +22,8 @@
  * When programming is complete, the "Programmed" LED will be lit.  When
  * verification is complete, the "Verified" LED will be lit.  If
  * verification fails, the program stops and the "Address" digits show
- * the address one past the location that failed.
+ * the address one past the location that failed for P3/P5, or the
+ * location that failed for R3/U3.
  */
 #include "emu.h"
 

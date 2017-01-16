@@ -244,6 +244,9 @@ m68705_new_device::m68705_new_device(
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_cb_r{ { *this }, { *this }, { *this }, { *this } }
 	, m_port_cb_w{ { *this }, { *this }, { *this }, { *this } }
+	, m_prescaler(0x7f)
+	, m_tdr(0xff)
+	, m_tcr(0x7f)
 	, m_vihtp(CLEAR_LINE)
 	, m_pcr(0xff)
 	, m_pl_data(0xff)
@@ -254,15 +257,15 @@ m68705_new_device::m68705_new_device(
 template <offs_t B> READ8_MEMBER(m68705_new_device::eprom_r)
 {
 	// read locked out when /VPON and /PLE are asserted
-	return (BIT(m_pcr, 2) || BIT(m_pcr, 0)) ? m_user_rom[B + offset] : 0xff;
+	return (!pcr_vpon() || !pcr_ple()) ? m_user_rom[B + offset] : 0xff;
 }
 
 template <offs_t B> WRITE8_MEMBER(m68705_new_device::eprom_w)
 {
 	// programming latch enabled when /VPON and /PLE are asserted
-	if (!BIT(m_pcr, 2) && !BIT(m_pcr, 0))
+	if (pcr_vpon() && pcr_ple())
 	{
-		if (BIT(m_pcr, 1))
+		if (!pcr_pge())
 		{
 			m_pl_data = data;
 			m_pl_addr = B + offset;
@@ -317,6 +320,65 @@ template <std::size_t N> void m68705_new_device::port_cb_w()
 	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
 }
 
+READ8_MEMBER(m68705_new_device::tdr_r)
+{
+	return m_tdr;
+}
+
+WRITE8_MEMBER(m68705_new_device::tdr_w)
+{
+	m_tdr = data;
+}
+
+READ8_MEMBER(m68705_new_device::tcr_r)
+{
+	// in MOR controlled mode, only TIR, TIM and TOPT are visible
+	return m_tcr | (tcr_topt() ? 0x37 : 0x00);
+}
+
+WRITE8_MEMBER(m68705_new_device::tcr_w)
+{
+	// 7  TIR   RW  Timer Interrupt Request Status
+	// 6  TIM   RW  Timer Interrupt Mask
+	// 5  TIN   RW  Timer Input Select
+	// 4  TIE   RW  Timer External Input Enable
+	// 3  TOPT  R   Timer Mask/Programmable Option
+	// 3  PSC    W  Prescaler Clear
+	// 2  PS2   RW  Prescaler Option
+	// 1  PS1   RW  Prescaler Option
+	// 0  PS0   RW  Prescaler Option
+
+	// TIN  TIE  CLOCK
+	//  0    0   Internal Clock (phase 2)
+	//  0    1   Gated (AND) of External and Internal Clocks
+	//  1    0   No Clock
+	//  1    1   External Clock
+
+	// in MOR controlled mode, TIN/PS2/PS1/PS0 are loaded from MOR on reset and TIE is always 1
+	// in MOR controlled mode, TIN, TIE, PS2, PS1, and PS0 always read as 1
+
+	// TOPT isn't a real bit in this register, it's a pass-through to the MOR register
+	// it's theoretically possible to get into a weird state by writing to the MOR while running
+	// for simplicity, we don't emulate this - we just check the MOR on initialisation and reset
+
+	if (tcr_topt())
+	{
+		m_tcr = (m_tcr & 0x3f) | (data & 0xc0);
+	}
+	else
+	{
+		if (BIT(data, 3))
+			m_prescaler = 0;
+		m_tcr = (m_tcr & 0x08) | (data & 0xf7);
+	}
+
+	// TODO: this is tied up with /INT2 on R/U devices
+	if (tcr_tir() && !tcr_tim())
+		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
+	else
+		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
+}
+
 READ8_MEMBER(m68705_new_device::misc_r)
 {
 	logerror("unsupported read MISC\n");
@@ -348,7 +410,7 @@ WRITE8_MEMBER(m68705_new_device::pcr_w)
 	data |= ((data & 0x01) << 1);
 
 	// write EPROM if /PGE is asserted (erase requires UV so don't clear bits)
-	if (!BIT(m_pcr, 2) && (0x20 & ((m_pcr ^ data) & ~data)))
+	if (pcr_vpon() && !pcr_pge() && !BIT(data, 1))
 		m_user_rom[m_pl_addr] |= m_pl_data;
 
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
@@ -399,132 +461,62 @@ WRITE8_MEMBER(m68705_new_device::arr_w)
 	logerror("unsupported write ARR = %02X\n", data);
 }
 
-READ8_MEMBER(m68705_new_device::internal_68705_tdr_r)
-{
-	//logerror("internal_68705 TDR read, returning %02X\n", m_tdr);
-	return m_tdr;
-}
-
-WRITE8_MEMBER(m68705_new_device::internal_68705_tdr_w)
-{
-	//logerror("internal_68705 TDR written with %02X, was %02X\n", data, m_tdr);
-	m_tdr = data;
-}
-
-
-READ8_MEMBER(m68705_new_device::internal_68705_tcr_r)
-{
-	//logerror("internal_68705 TCR read, returning %02X\n", (m_tcr&0xF7));
-	return (m_tcr & 0xF7);
-}
-
-WRITE8_MEMBER(m68705_new_device::internal_68705_tcr_w)
-{
-/*
-    logerror("internal_68705 TCR written with %02X\n", data);
-    if (data&0x80) logerror("  TIR=1, Timer Interrupt state is set\n"); else logerror("  TIR=0; Timer Interrupt state is cleared\n");
-    if (data&0x40) logerror("  TIM=1, Timer Interrupt is now masked\n"); else logerror("  TIM=0, Timer Interrupt is now unmasked\n");
-    if (data&0x20) logerror("  TIN=1, Timer Clock source is set to external\n"); else logerror("  TIN=0, Timer Clock source is set to internal\n");
-    if (data&0x10) logerror("  TIE=1, Timer External pin is enabled\n"); else logerror("  TIE=0, Timer External pin is disabled\n");
-    if (data&0x08) logerror("  PSC=1, Prescaler counter cleared\n"); else logerror("  PSC=0, Prescaler counter left alone\n");
-    logerror("  Prescaler: %d\n", (1<<(data&0x7)));
-*/
-	// if timer was enabled but now isn't, shut it off.
-	// below is a hack assuming the TIMER pin isn't going anywhere except tied to +5v, so basically TIN is acting as an active-low timer enable, and TIE is ignored even in the case where TIE=1, the timer will end up being 5v ANDED against the internal timer clock which == the internal timer clock.
-	// Note this hack is incorrect; the timer pin actually does connect somewhere (vblank or maybe one of the V counter bits?), but the game never actually uses the timer pin in external clock mode, so the TIMER connection must be left over from development. We can apparently safely ignore it.
-	if ((m_tcr^data)&0x20)// check if TIN state changed
-	{
-		/* logerror("timer enable state changed!\n"); */
-		if (data&0x20) m_68705_timer->adjust(attotime::never, TIMER_68705_PRESCALER_EXPIRED);
-		else m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
-	}
-	// prescaler check: if timer prescaler has changed, or the PSC bit is set, adjust the timer length for the prescaler expired timer, but only if the timer would be running
-	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) )
-	{
-		/* logerror("timer reset due to PSC or prescaler change!\n"); */
-		m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
-	}
-	m_tcr = data;
-	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
-	if ((m_tcr&0xC0) == 0x80)
-		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
-
-}
-
-TIMER_CALLBACK_MEMBER(m68705_new_device::timer_68705_increment)
-{
-	m_tdr++;
-	if (m_tdr == 0x00) m_tcr |= 0x80; // if we overflowed, set the int bit
-	if ((m_tcr&0xC0) == 0x80)
-		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
-	m_68705_timer->adjust(attotime::from_hz((clock() / 4) / (1 << (m_tcr & 0x07))), TIMER_68705_PRESCALER_EXPIRED);
-}
-
-void m68705_new_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_68705_PRESCALER_EXPIRED:
-		timer_68705_increment(ptr, param);
-		break;
-	default:
-		m68705_device::device_timer(timer, id, param, ptr);
-	}
-}
-
 void m68705_new_device::device_start()
 {
 	m68705_device::device_start();
 
-	save_item(NAME(m_tdr));
-	save_item(NAME(m_tcr));
-
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_ddr));
+
+	save_item(NAME(m_prescaler));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_tcr));
 
 	save_item(NAME(m_vihtp));
 	save_item(NAME(m_pcr));
 	save_item(NAME(m_pl_data));
 	save_item(NAME(m_pl_addr));
 
+	// initialise digital I/O
 	for (u8 &input : m_port_input) input = 0xff;
 	for (devcb_read8 &cb : m_port_cb_r) cb.resolve();
 	for (devcb_write8 &cb : m_port_cb_w) cb.resolve_safe();
 
+	// initialise timer/counter
+	u8 const options(get_mask_options());
+	m_tcr = 0x40 | (options & 0x37);
+	if (BIT(options, 6))
+		m_tcr |= 0x18;
+
+	// initialise EPROM control
 	m_vihtp = CLEAR_LINE;
 	m_pcr = 0xff;
 	m_pl_data = 0xff;
 	m_pl_addr = 0xffff;
-
-	// allocate the MCU timer, and set it to fire NEVER.
-	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68705_new_device::timer_68705_increment),this));
-	m_68705_timer->adjust(attotime::never);
 }
 
 void m68705_new_device::device_reset()
 {
 	m68705_device::device_reset();
 
-	if (CLEAR_LINE != m_vihtp)
-		RM16(0xfff6, &m_pc);
-
+	// reset digital I/O
 	port_ddr_w<0>(space(AS_PROGRAM), 0, 0x00, 0xff);
 	port_ddr_w<1>(space(AS_PROGRAM), 0, 0x00, 0xff);
 	port_ddr_w<2>(space(AS_PROGRAM), 0, 0x00, 0xff);
 	port_ddr_w<3>(space(AS_PROGRAM), 0, 0x00, 0xff);
 
+	// reset timer/counter
+	u8 const options(get_mask_options());
+	m_prescaler = 0x7f;
+	m_tdr = 0xff;
+	m_tcr = BIT(options, 6) ? (0x58 | (options & 0x27)) : (0x40 | (m_tcr & 0x37));
+
+	// reset EPROM control
 	m_pcr |= 0xfb; // b2 (/VPON) is driven by external input and hence unaffected by reset
 
-	m_tdr = 0xff;
-	m_tcr = 0xff;
-
-	//set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-	m_68705_timer->adjust(attotime::from_hz((clock() / 4) / (1 << 7)));
+	if (CLEAR_LINE != m_vihtp)
+		RM16(0xfff6, &m_pc);
 }
 
 void m68705_new_device::execute_set_input(int inputnum, int state)
@@ -532,10 +524,7 @@ void m68705_new_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case M68705_VPP_LINE:
-		if (ASSERT_LINE == state)
-			m_pcr &= 0xfb;
-		else
-			m_pcr |= 0x04;
+		m_pcr = (m_pcr & 0xfb) | ((ASSERT_LINE == state) ? 0x00 : 0x04);
 		break;
 	case M68705_VIHTP_LINE:
 		// TODO: this is actually the same physical pin as the timer input, so they should be tied up
@@ -560,6 +549,26 @@ void m68705_new_device::nvram_write(emu_file &file)
 	file.write(&m_user_rom[0], m_user_rom.bytes());
 }
 
+void m68705_new_device::burn_cycles(unsigned count)
+{
+	// handle internal timer/counter source
+	if (!tcr_tin()) // TODO: check tcr_tie() and gate on TIMER if appropriate
+	{
+		unsigned const ps_opt(tcr_ps());
+		unsigned const ps_mask((1 << ps_opt) - 1);
+		unsigned const decrements((count + (m_prescaler & ps_mask)) >> ps_opt);
+
+		if (decrements && (decrements >= m_tdr))
+		{
+			m_tcr |= 0x80;
+			if (!tcr_tim())
+				set_input_line(M68705_INT_TIMER, ASSERT_LINE);
+		}
+		m_prescaler = (count + m_prescaler) & 0x7f;
+		m_tdr = (m_tdr - decrements) & 0xff;
+	}
+}
+
 
 /****************************************************************************
  * M68705Px family
@@ -577,8 +586,8 @@ DEVICE_ADDRESS_MAP_START( p_map, 8, m68705p_device )
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
 	// 0x0007 not used (no port D)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
 	// 0x000a not used
 	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
 	// 0x000c-0x000f not used
@@ -631,8 +640,8 @@ DEVICE_ADDRESS_MAP_START( u_map, 8, m68705u_device )
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
 	// 0x0007 not used (port D is input only)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
 	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
 	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
 	// 0x000c-0x000f not used
@@ -698,8 +707,8 @@ DEVICE_ADDRESS_MAP_START( r_map, 8, m68705r_device )
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(port_ddr_w<1>)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(port_ddr_w<2>)
 	// 0x0007 not used (port D is input only)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(tdr_r, tdr_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(tcr_r, tcr_w)
 	AM_RANGE(0x000a, 0x000a) AM_READWRITE(misc_r, misc_w)
 	AM_RANGE(0x000b, 0x000b) AM_READWRITE(pcr_r, pcr_w)
 	// 0x000c-0x000d not used
@@ -750,6 +759,11 @@ tiny_rom_entry const *m68705p3_device::device_rom_region() const
 	return ROM_NAME(m68705p3);
 }
 
+u8 m68705p3_device::get_mask_options() const
+{
+	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+}
+
 
 /****************************************************************************
  * M68705P5 device
@@ -763,6 +777,11 @@ m68705p5_device::m68705p5_device(machine_config const &mconfig, char const *tag,
 tiny_rom_entry const *m68705p5_device::device_rom_region() const
 {
 	return ROM_NAME(m68705p5);
+}
+
+u8 m68705p5_device::get_mask_options() const
+{
+	return get_user_rom()[0x0784];
 }
 
 
@@ -780,6 +799,11 @@ tiny_rom_entry const *m68705r3_device::device_rom_region() const
 	return ROM_NAME(m68705r3);
 }
 
+u8 m68705r3_device::get_mask_options() const
+{
+	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+}
+
 
 /****************************************************************************
  * M68705U3 device
@@ -793,4 +817,9 @@ m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag,
 tiny_rom_entry const *m68705u3_device::device_rom_region() const
 {
 	return ROM_NAME(m68705u3);
+}
+
+u8 m68705u3_device::get_mask_options() const
+{
+	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
 }

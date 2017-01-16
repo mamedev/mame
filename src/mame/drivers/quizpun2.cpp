@@ -82,11 +82,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m6805/m68705.h"
-#include "machine/gen_latch.h"
+#include "cpu/z80/z80.h"
+
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
+
 #include "sound/2203intf.h"
+
 
 // very preliminary quizpun2 protection simulation
 
@@ -150,7 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER(quizpun2_protection_w);
 
 	// quizpun
-	uint8_t m_port_a, m_port_b, m_port_c;
+	uint8_t m_port_a, m_port_b;
 	bool m_quizpun_pending;
 	bool m_quizpun_written;
 	bool m_quizpun_repeat;
@@ -269,7 +273,7 @@ void quizpun2_state::machine_reset()
 	m_prot.addr = 0;
 
 	// quizpun
-	m_port_a = m_port_b = m_port_c = 0;
+	m_port_a = m_port_b = 0;
 	m_quizpun_pending = m_quizpun_written = m_quizpun_repeat = false;
 }
 
@@ -529,10 +533,11 @@ READ8_MEMBER(quizpun2_state::quizpun_68705_port_b_r)
 	// bit 1: 0 = main cpu has written
 	// bit 0: 0 = main cpu is reading
 
-	uint8_t ret = m_port_b & 0xf4;
-	ret |=  (    m_quizpun_pending                          ? 0 : (1 << 3)) |
-			(   (m_quizpun_pending &&  m_quizpun_written)   ? 0 : (1 << 1)) |
-			(   (m_quizpun_pending && !m_quizpun_written)   ? 0 : (1 << 0)) ;
+	uint8_t const ret =
+			0xf4 |
+			( m_quizpun_pending                        ? 0 : (1 << 3)) |
+			((m_quizpun_pending &&  m_quizpun_written) ? 0 : (1 << 1)) |
+			((m_quizpun_pending && !m_quizpun_written) ? 0 : (1 << 0));
 
 //  logerror("%s: port B read %02x\n", machine().describe_context(), ret);
 	return ret;
@@ -544,7 +549,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_b_w)
 
 	// bit 2: 0->1 run main cpu
 
-	if (!(m_port_b & 0x04) && (data & 0x04))
+	if (!BIT(m_port_b, 2) && BIT(data, 2))
 	{
 		m_quizpun_pending = false;
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -556,8 +561,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_b_w)
 
 READ8_MEMBER(quizpun2_state::quizpun_68705_port_c_r)
 {
-	uint8_t ret = m_port_c & 0xf7;
-	ret |= m_eeprom->do_read() ? 0x08 : 0;
+	uint8_t const ret = 0xf7 | (m_eeprom->do_read() ? 0x08 : 0x00);
 //  logerror("%s: port C read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -565,32 +569,16 @@ READ8_MEMBER(quizpun2_state::quizpun_68705_port_c_r)
 WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
 {
 	// latch the bit
-	m_eeprom->di_write((data & 0x04) >> 2);
+	m_eeprom->di_write(BIT(data, 2));
 
 	// reset line asserted: reset.
-	m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
 //  logerror("%s: port C write %02x\n", machine().describe_context(), data);
-	m_port_c = data;
 }
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, quizpun2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-
-	AM_RANGE(0x000, 0x000) AM_READWRITE(quizpun_68705_port_a_r, quizpun_68705_port_a_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(quizpun_68705_port_b_r, quizpun_68705_port_b_w)
-	AM_RANGE(0x002, 0x002) AM_READWRITE(quizpun_68705_port_c_r, quizpun_68705_port_c_w)
-
-	AM_RANGE(0x004, 0x004) AM_NOP // DDR A
-	AM_RANGE(0x005, 0x005) AM_NOP // DDR B
-	AM_RANGE(0x006, 0x006) AM_NOP // DDR C
-
-	AM_RANGE(0x010, 0x07f) AM_RAM
-	AM_RANGE(0x080, 0x7ff) AM_ROM
-ADDRESS_MAP_END
 
 /***************************************************************************
                             Memory Maps - Sound CPU
@@ -731,8 +719,13 @@ static MACHINE_CONFIG_DERIVED( quizpun, quizpun2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(quizpun_io_map)
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
+	MCFG_M68705_PORTA_R_CB(READ8(quizpun2_state, quizpun_68705_port_a_r))
+	MCFG_M68705_PORTB_R_CB(READ8(quizpun2_state, quizpun_68705_port_b_r))
+	MCFG_M68705_PORTC_R_CB(READ8(quizpun2_state, quizpun_68705_port_c_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_b_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(quizpun2_state, quizpun_68705_port_c_w))
 MACHINE_CONFIG_END
 
 /***************************************************************************
