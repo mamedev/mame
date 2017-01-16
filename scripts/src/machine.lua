@@ -260,10 +260,10 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/68561mpcc.h,MACHINES += 68561MPCC
+--@src/devices/machine/68561mpcc.h,MACHINES["MPCC68561"] = true
 ---------------------------------------------------
 
-if (MACHINES["68561MPCC"]~=null) then
+if (MACHINES["MPCC68561"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/68561mpcc.cpp",
 		MAME_DIR .. "src/devices/machine/68561mpcc.h",
