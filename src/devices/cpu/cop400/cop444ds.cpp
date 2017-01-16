@@ -62,15 +62,15 @@ CPU_DISASSEMBLE(cop444)
 	{
 		util::stream_format(stream, "AISC %u", opcode & 0xF);
 	}
-	else if (opcode >= 0x60 && opcode <= 0x63)
+	else if (opcode >= 0x60 && opcode <= 0x67)
 	{
-		address = ((opcode & 0x03) << 8) | next_opcode;
+		address = ((opcode & 0x07) << 8) | next_opcode;
 		util::stream_format(stream, "JMP %03x", address);
 		bytes = 2;
 	}
-	else if (opcode >= 0x68 && opcode <= 0x6B)
+	else if (opcode >= 0x68 && opcode <= 0x6f)
 	{
-		address = ((opcode & 0x03) << 8) | next_opcode;
+		address = ((opcode & 0x07) << 8) | next_opcode;
 		util::stream_format(stream, "JSR %03x", address);
 		flags = DASMFLAG_STEP_OVER;
 		bytes = 2;
@@ -162,19 +162,15 @@ CPU_DISASSEMBLE(cop444)
 		case 0x23:
 			bytes = 2;
 
-			if (next_opcode <= 0x3f)
+			if (next_opcode <= 0x7f)
 			{
-				address = (uint16_t)(next_opcode & 0x3F);
-				util::stream_format(stream, "LDD %u,%u", ((address & 0x30) >> 4),address & 0x0F);
+				address = (uint16_t)(next_opcode & 0x7F);
+				util::stream_format(stream, "LDD %u,%u", address >> 4, address & 0x0F);
 			}
-			else if (next_opcode >= 0x80 && next_opcode <= 0xbf)
+			else if (next_opcode >= 0x80)
 			{
-				address = (uint16_t)(next_opcode & 0x3F);
-				util::stream_format(stream, "XAD %u,%u", ((address & 0x30) >> 4),address & 0x0F);
-			}
-			else
-			{
-				util::stream_format(stream, "Invalid");
+				address = (uint16_t)(next_opcode & 0x7f);
+				util::stream_format(stream, "XAD %u,%u", address >> 4, address & 0x0F);
 			}
 			break;
 
@@ -217,21 +213,9 @@ CPU_DISASSEMBLE(cop444)
 			{
 				util::stream_format(stream, "LEI %u", next_opcode & 0xF);
 			}
-			else if (next_opcode >= 0x80 && next_opcode <= 0x8F)
+			else if (next_opcode >= 0x80)
 			{
-				util::stream_format(stream, "LBI 0,%u", next_opcode & 0xF);
-			}
-			else if (next_opcode >= 0x90 && next_opcode <= 0x9F)
-			{
-				util::stream_format(stream, "LBI 1,%u", next_opcode & 0xF);
-			}
-			else if (next_opcode >= 0xA0 && next_opcode <= 0xAF)
-			{
-				util::stream_format(stream, "LBI 2,%u", next_opcode & 0xF);
-			}
-			else if (next_opcode >= 0xB0 && next_opcode <= 0xBF)
-			{
-				util::stream_format(stream, "LBI 3,%u", next_opcode & 0xF);
+				util::stream_format(stream, "LBI %u,%u", (next_opcode >> 4) & 0x07, next_opcode & 0xF);
 			}
 			else
 			{

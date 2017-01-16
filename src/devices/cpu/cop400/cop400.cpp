@@ -48,7 +48,6 @@
 
     TODO:
 
-    - COP444/445 opcode support for 2048x8 and 128x4 memory size
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
     - COP413/COP414/COP415/COP405
@@ -178,37 +177,39 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_d_mask(d_mask)
 	, m_in_mask(in_mask)
 {
-	int i;
+	for (int i = 0; i < 256; i++) {
+		m_InstLen[i] = 1;
+	}
 
-	/* initialize instruction length array */
-	for (i=0; i<256; i++) m_InstLen[i]=1;
+	m_InstLen[0x33] = m_InstLen[0x23] = 2;
 
 	switch (featuremask)
 	{
 		case COP410_FEATURE:
-			/* select opcode map */
 			m_opcode_map = COP410_OPCODE_MAP;
-			/* initialize instruction length array */
-			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x68] =
-			m_InstLen[0x69] = m_InstLen[0x33] = m_InstLen[0x23] = 2;
+
+			for (int r = 0; r < 2; r++) {
+				m_InstLen[0x60 + r] = 2; // JMP
+				m_InstLen[0x68 + r] = 2; // JSR
+			}
 			break;
 
 		case COP420_FEATURE:
-			/* select opcode map */
 			m_opcode_map = COP420_OPCODE_MAP;
-			/* initialize instruction length array */
-			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
-			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
-			m_InstLen[0x33] = m_InstLen[0x23] = 2;
+
+			for (int r = 0; r < 4; r++) {
+				m_InstLen[0x60 + r] = 2; // JMP
+				m_InstLen[0x68 + r] = 2; // JSR
+			}
 			break;
 
 		case COP444_FEATURE:
-			/* select opcode map */
 			m_opcode_map = COP444_OPCODE_MAP;
-			/* initialize instruction length array */
-			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
-			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
-			m_InstLen[0x33] = m_InstLen[0x23] = 2;
+
+			for (int r = 0; r < 8; r++) {
+				m_InstLen[0x60 + r] = 2; // JMP
+				m_InstLen[0x68 + r] = 2; // JSR
+			}
 			break;
 
 		default:
@@ -863,13 +864,11 @@ void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 void cop400_cpu_device::device_start()
 {
 	/* find address spaces */
-
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 
 	/* find i/o handlers */
-
 	m_read_l.resolve_safe(0);
 	m_read_l_tristate.resolve_safe(0);
 	m_write_l.resolve_safe();
@@ -883,12 +882,10 @@ void cop400_cpu_device::device_start()
 	m_read_cko.resolve_safe(0);
 
 	/* allocate serial timer */
-
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 	m_serial_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki, clock()));
 
 	/* allocate counter timer */
-
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
@@ -897,7 +894,6 @@ void cop400_cpu_device::device_start()
 	}
 
 	/* allocate IN latch timer */
-
 	m_inil_timer = nullptr;
 	if (m_has_inil)
 	{
@@ -906,7 +902,6 @@ void cop400_cpu_device::device_start()
 	}
 
 	/* register for state saving */
-
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prevpc));
 	save_item(NAME(m_sa));
