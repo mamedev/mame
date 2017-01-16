@@ -383,7 +383,6 @@ I/O is via TTL, very similar to Designer Display
 
 ******************************************************************************/
 
-#include "emu.h"
 #include "includes/fidelbase.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
@@ -1569,7 +1568,7 @@ static MACHINE_CONFIG_START( csc, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // 38400kHz/64
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, csc_pia0_pb_r))
@@ -1614,7 +1613,7 @@ static MACHINE_CONFIG_START( eas, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz)
 	MCFG_CPU_PROGRAM_MAP(eas_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidel6502_state, eas_ppi_porta_w))
@@ -1648,7 +1647,7 @@ static MACHINE_CONFIG_DERIVED( eag, eas )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END

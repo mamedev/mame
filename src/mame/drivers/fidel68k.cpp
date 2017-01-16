@@ -153,7 +153,6 @@ B0000x-xxxxxx: see V7, -800000
 
 ******************************************************************************/
 
-#include "emu.h"
 #include "includes/fidelbase.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
@@ -631,7 +630,7 @@ static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
 
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, irq2_line_hold, 600)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
 	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
 	MCFG_DEVICE_REMOVE("irq_off")
 MACHINE_CONFIG_END

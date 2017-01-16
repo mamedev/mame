@@ -489,7 +489,6 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
-#include "emu.h"
 #include "includes/fidelbase.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
@@ -1518,7 +1517,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3900000) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidelbase_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vsc_ppi_porta_w))
