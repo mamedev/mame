@@ -1,481 +1,585 @@
-// license:BSD-3-Clause
-// copyright-holders:Sergey Svishchev
-/*********************************************************************
+// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+/***************************************************************************
 
-    68561mpcc.c
+    MPCC Multi-Protocol Communications Controller emulation
 
-    Rockwell 68561 MPCC (Multi Protocol Communications Controller)
+    The MPCC was introduced in the late 80:ies by Rockwell
 
-    skeleton driver, just enough for besta.c console to work
+    The variants in the MPCC family are as follows:
 
-*********************************************************************/
+	- 68560  with an 8 bit data bus
+	- 68560A with an 8 bit data bus and some enhancements
+	- 68561  with a 16 bit data bus
+	- 68561A with a 16 bit data bus and some enhancements
 
+FEATURES
+------------------------------------------------------------------
+ *   Full duplex synchronous/asynchronous receiver and transmitter
+ *   Implements IBM Binary Synchronous Communications (BSC) in two coding formats: ASCII and EBCDIC
+ *   Supports other synchronous character -oriented protocols (COP), such as six -bit BSC, X3.28k. ISO IS1745, ECMA-16, etc.
+ *   Supports synchronous bit oriented protocols (BOP), such as SDLC, HDLC, X.25, etc.
+ *   Asynchronous and isochronous modes
+ *   Modem handshake interface
+ *   High speed serial data rate (DC to 4 MHz)
+ *   Internal oscillator and baud rate generator with programmable data rate
+ *   Crystal or TTL level clock input and buffered clock output (8 MHz)
+ *   Direct interface to 68008/68000 asynchronous bus
+ *   Eight -character receiver and transmitter buffer registers
+ *   22 directly addressable registers for flexible option selection, complete status reporting, and data transfer
+ *   Three separate programmable interrupt vector numbers for receiver, transmitter and serial interface
+ *   Maskable interrupt conditions for receiver, transmitter and serial interface
+ *   Programmable microprocessor bus data transfer; polled, interrupt and two -channel DMA transfer compatible with MC68440/MC68450
+ *   Clock control register for receiver clock divisor and receiver and transmitter clock routing
+ *   Selectable full/half duplex, autoecho and local loop -back modes
+ *   Selectable parity (enable, odd, even) and CRC (control field enable, CRC -16, CCITT V.41, VRC/LRC)
+ *-------------------------------------------------------------------------------------------
+ *       x = Features that has been implemented  p = partly n = features that will not
+ *-------------------------------------------------------------------------------------------
+*/
 
 #include "emu.h"
 #include "68561mpcc.h"
 
-const device_type MPCC68561 = &device_creator<mpcc68561_t>;
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+#define LOG_GENERAL 0x001
+#define LOG_SETUP   0x002
+#define LOG_PRINTF  0x004
+#define LOG_READ    0x008
+#define LOG_INT     0x010
+#define LOG_CMD     0x020
+#define LOG_TX      0x040
+#define LOG_RCV     0x080
+#define LOG_CTS     0x100
+#define LOG_DCD     0x200
+#define LOG_SYNC    0x400
+#define LOG_CHAR    0x800
 
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
 
-#define LOG_MPCC    (1)
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASK(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASK(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASK(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASK(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
+#define LOGCHAR(...)  LOGMASK(LOG_CHAR,    __VA_ARGS__)
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock, "mpcc68561", __FILE__), mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
-	intrq_cb(*this)
-{
-}
-
-/*-------------------------------------------------
-    mpcc_updateirqs
--------------------------------------------------*/
-
-void mpcc68561_t::updateirqs()
-{
-	int irqstat;
-
-	irqstat = 0;
-	if (MasterIRQEnable)
-	{
-		if ((channel[0].txIRQEnable) && (channel[0].txIRQPending))
-		{
-			IRQType = IRQ_B_TX;
-			irqstat = 1;
-		}
-		else if ((channel[1].txIRQEnable) && (channel[1].txIRQPending))
-		{
-			IRQType = IRQ_A_TX;
-			irqstat = 1;
-		}
-		else if ((channel[0].extIRQEnable) && (channel[0].extIRQPending))
-		{
-			IRQType = IRQ_B_EXT;
-			irqstat = 1;
-		}
-		else if ((channel[1].extIRQEnable) && (channel[1].extIRQPending))
-		{
-			IRQType = IRQ_A_EXT;
-			irqstat = 1;
-		}
-	}
-	else
-	{
-		IRQType = IRQ_NONE;
-	}
-
-//  printf("mpcc: irqstat %d, last %d\n", irqstat, lastIRQStat);
-//  printf("ch0: en %d pd %d  ch1: en %d pd %d\n", channel[0].txIRQEnable, channel[0].txIRQPending, channel[1].txIRQEnable, channel[1].txIRQPending);
-
-	// don't spam the driver with unnecessary transitions
-	if (irqstat != lastIRQStat)
-	{
-		lastIRQStat = irqstat;
-
-		// tell the driver the new IRQ line status if possible
-#if LOG_MPCC
-		printf("mpcc68561 IRQ status => %d\n", irqstat);
+#if VERBOSE & LOG_PRINTF
+#define logerror printf
 #endif
-		if(!intrq_cb.isnull())
-			intrq_cb(irqstat);
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#define LLFORMAT "%I64d"
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#define LLFORMAT "%lld"
+#endif
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+// device type definition
+const device_type MPCC       = &device_creator<mpcc_device>;
+const device_type MPCC68560  = &device_creator<mpcc68560_device>;
+const device_type MPCC68560A = &device_creator<mpcc68560A_device>;
+const device_type MPCC68561  = &device_creator<mpcc68561_device>;
+const device_type MPCC68561A = &device_creator<mpcc68561A_device>;
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	  device_serial_interface(mconfig, *this),
+	  m_variant(variant),
+	  m_rxc(0),
+	  m_txc(0),
+	  m_brg_rate(0),
+	  m_rcv(0),
+	  m_rxd(0),
+	  m_tra(0),
+	  m_out_txd_cb(*this),
+	  m_out_dtr_cb(*this),
+	  m_out_rts_cb(*this),
+	  m_out_rtxc_cb(*this),
+	  m_out_trxc_cb(*this),
+	  m_out_int_cb(*this),
+	  m_rsr(0),
+	  m_rcr(0),
+	  m_rdr(0),
+	  m_rivnr(0),
+	  m_rier(0),
+	  m_tsr(0),
+	  m_tcr(0),
+	  m_tdr(0),
+	  m_tivnr(0),
+	  m_tier(0),
+	  m_sisr(0),
+	  m_sicr(0),
+	  m_sivnr(0),
+	  m_sier(0),
+	  m_psr1(0),
+	  m_psr2(0),
+	  m_ar1(0),
+	  m_ar2(0),
+	  m_brdr1(0),
+	  m_brdr2(0),
+	  m_ccr(0),
+	  m_ecr(0)
+{
+	for (auto & elem : m_int_state)
+		elem = 0;
+}
+
+mpcc_device::mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MPCC, "Rockwell MPCC", tag, owner, clock, "mpcc", __FILE__),
+	  device_serial_interface(mconfig, *this),
+	  m_variant(TYPE_MPCC),
+	  m_rxc(0),
+	  m_txc(0),
+	  m_brg_rate(0),
+	  m_rcv(0),
+	  m_rxd(0),
+	  m_tra(0),
+	  m_out_txd_cb(*this),
+	  m_out_dtr_cb(*this),
+	  m_out_rts_cb(*this),
+	  m_out_rtxc_cb(*this),
+	  m_out_trxc_cb(*this),
+	  m_out_int_cb(*this),
+	  m_rsr(0),
+	  m_rcr(0),
+	  m_rdr(0),
+	  m_rivnr(0),
+	  m_rier(0),
+	  m_tsr(0),
+	  m_tcr(0),
+	  m_tdr(0),
+	  m_tivnr(0),
+	  m_tier(0),
+	  m_sisr(0),
+	  m_sicr(0),
+	  m_sivnr(0),
+	  m_sier(0),
+	  m_psr1(0),
+	  m_psr2(0),
+	  m_ar1(0),
+	  m_ar2(0),
+	  m_brdr1(0),
+	  m_brdr2(0),
+	  m_ccr(0),
+	  m_ecr(0)
+{
+	for (auto & elem : m_int_state)
+		elem = 0;
+}
+
+mpcc68560_device::mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68560, "MPCC 68560", tag, owner, clock, TYPE_MPCC68560, "mpcc68560", __FILE__){ }
+
+mpcc68560A_device::mpcc68560A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68560A, "MPCC 68560A", tag, owner, clock, TYPE_MPCC68560A, "mpcc68560A", __FILE__){ }
+
+mpcc68561_device::mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68561, "MPCC 68561", tag, owner, clock, TYPE_MPCC68561, "mpcc68561", __FILE__){ }
+
+mpcc68561A_device::mpcc68561A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68561A, "MPCC 68561A", tag, owner, clock, TYPE_MPCC68561A, "mpcc68561A", __FILE__){ }
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void mpcc_device::device_start()
+{
+	LOGSETUP("%s\n", FUNCNAME);
+
+	// resolve callbacks
+	m_out_txd_cb.resolve_safe();
+	m_out_dtr_cb.resolve_safe();
+	m_out_rts_cb.resolve_safe();
+	m_out_rtxc_cb.resolve_safe();
+	m_out_trxc_cb.resolve_safe();
+	m_out_int_cb.resolve_safe();
+
+	// state saving
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_rsr));
+	save_item(NAME(m_rcr));
+	save_item(NAME(m_rdr));
+	save_item(NAME(m_rivnr));
+	save_item(NAME(m_rier));
+	save_item(NAME(m_tsr));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_tivnr));
+	save_item(NAME(m_tier));
+	save_item(NAME(m_sisr));
+	save_item(NAME(m_sicr));
+	save_item(NAME(m_sivnr));
+	save_item(NAME(m_sier));
+	save_item(NAME(m_psr1));
+	save_item(NAME(m_psr2));
+	save_item(NAME(m_ar1));
+	save_item(NAME(m_ar2));
+	save_item(NAME(m_brdr1));
+	save_item(NAME(m_brdr2));
+	save_item(NAME(m_ccr));
+	save_item(NAME(m_ecr));
+	LOG(" - MPCC variant %02x\n", m_variant);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+void mpcc_device::device_reset()
+{
+	LOGSETUP("%s %s \n",tag(), FUNCNAME);
+
+	m_rsr 	= 0x00;
+	m_rcr 	= 0x01;
+	m_rivnr = 0x0f;
+	m_rier 	= 0x00;
+	m_tsr 	= 0x80;
+	m_tcr 	= 0x01;
+	m_tivnr = 0x0f;
+	m_tier 	= 0x00;
+	m_sisr 	= 0x00;
+	m_sicr 	= 0x00;
+	m_sivnr = 0x0f;
+	m_sier 	= 0x00;
+	m_psr1 	= 0x00;
+	m_psr2 	= 0x00;
+	m_ar1 	= 0x00;
+	m_ar2 	= 0x00;
+	m_brdr1 = 0x01;
+	m_brdr2 = 0x00;
+	m_ccr 	= 0x00;
+	m_ecr 	= 0x04;
+
+	// Init out callbacks to known inactive state
+	m_out_txd_cb(1);
+	m_out_dtr_cb(1);
+	m_out_rts_cb(1);
+	m_out_rtxc_cb(1);
+	m_out_trxc_cb(1);
+	m_out_int_cb(1);
+}
+
+/*
+ * Serial device implementation
+ */
+//-------------------------------------------------
+//  tra_callback - is called for each bit that needs to be transmitted
+//-------------------------------------------------
+void mpcc_device::tra_callback()
+{
+	// Check if transmitter is idle as in disabled
+	if (!(m_tcr & REG_TCR_TEN))
+	{
+		// transmit idle TODO: Support TCR TICS bit
+		m_out_txd_cb(1);
+	}
+#if 0
+	// Check if we are transmitting break TODO: Figure out Break support
+	else if (...)
+	{
+		// transmit break
+		m_out_txd_cb(0);
+	}
+#endif
+	// Check if there is more bits to send
+	else if (!is_transmit_register_empty())
+	{
+		// Get the next bit
+		int db = transmit_register_get_data_bit();
+
+		// transmit data
+		m_out_txd_cb(db);
+	}
+	// Otherwise we don't know why we are called...
+	else
+	{
+		logerror("%s %s Failed to transmit\n", FUNCNAME, m_owner->tag());
 	}
 }
 
-/*-------------------------------------------------
-    mpcc_initchannel
--------------------------------------------------*/
-void mpcc68561_t::initchannel(int ch)
+//-------------------------------------------------
+//  tra_complete - is called when the transmitter shift register has sent the last bit
+//-------------------------------------------------
+void mpcc_device::tra_complete()
 {
-	channel[ch].syncHunt = 1;
-}
+	// check if transmitter is enabled and we are not sending BREAK level
+	if ((m_tcr & REG_TCR_TEN) && !(m_tcr & REG_TCR_TICS))
+	{	// check if there are more data in the fifo
+		if (!m_tx_data_fifo.empty())
+		{
+			transmit_register_setup(m_tx_data_fifo.dequeue()); // Reload the shift register
+			m_tsr |= REG_TSR_TDRA; // Mark fifo as having room for more data
+		}
+		else
+		{
+			m_out_rts_cb(CLEAR_LINE); // TODO: respect the RTSLV bit
+		}
 
-/*-------------------------------------------------
-    mpcc_resetchannel
--------------------------------------------------*/
-void mpcc68561_t::resetchannel(int ch)
-{
-	emu_timer *timersave = channel[ch].baudtimer;
-
-	memset(&channel[ch], 0, sizeof(Chan));
-
-	channel[ch].txUnderrun = 1;
-	channel[ch].baudtimer = timersave;
-
-	channel[ch].baudtimer->adjust(attotime::never, ch);
-}
-
-/*-------------------------------------------------
-    mpcc68561_baud_expire - baud rate timer expiry
--------------------------------------------------*/
-
-void mpcc68561_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	Chan *pChan = &channel[id];
-	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
-	int rate;
-
-	if (brconst)
+		// Check if Tx interrupts are enabled
+		if (m_tier & REG_TIER_TDRA)
+		{
+			// TODO: Check circumstances, eg int on first or every character etc
+			trigger_interrupt(INT_TX_TDRA);
+		}
+	}       // Check if sending BREAK
+	else if (m_tcr & REG_TCR_TICS)
 	{
-		rate = clock() / brconst;
+		// TODO: Should transmit content of AR2, needs investigation
+		m_out_txd_cb(0);
 	}
 	else
 	{
-		rate = 0;
+		// transmit mark
+		m_out_txd_cb(1);
 	}
+}
 
-	// is baud counter IRQ enabled on this channel?
-	// always flag pending in case it's enabled after this
-	pChan->baudIRQPending = 1;
-	if (pChan->baudIRQEnable)
+//-------------------------------------------------
+//  rcv_callback - called when it is time to sample incomming data bit
+//-------------------------------------------------
+void mpcc_device::rcv_callback()
+{
+	// Check if the Receiver is enabled
+	if (!(m_rcr & REG_RCR_RRES))
 	{
-		if (pChan->extIRQEnable)
+		receive_register_update_bit(m_rxd);
+	}
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void mpcc_device::rcv_complete()
+{
+	uint8_t data;
+
+	receive_register_extract();
+	data = get_received_char();
+
+	//	receive_data(data);
+	if (m_rx_data_fifo.full())
+	{
+		// receive overrun error detected, new data is lost
+		m_rsr |= REG_RSR_ROVRN;
+		// interrupt if rx overrun interrupt is enabled
+		if (m_rier & REG_RIER_ROVRN)
 		{
-			pChan->extIRQPending = 1;
-			pChan->baudIRQPending = 0;
-			updateirqs();
+			trigger_interrupt(INT_RX_ROVRN);
 		}
 	}
-
-	// reset timer according to current register values
-	if (rate)
-	{
-		timer.adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
-	}
 	else
 	{
-		timer.adjust(attotime::never, 0, attotime::never);
+		m_rx_data_fifo.enqueue(data);
+		m_rsr |= REG_RSR_RDA;
+		// interrupt if rx data availble is enabled
+		if (m_rier & REG_RIER_RDA)
+		{
+			trigger_interrupt(INT_RX_RDA);
+		}
 	}
 }
 
-/*-------------------------------------------------
-    device_start - device-specific startup
--------------------------------------------------*/
-
-void mpcc68561_t::device_start()
+//-------------------------------------------------
+//  write_rx - called by terminal through rs232/diserial
+//         when character is sent to board
+//-------------------------------------------------
+WRITE_LINE_MEMBER(mpcc_device::write_rx)
 {
-	intrq_cb.resolve_safe();
+	LOGRCV("%s(%d)\n", FUNCNAME, state);
+	m_rxd = state;
 
-	memset(channel, 0, sizeof(channel));
-
-	mode = 0;
-	reg = 0;
-	status = 0;
-	IRQV = 0;
-	MasterIRQEnable = 0;
-	lastIRQStat = 0;
-	IRQType = IRQ_NONE;
-
-	channel[0].baudtimer = timer_alloc(0);
+	//only use rx_w when self-clocked
+	if(m_rxc != 0 || m_brg_rate != 0)
+		device_serial_interface::rx_w(state);
 }
 
 
-/*-------------------------------------------------
-    device_reset - device-specific reset
--------------------------------------------------*/
-void mpcc68561_t::device_reset()
+/*
+ * Interrupts
+ */
+//-------------------------------------------------
+//  check_interrupts -
+//-------------------------------------------------
+void mpcc_device::check_interrupts()
 {
-	IRQType = IRQ_NONE;
-	MasterIRQEnable = 0;
-	IRQV = 0;
+	int state = 0;
+	LOGINT("%s %s \n",tag(), FUNCNAME);
 
-	initchannel(0);
-	resetchannel(0);
-}
-
-/*-------------------------------------------------
-    mpcc_set_status
--------------------------------------------------*/
-
-void mpcc68561_t::set_status(int _status)
-{
-	status = _status;
-}
-
-/*-------------------------------------------------
-    mpcc_acknowledge
--------------------------------------------------*/
-
-void mpcc68561_t::acknowledge()
-{
-	if(!intrq_cb.isnull())
-		intrq_cb(0);
-}
-
-/*-------------------------------------------------
-    mpcc_getreg
--------------------------------------------------*/
-
-uint8_t mpcc68561_t::getreg()
-{
-	/* Not yet implemented */
-	#if LOG_MPCC
-	printf("mpcc: port A reg %d read 0x%02x\n", reg, channel[0].reg_val[reg]);
-	#endif
-
-	if (reg == 0)
+	// loop over all interrupt sources
+	for (auto & elem : m_int_state)
 	{
-		uint8_t rv = 0;
-
-		Chan *ourCh = &channel[0];
-
-		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
-		rv |= (ourCh->syncHunt) ? 0x10 : 0;
-		rv |= channel[0].reg_val[0] & 0x05; // pick up TXBE and RXBF bits
-
-		return rv;
+		state |= elem;
 	}
-	else if (reg == 10)
+
+	// update IRQ line
+	// If we are not serving any interrupt the IRQ is asserted already and we need to do nothing
+	if ((state & INT_ACK) == 0)
 	{
-		return 0;
+		// If there is a new interrupt not yet acknowledged IRQ needs to be asserted
+		if (state & INT_REQ)
+		{
+			m_out_int_cb(ASSERT_LINE);
+		}
+		// Otherwise we just clear the IRQ line allowing other devices to interrupt
+		else
+		{
+			m_out_int_cb(CLEAR_LINE);
+		}
 	}
-	return channel[0].reg_val[reg];
 }
 
-/*-------------------------------------------------
-    mpcc_putreg
--------------------------------------------------*/
+//-------------------------------------------------
+//  reset_interrupts -
+//-------------------------------------------------
 
-void mpcc68561_t::putreg(int ch, uint8_t data)
+void mpcc_device::reset_interrupts()
 {
-	Chan *pChan = &channel[ch];
-
-	channel[ch].reg_val[reg] = data;
-	#if LOG_MPCC
-	printf("mpcc: port %c reg %d write 0x%02x\n", 'A'+ch, reg, data);
-	#endif
-
-	switch (reg)
+	LOGINT("%s %s \n",tag(), FUNCNAME);
+	// reset internal interrupt sources
+	for (auto & elem : m_int_state)
 	{
-		case 0: // command register
-			switch ((data >> 3) & 7)
-			{
-				case 1: // select high registers (handled elsewhere)
-					break;
-
-				case 2: // reset external and status IRQs
-					pChan->syncHunt = 0;
-					break;
-
-				case 5: // ack Tx IRQ
-					pChan->txIRQPending = 0;
-					updateirqs();
-					break;
-
-				case 0: // nothing
-				case 3: // send SDLC abort
-				case 4: // enable IRQ on next Rx byte
-				case 6: // reset errors
-				case 7: // reset highest IUS
-					// we don't handle these yet
-					break;
-
-			}
-			break;
-
-		case 1: // Tx/Rx IRQ and data transfer mode defintion
-			pChan->extIRQEnable = (data & 1);
-			pChan->txIRQEnable = (data & 2) ? 1 : 0;
-			pChan->rxIRQEnable = (data >> 3) & 3;
-			updateirqs();
-			break;
-
-		case 2: // IRQ vector
-			IRQV = data;
-			break;
-
-		case 3: // Rx parameters and controls
-			pChan->rxEnable = (data & 1);
-			pChan->syncHunt = (data & 0x10) ? 1 : 0;
-			break;
-
-		case 5: // Tx parameters and controls
-//          printf("ch %d TxEnable = %d [%02x]\n", ch, data & 8, data);
-			pChan->txEnable = data & 8;
-
-			if (pChan->txEnable)
-			{
-				pChan->reg_val[0] |= 0x04;  // Tx empty
-			}
-			break;
-
-		case 4: // Tx/Rx misc parameters and modes
-		case 6: // sync chars/SDLC address field
-		case 7: // sync char/SDLC flag
-			break;
-
-		case 9: // master IRQ control
-			MasterIRQEnable = (data & 8) ? 1 : 0;
-			updateirqs();
-
-			// channel reset command
-			switch ((data>>6) & 3)
-			{
-				case 0: // do nothing
-					break;
-
-				case 1: // reset channel B
-					resetchannel(0);
-					break;
-
-				case 3: // force h/w reset (entire chip)
-					IRQType = IRQ_NONE;
-					MasterIRQEnable = 0;
-					IRQV = 0;
-
-					initchannel(0);
-					resetchannel(0);
-
-					// make sure we stop yanking the IRQ line if we were
-					updateirqs();
-					break;
-
-			}
-			break;
-
-		case 10:    // misc transmitter/receiver control bits
-		case 11:    // clock mode control
-		case 12:    // lower byte of baud rate gen
-		case 13:    // upper byte of baud rate gen
-			break;
-
-		case 14:    // misc control bits
-			if (data & 0x01)    // baud rate generator enable?
-			{
-				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
-				int rate = clock() / brconst;
-
-				pChan->baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
-			}
-			break;
-
-		case 15:    // external/status interrupt control
-			pChan->baudIRQEnable = (data & 2) ? 1 : 0;
-			pChan->DCDEnable = (data & 8) ? 1 : 0;
-			pChan->CTSEnable = (data & 0x20) ? 1 : 0;
-			pChan->txUnderrunEnable = (data & 0x40) ? 1 : 0;
-			break;
+		elem = 0;
 	}
+
+	// check external interrupt sources
+	check_interrupts();
 }
 
-/*-------------------------------------------------
-    mpcc68561_get_reg_a
--------------------------------------------------*/
-
-uint8_t mpcc68561_t::get_reg_a(int reg)
+//-----------------------------------------------------------------------
+//  trigger_interrupt - called when a potential interrupt condition occurs
+//-------------------------------------------------
+void mpcc_device::trigger_interrupt(int source)
 {
-	return channel[0].reg_val[reg];
+	LOGINT("%s %s: %02x\n",FUNCNAME, tag(), source);
+	switch(source)
+	{
+	case INT_TX_TDRA:
+	case INT_TX_TFC:
+	case INT_TX_TUNRN:
+	case INT_TX_TFERR:
+		m_int_state[TX_INT_PRIO] = INT_REQ;
+		break;
+	case INT_RX_RDA:
+	case INT_RX_EOF:
+	case INT_RX_CPERR:
+	case INT_RX_FRERR:
+	case INT_RX_ROVRN:
+	case INT_RX_RAB:
+		m_int_state[RX_INT_PRIO] = INT_REQ;
+		break;
+	case INT_SR_CTS:
+	case INT_SR_DSR:
+	case INT_SR_DCD:
+		m_int_state[SR_INT_PRIO] = INT_REQ;
+		break;
+	}
+	check_interrupts();
 }
 
-
-
-/*-------------------------------------------------
-    mpcc68561_set_reg_a
--------------------------------------------------*/
-
-void mpcc68561_t::set_reg_a(int reg, uint8_t data)
+//-------------------------------------------------
+//  Read register
+//-------------------------------------------------
+READ8_MEMBER( mpcc_device::read )
 {
-	channel[0].reg_val[reg] = data;
-}
-
-
-
-/*-------------------------------------------------
-    mpcc68561_r
--------------------------------------------------*/
-
-READ8_MEMBER( mpcc68561_t::reg_r)
-{
-	uint8_t result = 0;
-
-	offset %= 4;
+	uint8_t data = 0;
 
 	switch(offset)
 	{
-		case 1:
-			/* Channel A (Modem Port) Control */
-			if (mode == 1)
-				mode = 0;
-			else
-				reg = 0;
-
-			result = getreg();
-			break;
-
-		case 3:
-			/* Channel A (Modem Port) Data */
-			return channel[0].rxData;
-			break;
+	case 0x00: data = m_rsr; logerror("MPCC: Reg RSR not implemented\n"); break;
+	case 0x01: data = m_rcr; logerror("MPCC: Reg RCR not implemented\n"); break;
+	case 0x02: data = m_rdr; logerror("MPCC: Reg RDR not implemented\n"); break;
+	case 0x04: data = m_rivnr; logerror("MPCC: Reg RIVNR not implemented\n"); break;
+	case 0x05: data = m_rier; logerror("MPCC: Reg RIER not implemented\n"); break;
+	case 0x08: data = m_tsr; break; logerror("MPCC: Reg TSR not implemented\n"); break;
+	case 0x09: data = m_tcr; logerror("MPCC: Reg TCR not implemented\n"); break;
+	//case 0x0a: data = m_tdr; break;
+	case 0x0c: data = m_tivnr; logerror("MPCC: Reg TIVNR not implemented\n"); break;
+	case 0x0d: data = m_tier; logerror("MPCC: Reg TIER not implemented\n"); break;
+	case 0x10: data = m_sisr; logerror("MPCC: Reg SISR not implemented\n"); break;
+	case 0x11: data = m_sicr; logerror("MPCC: Reg SICR not implemented\n"); break;
+	case 0x14: data = m_sivnr; logerror("MPCC: Reg SIVNR not implemented\n"); break;
+	case 0x15: data = m_sier; logerror("MPCC: Reg SIER not implemented\n"); break;
+	case 0x18: data = m_psr1; logerror("MPCC: Reg PSR1 not implemented\n"); break;
+	case 0x19: data = m_psr2; logerror("MPCC: Reg PSR2 not implemented\n"); break;
+	case 0x1a: data = m_ar1; logerror("MPCC: Reg AR1 not implemented\n"); break;
+	case 0x1b: data = m_ar2; logerror("MPCC: Reg AR2 not implemented\n"); break;
+	case 0x1c: data = m_brdr1; logerror("MPCC: Reg BRDR1 not implemented\n"); break;
+	case 0x1d: data = m_brdr2; logerror("MPCC: Reg BRDR2 not implemented\n"); break;
+	case 0x1e: data = m_ccr; logerror("MPCC: Reg CCR not implemented\n"); break;
+	case 0x1f: data = m_ecr; logerror("MPCC: Reg ECR not implemented\n"); break;
+	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
 	}
-	return result;
+	LOGSETUP(" * %s Reg %02x -> %02x  \n", m_owner->tag(), offset, data);
+	return data;
 }
 
-
-
-/*-------------------------------------------------
-    mpcc68561_w
--------------------------------------------------*/
-
-WRITE8_MEMBER( mpcc68561_t::reg_w )
+//-------------------------------------------------
+//  Write register
+//-------------------------------------------------
+WRITE8_MEMBER( mpcc_device::write )
 {
-	Chan *pChan;
-
-	offset &= 3;
-
-//  printf(" mode %d data %x offset %d  \n", mode, data, offset);
-
+	LOGSETUP(" * %s Reg %02x <- %02x  \n", m_owner->tag(), offset, data);
 	switch(offset)
 	{
-		case 1:
-			/* Channel A (Modem Port) Control */
-			if (mode == 0)
-			{
-				if((data & 0xf0) == 0)  // not a reset command
-				{
-					mode = 1;
-					reg = data & 0x0f;
-//                  putareg(data & 0xf0);
-				}
-				else if (data == 0x10)
-				{
-					pChan = &channel[0];
-					// clear ext. interrupts
-					pChan->extIRQPending = 0;
-					pChan->baudIRQPending = 0;
-					updateirqs();
-				}
-			}
-			else
-			{
-				mode = 0;
-				putreg(0, data);
-			}
-			break;
+	case 0x00: m_rsr = data; logerror("MPCC: Reg RSR not implemented\n"); break;
+	case 0x01: m_rcr = data; logerror("MPCC: Reg RCR not implemented\n"); break;
+	//case 0x02: m_rdr = data; break;
+	case 0x04: m_rivnr = data; logerror("MPCC: Reg RIVNR not implemented\n"); break;
+	case 0x05: m_rier = data; logerror("MPCC: Reg RIER not implemented\n"); break;
+	case 0x08: m_tsr = data; logerror("MPCC: Reg TSR not implemented\n"); break;
+	case 0x09: m_tcr = data; logerror("MPCC: Reg TCR not implemented\n"); break;
+	case 0x0a: m_tdr = data; LOGCHAR("*%c", data); do_tdr_w(data); break;
+	case 0x0c: m_tivnr = data; logerror("MPCC: Reg TIVNR not implemented\n"); break;
+	case 0x0d: m_tier = data; logerror("MPCC: Reg TIER not implemented\n"); break;
+	case 0x10: m_sisr = data; logerror("MPCC: Reg SISR not implemented\n"); break;
+	case 0x11: m_sicr = data; logerror("MPCC: Reg SICR not implemented\n"); break;
+	case 0x14: m_sivnr = data; logerror("MPCC: Reg SIVNR not implemented\n"); break;
+	case 0x15: m_sier = data; logerror("MPCC: Reg SIER not implemented\n"); break;
+	case 0x18: m_psr1 = data; logerror("MPCC: Reg PSR1 not implemented\n"); break;
+	case 0x19: m_psr2 = data; logerror("MPCC: Reg PSR2 not implemented\n"); break;
+	case 0x1a: m_ar1 = data; logerror("MPCC: Reg AR1 not implemented\n"); break;
+	case 0x1b: m_ar2 = data; logerror("MPCC: Reg AR2 not implemented\n"); break;
+	case 0x1c: m_brdr1 = data; logerror("MPCC: Reg BRDR1 not implemented\n"); break;
+	case 0x1d: m_brdr2 = data; logerror("MPCC: Reg BRDR2 not implemented\n"); break;
+	case 0x1e: m_ccr = data; logerror("MPCC: Reg CCR not implemented\n"); break;
+	case 0x1f: m_ecr = data; logerror("MPCC: Reg ECR not implemented\n"); break;
+	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
+	}
+}
 
-		case 3:
-			/* Channel A (Modem Port) Data */
-			pChan = &channel[0];
-
-			if (pChan->txEnable)
-			{
-				pChan->txData = data;
-				// local loopback?
-				if (pChan->reg_val[14] & 0x10)
-				{
-					pChan->rxData = data;
-					pChan->reg_val[0] |= 0x01;  // Rx character available
-				}
-				pChan->reg_val[1] |= 0x01;  // All sent
-				pChan->reg_val[0] |= 0x04;  // Tx empty
-				pChan->txUnderrun = 1;
-				pChan->txIRQPending = 1;
-				updateirqs();
-			}
-			break;
+void mpcc_device::do_tdr_w(uint8_t data)
+{
+	// Check of Tx fifo has room
+	if (m_tx_data_fifo.full())
+	{
+		logerror("- TX FIFO is full, discarding data\n");
+		LOGTX("- TX FIFO is full, discarding data\n");
+	}
+	else // ..there is still room
+	{
+		m_tx_data_fifo.enqueue(data);		
+		if (m_tx_data_fifo.full())
+		{
+			m_tsr &= ~REG_TSR_TDRA; // Mark fifo as full
+		}
 	}
 }

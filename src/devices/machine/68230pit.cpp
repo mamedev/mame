@@ -31,7 +31,7 @@
 #define LOG_DR      0x20
 #define LOG_INT     0x40
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_GENERAL | LOG_INT | LOG_BIT | LOG_DR)
+#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP | LOG_GENERAL | LOG_INT | LOG_BIT | LOG_DR)
 
 #define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
 #define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
@@ -142,19 +142,30 @@ pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 void pit68230_device::device_start ()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGSETUP("%s\n", FUNCNAME);
 
-	// resolve callbacks
+	// NOTE:
+	// Not using resolve_safe for the m_px_in_cb's is a temporary way to be able to check
+	// if a handler is installed with isnull(). The safe function installs a dummy default
+	// handler which disable the isnull() test. TODO: Need a better fix?
+
+	// resolve callbacks Port A
 	m_pa_out_cb.resolve_safe();
 	m_pa_in_cb.resolve();
+
+	// resolve callbacks Port B
 	m_pb_out_cb.resolve_safe();
 	m_pb_in_cb.resolve();
+
+	// resolve callbacks Port C
 	m_pc_out_cb.resolve_safe();
-	m_pc_in_cb.resolve(); // A temporary way to check if handler is installed with isnull(). TODO: Need better fix.
+	m_pc_in_cb.resolve();
+
 	m_h1_out_cb.resolve_safe();
 	m_h2_out_cb.resolve_safe();
 	m_h3_out_cb.resolve_safe();
 	m_h4_out_cb.resolve_safe();
+
 	m_tirq_out_cb.resolve_safe();
 	m_pirq_out_cb.resolve_safe();
 
@@ -186,7 +197,7 @@ void pit68230_device::device_start ()
 //-------------------------------------------------
 void pit68230_device::device_reset ()
 {
-	LOG("%s %s \n",tag(), FUNCNAME);
+	LOGSETUP("%s %s \n",tag(), FUNCNAME);
 
 	m_pgcr = 0;
 	m_psrr = 0;
@@ -203,6 +214,7 @@ void pit68230_device::device_reset ()
 	m_tcr = 0;
 	m_tivr = 0x0f; m_tirq_out_cb(CLEAR_LINE);
 	m_tsr = 0;
+	LOGSETUP("%s %s DONE!\n",tag(), FUNCNAME);
 }
 
 /*
@@ -280,9 +292,60 @@ void pit68230_device::device_timer (emu_timer &timer, device_timer_id id, int32_
 	}
 }
 
-void pit68230_device::h1_set (uint8_t state)
+WRITE_LINE_MEMBER( pit68230_device::h1_w )
 {
-	if (state) m_psr |= 1; else m_psr &= ~1;
+	LOGBIT("%s %s H1 set to %d\n", tag(), FUNCNAME, state);
+
+	// Set the direct level in PSR
+	m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H1L) : (m_psr | REG_PSR_H1L));
+
+	// Set the programmed assert level in PSR
+	if (m_pgcr & REG_PGCR_H1_SENSE)
+		m_psr = ((state != 0) ? (m_psr & ~REG_PSR_H1S) : (m_psr | REG_PSR_H1S));
+	else
+		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H1S) : (m_psr | REG_PSR_H1S));
+}
+
+WRITE_LINE_MEMBER( pit68230_device::h2_w )
+{
+	LOGBIT("%s %s H2 set to %d\n", tag(), FUNCNAME, state);
+
+	// Set the direct level in PSR
+	m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H2L) : (m_psr | REG_PSR_H2L));
+
+	// Set the programmed assert level in PSR
+	if (m_pgcr & REG_PGCR_H2_SENSE)
+		m_psr = ((state != 0) ? (m_psr & ~REG_PSR_H2S) : (m_psr | REG_PSR_H2S));
+	else
+		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H2S) : (m_psr | REG_PSR_H2S));
+}
+
+WRITE_LINE_MEMBER( pit68230_device::h3_w )
+{
+	LOGBIT("%s %s H3 set to %d\n", tag(), FUNCNAME, state);
+
+	// Set the direct level in PSR
+	m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H3L) : (m_psr | REG_PSR_H3L));
+
+	// Set the programmed assert level in PSR
+	if (m_pgcr & REG_PGCR_H3_SENSE)
+		m_psr = ((state != 0) ? (m_psr & ~REG_PSR_H3S) : (m_psr | REG_PSR_H3S));
+	else
+		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H3S) : (m_psr | REG_PSR_H3S));
+}
+
+WRITE_LINE_MEMBER( pit68230_device::h4_w )
+{
+	LOGBIT("%s %s H4 set to %d\n", tag(), FUNCNAME, state);
+
+	// Set the direct level in PSR
+	m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H4L) : (m_psr | REG_PSR_H4L));
+
+	// Set the programmed assert level in PSR
+	if (m_pgcr & REG_PGCR_H4_SENSE)
+		m_psr = ((state != 0) ? (m_psr & ~REG_PSR_H4S) : (m_psr | REG_PSR_H4S));
+	else
+		m_psr = ((state == 0) ? (m_psr & ~REG_PSR_H4S) : (m_psr | REG_PSR_H4S));
 }
 
 // TODO: remove this method and replace it with a call to pb_update_bit() in force68k.cpp
@@ -293,7 +356,7 @@ void pit68230_device::portb_setbit(uint8_t bit, uint8_t state)
 
 void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state)
 {
-	LOGBIT("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state);
+	LOGBIT("%s %s bit %d to %d\n", tag(), FUNCNAME, bit, state);
 	// Check if requested bit is an output bit and can't be affected
 	if (m_paddr & (1 << bit))
 	{
@@ -860,9 +923,8 @@ the instantaneous pin level is read and no input latching is performed except at
 data bus interface. Writes to this address are answered with DTACK, but the data is ignored.*/
 uint8_t pit68230_device::rr_pitreg_paar()
 {
-	// NOTE: no side effect emulated so using ..padr
 	uint8_t ret;
-	ret = m_pa_in_cb();
+	ret = m_pa_in_cb.isnull() ? 0 : m_pa_in_cb();
 	LOGR("%s %s <- %02x\n",tag(), FUNCNAME, ret);
 	return ret;
 }
@@ -873,9 +935,8 @@ the instantaneous pin level is read and no input latching is performed except at
 data bus interface.Writes to this address are answered with DTACK, but the data is ignored.*/
 uint8_t pit68230_device::rr_pitreg_pbar()
 {
-	// NOTE: no side effect emulated so using ..pbdr
 	uint8_t ret;
-	ret = m_pb_in_cb();
+	ret = m_pb_in_cb.isnull() ? 0 : m_pb_in_cb();
 	LOGR("%s %s <- %02x\n",tag(), FUNCNAME, ret);
 	return ret;
 }

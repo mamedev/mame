@@ -142,9 +142,9 @@ Basadressen av I / O-enheter:
  *---------------------------------------------------------------------------
  *  TODO:
  *  - Find accurate documentation and adjust memory map
- *  - Add layout
- *  - Write & add 68561 UART
- *  - Add 68230 PIT
+ *  - Add PCB layout
+ *  - Improve 68561 UART
+ *  - Improve hookup of 68230 PIT
  *  - Add variants of boards in the CPU-20 and CPU-21 family
  *  - Add FGA, DUSCC devices and CPU-22 variants
  *
@@ -158,6 +158,7 @@ Basadressen av I / O-enheter:
 #include "bus/rs232/rs232.h"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
+#include "machine/68561mpcc.h"
 #include "machine/clock.h"
 
 #define LOG_GENERAL 0x01
@@ -192,6 +193,7 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 		, m_maincpu (*this, "maincpu")
 		, m_pit (*this, "pit")
 		, m_bim  (*this, "bim")
+		, m_mpcc  (*this, "mpcc")
 	{
 	}
 	DECLARE_READ32_MEMBER (bootvect_r);
@@ -208,6 +210,7 @@ private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
+	required_device<mpcc68561_device> m_mpcc;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint32_t  *m_sysrom;
@@ -224,7 +227,7 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, cpu20_state)
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
-//	AM_RANGE (0xff800000, 0xff80000f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0x00ff00ff)
+	AM_RANGE (0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0xffffffff)
 //	AM_RANGE (0xff800200, 0xff80020f) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
 	AM_RANGE (0xff800800, 0xff80080f) AM_DEVREADWRITE8("bim", bim68153_device, read, write, 0xff00ff00)
 //	AM_RANGE (0xff800a00, 0xff800a0f) AM_DEVREADWRITE8("rtc", rtc_device, read, write, 0x00ff00ff)
@@ -254,6 +257,8 @@ void cpu20_state::machine_reset ()
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
 		m_sysrom = (uint32_t*)(memregion ("roms")->base());
+
+	m_pit->h1_w(1); // signal no ACFAIL or SYSFAIL
 }
 
 #if 0
@@ -339,6 +344,19 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 		/*INT1 - MPCC@8.064 MHz aswell */
 		/*INT2 - PI/T timer */
 		/*INT3 - SYSFAIL/IRQVMX/ACFAIL/MPCC2/3 */
+
+	/* MPCC */                                                                 
+#define RS232P1_TAG      "rs232p1"
+	MCFG_MPCC68561_ADD ("mpcc", XTAL_8_664MHz, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	// RS232
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, rx_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, cts_w))
+
+//	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int1_w))
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -384,6 +402,30 @@ ROM_END
                            - PC2 used as I/O pin,CLK and x32 prescaler are used
 						   - Timer reload the preload values when reaching 0 (zero)
 						   - Timer is enabled
+ * MPCC setup
+ * : Reg 19 <- 1e - PSR2: Byte mode, 1 Stop bit, 8 bit data, ASYNC mode
+ * : Reg 1c <- 8a - BRDR1: Baud Rate Divider 1
+ * : Reg 1d <- 00 - BRDR1: Baud Rate Divider 2
+ * : Reg 1e <- 1c - CCR: x3 Mode, TxC is output, internal RxC, ISOC
+ * : Reg 1f <- 00 - ECR: No parity
+ * : Reg 0d <- 00 - TIER: interrupts disabled
+ * : Reg 15 <- 00 - SIER: interrupts disabled
+ * : Reg 05 <- 80 - RIER: enable RDA interrupts
+ * : Reg 01 <- 01 - RCR: Reset receiver command
+ * : Reg 01 <- 00 - RCR: Reciver in normal operation
+ * : Reg 09 <- 01 - TCR: Reset transmitter command
+ * : Reg 09 <- 80 - TCR: Transmitter in normal operation
+ * : Reg 11 <- c0 - SICR: Assert RTS, Assert DTR
+ * : Reg 08 -> 80 - TSR: Tx FIFO has room
+ * : Reg 0a <- 0a - TDR: send 0x0a to Tx FIFO... etc
+ *
+ * TDR outputs:
+ * "Disk Controller installed
+ *  Disk #0:  Header sector error = 145
+ *  Disk #1:  Header sector error = 145
+ *  Out of PDOS boot disk table entries.
+ *  I'LL Retry them all."
+ *
  */
 
 /* Driver */
