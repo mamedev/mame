@@ -2295,7 +2295,6 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 	if (basetype==(STACKPOINTER & MODE_MASK)) util::stream_format(stream, " SP");
 	if (basetype==REGISTERBANK) util::stream_format(stream, " RBS");
 	if (basetype==PROGRAMSTATUSWORD) util::stream_format(stream, " PSW");
-	if (basetype==CARRYFLAG) util::stream_format(stream, " CF");
 	if (basetype==MEMVECTOR_16BIT) util::stream_format(stream, " ($%04x)", val);
 	if (basetype==ABSOLUTE_VAL_8)
 	{
@@ -2303,7 +2302,11 @@ void tlcs870_device::disasm_disassemble_param(std::ostream &stream, offs_t pc, c
 		else util::stream_format(stream, "$%02x", val);
 	}
 
-	if (type&BITPOS)
+	if (basetype == (CARRYFLAG & MODE_MASK))
+	{
+		util::stream_format(stream, " CF");
+	}
+	else if (type&BITPOS)
 	{
 		if (type & BITPOS_INDIRECT) util::stream_format(stream, ".BIT_%s", reg8[m_bitpos&7]);
 		else util::stream_format(stream, ".BIT_%d", m_bitpos);
@@ -2354,7 +2357,7 @@ void tlcs870_device::execute_set_input(int inputnum, int state)
 #endif
 }
 
-uint16_t tlcs870_device::get_addr(int temppc, uint16_t param_type, uint16_t param_val)
+uint16_t tlcs870_device::get_addr(uint16_t param_type, uint16_t param_val)
 {
 	uint16_t addr = 0x0000;
 
@@ -2364,7 +2367,7 @@ uint16_t tlcs870_device::get_addr(int temppc, uint16_t param_type, uint16_t para
 		addr = param_val;
 		break;
 	case ADDR_IN_PC_PLUS_REG_A:
-		addr = temppc + 2 + get_reg8(REG_A);
+		addr = m_temppc + 2 + get_reg8(REG_A);
 		break;
 	case ADDR_IN_DE:
 		addr = get_reg16(REG_DE);
@@ -2468,6 +2471,106 @@ uint16_t tlcs870_device::get_source_val(uint16_t param_type, uint16_t param_val)
 	return ret_val;
 }
 
+void tlcs870_device::setbit_param1(uint8_t bit)
+{
+	if (m_param1_type & BITPOS)
+	{
+		uint8_t bitpos;
+
+		// need to read param 1
+		uint16_t addr = 0x0000;
+		uint16_t val = 0;
+
+		// READ
+		if (m_param1_type & ADDR_IN_BASE)
+		{
+			addr = get_addr(m_param1_type, m_param1); // any pre/post HL address adjustments happen here
+			if (m_param1_type & IS16BIT)
+				val = RM16(addr);
+			else
+				val = RM8(addr);
+		}
+		else
+		{
+			val = get_source_val(m_param1_type, m_param1);
+		}
+
+		if (m_param1_type & BITPOS_INDIRECT)
+		{
+			bitpos = get_reg8(m_bitpos & 7) & 0x7;
+		}
+		else
+		{
+			bitpos = m_bitpos;
+		}
+
+		// MODIFY
+		int bitused = (1 << bitpos) & 1;
+		bit ? (val |= bitused) : (val &= ~bitused);
+
+		// WRITE
+		if (m_param1_type & ADDR_IN_BASE)
+		{
+			//addr = get_addr(m_param1_type,m_param1); // already have addr, don't want to cause any further HL decrements/increments.
+			if (m_param1_type & IS16BIT)
+				WM16(addr, val);
+			else
+				WM8(addr, val);
+		}
+		else
+		{
+			set_dest_val(m_param1_type, m_param1, val);
+		}
+	}
+	else
+	{
+		fatalerror("not a bit op? 0\n");
+	}
+}
+
+uint8_t tlcs870_device::getbit_param2()
+{
+	uint8_t bit = 0;
+
+	if (m_param2_type & BITPOS)
+	{
+		uint8_t bitpos;
+
+		// need to read param 2
+		uint16_t addr = 0x0000;
+		uint16_t val = 0;
+		if (m_param2_type & ADDR_IN_BASE)
+		{
+			addr = get_addr(m_param2_type, m_param2);
+			if (m_param2_type & IS16BIT)
+				val = RM16(addr);
+			else
+				val = RM8(addr);
+		}
+		else
+		{
+			val = get_source_val(m_param2_type, m_param2);
+		}
+
+		if (m_param2_type & BITPOS_INDIRECT)
+		{
+			bitpos = get_reg8(m_bitpos & 7) & 0x7;
+		}
+		else
+		{
+			bitpos = m_bitpos;
+		}
+
+		bit = (val >> bitpos) & 1;
+	}
+	else
+	{
+		fatalerror("not a bit op? 0\n");
+	}
+
+	return bit;
+}
+
 void tlcs870_device::execute_run()
 {
 	do
@@ -2476,7 +2579,7 @@ void tlcs870_device::execute_run()
 		debugger_instruction_hook(this, m_pc.d);
 
 		//check_interrupts();
-		int temppc = m_pc.d;
+		m_temppc = m_pc.d;
 
 		m_addr = m_pc.d;
 		decode();
@@ -2529,14 +2632,28 @@ void tlcs870_device::execute_run()
 		case LD:
 		{
 			// this 'get val' should be in a function
-			if (m_param1_type == CARRYFLAG)
+			if ((m_param1_type & BITPOS) || (m_param2_type & BITPOS))
 			{
-				// 'TEST' style bit instruction
+				// bit operations, including the 'TEST' style bit instruction
+				uint8_t bit = 0;
+				
+				if (m_param2_type == CARRYFLAG)
+				{
+					bit = IS_CF;
 
-			}
-			else if (m_param2_type == CARRYFLAG)
-			{
-				// other bit-type operation
+					setbit_param1(bit);
+
+				}
+				else if (m_param1_type == CARRYFLAG)
+				{
+					getbit_param2();
+
+					bit ? SET_CF : CLEAR_CF;
+				}
+				else
+				{
+					fatalerror("not a bit op?! 2");
+				}
 			}
 			else
 			{
@@ -2544,7 +2661,7 @@ void tlcs870_device::execute_run()
 				uint16_t val = 0;
 				if (m_param2_type & ADDR_IN_BASE)
 				{
-					addr = get_addr(temppc, m_param2_type,m_param2);
+					addr = get_addr(m_param2_type,m_param2);
 					if (m_param2_type & IS16BIT)
 						val = RM16(addr);
 					else
@@ -2557,7 +2674,7 @@ void tlcs870_device::execute_run()
 
 				if (m_param1_type & ADDR_IN_BASE)
 				{
-					addr = get_addr(temppc, m_param1_type,m_param1);
+					addr = get_addr(m_param1_type,m_param1);
 					if (m_param1_type & IS16BIT)
 						WM16(addr, val);
 					else
@@ -2630,7 +2747,7 @@ void tlcs870_device::execute_run()
 			break;
 		}
 
-		m_icount-=m_cycles;
+		m_icount-=m_cycles*4; // 1 machine cycle = 4 clock cycles?
 
 
 	} while( m_icount > 0 );
@@ -2786,6 +2903,7 @@ void tlcs870_device::device_start()
 {
 //	int i, p;
 	m_sp.d = 0x0000;
+	m_F = 0;
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
@@ -2816,7 +2934,7 @@ void tlcs870_device::device_start()
 
 void tlcs870_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	int F = 0;
+	int F = m_F;
 
 	switch (entry.index())
 	{

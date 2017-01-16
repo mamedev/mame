@@ -88,7 +88,7 @@ protected:
 // special
 #define CONDITIONAL 0x03
 #define STACKPOINTER (0x04 | IS16BIT) // this is a 16-bit reg
-#define CARRYFLAG 0x5 // also flag as BITPOS since it's a bit operation?
+#define CARRYFLAG (0x5 | BITPOS) // also flag as BITPOS since it's a bit operation?
 #define MEMVECTOR_16BIT 0x6
 #define REGISTERBANK 0x7
 #define PROGRAMSTATUSWORD 0x8
@@ -113,7 +113,22 @@ protected:
 #define FLAG_Z (0x40)
 #define FLAG_C (0x20)
 #define FLAG_H (0x10)
-	
+
+
+#define IS_JF ((m_F & FLAG_J) ? 1 : 0)
+#define IS_ZF ((m_F & FLAG_Z) ? 1 : 0)
+#define IS_CF ((m_F & FLAG_C) ? 1 : 0)
+#define IS_HF ((m_F & FLAG_H) ? 1 : 0)
+
+#define SET_JF (m_F |= FLAG_J)
+#define SET_ZF (m_F |= FLAG_Z)
+#define SET_CF (m_F |= FLAG_C)
+#define SET_HF (m_F |= FLAG_H)
+
+#define CLEAR_JF (m_F &= ~FLAG_J)
+#define CLEAR_ZF (m_F &= ~FLAG_Z)
+#define CLEAR_CF (m_F &= ~FLAG_C)
+#define CLEAR_HF (m_F &= ~FLAG_H)
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,12 +170,13 @@ private:
 	int     m_icount;
 
 	// Work registers
-	uint8_t m_op;
+	uint16_t m_op;
 	int m_param2_type;
 	uint16_t m_param2;
 
 	int m_param1_type;
 	uint16_t m_param1;
+	uint16_t m_temppc; // this is just PPC? use generic reg?
 
 	uint8_t m_bitpos;
 	uint8_t m_flagsaffected;
@@ -187,8 +203,11 @@ private:
 	void decode_register_prefix(uint8_t b0);
 	void decode_source(int type, uint16_t val);
 	void decode_dest(uint8_t b0);
-	
-	uint16_t get_addr(int temppc, uint16_t param_type, uint16_t param_val);
+
+	void setbit_param1(uint8_t bit);
+	uint8_t getbit_param2();
+
+	uint16_t get_addr(uint16_t param_type, uint16_t param_val);
 	uint16_t get_source_val(uint16_t param_type, uint16_t param_val);
 	void set_dest_val(uint16_t param_type, uint16_t param_val, uint16_t dest_val);
 
