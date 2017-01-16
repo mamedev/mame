@@ -620,7 +620,7 @@ void fidelz80base_state::machine_reset()
 
 void fidelz80base_state::display_update()
 {
-	uint32_t active_state[0x20];
+	u32 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -633,7 +633,7 @@ void fidelz80base_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -688,7 +688,7 @@ void fidelz80base_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void fidelz80base_state::set_display_segmask(uint32_t digits, uint32_t mask)
+void fidelz80base_state::set_display_segmask(u32 digits, u32 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -699,12 +699,12 @@ void fidelz80base_state::set_display_segmask(uint32_t digits, uint32_t mask)
 	}
 }
 
-void fidelz80base_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
+void fidelz80base_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	uint32_t mask = (1 << maxx) - 1;
+	u32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -715,9 +715,9 @@ void fidelz80base_state::display_matrix(int maxx, int maxy, uint32_t setx, uint3
 
 // generic input handlers
 
-uint16_t fidelz80base_state::read_inputs(int columns)
+u16 fidelz80base_state::read_inputs(int columns)
 {
-	uint16_t ret = 0;
+	u16 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -741,7 +741,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 
 DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	// max size is 16KB?
 	if (size > 0x4000)
@@ -769,7 +769,7 @@ DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
 void fidelz80_state::vcc_prepare_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
-	uint8_t outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
 	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
@@ -836,7 +836,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low), also language switches
-	uint8_t lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
+	u8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
@@ -879,7 +879,7 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 WRITE8_MEMBER(fidelz80_state::bcc_control_w)
 {
 	// a0-a2,d7: digit segment data via NE591, Q7 is speaker out
-	uint8_t mask = 1 << (offset & 7);
+	u8 mask = 1 << (offset & 7);
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
 	m_dac->write(BIT(m_7seg_data, 7));
 
@@ -951,7 +951,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 
 READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// d4: TSI BUSY line
 	data |= (m_speech->busy_r()) ? 0 : 0x10;
@@ -987,7 +987,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 void fidelz80_state::vbrc_prepare_display()
 {
 	// 14seg led segments, d15 is extra led, d14 is unused (tone on prototype?)
-	uint16_t outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	u16 outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
 	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16, 8, outdata, m_led_select);
 }
@@ -1093,7 +1093,7 @@ ADDRESS_MAP_END
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
 READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
-	uint8_t data = 0xff; // open bus
+	u8 data = 0xff; // open bus
 	if (~offset & 4)
 		data &= m_ppi8255->read(space, offset & 3);
 	if (~offset & 8)

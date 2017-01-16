@@ -90,29 +90,29 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
 	// misc common
-	uint16_t m_inp_mux;                   // multiplexed keypad mask
-	uint16_t m_led_select;
-	uint16_t m_led_data;
+	u16 m_inp_mux;                  // multiplexed keypad mask
+	u16 m_led_select;
+	u16 m_led_data;
 
-	uint16_t read_inputs(int columns);
+	u16 read_inputs(int columns);
 
 	// display common
-	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                   // display matrix number of rows
-	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
+	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 
-	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	uint32_t m_display_cache[0x20];       // (internal use)
-	uint8_t m_display_decay[0x20][0x20];  // (internal use)
+	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u32 m_display_cache[0x20];      // (internal use)
+	u8 m_display_decay[0x20][0x20]; // (internal use)
 	
-	uint8_t m_lcd_control;
+	u8 m_lcd_control;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(uint32_t digits, uint32_t mask);
-	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Super Constellation	
 	DECLARE_WRITE8_MEMBER(supercon_mux_w);
@@ -192,7 +192,7 @@ void novag6502_state::machine_reset()
 
 void novag6502_state::display_update()
 {
-	uint32_t active_state[0x20];
+	u32 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -205,7 +205,7 @@ void novag6502_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -260,7 +260,7 @@ void novag6502_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void novag6502_state::set_display_segmask(uint32_t digits, uint32_t mask)
+void novag6502_state::set_display_segmask(u32 digits, u32 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -271,12 +271,12 @@ void novag6502_state::set_display_segmask(uint32_t digits, uint32_t mask)
 	}
 }
 
-void novag6502_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
+void novag6502_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	uint32_t mask = (1 << maxx) - 1;
+	u32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -287,9 +287,9 @@ void novag6502_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t
 
 // generic input handlers
 
-uint16_t novag6502_state::read_inputs(int columns)
+u16 novag6502_state::read_inputs(int columns)
 {
-	uint16_t ret = 0;
+	u16 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)

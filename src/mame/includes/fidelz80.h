@@ -33,36 +33,36 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<11> m_inp_matrix; // max 11
 	optional_device<s14001a_device> m_speech;
-	optional_region_ptr<uint8_t> m_speech_rom;
+	optional_region_ptr<u8> m_speech_rom;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
 
 	// misc common
-	uint16_t m_inp_mux;                   // multiplexed keypad/leds mask
-	uint16_t m_led_select;
-	uint32_t m_7seg_data;                 // data for seg leds
-	uint16_t m_led_data;
-	uint8_t m_speech_data;
-	uint8_t m_speech_bank;                // speech rom higher address bits
+	u16 m_inp_mux;                  // multiplexed keypad/leds mask
+	u16 m_led_select;
+	u32 m_7seg_data;                // data for seg leds
+	u16 m_led_data;
+	u8 m_speech_data;
+	u8 m_speech_bank;               // speech rom higher address bits
 
-	uint16_t read_inputs(int columns);
+	u16 read_inputs(int columns);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 
 	// display common
-	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                   // display matrix number of rows
-	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
+	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 
-	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	uint32_t m_display_cache[0x20];       // (internal use)
-	uint8_t m_display_decay[0x20][0x20];  // (internal use)
+	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u32 m_display_cache[0x20];      // (internal use)
+	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(uint32_t digits, uint32_t mask);
-	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;

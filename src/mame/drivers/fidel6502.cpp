@@ -535,7 +535,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
 READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 {
 	// d2: printer?
-	uint8_t data = 0x04;
+	u8 data = 0x04;
 
 	// d3: TSI BUSY line
 	if (m_speech->busy_r())
@@ -679,7 +679,7 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
 {
 	// d0: printer? white wire from LED pcb
-	uint8_t data = 1;
+	u8 data = 1;
 
 	// d1: TSI BUSY line
 	data |= (m_speech->busy_r()) ? 2 : 0;
@@ -712,7 +712,7 @@ WRITE8_MEMBER(fidel6502_state::sc9_control_w)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
-	uint16_t sel = 1 << (data & 0xf) & 0x3ff;
+	u16 sel = 1 << (data & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
 	sc9_prepare_display();
 
@@ -748,7 +748,7 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	uint16_t sel = 1 << (data & 0xf) & 0x3ff;
+	u16 sel = 1 << (data & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
@@ -803,24 +803,24 @@ READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
 WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 {
 	// a0-a2,d0: 74259(1)
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	uint16_t sel = 1 << (m_led_select & 0xf) & 0x3ff;
-	uint8_t led_data = sel & 0xff;
+	u16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	u8 led_data = sel & 0xff;
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
-	uint8_t led_sel = ~BITSWAP8(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
+	u8 led_sel = ~BITSWAP8(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
 
 	// a0-a2,d1: digit segment data (model 6093)
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
-	uint8_t seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
 	for (int i = 0; i < 6; i++)
@@ -850,7 +850,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
 {
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
-	uint8_t d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
+	u8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
 
 	// a0-a2,d7: multiplexed inputs (active low)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
@@ -858,7 +858,7 @@ READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
 
 READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 {
-	uint8_t d7 = 0x80;
+	u8 d7 = 0x80;
 
 	// 74259(1) Q7 + 74251 I0: battery status
 	if (m_inp_mux == 1 && ~m_led_select & 0x80)
@@ -878,15 +878,15 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 {
-	uint8_t q3_old = m_led_select & 8;
+	u8 q3_old = m_led_select & 8;
 
 	// a0-a2,d7: 74259
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// 74259 Q4-Q7: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	uint16_t sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
+	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
@@ -913,7 +913,7 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
-	uint32_t mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
+	u32 mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
 	for (int i = 0; i < 4; i++)
 	{
 		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? 0 : mask);
@@ -943,12 +943,12 @@ DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
 WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 {
 	// a0-a2,d7: 74259(1)
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// 74259 Q4-Q7: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	uint16_t sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
+	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
 	m_inp_mux = sel & 0x1ff;
 
 	// 74259 Q0,Q1: led select (active low)

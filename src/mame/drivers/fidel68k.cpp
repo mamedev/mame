@@ -203,7 +203,7 @@ public:
 WRITE8_MEMBER(fidel68k_state::fexcel68k_mux_w)
 {
 	// a1-a3,d0: 74259
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
@@ -222,7 +222,7 @@ void fidel68k_state::eag_prepare_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	uint8_t seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
@@ -258,7 +258,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	uint16_t sel = 1 << (data & 0xf);
+	u16 sel = 1 << (data & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();

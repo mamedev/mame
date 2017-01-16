@@ -108,21 +108,21 @@ public:
 
 	memory_region *m_cart_rom;
 
-	uint8_t m_bus_control;
-	uint8_t m_power;
-	uint8_t m_banks;
-	uint8_t m_clock_control;
-	uint8_t m_clock_divider;
-	uint8_t m_key_select;
+	u8 m_bus_control;
+	u8 m_power;
+	u8 m_banks;
+	u8 m_clock_control;
+	u8 m_clock_divider;
+	u8 m_key_select;
 
-	std::unique_ptr<uint8_t[]> m_sysram[2];
-	uint16_t m_sysram_size[2];
-	uint16_t m_sysram_end[2];
-	uint16_t m_sysram_mask[2];
+	std::unique_ptr<u8[]> m_sysram[2];
+	u16 m_sysram_size[2];
+	u16 m_sysram_end[2];
+	u16 m_sysram_mask[2];
 
 	void postload();
-	void init_sysram(int chip, uint16_t size);
-	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
+	void init_sysram(int chip, u16 size);
+	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_clock_divider();
 
 	DECLARE_READ8_MEMBER(sysram_r);
@@ -156,7 +156,7 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
@@ -186,7 +186,7 @@ PALETTE_INIT_MEMBER(cc40_state, cc40)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void cc40_state::update_lcd_indicator(uint8_t y, uint8_t x, int state)
+void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 {
 	// reference _________________...
 	// output#  |10  11     12     13     14      0      1      2      3   4
@@ -336,7 +336,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 
 READ8_MEMBER(cc40_state::keyboard_r)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -510,12 +510,12 @@ void cc40_state::machine_reset()
 	bankswitch_w(space, 0, 0);
 }
 
-void cc40_state::init_sysram(int chip, uint16_t size)
+void cc40_state::init_sysram(int chip, u16 size)
 {
 	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
-		m_sysram[chip] = std::make_unique<uint8_t[]>(0x2000);
+		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
 		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
