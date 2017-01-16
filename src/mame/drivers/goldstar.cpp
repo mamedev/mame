@@ -8474,6 +8474,9 @@ static MACHINE_CONFIG_DERIVED( mbstar, lucky8 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mbstar_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_mbstar)
 MACHINE_CONFIG_END
 
 
