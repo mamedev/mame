@@ -72,6 +72,7 @@ public:
 	pushman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tigeroad_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
+		, m_host_semaphore(false)
 		, m_mcu_semaphore(false)
 		, m_host_latch(0xffff)
 		, m_mcu_latch(0xffff)
@@ -81,10 +82,8 @@ public:
 		m_has_coinlock = false;
 	}
 
-	DECLARE_READ16_MEMBER(mcu_data_r);
-	DECLARE_READ16_MEMBER(mcu_ack_r);
-	DECLARE_WRITE16_MEMBER(mcu_data_w);
-	DECLARE_WRITE16_MEMBER(mcu_cmd_w);
+	DECLARE_READ16_MEMBER(mcu_comm_r);
+	DECLARE_WRITE16_MEMBER(mcu_comm_w);
 
 	DECLARE_WRITE8_MEMBER(mcu_pa_w);
 	DECLARE_WRITE8_MEMBER(mcu_pb_w);
@@ -95,7 +94,7 @@ protected:
 
 	required_device<m68705u_device> m_mcu;
 
-	bool    m_mcu_semaphore;
+	bool    m_host_semaphore, m_mcu_semaphore;
 	u16     m_host_latch, m_mcu_latch;
 	u16     m_mcu_output;
 	u8      m_mcu_latch_ctl;
@@ -107,9 +106,8 @@ class bballs_state : public tigeroad_state
 public:
 	bballs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tigeroad_state(mconfig, type, tag)
-		, m_shared_ram{ 0, 0, 0, 0, 0, 0, 0, 0 }
-		, m_latch(0xffff)
-		, m_new_latch(0)
+		, m_mcu_semaphore(false)
+		, m_mcu_latch(0xffff)
 	{
 		m_has_coinlock = false;
 	}
@@ -118,12 +116,10 @@ public:
 	DECLARE_WRITE16_MEMBER(bballs_68705_w);
 
 	DECLARE_MACHINE_RESET(bballs);
-	DECLARE_DRIVER_INIT(bballs);
 
 protected:
 	virtual void machine_start() override;
 
-	u8  m_shared_ram[8];
-	u16 m_latch;
-	u16 m_new_latch;
+	bool    m_mcu_semaphore;
+	u16     m_mcu_latch;
 };

@@ -87,15 +87,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_IMPORT_FROM(main_map)
 
-	AM_RANGE(0x060000, 0x060001) AM_READWRITE(mcu_data_r, mcu_data_w)
-	AM_RANGE(0x060002, 0x600003) AM_WRITE(mcu_cmd_w)
-	AM_RANGE(0x060006, 0x060007) AM_READ(mcu_ack_r)
+	AM_RANGE(0x060000, 0x060007) AM_READ(mcu_comm_r)
+	AM_RANGE(0x060000, 0x060003) AM_WRITE(mcu_comm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, bballs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r, bballs_68705_w)
+	AM_RANGE(0x60000, 0x60007) AM_READ(bballs_68705_r)
+	AM_RANGE(0x60000, 0x60003) AM_WRITE(bballs_68705_w)
 	// are these mirror addresses or does this PCB have a different addressing?
 	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)
@@ -685,6 +685,7 @@ MACHINE_CONFIG_END
 
 void pushman_state::machine_start()
 {
+	save_item(NAME(m_host_semaphore));
 	save_item(NAME(m_mcu_semaphore));
 	save_item(NAME(m_host_latch));
 	save_item(NAME(m_mcu_latch));
@@ -705,17 +706,14 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(bballs_state, bballs)
 {
-	m_new_latch = 0;
-	m_latch = 0x400;
-
-	std::fill(std::begin(m_shared_ram), std::end(m_shared_ram), 0);
+	m_mcu_semaphore = false;
+	m_mcu_latch = 0x0400;
 }
 
 void bballs_state::machine_start()
 {
-	save_item(NAME(m_shared_ram));
-	save_item(NAME(m_latch));
-	save_item(NAME(m_new_latch));
+	save_item(NAME(m_mcu_semaphore));
+	save_item(NAME(m_mcu_latch));
 }
 
 static MACHINE_CONFIG_DERIVED_CLASS(bballs, f1dream_comad, bballs_state)
