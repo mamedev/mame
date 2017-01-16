@@ -1068,9 +1068,11 @@ void cop400_cpu_device::execute_run()
 {
 	do
 	{
-		// debugger hook
-		m_prevpc = PC;
-		debugger_instruction_hook(this, PC);
+		if (!m_skip) {
+			// debugger hook
+			m_prevpc = PC;
+			debugger_instruction_hook(this, PC);
+		}
 
 		// halt logic
 		if (m_cko == COP400_CKO_HALT_IO_PORT) {
