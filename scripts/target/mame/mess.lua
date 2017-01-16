@@ -729,6 +729,7 @@ FORMATS["ADAM_DSK"] = true
 FORMATS["AFS_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["AP2_DSK"] = true
+FORMATS["APD_DSK"] = true
 FORMATS["APF_APT"] = true
 FORMATS["APOLLO_DSK"] = true
 FORMATS["APPLIX_DSK"] = true
