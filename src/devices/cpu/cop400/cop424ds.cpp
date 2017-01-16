@@ -2,15 +2,15 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    cop444ds.c
+    cop424ds.c
 
-    National Semiconductor COP444L Emulator.
+    National Semiconductor COP424C/COP444C Emulator.
 
 ***************************************************************************/
 
 #include "emu.h"
 
-CPU_DISASSEMBLE(cop444)
+CPU_DISASSEMBLE(cop424)
 {
 	uint8_t opcode = oprom[0];
 	uint8_t next_opcode = oprom[1];
@@ -261,6 +261,18 @@ CPU_DISASSEMBLE(cop444)
 					util::stream_format(stream, "INL");
 					break;
 
+				case 0x2F:
+					util::stream_format(stream, "CTMA");
+					break;
+
+				case 0x38:
+					util::stream_format(stream, "HALT");
+					break;
+
+				case 0x39:
+					util::stream_format(stream, "IT");
+					break;
+
 				case 0x3A:
 					util::stream_format(stream, "OMG");
 					break;
@@ -272,6 +284,11 @@ CPU_DISASSEMBLE(cop444)
 				case 0x3E:
 					util::stream_format(stream, "OBD");
 					break;
+
+				case 0x3F:
+					util::stream_format(stream, "CAMT");
+					break;
+
 
 				default:
 					util::stream_format(stream, "Invalid");

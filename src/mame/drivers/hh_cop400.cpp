@@ -556,7 +556,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=47K, C=100pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -846,7 +846,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mdallas, mdallas_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=57K, C=101pf
+	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
