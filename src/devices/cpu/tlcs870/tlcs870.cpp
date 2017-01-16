@@ -2642,6 +2642,9 @@ void tlcs870_device::execute_run()
 					bit = IS_CF;
 
 					setbit_param1(bit);
+				
+					// for this type of operation ( LD *.b, CF ) the Jump Flag always ends up being 1
+					SET_JF;
 
 				}
 				else if (m_param1_type == CARRYFLAG)
@@ -2649,6 +2652,8 @@ void tlcs870_device::execute_run()
 					getbit_param2();
 
 					bit ? SET_CF : CLEAR_CF;
+					// for this type of operation ( LD CF, *.b ) the Jump Flag always ends up the inverse of the Carry Flag
+					bit ? CLEAR_JF : SET_JF;
 				}
 				else
 				{
@@ -2670,6 +2675,15 @@ void tlcs870_device::execute_run()
 				else
 				{
 					val = get_source_val(m_param2_type,m_param2);
+				}
+
+				SET_JF; // Jump Flag always gets set
+
+				// some (but not all) LD operations change the Zero Flag, some leave it undefined (for those we don't change it)
+				if (m_flagsaffected & FLAG_Z)
+				{
+					if (val == 0x00) SET_ZF;
+					else CLEAR_ZF;
 				}
 
 				if (m_param1_type & ADDR_IN_BASE)
