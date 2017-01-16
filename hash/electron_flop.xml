@@ -65,7 +65,7 @@
 		</part>
 	</software>
 
-	<software name="abgensnr" cloneof="argcreat">
+	<software name="abgensnr">
 		<description>Answer Back - General Knowledge Senior Quiz</description>
 		<year>1984</year>
 		<publisher>Kosmos</publisher>
@@ -476,7 +476,7 @@
 		</part>
 	</software>
 
-	<software name="pias35">
+	<software name="pias35" cloneof="pias">
 		<description>Play It Again Sam (3.5")</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
