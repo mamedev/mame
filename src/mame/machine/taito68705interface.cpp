@@ -21,6 +21,7 @@
     matmania.cpp - maniach
     nycaptor.cpp - nycaptor
     renegade.cpp - renegade
+    retofinv.cpp - retofinv
     slapfght.cpp - slapfght
     xain.cpp     - xsleena
 

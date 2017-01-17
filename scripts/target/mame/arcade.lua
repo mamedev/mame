@@ -3666,7 +3666,6 @@ files {
 	MAME_DIR .. "src/mame/video/rastan.cpp",
 	MAME_DIR .. "src/mame/drivers/retofinv.cpp",
 	MAME_DIR .. "src/mame/includes/retofinv.h",
-	MAME_DIR .. "src/mame/machine/retofinv.cpp",
 	MAME_DIR .. "src/mame/video/retofinv.cpp",
 	MAME_DIR .. "src/mame/drivers/rollrace.cpp",
 	MAME_DIR .. "src/mame/includes/rollrace.h",

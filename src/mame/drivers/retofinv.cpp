@@ -31,11 +31,11 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/retofinv.h"
+
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m68705.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/retofinv.h"
 
 
 void retofinv_state::machine_start()
@@ -43,23 +43,6 @@ void retofinv_state::machine_start()
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_cpu2_m6000));
-
-	if (m_68705 != nullptr) // only for the parent (with MCU)
-	{
-		save_item(NAME(m_from_main));
-		save_item(NAME(m_from_mcu));
-		save_item(NAME(m_mcu_sent));
-		save_item(NAME(m_main_sent));
-		save_item(NAME(m_portA_in));
-		save_item(NAME(m_portA_out));
-		save_item(NAME(m_ddrA));
-		save_item(NAME(m_portB_in));
-		save_item(NAME(m_portB_out));
-		save_item(NAME(m_ddrB));
-		save_item(NAME(m_portC_in));
-		save_item(NAME(m_portC_out));
-		save_item(NAME(m_ddrC));
-	}
 }
 
 WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
@@ -74,9 +57,7 @@ WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
 
 WRITE8_MEMBER(retofinv_state::mcu_reset_w)
 {
-	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (m_68705 != nullptr)
-		m_68705->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_68705->reset_w(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
@@ -91,8 +72,8 @@ READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 
 WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
-		m_soundlatch->write(space, 0, data);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::irq0_ack_w)
@@ -119,8 +100,17 @@ WRITE8_MEMBER(retofinv_state::coinlockout_w)
 	machine().bookkeeping().coin_lockout_w(0,~data & 1);
 }
 
+READ8_MEMBER(retofinv_state::mcu_status_r)
+{
+	/* bit 4 = when 1, mcu is ready to receive data from main cpu */
+	/* bit 5 = when 1, mcu has sent data to the main cpu */
+	return
+			((CLEAR_LINE == m_68705->host_semaphore_r()) ? 0x10 : 0x00) |
+			((CLEAR_LINE != m_68705->mcu_semaphore_r()) ? 0x20 : 0x00);
+}
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
+
+static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM /* space for diagnostic ROM? The code looks */
@@ -132,7 +122,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc002, 0xc002) AM_READNOP /* bit 7 must be 0, otherwise game resets */
-	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
@@ -140,14 +129,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(irq0_ack_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(coinlockout_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(cpu2_reset_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(mcu_reset_w)
 //  AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)   // presumably (meaning memory map is shared with cpu 1)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(mcu_r)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(mcu_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
+	AM_IMPORT_FROM(bootleg_map)
+	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
+	AM_RANGE(0xc803, 0xc803) AM_WRITE(mcu_reset_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("68705", taito68705_mcu_device, data_r)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("68705", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
@@ -166,18 +160,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM         /* space for diagnostic ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, retofinv_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mcu_portA_r, mcu_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mcu_portB_r, mcu_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_portC_r, mcu_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(mcu_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(mcu_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(mcu_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -382,8 +364,7 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60)
 
-	MCFG_CPU_ADD("68705", M68705,18432000/6)    /* 3.072 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("68705", TAITO68705_MCU, 18432000/6)    /* 3.072 MHz? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -418,8 +399,10 @@ MACHINE_CONFIG_END
 
 /* bootleg has no mcu */
 static MACHINE_CONFIG_DERIVED( retofinb, retofinv )
-	MCFG_DEVICE_REMOVE("68705")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
+	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END
 
 
@@ -441,7 +424,7 @@ ROM_START( retofinv )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a37-05.17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
 
-	ROM_REGION( 0x0800, "68705", 0 )    /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "68705:mcu", 0 )    /* 2k for the microcontroller */
 	/* the only available dump is from a bootleg board, and is not the real thing (see notes at top of driver) */
 	ROM_LOAD( "a37-09.37", 0x00000, 0x0800, BAD_DUMP CRC(79bd6ded) SHA1(4967e95b4461c1bfb4e933d1804677799014f77b) )
 
