@@ -315,7 +315,7 @@ namespace netlist
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
-	};
+};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources

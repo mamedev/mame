@@ -8,7 +8,7 @@
 #include "devices/net_lib.h"
 
 #include "nld_opamps.h"
-
+#include "nl_errstr.h"
 
 namespace netlist
 {
@@ -100,7 +100,7 @@ namespace netlist
 				connect("EBUF.IP", "RP1.1");
 			}
 			else
-				netlist().log().fatal("Unknown opamp type: {1}", m_type);
+				log().fatal(MF_1_UNKNOWN_OPAMP_TYPE, m_type);
 
 		}
 

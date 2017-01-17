@@ -72,7 +72,7 @@ namespace netlist
 		setup_t &m_setup;
 
 		const char *m_buf;
-	};
+};
 
 }
 

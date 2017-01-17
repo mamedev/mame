@@ -237,7 +237,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
-	virtual void vdowrite(const pstring &ls) const {}
+	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:
 	bool m_enabled;

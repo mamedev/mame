@@ -121,9 +121,9 @@ namespace netlist
 			}
 		}
 		if (!f)
-			netlist().log().warning("D/A Proxy: Found no valid combination of power terminals on device {1}", out_proxied->device().name());
+			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else
-			netlist().log().warning("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
+			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 #if (0)
 		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
 		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::type_t::OUTPUT, false);

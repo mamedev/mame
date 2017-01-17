@@ -990,7 +990,7 @@ namespace netlist
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 		model_map_t m_map;
-	};
+};
 
 
 	class param_data_t : public param_str_t
@@ -1001,6 +1001,28 @@ namespace netlist
 		std::unique_ptr<plib::pistream> stream();
 	protected:
 		virtual void changed() override;
+	};
+
+	// -----------------------------------------------------------------------------
+	// rom parameter
+	// -----------------------------------------------------------------------------
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name);
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1068,6 +1090,8 @@ namespace netlist
 				update();
 			#endif
 		}
+
+		plib::plog_base<NL_DEBUG> &log();
 
 	public:
 		virtual void timestep(ATTR_UNUSED const nl_double st) { }
@@ -1230,22 +1254,16 @@ namespace netlist
 			return tmp;
 		}
 
-		template<class device_class>
-		device_class *get_single_device(const char *classname)
+		template<class C>
+		static bool check_class(core_device_t *p)
 		{
-			device_class *ret = nullptr;
-			for (auto &d : m_devices)
-			{
-				device_class *dev = dynamic_cast<device_class *>(d.get());
-				if (dev != nullptr)
-				{
-					if (ret != nullptr)
-						this->log().fatal("more than one {1} device found", classname);
-					else
-						ret = dev;
-				}
-			}
-			return ret;
+			return dynamic_cast<C *>(p) != nullptr;
+		}
+
+		template<class C>
+		C *get_single_device(const char *classname)
+		{
+			return dynamic_cast<C *>(pget_single_device(classname, check_class<C>));
 		}
 
 		/* logging and name */
@@ -1278,6 +1296,9 @@ namespace netlist
 		void print_stats() const;
 
 	private:
+
+		core_device_t *pget_single_device(const char *classname, bool (*cc)(core_device_t *));
+
 		/* mostly rw */
 		netlist_time                        m_time;
 		detail::queue_t                     m_queue;
@@ -1326,38 +1347,19 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// rom parameter
+	// inline implementations
 	// -----------------------------------------------------------------------------
 
 	template <typename ST, std::size_t AW, std::size_t DW>
-	class param_rom_t final: public param_data_t
+	inline param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring name)
+	: param_data_t(device, name)
 	{
-	public:
-
-		param_rom_t(device_t &device, const pstring name)
-		: param_data_t(device, name)
-		{
-			auto f = stream();
-			if (f != nullptr)
-				f->read(&m_data[0],1<<AW);
-			else
-				device.netlist().log().warning("Rom {1} not found", Value());
-		}
-
-		const ST & operator[] (std::size_t n) { return m_data[n]; }
-
-	protected:
-		virtual void changed() override
-		{
-			stream()->read(&m_data[0],1<<AW);
-		}
-	private:
-		ST m_data[1 << AW];
-	};
-
-	// -----------------------------------------------------------------------------
-	// inline implementations
-	// -----------------------------------------------------------------------------
+		auto f = stream();
+		if (f != nullptr)
+			f->read(&m_data[0],1<<AW);
+		else
+			device.netlist().log().warning("Rom {1} not found", Value());
+	}
 
 	inline bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
 	{

@@ -600,6 +600,21 @@ void netlist_t::print_stats() const
 	}
 }
 
+core_device_t *netlist_t::pget_single_device(const char *classname, bool (*cc)(core_device_t *))
+{
+	core_device_t *ret = nullptr;
+	for (auto &d : m_devices)
+	{
+		if (cc(d.get()))
+		{
+			if (ret != nullptr)
+				this->log().fatal(MF_1_MORE_THAN_ONE_1_DEVICE_FOUND, classname);
+			else
+				ret = d.get();
+		}
+	}
+	return ret;
+}
 
 
 // ----------------------------------------------------------------------------------------
@@ -651,6 +666,11 @@ void core_device_t::set_delegate_pointer()
 #endif
 }
 
+plib::plog_base<NL_DEBUG> &core_device_t::log()
+{
+	return netlist().log();
+}
+
 // ----------------------------------------------------------------------------------------
 // device_t
 // ----------------------------------------------------------------------------------------
@@ -698,7 +718,7 @@ void device_t::connect(const pstring &t1, const pstring &t2)
 void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	if (!setup().connect(t1, t2))
-		netlist().log().fatal(MF_2_ERROR_CONNECTING_1_TO_2, t1.name(), t2.name());
+		log().fatal(MF_2_ERROR_CONNECTING_1_TO_2, t1.name(), t2.name());
 }
 
 
@@ -1174,7 +1194,7 @@ param_ptr_t::~param_ptr_t()
 
 void param_model_t::changed()
 {
-	netlist().log().fatal("Models can not be changed at runtime");
+	netlist().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
 	m_map.clear();
 }
 
@@ -1200,8 +1220,6 @@ std::unique_ptr<plib::pistream> param_data_t::stream()
 {
 	return device().netlist().setup().get_data_stream(Value());
 }
-
-
 
 	namespace devices
 	{
