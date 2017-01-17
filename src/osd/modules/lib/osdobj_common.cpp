@@ -131,7 +131,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
 	{ OSDOPTION_PA_API,                       OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio API" },
 	{ OSDOPTION_PA_DEVICE,                    OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio device" },
-	{ OSDOPTION_PA_LATENCY "(0.001-0.25)",    "0",              OPTION_FLOAT,     "suggested latency in seconds, 0 for default" },
+	{ OSDOPTION_PA_LATENCY "(0-0.25)",        "0",              OPTION_FLOAT,     "suggested latency in seconds, 0 for default" },
 #endif
 
 #ifdef SDLMAME_MACOSX
