@@ -2496,6 +2496,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 {
 	const char *action = nullptr;
 	bool detect_loops = true;
+	bool logerror = false;
 	device_t *cpu;
 	FILE *f = nullptr;
 	const char *mode;
@@ -2507,8 +2508,25 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	/* validate parameters */
 	if (!validate_cpu_parameter((params > 1) ? param[1] : nullptr, &cpu))
 		return;
-	if (!validate_boolean_parameter((params > 2) ? param[2] : nullptr, &detect_loops))
-		return;
+	if (params > 2)
+	{
+		std::stringstream stream;
+		stream.str(param[2]);
+
+		std::string flag;
+		while (std::getline(stream, flag, '|'))
+		{
+			if (!core_stricmp(flag.c_str(), "noloop"))
+				detect_loops = false;
+			else if (!core_stricmp(flag.c_str(), "logerror"))
+				logerror = true;
+			else
+			{
+				m_console.printf("Invalid flag '%s'\n", flag.c_str());
+				return;
+			}
+		}
+	}
 	if (!debug_command_parameter_command(action = (params > 3) ? param[3] : nullptr))
 		return;
 
@@ -2533,7 +2551,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	}
 
 	/* do it */
-	cpu->debug()->trace(f, trace_over, detect_loops, action);
+	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action);
 	if (f)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
 	else
