@@ -271,8 +271,10 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 void tms9927_device::recompute_parameters(bool postload)
 {
 	uint16_t offset_hpix, offset_vpix;
+#if 0
 	attoseconds_t refresh;
 	rectangle visarea;
+#endif
 
 	if (m_reset)
 		return;
@@ -311,6 +313,7 @@ void tms9927_device::recompute_parameters(bool postload)
 	if (!m_valid_config)
 		return;
 
+#if 0
 	/* create a visible area */
 	/* fix me: how do the offsets fit in here? */
 	visarea.set(0, m_visible_hpix - 1, 0, m_visible_vpix - 1);
@@ -318,7 +321,8 @@ void tms9927_device::recompute_parameters(bool postload)
 	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 
 	m_screen->configure(m_total_hpix, m_total_vpix, visarea, refresh);
-
+#endif
 	m_vsyn = 0;
 	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
+
 }

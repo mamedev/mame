@@ -23,7 +23,9 @@ uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &
 	if (!m_intvkbd_text_blanked)
 	{
 		uint8_t *videoram = m_videoram;
-
+		int xoffset = STIC_OVERSCAN_LEFT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE;
+		int yoffset = STIC_OVERSCAN_TOP_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE;
+		
 		rectangle cursor_rect;
 		m_crtc->cursor_bounds(cursor_rect);
 		int cursor_col = cursor_rect.min_x / 8;
@@ -41,14 +43,14 @@ uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &
 					191, /* a block */
 					7,   /* white   */
 					0,0,
-					x<<3, y<<3, 0);
+					xoffset+(x<<3), yoffset+(y<<3), 0);
 				} else {
 					int offs = current_row*64+x;
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					videoram[offs],
 					7, /* white */
 					0,0,
-					x<<3, y<<3, 0);
+					xoffset+(x<<3), yoffset+(y<<3), 0);
 				}
 			}
 			current_row = (current_row + 1) % 24;
