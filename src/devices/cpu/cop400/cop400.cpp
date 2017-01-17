@@ -47,7 +47,6 @@
 
     TODO:
 
-	- fix state masks
 	- COP410L/COP410C
     - save internal RAM when CKO is RAM power supply pin
     - COP404L opcode map switching, dual timer, microbus enable
@@ -370,7 +369,7 @@ void cop400_cpu_device::WRITE_G(uint8_t data)
 
 INSTRUCTION(illegal)
 {
-	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
+	logerror("COP400: PC = %03x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
 }
 
 #include "cop400op.hxx"
@@ -737,11 +736,11 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP444L_OPCODE_MA
 {
 	OP(clra)        , OP(skmbz0)    , OP(xor_)      , OP(skmbz2)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(casc)        , OP(skmbz1)    , OP(cop444l_xabr), OP(skmbz3)       , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(casc)        , OP(skmbz1)    , OP(cop444l_xabr), OP(skmbz3)      , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop444l_op23)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop444l_op23)  , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(asc)         , OP(add)       , OP(rc)        , OP(cop444l_op33)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(asc)         , OP(add)       , OP(rc)        , OP(cop444l_op33)  , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
 	OP(comp)        , OP(skt)       , OP(rmb2)      , OP(rmb3)          , OP(nop)       , OP(rmb1)      , OP(smb2)      , OP(smb1)      ,
@@ -868,11 +867,11 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP424C_OPCODE_MA
 {
 	OP(clra)        , OP(skmbz0)    , OP(xor_)      , OP(skmbz2)        , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(casc)        , OP(skmbz1)    , OP(cop444l_xabr), OP(skmbz3)       , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(casc)        , OP(skmbz1)    , OP(cop444l_xabr), OP(skmbz3)      , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop444l_op23)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(skc)         , OP(ske)       , OP(sc)        , OP(cop444l_op23)  , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
-	OP(asc)         , OP(add)       , OP(rc)        , OP(cop444l_op33)   , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
+	OP(asc)         , OP(add)       , OP(rc)        , OP(cop444l_op33)  , OP(xis)       , OP(ld)        , OP(x)         , OP(xds)       ,
 	OP(lbi)         , OP(lbi)       , OP(lbi)       , OP(lbi)           , OP(lbi)       , OP(lbi)       , OP(lbi)       , OP(lbi)       ,
 
 	OP(comp)        , OP(skt)       , OP(rmb2)      , OP(rmb3)          , OP(nop)       , OP(rmb1)      , OP(smb2)      , OP(smb1)      ,
@@ -1016,17 +1015,17 @@ void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 {
 	switch (id)
 	{
-		case TIMER_SERIAL:
-			serial_tick();
-			break;
+	case TIMER_SERIAL:
+		serial_tick();
+		break;
 
-		case TIMER_COUNTER:
-			counter_tick();
-			break;
+	case TIMER_COUNTER:
+		counter_tick();
+		break;
 
-		case TIMER_INIL:
-			inil_tick();
-			break;
+	case TIMER_INIL:
+		inil_tick();
+		break;
 	}
 }
 
@@ -1095,36 +1094,26 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_halt));
 	save_item(NAME(m_idle));
 
-	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).mask(0x3).callimport().callexport().noshow().formatstr("%3s");
+	// setup debugger state display
+	offs_t pc_mask = m_program->addrmask();
 
-	state_add(COP400_PC,       "PC",        m_pc).mask(0xfff);
-
-	if (m_featuremask & (COP410_FEATURE | COP420_FEATURE | COP444L_FEATURE | COP424C_FEATURE))
-	{
-		state_add(COP400_SA,   "SA",        m_sa).mask(0xfff);
-		state_add(COP400_SB,   "SB",        m_sb).mask(0xfff);
-		if (m_featuremask & (COP420_FEATURE | COP444L_FEATURE | COP424C_FEATURE))
-		{
-			state_add(COP400_SC, "SC",      m_sc).mask(0xfff);
-		}
+	state_add(STATE_GENPC, "GENPC", m_pc).mask(pc_mask).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_prevpc).mask(pc_mask).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
+	state_add(COP400_PC, "PC", m_pc).mask(pc_mask);
+	state_add(COP400_SA, "SA", m_sa).mask(pc_mask);
+	state_add(COP400_SB, "SB", m_sb).mask(pc_mask);
+	if (!(m_featuremask & COP410_FEATURE)) {
+		state_add(COP400_SC, "SC", m_sc).mask(pc_mask);
 	}
-
-	state_add(COP400_A,        "A",         m_a).mask(0xf);
-	state_add(COP400_B,        "B",         m_b);
-	state_add(COP400_C,        "C",         m_c).mask(0x1);
-
-	state_add(COP400_EN,       "EN",        m_en).mask(0xf);
-	state_add(COP400_G,        "G",         m_g).mask(0xf);
-	state_add(COP400_Q,        "Q",         m_q);
-
-	state_add(COP400_SIO,      "SIO",       m_sio).mask(0xf);
-	state_add(COP400_SKL,      "SKL",       m_skl).mask(0x1);
-
-	if (m_featuremask & COP424C_FEATURE)
-	{
-		state_add(COP400_T,    "T",         m_t);
+	state_add(COP400_B, "B", m_b);
+	state_add(COP400_A, "A", m_a).mask(0xf);
+	state_add(COP400_G, "G", m_g).mask(0xf);
+	state_add(COP400_Q, "Q", m_q);
+	state_add(COP400_SIO, "SIO", m_sio).mask(0xf);
+	state_add(COP400_EN, "EN", m_en).mask(0xf);
+	if (m_featuremask & COP424C_FEATURE) {
+		state_add(COP400_T, "T", m_t);
 	}
 
 	m_icountptr = &m_icount;
@@ -1253,10 +1242,11 @@ void cop400_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS:
-			m_c = (m_flags >> 1) & 1;
-			m_skl = (m_flags >> 0) & 1;
-			break;
+	case STATE_GENFLAGS:
+		m_skt_latch = BIT(m_flags, 2);
+		m_c = BIT(m_flags, 1);
+		m_skl = BIT(m_flags, 0);
+		break;
 	}
 }
 
@@ -1264,9 +1254,9 @@ void cop400_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS:
-			m_flags = (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
-			break;
+	case STATE_GENFLAGS:
+		m_flags = (m_skt_latch ? 0x04 : 0x00) | (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
+		break;
 	}
 }
 
@@ -1274,12 +1264,12 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c",
-					m_c ? 'C' : '.',
-					m_skl ? 'S' : '.',
-					m_skt_latch ? 'T' : '.');
-			break;
+	case STATE_GENFLAGS:
+		str = string_format("%c%c%c",
+				m_c ? 'C' : '.',
+				m_skl ? 'S' : '.',
+				m_skt_latch ? 'T' : '.');
+		break;
 	}
 }
 
