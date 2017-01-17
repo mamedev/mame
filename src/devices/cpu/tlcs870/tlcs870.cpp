@@ -2676,7 +2676,56 @@ void tlcs870_device::execute_run()
 			break;
 		*/
 		case INC:
+		{
+			// READ
+			uint16_t addr = 0x0000;
+			uint16_t val = 0;
+			if (m_param1_type & ADDR_IN_BASE)
+			{
+				addr = get_addr(m_param1_type, m_param1);
+				if (m_param1_type & IS16BIT)
+					val = RM16(addr);
+				else
+					val = RM8(addr);
+			}
+			else
+			{
+				val = get_source_val(m_param1_type, m_param1);
+			}
+
+			// MODIFY
+			val++;
+
+			if (!(m_param1_type & IS16BIT))
+				val &= 0xff;
+
+			if (val == 0)
+			{
+				SET_ZF;
+				SET_JF;
+			}
+			else
+			{
+				CLEAR_ZF;
+				CLEAR_JF;
+			}
+
+			// WRITE
+			if (m_param1_type & ADDR_IN_BASE)
+			{
+				//addr = get_addr(m_param1_type,m_param1); // already have
+				if (m_param1_type & IS16BIT)
+					WM16(addr, val);
+				else
+					WM8(addr, val);
+			}
+			else
+			{
+				set_dest_val(m_param1_type,m_param1, val);
+			}
+
 			break;
+		}
 		/*
 		case J:
 			break;
