@@ -775,7 +775,7 @@ void setup_t::resolve_inputs()
 
 void setup_t::start_devices()
 {
-	pstring env = plib::util::environment("NL_LOGS");
+	pstring env = plib::util::environment("NL_LOGS", "");
 
 	if (env != "")
 	{

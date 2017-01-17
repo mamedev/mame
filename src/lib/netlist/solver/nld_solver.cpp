@@ -275,7 +275,7 @@ void NETLIB_NAME(solver)::post_start()
 	//m_params.m_max_timestep = std::max(m_params.m_max_timestep, m_params.m_max_timestep::)
 
 	// Override log statistics
-	pstring p = plib::util::environment("NL_STATS");
+	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
 		m_params.m_log_stats = p.as_long();
 	else
