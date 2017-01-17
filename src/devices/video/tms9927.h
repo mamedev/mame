@@ -19,7 +19,9 @@
 #define MCFG_TMS9927_REGION(_tag) \
 	tms9927_device::set_region_tag(*device, "^" _tag);
 
-
+#define MCFG_TMS9927_OVERSCAN(_left, _right, _top, _bottom) \
+	tms9927_device::set_overscan(*device, _left, _right, _top, _bottom);
+	
 class tms9927_device : public device_t,
 						public device_video_interface
 {
@@ -32,7 +34,14 @@ public:
 
 	static void set_char_width(device_t &device, int pixels) { downcast<tms9927_device &>(device).m_hpixels_per_column = pixels; }
 	static void set_region_tag(device_t &device, const char *tag) { downcast<tms9927_device &>(device).m_selfload.set_tag(tag); }
-
+	static void set_overscan(device_t &device, int left, int right, int top, int bottom) {
+			tms9927_device &dev = downcast<tms9927_device &>(device);
+			dev.m_overscan_left = left;
+			dev.m_overscan_right = right;
+			dev.m_overscan_top = top;
+			dev.m_overscan_bottom = bottom;
+	}
+		
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
 
@@ -59,7 +68,11 @@ private:
 
 	devcb_write_line m_write_vsyn;
 	int m_hpixels_per_column;         /* number of pixels per video memory address */
-
+	uint16_t  m_overscan_left;
+	uint16_t  m_overscan_right;
+	uint16_t  m_overscan_top;
+	uint16_t  m_overscan_bottom;
+	
 	// internal state
 	optional_region_ptr<uint8_t> m_selfload;
 
@@ -68,12 +81,13 @@ private:
 	uint8_t   m_reg[9];
 	uint8_t   m_start_datarow;
 	uint8_t   m_reset;
-
+	
 	/* derived state; no need to save */
 	uint8_t   m_valid_config;
 	uint16_t  m_total_hpix, m_total_vpix;
 	uint16_t  m_visible_hpix, m_visible_vpix;
 
+	
 	int m_vsyn;
 
 	emu_timer *m_vsync_timer;
