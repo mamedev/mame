@@ -147,6 +147,10 @@ public:
 	DECLARE_READ32_MEMBER(dma_plotter_eosl_r) { return m_dma_plotter_eosl; }
 	DECLARE_WRITE32_MEMBER(dma_plotter_eosl_w) { m_dma_plotter_eosl = data; }
 
+	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
+	DECLARE_READ32_MEMBER(error_businfo_r) { return m_error_businfo; }
+	void bus_error(uint32_t address, uint32_t cycle_type) { m_error_address = address; m_error_businfo = cycle_type; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -215,6 +219,9 @@ private:
 	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask, int channel);
 
 	uint16_t m_arbctl;
+
+	uint32_t m_error_address;
+	uint32_t m_error_businfo;
 };
 
 // device type definition

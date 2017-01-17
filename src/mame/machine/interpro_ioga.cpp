@@ -32,7 +32,8 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
 	AM_RANGE(0x88, 0x8b) AM_READWRITE(timer_prescaler_r, timer_prescaler_w)
 	AM_RANGE(0x8c, 0x8f) AM_READWRITE(timer0_r, timer0_w)
 	AM_RANGE(0x90, 0x93) AM_READWRITE(timer1_r, timer1_w)
-
+	AM_RANGE(0x94, 0x97) AM_READ(error_address_r)
+	AM_RANGE(0x98, 0x9b) AM_READ(error_businfo_r)
 	AM_RANGE(0x9c, 0x9f) AM_READWRITE16(arbctl_r, arbctl_w, 0x0000ffff)
 
 	AM_RANGE(0xa8, 0xab) AM_READWRITE(timer3_r, timer3_w)
@@ -268,119 +269,6 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 	break;
 	}
 }
-
-/*
-IOGA
-00: ethernet remap 003e0480 // ET_82586_BASE_ADDR or IOGA_ETH_REMAP
-04 : ethernet map page 00fff4b0 // ET_82586_CNTL_REG  or IOGA_ETH_MAPPG
-08 : ethernet control 000004b2 // IOGA_ETH_CTL
-0C : plotter real address 00000fff
-
-10 : plotter virtual address fffffffc
-14 : plotter transfer count 003fffff
-18 : plotter control ec000001
-1C : plotter end - of - scanline counter ffffffff
-
-20 : SCSI real address 00000000
-24 : SCSI virtual address 007e96b8
-28 : SCSI transfer count
-2C : SCSI control
-
-30 : floppy real address
-34 : floppy virtual address
-38 : floppy transfer count
-3C : floppy control
-
-40 : serial address 0 (003ba298)
-44 : serial control 0 (01000000)
-48 : serial address 1 (ffffffff)
-4C : serial control 1 (01200000)
-
-50 : serial address 2 (ffffffff)
-54 : serial control 2 (01200000)
-
--- 16 bit
-5A : SIB control(00ff)
-5C : internal int  3 (timer 2) 00ff        irq 0
-5E : internal int  4 (timer 3) 00ff        irq 1
-
-60 : external int  0 (SCSI)0a20            irq 2
-62 : external int  1 (floppy)0621          irq 3
-64 : external int  2 (plotter)1622         irq 4
-66 : external int  3 (SRX / CBUS 0) 0a02   irq 5
-68 : external int  4 (SRX / CBUS 1) 0e24   irq 6
-6A : external int  5 (SRX / CBUS 2) 0e25   irq 7
-6C : external int  6 (VB)0c26              irq 8
-6E : external int  7 0cff                  irq 9
-70 : external int  8 (CBUS 3) 0cff         irq 10
-72 : external int  9 (clock / calendar) 0e29  irq 11
-74 : external int 10 (clock/SGA) 04fe         irq 12
-
-76 : internal int  0 (mouse)0010              irq 13
-78 : internal int  1 (timer 0) 0011 - 60Hz    irq 14
-7A : internal int  2 (timer 1) 0212           irq 15
-7C : internal int  5 (serial DMA) 0e13        irq 16
-7E : external int 11 (serial) 0a01            irq 17
-80 : external int 12 (Ethernet)162c			  irq 18 // IOGA_EXTINT12
-
--- 8 bit
-82 : soft int 00
-83 : NMI control 1b
-
--- 32 bit
-84 : mouse status 00070000
-88 : timer prescaler 05aa06da
-8C : timer 0 00000022
-90 : timer 1 00010005
-94 : error address 7f100000
-98 : error cycle type 00001911 // short?
-
--- 16 bit
-9C: arbiter control 000a // IOGA_ARBCTL
-	#define ETHC_BR_ENA	(1<<0)
-	#define SCSI_BR_ENA	(1<<1)
-	#define PLT_BR_ENA	(1<<2)
-	#define FLP_BR_ENA	(1<<3)
-	#define SER0_BR_ENA	(1<<4)
-	#define SER1_BR_ENA	(1<<5)
-	#define SER2_BR_ENA	(1<<6)
-	#define ETHB_BR_ENA	(1<<7)
-	#define ETHA_BR_ENA	(1<<8)
-
-9E : I / O base address
-
--- 32 bit
-A0 : timer 2 count ccc748ec
-A4 : timer 2 value ffffffff
-A8 : timer 3 bfffffff // timer 3 count
-AC : bus timeout 445a445c
-
--- 16 bit
-B0 : soft int 8 00ff
-B2 : soft int 9 00ff
-B4 : soft int 10 00ff
-B6 : soft int 11 00ff
-B8 : soft int 12 00ff
-BA : soft int 13 00ff
-BC : soft int 14 00ff
-BE : soft int 15 00ff
-
--- 32 bit
-C0 : ethernet address A 403bc002 // IOGA_ETHADDR_A
-C4 : ethernet address B 403a68a0 // IOGA_ETHADDR_B
-C8 : ethernet address C 4039f088 // IOGA_ETHADDR_C
-
-		 (62) = 0x0421			// set floppy interrupts?
-	(3C) &= 0xfeff ffff		// turn off and on again
-	(3C) |= 0x0100 0000
-	(9C) |= 0x0008
-	(62) = 0x0621
-
-	during rom boot, all interrupt vectors point at 7f10249e
-
-	int 16 = prioritized interrupt 16, level 0, number 0, mouse interface
-	17 timer 0
-*/
 
 /******************************************************************************
  Interrupts
