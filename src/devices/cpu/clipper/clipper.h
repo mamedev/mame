@@ -229,9 +229,11 @@ protected:
 	double m_f[16];
 
 private:
-	address_space_config m_program_config;
+	address_space_config m_insn_config;
+	address_space_config m_data_config;
 
-	address_space *m_program;
+	address_space *m_insn;
+	address_space *m_data;
 
 	int m_icount;
 	int m_interrupt_cycles;

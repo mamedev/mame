@@ -28,8 +28,10 @@ const device_type CLIPPER = &device_creator<clipper_device>;
 
 clipper_device::clipper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, CLIPPER, "c400", tag, owner, clock, "c400", __FILE__),
-	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0),
-	m_program(nullptr),
+	m_insn_config("insn", ENDIANNESS_LITTLE, 32, 32, 0),
+	m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0),
+	m_insn(nullptr),
+	m_data(nullptr),
 	m_pc(0),
 	m_r(m_rs),
 	m_icount(0),
@@ -40,7 +42,8 @@ clipper_device::clipper_device(const machine_config &mconfig, const char *tag, d
 void clipper_device::device_start()
 {
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
+	m_insn = &space(AS_PROGRAM);
+	m_data = &space(AS_DATA);
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -161,7 +164,7 @@ void clipper_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 
 		// fetch instruction word
-		insn = m_program->read_word(m_pc + 0);
+		insn = m_insn->read_word(m_pc + 0);
 
 		// decode and execute instruction, return next pc
 		m_pc = execute_instruction(insn);
@@ -184,9 +187,15 @@ void clipper_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-const address_space_config * clipper_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *clipper_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
+	switch (spacenum)
+	{
+	case AS_PROGRAM: return &m_insn_config;
+	case AS_DATA: return &m_data_config;
+	}
+
+	return nullptr;
 }
 
 #define R1 ((insn & 0x00f0) >> 4)
@@ -205,16 +214,13 @@ void clipper_device::decode_instruction (uint16_t insn)
 		if (insn & 0x0080)
 		{
 			// fetch 16 bit immediate and sign extend
-			m_info.op.imm = (int16_t)m_program->read_word(m_pc + 2);
+			m_info.op.imm = (int16_t)m_insn->read_word(m_pc + 2);
 			m_info.size = 4;
 		}
 		else
 		{
 			// fetch 32 bit immediate and sign extend
-			if ((m_pc & 0x2) == 0)
-				m_info.op.imm = (int32_t)(m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
-			else
-				m_info.op.imm = (int32_t)m_program->read_dword(m_pc + 2);
+			m_info.op.imm = (int32_t)m_insn->read_dword_unaligned(m_pc + 2);
 			m_info.size = 6;
 		}
 	}
@@ -228,39 +234,30 @@ void clipper_device::decode_instruction (uint16_t insn)
 		{
 		case ADDR_MODE_PC32:
 			m_info.op.r2 = R2;
-			if ((m_pc & 0x2) == 0)
-				m_info.address = m_pc + (int32_t)(m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
-			else
-				m_info.address = m_pc + (int32_t)m_program->read_dword(m_pc + 2);
+			m_info.address = m_pc + (int32_t)m_insn->read_dword_unaligned(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_ABS32:
 			m_info.op.r2 = R2;
-			if ((m_pc & 0x2) == 0)
-				m_info.address = (m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
-			else
-				m_info.address = m_program->read_dword(m_pc + 2);
+			m_info.address = m_insn->read_dword_unaligned(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_REL32:
-			m_info.op.r2 = m_program->read_word(m_pc + 2) & 0xf;
-			if ((m_pc & 0x2) == 0)
-				m_info.address = m_r[R2] + (int32_t)m_program->read_dword(m_pc + 4);
-			else
-				m_info.address = m_r[R2] + (int32_t)(m_program->read_word(m_pc + 4) | (m_program->read_word(m_pc + 6) << 16));
+			m_info.op.r2 = m_insn->read_word(m_pc + 2) & 0xf;
+			m_info.address = m_r[R2] + (int32_t)m_insn->read_dword_unaligned(m_pc + 4);
 			m_info.size = 8;
 			break;
 
 		case ADDR_MODE_PC16:
 			m_info.op.r2 = R2;
-			m_info.address = m_pc + (int16_t)m_program->read_word(m_pc + 2);
+			m_info.address = m_pc + (int16_t)m_insn->read_word(m_pc + 2);
 			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_REL12:
-			temp = m_program->read_word(m_pc + 2);
+			temp = m_insn->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_r[R2] + ((int16_t)temp >> 4);
@@ -269,12 +266,12 @@ void clipper_device::decode_instruction (uint16_t insn)
 
 		case ADDR_MODE_ABS16:
 			m_info.op.r2 = R2;
-			m_info.address = (int16_t)m_program->read_word(m_pc + 2);
+			m_info.address = (int16_t)m_insn->read_word(m_pc + 2);
 			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_PCX:
-			temp = m_program->read_word(m_pc + 2);
+			temp = m_insn->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_pc + m_r[(temp >> 4) & 0xf];
@@ -282,7 +279,7 @@ void clipper_device::decode_instruction (uint16_t insn)
 			break;
 
 		case ADDR_MODE_RELX:
-			temp = m_program->read_word(m_pc + 2);
+			temp = m_insn->read_word(m_pc + 2);
 
 			m_info.op.r2 = temp & 0xf;
 			m_info.address = m_r[R2] + m_r[(temp >> 4) & 0xf];
@@ -298,7 +295,7 @@ void clipper_device::decode_instruction (uint16_t insn)
 	else if ((insn & 0xfd00) == 0xb400)
 	{
 		// macro instructions
-		m_info.op.macro = m_program->read_word(m_pc + 2);
+		m_info.op.macro = m_insn->read_word(m_pc + 2);
 		m_info.size = 4;
 	}
 	else
@@ -350,20 +347,20 @@ int clipper_device::execute_instruction (uint16_t insn)
 		break;
 	case 0x13: 
 		// ret: return from subroutine
-		next_pc = m_program->read_dword(m_r[R2]);
+		next_pc = m_data->read_dword(m_r[R2]);
 		m_r[R2] += 4;
 		// TRAPS: C,U,A,P,R
 		break;
 	case 0x14: 
 		// pushw: push word
 		m_r[R1] -= 4;
-		m_program->write_dword(m_r[R1], m_r[R2]);
+		m_data->write_dword(m_r[R1], m_r[R2]);
 		// TRAPS: A,P,W
 		break;
 
 	case 0x16: 
 		// popw: pop word
-		m_r[R2] = m_program->read_dword(m_r[R1]);
+		m_r[R2] = m_data->read_dword(m_r[R1]);
 		m_r[R1] += 4;
 		// TRAPS: C,U,A,P,R
 		break;
@@ -601,14 +598,14 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x44: 
 		// call: call subroutine (relative)
 		m_r[R2] -= 4;
-		m_program->write_dword(m_r[R2], next_pc);
+		m_data->write_dword(m_r[R2], next_pc);
 		next_pc = m_r[R1];
 		// TRAPS: A,P,W
 		break;
 	case 0x45: 
 		// call: call subroutine (other modes)
 		m_r[m_info.op.r2] -= 4;
-		m_program->write_dword(m_r[m_info.op.r2], next_pc);
+		m_data->write_dword(m_r[m_info.op.r2], next_pc);
 		next_pc = m_info.address;
 		// TRAPS: A,P,W
 		break;
@@ -669,12 +666,12 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 	case 0x60: 
 		// loadw: load word (relative)
-		m_r[R2] = m_program->read_dword(m_r[R1]);
+		m_r[R2] = m_data->read_dword(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x61: 
 		// loadw: load word (other modes)
-		m_r[m_info.op.r2] = m_program->read_dword(m_info.address);
+		m_r[m_info.op.r2] = m_data->read_dword(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x62:
@@ -689,125 +686,125 @@ int clipper_device::execute_instruction (uint16_t insn)
 		break;
 	case 0x64: 
 		// loads: load single floating (relative)
-		((uint64_t *)&m_f)[R2] = m_program->read_dword(m_r[R1]);
+		((uint64_t *)&m_f)[R2] = m_data->read_dword(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x65:
 		// loads: load single floating (other modes)
-		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_dword(m_info.address);
+		((uint64_t *)&m_f)[m_info.op.r2] = m_data->read_dword(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x66: 
 		// loadd: load double floating (relative)
-		((uint64_t *)&m_f)[R2] = m_program->read_qword(m_r[R1]);
+		((uint64_t *)&m_f)[R2] = m_data->read_qword(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x67:
 		// loadd: load double floating (other modes)
-		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_qword(m_info.address);
+		((uint64_t *)&m_f)[m_info.op.r2] = m_data->read_qword(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x68:
 		// loadb: load byte (relative)
-		m_r[R2] = (int8_t)m_program->read_byte(m_r[R1]);
+		m_r[R2] = (int8_t)m_data->read_byte(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x69:
 		// loadb: load byte (other modes)
-		m_r[m_info.op.r2] = (int8_t)m_program->read_byte(m_info.address);
+		m_r[m_info.op.r2] = (int8_t)m_data->read_byte(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6a: 
 		// loadbu: load byte unsigned (relative)
-		m_r[R2] = (uint8_t)m_program->read_byte(m_r[R1]);
+		m_r[R2] = (uint8_t)m_data->read_byte(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6b:
 		// loadbu: load byte unsigned (other modes)
-		m_r[m_info.op.r2] = m_program->read_byte(m_info.address);
+		m_r[m_info.op.r2] = m_data->read_byte(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6c: 
 		// loadh: load halfword (relative)
-		m_r[R2] = (int16_t)m_program->read_word(m_r[R1]);
+		m_r[R2] = (int16_t)m_data->read_word(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6d:
 		// loadh: load halfword (other modes)
-		m_r[m_info.op.r2] = (int16_t)m_program->read_word(m_info.address);
+		m_r[m_info.op.r2] = (int16_t)m_data->read_word(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6e:
 		// loadhu: load halfword unsigned (relative)
-		m_r[R2] = m_program->read_word(m_r[R1]);
+		m_r[R2] = m_data->read_word(m_r[R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6f:
 		// loadhu: load halfword unsigned (other modes)
-		m_r[m_info.op.r2] = m_program->read_word(m_info.address);
+		m_r[m_info.op.r2] = m_data->read_word(m_info.address);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x70: 
 		// storw: store word (relative)
-		m_program->write_dword(m_r[R1], m_r[R2]);
+		m_data->write_dword(m_r[R1], m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 	case 0x71:
 		// storw: store word (other modes)
-		m_program->write_dword(m_info.address, m_r[m_info.op.r2]);
+		m_data->write_dword(m_info.address, m_r[m_info.op.r2]);
 		// TRAPS: A,P,W,I
 		break;
 	case 0x72:
 		// tsts: test and set (relative)
-		m_r[R2] = m_program->read_dword(m_r[R1]);
-		m_program->write_dword(m_r[R1], m_r[R2] | 0x80000000);
+		m_r[R2] = m_data->read_dword(m_r[R1]);
+		m_data->write_dword(m_r[R1], m_r[R2] | 0x80000000);
 		// TRAPS: C,U,A,P,R,W,I
 		break;
 	case 0x73:
 		// tsts: test and set (other modes)
-		m_r[R2] = m_program->read_dword(m_info.address);
-		m_program->write_dword(m_info.address, m_r[R2] | 0x80000000);
+		m_r[R2] = m_data->read_dword(m_info.address);
+		m_data->write_dword(m_info.address, m_r[R2] | 0x80000000);
 		// TRAPS: C,U,A,P,R,W,I
 		break;
 	case 0x74:
 		// stors: store single floating (relative)
-		m_program->write_dword(m_r[R1], *((uint32_t *)&m_f[R2]));
+		m_data->write_dword(m_r[R1], *((uint32_t *)&m_f[R2]));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x75:
 		// stors: store single floating (other modes)
-		m_program->write_dword(m_info.address, *((uint32_t *)&m_f[m_info.op.r2]));
+		m_data->write_dword(m_info.address, *((uint32_t *)&m_f[m_info.op.r2]));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x76:
 		// stord: store double floating (relative)
-		m_program->write_qword(m_r[R1], *((uint64_t *)&m_f[R2]));
+		m_data->write_qword(m_r[R1], *((uint64_t *)&m_f[R2]));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x77:
 		// stord: store double floating (other modes)
-		m_program->write_qword(m_info.address, *((uint64_t *)&m_f[m_info.op.r2]));
+		m_data->write_qword(m_info.address, *((uint64_t *)&m_f[m_info.op.r2]));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x78:
 		// storb: store byte (relative)
-		m_program->write_byte(m_r[R1], (uint8_t)m_r[R2]);
+		m_data->write_byte(m_r[R1], (uint8_t)m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 	case 0x79:
 		// storb: store byte (other modes)
-		m_program->write_byte(m_info.address, (uint8_t)m_r[m_info.op.r2]);
+		m_data->write_byte(m_info.address, (uint8_t)m_r[m_info.op.r2]);
 		// TRAPS: A,P,W,I
 		break;
 
 	case 0x7c:
 		// storh: store halfword (relative)
-		m_program->write_word(m_r[R1], (uint16_t)m_r[R2]);
+		m_data->write_word(m_r[R1], (uint16_t)m_r[R2]);
 		// TRAPS: A,P,W,I
 		break;
 	case 0x7d:
 		// storh: store halfword (other modes)
-		m_program->write_word(m_info.address, (uint16_t)m_r[m_info.op.r2]);
+		m_data->write_word(m_info.address, (uint16_t)m_r[m_info.op.r2]);
 		// TRAPS: A,P,W,I
 		break;
 
@@ -1059,7 +1056,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// store ri at sp - 4 * (15 - i)
 			for (int i = R2; i < 15; i++)
-				m_program->write_dword(m_r[15] - 4 * (15 - i), m_r[i]);
+				m_data->write_dword(m_r[15] - 4 * (15 - i), m_r[i]);
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[15] -= 4 * (15 - R2);
@@ -1075,7 +1072,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			while (m_r[0])
 			{
-				m_program->write_byte(m_r[2], m_program->read_byte(m_r[1]));
+				m_data->write_byte(m_r[2], m_data->read_byte(m_r[1]));
 
 				m_r[0]--;
 				m_r[1]++;
@@ -1088,7 +1085,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			// initc: initialise r0 bytes at r1 with value in r2
 			while (m_r[0])
 			{
-				m_program->write_byte(m_r[1], m_r[2] & 0xff);
+				m_data->write_byte(m_r[1], m_r[2] & 0xff);
 
 				m_r[0]--;
 				m_r[1]++;
@@ -1106,8 +1103,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			while (m_r[0])
 			{
 				// set condition codes and abort the loop if the current byte does not match
-				int32_t byte1 = (int8_t)m_program->read_byte(m_r[1]);
-				int32_t byte2 = (int8_t)m_program->read_byte(m_r[2]);
+				int32_t byte1 = (int8_t)m_data->read_byte(m_r[1]);
+				int32_t byte2 = (int8_t)m_data->read_byte(m_r[2]);
 				if (byte1 != byte2)
 				{
 					FLAGS(C_SUB(byte2, byte1), V_SUB(byte2, byte1), byte2 == byte1, byte2 < byte1)
@@ -1129,7 +1126,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// load ri from sp + 4 * (i - N)
 			for (int i = R2; i < 15; i++)
-				m_r[i] = m_program->read_dword(m_r[15] + 4 * (i - R2));
+				m_r[i] = m_data->read_dword(m_r[15] + 4 * (i - R2));
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[15] += 4 * (15 - R2);
@@ -1142,7 +1139,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// store fi at sp - 8 * (8 - i)
 			for (int i = R2; i < 8; i++)
-				m_program->write_qword(m_r[15] - 8 * (8 - i), m_f[i]);
+				m_data->write_qword(m_r[15] - 8 * (8 - i), m_f[i]);
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[15] -= 8 * (8 - R2);
@@ -1155,7 +1152,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// load fi from sp + 8 * (i - N)
 			for (int i = R2; i < 8; i++)
-				m_f[i] = m_program->read_qword(m_r[15] + 8 * (i - R2));
+				m_f[i] = m_data->read_qword(m_r[15] + 8 * (i - R2));
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[15] += 8 * (8 - R2);
@@ -1248,7 +1245,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			case 0x02:
 				// saveur: save user registers
 				for (int i = 0; i < 16; i++)
-					m_program->write_dword(m_rs[(m_info.op.macro >> 4) & 0xf] - 4 * (i + 1), m_ru[15 - i]);
+					m_data->write_dword(m_rs[(m_info.op.macro >> 4) & 0xf] - 4 * (i + 1), m_ru[15 - i]);
 
 				m_rs[(m_info.op.macro >> 4) & 0xf] -= 64;
 				// TRAPS: A,P,W,S
@@ -1257,7 +1254,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			case 0x03:
 				// restur: restore user registers
 				for (int i = 0; i < 16; i++)
-					m_ru[i] = m_program->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 4 * i);
+					m_ru[i] = m_data->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 4 * i);
 
 				m_rs[(m_info.op.macro >> 4) & 0xf] += 64;
 				// TRAPS: C,U,A,P,R,S
@@ -1268,9 +1265,9 @@ int clipper_device::execute_instruction (uint16_t insn)
 				LOG_INTERRUPT("reti r%d, ssp = %08x, pc = %08x, next_pc = %08x\n",
 					(op.macro >> 4) & 0xf, m_rs[(m_info.op.macro >> 4) & 0xf], m_pc, m_program->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 8));
 
-				m_psw = m_program->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 0);
-				m_ssw = m_program->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 4);
-				next_pc = m_program->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 8);
+				m_psw = m_data->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 0);
+				m_ssw = m_data->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 4);
+				next_pc = m_data->read_dword(m_rs[(m_info.op.macro >> 4) & 0xf] + 8);
 
 				m_rs[(m_info.op.macro >> 4) & 0xf] += 12;
 
@@ -1333,9 +1330,9 @@ uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint
 	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;
 
 	// push pc, psw and ssw onto supervisor stack
-	m_program->write_dword(m_rs[15] - 4, pc);
-	m_program->write_dword(m_rs[15] - 12, m_psw);
-	m_program->write_dword(m_rs[15] - 8, m_ssw);
+	m_data->write_dword(m_rs[15] - 4, pc);
+	m_data->write_dword(m_rs[15] - 12, m_psw);
+	m_data->write_dword(m_rs[15] - 8, m_ssw);
 
 	// decrement supervisor stack pointer
 
@@ -1348,7 +1345,7 @@ uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint
 	m_rs[15] -= 24;
 
 	// load ssw from trap vector and set previous mode
-	m_ssw = (m_program->read_dword(vector + 0) & ~SSW_P) | (SSW(U) << 1);
+	m_ssw = (m_data->read_dword(vector + 0) & ~SSW_P) | (SSW(U) << 1);
 
 	// clear psw
 	m_psw = 0;
@@ -1356,7 +1353,7 @@ uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint
 	m_r = SSW(U) ? m_ru : m_rs;
 
 	// return new pc from trap vector
-	return m_program->read_dword(vector + 4);
+	return m_data->read_dword(vector + 4);
 }
 
 void clipper_device::evaluate_cc2f(double v0, double v1)
