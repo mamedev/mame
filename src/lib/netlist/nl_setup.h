@@ -356,7 +356,7 @@ namespace netlist
 	{
 	public:
 		source_mem_t(setup_t &setup, const char *mem)
-		: source_t(setup), m_str(mem)
+		: source_t(setup), m_str(mem, pstring::UTF8)
 		{
 		}
 

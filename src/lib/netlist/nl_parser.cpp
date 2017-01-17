@@ -29,13 +29,8 @@ bool parser_t::parse(const pstring nlname)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	//const char ws[5] = { ' ', 9, 10, 13, 0 };
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	set_comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
 	m_tok_param_right = register_token(")");
@@ -404,7 +399,7 @@ void parser_t::device(const pstring &dev_type)
 
 nl_double parser_t::eval_param(const token_t tok)
 {
-	static const char *macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
+	static pstring macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
 	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;

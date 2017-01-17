@@ -1159,7 +1159,7 @@ namespace netlist
 	struct detail::family_setter_t
 	{
 		family_setter_t() { }
-		family_setter_t(core_device_t &dev, const char *desc);
+		family_setter_t(core_device_t &dev, const pstring desc);
 		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
 	};
 
@@ -1278,11 +1278,11 @@ namespace netlist
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, pstring::from_utf8(owner.name()) + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), pstring::from_utf8(owner.name()) + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
 		void rebuild_lists(); /* must be called after post_load ! */
@@ -1342,7 +1342,7 @@ namespace netlist
 		object_array_t(core_device_t &dev, init names)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, names.p[i]);
+				this->emplace(i, dev, pstring(names.p[i], pstring::UTF8));
 		}
 	};
 

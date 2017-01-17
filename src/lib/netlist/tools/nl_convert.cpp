@@ -185,21 +185,21 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 {
 	{
 		int i = 0;
-		while (m_units[i].m_unit != "-" )
+		while (pstring(m_units[i].m_unit, pstring::UTF8) != "-" )
 		{
 			if (m_units[i].m_mult <= std::abs(val))
 				break;
 			i++;
 		}
-		return plib::pfmt(m_units[i].m_func.c_str())(val / m_units[i].m_mult);
+		return plib::pfmt(m_units[i].m_func)(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
 {
 	int i = 0;
-	while (m_units[i].m_unit != "-")
+	while (pstring(m_units[i].m_unit, pstring::UTF8) != "-")
 	{
-		if (m_units[i].m_unit == unit)
+		if (pstring(m_units[i].m_unit, pstring::UTF8) == unit)
 			return m_units[i].m_mult;
 		i++;
 	}
@@ -407,13 +407,7 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::pist
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("/*", "*/", "//");
 	set_string_char('\'');
@@ -549,13 +543,7 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::pistre
 {
 	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
 	set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("","","//"); // FIXME:needs to be confirmed
 	set_string_char('"');
@@ -590,7 +578,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 {
 	plib::pistringstream istrm(contents);
 	tokenizer tok(*this, istrm);
-	auto lm = read_lib_map(s_lib_map);
+	auto lm = read_lib_map(pstring(s_lib_map, pstring::UTF8));
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");

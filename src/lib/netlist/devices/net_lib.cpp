@@ -22,7 +22,8 @@
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip;
 
-#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
+//#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
+#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (pstring(# name), pstring(xstr(nic)), pstring(defparam)) );
 #define ENTRYX(nic, name, defparam) { NETLIB_DEVICE_DECL(nic) ENTRYX1(NETLIB_NAME(nic), name, defparam, decl_ ## nic) }
 
 namespace netlist

@@ -101,8 +101,8 @@ private:
 	};
 
 	struct unit_t {
-		pstring m_unit;
-		pstring m_func;
+		const char *m_unit;
+		const char *m_func;
 		double m_mult;
 	};
 

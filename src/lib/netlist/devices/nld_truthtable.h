@@ -168,7 +168,7 @@ namespace netlist
 		{
 			while (*desc != nullptr && **desc != 0 )
 				{
-					m_desc.push_back(*desc);
+					m_desc.push_back(pstring(*desc, pstring::UTF8));
 					desc++;
 				}
 			init();

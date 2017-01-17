@@ -211,7 +211,7 @@ struct input_t
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
-		m_param = setup.find_param(buf, true);
+		m_param = setup.find_param(pstring(buf, pstring::UTF8), true);
 	}
 
 	void setparam()
@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
 				result = c.result();
 			}
 			/* present result */
-			pout_strm.write(result.c_str());
+			pout_strm.write(result);
 		}
 		else
 		{

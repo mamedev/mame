@@ -161,7 +161,7 @@ public:
 	explicit pfmt(const char *fmt);
 	virtual ~pfmt();
 
-	operator pstring() const { return m_str; }
+	operator pstring() const { return pstring(m_str, pstring::UTF8); }
 
 	const char *cstr() { return m_str; }
 
@@ -196,7 +196,7 @@ public:
 
 	void operator ()(const char *fmt) const
 	{
-		if (build_enabled && m_enabled) vdowrite(fmt);
+		if (build_enabled && m_enabled) vdowrite(pstring(fmt, pstring::UTF8));
 	}
 
 	template<typename T1>

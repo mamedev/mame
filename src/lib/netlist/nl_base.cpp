@@ -199,7 +199,7 @@ void detail::queue_t::on_post_load()
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
-		detail::net_t *n = netlist().find_net(m_names[i].m_buf);
+		detail::net_t *n = netlist().find_net(pstring(m_names[i].m_buf, pstring::UTF8));
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
 		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
 		this->push(n, netlist_time::from_raw(m_times[i]));
@@ -726,7 +726,7 @@ void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_term
 // family_setter_t
 // -----------------------------------------------------------------------------
 
-detail::family_setter_t::family_setter_t(core_device_t &dev, const char *desc)
+detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring desc)
 {
 	dev.set_logic_family(dev.netlist().family_from_model(desc));
 }
