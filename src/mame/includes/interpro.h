@@ -9,34 +9,31 @@
 #include "emu.h"
 
 #include "cpu/clipper/clipper.h"
+#include "machine/cammu.h"
 
-#include "machine/bankdev.h"
+#include "machine/interpro_ioga.h"
 
 #include "machine/z80scc.h"
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
-#include "machine/interpro_ioga.h"
 #include "machine/ncr539x.h"
 
 #include "bus/rs232/rs232.h"
 
 #include "formats/pc_dsk.h"
 
-#define INTERPRO_CPU_TAG "cpu"
+#define INTERPRO_CPU_TAG        "cpu"
+#define INTERPRO_CAMMU_TAG      "cammu"
 
-#define INTERPRO_MAINSPACE_TAG "main_space"
-#define INTERPRO_IOSPACE_TAG "io_space"
-#define INTERPRO_BOOTSPACE_TAG "boot_space"
-
-#define INTERPRO_RTC_TAG "rtc"
-#define INTERPRO_SCC1_TAG "scc1"
-#define INTERPRO_SCC2_TAG "scc2"
-#define INTERPRO_ROM_TAG "rom"
-#define INTERPRO_EEPROM_TAG "eeprom"
-#define INTERPRO_TERMINAL_TAG "terminal"
-#define INTERPRO_FDC_TAG "fdc"
-#define INTERPRO_SCSI_TAG "scsi"
-#define INTERPRO_IOGA_TAG "ioga"
+#define INTERPRO_RTC_TAG        "rtc"
+#define INTERPRO_SCC1_TAG       "scc1"
+#define INTERPRO_SCC2_TAG       "scc2"
+#define INTERPRO_ROM_TAG        "rom"
+#define INTERPRO_EEPROM_TAG     "eeprom"
+#define INTERPRO_TERMINAL_TAG   "terminal"
+#define INTERPRO_FDC_TAG        "fdc"
+#define INTERPRO_SCSI_TAG       "scsi"
+#define INTERPRO_IOGA_TAG       "ioga"
 
 // TODO: RTC is actually a DS12887, but the only difference is the 128 byte NVRAM, same as the DS12885
 
@@ -46,9 +43,7 @@ public:
 	interpro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, INTERPRO_CPU_TAG),
-		m_main_space(*this, INTERPRO_MAINSPACE_TAG),
-		m_io_space(*this, INTERPRO_IOSPACE_TAG),
-		m_boot_space(*this, INTERPRO_BOOTSPACE_TAG),
+		m_cammu(*this, INTERPRO_CAMMU_TAG),
 		m_scc1(*this, INTERPRO_SCC1_TAG),
 		m_scc2(*this, INTERPRO_SCC2_TAG),
 		m_rtc(*this, INTERPRO_RTC_TAG),
@@ -58,10 +53,7 @@ public:
 		{ }
 
 	required_device<clipper_device> m_maincpu;
-
-	required_device<address_map_bank_device> m_main_space;
-	required_device<address_map_bank_device> m_io_space;
-	required_device<address_map_bank_device> m_boot_space;
+	required_device<cammu_device> m_cammu;
 
 	// FIXME: not sure which one is the escc
 	required_device<z80scc_device> m_scc1;
@@ -75,17 +67,14 @@ public:
 
 	DECLARE_DRIVER_INIT(ip2800);
 
-	DECLARE_READ32_MEMBER(interpro_mmu_r);
-	DECLARE_WRITE32_MEMBER(interpro_mmu_w);
-
 	DECLARE_WRITE16_MEMBER(emerald_w);
 	DECLARE_READ16_MEMBER(emerald_r);
 
 	DECLARE_WRITE16_MEMBER(mcga_w);
 	DECLARE_READ16_MEMBER(mcga_r);
 
-	DECLARE_WRITE8_MEMBER(interpro_rtc_w);
-	DECLARE_READ8_MEMBER(interpro_rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_READ8_MEMBER(rtc_r);
 
 	DECLARE_READ32_MEMBER(idprom_r);
 	DECLARE_READ32_MEMBER(slot0_r);

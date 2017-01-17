@@ -41,20 +41,20 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
 	AM_RANGE(0xb0, 0xbf) AM_READWRITE16(softint_vector_r, softint_vector_w, 0xffffffff)
 ADDRESS_MAP_END
 
-// InterPro IOGA
 const device_type INTERPRO_IOGA = &device_creator<interpro_ioga_device>;
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_IOGA, "InterPro IOGA", tag, owner, clock, "ioga", __FILE__),
 	m_out_nmi_func(*this),
 	m_out_int_func(*this),
+	m_memory_space(nullptr),
 	m_dma_channel{
 		{ 0,0,0,0,false, 0, {*this}, {*this} },
 		{ 0,0,0,0,false, 0, {*this}, {*this} },
 		{ 0,0,0,0,false, 0, {*this}, {*this} },
 		{ 0,0,0,0,false, 0, {*this}, {*this} } },
 	m_fdc_tc_func(*this)
-	{
+{
 }
 
 void interpro_ioga_device::device_start()
@@ -63,6 +63,11 @@ void interpro_ioga_device::device_start()
 	m_out_nmi_func.resolve();
 	m_out_int_func.resolve();
 
+	// TODO: parameterise the cammu name and space number
+	device_memory_interface *mmu;
+	siblingdevice("cammu")->interface(mmu);
+	m_memory_space = &mmu->space(AS_0);
+
 	for (int i = 0; i < IOGA_DMA_CHANNELS; i++)
 	{
 		m_dma_channel[i].device_r.resolve_safe(0xff);
@@ -70,8 +75,6 @@ void interpro_ioga_device::device_start()
 	}
 
 	m_fdc_tc_func.resolve();
-
-	m_cpu = machine().device<cpu_device>("cpu");
 
 	// allocate ioga timers
 	m_timer[0] = timer_alloc(IOGA_TIMER_0);
@@ -233,16 +236,15 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 				param, m_dma_channel[param].control, m_dma_channel[param].real_address, m_dma_channel[param].transfer_count);
 			m_dma_channel[param].dma_active = true;
 		}
-		address_space &space = m_cpu->space(AS_PROGRAM);
 
 		// while the device is requesting a data transfer and the transfer count is not zero
 		while (m_dma_channel[param].drq_state &&  m_dma_channel[param].transfer_count)
 		{
 			// transfer a byte between device and memory
 			if (true)
-				space.write_byte(m_dma_channel[param].real_address, m_dma_channel[param].device_r());
+				m_memory_space->write_byte(m_dma_channel[param].real_address, m_dma_channel[param].device_r());
 			else
-				m_dma_channel[param].device_w(space.read_byte(m_dma_channel[param].real_address));
+				m_dma_channel[param].device_w(m_memory_space->read_byte(m_dma_channel[param].real_address));
 
 			// increment addresses and decrement count
 			m_dma_channel[param].real_address++;

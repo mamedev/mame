@@ -322,7 +322,7 @@ READ32_MEMBER(interpro_state::slot0_r)
 	return ((uint8_t *)&slot0)[offset % 32];
 }
 
-WRITE8_MEMBER(interpro_state::interpro_rtc_w)
+WRITE8_MEMBER(interpro_state::rtc_w)
 {
 	switch (offset)
 	{
@@ -342,7 +342,7 @@ WRITE8_MEMBER(interpro_state::interpro_rtc_w)
 	}
 }
 
-READ8_MEMBER(interpro_state::interpro_rtc_r)
+READ8_MEMBER(interpro_state::rtc_r)
 {
 	switch (offset)
 	{
@@ -409,91 +409,30 @@ WRITE32_MEMBER(interpro_state::sga_ddtc1_w)
 	}
 }
 
-READ32_MEMBER(interpro_state::interpro_mmu_r)
-{
-	// handle htlb
-	if (m_maincpu->supervisor_mode() && (offset & ~0x1FFF) == 0)
-	{
-		switch (offset & 0x3C00)
-		{
-		case 0x000:
-		case 0x400:
-		case 0x800:
-		case 0xC00:
-			return m_main_space->read32(space, offset, mem_mask);
-
-		case 0x1000:
-		case 0x1400:
-			return m_io_space->read32(space, offset & 0x7ff, mem_mask);
-
-		case 0x1800:
-		case 0x1C00:
-			return m_boot_space->read32(space, offset & 0x7ff, mem_mask);
-		}
-	}
-
-	// address with upper bytes 0 or 0x7f1
-	if ((offset >> 22) == 0x00 || (offset >> 18) == 0x7f1)
-		return m_main_space->read32(space, offset, mem_mask);
-	else
-		return m_io_space->read32(space, offset, mem_mask);
-}
-
-WRITE32_MEMBER(interpro_state::interpro_mmu_w)
-{
-	// handle htlb
-	if (m_maincpu->supervisor_mode() && (offset & ~0x1FFF) == 0)
-	{
-		switch (offset & 0x3C00)
-		{
-		case 0x000:
-		case 0x400:
-		case 0x800:
-		case 0xC00:
-			// pages 0-3: main space
-			m_main_space->write32(space, offset, data, mem_mask);
-			return;
-
-		case 0x1000:
-		case 0x1400:
-			// pages 4-5: pages 0-1 i/o space
-			m_io_space->write32(space, offset & 0x7ff, data, mem_mask);
-			return;
-
-		case 0x1800:
-		case 0x1C00:
-			// pages 6-7: pages 0-1 boot space
-			m_boot_space->write32(space, offset & 0x7ff, data, mem_mask);
-			return;
-		}
-	}
-
-	// address with upper byte 0x00 or upper 3 bytes 0x7f1
-	if ((offset >> 22) == 0x00 || (offset >> 18) == 0x7f1)
-		m_main_space->write32(space, offset, data, mem_mask);
-	else
-		m_io_space->write32(space, offset, data, mem_mask);
-}
-
 // driver init
 DRIVER_INIT_MEMBER(interpro_state, ip2800)
 {
 }
 
-static ADDRESS_MAP_START(interpro_map, AS_PROGRAM, 32, interpro_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(interpro_mmu_r, interpro_mmu_w)
+// these maps point the cpu virtual addresses to the mmu
+static ADDRESS_MAP_START(clipper_insn_map, AS_PROGRAM, 32, interpro_state)
+	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREAD32(INTERPRO_CAMMU_TAG, cammu_device, mmu_r, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_main_map, AS_PROGRAM, 32, interpro_state)
+static ADDRESS_MAP_START(clipper_data_map, AS_DATA, 32, interpro_state)
+AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE32(INTERPRO_CAMMU_TAG, cammu_device, mmu_r, mmu_w, 0xffffffff)
+ADDRESS_MAP_END
+
+// these maps represent the real main, i/o and boot spaces of the system
+static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM // 16M RAM
 	
 	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_ROM_TAG, 0)
 	AM_RANGE(0x7f180000, 0x7f1bffff) AM_ROM AM_REGION(INTERPRO_EEPROM_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_io_map, AS_PROGRAM, 32, interpro_state)
-	// really cammus
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM
+static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
+	AM_RANGE(0x00000000, 0x00000fff) AM_DEVICE32(INTERPRO_CAMMU_TAG, cammu_device, map, 0xffffffff)
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM
 
 	AM_RANGE(0x40000000, 0x4000003f) AM_READWRITE16(mcga_r, mcga_w, 0xffff)
@@ -518,7 +457,7 @@ static ADDRESS_MAP_START(interpro_io_map, AS_PROGRAM, 32, interpro_state)
 	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(emerald_r, emerald_w, 0xffff)
 	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
-	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(interpro_rtc_r, interpro_rtc_w, 0xff)
+	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(rtc_r, rtc_w, 0xff)
 	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ(idprom_r)
 
 	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map) 
@@ -527,7 +466,7 @@ static ADDRESS_MAP_START(interpro_io_map, AS_PROGRAM, 32, interpro_state)
 	AM_RANGE(0x8f000000, 0x8f0fffff) AM_READ(slot0_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(interpro_boot_map, AS_PROGRAM, 32, interpro_state)
+static ADDRESS_MAP_START(interpro_boot_map, AS_2, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -545,30 +484,15 @@ static INPUT_PORTS_START(ip2800)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START(ip2800, interpro_state)
-	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER, 10000000)
-	MCFG_CPU_PROGRAM_MAP(interpro_map)
+	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(clipper_insn_map)
+	MCFG_CPU_DATA_MAP(clipper_data_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, inta_cb)
 
-	// mmu main memory space
-	MCFG_DEVICE_ADD(INTERPRO_MAINSPACE_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(interpro_main_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
-
-	// mmu i/o space
-	MCFG_DEVICE_ADD(INTERPRO_IOSPACE_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(interpro_io_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
-
-	// mmu boot space
-	MCFG_DEVICE_ADD(INTERPRO_BOOTSPACE_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(interpro_boot_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	MCFG_DEVICE_ADD(INTERPRO_CAMMU_TAG, CAMMU, 0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, interpro_main_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, interpro_io_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_2, interpro_boot_map)
 
 	// serial controllers and rs232 bus
 	MCFG_SCC85C30_ADD(INTERPRO_SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0) 
@@ -620,6 +544,7 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_FLOPPY, DEVREAD8(INTERPRO_FDC_TAG, n82077aa_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, n82077aa_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_SERIAL, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
 	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, n82077aa_device, tc_line_w))
+	MCFG_INTERPRO_IOGA_DMA_BUS(INTERPRO_CAMMU_TAG, AS_0)
 
 MACHINE_CONFIG_END
 

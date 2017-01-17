@@ -24,6 +24,8 @@
 #define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
 	devcb = &interpro_ioga_device::static_set_fdc_tc_callback(*device, DEVCB_##_tc);
 
+#define MCFG_INTERPRO_IOGA_DMA_BUS(_mmu, _space)
+
 // timer 0 seem to be a 60Hz cycle
 #define IOGA_TIMER0_IRQ     14
 
@@ -157,8 +159,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	cpu_device *m_cpu;
-
 private:
 	static const device_timer_id IOGA_TIMER_0 = 0;
 	static const device_timer_id IOGA_TIMER_1 = 1;
@@ -198,6 +198,7 @@ private:
 	emu_timer *m_timer[4];
 
 	// dma state
+	address_space *m_memory_space;
 	emu_timer *m_dma_timer;
 
 	// dma channels
