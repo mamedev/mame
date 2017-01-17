@@ -62,7 +62,7 @@ NETLIB_OBJECT(solver)
 
 	/* automatic time step */
 	, m_dynamic_ts(*this, "DYNAMIC_TS", 0)
-	, m_dynamic_lte(*this, "DYNAMIC_LTE", 5e-5)                     // diff/timestep
+	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution

@@ -11,12 +11,18 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
+#include <cstddef>
+#include <memory>
 #include <vector>
 
-#include "nl_setup.h"
-#include "nl_base.h"
-#include "nl_factory.h"
 #include "analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "nl_time.h"
+#include "plib/palloc.h"
+#include "plib/pfmtlog.h"
+#include "plib/pfunction.h"
+#include "plib/pstring.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -309,9 +315,15 @@ namespace netlist
 		, m_func(*this, "FUNC", "")
 		, m_Q(*this, "Q")
 		{
+			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
-				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
-			compile();
+			{
+				pstring n = plib::pfmt("A{1}")(i);
+				m_I.push_back(plib::make_unique<analog_input_t>(*this, n));
+				inps.push_back(n);
+				m_vals.push_back(0.0);
+			}
+			m_precompiled.compile_postfix(inps, m_func());
 		}
 
 	protected:
@@ -321,32 +333,13 @@ namespace netlist
 
 	private:
 
-		enum rpn_cmd
-		{
-			ADD,
-			MULT,
-			SUB,
-			DIV,
-			POW,
-			PUSH_CONST,
-			PUSH_INPUT
-		};
-
-		struct rpn_inst
-		{
-			rpn_inst() : m_cmd(ADD), m_param(0.0) { }
-			rpn_cmd m_cmd;
-			nl_double m_param;
-		};
-
-		void compile();
-
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
 		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
-		std::vector<rpn_inst> m_precompiled;
+		std::vector<double> m_vals;
+		plib::pfunction m_precompiled;
 	};
 
 	// -----------------------------------------------------------------------------

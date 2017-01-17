@@ -122,7 +122,7 @@ public:
 	{
 	}
 
-	NETLIB_IS_DYNAMIC()
+	NETLIB_IS_DYNAMIC(true)
 
 	//NETLIB_RESETI();
 	NETLIB_UPDATEI();

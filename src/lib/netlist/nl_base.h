@@ -85,17 +85,25 @@ class NETLIB_NAME(name) : public device_t
 		: device_t(owner, name)
 
 	/*! Add this to a device definition to mark the device as dynamic.
-	*  If this is added to device definition the device is treated as an analog
-	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
-	*  of the Newton-Raphson step of solving the linear equations.
+	*  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
+	*  is treated as an analog dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI
+	*  is called on a each step of the Newton-Raphson step
+	*  of solving the linear equations.
+	*
+	*  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
+	*  device a dynamic device if parameter m_func is set.
 	*/
-#define NETLIB_IS_DYNAMIC()                                                       \
-	public: virtual bool is_dynamic() const override { return true; }
+#define NETLIB_IS_DYNAMIC(expr)                                                \
+	public: virtual bool is_dynamic() const override { return expr; }
 
 	/*! Add this to a device definition to mark the device as a time-stepping device.
      *
 	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
 	 *  the capacitor and inductor devices uses this.
+	 *
+	 *  You may also use e.g. NETLIB_IS_TIMESTEP(m_func() != "") to only make the
+	 *  device a dynamic device if parameter m_func is set. This is used by the
+	 *  Voltage Source element.
 	 *
 	 *  Example:
 	 *
@@ -109,8 +117,8 @@ class NETLIB_NAME(name) : public device_t
 	 *       }
 	 *
 	 */
-#define NETLIB_IS_TIMESTEP()                                                   \
-	public: virtual bool is_timestep() const override { return true; }
+#define NETLIB_IS_TIMESTEP(expr)                                               \
+	public: virtual bool is_timestep() const override { return expr; }
 
 	/*! Used to implement the time stepping code.
 	 *

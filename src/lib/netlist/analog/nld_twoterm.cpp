@@ -300,6 +300,13 @@ NETLIB_UPDATE(VS)
 	NETLIB_NAME(twoterm)::update();
 }
 
+NETLIB_TIMESTEP(VS)
+{
+	this->set(1.0 / m_R(),
+			m_compiled.evaluate(std::vector<double>({netlist().time().as_double()})),
+			0.0);
+}
+
 // ----------------------------------------------------------------------------------------
 // nld_CS
 // ----------------------------------------------------------------------------------------
@@ -317,6 +324,13 @@ NETLIB_RESET(CS)
 NETLIB_UPDATE(CS)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+NETLIB_TIMESTEP(CS)
+{
+	const double I = m_compiled.evaluate(std::vector<double>({netlist().time().as_double()}));
+	set_mat(0.0, 0.0, -I,
+			0.0, 0.0,  I);
 }
 
 	} //namespace analog

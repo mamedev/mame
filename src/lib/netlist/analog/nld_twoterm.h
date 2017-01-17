@@ -34,6 +34,7 @@
 #define NLD_TWOTERM_H_
 
 #include "nl_base.h"
+#include "plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Macros
@@ -280,7 +281,7 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_IS_TIMESTEP()
+	NETLIB_IS_TIMESTEP(true)
 	NETLIB_TIMESTEPI();
 
 	param_double_t m_C;
@@ -312,7 +313,7 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_IS_TIMESTEP()
+	NETLIB_IS_TIMESTEP(true)
 	NETLIB_TIMESTEPI();
 
 	param_double_t m_L;
@@ -426,9 +427,7 @@ public:
 		register_subalias("K", m_N);
 	}
 
-
-	NETLIB_IS_DYNAMIC()
-
+	NETLIB_IS_DYNAMIC(true)
 	NETLIB_UPDATE_TERMINALSI();
 
 	diode_model_t m_model;
@@ -454,10 +453,16 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
 	, m_R(*this, "R", 0.1)
 	, m_V(*this, "V", 0.0)
+	, m_func(*this,"FUNC", "")
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);
+		if (m_func() != "")
+			m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
 	}
+
+	NETLIB_IS_TIMESTEP(m_func() != "")
+	NETLIB_TIMESTEPI();
 
 protected:
 	NETLIB_UPDATEI();
@@ -465,6 +470,8 @@ protected:
 
 	param_double_t m_R;
 	param_double_t m_V;
+	param_str_t m_func;
+	plib::pfunction m_compiled;
 };
 
 // -----------------------------------------------------------------------------
@@ -476,16 +483,24 @@ NETLIB_OBJECT_DERIVED(CS, twoterm)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
+	, m_func(*this,"FUNC", "")
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);
+		if (m_func() != "")
+			m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
 	}
+
+	NETLIB_IS_TIMESTEP(m_func() != "")
+	NETLIB_TIMESTEPI();
+protected:
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();
-protected:
 
 	param_double_t m_I;
+	param_str_t m_func;
+	plib::pfunction m_compiled;
 };
 
 

@@ -118,7 +118,7 @@ public:
 	{
 	}
 
-	NETLIB_IS_DYNAMIC()
+	NETLIB_IS_DYNAMIC(true)
 
 	param_double_t m_cur_limit; /* current limit */
 
