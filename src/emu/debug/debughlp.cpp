@@ -86,6 +86,7 @@ static const help_item static_help_list[] =
 		"  printf <format>[,<item>[,...]] -- prints one or more <item>s to the console using <format>\n"
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
+		"  tracesym <item>[,...]] -- outputs one or more <item>s to the trace file\n"
 		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes\n"
 		"  trackpc [<bool>,<cpu>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear]\n"
 		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear]\n"
@@ -383,6 +384,22 @@ static const help_item static_help_list[] =
 		"\n"
 		"printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
 		"  Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+	},
+	{
+		"tracesym",
+		"\n"
+		"  tracesym <item>[,...]\n"
+			"\n"
+			"The tracesym command prints the specified symbols and routes the output to the currently open trace "
+			"file (see the 'trace' command for details). If no file is currently open, tracesym does nothing. "
+			"\n"
+			"Examples:\n"
+			"\n"
+			"tracelog pc\n"
+			"  Outputs PC=<pcval> where <pcval> is displayed in the default format.\n"
+			"\n"
+			"printf a,b\n"
+			"  Outputs A=<aval>, B=<bval> on one line.\n"
 	},
 	{
 		"trackpc",
