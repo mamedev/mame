@@ -2,6 +2,7 @@
 // copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
 #include "video/stic.h"
+#include "video/tms9927.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
 
@@ -115,7 +116,7 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				rv = intvkbd_tms9927_r(space, offset-0xc0);
+				rv = m_crtc->read(space, offset-0xc0);
 				break;
 			default:
 				rv = (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
@@ -230,7 +231,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 			case 0xce:
 			case 0xcf:
 				/* TMS9927 regs */
-				intvkbd_tms9927_w(space, offset-0xc0, data);
+				m_crtc->write(space, offset-0xc0, data);
 				break;
 			default:
 				logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
@@ -348,10 +349,6 @@ void intv_state::machine_start()
 		save_item(NAME(m_tape_interrupts_enabled));
 		save_item(NAME(m_tape_unknown_write));
 		save_item(NAME(m_tape_motor_mode));
-		save_item(NAME(m_tms9927_num_rows));
-		save_item(NAME(m_tms9927_cursor_col));
-		save_item(NAME(m_tms9927_cursor_row));
-		save_item(NAME(m_tms9927_last_row));
 	}
 
 	if (m_cart && m_cart->exists())

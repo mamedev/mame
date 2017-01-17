@@ -53,6 +53,7 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
+#include "video/tms9927.h"
 #include "includes/intv.h"
 #include "sound/ay8910.h"
 #include "softlist.h"
@@ -537,6 +538,10 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
+
+	/* crt controller */
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_17_9712MHz/2)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE)
