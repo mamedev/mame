@@ -542,6 +542,8 @@ public:
 	struct {
 		uint8_t pal_entry;
 		uint8_t r[0x100],g[0x100],b[0x100];
+		uint16_t read_bank;
+		uint16_t write_bank;
 	}m_analog256;
 	struct {
 		uint8_t mode;
@@ -592,6 +594,13 @@ public:
 	DECLARE_WRITE16_MEMBER(grcg_gvram_w);
 	DECLARE_READ16_MEMBER(grcg_gvram0_r);
 	DECLARE_WRITE16_MEMBER(grcg_gvram0_w);
+	
+	DECLARE_READ16_MEMBER(pc9821_grcg_gvram_r);
+	DECLARE_WRITE16_MEMBER(pc9821_grcg_gvram_w);
+	DECLARE_READ16_MEMBER(pc9821_grcg_gvram0_r);
+	DECLARE_WRITE16_MEMBER(pc9821_grcg_gvram0_w);
+	uint16_t m_pc9821_256vram_bank;
+	
 	DECLARE_READ16_MEMBER(upd7220_grcg_r);
 	DECLARE_WRITE16_MEMBER(upd7220_grcg_w);
 	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
@@ -742,7 +751,8 @@ public:
 #define DISPLAY_REG 7
 
 #define ANALOG_16_MODE 0
-#define ANALOG_256_MODE 0x10
+#define ANALOG_256_MODE (0x20 >> 1)
+#define GDC_IS_5MHz (0x84 >> 1)
 
 void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -2302,7 +2312,7 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 	uint8_t res;
 
 	res = 0;
-
+	
 	switch(m_ext2_ff)
 	{
 		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
@@ -2312,6 +2322,8 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 				popmessage("PC-9821: read ext2 f/f with value %02x",m_ext2_ff);
 			break;
 	}
+
+	res|= (m_ex_video_ff[GDC_IS_5MHz] << 1);
 
 	return res;
 }
@@ -2333,15 +2345,70 @@ WRITE8_MEMBER(pc9801_state::winram_w)
     offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
 }*/
 
+// TODO: analog 256 mode needs HW tests
+READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+	{
+		return space.read_word(0xf00000|(offset*2)|((m_analog256.write_bank)*0x8000),mem_mask);
+	}
+	
+	return grcg_gvram_r(space,offset,mem_mask);
+}
+
+WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+	{
+		space.write_word(0xf00000|(offset*2)|(m_analog256.write_bank*0x8000),data,mem_mask);
+		return;
+	}
+	
+	grcg_gvram_w(space,offset,data,mem_mask);
+}
+
+READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+	{
+		switch(offset*2)
+		{
+			case 4: return m_analog256.write_bank;
+//			case 6: return m_analog256.read_bank;
+		}
+		
+		//return 0;
+	}
+	
+	return grcg_gvram0_r(space,offset,mem_mask);
+}
+
+WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+	{
+		//printf("%08x %08x\n",offset*2,data);
+		switch(offset*2)
+		{
+			case 4: COMBINE_DATA(&m_analog256.write_bank); break;
+//			case 6: COMBINE_DATA(&m_analog256.read_bank); break;
+		}
+		//return;
+	}
+	
+	grcg_gvram0_w(space,offset,data,mem_mask);
+}
+
+
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
 	AM_RANGE(0x000a0000, 0x000a3fff) AM_READWRITE16(tvram_r, tvram_w, 0xffffffff)
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_READWRITE8(pc9801rs_knjram_r, pc9801rs_knjram_w, 0xffffffff)
-	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE16(grcg_gvram_r, grcg_gvram_w, 0xffffffff)
+	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE16(pc9821_grcg_gvram_r, pc9821_grcg_gvram_w, 0xffffffff)
 	AM_RANGE(0x000cc000, 0x000cdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
 //  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
 	AM_RANGE(0x000da000, 0x000dbfff) AM_RAM // ide ram
-	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(grcg_gvram0_r,grcg_gvram0_w, 0xffffffff)
+	AM_RANGE(0x000e0000, 0x000e7fff) AM_READWRITE16(pc9821_grcg_gvram0_r,pc9821_grcg_gvram0_w, 0xffffffff)
 	AM_RANGE(0x000e8000, 0x000fffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x00f00000, 0x00f9ffff) AM_RAM AM_SHARE("ext_gvram")
 	AM_RANGE(0xffee8000, 0xffefffff) AM_DEVICE16("ipl_bank", address_map_bank_device, amap16, 0xffffffff)
