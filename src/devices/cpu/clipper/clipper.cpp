@@ -211,7 +211,10 @@ void clipper_device::decode_instruction (uint16_t insn)
 		else
 		{
 			// fetch 32 bit immediate and sign extend
-			m_info.op.imm = (int32_t)m_program->read_dword(m_pc + 2);
+			if ((m_pc & 0x2) == 0)
+				m_info.op.imm = (int32_t)(m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
+			else
+				m_info.op.imm = (int32_t)m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 		}
 	}
@@ -225,19 +228,28 @@ void clipper_device::decode_instruction (uint16_t insn)
 		{
 		case ADDR_MODE_PC32:
 			m_info.op.r2 = R2;
-			m_info.address = m_pc + (int32_t)m_program->read_dword(m_pc + 2);
+			if ((m_pc & 0x2) == 0)
+				m_info.address = m_pc + (int32_t)(m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
+			else
+				m_info.address = m_pc + (int32_t)m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_ABS32:
 			m_info.op.r2 = R2;
-			m_info.address = m_program->read_dword(m_pc + 2);
+			if ((m_pc & 0x2) == 0)
+				m_info.address = (m_program->read_word(m_pc + 2) | (m_program->read_word(m_pc + 4) << 16));
+			else
+				m_info.address = m_program->read_dword(m_pc + 2);
 			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_REL32:
 			m_info.op.r2 = m_program->read_word(m_pc + 2) & 0xf;
-			m_info.address = m_r[R2] + (int32_t)m_program->read_dword(m_pc + 4);
+			if ((m_pc & 0x2) == 0)
+				m_info.address = m_r[R2] + (int32_t)m_program->read_dword(m_pc + 4);
+			else
+				m_info.address = m_r[R2] + (int32_t)(m_program->read_word(m_pc + 4) | (m_program->read_word(m_pc + 6) << 16));
 			m_info.size = 8;
 			break;
 
