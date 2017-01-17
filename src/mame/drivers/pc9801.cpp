@@ -17,6 +17,7 @@
     - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
     - investigate on POR bit
     - test 2dd more
+	- clean-ups/split into devices.
 	
     TODO (PC-9801RS):
     - extra features;
@@ -2306,7 +2307,7 @@ READ16_MEMBER(pc9801_state::timestamp_r)
 
 /* basically a read-back of various registers */
 // bit 1: GDC clock select (port 0x6a, selects with 0x84 & bit 0)
-// bit 0: 
+// bit 0: current setting
 READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 {
 	uint8_t res;
@@ -2315,8 +2316,38 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 	
 	switch(m_ext2_ff)
 	{
+//		case 0x00: ?
+//		case 0x01: 200 line color / b&w mode (i/o 0x68 -> 0x02)
+//		case 0x02: Odd-numbered raster mask  (i/o 0x68 -> 0x08)
 		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
+//		case 0x04: palette mode (i/o 0x6a -> 0x00)
+//		case 0x05: GDC sync mode (i/o 0x6a -> 0x40)
+//		case 0x06: unknown (i/o 0x6a -> 0x44)
+//		case 0x07: EGC compatibility mode (i/o 0x6a -> 0x04)
+//		case 0x08: Protected mode f/f (i/o 0x6a -> 0x06)
+//		case 0x09: GDC clock #0 (i/o 0x6a -> 0x82)
 		case 0x0a: res = m_ex_video_ff[ANALOG_256_MODE]; break; // 256 color mode
+//		case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
+//		case 0x0c: unknown
+//		case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
+//		case 0x0e: 65536 color GFX mode (i/o 0x6a -> 0x22)
+//		case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
+//		case 0x10: unknown (i/o 0x6a -> 0x6a)
+//		case 0x11: Reverse mode related (i/o 0x6a -> 0x26)
+//		case 0x12: 256 color overscan color (i/o 0x6a -> 0x2c)
+//		case 0x13: Reverse mode related (i/o 0x6a -> 0x28)
+//		case 0x14: AGDC Drawing processor selection (i/o 0x6a -> 0x66)
+//		case 0x15: unknown (i/o 0x6a -> 0x60)
+//		case 0x16: unknown (i/o 0x6a -> 0xc2)
+//		case 0x17: bitmap config direction (i/o 0x6a -> 0x6c)
+//		case 0x18: High speed palette write (i/o 0x6a -> 0x2a)
+//		case 0x19: unknown (i/o 0x6a -> 0x48)
+//		case 0x1a: unknown (i/o 0x6a -> 0xc8)
+//		case 0x1b: unknown (i/o 0x6a -> 0x2e)
+//		case 0x1c: unknown (i/o 0x6a -> 0x6e)
+//		case 0x1d: unknown (i/o 0x6a -> 0xc0)
+//		case 0x1e: unknown (i/o 0x6a -> 0x80 or 0x46?)
+//		case 0x1f: unknown (i/o 0x6a -> 0x08)
 		default:
 			if(m_ext2_ff < 0x20)
 				popmessage("PC-9821: read ext2 f/f with value %02x",m_ext2_ff);
