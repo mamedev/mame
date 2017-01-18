@@ -345,14 +345,14 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 		/*INT2 - PI/T timer */
 		/*INT3 - SYSFAIL/IRQVMX/ACFAIL/MPCC2/3 */
 
-	/* MPCC */                                                                 
+	/* MPCC */
 #define RS232P1_TAG      "rs232p1"
-	MCFG_MPCC68561_ADD ("mpcc", XTAL_8_664MHz, 0, 0)
+	MCFG_MPCC68561_ADD ("mpcc", XTAL_16MHz, 0, 0)
 	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
 	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
 	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
 	// RS232
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, rx_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, cts_w))
 
@@ -382,7 +382,7 @@ ROM_END
  * : 0 Reg control <- 57 - Lev:7 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
  * : 1 Reg control <- 54 - Lev:4 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
  * : 2 Reg control <- 55 - Lev:5 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
- * : 3 Reg control <- 54 - Lev:4 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0 
+ * : 3 Reg control <- 54 - Lev:4 Auto Disable:0 Int Enable:1 Vector:0 Auto Clear:1 Flag:0
  *
  * PIT setup:
  * :pit Reg 0a -> 00
