@@ -329,7 +329,7 @@
 		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="73" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
 
 	<!-- lcd panel -->
-<!--
+
 		<screen index="0">
 			<bounds x="86.5" y="9.5" width="24.25" height="2.5" />
 		</screen>
@@ -338,7 +338,7 @@
 		<bezel element="static_lcd"><bounds x="86" y="11.9" width="25.25" height="1.1" /></bezel>
 		<bezel element="static_lcd"><bounds x="86" y="8.5" width="0.6" height="3.5" /></bezel>
 		<bezel element="static_lcd"><bounds x="110.65" y="8.5" width="0.6" height="3.5" /></bezel>
--->
+
 	<!-- right side buttons -->
 
 		<bezel element="but" inputtag="IN.7" inputmask="0x400"><bounds x="87.75" y="24.00" width="2.5" height="2.5" /></bezel>

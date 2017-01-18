@@ -57,8 +57,6 @@ instead of magnet sensors.
 #include "bus/rs232/rs232.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
-#include "sound/beep.h"
-#include "video/hd44780.h"
 
 // internal artwork
 #include "novag_sexpert.lh" // clickable
@@ -70,12 +68,8 @@ class novag6502_state : public novagbase_state
 {
 public:
 	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag),
-		m_lcd(*this, "hd44780")
+		: novagbase_state(mconfig, type, tag)
 	{ }
-
-	// devices/pointers
-	optional_device<hd44780_device> m_lcd;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -93,8 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sexpert_lcd_data_w);
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
-	DECLARE_PALETTE_INIT(sexpert);
-	HD44780_PIXEL_UPDATE(sexpert_pixel_update);
 	DECLARE_MACHINE_RESET(sexpert);
 	DECLARE_DRIVER_INIT(sexpert);
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
@@ -247,6 +239,29 @@ void novagbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 }
 
 
+// LCD
+
+PALETTE_INIT_MEMBER(novagbase_state, novag_lcd)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+}
+
+HD44780_PIXEL_UPDATE(novagbase_state::novag_lcd_pixel_update)
+{
+	// char size is 5x8
+	if (x > 4 || y > 7)
+		return;
+
+	if (line < 2 && pos < 8)
+	{
+		// internal: (8+8)*1, external: 1*16
+		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+	}
+}
+
+
 // generic input handlers
 
 u16 novagbase_state::read_inputs(int columns)
@@ -308,34 +323,14 @@ READ8_MEMBER(novag6502_state::supercon_input2_r)
     Super Expert
 ******************************************************************************/
 
-// LCD
-
-PALETTE_INIT_MEMBER(novag6502_state, sexpert)
-{
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
-}
-
-HD44780_PIXEL_UPDATE(novag6502_state::sexpert_pixel_update)
-{
-	// char size is 5x8
-	if (x > 4 || y > 7)
-		return;
-
-	if (line < 2 && pos < 8)
-	{
-		// internal: (8+8)*1, external: 1*16
-		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
-	}
-}
+// TTL/generic
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 {
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
 	// d2: HD44780 E
-	m_lcd_control = data;
+	m_lcd_control = data & 7;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
@@ -344,8 +339,6 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
 	if (m_lcd_control & 4 && ~m_lcd_control & 2)
 		m_lcd->write(space, m_lcd_control & 1, data);
 }
-
-// TTL/generic
 
 WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
 {
@@ -825,11 +818,11 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(novag6502_state, sexpert)
+	MCFG_PALETTE_INIT_OWNER(novagbase_state, novag_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novag6502_state, sexpert_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)

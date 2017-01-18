@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sound/beep.h"
+#include "video/hd44780.h"
 
 class novagbase_state : public driver_device
 {
@@ -16,6 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
+		m_lcd(*this, "hd44780"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -25,6 +27,7 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<beep_device> m_beeper;
+	optional_device<hd44780_device> m_lcd;
 	optional_ioport_array<8> m_inp_matrix;
 
 	// misc common
@@ -50,6 +53,9 @@ public:
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
+
+	DECLARE_PALETTE_INIT(novag_lcd);
+	HD44780_PIXEL_UPDATE(novag_lcd_pixel_update);
 
 protected:
 	virtual void machine_start() override;
