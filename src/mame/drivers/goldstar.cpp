@@ -11543,7 +11543,33 @@ ROM_END
   C: DM74LS374N
   D: DS1232
 
-  
+  Unknown Zilog 40pin IC (scratched):
+  (could be either a Z86C15 or Z86C91 MCU)
+
+                    +-----V-----+
+               VCC -|01       40|- 74LS08N (Pin 01)
+        XTAL 8MHz <-|02       39|- GAL16V8 (Pin 17)
+        XTAL 8MHz >-|03   Z   38|- 74LS374 (Pin 03)
+               N/C -|04   I   37|- 74LS374 (Pin 04)
+               N/C -|05   L   36|- 74LS374 (Pin 07)
+  74LS08N (Pin 10) -|06   O   35|- 74LS374 (Pin 08)
+  GAL16V8 (Pin 07) -|07   G   34|- 74LS374 (Pin 13)
+  GAL16V8 (Pin 08) -|08       33|- 74LS374 (Pin 14)
+  74LS374 (Pin 11) -|09       32|- 74LS374 (Pin 17)
+               N/C -|10       31|- 74LS374 (Pin 18)
+               GND -|11       30|- 74LS374 (Pin 01)
+               N/C -|12       29|- 74LS08N (Pin 02)
+      27C512 (A08) -|13       28|- 27C512 (Q7)
+      27C512 (A09) -|14       27|- 27C512 (Q6)
+      27C512 (A10) -|15       26|- 27C512 (Q5)
+      27C512 (A11) -|16       25|- 27C512 (Q4)
+      27C512 (A12) -|17       24|- 27C512 (Q3)
+      27C512 (A13) -|18       23|- 27C512 (Q2)
+      27C512 (A14) -|19       22|- 27C512 (Q1)
+      27C512 (A15) -|20       21|- 27C512 (Q0)
+                    +-----------+
+
+
   BASE Board (based on WING W4):
 
   XTAL: 11.98135MHZ
