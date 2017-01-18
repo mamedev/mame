@@ -182,9 +182,10 @@ int sound_pa::init(osd_options const &options)
 	m_overflows             = 0;
 	m_has_overflowed        = false;
 	m_has_underflowed       = false;
-	m_skip_threshold_ticks  = 0;
 	m_osd_ticks             = 0;
+	m_skip_threshold_ticks  = 0;
 	m_osd_tps               = osd_ticks_per_second();
+	m_buffer_min_ct         = INT_MAX;
 
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
