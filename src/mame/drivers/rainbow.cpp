@@ -44,7 +44,7 @@ NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before sta
 until shutdown. "Hot swapping" wasn't possible on the original system (our GUI just doesn't forbid it).
 
 To create a DEC RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
->chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd
+>chdman createhd -c none -chs 153,4,16 -ss 512 -o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
 Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot from a properly formatted
