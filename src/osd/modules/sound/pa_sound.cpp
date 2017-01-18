@@ -57,7 +57,7 @@ private:
 		int              reserve;
 		std::atomic<int> rd_pos, wr_pos;
 
-		audio_buffer(int size, int reserve) : size(size), reserve(reserve) {
+		audio_buffer(int size, int reserve) : size(size + reserve), reserve(reserve) {
 			rd_pos = wr_pos = 0;
 			buf = new T[size]();
 		}
@@ -65,11 +65,8 @@ private:
 		~audio_buffer() { delete[] buf; }
 
 		int count() {
-			int diff;
-			diff = wr_pos - rd_pos;
-			diff = diff < 0 ? size + diff : diff;
-			diff -= reserve;
-			return diff < 0 ? 0 : diff;
+			int diff = wr_pos - rd_pos;
+			return diff < 0 ? size + diff : diff;
 		}
 
 		void increment_wrpos(int n) {
@@ -77,7 +74,7 @@ private:
 		}
 
 		int write(const T* src, int n, int attenuation) {
-			n = std::min<int>(n, size - count());
+			n = std::min<int>(n, size - reserve - count());
 
 			if (wr_pos + n > size) {
 				att_memcpy(buf + wr_pos, src, sizeof(T) * (size - wr_pos), attenuation);
@@ -111,7 +108,7 @@ private:
 		}
 
 		int clear(int n) {
-			n = std::min<int>(n, size - count());
+			n = std::min<int>(n, size - reserve - count());
 
 			if (wr_pos + n > size) {
 				std::memset(buf + wr_pos, 0, sizeof(T) * (size - wr_pos));
@@ -186,6 +183,8 @@ int sound_pa::init(osd_options const &options)
 	m_has_overflowed        = false;
 	m_has_underflowed       = false;
 	m_skip_threshold_ticks  = 0;
+	m_osd_ticks             = 0;
+	m_osd_tps               = osd_ticks_per_second();
 
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
@@ -193,8 +192,6 @@ int sound_pa::init(osd_options const &options)
 		osd_printf_error("PortAudio: Unable to allocate audio buffer, sound is disabled\n");
 		goto error;
 	}
-
-	m_osd_tps = osd_ticks_per_second();
 
 	err = Pa_Initialize();
 
@@ -355,9 +352,8 @@ int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
 		m_ab->read(output_buffer, buf_ct);
 		std::memset(output_buffer + buf_ct, 0, (number_of_samples - buf_ct) * sizeof(s16));
 
-		// rd_pos == wr_pos only happens when buffer hasn't received any samples,
-		// i.e. before update_audio_stream has been called
-		if (m_ab->rd_pos != m_ab->wr_pos)
+		// if update_audio_stream has been called, note the underflow
+		if (m_osd_ticks)
 			m_has_underflowed = true;
 
 		m_skip_threshold_ticks = m_osd_ticks;
@@ -370,9 +366,6 @@ void sound_pa::update_audio_stream(bool is_throttled, const s16 *buffer, int sam
 {
 	if (!sample_rate())
 		return;
-
-	// for determining buffer overflows, take the sample here instead of in the callback
-	m_osd_ticks = osd_ticks();
 
 #if LOG_BUFCNT
 	if (m_log.good())
@@ -394,6 +387,9 @@ void sound_pa::update_audio_stream(bool is_throttled, const s16 *buffer, int sam
 	}
 
 	m_ab->write(buffer, samples_this_frame * 2, m_attenuation);
+
+	// for determining buffer overflows, take the sample here instead of in the callback
+	m_osd_ticks = osd_ticks();
 }
 
 void sound_pa::set_mastervolume(int attenuation)
