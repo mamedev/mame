@@ -113,6 +113,45 @@
   AB =  NEC C1663C 8926B.
 
 
+  Pinout:
+
+                   solder side |##| components
+            -------------------|--|-----------------
+                           gnd |01| gnd
+                           gnd |02| gnd
+                           +5v |03| +5v
+                           +5v |04| +5v
+                           -5v |05| -5v
+                          +12v |06| +12v
+                               |  |
+           hole (no connector) |07| hole (no connector)
+                               |  |
+            Coin B (10Y) meter |08| Coin A (100Y) meter
+                  hopper motor |09| unknown out (ULN2003, pin15)
+                     speaker - |10| speaker +
+ (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
+                         green |12| red
+                          sync |13| blue
+  (ULN2003, pin13) unknown out |14| video gnd
+                               |  |
+                      medal in |15| management
+               coin B (10Y) in |16| reset
+              coin A (100Y) in |17| unknown in (active)
+             +5v |<|-- (diode) |18| (diode) --|>| +5v
+             +5v |<|-- (diode) |19| (diode) --|>| +5v
+                               |  |
+                Botechin (5th) |20| (1st) Boketa
+           (active) unknown in |21| (2nd) Kunio
+           (active) unknown in |22| (3rd) Pyon-Pyon
+                         start |23| (4th) Pyokorin
+                        payout |24| hopper in (opto in)
+                               |  |
+                      not used |25| not used
+                      not used |26| not used
+                           gnd |27| gnd
+                           gnd |28| gnd
+
+
 ************************************************************************************
 
   General Notes....
