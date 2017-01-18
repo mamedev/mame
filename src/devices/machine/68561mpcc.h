@@ -130,12 +130,23 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
+
+	// serial device setup helpers
+	uint32_t get_brg_rate();
+	uint32_t get_tx_rate();
+	uint32_t get_rx_rate();
+	uint32_t get_clock_div();
+	uint32_t get_word_length();
+	stop_bits_t get_stop_bits();
+	parity_t get_parity();
+	void update_serial();
 
 	/*
 	 * Interrupts
@@ -262,10 +273,10 @@ protected:
 	void do_tsr(uint8_t data);
 	enum
 	{
-		REG_TSR_TDRA  = 0x80,
-		REG_TSR_TFC   = 0x40,
-		REG_TSR_TUNRN = 0x04,
-		REG_TSR_TFERR = 0x02,
+		REG_TSR_TDRA  = 0x80, // Tx Fifo Full or not
+		REG_TSR_TFC   = 0x40, // Tx Frame Complete
+		REG_TSR_TUNRN = 0x04, // Tx underrun
+		REG_TSR_TFERR = 0x02, // Tx Frame Error
 	};
 
 	// TCR - Tx Control Register

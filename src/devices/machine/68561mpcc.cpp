@@ -56,7 +56,7 @@ FEATURES
 #define LOG_SYNC    0x400
 #define LOG_CHAR    0x800
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP) //  | LOG_GENERAL)
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
 
 #define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
 #define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
@@ -237,6 +237,8 @@ void mpcc_device::device_start()
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_ecr));
 	LOG(" - MPCC variant %02x\n", m_variant);
+
+	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 //-------------------------------------------------
@@ -246,6 +248,11 @@ void mpcc_device::device_reset()
 {
 	LOGSETUP("%s %s \n",tag(), FUNCNAME);
 
+	// Reset RS232 emulation
+	receive_register_reset();
+	transmit_register_reset();
+
+	// Device reset values
 	m_rsr 	= 0x00;
 	m_rcr 	= 0x01;
 	m_rivnr = 0x0f;
@@ -279,6 +286,199 @@ void mpcc_device::device_reset()
 /*
  * Serial device implementation
  */
+
+void mpcc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+//-------------------------------------------------
+// get_brg_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_brg_rate()
+{
+	uint32_t rate;
+	uint32_t brg_const;
+
+	brg_const = (m_brdr1 | m_brdr2 << 8); // Baud rate divider
+	brg_const += (m_ccr & REG_CCR_PSCDIV) ? 3 : 2; // Add prescaler factor
+	brg_const += (m_psr2 & REG_PSR2_PSEL_MSK) == REG_PSR2_PSEL_ASCII ? 2 : 1; // Add K factor
+	rate = clock() / brg_const;
+
+	return rate;
+}
+
+//-------------------------------------------------
+// get_tx_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_tx_rate()
+{
+	uint32_t rate;
+
+	// Check if TxC is an input and use it instead of the BRG
+	if ((m_ccr & REG_CCR_TCLO) == 0)
+	{
+		rate = m_txc;
+	}
+	else
+	{
+		rate = get_brg_rate();
+	}
+
+	return rate;
+}
+
+//-------------------------------------------------
+// get_clock_div - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_clock_div()
+{
+	uint32_t clk_div = 1;
+
+	switch (m_ccr & REG_CCR_CLKDIV_MSK)
+	{
+	case REG_CCR_CLKDIV_X1 : clk_div =  1; break;
+	case REG_CCR_CLKDIV_X16: clk_div = 16; break;
+	case REG_CCR_CLKDIV_X32: clk_div = 32; break;
+	case REG_CCR_CLKDIV_X64: clk_div = 64; break;
+	}
+
+	return clk_div;
+}
+
+//-------------------------------------------------
+// get_rx_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_rx_rate()
+{
+	uint32_t rate;
+
+	// Check if TxC is an input and use it instead of the BRG
+	if ((m_ccr & REG_CCR_RCLKIN) == 0)
+	{
+		rate = m_rxc / get_clock_div();
+	}
+	else
+	{
+		rate = get_brg_rate();
+	}
+
+	return rate;
+}
+
+//-------------------------------------------------
+//  get_word_length - get word length
+//-------------------------------------------------
+uint32_t mpcc_device::get_word_length()
+{
+	int bits = 5;
+
+	switch (m_psr2 & REG_PSR2_CHLN_MSK)
+	{
+	case REG_PSR2_CHLN_5:  bits = 5;   break;
+	case REG_PSR2_CHLN_6:  bits = 6;   break;
+	case REG_PSR2_CHLN_7:  bits = 7;   break;
+	case REG_PSR2_CHLN_8:  bits = 8;   break;
+	}
+
+	return bits;
+}
+
+//-------------------------------------------------
+//  get_stop_bits - translate stop bit settings for serial interface
+//-------------------------------------------------
+device_serial_interface::stop_bits_t mpcc_device::get_stop_bits()
+{
+	switch (m_psr2 & REG_PSR2_STP_MSK)
+	{
+	case REG_PSR2_STP_1:   return STOP_BITS_1;
+	case REG_PSR2_STP_1_5: return STOP_BITS_1_5;
+	case REG_PSR2_STP_2:   return STOP_BITS_2;
+	}
+
+	return STOP_BITS_0;
+}
+
+//-------------------------------------------------
+//  get_parity - translate parity settings for serial interface
+//-------------------------------------------------
+device_serial_interface::parity_t mpcc_device::get_parity()
+{
+	parity_t parity;
+
+	if (m_ecr & REG_ECR_PAREN)
+	{
+		if (m_ecr & REG_ECR_ODDPAR)
+			parity = PARITY_ODD;
+		else
+			parity = PARITY_EVEN;
+	}
+	else
+	{
+		parity = PARITY_NONE;
+	}
+	return parity;
+}
+
+//-------------------------------------------------
+//  update_serial -
+//-------------------------------------------------
+void mpcc_device::update_serial()
+{
+	int         data_bits = get_word_length();
+	stop_bits_t stop_bits = get_stop_bits();
+	parity_t    parity    = get_parity();
+
+	LOGSETUP(" %s() %s Setting data frame %d+%d%c%s\n", FUNCNAME, m_owner->tag(), 1,
+		 data_bits, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', 
+		stop_bits == STOP_BITS_1 ? "1" : (stop_bits == STOP_BITS_2 ? "2" : "1.5"));
+
+	set_data_frame(1, data_bits, parity, stop_bits);
+
+	// Setup the Receiver
+	//  check if the receiver is in reset mode
+	if  (m_rcr & REG_RCR_RRES)
+	{
+		LOG("- Rx in reset\n");
+		set_rcv_rate(0);
+	}
+	// Rx is running
+	else
+	{
+		LOG("- Rx enabled\n");
+		m_brg_rate = get_rx_rate();
+
+		LOG("- BRG rate %d\n", m_brg_rate);
+		set_rcv_rate(m_brg_rate);
+	}
+
+	// Setup the Transmitter
+	//  check if Rx is in reset
+	if  (m_tcr & REG_TCR_TRES)
+	{
+		LOG("- Tx in reset\n");
+		set_tra_rate(0);
+	}
+	// Tx is running
+	else
+	{
+		// Check that Tx is enabled
+		if (m_tcr & REG_TCR_TEN)
+		{
+			LOG("- Tx enabled\n");
+			m_brg_rate = get_tx_rate();
+
+			LOG("- BRG rate %d\n", m_brg_rate);
+			set_tra_rate(m_brg_rate);
+		}
+		else
+		{
+			LOG("- Tx disabled\n");
+			set_tra_rate(0);
+		}
+	}
+}
+
 //-------------------------------------------------
 //  tra_callback - is called for each bit that needs to be transmitted
 //-------------------------------------------------
@@ -288,6 +488,7 @@ void mpcc_device::tra_callback()
 	if (!(m_tcr & REG_TCR_TEN))
 	{
 		// transmit idle TODO: Support TCR TICS bit
+		LOGTX("%s idle bit\n", FUNCNAME);
 		m_out_txd_cb(1);
 	}
 #if 0
@@ -303,6 +504,7 @@ void mpcc_device::tra_callback()
 	{
 		// Get the next bit
 		int db = transmit_register_get_data_bit();
+		LOGTX("%s bit: %d\n", FUNCNAME, db ? 1 : 0);
 
 		// transmit data
 		m_out_txd_cb(db);
@@ -587,6 +789,8 @@ void mpcc_device::do_rcr(uint8_t data)
 	LOGSETUP(" - Rx strip SYN: %s\n", (m_rcr & REG_RCR_STRSYN) ? "enabled" : "disabled");
 	LOGSETUP(" - Rx Abort    : %s\n", (m_rcr & REG_RCR_RABTEN) ? "enabled" : "disabled");
 	LOGSETUP(" - Rx Mode     : %s\n", (m_rcr & REG_RCR_RRES  ) ? "reset" : "normal");
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_rcr()
@@ -632,6 +836,22 @@ void mpcc_device::do_tdr(uint8_t data)
 			m_tsr &= ~REG_TSR_TDRA; // Mark fifo as full
 		}
 	}
+
+	// Check if Tx is enabled
+	if (m_tcr & REG_TCR_TEN)
+	{
+		LOGTX("- TX is enabled\n");
+		if (is_transmit_register_empty()) // Is the shift register loaded?
+		{
+			LOGTX("- Setting up transmitter\n");
+			transmit_register_setup(m_tx_data_fifo.dequeue()); // Load the shift register, reload is done in tra_complete()
+			m_tsr |= REG_TSR_TDRA; // Now there is a slot in the FIFO available again
+		}
+		else
+		{
+			LOGTX("- Transmitter not empty\n");
+		}
+	}
 }
 
 void mpcc_device::do_tcr(uint8_t data)
@@ -640,12 +860,14 @@ void mpcc_device::do_tcr(uint8_t data)
 	m_tcr = data;
 	LOGSETUP(" - Tx                : %s\n", (m_tcr & REG_TCR_TEN)    ? "enabled" : "disabled");
 	LOGSETUP(" - Tx DMA            : %s\n", (m_tcr & REG_TCR_TDSREN) ? "enabled" : "disabled");
-	LOGSETUP(" - Tx Idle character : %s\n", (m_tcr & REG_TCR_TICS)   ? "AR2" : "high");
-	LOGSETUP(" - Tx Half Word next : %s\n", (m_tcr & REG_TCR_THW)    ? "yes" : "no");
-	LOGSETUP(" - Tx Last character : %s\n", (m_tcr & REG_TCR_TLAST)  ? "yes" : "no");
+	LOGSETUP(" - Tx Idle character : %s\n", (m_tcr & REG_TCR_TICS)   ? "AR2"     : "high");
+	LOGSETUP(" - Tx Half Word next : %s\n", (m_tcr & REG_TCR_THW)    ? "yes"     : "no");
+	LOGSETUP(" - Tx Last character : %s\n", (m_tcr & REG_TCR_TLAST)  ? "yes"     : "no");
 	LOGSETUP(" - Tx SYN            : %s\n", (m_tcr & REG_TCR_TSYN)   ? "enabled" : "disabled");
-	LOGSETUP(" - Tx Abort command  : %s\n", (m_tcr & REG_TCR_TABT)   ? "active" : "inactive");
-	LOGSETUP(" - Tx Mode           : %s\n", (m_tcr & REG_TCR_TRES)   ? "reset" : "normal");
+	LOGSETUP(" - Tx Abort command  : %s\n", (m_tcr & REG_TCR_TABT)   ? "active"  : "inactive");
+	LOGSETUP(" - Tx Mode           : %s\n", (m_tcr & REG_TCR_TRES)   ? "reset"   : "normal");
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_tcr()
@@ -727,6 +949,8 @@ void mpcc_device::do_psr1(uint8_t data)
 	LOGSETUP(" - IPARS option       : %s\n", (m_psr1 & REG_PSR1_IPARS) ? "enabled" : "disabled" );
 	LOGSETUP(" - Control Field Width: %s\n", (m_psr1 & REG_PSR1_CTLEX) ? "16 bit"  : "8 bit" );
 	LOGSETUP(" - Address Extend     : %s\n", (m_psr1 & REG_PSR1_ADDEX) ? "enabled" : "disabled" );
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_psr1()
@@ -746,6 +970,8 @@ void mpcc_device::do_psr2(uint8_t data)
 		  ( (m_psr2 & REG_PSR2_STP_MSK) == REG_PSR2_STP_2 ? "2" : "Unknown")));
 	LOGSETUP(" - %d bit characters\n", 5 + ((m_psr2 & REG_PSR2_CHLN_MSK) >> 3));
 	LOGSETUP(" - Protocol %d %s\n", m_psr2 & REG_PSR2_PSEL_MSK, (m_psr2 & REG_PSR2_PSEL_MSK) != REG_PSR2_PSEL_ASCII ? "(not implemented)" : "");
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_psr2()
@@ -763,6 +989,8 @@ void mpcc_device::do_brdr1(uint8_t data)
 	LOG("%s -> %02x\n", FUNCNAME, data);
 	m_brdr1 = data;
 	LOGSETUP(" - Baudrate Divider 1: %02x\n", m_brdr1);
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_brdr1()
@@ -777,6 +1005,8 @@ void mpcc_device::do_brdr2(uint8_t data)
 	LOG("%s -> %02x\n", FUNCNAME, data);
 	m_brdr2 = data;
 	LOGSETUP(" - Baudrate Divider 2: %02x\n", m_brdr2);
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_brdr2()
@@ -796,6 +1026,8 @@ void mpcc_device::do_ccr(uint8_t data)
 	LOGSETUP(" - External RxC divisor: x%d\n",(m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X1 ? 1 :
 			 ( (m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X16 ? 16 :
 			   ( (m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X32 ? 32 : 64)));
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_ccr()
@@ -816,6 +1048,8 @@ void mpcc_device::do_ecr(uint8_t data)
 			 ( (m_ecr & REG_ECR_CRCSEL_MSK) == REG_ECR_CRCSEL_C16 ? "CRC-16 (BSC)" :
 			   ( (m_ecr & REG_ECR_CRCSEL_MSK) == REG_ECR_CRCSEL_VRC ? "VRC/LRC (BSC, ASCII, non-transp)" :
 				 "Not used")));
+
+	update_serial();
 }
 
 uint8_t mpcc_device::do_ecr()
