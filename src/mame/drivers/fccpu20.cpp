@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 
 	/* MPCC */
 #define RS232P1_TAG      "rs232p1"
-	MCFG_MPCC68561_ADD ("mpcc", XTAL_8_664MHz, 0, 0)
+	MCFG_MPCC68561_ADD ("mpcc", XTAL_16MHz, 0, 0)
 	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
 	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
 	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
