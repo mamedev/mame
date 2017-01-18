@@ -158,7 +158,7 @@
 #include "ebball3.lh"
 #include "ebaskb2.lh"
 #include "efootb4.lh"
-#include "einvader.lh" // test-layout(but still playable)
+#include "einvader.lh"
 #include "elecbowl.lh"
 #include "elecdet.lh"
 #include "esbattle.lh"
@@ -2901,8 +2901,6 @@ MACHINE_CONFIG_END
   TMS1100, the second more widespread release runs on a COP400. There are
   also differences with the overlay mask.
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class einvader_state : public hh_tms1k_state
@@ -2990,6 +2988,11 @@ static MACHINE_CONFIG_START( einvader, einvader_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(einvader_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(einvader_state, write_o))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(939, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 939-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvader)
 
@@ -8038,6 +8041,9 @@ ROM_START( einvader )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
+
+	ROM_REGION( 44398, "svg", 0)
+	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) ) // by hap, ver. 23 mar 2016
 ROM_END
 
 
@@ -8528,7 +8534,7 @@ CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Ent
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, esbattle,  0,        0, esbattle,  esbattle,  driver_device, 0, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efootb4 ,  0,        0, efootb4,   efootb4,   driver_device, 0, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,  0,        0, ebaskb2,   ebaskb2,   driver_device, 0, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE )
