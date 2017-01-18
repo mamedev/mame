@@ -2213,31 +2213,33 @@ ROM_END
   Pinouts / Edge Connectors....
 
 
-             A board connector.
-     ---------------+--+------------------
-        Solder Side |PN| Components Side
-     ---------------+--+------------------
-                    |01| GND
-       GEARS SWITCH |02| GND
-     50 PTS COIN-IN |03| GND
-                    |04| GND
-     25 PTS COIN-IN |05| GND
-                +5V |06| +5V
-                +5V |07| +5V
-                +5V |08| +5V
-                    |09|
-                    |10|
-               +12V |11|
-     WHEEL X SIGNAL |12|
-     WHEEL Z SIGNAL |13|
-                -5V |14|
-  AUDIO SIGNAL 1(*) |15| AMP AUDIO SIGNAL (**)
-  AUDIO SIGNAL 2(*) |16| AMP AUDIO SIGNAL (**)
-  AUDIO SIGNAL 3(*) |17|
-  AUDIO SIGNAL 4(*) |18|
+            'A' board connector.                              'B' board connector.
+     ---------------+--+------------------             ---------------+--+------------------
+        Solder Side |PN| Components Side                  Solder Side |PN| Components Side
+     ---------------+--+------------------             ---------------+--+------------------
+                    |01| GND                                      GND |01| GND 
+       GEARS SWITCH |02| GND                                          |02| 
+     50 PTS COIN-IN |03| GND                                          |03| 
+                    |04| GND                                      +5V |04| +5V 
+     25 PTS COIN-IN |05| GND                                          |05| COMMON ACCEL + BREAK (HI)
+                +5V |06| +5V                                BRAKE POT |06| ACCEL POT
+                +5V |07| +5V                                          |07| COMMON ACCEL + BREAK (LO)
+                +5V |08| +5V                                          |08| GND 
+                    |09|                          AUDIO SIGNAL 4(***) |09| AUDIO SIGNAL 1(***)
+                    |10|                          AUDIO SIGNAL 3(***) |10| AUDIO SIGNAL 2(***)
+               +12V |11|                                          GND |11| GND 
+     WHEEL X SIGNAL |12|                                              |12| 
+     WHEEL Z SIGNAL |13|                                              |13| 
+                -5V |14|                                              |14| 
+  AUDIO SIGNAL 1(*) |15| AMP AUDIO SIGNAL (**)                        |15| 
+  AUDIO SIGNAL 2(*) |16| AMP AUDIO SIGNAL (**)                        |16| 
+  AUDIO SIGNAL 3(*) |17|                                              |17| 
+  AUDIO SIGNAL 4(*) |18|                                              |18| 
 
-  (*)  To 'B' connector.
-  (**) To 'D' connector.
+
+  (*)   To 'B' connector.
+  (**)  To 'D' connector.
+  (***) To 'A' connector.
 
 */
 ROM_START( polepos2bs )
