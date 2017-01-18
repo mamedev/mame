@@ -49,60 +49,60 @@ public:
 	virtual void set_mastervolume(int attenuation);
 
 private:
-	/* Lock free SPSC ring buffer */
+	// Lock free SPSC ring buffer
 	template <typename T>
 	struct audio_buffer {
 		T*               buf;
 		int              size;
 		int              reserve;
-		std::atomic<int> rd_pos, wr_pos;
+		std::atomic<int> playpos, writepos;
 
 		audio_buffer(int size, int reserve) : size(size + reserve), reserve(reserve) {
-			rd_pos = wr_pos = 0;
+			playpos = writepos = 0;
 			buf = new T[size]();
 		}
 
 		~audio_buffer() { delete[] buf; }
 
 		int count() {
-			int diff = wr_pos - rd_pos;
+			int diff = writepos - playpos;
 			return diff < 0 ? size + diff : diff;
 		}
 
-		void increment_wrpos(int n) {
-			wr_pos = (wr_pos + n) % size;
+		void increment_writepos(int n) {
+			writepos.store((writepos + n) % size);
 		}
 
 		int write(const T* src, int n, int attenuation) {
 			n = std::min<int>(n, size - reserve - count());
 
-			if (wr_pos + n > size) {
-				att_memcpy(buf + wr_pos, src, sizeof(T) * (size - wr_pos), attenuation);
-				att_memcpy(buf, src + (size - wr_pos), sizeof(T) * (n - (size - wr_pos)), attenuation);
+			if (writepos + n > size) {
+				att_memcpy(buf + writepos, src, sizeof(T) * (size - writepos), attenuation);
+				att_memcpy(buf, src + (size - writepos), sizeof(T) * (n - (size - writepos)), attenuation);
 			} else {
-				att_memcpy(buf + wr_pos, src, sizeof(T) * n, attenuation);
+				att_memcpy(buf + writepos, src, sizeof(T) * n, attenuation);
 			}
 
-			increment_wrpos(n);
+			increment_writepos(n);
 
 			return n;
 		}
 
-		void increment_rdpos(int n) {
-			rd_pos = (rd_pos + n) % size;
+		void increment_playpos(int n) {
+			playpos.store((playpos + n) % size);
 		}
 
 		int read(T* dst, int n) {
 			n = std::min<int>(n, count());
 
-			if (rd_pos + n > size) {
-				std::memcpy(dst, buf + rd_pos, sizeof(T) * (size - rd_pos));
-				std::memcpy(dst + (size - rd_pos), buf, sizeof(T) * (n - (size - rd_pos)));
+			if (playpos + n > size) {
+				std::memcpy(dst, buf + playpos, sizeof(T) * (size - playpos));
+				std::memcpy(dst + (size - playpos), buf, sizeof(T) * (n - (size - playpos)));
 			} else {
-				std::memcpy(dst, buf + rd_pos, sizeof(T) * n);
+				std::memcpy(dst, buf + playpos, sizeof(T) * n);
 			}
 
-			increment_rdpos(n);
+			increment_playpos(n);
 
 			return n;
 		}
@@ -110,14 +110,14 @@ private:
 		int clear(int n) {
 			n = std::min<int>(n, size - reserve - count());
 
-			if (wr_pos + n > size) {
-				std::memset(buf + wr_pos, 0, sizeof(T) * (size - wr_pos));
-				std::memset(buf, 0, sizeof(T) * (n - (size - wr_pos)));
+			if (writepos + n > size) {
+				std::memset(buf + writepos, 0, sizeof(T) * (size - writepos));
+				std::memset(buf, 0, sizeof(T) * (n - (size - writepos)));
 			} else {
-				std::memset(buf + wr_pos, 0, sizeof(T) * n);
+				std::memset(buf + writepos, 0, sizeof(T) * n);
 			}
 
-			increment_wrpos(n);
+			increment_writepos(n);
 
 			return n;
 		}
@@ -340,7 +340,7 @@ int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
 
 			// if adjustment is less than two milliseconds, don't bother
 			if (adjust / 2 > sample_rate() / 500) {
-				m_ab->increment_rdpos(adjust);
+				m_ab->increment_playpos(adjust);
 				m_has_overflowed = true;
 			}
 
