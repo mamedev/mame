@@ -11569,6 +11569,31 @@ ROM_END
       27C512 (A15) -|20       21|- 27C512 (Q0)
                     +-----------+
 
+  40-Pin DIP Pin Identification for Z86C15 MCU (for reference):
+  
+  ---------------------------------------------------------
+  Pin    Symbol    Function                       Direction
+  ---------------------------------------------------------
+  01     VCC       Power Supply                   Input
+  02     CLKOUT    Z8 System Clock                Output
+  03     RCIN      RC Oscillator Clock            Input
+  04     P37       Port 3, Pin 7                  Output
+  05     P30       Port 3, Pin 0                  Input
+  06     /RESET    Reset                          Input
+  07     AGND      Analog Ground
+  08     NC        Not Connected
+  09     /WDTOUT   Watch-Dog Timer                Output
+  10     P35       Port 3, Pin 5                  Output
+  11     GND       Ground
+  12     P32       Port 3, Pin 2                  Input
+  13-20  P00-P07   Port 0, Pins 0,1,2,3,4,5,6,7   In/Output
+  21-28  P10-P17   Port 1, Pins 0,1,2,3,4,5,6,7   In/Output
+  29     P34       Port 3, Pin 4                  Output
+  30     P33       Port 3, Pin 3                  Input
+  31-38  P20-P27   Port 2, Pins 0,1,2,3,4,5,6,7   In/Output
+  39     P31       Port 3, Pin 1                  Input
+  40     P36       Port 3, Pin 6                  Output
+  ---------------------------------------------------------
 
   BASE Board (based on WING W4):
 
