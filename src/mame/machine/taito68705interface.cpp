@@ -38,7 +38,6 @@
     bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
     changela.cpp - changela - looks like an ancestor of arkanoid without automatic semaphores
     mexico86.cpp - knightb, mexico86 - bootleg 68705s
-    retofinv.cpp - the current MCU dump is a bootleg at least
     sqix.cpp - hotsmash - kaneko hookup, different from Taito ones.
 
     there are other drivers (and games in existing drivers) that could hookup here, but currently lack MCU dumps.

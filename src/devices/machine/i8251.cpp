@@ -24,7 +24,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define LOG(...)  do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -33,12 +33,26 @@
 const device_type I8251 = &device_creator<i8251_device>;
 const device_type V53_SCU = &device_creator<v53_scu_device>;
 
+template class device_finder<i8251_device, false>;
+template class device_finder<i8251_device, true>;
+template class device_finder<v53_scu_device, false>;
+template class device_finder<v53_scu_device, true>;
+
+
 //-------------------------------------------------
 //  i8251_device - constructor
 //-------------------------------------------------
 
-i8251_device::i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+i8251_device::i8251_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *name,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const char *shortname,
+		const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),
 	m_dtr_handler(*this),
@@ -56,25 +70,12 @@ i8251_device::i8251_device(const machine_config &mconfig, device_type type, cons
 }
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8251, "8251 USART", tag, owner, clock, "i8251", __FILE__),
-	device_serial_interface(mconfig, *this),
-	m_txd_handler(*this),
-	m_dtr_handler(*this),
-	m_rts_handler(*this),
-	m_rxrdy_handler(*this),
-	m_txrdy_handler(*this),
-	m_txempty_handler(*this),
-	m_syndet_handler(*this),
-	m_cts(1),
-	m_dsr(1),
-	m_rxd(0),
-	m_rxc(0),
-	m_txc(0)
+	: i8251_device(mconfig, I8251, "8251 USART", tag, owner, clock, "i8251", __FILE__)
 {
 }
 
 v53_scu_device::v53_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, V53_SCU, "V53 SCU", tag, owner, clock, "v53_scu")
+	: i8251_device(mconfig, V53_SCU, "V53 SCU", tag, owner, clock, "v53_scu", __FILE__)
 {
 }
 
@@ -121,15 +122,11 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	int state;
+	int state = m_status & I8251_STATUS_RX_READY;
 
-	state = m_status & I8251_STATUS_RX_READY;
-
-	/* masked? */
-	if ((m_command & (1<<2))==0)
-	{
+	// masked?
+	if (!BIT(m_command, 2))
 		state = 0;
-	}
 
 	m_rxrdy_handler(state != 0);
 }
@@ -142,19 +139,22 @@ void i8251_device::update_rx_ready()
 
 void i8251_device::receive_clock()
 {
-	m_rxc_count++;
-
-	if (m_rxc_count == m_br_factor)
-		m_rxc_count = 0;
-	else
-		return;
-
 	/* receive enable? */
-	if (m_command & (1<<2))
+	if (BIT(m_command, 2))
 	{
+		const bool sync = is_receive_register_synchronized();
+		if (sync)
+		{
+			--m_rxc_count;
+			if (m_rxc_count)
+				return;
+		}
+
 		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
 		receive_register_update_bit(m_rxd);
+		if (is_receive_register_synchronized())
+			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
 
 		if (is_receive_register_full())
 		{
@@ -167,25 +167,24 @@ void i8251_device::receive_clock()
 /*-------------------------------------------------
     is_tx_enabled
 -------------------------------------------------*/
-bool i8251_device::is_tx_enabled(void) const
+bool i8251_device::is_tx_enabled() const
 {
-		return BIT(m_command , 0) != 0 && m_cts == 0;
+	return BIT(m_command , 0) && !m_cts;
 }
 
 /*-------------------------------------------------
     check_for_tx_start
 -------------------------------------------------*/
-void i8251_device::check_for_tx_start(void)
+void i8251_device::check_for_tx_start()
 {
-		if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY) {
-				start_tx();
-		}
+	if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY)
+		start_tx();
 }
 
 /*-------------------------------------------------
     start_tx
 -------------------------------------------------*/
-void i8251_device::start_tx(void)
+void i8251_device::start_tx()
 {
 	transmit_register_setup(m_tx_data);
 	m_status &= ~I8251_STATUS_TX_EMPTY;
@@ -199,23 +198,25 @@ void i8251_device::start_tx(void)
 void i8251_device::transmit_clock()
 {
 	m_txc_count++;
-
-	if (m_txc_count == m_br_factor)
-		m_txc_count = 0;
-	else
+	if (m_txc_count != m_br_factor)
 		return;
 
-	if (is_transmit_register_empty()) {
-		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || (m_flags & I8251_DELAYED_TX_EN) != 0)) {
+	m_txc_count = 0;
+
+	if (is_transmit_register_empty())
+	{
+		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || (m_flags & I8251_DELAYED_TX_EN) != 0))
 			start_tx();
-		} else {
+		else
 			m_status |= I8251_STATUS_TX_EMPTY;
-		}
+
 		update_tx_ready();
 		update_tx_empty();
 	}
+
 	/* if diserial has bits to send, make them so */
-	if (!is_transmit_register_empty()) {
+	if (!is_transmit_register_empty())
+	{
 		uint8_t data = transmit_register_get_data_bit();
 		m_txd_handler(data);
 	}
@@ -223,7 +224,7 @@ void i8251_device::transmit_clock()
 #if 0
 	/* hunt mode? */
 	/* after each bit has been shifted in, it is compared against the current sync byte */
-	if (m_command & (1<<7))
+	if (BIT(m_command, 7))
 	{
 		/* data matches sync byte? */
 		if (m_data == m_sync_bytes[m_sync_byte_offset])
@@ -236,7 +237,7 @@ void i8251_device::transmit_clock()
 			if (m_sync_byte_offset == m_sync_byte_count)
 			{
 				/* ent hunt mode */
-				m_command &=~(1<<7);
+				m_command &= ~(1<<7);
 			}
 		}
 		else
@@ -295,7 +296,7 @@ void i8251_device::update_tx_empty()
 
 void i8251_device::device_reset()
 {
-	LOG(("I8251: Reset\n"));
+	LOG("I8251: Reset\n");
 
 	/* what is the default setup when the 8251 has been reset??? */
 
@@ -342,52 +343,34 @@ void i8251_device::device_reset()
 WRITE8_MEMBER(i8251_device::command_w)
 {
 	/* command */
-	LOG(("I8251: Command byte\n"));
+	LOG("I8251: Command byte\n");
 
 	m_command = data;
 
-	LOG(("Command byte: %02x\n", data));
+	LOG("Command byte: %02x\n", data);
 
-	if (data & (1<<7))
-	{
-		LOG(("hunt mode\n"));
-	}
+	if (BIT(data, 7))
+		LOG("hunt mode\n");
 
-	if (data & (1<<5))
-	{
-		LOG(("/rts set to 0\n"));
-	}
+	if (BIT(data, 5))
+		LOG("/rts set to 0\n");
 	else
-	{
-		LOG(("/rts set to 1\n"));
-	}
+		LOG("/rts set to 1\n");
 
-	if (data & (1<<2))
-	{
-		LOG(("receive enable\n"));
-	}
+	if (BIT(data, 2))
+		LOG("receive enable\n");
 	else
-	{
-		LOG(("receive disable\n"));
-	}
+		LOG("receive disable\n");
 
-	if (data & (1<<1))
-	{
-		LOG(("/dtr set to 0\n"));
-	}
+	if (BIT(data, 1))
+		LOG("/dtr set to 0\n");
 	else
-	{
-		LOG(("/dtr set to 1\n"));
-	}
+		LOG("/dtr set to 1\n");
 
-	if (data & (1<<0))
-	{
-		LOG(("transmit enable\n"));
-	}
+	if (BIT(data, 0))
+		LOG("transmit enable\n");
 	else
-	{
-				LOG(("transmit disable\n"));
-	}
+		LOG("transmit disable\n");
 
 
 	/*  bit 7:
@@ -419,12 +402,10 @@ WRITE8_MEMBER(i8251_device::command_w)
 	m_rts_handler(!BIT(data, 5));
 	m_dtr_handler(!BIT(data, 1));
 
-	if (data & (1<<4))
-	{
+	if (BIT(data, 4))
 		m_status &= ~(I8251_STATUS_PARITY_ERROR | I8251_STATUS_OVERRUN_ERROR | I8251_STATUS_FRAMING_ERROR);
-	}
 
-	if (data & (1<<6))
+	if (BIT(data, 6))
 	{
 		// datasheet says "returns to mode format", not
 		// completely resets the chip.  behavior of DEC Rainbow
@@ -432,15 +413,15 @@ WRITE8_MEMBER(i8251_device::command_w)
 		m_flags |= I8251_EXPECTING_MODE;
 	}
 
-		check_for_tx_start();
+	check_for_tx_start();
 	update_rx_ready();
 	update_tx_ready();
-		update_tx_empty();
+	update_tx_empty();
 }
 
 WRITE8_MEMBER(i8251_device::mode_w)
 {
-	LOG(("I8251: Mode byte\n"));
+	LOG("I8251: Mode byte = %X\n", data);
 
 	m_mode_byte = data;
 
@@ -472,60 +453,55 @@ WRITE8_MEMBER(i8251_device::mode_w)
 		    3 = x64
 		    */
 
-		LOG(("I8251: Asynchronous operation\n"));
+		LOG("I8251: Asynchronous operation\n");
 
-		LOG(("Character length: %d\n", (((data >> 2) & 0x03) + 5)));
+		const int data_bits_count = ((data >> 2) & 0x03) + 5;
+		LOG("Character length: %d\n", data_bits_count);
 
 		parity_t parity;
-
-		if (data & (1 << 4))
+		if (BIT(data, 4))
 		{
-			LOG(("enable parity checking\n"));
-
-			if (data & (1 << 5))
+			if (BIT(data, 5))
 			{
-				LOG(("even parity\n"));
+				LOG("enable parity checking (even parity)\n");
 				parity = PARITY_EVEN;
 			}
 			else
 			{
-				LOG(("odd parity\n"));
+				LOG("enable parity checking (odd parity)\n");
 				parity = PARITY_ODD;
 			}
 		}
 		else
 		{
-			LOG(("parity check disabled\n"));
+			LOG("parity check disabled\n");
 			parity = PARITY_NONE;
 		}
 
 		stop_bits_t stop_bits;
-
 		switch ((data >> 6) & 0x03)
 		{
 		case 0:
-		default:
 			stop_bits = STOP_BITS_0;
-			LOG(("stop bit: inhibit\n"));
+			LOG("stop bit: inhibit\n");
 			break;
 
 		case 1:
 			stop_bits = STOP_BITS_1;
-			LOG(("stop bit: 1 bit\n"));
+			LOG("stop bit: 1 bit\n");
 			break;
 
 		case 2:
 			stop_bits = STOP_BITS_1_5;
-			LOG(("stop bit: 1.5 bits\n"));
+			LOG("stop bit: 1.5 bits\n");
 			break;
 
 		case 3:
 			stop_bits = STOP_BITS_2;
-			LOG(("stop bit: 2 bits\n"));
+			LOG("stop bit: 2 bits\n");
 			break;
 		}
 
-		int data_bits_count = ((data >> 2) & 0x03) + 5;
 
 		set_data_frame(1, data_bits_count, parity, stop_bits);
 		receive_register_reset();
@@ -537,13 +513,13 @@ WRITE8_MEMBER(i8251_device::mode_w)
 		case 3: m_br_factor = 64; break;
 		}
 
-		m_rxc_count = m_txc_count = 0;
+		m_txc_count = 0;
 
 #if 0
 		/* data bits */
 		m_receive_char_length = (((data >> 2) & 0x03) + 5);
 
-		if (data & (1 << 4))
+		if (BIT(data, 4))
 		{
 			/* parity */
 			m_receive_char_length++;
@@ -580,7 +556,7 @@ WRITE8_MEMBER(i8251_device::mode_w)
 		        3 = 8 bits
 		        bit 1,0 = 0
 		        */
-		LOG(("I8251: Synchronous operation\n"));
+		LOG("I8251: Synchronous operation\n");
 
 		/* setup for sync byte(s) */
 		m_flags |= I8251_EXPECTING_SYNC_BYTE;
@@ -603,9 +579,9 @@ WRITE8_MEMBER(i8251_device::control_w)
 	{
 		if (m_flags & I8251_EXPECTING_SYNC_BYTE)
 		{
-			LOG(("I8251: Sync byte\n"));
+			LOG("I8251: Sync byte\n");
 
-			LOG(("Sync byte: %02x\n", data));
+			LOG("Sync byte: %02x\n", data);
 			/* store sync byte written */
 			m_sync_bytes[m_sync_byte_offset] = data;
 			m_sync_byte_offset++;
@@ -639,7 +615,7 @@ READ8_MEMBER(i8251_device::status_r)
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
-	LOG(("status: %02x\n", status));
+	LOG("status: %02x\n", status);
 	return status;
 }
 
@@ -653,7 +629,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 {
 	m_tx_data = data;
 
-		LOG(("data_w %02x\n" , data));
+		LOG("data_w %02x\n" , data);
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
@@ -687,9 +663,8 @@ void i8251_device::receive_character(uint8_t ch)
 
 	/* char has not been read and another has arrived! */
 	if (m_status & I8251_STATUS_RX_READY)
-	{
 		m_status |= I8251_STATUS_OVERRUN_ERROR;
-	}
+
 	m_status |= I8251_STATUS_RX_READY;
 
 	update_rx_ready();
@@ -703,7 +678,7 @@ void i8251_device::receive_character(uint8_t ch)
 
 READ8_MEMBER(i8251_device::data_r)
 {
-	LOG(("read data: %02x, STATUS=%02x\n",m_rx_data,m_status));
+	LOG("read data: %02x, STATUS=%02x\n",m_rx_data,m_status);
 	/* reading clears */
 	m_status &= ~I8251_STATUS_RX_READY;
 
@@ -728,9 +703,9 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 {
 	m_cts = state;
 
-		check_for_tx_start();
-		update_tx_ready();
-		update_tx_empty();
+	check_for_tx_start();
+	update_tx_ready();
+	update_tx_empty();
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_dsr)

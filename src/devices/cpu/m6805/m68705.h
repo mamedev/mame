@@ -94,6 +94,28 @@ public:
 protected:
 	enum
 	{
+		M68705_LATCHA = 0x10,
+		M68705_LATCHB,
+		M68705_LATCHC,
+		M68705_LATCHD,
+		M68705_DDRA,
+		M68705_DDRB,
+		M68705_DDRC,
+		M68705_DDRD,
+
+		M68705_PS,
+		M68705_TDR,
+		M68705_TCR,
+
+		M68705_PCR,
+		M68705_PLD,
+		M68705_PLA,
+
+		M68705_MOR
+	};
+
+	enum
+	{
 		PORT_COUNT = 4
 	};
 
@@ -147,6 +169,11 @@ protected:
 
 	u8 *const get_user_rom() const { return &m_user_rom[0]; }
 	virtual u8 get_mask_options() const = 0;
+
+	template <std::size_t N> void add_port_latch_state();
+	template <std::size_t N> void add_port_ddr_state();
+	void add_timer_state();
+	void add_eprom_state();
 
 private:
 	bool    tcr_tir() const     { return BIT(m_tcr, 7); }
@@ -206,6 +233,8 @@ protected:
 			char const *shortname,
 			char const *source);
 
+	virtual void device_start() override;
+
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
@@ -248,6 +277,8 @@ protected:
 			char const *shortname,
 			char const *source);
 
+	virtual void device_start() override;
+
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
@@ -276,6 +307,8 @@ protected:
 			char const *name,
 			char const *shortname,
 			char const *source);
+
+	virtual void device_start() override;
 
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,

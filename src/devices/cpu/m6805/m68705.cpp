@@ -569,6 +569,30 @@ void m68705_new_device::burn_cycles(unsigned count)
 	}
 }
 
+template <std::size_t N> void m68705_new_device::add_port_latch_state()
+{
+	state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff);
+}
+
+template <std::size_t N> void m68705_new_device::add_port_ddr_state()
+{
+	state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff);
+}
+
+void m68705_new_device::add_timer_state()
+{
+	state_add(M68705_PS, "PS", m_prescaler).mask(0x7f);
+	state_add(M68705_TDR, "TDR", m_tdr).mask(0xff);
+	state_add(M68705_TCR, "TCR", m_tcr).mask(0xff);
+}
+
+void m68705_new_device::add_eprom_state()
+{
+	state_add(M68705_PCR, "PCR", m_pcr).mask(0xff);
+	state_add(M68705_PLA, "PLA", m_pl_addr).mask(0xffff);
+	state_add(M68705_PLD, "PLD", m_pl_data).mask(0xff);
+}
+
 
 /****************************************************************************
  * M68705Px family
@@ -611,6 +635,21 @@ m68705p_device::m68705p_device(
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
 	set_port_mask<3>(0xff);         // Port D isn't present
+}
+
+void m68705p_device::device_start()
+{
+	m68705_new_device::device_start();
+
+	add_port_latch_state<0>();
+	add_port_latch_state<1>();
+	add_port_latch_state<2>();
+	add_port_ddr_state<0>();
+	add_port_ddr_state<1>();
+	add_port_ddr_state<2>();
+	add_timer_state();
+	add_eprom_state();
+	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
 offs_t m68705p_device::disasm_disassemble(
@@ -680,6 +719,24 @@ m68705u_device::m68705u_device(
 {
 }
 
+void m68705u_device::device_start()
+{
+	m68705_new_device::device_start();
+
+	add_port_latch_state<0>();
+	add_port_latch_state<1>();
+	add_port_latch_state<2>();
+	add_port_latch_state<3>();
+	add_port_ddr_state<0>();
+	add_port_ddr_state<1>();
+	add_port_ddr_state<2>();
+	add_timer_state();
+	add_eprom_state();
+	state_add(M68705_MOR, "MOR", get_user_rom()[0x0f38]).mask(0xff);
+
+	// TODO: MISC register
+}
+
 offs_t m68705u_device::disasm_disassemble(
 		std::ostream &stream,
 		offs_t pc,
@@ -732,6 +789,13 @@ m68705r_device::m68705r_device(
 		char const *source)
 	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705r_device::r_map), this), shortname, source)
 {
+}
+
+void m68705r_device::device_start()
+{
+	m68705u_device::device_start();
+
+	// TODO: ADC
 }
 
 offs_t m68705r_device::disasm_disassemble(
@@ -801,7 +865,7 @@ tiny_rom_entry const *m68705r3_device::device_rom_region() const
 
 u8 m68705r3_device::get_mask_options() const
 {
-	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+	return get_user_rom()[0x0f38] & 0xf7; // no SNM bit
 }
 
 
@@ -821,5 +885,5 @@ tiny_rom_entry const *m68705u3_device::device_rom_region() const
 
 u8 m68705u3_device::get_mask_options() const
 {
-	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+	return get_user_rom()[0x0f38] & 0xf7; // no SNM bit
 }
