@@ -14,11 +14,12 @@
 #include "cpu/cop400/cop400.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+//#include "rendlay.h"
 
 // internal artwork
 #include "bship82.lh" // clickable
 #include "ctstein.lh" // clickable
-#include "einvaderc.lh" // test-layout(but still playable)
+#include "einvaderc.lh"
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
@@ -469,8 +470,6 @@ MACHINE_CONFIG_END
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
   second release with a gray case instead of black.
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class einvaderc_state : public hh_cop400_state
@@ -556,7 +555,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP444L, 900000) // approximation - RC osc. R=47K, C=100pf
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -565,6 +564,11 @@ static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(einvaderc_state, write_so))
 	MCFG_COP400_WRITE_L_CB(WRITE8(einvaderc_state, write_l))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(913, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
 
@@ -1436,6 +1440,9 @@ ROM_END
 ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
+
+	ROM_REGION( 80636, "svg", 0)
+	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) ) // by hap, ver. 18 jan 2017
 ROM_END
 
 
@@ -1487,7 +1494,7 @@ CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Cas
 
 CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball/Hockey/Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )

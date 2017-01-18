@@ -122,6 +122,8 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
+  - 7in1ss: in 2-player mode, game select and skill select can be configured
+    after selecting a game?
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
@@ -3724,7 +3726,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ginv1000, ginv1000_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 325000) // approximation
+	MCFG_CPU_ADD("maincpu", TMS1370, 340000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(ginv1000_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ginv1000_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ginv1000_state, write_o))
