@@ -124,7 +124,7 @@ namespace netlist
 
 	private:
 		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		NETLIB_SUB(twoterm) m_RV;
+		analog::NETLIB_SUB(twoterm) m_RV;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
 	};

@@ -29,6 +29,7 @@
 /* Devices */
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
+#include "machine/bankdev.h"
 #include "machine/ram.h"
 
 
@@ -40,6 +41,8 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
 		m_io_network_id(*this, "NETWORK ID")
@@ -52,9 +55,8 @@ public:
 
 	/* NR signal */
 	uint8_t m_NR;
-	uint8_t m_df_on_databus;
 
-	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
+	DECLARE_READ8_MEMBER(nmi_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
@@ -68,6 +70,8 @@ protected:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
+	required_device<address_map_bank_device> m_bank1;
+	required_device<address_map_bank_device> m_bank2;
 	required_ioport_array<9> m_io_ports;
 	required_ioport m_io_line9;
 	required_ioport m_io_network_id;
@@ -85,14 +89,13 @@ protected:
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
+
+READ8_MEMBER(elwro800_state::nmi_r)
 {
-	if (m_ram_at_0000 && address == 0x66)
-	{
-		direct.explicit_configure(0x66, 0x66, 0, &m_df_on_databus);
-		return ~0;
-	}
-	return address;
+	if (m_ram_at_0000)
+		return 0xdf;
+	else
+		return m_bank1->read8(space, 0x66);
 }
 
 /*************************************
@@ -131,35 +134,30 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x0000); /* BAS0 ROM */
-		m_maincpu->space(AS_PROGRAM).nop_write(0x0000, 0x1fff);
+		m_bank1->set_bank(1);
 		m_ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000); /* BOOT ROM */
-		m_maincpu->space(AS_PROGRAM).nop_write(0x0000, 0x1fff);
+		m_bank1->set_bank(2);
 		m_ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
-		membank("bank1")->set_base(messram);
-		m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x1fff, "bank1");
+		m_bank1->set_bank(0);
 		m_ram_at_0000 = 1;
 	}
 
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-		membank("bank2")->set_base(memregion("maincpu")->base() + 0x2000); /* BAS1 ROM */
-		m_maincpu->space(AS_PROGRAM).nop_write(0x2000, 0x3fff);
+		m_bank2->set_bank(1); // BAS1 ROM
 	}
 	else
 	{
-		membank("bank2")->set_base(messram + 0x2000); /* RAM */
-		m_maincpu->space(AS_PROGRAM).install_write_bank(0x2000, 0x3fff, "bank2");
+		m_bank2->set_bank(0); // RAM
 	}
 
 	if (BIT(ls175,2))
@@ -364,14 +362,32 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8, elwro800_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("bank3")
+static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8, elwro800_state)
+	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state )
+static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(elwro800jr_io_r, elwro800jr_io_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(elwro800_m1, AS_DECRYPTED_OPCODES, 8, elwro800_state)
+	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
+	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(elwro800_bank1, AS_PROGRAM, 8, elwro800_state)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("rambank1")
+	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x0000) AM_WRITENOP // BAS0 ROM
+	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x4000) AM_WRITENOP // BOOT ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(elwro800_bank2, AS_PROGRAM, 8, elwro800_state)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("rambank2")
+	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x2000) AM_WRITENOP // BAS1 ROM
 ADDRESS_MAP_END
 
 /*************************************
@@ -496,18 +512,17 @@ MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 {
 	uint8_t *messram = m_ram->pointer();
 
-	m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
 
-	membank("bank3")->set_base(messram + 0x4000);
+	membank("rambank1")->set_base(messram + 0x0000);
+	membank("rambank2")->set_base(messram + 0x2000);
+	membank("rambank3")->set_base(messram + 0x4000);
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(0);
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&elwro800_state::elwro800_direct_handler, this));
 }
 
 INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
@@ -544,6 +559,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_CPU_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(elwro800_mem)
 	MCFG_CPU_IO_MAP(elwro800_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(elwro800_m1)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
@@ -600,6 +616,16 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank1)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
+	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank2)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -263,7 +263,7 @@ public:
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
-	void trace(FILE *file, bool trace_over, bool detect_loops, const char *action);
+	void trace(FILE *file, bool trace_over, bool detect_loops, bool logerror, const char *action);
 	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
 	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
@@ -280,6 +280,7 @@ private:
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
 	u32 dasm_wrapped(std::string &buffer, offs_t pc);
+	void errorlog_write_line(const char *line);
 
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
@@ -336,12 +337,13 @@ private:
 	class tracer
 	{
 	public:
-		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action);
+		tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, bool logerror, const char *action);
 		~tracer();
 
 		void update(offs_t pc);
 		void vprintf(const char *format, va_list va);
 		void flush();
+		bool logerror() const { return m_logerror; }
 
 	private:
 		static const int TRACE_LOOPS = 64;
@@ -351,6 +353,7 @@ private:
 		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
 		bool                m_detect_loops;             // whether or not we should detect loops
+		bool				m_logerror;					// whether or not we should collect logerror output
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
 		bool                m_trace_over;               // true if we're tracing over

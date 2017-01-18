@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
+#include "cpu/m6805/m68705.h"
+
 #include "machine/gen_latch.h"
-#include "sound/ay8910.h"
-#include "sound/discrete.h"
+
 #include "sound/dac.h"
+#include "sound/discrete.h"
+#include "sound/ay8910.h"
+
 
 class taitosj_state : public driver_device
 {
@@ -62,7 +66,6 @@ public:
 	uint8_t m_zaccept;
 	uint8_t m_zready;
 	uint8_t m_busreq;
-	uint8_t m_portA_in;
 	uint8_t m_portA_out;
 	uint8_t m_spacecr_prot_value;
 	uint8_t m_protection_value;
@@ -89,9 +92,7 @@ public:
 	DECLARE_READ8_MEMBER(taitosj_mcu_data_r);
 	DECLARE_WRITE8_MEMBER(taitosj_mcu_data_w);
 	DECLARE_READ8_MEMBER(taitosj_mcu_status_r);
-	DECLARE_READ8_MEMBER(taitosj_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(taitosj_68705_portA_w);
-	DECLARE_READ8_MEMBER(taitosj_68705_portB_r);
 	DECLARE_WRITE8_MEMBER(taitosj_68705_portB_w);
 	DECLARE_READ8_MEMBER(taitosj_68705_portC_r);
 	DECLARE_READ8_MEMBER(spacecr_prot_r);
@@ -141,7 +142,7 @@ public:
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<m68705p_device> m_mcu;
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<discrete_device> m_dacvol;
 	required_device<ay8910_device> m_ay1;

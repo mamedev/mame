@@ -8,8 +8,8 @@
 
 **************************************************************************/
 
-#ifndef __RAM_H__
-#define __RAM_H__
+#ifndef MAME_DEVICES_MACHINE_RAM_H
+#define MAME_DEVICES_MACHINE_RAM_H
 
 
 /***************************************************************************
@@ -92,4 +92,7 @@ extern const device_type RAM;
 // device iterator
 typedef device_type_iterator<&device_creator<ram_device>, ram_device> ram_device_iterator;
 
-#endif /* __RAM_H__ */
+extern template class device_finder<ram_device, false>;
+extern template class device_finder<ram_device, true>;
+
+#endif // MAME_DEVICES_MACHINE_RAM_H

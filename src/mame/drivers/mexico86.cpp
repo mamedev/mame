@@ -50,10 +50,9 @@ PS4  J8635      PS4  J8541       PS4  J8648
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/2203intf.h"
 #include "includes/mexico86.h"
+
+#include "cpu/z80/z80.h"
 
 
 /*************************************
@@ -64,7 +63,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 
 READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
-	uint8_t result = m_ymsnd->read(space, offset);
+	u8 result = m_ymsnd->read(space, offset);
 
 	if (offset == 0)
 		result &= 0x7f;
@@ -99,19 +98,6 @@ static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_READ(kiki_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddr_b_w)
-	AM_RANGE(0x000a, 0x000a) AM_WRITENOP    /* looks like a bug in the code, writes to */
-											/* 0x0a (=10dec) instead of 0x10 */
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
@@ -397,16 +383,12 @@ GFXDECODE_END
 
 void mexico86_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	u8 *const ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 
-	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
 	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
 	save_item(NAME(m_address));
 	save_item(NAME(m_latch));
 
@@ -416,6 +398,9 @@ void mexico86_state::machine_start()
 	save_item(NAME(m_coin_fract));
 
 	save_item(NAME(m_charbank));
+
+	m_port_a_out = 0xff;
+	m_port_b_out = 0xff;
 }
 
 void mexico86_state::machine_reset()
@@ -424,12 +409,6 @@ void mexico86_state::machine_reset()
 	if (m_subcpu != nullptr)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
 	m_address = 0;
 	m_latch = 0;
 
@@ -452,8 +431,10 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_CPU_PROGRAM_MAP(mexico86_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
-	MCFG_CPU_PROGRAM_MAP(mexico86_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705P3, 4000000) /* xtal is 4MHz, divided by 4 internally */
+	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"));
+	MCFG_M68705_PORTA_W_CB(WRITE8(mexico86_state, mexico86_68705_port_a_w));
+	MCFG_M68705_PORTB_W_CB(WRITE8(mexico86_state, mexico86_68705_port_b_w));
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mexico86_state, mexico86_m68705_interrupt)
 
 	MCFG_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */

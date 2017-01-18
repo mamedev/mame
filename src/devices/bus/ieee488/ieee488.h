@@ -245,6 +245,9 @@ public:
 extern const device_type IEEE488;
 extern const device_type IEEE488_SLOT;
 
+extern template class device_finder<ieee488_device, false>;
+extern template class device_finder<ieee488_device, true>;
+
 
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
 SLOT_INTERFACE_EXTERN( hp_ieee488_devices );

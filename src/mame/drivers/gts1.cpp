@@ -104,8 +104,7 @@ public:
 	DECLARE_READ8_MEMBER (gts1_io_r);
 	DECLARE_WRITE8_MEMBER(gts1_io_w);
 	DECLARE_READ8_MEMBER (gts1_pa_r);
-	DECLARE_WRITE8_MEMBER(gts1_pa_w);
-	DECLARE_WRITE8_MEMBER(gts1_pb_w);
+	DECLARE_WRITE8_MEMBER(gts1_do_w);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -134,8 +133,6 @@ static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
 	AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "u6", r10788_device, io_r, io_w ) // (U6) display chip
 	AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )         // catch undecoded I/O accesss
-	AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )         // CPU I/O port A (input/output)
-	AM_RANGE(0x0101, 0x0101) AM_WRITE( gts1_pb_w )                               // CPU I/O port B (output only)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts1_dips )
@@ -669,27 +666,22 @@ READ8_MEMBER (gts1_state::gts1_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_pa_w)
+WRITE8_MEMBER(gts1_state::gts1_do_w)
 {
-	// write address lines 7-4
-	m_6351_addr = (m_6351_addr & 0x0f) | ((data & 0x0f) << 4);
-	LOG(("%s: ROM hi:%x addr:%02x\n", __FUNCTION__, data & 0x0f, m_6351_addr));
-}
-
-WRITE8_MEMBER(gts1_state::gts1_pb_w)
-{
-	// write address lines 3-0
-	m_6351_addr = (m_6351_addr & 0xf0) | (data & 0x0f);
-	LOG(("%s: ROM lo:%x addr:%02x\n", __FUNCTION__, data & 0x0f, m_6351_addr));
+	// write address lines (DO1-4 to A0-3, DIO1-4 to A4-7)
+	m_6351_addr = (m_6351_addr & 0x300) | data;
+	LOG(("%s: ROM addr:%02x\n", __FUNCTION__, m_6351_addr));
 }
 
 
 static MACHINE_CONFIG_START( gts1, gts1_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPS4, XTAL_3_579545MHz / 18)  // divided in the CPU
+	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL_3_579545MHz)  // divided by 18 in the CPU
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
 	MCFG_CPU_DATA_MAP(gts1_data)
 	MCFG_CPU_IO_MAP(gts1_io)
+	MCFG_PPS4_DISCRETE_INPUT_A_CB(READ8(gts1_state, gts1_pa_r))
+	MCFG_PPS4_DISCRETE_OUTPUT_CB(WRITE8(gts1_state, gts1_do_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -697,11 +689,13 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 	MCFG_DEVICE_ADD( "u5", RA17XX, 0 )
 	MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
 	MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
+	MCFG_RA17XX_CPU("maincpu")
 
 	/* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
 	MCFG_DEVICE_ADD( "u4", RA17XX, 0 )
 	MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
 	MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
+	MCFG_RA17XX_CPU("maincpu")
 
 	/* 10696 General Purpose Input/Output */
 	MCFG_DEVICE_ADD( "u2", R10696, 0 )

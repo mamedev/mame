@@ -11,6 +11,8 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
+#ifndef NL_AUTO_DEVICES
+
 #define TTL_7400_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_7400_GATE, name)
 
@@ -199,6 +201,8 @@
 
 #define TTL_74260_DIP(name) \
 		NET_REGISTER_DEV(TTL_74260_DIP, name)
+
+#endif
 
 /* ----------------------------------------------------------------------------
  *  External declarations

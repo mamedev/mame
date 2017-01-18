@@ -85,17 +85,25 @@ class NETLIB_NAME(name) : public device_t
 		: device_t(owner, name)
 
 	/*! Add this to a device definition to mark the device as dynamic.
-	*  If this is added to device definition the device is treated as an analog
-	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
-	*  of the Newton-Raphson step of solving the linear equations.
+	*  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
+	*  is treated as an analog dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI
+	*  is called on a each step of the Newton-Raphson step
+	*  of solving the linear equations.
+	*
+	*  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
+	*  device a dynamic device if parameter m_func is set.
 	*/
-#define NETLIB_IS_DYNAMIC()                                                       \
-	public: virtual bool is_dynamic() const override { return true; }
+#define NETLIB_IS_DYNAMIC(expr)                                                \
+	public: virtual bool is_dynamic() const override { return expr; }
 
 	/*! Add this to a device definition to mark the device as a time-stepping device.
      *
 	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
 	 *  the capacitor and inductor devices uses this.
+	 *
+	 *  You may also use e.g. NETLIB_IS_TIMESTEP(m_func() != "") to only make the
+	 *  device a dynamic device if parameter m_func is set. This is used by the
+	 *  Voltage Source element.
 	 *
 	 *  Example:
 	 *
@@ -109,8 +117,8 @@ class NETLIB_NAME(name) : public device_t
 	 *       }
 	 *
 	 */
-#define NETLIB_IS_TIMESTEP()                                                   \
-	public: virtual bool is_timestep() const override { return true; }
+#define NETLIB_IS_TIMESTEP(expr)                                               \
+	public: virtual bool is_timestep() const override { return expr; }
 
 	/*! Used to implement the time stepping code.
 	 *
@@ -132,14 +140,12 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
+#define NETLIB_SUBXX(ns, chip) std::unique_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
 #define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
-
-#define NETLIB_STOP(chip) void NETLIB_NAME(chip) :: stop(void)
 
 #define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params
@@ -235,7 +241,7 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		~logic_family_desc_t();
+		virtual ~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -372,7 +378,7 @@ namespace netlist
 	/*! The base class for netlist devices, terminals and parameters.
 	 *
 	 *  This class serves as the base class for all device, terminal and
-	 *  objects. It provides new and delete operators to supported e.g. pooled
+	 *  objects. It provides new and delete operators to support e.g. pooled
 	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
 	 *  well.
 	 */
@@ -441,9 +447,8 @@ namespace netlist
 		 *
 		 * \param dev  device owning the object.
 		 * \param name string holding the name of the device
-		 * \param type type   of this object.
 		 */
-		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		device_object_t(core_device_t &dev, const pstring &name);
 		/*! returns reference to owning device.
 		 * \returns reference to owning device.
 		 */
@@ -452,22 +457,22 @@ namespace netlist
 		/*! The object type.
 		 * \returns type of the object
 		 */
-		type_t type() const { return m_type; }
+		type_t type() const;
 		/*! Checks if object is of specified type.
-		 * \param type type to check object against.
+		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const type_t type) const { return (m_type == type); }
+		bool is_type(const type_t atype) const { return (type() == atype); }
 
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
 		netlist_t &netlist();
+		const netlist_t &netlist() const;
 
 	private:
 		core_device_t & m_device;
-		const type_t    m_type;
-	};
+};
 
 
 	// -----------------------------------------------------------------------------
@@ -495,8 +500,7 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname,
-				const type_t type, const state_e state);
+		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
@@ -528,9 +532,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-		: core_terminal_t(dev, aname, type, state)
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
+		: core_terminal_t(dev, aname, state)
 		{
 		}
 		virtual ~analog_t();
@@ -609,9 +612,8 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-			: core_terminal_t(dev, aname, type, state)
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
+			: core_terminal_t(dev, aname, state)
 			, logic_family_t()
 			, m_proxy(nullptr)
 		{
@@ -705,6 +707,7 @@ namespace netlist
 		void reset();
 
 		void add_terminal(core_terminal_t &terminal);
+		void remove_terminal(core_terminal_t &terminal);
 
 		bool is_logic() const NL_NOEXCEPT;
 		bool is_analog() const NL_NOEXCEPT;
@@ -870,10 +873,10 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(const param_type_t atype, device_t &device, const pstring &name);
+		param_t(device_t &device, const pstring &name);
 		virtual ~param_t();
 
-		param_type_t param_type() const { return m_param_type; }
+		param_type_t param_type() const;
 
 	protected:
 		void update_param();
@@ -888,8 +891,6 @@ namespace netlist
 			}
 		}
 
-	private:
-		const param_type_t m_param_type;
 	};
 
 	class param_ptr_t final: public param_t
@@ -958,21 +959,39 @@ namespace netlist
 		pstring m_param;
 	};
 
-	class param_model_t final : public param_str_t
+	class param_model_t : public param_str_t
 	{
 	public:
+
+		class value_t
+		{
+		public:
+			value_t(param_model_t &param, const pstring name)
+			{
+				m_value = param.model_value(name);
+			}
+			double operator()() const { return m_value; }
+			operator double() const { return m_value; }
+		private:
+			double m_value;
+		};
+
+		friend class value_t;
+
 		param_model_t(device_t &device, const pstring name, const pstring val)
 		: param_str_t(device, name, val) { }
 
-		/* these should be cached! */
-		nl_double model_value(const pstring &entity);
-		const pstring model_value_str(const pstring &entity);
-		const pstring model_type();
+		const pstring model_value_str(const pstring &entity) /*const*/;
+		const pstring model_type() /*const*/;
 	protected:
 		virtual void changed() override;
+		nl_double model_value(const pstring &entity) /*const*/;
 	private:
+		/* hide this */
+		void setTo(const pstring &param) = delete;
 		model_map_t m_map;
 	};
+
 
 	class param_data_t : public param_str_t
 	{
@@ -1007,19 +1026,7 @@ namespace netlist
 			m_stat_total_time.stop();
 		}
 
-		void do_update() NL_NOEXCEPT
-		{
-			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-				(this->*m_static_update)();
-			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-				m_static_update(this);
-			#else
-				update();
-			#endif
-		}
-
 		void set_delegate_pointer();
-		void stop_dev();
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1035,6 +1042,7 @@ namespace netlist
 			if (m_hint_deactivate)
 				dec_active();
 		}
+
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
@@ -1048,8 +1056,18 @@ namespace netlist
 		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
-		virtual void stop() { }
 		virtual void reset() { }
+
+		void do_update() NL_NOEXCEPT
+		{
+			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+				(this->*m_static_update)();
+			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
+				m_static_update(this);
+			#else
+				update();
+			#endif
+		}
 
 	public:
 		virtual void timestep(ATTR_UNUSED const nl_double st) { }
@@ -1090,19 +1108,17 @@ namespace netlist
 
 		setup_t &setup();
 
-#if 1
-		template<class C>
-		void register_sub(const pstring &name, std::unique_ptr<C> &dev)
+		template<class C, typename... Args>
+		void register_sub(const pstring &name, std::unique_ptr<C> &dev, const Args&... args)
 		{
-			dev.reset(new C(*this, name));
+			dev.reset(new C(*this, name, args...));
 		}
-#endif
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
-		void connect_late(const pstring &t1, const pstring &t2);
-		void connect_late(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect(const pstring &t1, const pstring &t2);
+		void connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 	protected:
 
@@ -1139,7 +1155,6 @@ namespace netlist
 
 	class detail::queue_t :
 			public timed_queue<net_t *, netlist_time>,
-			public detail::object_t,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1172,32 +1187,35 @@ namespace netlist
 		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
-		pstring name() const { return m_name; }
+		/* run functions */
+
+		const netlist_time time() const { return m_time; }
+		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
+
+		/* never use this in constructors! */
+		nl_double gmin() const;
+
+		void process_queue(const netlist_time &delta);
+		void abort_current_queue_slice() { m_queue.retime(nullptr, m_time); }
+
+		/* Control functions */
 
 		void start();
 		void stop();
+		void reset();
 
 		const detail::queue_t &queue() const { return m_queue; }
 		detail::queue_t &queue() { return m_queue; }
-		const netlist_time time() const { return m_time; }
-		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
-		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
-		nl_double gmin() const;
 
-		void push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT;
-		void remove_from_queue(detail::net_t &out) NL_NOEXCEPT;
+		/* netlist build functions */
 
-		void process_queue(const netlist_time &delta);
-		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
-
-		void rebuild_lists(); /* must be called after post_load ! */
-
-		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
 
-		void register_dev(plib::owned_ptr<device_t> dev);
+		void register_dev(plib::owned_ptr<core_device_t> dev);
+		void remove_dev(core_device_t *dev);
 
 		detail::net_t *find_net(const pstring &name);
+		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1230,34 +1248,36 @@ namespace netlist
 			return ret;
 		}
 
+		/* logging and name */
+
+		pstring name() const { return m_name; }
 		plib::plog_base<NL_DEBUG> &log() { return m_log; }
 		const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
+
+		/* state related */
 
 		plib::state_manager_t &state() { return m_state; }
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, pstring(owner.name()) + "." + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
-		virtual void reset();
+		void rebuild_lists(); /* must be called after post_load ! */
 
 		plib::dynlib &lib() { return *m_lib; }
 
+		/* sole use is to manage lifetime of net objects */
+		std::vector<plib::owned_ptr<detail::net_t>> m_nets;
+
+	protected:
 		void print_stats() const;
 
-		std::vector<plib::owned_ptr<core_device_t>>                           m_devices;
-		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
-		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
-
 	private:
-		plib::state_manager_t               m_state;
 		/* mostly rw */
 		netlist_time                        m_time;
 		detail::queue_t                     m_queue;
@@ -1266,7 +1286,6 @@ namespace netlist
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
-		devices::NETLIB_NAME(gnd) *          m_gnd;
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring                             m_name;
@@ -1274,12 +1293,18 @@ namespace netlist
 		plib::plog_base<NL_DEBUG>           m_log;
 		plib::dynlib *                      m_lib; // external lib needs to be loaded as long as netlist exists
 
+		plib::state_manager_t               m_state;
+
 		// performance
 		nperftime_t     m_stat_mainloop;
 		nperfcount_t    m_perf_out_processed;
 		nperfcount_t    m_perf_inp_processed;
 		nperfcount_t    m_perf_inp_active;
-	};
+
+		std::vector<plib::owned_ptr<core_device_t>> m_devices;
+		/* sole use is to manage lifetime of family objects */
+		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
+};
 
 	// -----------------------------------------------------------------------------
 	// Support classes for devices
@@ -1397,23 +1422,19 @@ namespace netlist
 			m_time = netlist().time() + delay;
 			m_in_queue = (m_active > 0);     /* queued ? */
 			if (m_in_queue)
-			{
-				netlist().push_to_queue(*this, m_time);
-			}
+				netlist().queue().push(this, m_time);
 		}
 	}
 
 	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if (is_queued())
-			netlist().remove_from_queue(*this);
+			netlist().queue().remove(this);
 
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */
 		if (m_in_queue)
-		{
-			netlist().push_to_queue(*this, m_time);
-		}
+			netlist().queue().push(this, m_time);
 	}
 
 	inline const analog_net_t & analog_t::net() const NL_NOEXCEPT
@@ -1450,22 +1471,12 @@ namespace netlist
 
 	inline void analog_output_t::set_Q(const nl_double newQ) NL_NOEXCEPT
 	{
-		if (newQ != net().Q_Analog())
+		if (newQ != m_my_net.Q_Analog())
 		{
-			net().m_cur_Analog = newQ;
-			net().toggle_new_Q();
-			net().push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.m_cur_Analog = newQ;
+			m_my_net.toggle_new_Q();
+			m_my_net.push_to_queue(NLTIME_FROM_NS(1));
 		}
-	}
-
-	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT
-	{
-		m_queue.push(attime, &out);
-	}
-
-	inline void netlist_t::remove_from_queue(detail::net_t &out) NL_NOEXCEPT
-	{
-		m_queue.remove(&out);
 	}
 
 	template <typename T>
@@ -1485,6 +1496,11 @@ namespace netlist
 	}
 
 	inline netlist_t &detail::device_object_t::netlist()
+	{
+		return m_device.netlist();
+	}
+
+	inline const netlist_t &detail::device_object_t::netlist() const
 	{
 		return m_device.netlist();
 	}

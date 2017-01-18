@@ -99,7 +99,7 @@ bool parser_t::parse(const pstring nlname)
 	}
 }
 
-void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
+void parser_t::parse_netlist(const pstring &nlname)
 {
 	while (true)
 	{
@@ -132,10 +132,10 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 		else if (token.is(m_tok_LOCAL_SOURCE))
 			net_local_source();
 		else if (token.is(m_tok_TRUTHTABLE_START))
-			net_truthtable_start();
+			net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
-			m_setup.register_lib_entry(get_identifier());
+			m_setup.register_lib_entry(get_identifier(), "parser: " + nlname);
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_NETLIST_END))
@@ -148,7 +148,7 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 	}
 }
 
-void parser_t::net_truthtable_start()
+void parser_t::net_truthtable_start(const pstring &nlname)
 {
 	pstring name = get_identifier();
 	require_token(m_tok_comma);
@@ -194,7 +194,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			netlist::devices::tt_factory_create(m_setup, desc);
+			netlist::devices::tt_factory_create(m_setup, desc, nlname);
 			return;
 		}
 	}

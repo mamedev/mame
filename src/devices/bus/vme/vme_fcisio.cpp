@@ -130,6 +130,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
+#include "machine/68153bim.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "vme_fcisio.h"
@@ -202,6 +203,8 @@ static MACHINE_CONFIG_FRAGMENT (fcisio1)
 
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
 	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
+
+	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -328,6 +331,7 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 	,m_duscc2(*this, "duscc2")
 	,m_duscc3(*this, "duscc3")
 	,m_pit (*this, "pit")
+	,m_bim (*this, "bim")
 {
 	LOG("%s\n", FUNCNAME);
 }
@@ -341,6 +345,7 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 	,m_duscc2(*this, "duscc2")
 	,m_duscc3(*this, "duscc3")
 	,m_pit (*this, "pit")
+	,m_bim (*this, "bim")
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }

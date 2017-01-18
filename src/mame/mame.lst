@@ -2074,6 +2074,7 @@ astrof3                         // (c) [1980?]
 spfghmk2                        // (c) [1979] Data East Corporation
 spfghmk22                       // (c) [1979] Data East Corporation
 sstarbtl                        // bootleg
+strfight                        // bootleg (VGG)
 tomahawk                        // (c) 1980 Data East, Inc.
 tomahawk1                       // (c) 1980 Data East, Inc.
 
@@ -8906,6 +8907,7 @@ hardbodyg                       //
 hvymetap                        //
 ladyluck                        //
 motrdome                        //
+motrdomeg                       //
 prtyanim                        //
 prtyanimg                       //
 specforc                        //
@@ -13674,6 +13676,7 @@ magoddsb                        // 198? (c) Micro Manufacturing Ltd.
 magoddsc                        // 198? (c) Micro Manufacturing Ltd.
 magoddsd                        // 198? (c) Micro Manufacturing Ltd.
 match98                         // (c) 1998 Amcoe
+mbs2euro                        // (c) 2002 Auto-Data Graz
 megaline                        // (c) 1991 Fun World.
 moonlght                        // bootleg
 moonlghta                       // bootleg
@@ -14098,7 +14101,7 @@ orbit1                          //
 shark                           //
 
 @source:hapyfish.cpp
-hapyfsh2						// bootleg
+hapyfsh2                        // bootleg
 
 @source:harddriv.cpp
 harddriv                        // 136052           (c) 1988
@@ -14198,6 +14201,7 @@ funjacks                        // Mattel
 funrlgl                         // Mattel
 h2hbaskb                        // Coleco
 lightfgt                        // Milton Bradley
+mdallas                         // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
 
@@ -14255,6 +14259,7 @@ ktopgun                         // Konami
 nupogodi                        //
 
 @source:hh_tms1k.cpp
+7in1ss                          // Tiger Electronics
 amaztron                        // Coleco
 astro                           // Kosmos
 bankshot                        // Parker Bros
@@ -14263,6 +14268,7 @@ bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
 cmsport                         // Conic
+cnbaskb                         // Conic
 cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
@@ -14282,6 +14288,7 @@ elecdet                         // Ideal
 esbattle                        // Entex
 esoccer                         // Entex
 fxmcr165                        // Gakken
+ginv1000                        // Gakken
 gjackpot                        // Gakken
 gpoker                          // Gakken
 h2hbaseb                        // Coleco
@@ -17424,6 +17431,12 @@ wilytowr                        // M63 (c) 1984
 @source:m6805evs.cpp
 m6805evs                        //
 
+@source:m68705prg.cpp
+705p3prg                        //
+705p5prg                        //
+705r3prg                        //
+705u3prg                        //
+
 @source:m72.cpp
 airduel                         // (c) 1990 (World)
 airduelm72                      // (c) 1990 (Japan)
@@ -20375,6 +20388,9 @@ miniboy7a                       // (c) 1983, Bonanza Enterprises
 mcom4_02                        //
 minicom                         //
 
+@source:miniforce.cpp
+miniforce                       // D26 cabinet test board
+
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
@@ -20482,7 +20498,6 @@ alm16                           // 1988 Mephisto Almeria 68000
 alm32                           // 1988 Mephisto Alimera 68020
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 bpl32                           // 1996 Mephisto Berlin Pro London Upgrade V5.00
-diablo68                        // 1991 Novag Diablo 68000 Chess Computer
 gen32                           // 1993 Mephisto Genius030 V4.00
 gen32_41                        // 1993 Mephisto Genius030 V4.01
 lond020                         // 1996 Mephisto London 68020 32 Bit
@@ -20493,12 +20508,6 @@ megaiv                          // 1989 Mephisto Mega IV Schachcomputer
 milano                          // 1989 Mephisto Milano Schachcomputer
 monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 polgar                          // 1986 Mephisto Polgar Schachcomputer
-sexpertb                        // 1988 Novag Expert B Chess Computer
-sexpertc                        // 1989 Novag Super Expert C Chess Computer
-sfortea                         // 1987 Novag Super Forte A Chess Computer
-sforteb                         // 1988 Novag Super Forte B Chess Computer
-sforteba                        // 1988 Novag Super Forte B Chess Computer (ALT)
-sfortec                         // 1989 Novag Super Forte C Chess Computer
 van16                           // 1991 Mephisto Vancouver 68000
 van32                           // 1991 Mephisto Vancouver 68020
 
@@ -28478,7 +28487,8 @@ wccf331e                        // 2005.06 World Club Champion Football European
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
 wldkicks                        // 2000.03 World Kicks (US, WK3 Ver.A)
 wldkicksa                       // 2000.03 World Kicks (Asia, WK2 Ver.A)
-wldkicksj                       // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
+wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
+wldkickspj                      // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
 wrungpo                         // 2001.?? Wave Runner GP (USA, Rev A)
@@ -29200,7 +29210,19 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+cforteb                         //
+sexperta                        //
+sexpertb                        //
+sexpertc                        //
+sexpertc1                       //
+sfortea                         //
+sfortea1                        //
+sforteb                         //
+sfortec                         //
 supercon                        //
+
+@source:novag68k.cpp
+diablo68                        //
 
 @source:nsm.cpp
 firebird                        //
@@ -29589,7 +29611,7 @@ pbaction4                       // (c) 1985 Tehkan
 pbaction5                       // (c) 1985 Tehkan
 
 @source:pc.cpp
-ataripc1						// Atari PC1 
+ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
@@ -31000,6 +31022,7 @@ poly880                         //
 
 @source:polyplay.cpp
 polyplay                        //
+polyplay2                       //
 
 @source:pong.cpp
 breakout                        // (c) 1976 Atari
@@ -31371,6 +31394,9 @@ pv9234                          //
 
 @source:pve500.cpp
 pve500                          // SONY PVE-500
+
+@source:pwrview.cpp
+pwrview                         // Compugraphic MCS PowerView 10
 
 @source:px4.cpp
 px4                             // 1985 Epson PX-4
@@ -35927,7 +35953,7 @@ tekipaki                        // TP-020 (c) 1991 Toaplan
 truxton2                        // TP-024 (c) 1992 Toaplan
 vfive                           // TP-027 (c) 1993 Toaplan (Japan)
 whoopee                         // TP-025
-enmadaio						// TP-031
+enmadaio                        // TP-031
 
 @source:toki.cpp
 juju                            // (c) 1989 Tad (Japan)

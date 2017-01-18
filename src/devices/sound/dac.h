@@ -277,12 +277,14 @@ public: \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class)
 
 // DAC chips
+DAC_GENERATOR(AD7224, ad7224_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7224", "ad7224")
 DAC_GENERATOR(AD7521, ad7521_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7521", "ad7521")
 DAC_GENERATOR(AD7524, ad7524_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7524", "ad7524")
 DAC_GENERATOR(AD7528, ad7528_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7528", "ad7528") /// 2 x vin + 2 x vout
 DAC_GENERATOR(AD7533, ad7533_device, dac_word_interface, dac_code_binary<10>, dac_gain_r2r, "AD7533", "ad7533")
 DAC_GENERATOR(AD7541, ad7541_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7541", "ad7541")
 DAC_GENERATOR(AM6012, am6012_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AM6012", "am6012")
+DAC_GENERATOR(DAC08, dac08_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC08", "dac08")
 DAC_GENERATOR(DAC0800, dac0800_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC0800", "dac0800")
 DAC_GENERATOR(DAC1200, dac1200_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "DAC1200", "dac1200")
 DAC_GENERATOR(MC1408, mc1408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC1408", "mc1408")
@@ -291,6 +293,7 @@ DAC_GENERATOR(MC3410, mc3410_device, dac_word_interface, dac_code_binary<10>, da
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 
 // DAC circuits/unidentified chips
 DAC_GENERATOR(DAC_1BIT, dac_1bit_device, dac_bit_interface, dac_code_binary<1>, 1.0, "1-Bit DAC", "dac")

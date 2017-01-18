@@ -140,33 +140,6 @@ private:
 
 template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);
 
-#if 0
-template <typename T>
-class pstate_interface_t
-{
-public:
-	pstate_interface_t() { }
-
-	template<typename C> void save(C &state, const pstring &stname)
-	{
-		state_manager_t &manager = static_cast<T*>(this)->state_manager();
-		pstring module = static_cast<T*>(this)->name();
-		manager.save_item(this, state, module + "." + stname);
-	}
-	template<typename C, std::size_t N> void save(C (&state)[N], const pstring &stname)
-	{
-		state_manager_t &manager = static_cast<T*>(this)->state_manager();
-		pstring module = static_cast<T*>(this)->name();
-		manager.save_state_ptr(this, module + "." + stname, state_manager_t::datatype_f<C>::f(), N, &(state[0]));
-	}
-	template<typename C> void save(C *state, const pstring &stname, const int count)
-	{
-		state_manager_t &manager = static_cast<T*>(this)->state_manager();
-		pstring module = static_cast<T*>(this)->name();
-		manager.save_state_ptr(this, module + "." + stname, state_manager_t::datatype_f<C>::f(), count, state);
-	}
-};
-#endif
 }
 
 #endif /* PSTATE_H_ */

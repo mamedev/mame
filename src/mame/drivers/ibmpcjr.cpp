@@ -657,6 +657,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( ibmpcjx )
@@ -680,7 +681,7 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 
 

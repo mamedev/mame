@@ -75,22 +75,36 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-/* Useful temporary debug printout format */
-// printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
-#define VERBOSE 0
-#define LOGPRINT(...)   do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
-#define LOG(...)        {} LOGPRINT(__VA_ARGS__)
-#define LOGR(...)       {}
-#define LOGSETUP(...)   {} LOGPRINT(__VA_ARGS__)
-#define LOGINT(...)     {}
-#define LOGCMD(...)     {}
-#define LOGTX(...)      {}
-#define LOGRCV(...)     {}
-#define LOGCTS(...)     {}
-#define LOGDCD(...)     {}
-#define LOGSYNC(...)    {}
-#if VERBOSE == 2
+#define LOG_GENERAL 0x001
+#define LOG_SETUP   0x002
+#define LOG_PRINTF  0x004
+#define LOG_READ    0x008
+#define LOG_INT     0x010
+#define LOG_CMD     0x020
+#define LOG_TX      0x040
+#define LOG_RCV     0x080
+#define LOG_CTS     0x100
+#define LOG_DCD     0x200
+#define LOG_SYNC    0x400
+
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASK(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASK(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASK(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASK(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
+
+#if VERBOSE & LOG_PRINTF
 #define logerror printf
 #endif
 

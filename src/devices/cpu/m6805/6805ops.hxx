@@ -159,7 +159,7 @@ OP_HANDLER( bms )
 /* $2e BIL relative ---- */
 OP_HANDLER( bil )
 {
-	BRANCH(m_irq_state[0] != CLEAR_LINE);
+	BRANCH(m_irq_state[M6805_IRQ_LINE] != CLEAR_LINE);
 }
 
 DERIVED_OP_HANDLER( hd63705, bil )
@@ -170,7 +170,7 @@ DERIVED_OP_HANDLER( hd63705, bil )
 /* $2f BIH relative ---- */
 OP_HANDLER( bih )
 {
-	BRANCH(m_irq_state[0] == CLEAR_LINE);
+	BRANCH(m_irq_state[M6805_IRQ_LINE] == CLEAR_LINE);
 }
 
 DERIVED_OP_HANDLER( hd63705, bih )

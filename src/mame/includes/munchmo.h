@@ -26,12 +26,12 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_sprite_xpos;
-	required_shared_ptr<uint8_t> m_sprite_tile;
-	required_shared_ptr<uint8_t> m_sprite_attr;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_status_vram;
-	required_shared_ptr<uint8_t> m_vreg;
+	required_shared_ptr<u8> m_sprite_xpos;
+	required_shared_ptr<u8> m_sprite_tile;
+	required_shared_ptr<u8> m_sprite_attr;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_status_vram;
+	required_shared_ptr<u8> m_vreg;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
@@ -48,20 +48,20 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_flipscreen_w);
-	DECLARE_READ8_MEMBER(munchmo_ay1reset_r);
-	DECLARE_READ8_MEMBER(munchmo_ay2reset_r);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_READ8_MEMBER(ay1reset_r);
+	DECLARE_READ8_MEMBER(ay2reset_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(munchmo);
-	uint32_t screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mnchmobl_vblank_irq);
-	INTERRUPT_GEN_MEMBER(mnchmobl_sound_irq);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank_irq(screen_device &screen, bool vblank_state);
+	IRQ_CALLBACK_MEMBER(generic_irq_ack);
 	void draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

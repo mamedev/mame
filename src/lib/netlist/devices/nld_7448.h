@@ -34,6 +34,8 @@
 
 #define USE_TRUTHTABLE_7448 (0)
 
+#ifndef NL_AUTO_DEVICES
+
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                   \
 		NET_REGISTER_DEV(TTL_7448, name)                                        \
 		NET_CONNECT(name, A, cA0)                                               \
@@ -46,5 +48,7 @@
 
 #define TTL_7448_DIP(name)                                                      \
 		NET_REGISTER_DEV(TTL_7448_DIP, name)
+
+#endif
 
 #endif /* NLD_7448_H_ */

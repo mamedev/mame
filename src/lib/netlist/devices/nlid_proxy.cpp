@@ -107,7 +107,7 @@ namespace netlist
 
 		register_subalias("Q", m_RV.m_P);
 
-		connect_late(m_RV.m_N, m_GNDHack);
+		connect(m_RV.m_N, m_GNDHack);
 		bool f = false;
 		for (int i = 0; i < 3; i++)
 		{

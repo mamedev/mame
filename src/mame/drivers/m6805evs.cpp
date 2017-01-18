@@ -27,7 +27,7 @@ ToDo:
 ******************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68705.h"
 
 
 class m6805evs_state : public driver_device

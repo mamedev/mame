@@ -7,10 +7,8 @@
     - Updated memory map to partially handle screen flipping
 
  05/01/2003  Ryan Holtz
-    - Corrected second AY (shouldn't have been there)
     - Added first AY's status read
     - Added coinage DIP
-    - What are those unmapped port writes!? Not AY...
 
  2003.01.01. Tomasz Slanina
 
@@ -60,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -163,6 +162,17 @@ uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		flipy = (m_spriteram[offs+1]&0x80)>>7;
 		flipx = (m_spriteram[offs+1]&0x40)>>6;
 
+		if (flip_screen_x())
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+		if (flip_screen_y())
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_spriteram[offs+1]&0x3f,
 			pal,
@@ -175,13 +185,22 @@ uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 {
-	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+WRITE8_MEMBER(skyarmy_state::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
 WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 {
 	m_nmi=data & 1;
+	if (!m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -192,20 +211,22 @@ static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* Color RAM */
 	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW") AM_WRITE(coin_counter_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
 	AM_RANGE(0xa005, 0xa005) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP // video RAM buffering?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8, skyarmy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay0", ay8910_device, address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay0", ay8910_device, data_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay1", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -317,7 +338,9 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 2500000)
+	MCFG_SOUND_ADD("ay0", AY8910, 2500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -341,4 +364,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

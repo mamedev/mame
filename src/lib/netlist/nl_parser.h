@@ -37,7 +37,7 @@ namespace netlist
 		void net_submodel();
 		void net_include();
 		void net_local_source();
-		void net_truthtable_start();
+		void net_truthtable_start(const pstring &nlname);
 
 		/* for debugging messages */
 		netlist_t &netlist() { return m_setup.netlist(); }
