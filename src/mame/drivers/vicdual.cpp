@@ -2547,7 +2547,7 @@ ROM_START( depthcho )
 	ROM_LOAD( "316-0014.u28", 0x0020, 0x0020, CRC(7b7a8492) SHA1(6ba8d891cc6eb0dd80051377b6b832e8894655e7) )    /* sequence PROM */
 ROM_END
 
-/* Fully working PCB set from my full-size Sun Hunter upright machine.
+/* Fully working PCB set from my full-size Sub Hunter upright machine.
 
 Essentally this pcb set is a Taito-made license of 
 'Depthcharge' by Gremlin.
