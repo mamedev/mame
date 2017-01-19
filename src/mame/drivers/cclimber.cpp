@@ -2265,6 +2265,7 @@ ROM_END
    this set also explains why the cannonball set above contained a number of bagman roms, it was clearly
    a half-converted board.
 
+   A bootleg of "Le Bagnard" with a KCK-series motherboard has also been observed.
 */
 ROM_START( bagmanf )
 	ROM_REGION( 0x6000, "maincpu", 0 )
