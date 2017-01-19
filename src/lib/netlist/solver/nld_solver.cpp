@@ -398,8 +398,9 @@ void NETLIB_NAME(solver)::post_start()
 
 void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
 {
+	plib::putf8_fmt_writer w(strm);
 	for (auto & s : m_mat_solvers)
-		s->create_solver_code(strm);
+		s->create_solver_code(w);
 }
 
 	NETLIB_DEVICE_IMPL(solver)

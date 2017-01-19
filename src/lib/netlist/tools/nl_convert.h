@@ -49,7 +49,7 @@ protected:
 
 	double get_sp_val(const pstring &sin);
 
-	plib::pstream_fmt_writer_t out;
+	plib::putf8_fmt_writer out;
 private:
 
 	struct net_t
@@ -166,7 +166,7 @@ public:
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm);
+		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &strm);
 
 		token_id_t m_tok_ADD;
 		token_id_t m_tok_VALUE;
@@ -202,7 +202,7 @@ public:
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::pistream &strm);
+		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &strm);
 
 		token_id_t m_tok_HEA;
 		token_id_t m_tok_APP;

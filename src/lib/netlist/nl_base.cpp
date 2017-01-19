@@ -135,24 +135,6 @@ const logic_family_desc_t *family_CD4XXX()
 	return &obj;
 }
 
-class logic_family_std_proxy_t : public logic_family_desc_t
-{
-public:
-	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
-};
-
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
-		const pstring &name, logic_output_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-}
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-}
 
 // ----------------------------------------------------------------------------------------
 // queue_t
@@ -315,36 +297,6 @@ void netlist_t::remove_dev(core_device_t *dev)
         );
 }
 
-const logic_family_desc_t *netlist_t::family_from_model(const pstring &model)
-{
-	model_map_t map;
-	setup().model_parse(model, map);
-
-	if (setup().model_value_str(map, "TYPE") == "TTL")
-		return family_TTL();
-	if (setup().model_value_str(map, "TYPE") == "CD4XXX")
-		return family_CD4XXX();
-
-	for (auto & e : m_family_cache)
-		if (e.first == model)
-			return e.second.get();
-
-	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
-
-	ret->m_fixed_V = setup().model_value(map, "FV");
-	ret->m_low_thresh_PCNT = setup().model_value(map, "IVL");
-	ret->m_high_thresh_PCNT = setup().model_value(map, "IVH");
-	ret->m_low_VO = setup().model_value(map, "OVL");
-	ret->m_high_VO = setup().model_value(map, "OVH");
-	ret->m_R_low = setup().model_value(map, "ORL");
-	ret->m_R_high = setup().model_value(map, "ORH");
-
-	auto retp = ret.get();
-
-	m_family_cache.emplace_back(model, std::move(ret));
-
-	return retp;
-}
 
 
 void netlist_t::start()
@@ -600,7 +552,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-core_device_t *netlist_t::pget_single_device(const char *classname, bool (*cc)(core_device_t *))
+core_device_t *netlist_t::pget_single_device(const pstring classname, bool (*cc)(core_device_t *))
 {
 	core_device_t *ret = nullptr;
 	for (auto &d : m_devices)
@@ -728,7 +680,7 @@ void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_term
 
 detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring desc)
 {
-	dev.set_logic_family(dev.netlist().family_from_model(desc));
+	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
 }
 
 detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *desc)

@@ -100,7 +100,7 @@ namespace netlist
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const char *power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
+		const pstring power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 		//register_sub(m_RV);
 		//register_term("1", m_RV.m_P);
 		//register_term("2", m_RV.m_N);
@@ -112,9 +112,9 @@ namespace netlist
 		for (int i = 0; i < 3; i++)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = netlist().setup().find_terminal(devname + "." + pstring(power_syms[i][0], pstring::UTF8),
+			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
 					detail::device_object_t::type_t::INPUT, false);
-			auto tn = netlist().setup().find_terminal(devname + "." + pstring(power_syms[i][1], pstring::UTF8),
+			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
 					detail::device_object_t::type_t::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{

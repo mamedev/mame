@@ -902,6 +902,57 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 	return tmp.as_double() * factor;
 }
 
+class logic_family_std_proxy_t : public logic_family_desc_t
+{
+public:
+	logic_family_std_proxy_t() { }
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
+			const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+};
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
+		const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
+
+
+const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
+{
+	model_map_t map;
+	model_parse(model, map);
+
+	if (model_value_str(map, "TYPE") == "TTL")
+		return family_TTL();
+	if (model_value_str(map, "TYPE") == "CD4XXX")
+		return family_CD4XXX();
+
+	for (auto & e : netlist().m_family_cache)
+		if (e.first == model)
+			return e.second.get();
+
+	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
+
+	ret->m_fixed_V = model_value(map, "FV");
+	ret->m_low_thresh_PCNT = model_value(map, "IVL");
+	ret->m_high_thresh_PCNT = model_value(map, "IVH");
+	ret->m_low_VO = model_value(map, "OVL");
+	ret->m_high_VO = model_value(map, "OVH");
+	ret->m_R_low = model_value(map, "ORL");
+	ret->m_R_high = model_value(map, "ORH");
+
+	auto retp = ret.get();
+
+	netlist().m_family_cache.emplace_back(model, std::move(ret));
+
+	return retp;
+}
+
 void setup_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 {
 	devices::tt_factory_create(*this, desc, sourcefile);
@@ -938,12 +989,16 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
 }
 
 
-bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
+bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
 {
 	plib::pomemstream ostrm;
+	plib::putf8_writer owrt(ostrm);
 
-	plib::pimemstream istrm2(plib::ppreprocessor(&m_defines).process(istrm, ostrm));
-	return parser_t(istrm2, *this).parse(name);
+	plib::ppreprocessor(&m_defines).process(istrm, owrt);
+
+	plib::pimemstream istrm2(ostrm);
+	plib::putf8_reader reader2(istrm2);
+	return parser_t(reader2, *this).parse(name);
 }
 
 void setup_t::register_define(pstring defstr)
@@ -964,7 +1019,11 @@ bool source_t::parse(const pstring &name)
 	if (m_type != SOURCE)
 		return false;
 	else
-		return m_setup.parse_stream(*stream(name), name);
+	{
+		auto rstream = stream(name);
+		plib::putf8_reader reader(*rstream);
+		return m_setup.parse_stream(reader, name);
+	}
 }
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)

@@ -135,7 +135,7 @@ public:
 
 	virtual void log_stats();
 
-	virtual void create_solver_code(plib::postream &strm)
+	virtual void create_solver_code(plib::putf8_fmt_writer &strm)
 	{
 		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
 	}

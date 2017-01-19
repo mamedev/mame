@@ -181,7 +181,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().family_from_model(m_FAMILY()));
+			set_logic_family(setup().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()

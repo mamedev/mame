@@ -15,7 +15,7 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
-ptokenizer::ptokenizer(pistream &strm)
+ptokenizer::ptokenizer(plib::putf8_reader &strm)
 : m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 {
 }
@@ -483,7 +483,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 }
 
 
-postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
+void ppreprocessor::process(putf8_reader &istrm, putf8_writer &ostrm)
 {
 	pstring line;
 	while (istrm.readline(line))
@@ -491,7 +491,6 @@ postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
 		line = process_line(line);
 		ostrm.writeline(line);
 	}
-	return ostrm;
 }
 
 }

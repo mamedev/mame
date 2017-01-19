@@ -244,7 +244,7 @@ namespace netlist
 
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring name);
 
-		bool parse_stream(plib::pistream &istrm, const pstring &name);
+		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
 
 		/* register a source */
 
@@ -265,6 +265,8 @@ namespace netlist
 		nl_double model_value(model_map_t &map, const pstring &entity);
 
 		void model_parse(const pstring &model, model_map_t &map);
+
+		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		/* FIXME: truth table trampoline */
 

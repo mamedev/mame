@@ -22,7 +22,7 @@ plog_dispatch_intf::~plog_dispatch_intf()
 {
 }
 
-pfmt::pfmt(const pstring &fmt)
+pfmt::pfmt(const pstring fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
 	std::size_t l = fmt.blen() + 1;
@@ -32,18 +32,6 @@ pfmt::pfmt(const pstring &fmt)
 		m_str = palloc_array<char>(2 * l);
 	}
 	memcpy(m_str, fmt.c_str(), l);
-}
-
-pfmt::pfmt(const char *fmt)
-: m_str(m_str_buf), m_allocated(0), m_arg(0)
-{
-	std::size_t l = strlen(fmt) + 1;
-	if (l>sizeof(m_str_buf))
-	{
-		m_allocated = 2 * l;
-		m_str = palloc_array<char>(2 * l);
-	}
-	memcpy(m_str, fmt, l);
 }
 
 pfmt::~pfmt()

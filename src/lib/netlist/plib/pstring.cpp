@@ -426,7 +426,6 @@ void pstring_t<F>::sfree(pstr_t *s)
 		}
 		else
 			plib::pfree_array(reinterpret_cast<char *>(s));
-		//_mm_free(((char *)s));
 	}
 }
 
@@ -477,7 +476,6 @@ void pstring_t<F>::sfree(pstr_t *s)
 	if (s->m_ref_count == 0 && s != &m_zero)
 	{
 		plib::pfree_array(((char *)s));
-		//_mm_free(((char *)s));
 	}
 }
 

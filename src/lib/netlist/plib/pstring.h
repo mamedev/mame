@@ -81,6 +81,7 @@ public:
 
 	pstring_t(const pstring_t &string) : m_ptr(&m_zero) { init(string); }
 	pstring_t(pstring_t &&string) : m_ptr(string.m_ptr) { string.m_ptr = nullptr; }
+	explicit pstring_t(code_t code) : m_ptr(&m_zero) { pstring_t t; t+= code;  init(t); }
 
 	// assignment operators
 	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }

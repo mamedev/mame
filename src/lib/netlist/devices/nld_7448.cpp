@@ -14,7 +14,7 @@ namespace netlist
 	{
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 
-	NETLIB_TRUTHTABLE(7448, 7, 7, 0);
+	NETLIB_TRUTHTABLE(7448, 7, 7);
 
 	#else
 
@@ -80,7 +80,7 @@ namespace netlist
 
 	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
 	nld_7448::truthtable_t nld_7448::m_ttbl;
-	const char *nld_7448::m_desc[] = {
+	const pstring nld_7448::m_desc[] = {
 			" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g",
 
 			"  1,  1,  1,   0,  0,  0,  0 | 1, 1, 1, 1, 1, 1, 0|100,100,100,100,100,100,100",

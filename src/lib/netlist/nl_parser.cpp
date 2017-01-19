@@ -29,7 +29,6 @@ bool parser_t::parse(const pstring nlname)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	//const char ws[5] = { ' ', 9, 10, 13, 0 };
 	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	set_comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
@@ -60,7 +59,6 @@ bool parser_t::parse(const pstring nlname)
 	while (true)
 	{
 		token_t token = get_token();
-
 		if (token.is_type(ENDOFFILE))
 		{
 			return false;

@@ -1239,7 +1239,6 @@ namespace netlist
 		void remove_dev(core_device_t *dev);
 
 		detail::net_t *find_net(const pstring &name);
-		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1261,7 +1260,7 @@ namespace netlist
 		}
 
 		template<class C>
-		C *get_single_device(const char *classname)
+		C *get_single_device(const pstring classname)
 		{
 			return dynamic_cast<C *>(pget_single_device(classname, check_class<C>));
 		}
@@ -1289,15 +1288,18 @@ namespace netlist
 
 		plib::dynlib &lib() { return *m_lib; }
 
+		// FIXME: find something better
 		/* sole use is to manage lifetime of net objects */
 		std::vector<plib::owned_ptr<detail::net_t>> m_nets;
+		/* sole use is to manage lifetime of family objects */
+		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 	protected:
 		void print_stats() const;
 
 	private:
 
-		core_device_t *pget_single_device(const char *classname, bool (*cc)(core_device_t *));
+		core_device_t *pget_single_device(const pstring classname, bool (*cc)(core_device_t *));
 
 		/* mostly rw */
 		netlist_time                        m_time;
@@ -1323,8 +1325,6 @@ namespace netlist
 		nperfcount_t    m_perf_inp_active;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
-		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 };
 
 	// -----------------------------------------------------------------------------
