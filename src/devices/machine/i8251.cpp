@@ -482,6 +482,7 @@ WRITE8_MEMBER(i8251_device::mode_w)
 		switch ((data >> 6) & 0x03)
 		{
 		case 0:
+		default:
 			stop_bits = STOP_BITS_0;
 			LOG("stop bit: inhibit\n");
 			break;
