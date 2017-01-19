@@ -193,17 +193,18 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_DIPNAME( 0x20, 0x20, "Key Click" )
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
-	PORT_DIPNAME( 0x40, 0x20, DEF_STR(Unknown) )
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x80, 0x20, DEF_STR(Unknown) )
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
 
 MACHINE_CONFIG_FRAGMENT(zorba_keyboard)
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz) // MC68705P3S
+	// MC68705P3S
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz * 1.05) // the 1.05 is a hack to get better sync with the host's USART - something's off in our timings
 	MCFG_M68705_PORTA_R_CB(READ8(zorba_keyboard_device, mcu_pa_r));
 	MCFG_M68705_PORTB_R_CB(READ8(zorba_keyboard_device, mcu_pb_r));
 	MCFG_M68705_PORTB_W_CB(WRITE8(zorba_keyboard_device, mcu_pb_w));
@@ -212,7 +213,7 @@ MACHINE_CONFIG_FRAGMENT(zorba_keyboard)
 	// TODO: beeper frequency is unknown, using value from Sun keyboard for now
 	MCFG_SPEAKER_STANDARD_MONO("bell")
 	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.4)
 MACHINE_CONFIG_END
 
 
