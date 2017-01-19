@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( bagmanf_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagmanf_a000_r) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_SHARE("flip_screen")
 	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xa800, 0xa800) AM_READNOP AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READNOP
 ADDRESS_MAP_END
@@ -2265,6 +2265,7 @@ ROM_END
    this set also explains why the cannonball set above contained a number of bagman roms, it was clearly
    a half-converted board.
 
+   A bootleg of "Le Bagnard" with a KCK-series motherboard has also been observed.
 */
 ROM_START( bagmanf )
 	ROM_REGION( 0x6000, "maincpu", 0 )
