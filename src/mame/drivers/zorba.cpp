@@ -259,7 +259,7 @@ MACHINE_CONFIG_START( zorba, zorba_state )
 	// J6 TTL-level serial keyboard
 	MCFG_DEVICE_ADD("keyboard", ZORBA_KEYBOARD, 0)
 	MCFG_ZORBA_KEYBOARD_RXD_CB(DEVWRITELINE("uart2", i8251_device, write_rxd))
-	//MCFG_QUANTUM_PERFECT_CPU("keyboard:mcu")
+	MCFG_QUANTUM_PERFECT_CPU("keyboard:mcu")
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "zorba")
 MACHINE_CONFIG_END
