@@ -1,8 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+/*
+
+	TODO:
+
+	- GR is always 0
+
+*/
+
 #include "includes/newbrain.h"
 #include "rendlay.h"
-#include "newbrain.lh"
 
 #define LOG 0
 
@@ -54,6 +61,10 @@ WRITE8_MEMBER( newbrain_state::tvtl_w )
 
 void newbrain_state::video_start()
 {
+	// set timer
+	m_clkint_timer = timer_alloc(TIMER_ID_CLKINT);
+	m_clkint_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+
 	// state saving
 	save_item(NAME(m_rv));
 	save_item(NAME(m_fs));
@@ -70,72 +81,68 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 	int gr = 0;
 
 	uint16_t videoram_addr = m_tvl;
-	uint8_t rc = 0;
+	int rc = 0;
+	uint8_t vsr = 0;
+	uint8_t grsr = 0;
 
-	for (int y = 0; y < 200; y++)
-	{
+	for (int y = 0; y < 240; y++) {
 		int x = 0;
 
-		for (int sx = 0; sx < columns; sx++)
-		{
-			uint8_t videoram_data = m_ram->pointer()[(videoram_addr + sx) & 0x7fff];
-			uint8_t charrom_data;
+		for (int sx = 0; sx < columns; sx++) {
+			uint8_t rd = m_ram->pointer()[(videoram_addr + sx) & 0x7fff];
 
-			if (gr)
-			{
-				/* render video ram data */
-				charrom_data = videoram_data;
+			bool rc3 = BIT(rc, 3);
+			bool txt = !(BIT(rd, 6) || BIT(rd, 5));
+			bool txtq = m_ucr || txt;
+
+			int rc_ = rc & 0x07;
+			if (rc3 && txt) {
+				rc_ = 7;
 			}
-			else
-			{
-				/* render character rom data */
-				uint16_t charrom_addr = (rc << 8) | ((BIT(videoram_data, 7) && m_fs) << 7) | (videoram_data & 0x7f);
-				charrom_data = m_char_rom->base()[charrom_addr & 0xfff];
+			
+			uint16_t charrom_addr = (m_ucr << 11) | (rc_ << 8) | ((BIT(rd, 7) && m_fs) << 7) | (rd & 0x7f);
+			uint8_t crd = m_char_rom->base()[charrom_addr & 0xfff];
+			bool crd0 = BIT(crd, 0);
 
-				if ((videoram_data & 0x80) && !m_fs)
-				{
-					/* invert character */
-					charrom_data ^= 0xff;
-				}
+			bool ldvsr = !(((!rc3 ^ crd0) || gr) || txtq);
 
-				if ((videoram_data & 0x60) && !m_ucr)
-				{
-					/* strip bit D0 */
-					charrom_data &= 0xfe;
-				}
+			if (!ldvsr && !gr) {
+				vsr = (crd & 0xfe) | (crd0 && txtq);
 			}
 
-			for (int bit = 0; bit < 8; bit++)
-			{
-				int color = BIT(charrom_data, 7) ^ m_rv;
+			if (!ldvsr && gr) {
+				grsr = rd;
+			}
+
+			for (int i = 0; i < 8; i++) {
+				uint8_t sr = gr ? grsr : vsr;
+				int color = BIT(sr, 7) ^ m_rv;
 
 				bitmap.pix32(y, x++) = m_palette->pen(color);
 
-				if (columns == 40)
-				{
+				if (columns == 40) {
 					bitmap.pix32(y, x++) = m_palette->pen(color);
 				}
 
-				charrom_data <<= 1;
+				grsr <<= 1;
+				vsr <<= 1;
 			}
 		}
 
 		if (gr)
 		{
-			/* get new data for each line */
+			// get new data for each line
 			videoram_addr += columns;
 			videoram_addr += excess;
 		}
 		else
 		{
-			/* increase row counter */
 			rc++;
 
-			if (rc == (m_ucr ? 8 : 10))
-			{
-				/* reset row counter */
+			if (rc == (m_ucr ? 8 : 10)) {
 				rc = 0;
 
+				// get new data after each character row
 				videoram_addr += columns;
 				videoram_addr += excess;
 			}
@@ -178,12 +185,9 @@ GFXDECODE_END
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
-	MCFG_DEFAULT_LAYOUT(layout_newbrain)
-
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 

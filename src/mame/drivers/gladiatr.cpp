@@ -20,7 +20,7 @@ special thanks to:
 - Camilty for precious hardware information and screenshots
 - Jason Richmond for hardware information and misc. notes
 - Joe Rounceville for schematics
-- JunoMan for measuring and tracing signals on a bootleg
+- JunoMan for measuring and tracing signals
 - and everyone else who's offered support along the way!
 
 
@@ -185,8 +185,6 @@ TODO:
 - Ports 60,61,80,81 not fully understood yet...
 - The four 8741 dumps come from an unprotected bootleg, we need dumps from
   original boards.
-- TCLK and comms MCU clocks were measured on a bootleg board, we should
-  confirm that it's the same on original boards.
 
 ***************************************************************************/
 
@@ -272,22 +270,6 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
 {
 	m_tclk_val = state != 0;
-
-	// these are actually edge-triggered, but MAME only supports polled inputs
-
-	u8 const new_in0_val(m_in0->read());
-	if (BIT(~new_in0_val & (new_in0_val ^ m_in0_val), 5))
-		m_cctl_p1 = (m_cctl_p1 & 0xfc) | BIT(~new_in0_val, 5) | (BIT(~new_in0_val, 5) << 1);
-	else
-		m_cctl_p1 = (m_cctl_p1 & 0xfe) | BIT(~new_in0_val, 5);
-	m_in0_val = new_in0_val;
-
-	u8 const new_in1_val(m_in0->read());
-	if (BIT(~new_in1_val & (new_in1_val ^ m_in1_val), 5))
-		m_cctl_p2 = (m_cctl_p2 & 0xfc) | BIT(~new_in1_val, 5) | (BIT(~new_in1_val, 5) << 1);
-	else
-		m_cctl_p2 = (m_cctl_p2 & 0xfe) | BIT(~new_in1_val, 5);
-	m_in1_val = new_in1_val;
 }
 
 READ8_MEMBER(gladiatr_state::cctl_p1_r)
@@ -369,6 +351,33 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
 	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+}
+
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p1_s1)
+{
+	// P11 gets the value of 1P-S2 at the moment 1P-S1 was pressed
+	if (oldval && !newval)
+		m_cctl_p1 = (m_cctl_p1 & 0xfd) | (BIT(m_cctl_p1, 0) << 1);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p1_s2)
+{
+	// P10 is high when 1P-S2 is pressed
+	m_cctl_p1 = (m_cctl_p1 & 0xfe) | (newval ? 0x00 : 0x01);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p2_s1)
+{
+	// P21 gets the value of 2P-S2 at the moment 2P-S1 was pressed
+	if (oldval && !newval)
+		m_cctl_p2 = (m_cctl_p2 & 0xfd) | (BIT(m_cctl_p2, 0) << 1);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p2_s2)
+{
+	// P20 is high when 2P-S2 is pressed
+	m_cctl_p2 = (m_cctl_p2 & 0xfe) | (newval ? 0x00 : 0x01);
 }
 
 
@@ -624,8 +633,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s1, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -634,8 +643,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY   PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s1, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )                                     // coin counter outputs
 
 	PORT_START("IN2")   // cctl p1
@@ -707,12 +716,12 @@ static MACHINE_CONFIG_START( ppking, ppking_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
 	MCFG_CPU_IO_MAP(ppking_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
@@ -1145,16 +1154,12 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 	membank("bank2")->set_entry(0);
 
 	m_tclk_val = false;
-	m_in0_val = 0xff;
-	m_in1_val = 0xff;
 	m_cctl_p1 = 0xff;
 	m_cctl_p2 = 0xff;
 	m_ucpu_p1 = 0xff;
 	m_csnd_p1 = 0xff;
 
 	save_item(NAME(m_tclk_val));
-	save_item(NAME(m_in0_val));
-	save_item(NAME(m_in1_val));
 	save_item(NAME(m_cctl_p1));
 	save_item(NAME(m_cctl_p2));
 	save_item(NAME(m_ucpu_p1));

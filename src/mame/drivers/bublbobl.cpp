@@ -279,7 +279,6 @@ TODO:
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "cpu/m6805/m6805.h"
 #include "includes/bublbobl.h"
 
 
@@ -335,19 +334,6 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-// The 68705 is from a bootleg, the original MCU is a 6801U4
-static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8, bublbobl_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
-	AM_RANGE(0x002, 0x002) AM_READ_PORT("IN0")  // COIN
-	AM_RANGE(0x004, 0x004) AM_WRITE(bublbobl_68705_ddr_a_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(bublbobl_68705_ddr_b_w)
-	AM_RANGE(0x006, 0x006) AM_WRITENOP // ???
-	AM_RANGE(0x010, 0x07f) AM_RAM
-	AM_RANGE(0x080, 0x7ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -393,7 +379,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
 	AM_IMPORT_FROM(tokio_map)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map_bootleg, AS_PROGRAM, 8, bublbobl_state )
@@ -709,8 +695,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, main_sent_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_sent_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
 INPUT_PORTS_END
 
 /*************************************
@@ -945,45 +931,40 @@ static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,bub68705)
+MACHINE_START_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_START_CALL_MEMBER(common);
 
-	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
 	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
 	save_item(NAME(m_address));
 	save_item(NAME(m_latch));
+
+	m_port_a_out = 0xff;
+	m_port_b_out = 0xff;
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
+MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
 	m_address = 0;
 	m_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
+static MACHINE_CONFIG_DERIVED_CLASS( bub68705, bublbobl, bub68705_state )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("mcu")
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
+	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
+	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(bub68705_state, port_b_w))
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,bub68705)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,bub68705)
+	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
+	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
 MACHINE_CONFIG_END
 
 

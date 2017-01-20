@@ -30,13 +30,13 @@ ADDRESS_MAP_END
 
 
 // device definitions
-sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: sm510_base_device(mconfig, SM510, "SM510", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm510", __FILE__)
 { }
 
 
 // disasm
-offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE(sm510);
 	return CPU_DISASSEMBLE_NAME(sm510)(this, stream, pc, oprom, opram, options);

@@ -84,9 +84,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, tigeroad_state )
+static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
+	AM_IMPORT_FROM(main_map)
+
+	AM_RANGE(0x060000, 0x060007) AM_READ(mcu_comm_r)
+	AM_RANGE(0x060000, 0x060003) AM_WRITE(mcu_comm_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, bballs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x60000, 0x60007) AM_READ(bballs_68705_r)
+	AM_RANGE(0x60000, 0x60003) AM_WRITE(bballs_68705_w)
 	// are these mirror addresses or does this PCB have a different addressing?
 	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)
@@ -123,13 +132,6 @@ static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
-ADDRESS_MAP_END
-
-/* Pushman ONLY */
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tigeroad_state )
-	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r, pushman_68000_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 /* Pushman / Bouncing Balls */
@@ -570,25 +572,6 @@ static GFXDECODE_START( tigeroad )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
-void tigeroad_state::machine_start()
-{
-	save_item(NAME(m_control));
-	save_item(NAME(m_shared_ram));
-	save_item(NAME(m_latch));
-	save_item(NAME(m_new_latch));
-}
-
-MACHINE_RESET_MEMBER(tigeroad_state,pushman)
-{
-	// todo, move to an MCU sim reset function in machine/tigeroad.c
-	m_latch = 0;
-	m_new_latch = 0;
-	m_control[0] = 0;
-	m_control[1] = 0;
-
-	memset(m_shared_ram, 0, ARRAY_LENGTH(m_shared_ram));
-}
-
 static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 
 	/* basic machine hardware */
@@ -699,25 +682,45 @@ static MACHINE_CONFIG_START( f1dream_comad, tigeroad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pushman, f1dream_comad )
-	MCFG_CPU_ADD("mcu", M68705, 4000000)    /* No idea */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_MACHINE_RESET_OVERRIDE(tigeroad_state,pushman)
+
+void pushman_state::machine_start()
+{
+	save_item(NAME(m_host_semaphore));
+	save_item(NAME(m_mcu_semaphore));
+	save_item(NAME(m_host_latch));
+	save_item(NAME(m_mcu_latch));
+	save_item(NAME(m_mcu_output));
+	save_item(NAME(m_mcu_latch_ctl));
+}
+
+static MACHINE_CONFIG_DERIVED_CLASS(pushman, f1dream_comad, pushman_state)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pushman_map)
+
+	MCFG_CPU_ADD("mcu", M68705R3, 4000000)    /* No idea */
+	MCFG_M68705_PORTA_W_CB(WRITE8(pushman_state, mcu_pa_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(pushman_state, mcu_pb_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(pushman_state, mcu_pc_w))
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(tigeroad_state,bballs)
+MACHINE_RESET_MEMBER(bballs_state, bballs)
 {
-	MACHINE_RESET_CALL_MEMBER(pushman);
-
-	m_latch = 0x400;
+	m_mcu_semaphore = false;
+	m_mcu_latch = 0x0400;
 }
 
-static MACHINE_CONFIG_DERIVED( bballs, f1dream_comad )
+void bballs_state::machine_start()
+{
+	save_item(NAME(m_mcu_semaphore));
+	save_item(NAME(m_mcu_latch));
+}
+
+static MACHINE_CONFIG_DERIVED_CLASS(bballs, f1dream_comad, bballs_state)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(tigeroad_state,bballs)
+	MCFG_MACHINE_RESET_OVERRIDE(bballs_state, bballs)
 MACHINE_CONFIG_END
 
 
@@ -1179,41 +1182,29 @@ ROM_START( bballsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tigeroad_state,f1dream)
+DRIVER_INIT_MEMBER(tigeroad_state, f1dream)
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),this));
-}
-
-DRIVER_INIT_MEMBER(tigeroad_state,pushman)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::pushman_68705_r),this), write16_delegate(FUNC(tigeroad_state::pushman_68705_w),this)   );
-	m_has_coinlock = 0;
-}
-
-DRIVER_INIT_MEMBER(tigeroad_state,bballs)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x060000, 0x060007, read16_delegate(FUNC(tigeroad_state::bballs_68705_r),this), write16_delegate(FUNC(tigeroad_state::bballs_68705_w),this)   );
-	m_has_coinlock = 0;
 }
 
 /***************************************************************************/
 
 
-GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, driver_device, 0, ROT0, "Capcom", "Tiger Road (US)", 0 )
-GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, driver_device, 0, ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
-GAME( 1987, toramich, tigeroad, toramich, toramich, driver_device, 0, ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
-GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, driver_device, 0, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
+GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, driver_device,  0,       ROT0, "Capcom", "Tiger Road (US)", 0 )
+GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, driver_device,  0,       ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
+GAME( 1987, toramich, tigeroad, toramich, toramich, driver_device,  0,       ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
+GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, driver_device,  0,       ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
-GAME( 1988, f1dream,  0,        tigeroad, f1dream, tigeroad_state, f1dream,  ROT0, "Capcom (Romstar license)", "F-1 Dream", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // collisions are wrong
-GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
-GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream, driver_device,  0,        ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
+GAME( 1988, f1dream,  0,        tigeroad, f1dream,  tigeroad_state, f1dream, ROT0, "Capcom (Romstar license)", "F-1 Dream", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // collisions are wrong
+GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  driver_device,  0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
+GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream,  driver_device,  0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
-GAME( 1990, pushman,  0,       pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmana, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmans, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmant, pushman, pushman, pushman, tigeroad_state, pushman, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushman,  0,        pushman, pushman,   driver_device,  0,       ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmana, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmans, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmant, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, bballs,   0,       bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bballsa,  bballs,  bballs,  bballs, tigeroad_state,  bballs, ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballs,   0,        bballs,  bballs,    driver_device,  0,       ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballsa,  bballs,   bballs,  bballs,    driver_device,  0,       ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )

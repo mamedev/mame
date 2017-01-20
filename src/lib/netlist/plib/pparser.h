@@ -22,7 +22,7 @@ class ptokenizer
 {
 	P_PREVENT_COPYING(ptokenizer)
 public:
-	explicit ptokenizer(pistream &strm);
+	explicit ptokenizer(plib::putf8_reader &strm);
 
 	virtual ~ptokenizer();
 
@@ -126,7 +126,7 @@ private:
 
 	bool eof() { return m_strm.eof(); }
 
-	pistream &m_strm;
+	putf8_reader &m_strm;
 
 	int m_lineno;
 	pstring m_cur_line;
@@ -165,22 +165,12 @@ public:
 	ppreprocessor(std::vector<define_t> *defines = nullptr);
 	virtual ~ppreprocessor() {}
 
-	template<class ISTR, class OSTR>
-	OSTR &process(ISTR &istrm, OSTR &ostrm)
-	{
-		return dynamic_cast<OSTR &>(process_i(istrm, ostrm));
-	}
+	void process(putf8_reader &istrm, putf8_writer &ostrm);
 
 protected:
-
-	postream &process_i(pistream &istrm, postream &ostrm);
-
 	double expr(const plib::pstring_vector_t &sexpr, std::size_t &start, int prio);
-
 	define_t *get_define(const pstring &name);
-
 	pstring replace_macros(const pstring &line);
-
 	virtual void error(const pstring &err);
 
 private:
@@ -190,7 +180,7 @@ private:
 	std::unordered_map<pstring, define_t> m_defines;
 	plib::pstring_vector_t m_expr_sep;
 
-	std::uint_least32_t m_ifflag; // 31 if levels
+	std::uint_least64_t m_ifflag; // 31 if levels
 	int m_level;
 	int m_lineno;
 };

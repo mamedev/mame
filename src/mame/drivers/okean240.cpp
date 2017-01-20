@@ -54,9 +54,6 @@ Usage of terminal:
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
 
-#define KEYBOARD_TAG "keyboard"
-#define TERMINAL_TAG "terminal"
-
 class okean240_state : public driver_device
 {
 public:
@@ -70,7 +67,7 @@ public:
 		m_term_data(0),
 		m_j(0),
 		m_scroll(0),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_io_modifiers(*this, "MODIFIERS"),
 		m_maincpu(*this, "maincpu")
 	{
@@ -206,7 +203,7 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -243,7 +240,7 @@ static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
 	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
@@ -490,7 +487,7 @@ static MACHINE_CONFIG_START( okean240t, okean240_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -498,8 +495,8 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
-	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_REMOVE("terminal")
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -507,8 +504,8 @@ static MACHINE_CONFIG_DERIVED( okean240, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
-	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_REMOVE("terminal")
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(okean240_state, kbd_put))
 MACHINE_CONFIG_END
 

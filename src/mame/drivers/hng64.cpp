@@ -202,7 +202,7 @@ No.  PCB Label  IC Markings               IC Package
 Notes:
        1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
        2. If the game cart is not plugged in, the hardware shows nothing on screen.
-
+       3. The IOCTR I/O MCU runs at 8 MHz.
 
 
 Hyper Neo Geo game cartridges

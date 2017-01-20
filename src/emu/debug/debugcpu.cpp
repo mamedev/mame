@@ -1668,10 +1668,10 @@ device_debug::device_debug(device_t &device)
 
 		// add all registers into it
 		std::string tempstr;
-		for (auto &entry : m_state->state_entries())
+		for (const auto &entry : m_state->state_entries())
 		{
 			strmakelower(tempstr.assign(entry->symbol()));
-			m_symtable.add(tempstr.c_str(), (void *)(uintptr_t)entry->index(), get_state, set_state);
+			m_symtable.add(tempstr.c_str(), (void *)(uintptr_t)entry->index(), get_state, set_state, entry->format_string());
 		}
 	}
 
@@ -1684,6 +1684,10 @@ device_debug::device_debug(device_t &device)
 		if (m_state != nullptr && m_symtable.find("curpc") == nullptr)
 			m_symtable.add("curpc", nullptr, get_current_pc);
 	}
+
+	// set up trace
+	using namespace std::placeholders;
+	m_device.machine().add_logerror_callback(std::bind(&device_debug::errorlog_write_line, this, _1));
 }
 
 
@@ -2623,14 +2627,14 @@ u32 device_debug::compute_opcode_crc32(offs_t pc) const
 //  trace - trace execution of a given device
 //-------------------------------------------------
 
-void device_debug::trace(FILE *file, bool trace_over, bool detect_loops, const char *action)
+void device_debug::trace(FILE *file, bool trace_over, bool detect_loops, bool logerror, const char *action)
 {
 	// delete any existing tracers
 	m_trace = nullptr;
 
 	// if we have a new file, make a new tracer
 	if (file != nullptr)
-		m_trace = std::make_unique<tracer>(*this, *file, trace_over, detect_loops, action);
+		m_trace = std::make_unique<tracer>(*this, *file, trace_over, detect_loops, logerror, action);
 }
 
 
@@ -3291,11 +3295,12 @@ bool device_debug::registerpoint::hit()
 //  tracer - constructor
 //-------------------------------------------------
 
-device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, const char *action)
+device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, bool detect_loops, bool logerror, const char *action)
 	: m_debug(debug)
 	, m_file(file)
 	, m_action((action != nullptr) ? action : "")
 	, m_detect_loops(detect_loops)
+	, m_logerror(logerror)
 	, m_loops(0)
 	, m_nextdex(0)
 	, m_trace_over(trace_over)
@@ -3446,4 +3451,15 @@ device_debug::dasm_comment::dasm_comment(offs_t address, u32 crc, const char *te
 		m_text(text),
 		m_color(std::move(color))
 {
+}
+
+
+//-------------------------------------------------
+//  dasm_comment - constructor
+//-------------------------------------------------
+
+void device_debug::errorlog_write_line(const char *line)
+{
+	if (m_trace && m_trace->logerror())
+		trace_printf("%s", line);
 }

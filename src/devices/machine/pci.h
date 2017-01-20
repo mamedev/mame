@@ -80,6 +80,10 @@ public:
 	DECLARE_READ32_MEMBER (expansion_base_r);
 	DECLARE_WRITE32_MEMBER(expansion_base_w);
 	virtual DECLARE_READ8_MEMBER(capptr_r);
+	DECLARE_READ8_MEMBER(interrupt_line_r);
+	DECLARE_WRITE8_MEMBER(interrupt_line_w);
+	DECLARE_READ8_MEMBER(interrupt_pin_r);
+	DECLARE_WRITE8_MEMBER(interrupt_pin_w);
 
 protected:
 	optional_memory_region m_region;
@@ -118,6 +122,7 @@ protected:
 	uint32_t expansion_rom_size;
 	uint32_t expansion_rom_base;
 	bool is_multifunction_device;
+	uint8_t intr_line, intr_pin;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -192,10 +197,6 @@ public:
 	DECLARE_WRITE16_MEMBER(iobaseu_w);
 	DECLARE_READ16_MEMBER (iolimitu_r);
 	DECLARE_WRITE16_MEMBER(iolimitu_w);
-	DECLARE_READ8_MEMBER  (interrupt_line_r);
-	DECLARE_WRITE8_MEMBER (interrupt_line_w);
-	DECLARE_READ8_MEMBER  (interrupt_pin_r);
-	DECLARE_WRITE8_MEMBER (interrupt_pin_w);
 	DECLARE_READ16_MEMBER (bridge_control_r);
 	DECLARE_WRITE16_MEMBER(bridge_control_w);
 

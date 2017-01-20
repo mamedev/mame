@@ -923,7 +923,7 @@ static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 	MCFG_SAMPLES_NAMES(zektor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, VIDEO_CLOCK/4/2)
+	MCFG_SOUND_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */
@@ -1317,7 +1317,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 DRIVER_INIT_MEMBER(segag80v_state,zektor)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
+	ay8912_device *ay8912 = machine().device<ay8912_device>("aysnd");
 
 	/* configure security */
 	m_decrypt = segag80_security(82);
@@ -1325,7 +1325,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
 	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8910_device::address_data_w), ay8910));
+	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), ay8912));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
 

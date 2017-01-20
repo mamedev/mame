@@ -136,6 +136,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_printf, this, _1, _2, _3));
 	m_console.register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_logerror, this, _1, _2, _3));
 	m_console.register_command("tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracelog, this, _1, _2, _3));
+	m_console.register_command("tracesym",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_tracesym, this, _1, _2, _3));
 	m_console.register_command("quit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2, _3));
 	m_console.register_command("exit",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_quit, this, _1, _2, _3));
 	m_console.register_command("do",        CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_do, this, _1, _2, _3));
@@ -720,6 +721,42 @@ void debugger_commands::execute_tracelog(int ref, int params, const char *param[
 	/* then do a printf */
 	char buffer[1024];
 	if (mini_printf(buffer, param[0], params - 1, &values[1]))
+		m_cpu.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+}
+
+
+/*-------------------------------------------------
+	execute_tracesym - execute the tracesym command
+-------------------------------------------------*/
+
+void debugger_commands::execute_tracesym(int ref, int params, const char *param[])
+{
+	// build a format string appropriate for the parameters and validate them
+	std::stringstream format;
+	u64 values[MAX_COMMAND_PARAMS];
+	for (int i = 0; i < params; i++)
+	{
+		// find this symbol
+		symbol_entry *sym = m_cpu.get_visible_symtable()->find(param[i]);
+		if (!sym)
+		{
+			m_console.printf("Unknown symbol: %s\n", param[i]);
+			return;
+		}
+
+		// build the format string
+		util::stream_format(format, "%s=%s ",
+			param[i],
+			sym->format().empty() ? "%16X" : sym->format());
+
+		// validate the parameter
+		if (!validate_number_parameter(param[i], &values[i]))
+			return;
+	}
+
+	// then do a printf
+	char buffer[1024];
+	if (mini_printf(buffer, format.str().c_str(), params, values))
 		m_cpu.get_visible_cpu()->debug()->trace_printf("%s", buffer);
 }
 
@@ -2496,6 +2533,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 {
 	const char *action = nullptr;
 	bool detect_loops = true;
+	bool logerror = false;
 	device_t *cpu;
 	FILE *f = nullptr;
 	const char *mode;
@@ -2507,8 +2545,25 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	/* validate parameters */
 	if (!validate_cpu_parameter((params > 1) ? param[1] : nullptr, &cpu))
 		return;
-	if (!validate_boolean_parameter((params > 2) ? param[2] : nullptr, &detect_loops))
-		return;
+	if (params > 2)
+	{
+		std::stringstream stream;
+		stream.str(param[2]);
+
+		std::string flag;
+		while (std::getline(stream, flag, '|'))
+		{
+			if (!core_stricmp(flag.c_str(), "noloop"))
+				detect_loops = false;
+			else if (!core_stricmp(flag.c_str(), "logerror"))
+				logerror = true;
+			else
+			{
+				m_console.printf("Invalid flag '%s'\n", flag.c_str());
+				return;
+			}
+		}
+	}
 	if (!debug_command_parameter_command(action = (params > 3) ? param[3] : nullptr))
 		return;
 
@@ -2533,7 +2588,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 	}
 
 	/* do it */
-	cpu->debug()->trace(f, trace_over, detect_loops, action);
+	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action);
 	if (f)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename.c_str());
 	else

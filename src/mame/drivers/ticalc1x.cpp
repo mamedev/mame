@@ -76,11 +76,11 @@ void cmulti8_state::prepare_display()
 	set_display_segmask(0xfffff, 0xff);
 
 	// M-digit is on in memory mode, upper row is off in single mode
-	uint32_t m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
-	uint32_t mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
+	u32 m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
+	u32 mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
 
 	// R10 selects display row
-	uint32_t sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
+	u32 sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
 	display_matrix(8, 21, m_o, (sel & mask) | m);
 }
 
@@ -865,8 +865,8 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	uint8_t seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
-	uint16_t r = (data & 7) | (data << 1 & 0x1f0);
+	u8 seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u16 r = (data & 7) | (data << 1 & 0x1f0);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(7, 9, seg, r, false);
 

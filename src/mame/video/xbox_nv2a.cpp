@@ -2240,7 +2240,7 @@ void nv2a_renderer::extract_packed_float(uint32_t data, float &first, float &sec
 	e2 = (p2 >> 6) & 0b11111;
 	m3 = p3 & 0b11111;
 	e3 = (p3 >> 5) & 0b11111;
-	// the fopllowing is based on routine UF11toF32 in appendix G of the "OpenGL Programming Guide 8th edition" book
+	// the following is based on routine UF11toF32 in appendix G of the "OpenGL Programming Guide 8th edition" book
 	if (e1 == 0) {
 		if (m1 != 0) {
 			scale = 1.0 / (1 << 20);
@@ -2358,8 +2358,8 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 	}
 }
 
-/* Read vertices data from system memory. Method 0x1800 */
-int nv2a_renderer::read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit)
+/* Read vertices data from system memory. Method 0x1800 and 0x1808 */
+int nv2a_renderer::read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit)
 {
 	uint32_t m;
 	int a, b;
@@ -2372,31 +2372,7 @@ int nv2a_renderer::read_vertices_0x1800(address_space & space, vertex_nv *destin
 		b = enabled_vertex_attributes;
 		for (a = 0; a < 16; a++) {
 			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + indexesleft[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
-			}
-			b = b >> 1;
-		}
-		indexesleft_first = (indexesleft_first + 1) & 1023;
-		indexesleft_count--;
-	}
-	return limit;
-}
-
-/* Read vertices data from system memory. Method 0x1808 */
-int nv2a_renderer::read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit)
-{
-	uint32_t m;
-	int a, b;
-
-#ifdef MAME_DEBUG
-	memset(destination, 0, sizeof(vertex_nv)*limit);
-#endif
-	for (m = 0; m < limit; m++) {
-		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
-		b = enabled_vertex_attributes;
-		for (a = 0; a < 16; a++) {
-			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + indexesleft[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
+				read_vertex(space, vertexbuffer_address[a] + vertex_indexes[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
 			}
 			b = b >> 1;
 		}
@@ -2412,6 +2388,9 @@ int nv2a_renderer::read_vertices_0x1810(address_space & space, vertex_nv *destin
 	uint32_t m;
 	int a, b;
 
+#ifdef MAME_DEBUG
+	memset(destination, 0, sizeof(vertex_nv)*limit);
+#endif
 	for (m = 0; m < limit; m++) {
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
 		b = enabled_vertex_attributes;
@@ -2521,8 +2500,8 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 		// copy data for poly.c
 		for (m = 0; m < count; m++) {
 			destination[m].w = vert[m].attribute[0].fv[3];
-			destination[m].x = vert[m].attribute[0].fv[0] * supersample_factor_x;
-			destination[m].y = vert[m].attribute[0].fv[1] * supersample_factor_y;
+			destination[m].x = (vert[m].attribute[0].fv[0] - 0.53125) * supersample_factor_x;
+			destination[m].y = (vert[m].attribute[0].fv[1] - 0.53125) * supersample_factor_y;
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = vert[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
@@ -3054,7 +3033,13 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 			{
 				printf("%d %d\n\r", (int)primitive_type, vertex_first);
 				for (int n = 0; n < vertex_first; n++)
-					printf("%d X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", n, vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
+				{
+					if (indexesleft_count > 0)
+						printf("%d i:%d ", n, vertex_indexes[n]);
+					else
+						printf("%d ", n);
+					printf("X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
+				}
 			}
 #endif
 		vertex_count = 0;
@@ -3065,12 +3050,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		primitives_count = 0;
 		primitive_type = (NV2A_BEGIN_END)data;
 		if (data != 0) {
-			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
+			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0))
 				render_spans_callback = render_delegate(&nv2a_renderer::render_register_combiners, this);
-			}
-			else if (texture[0].enabled) {
+			else if (texture[0].enabled)
 				render_spans_callback = render_delegate(&nv2a_renderer::render_texture_simple, this);
-			}
 			else
 				render_spans_callback = render_delegate(&nv2a_renderer::render_color, this);
 		}
@@ -3109,20 +3092,17 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 			data = space.read_dword(address);
 			n = indexesleft_first + indexesleft_count;
 			if (mult == 2) {
-				indexesleft[n & 1023] = data & 0xffff;
-				indexesleft[(n + 1) & 1023] = (data >> 16) & 0xffff;
+				vertex_indexes[n & 1023] = data & 0xffff;
+				vertex_indexes[(n + 1) & 1023] = (data >> 16) & 0xffff;
 				indexesleft_count = indexesleft_count + 2;
 			}
 			else {
-				indexesleft[n & 1023] = data;
+				vertex_indexes[n & 1023] = data;
 				indexesleft_count = indexesleft_count + 1;
 			}
 			address += 4;
 			countlen--;
-			if (mult == 1)
-				read_vertices_0x1808(space, vertex_software + vertex_first, address, 1);
-			else
-				read_vertices_0x1800(space, vertex_software + vertex_first, address, 2);
+			read_vertices_0x180x(space, vertex_software + vertex_first, address, mult);
 			assemble_primitive(vertex_software + vertex_first, mult, render_spans_callback);
 			vertex_first = (vertex_first + mult) & 1023;
 		}

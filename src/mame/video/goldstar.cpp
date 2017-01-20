@@ -466,6 +466,39 @@ uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16
 }
 
 
+uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if (!(m_cm_enable_reg & 0x01))
+		return 0;
+
+	if (m_cm_enable_reg & 0x08)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
+			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+		}
+
+		// are these hardcoded, or registers?
+		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(0*8, (14+48)*8-1, 14*8, (36+7)*8-1);  // seems to be the one used...
+		const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+
+//		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+//		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+	}
+
+	if (m_cm_enable_reg & 0x02)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
 
 WRITE8_MEMBER(sanghopm_state::fg_vidram_w)
 {

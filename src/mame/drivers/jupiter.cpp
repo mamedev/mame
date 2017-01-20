@@ -27,9 +27,6 @@ ToDo:
 #include "machine/wd_fdc.h"
 #include "includes/jupiter.h"
 
-#define TERMINAL_TAG "terminal"
-#define KEYBOARD_TAG "keyboard"
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -75,7 +72,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -229,7 +226,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -263,7 +260,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(jupiter3_state, kbd_put))
 
 	// internal ram

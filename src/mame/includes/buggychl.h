@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
+	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(buggychl_chargen_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_bank_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);

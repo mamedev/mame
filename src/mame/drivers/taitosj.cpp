@@ -168,7 +168,6 @@ TODO:
 #include "emu.h"
 #include "includes/taitosj.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 
 
@@ -365,16 +364,6 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x5000, 0x5000) AM_READWRITE(sound_command_r, sound_command_ack_w)
 	AM_RANGE(0x5001, 0x5001) AM_READWRITE(sound_status_r,  sound_semaphore_clear_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( taitosj_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(taitosj_68705_portA_r, taitosj_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(taitosj_68705_portB_r, taitosj_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(taitosj_68705_portC_r)
-	AM_RANGE(0x0003, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1824,8 +1813,10 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
-	MCFG_CPU_PROGRAM_MAP(taitosj_mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_M68705_PORTA_W_CB(WRITE8(taitosj_state, taitosj_68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(taitosj_state, taitosj_68705_portB_w))
+	MCFG_M68705_PORTC_R_CB(READ8(taitosj_state, taitosj_68705_portC_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

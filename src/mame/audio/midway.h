@@ -29,7 +29,7 @@
 
 extern const device_type MIDWAY_SSIO;
 extern const device_type MIDWAY_SOUNDS_GOOD;
-extern const device_type MIDWAY_TURBO_CHIP_SQUEAK;
+extern const device_type MIDWAY_TURBO_CHEAP_SQUEAK;
 extern const device_type MIDWAY_SQUAWK_N_TALK;
 
 
@@ -145,14 +145,14 @@ private:
 };
 
 
-// ======================> midway_turbo_chip_squeak_device
+// ======================> midway_turbo_cheap_squeak_device
 
-class midway_turbo_chip_squeak_device : public device_t,
+class midway_turbo_cheap_squeak_device : public device_t,
 										public device_mixer_interface
 {
 public:
 	// construction/destruction
-	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);

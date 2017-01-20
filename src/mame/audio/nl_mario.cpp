@@ -220,7 +220,6 @@ NETLIST_START(mario)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.SOR_FACTOR, 1.0)
-	PARAM(Solver.GS_THRESHOLD, 5)
 	PARAM(Solver.GS_LOOPS, 1)
 	/* Dynamic timestepping avoids excessive newton loops on startup */
 	PARAM(Solver.DYNAMIC_LTE, 5e-2)

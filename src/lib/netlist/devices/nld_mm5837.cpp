@@ -31,12 +31,12 @@ namespace netlist
 		, m_shift(*this, "m_shift", 0)
 		, m_is_timestep(false)
 		{
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 
 			/* output */
 			//register_term("_RV1", m_RV.m_P);
 			//register_term("_RV2", m_RV.m_N);
-			connect_late(m_RV.m_N, m_VDD);
+			connect(m_RV.m_N, m_VDD);
 
 			/* device */
 			register_subalias("3", m_RV.m_P);
@@ -47,7 +47,7 @@ namespace netlist
 		NETLIB_UPDATE_PARAMI();
 
 	protected:
-		NETLIB_SUB(twoterm) m_RV;
+		analog::NETLIB_SUB(twoterm) m_RV;
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;
@@ -72,7 +72,7 @@ namespace netlist
 		m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
-			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
+		log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 
 		m_shift = 0x1ffff;
 		m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
@@ -82,7 +82,7 @@ namespace netlist
 	{
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
-			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
+		log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 	}
 
 	NETLIB_UPDATE(MM5837_dip)

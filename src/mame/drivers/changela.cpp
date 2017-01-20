@@ -11,11 +11,11 @@ Tomasz Slanina
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/changela.h"
+
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/changela.h"
 
 #include "changela.lh"
 
@@ -30,6 +30,8 @@ READ8_MEMBER(changela_state::mcu_r)
 WRITE8_MEMBER(changela_state::mcu_w)
 {
 	m_mcu_in = data;
+	if (!BIT(m_port_c_out, 2))
+		m_mcu->pa_w(space, 0, data);
 }
 
 
@@ -37,83 +39,30 @@ WRITE8_MEMBER(changela_state::mcu_w)
         MCU
 *********************************/
 
-READ8_MEMBER(changela_state::changela_68705_port_a_r)
-{
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
 WRITE8_MEMBER(changela_state::changela_68705_port_a_w)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_ddr_a_w)
-{
-	m_ddr_a = data;
-}
-
-READ8_MEMBER(changela_state::changela_68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (ioport("MCU")->read() & ~m_ddr_b);
-}
-
-WRITE8_MEMBER(changela_state::changela_68705_port_b_w)
-{
-	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(changela_state::changela_68705_ddr_b_w)
-{
-	m_ddr_b = data;
-}
-
-READ8_MEMBER(changela_state::changela_68705_port_c_r)
-{
-	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
-}
-
 WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
 {
-	/* PC3 is connected to the CLOCK input of the LS374,
-	    so we latch the data on positive going edge of the clock */
-
-/* this is strange because if we do this corectly - it just doesn't work */
-	if ((data & 8) /*& (!(m_port_c_out & 8))*/ )
-		m_mcu_out = m_port_a_out;
+	/* PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge */
+	if (BIT(data, 3) && ~BIT(m_port_c_out, 3))
+		m_mcu_out = m_port_a_out & (BIT(m_port_c_out, 2) ? 0xff : m_mcu_in);
 
 	/* PC2 is connected to the /OE input of the LS374 */
-	if (!(data & 4))
-		m_port_a_in = m_mcu_in;
+	if (BIT(data, 2))
+		m_mcu->pa_w(space, 0, BIT(data, 2) ? 0xff : m_mcu_in);
 
 	m_port_c_out = data;
 }
-
-WRITE8_MEMBER(changela_state::changela_68705_ddr_c_w)
-{
-	m_ddr_c = data;
-}
-
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, changela_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(changela_68705_port_a_r, changela_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(changela_68705_port_b_r, changela_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(changela_68705_port_c_r, changela_68705_port_c_w)
-
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(changela_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(changela_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(changela_68705_ddr_c_w)
-
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 
 
 /* U30 */
 READ8_MEMBER(changela_state::changela_24_r)
 {
-	return ((m_port_c_out & 2) << 2) | 7;   /* bits 2,1,0-N/C inputs */
+	return (BIT(m_port_c_out, 1) << 3) | 0x07;   /* bits 2,1,0-N/C inputs */
 }
 
 READ8_MEMBER(changela_state::changela_25_r)
@@ -168,15 +117,15 @@ READ8_MEMBER(changela_state::changela_2d_r)
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
 	switch (ioport("IN1")->read() & 0x03)
 	{
-		case 0x02:
-			gas = 0x80;
-			break;
-		case 0x01:
-			gas = 0x00;
-			break;
-		default:
-			gas = 0x40;
-			break;
+	case 0x02:
+		gas = 0x80;
+		break;
+	case 0x01:
+		gas = 0x00;
+		break;
+	default:
+		gas = 0x40;
+		break;
 	}
 
 	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
@@ -184,7 +133,7 @@ READ8_MEMBER(changela_state::changela_2d_r)
 
 WRITE8_MEMBER(changela_state::mcu_pc_0_w)
 {
-	m_port_c_in = (m_port_c_in & 0xfe) | (data & 1);
+	m_mcu->pc_w(space, 0, 0xfe | (data & 0x01));
 }
 
 WRITE8_MEMBER(changela_state::changela_collision_reset_0)
@@ -409,19 +358,10 @@ void changela_state::machine_start()
 	save_item(NAME(m_tree_on));
 
 	/* mcu */
-	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_port_c_in));
 	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
-
 	save_item(NAME(m_mcu_out));
 	save_item(NAME(m_mcu_in));
-	save_item(NAME(m_mcu_pc_1));
-	save_item(NAME(m_mcu_pc_0));
 
 	/* misc */
 	save_item(NAME(m_tree0_col));
@@ -433,6 +373,9 @@ void changela_state::machine_start()
 	save_item(NAME(m_tree_collision_reset));
 	save_item(NAME(m_prev_value_31));
 	save_item(NAME(m_dir_31));
+
+	m_port_a_out = 0xff;
+	m_port_c_out = 0xff;
 }
 
 void changela_state::machine_reset()
@@ -448,17 +391,6 @@ void changela_state::machine_reset()
 	m_tree_on[1] = 0;
 
 	/* mcu */
-	m_mcu_pc_1 = 0;
-	m_mcu_pc_0 = 0;
-
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_port_c_in = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
 	m_mcu_out = 0;
 	m_mcu_in = 0;
 
@@ -480,8 +412,10 @@ static MACHINE_CONFIG_START( changela, changela_state )
 	MCFG_CPU_PROGRAM_MAP(changela_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", changela_state, changela_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M68705,2500000)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P3, 2500000)
+	MCFG_M68705_PORTB_R_CB(IOPORT("MCU"))
+	MCFG_M68705_PORTA_W_CB(WRITE8(changela_state, changela_68705_port_a_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(changela_state, changela_68705_port_c_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -518,7 +452,7 @@ ROM_START( changela )
 	ROM_LOAD( "cl22",   0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) )
 	ROM_LOAD( "cl27",   0xb000, 0x1000, CRC(3668afb8) SHA1(bcfb788baf806edcb129ea9f9dcb1d4260684773) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705U3 */
+	ROM_REGION( 0x00800, "mcu", 0 ) /* 68705P3 */
 	ROM_LOAD( "cl38a",  0x0000, 0x800, CRC(b70156ce) SHA1(c5eab8bbd65c4f587426298da4e22f991ce01dde) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* tile data */

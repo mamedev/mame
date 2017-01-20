@@ -221,6 +221,7 @@ internal:
 		keyboard({{0}}),
 		m_coreWindow(coreWindow)
 	{
+		coreWindow->Dispatcher->AcceleratorKeyActivated += ref new TypedEventHandler<CoreDispatcher^, AcceleratorKeyEventArgs^>(this, &UwpKeyboardDevice::OnAcceleratorKeyActivated);
 		coreWindow->KeyDown += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &UwpKeyboardDevice::OnKeyDown);
 		coreWindow->KeyUp += ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &UwpKeyboardDevice::OnKeyUp);
 		coreWindow->CharacterReceived += ref new TypedEventHandler<CoreWindow^, CharacterReceivedEventArgs^>(this, &UwpKeyboardDevice::OnCharacterReceived);
@@ -273,6 +274,20 @@ internal:
 	void OnCharacterReceived(CoreWindow ^sender, CharacterReceivedEventArgs ^args)
 	{
 		this->Machine.ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), args->KeyCode);
+	}
+
+	void OnAcceleratorKeyActivated(CoreDispatcher ^sender, AcceleratorKeyEventArgs ^args)
+	{
+		std::lock_guard<std::mutex> scope_lock(m_state_lock);
+		auto eventType = args->EventType;
+		if (eventType == CoreAcceleratorKeyEventType::SystemKeyDown ||
+			eventType == CoreAcceleratorKeyEventType::SystemKeyUp)
+		{
+			CorePhysicalKeyStatus status = args->KeyStatus;
+			int discancode = (status.ScanCode & 0x7f) | (status.IsExtendedKey ? 0x80 : 0x00);
+			keyboard.state[discancode] =
+				eventType == CoreAcceleratorKeyEventType::SystemKeyDown ? 0x80 : 0;
+		}
 	}
 };
 
@@ -632,4 +647,3 @@ MODULE_NOT_SUPPORTED(uwp_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "uwp")
 
 MODULE_DEFINITION(KEYBOARDINPUT_UWP, uwp_keyboard_module)
 MODULE_DEFINITION(JOYSTICKINPUT_UWP, uwp_joystick_module)
-

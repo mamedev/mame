@@ -160,7 +160,7 @@ public:
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
 
-	ATTR_HOT inline netlist::setup_t &setup() { return *m_setup; }
+	ATTR_HOT inline netlist::setup_t &setup() { return m_netlist->setup(); }
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
 	ATTR_HOT inline const netlist::netlist_time last_time_update() { return m_old; }
@@ -195,7 +195,6 @@ private:
 	netlist::netlist_time        m_old;
 
 	netlist_mame_t *    m_netlist;
-	netlist::setup_t *   m_setup;
 
 	void (*m_setup_func)(netlist::setup_t &);
 };
@@ -851,7 +850,7 @@ public:
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
 	{
-		connect_late(m_feedback, m_Q);
+		connect(m_feedback, m_Q);
 		m_inc = netlist::netlist_time::from_nsec(1);
 
 
