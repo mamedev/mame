@@ -15,6 +15,6 @@
 
 #define LOG_GENERAL (1U << 0)
 
-#define LOGMASKED(mask, ...) do {if (VERBOSE & (mask)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (0)
+#define LOGMASKED(mask, ...) do { if (VERBOSE & (mask)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (false)
 
 #define LOG(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)

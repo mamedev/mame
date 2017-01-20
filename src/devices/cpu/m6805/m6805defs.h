@@ -53,9 +53,9 @@
 #define SP_ADJUST(s) ( ( (s) & SP_MASK ) | SP_LOW )
 
 /* macros to access memory */
-#define IMMBYTE(b) {b = M_RDOP_ARG(PC++);}
-#define IMMWORD(w) {w.d = 0; w.b.h = M_RDOP_ARG(PC); w.b.l = M_RDOP_ARG(PC+1); PC+=2;}
-#define SKIPBYTE() {M_RDOP_ARG(PC++);}
+#define IMMBYTE(b) do { b = M_RDOP_ARG(PC++); } while (false)
+#define IMMWORD(w) do { w.d = 0; w.b.h = M_RDOP_ARG(PC); w.b.l = M_RDOP_ARG(PC+1); PC+=2; } while (false)
+#define SKIPBYTE() do { M_RDOP_ARG(PC++); } while (false)
 
 #define PUSHBYTE(b) wr_s_handler_b(&b)
 #define PUSHWORD(w) wr_s_handler_w(&w)
@@ -91,15 +91,15 @@
 #define SET_FLAGS8(a,b,r)   {SET_N8(r); SET_Z8(r); SET_C8(r);}
 
 /* for treating an unsigned uint8_t as a signed int16_t */
-#define SIGNED(b) ((int16_t)(b & 0x80 ? b | 0xff00 : b))
+#define SIGNED(b) (int16_t(b & 0x80 ? b | 0xff00 : b))
 
 /* Macros for addressing modes */
-#define DIRECT EAD=0; IMMBYTE(m_ea.b.l)
-#define IMM8 EA = PC++
+#define DIRECT do { EAD=0; IMMBYTE(m_ea.b.l); } while (false)
+#define IMM8 do { EA = PC++; } while (false)
 #define EXTENDED IMMWORD(m_ea)
-#define INDEXED EA = X
-#define INDEXED1 {EAD = 0; IMMBYTE(m_ea.b.l); EA += X;}
-#define INDEXED2 {IMMWORD(m_ea); EA += X;}
+#define INDEXED do { EA = X; } while (false)
+#define INDEXED1 do { EAD = 0; IMMBYTE(m_ea.b.l); EA += X; } while (false)
+#define INDEXED2 do { IMMWORD(m_ea); EA += X;} while (false)
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -117,13 +117,32 @@
 #define CLI CC &=~ IFLAG
 
 /* macros for convenience */
-#define DIRBYTE(b) {DIRECT; b = RM(EAD);}
-#define EXTBYTE(b) {EXTENDED; b = RM(EAD);}
-#define IDXBYTE(b) {INDEXED; b = RM(EAD);}
-#define IDX1BYTE(b) {INDEXED1; b = RM(EAD);}
-#define IDX2BYTE(b) {INDEXED2; b = RM(EAD);}
+#define ARGADDR \
+		do { switch (M) { \
+		case addr_mode::IM: static_assert(addr_mode::IM != M, "invalid mode for this instruction"); break; \
+		case addr_mode::DI: DIRECT; break; \
+		case addr_mode::EX: EXTENDED; break; \
+		case addr_mode::IX: INDEXED; break; \
+		case addr_mode::IX1: INDEXED1; break; \
+		case addr_mode::IX2: INDEXED2; break; \
+		} } while (false)
+#define DIRBYTE(b) do { DIRECT; b = RM(EAD); } while (false)
+#define EXTBYTE(b) do { EXTENDED; b = RM(EAD); } while (false)
+#define IDXBYTE(b) do { INDEXED; b = RM(EAD); } while (false)
+#define IDX1BYTE(b) do { INDEXED1; b = RM(EAD); } while (false)
+#define IDX2BYTE(b) do { INDEXED2; b = RM(EAD); } while (false)
+#define ARGBYTE(b) \
+		do { switch (M) { \
+		case addr_mode::IM: IMMBYTE(b); break; \
+		case addr_mode::DI: DIRBYTE(b); break; \
+		case addr_mode::EX: EXTBYTE(b); break; \
+		case addr_mode::IX: IDXBYTE(b); break; \
+		case addr_mode::IX1: IDX1BYTE(b); break; \
+		case addr_mode::IX2: IDX2BYTE(b); break; \
+		} } while (false)
+
 /* Macros for branch instructions */
-#define BRANCH(f) { uint8_t t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
+#define BRANCH(f) do { uint8_t t; IMMBYTE(t); if (bool(f) == bool(C)) PC += SIGNED(t); } while (false)
 
 /* pre-clear a PAIR union; clearing h2 and h3 only might be faster? */
 #define CLEAR_PAIR(p)   p->d = 0
