@@ -55,6 +55,7 @@ FEATURES
 #define LOG_DCD     0x200
 #define LOG_SYNC    0x400
 #define LOG_CHAR    0x800
+#define LOG_RX     0x1000
 
 #define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
 
@@ -72,6 +73,7 @@ FEATURES
 #define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
 #define LOGCHAR(...)  LOGMASK(LOG_CHAR,    __VA_ARGS__)
+#define LOGRX(...)    LOGMASK(LOG_RX,      __VA_ARGS__)
 
 #if VERBOSE & LOG_PRINTF
 #define logerror printf
@@ -274,6 +276,10 @@ void mpcc_device::device_reset()
 	m_ccr 	= 0x00;
 	m_ecr 	= 0x04;
 
+	// Clear fifos
+	m_tx_data_fifo.clear();
+	m_rx_data_fifo.clear();
+
 	// Init out callbacks to known inactive state
 	m_out_txd_cb(1);
 	m_out_dtr_cb(1);
@@ -290,6 +296,76 @@ void mpcc_device::device_reset()
 void mpcc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+WRITE_LINE_MEMBER(mpcc_device::cts_w)
+{
+	if (state == CLEAR_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr &= ~REG_SISR_CTSLVL;
+		if ( (old_sisr & REG_SISR_CTSLVL) &&
+			 (m_sicr & REG_SICR_RTSLVL) &&
+			 (m_tcr  & REG_TCR_TEN))
+		{
+			m_sisr |= REG_SISR_CTST;
+			if (m_sier & REG_SIER_CTS)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of TxC
+				trigger_interrupt(INT_SR_CTS);
+				// TODO: Make sure TxC has negative transition after CTS goes inactive before INT can be reset in SISR7
+			}
+		}
+	}
+	else
+		m_sisr |= REG_SISR_CTSLVL;
+}
+
+WRITE_LINE_MEMBER(mpcc_device::dsr_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr |= REG_SISR_DSRLVL;
+		if ( !(old_sisr & REG_SISR_DSRLVL) &&
+			 !(m_rcr  & REG_RCR_RRES))
+		{
+			m_sisr |= REG_SISR_DSRT;
+			if (m_sier & REG_SIER_DSR)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of RxC
+				trigger_interrupt(INT_SR_DSR);
+				// TODO: Make sure RxC has negative transition after DSR goes inactive before INT can be reset in SISR6
+			}
+		}
+	}
+	else
+		m_sisr &= ~REG_SISR_DSRLVL;
+}
+
+WRITE_LINE_MEMBER(mpcc_device::dcd_w)
+{
+	if (state == CLEAR_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr &= ~REG_SISR_DCDLVL;
+		if ( (old_sisr & REG_SISR_DCDLVL) &&
+			 !(m_rcr & REG_RCR_RRES))
+		{
+			m_sisr |= REG_SISR_DCDT;
+			if (m_sier & REG_SIER_DCD)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of RxC
+				trigger_interrupt(INT_SR_DCD);
+				// TODO: Make sure RxC has negative transition before INT can be reset in SISR5
+			}
+		}
+	}
+	else
+		m_sisr |= REG_SISR_DCDLVL;
 }
 
 //-------------------------------------------------
@@ -430,7 +506,7 @@ void mpcc_device::update_serial()
 	parity_t    parity    = get_parity();
 
 	LOGSETUP(" %s() %s Setting data frame %d+%d%c%s\n", FUNCNAME, m_owner->tag(), 1,
-		 data_bits, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', 
+		 data_bits, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O',
 		stop_bits == STOP_BITS_1 ? "1" : (stop_bits == STOP_BITS_2 ? "2" : "1.5"));
 
 	set_data_frame(1, data_bits, parity, stop_bits);
@@ -439,16 +515,16 @@ void mpcc_device::update_serial()
 	//  check if the receiver is in reset mode
 	if  (m_rcr & REG_RCR_RRES)
 	{
-		LOG("- Rx in reset\n");
+		LOGSETUP("- Rx in reset\n");
 		set_rcv_rate(0);
 	}
 	// Rx is running
 	else
 	{
-		LOG("- Rx enabled\n");
+		LOGSETUP("- Rx enabled\n");
 		m_brg_rate = get_rx_rate();
 
-		LOG("- BRG rate %d\n", m_brg_rate);
+		LOGSETUP("- BRG rate %d\n", m_brg_rate);
 		set_rcv_rate(m_brg_rate);
 	}
 
@@ -456,7 +532,7 @@ void mpcc_device::update_serial()
 	//  check if Rx is in reset
 	if  (m_tcr & REG_TCR_TRES)
 	{
-		LOG("- Tx in reset\n");
+		LOGSETUP("- Tx in reset\n");
 		set_tra_rate(0);
 	}
 	// Tx is running
@@ -465,15 +541,15 @@ void mpcc_device::update_serial()
 		// Check that Tx is enabled
 		if (m_tcr & REG_TCR_TEN)
 		{
-			LOG("- Tx enabled\n");
+			LOGSETUP("- Tx enabled\n");
 			m_brg_rate = get_tx_rate();
 
-			LOG("- BRG rate %d\n", m_brg_rate);
+			LOGSETUP("- BRG rate %d\n", m_brg_rate);
 			set_tra_rate(m_brg_rate);
 		}
 		else
 		{
-			LOG("- Tx disabled\n");
+			LOGSETUP("- Tx disabled\n");
 			set_tra_rate(0);
 		}
 	}
@@ -532,6 +608,7 @@ void mpcc_device::tra_complete()
 		else
 		{
 			m_out_rts_cb(CLEAR_LINE); // TODO: respect the RTSLV bit
+			m_sicr &= ~REG_SICR_RTSLVL;
 		}
 
 		// Check if Tx interrupts are enabled
@@ -574,6 +651,7 @@ void mpcc_device::rcv_complete()
 
 	receive_register_extract();
 	data = get_received_char();
+	LOGRX("%s %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
 
 	//	receive_data(data);
 	if (m_rx_data_fifo.full())
@@ -706,7 +784,7 @@ READ8_MEMBER( mpcc_device::read )
 	{
 	case 0x00: data = do_rsr(); break;
 	case 0x01: data = do_rcr(); break;
-	case 0x02: data = m_rdr; logerror("MPCC: Reg RDR not implemented\n"); break;
+	case 0x02: data = do_rdr(); break;
 	case 0x04: data = m_rivnr; logerror("MPCC: Reg RIVNR not implemented\n"); break;
 	case 0x05: data = do_rier(); break;
 	case 0x08: data = m_tsr; break; logerror("MPCC: Reg TSR not implemented\n"); break;
@@ -714,7 +792,7 @@ READ8_MEMBER( mpcc_device::read )
 	//case 0x0a: data = m_tdr; break; // TDR is a write only register
 	case 0x0c: data = do_tivnr(); break;
 	case 0x0d: data = do_tier(); break;
-	case 0x10: data = m_sisr; logerror("MPCC: Reg SISR not implemented\n"); break;
+	case 0x10: data = do_sisr(); break;
 	case 0x11: data = do_sicr(); break;
 	case 0x14: data = m_sivnr; logerror("MPCC: Reg SIVNR not implemented\n"); break;
 	case 0x15: data = do_sier(); break;
@@ -750,7 +828,7 @@ WRITE8_MEMBER( mpcc_device::write )
 	case 0x0a: m_tdr = data; LOGCHAR("*%c", data); do_tdr(data); break;
 	case 0x0c: do_tivnr(data); break;
 	case 0x0d: do_tier(data); break;
-	case 0x10: m_sisr = data; logerror("MPCC: Reg SISR not implemented\n"); break;
+	case 0x10: do_sisr(data); break;
 	case 0x11: do_sicr(data); break;
 	case 0x14: m_sivnr = data; logerror("MPCC: Reg SIVNR not implemented\n"); break;
 	case 0x15: do_sier(data); break;
@@ -799,6 +877,26 @@ uint8_t mpcc_device::do_rcr()
 	LOG("%s <- %02x\n", FUNCNAME, data);
 	return data;
 }
+
+uint8_t mpcc_device::do_rdr()
+{
+	uint8_t data = 0;
+
+	if (!m_rx_data_fifo.empty())
+	{
+		// load data from the FIFO
+		data = m_rx_data_fifo.dequeue();
+	}
+	else
+	{
+		LOGRX("data_read: Attempt to read out character from empty FIFO\n");
+		logerror("data_read: Attempt to read out character from empty FIFO\n");
+	}
+
+	LOGRX("%s <- %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
+	return data;
+}
+
 
 void mpcc_device::do_rier(uint8_t data)
 {
@@ -908,10 +1006,47 @@ uint8_t mpcc_device::do_tier()
 	return data;
 }
 
+void mpcc_device::do_sisr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	if (data & REG_SISR_CTST) m_sisr &= ~REG_SISR_CTST;
+	if (data & REG_SISR_DSRT) m_sisr &= ~REG_SISR_DSRT;
+	if (data & REG_SISR_DCDT) m_sisr &= ~REG_SISR_DCDT;
+
+	LOGSETUP(" - CTS %d transitioned: %d\n", (m_sisr & REG_SISR_CTSLVL) ? 1 :0, (m_sisr & REG_SISR_CTST) ? 1 : 0);
+	LOGSETUP(" - DSR %d transitioned: %d\n", (m_sisr & REG_SISR_DSRLVL) ? 1 :0, (m_sisr & REG_SISR_DSRT) ? 1 : 0);
+	LOGSETUP(" - DCD %d transitioned: %d\n", (m_sisr & REG_SISR_DCDLVL) ? 1 :0, (m_sisr & REG_SISR_DCDT) ? 1 : 0);
+}
+
+uint8_t mpcc_device::do_sisr()
+{
+	uint8_t data = m_sisr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
 void mpcc_device::do_sicr(uint8_t data)
 {
 	LOG("%s -> %02x\n", FUNCNAME, data);
+
+	// If RTS is activated the RTS output latch can only be reset by an empty FIFO.
+	if ( !(m_sicr & REG_SICR_RTSLVL) &&
+		 (data & REG_SICR_RTSLVL))
+	{
+		m_out_rts_cb(ASSERT_LINE); // TODO: respect the RTSLV bit
+	}
+
 	m_sicr = data;
+
+	if (m_sicr & REG_SICR_DTRLVL)
+	{
+		m_out_dtr_cb(ASSERT_LINE);
+	}
+	else
+	{
+		m_out_dtr_cb(CLEAR_LINE);
+	}
+
 	LOGSETUP(" - RTS level : %s\n", (m_sicr & REG_SICR_RTSLVL) ? "high" : "low");
 	LOGSETUP(" - DTR level : %s\n", (m_sicr & REG_SICR_DTRLVL) ? "high" : "low");
 	LOGSETUP(" - Echo Mode : %s\n", (m_sicr & REG_SICR_ECHO)   ? "enabled" : "disabled");
