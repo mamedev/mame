@@ -6,6 +6,7 @@
  * Configurable logging
  ****************************************************************************/
 
+#define LOG_GENERAL (1U <<  0)
 #define LOG_INT     (1U <<  1)
 #define LOG_IOPORT  (1U <<  2)
 #define LOG_TIMER   (1U <<  3)

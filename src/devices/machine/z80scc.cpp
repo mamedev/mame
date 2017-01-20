@@ -78,6 +78,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 
+#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
 #define LOG_PRINTF  (1U <<  2)
 #define LOG_READ    (1U <<  3)
