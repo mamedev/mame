@@ -31023,6 +31023,7 @@ poly880                         //
 @source:polyplay.cpp
 polyplay                        //
 polyplay2                       //
+polyplay2c                      //
 
 @source:pong.cpp
 breakout                        // (c) 1976 Atari
