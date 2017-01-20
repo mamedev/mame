@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     Z80-SCC Serial Communications Controller emulation
@@ -72,41 +73,40 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #include "z80scc.h"
 
+
+//**************************************************************************
+//  CONFIGURABLE LOGGING
+//**************************************************************************
+
+#define LOG_SETUP   (1U <<  1)
+#define LOG_PRINTF  (1U <<  2)
+#define LOG_READ    (1U <<  3)
+#define LOG_INT     (1U <<  4)
+#define LOG_CMD     (1U <<  5)
+#define LOG_TX      (1U <<  6)
+#define LOG_RCV     (1U <<  7)
+#define LOG_CTS     (1U <<  8)
+#define LOG_DCD     (1U <<  9)
+#define LOG_SYNC    (1U << 10)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG_GENERAL 0x001
-#define LOG_SETUP   0x002
-#define LOG_PRINTF  0x004
-#define LOG_READ    0x008
-#define LOG_INT     0x010
-#define LOG_CMD     0x020
-#define LOG_TX      0x040
-#define LOG_RCV     0x080
-#define LOG_CTS     0x100
-#define LOG_DCD     0x200
-#define LOG_SYNC    0x400
-
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
-
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
-#define LOGCMD(...)   LOGMASK(LOG_CMD,     __VA_ARGS__)
-#define LOGTX(...)    LOGMASK(LOG_TX,      __VA_ARGS__)
-#define LOGRCV(...)   LOGMASK(LOG_RCV,     __VA_ARGS__)
-#define LOGCTS(...)   LOGMASK(LOG_CTS,     __VA_ARGS__)
-#define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
-#define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__

@@ -2,6 +2,25 @@
 #include "m68705.h"
 #include "m6805defs.h"
 
+/****************************************************************************
+ * Configurable logging
+ ****************************************************************************/
+
+#define LOG_INT     (1U <<  1)
+#define LOG_IOPORT  (1U <<  2)
+#define LOG_TIMER   (1U <<  3)
+#define LOG_EPROM   (1U <<  4)
+
+//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGINT(...)     LOGMASKED(LOG_INT,    __VA_ARGS__)
+#define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
+#define LOGTIMER(...)   LOGMASKED(LOG_TIMER,  __VA_ARGS__)
+#define LOGEPROM(...)   LOGMASKED(LOG_EPROM,  __VA_ARGS__)
+
+
 namespace {
 
 std::pair<u16, char const *> const m68705p_syms[] = {
@@ -51,6 +70,10 @@ ROM_END
 
 } // anonymous namespace
 
+
+/****************************************************************************
+ * Global variables
+ ****************************************************************************/
 
 device_type const M68705P3 = &device_creator<m68705p3_device>;
 device_type const M68705P5 = &device_creator<m68705p5_device>;
@@ -183,12 +206,18 @@ m68705_device::m68705_device(
 
 template <offs_t B> READ8_MEMBER(m68705_device::eprom_r)
 {
+	if (pcr_vpon() && !pcr_ple())
+		LOGEPROM("read EPROM %04X prevented when Vpp high and /PLE = 0\n", B + offset);
+
 	// read locked out when /VPON and /PLE are asserted
 	return (!pcr_vpon() || !pcr_ple()) ? m_user_rom[B + offset] : 0xff;
 }
 
 template <offs_t B> WRITE8_MEMBER(m68705_device::eprom_w)
 {
+	LOGEPROM("EPROM programming latch write%s%s: %04X = %02\n",
+			!pcr_vpon() ? " [Vpp low]" : "", !pcr_ple() ? " [disabled]" : "", B + offset, data);
+
 	// programming latch enabled when /VPON and /PLE are asserted
 	if (pcr_vpon() && pcr_ple())
 	{
@@ -212,12 +241,23 @@ template <std::size_t N> void m68705_device::set_port_open_drain(bool value)
 
 template <std::size_t N> void m68705_device::set_port_mask(u8 mask)
 {
+	if (configured() || started())
+		throw emu_fatalerror("Attempt to set physical port mask after configuration");
 	m_port_mask[N] = mask;
 }
 
 template <std::size_t N> READ8_MEMBER(m68705_device::port_r)
 {
-	if (!m_port_cb_r[N].isnull()) m_port_input[N] = m_port_cb_r[N](space, 0, ~m_port_ddr[N]);
+	if (!m_port_cb_r[N].isnull())
+	{
+		u8 const newval(m_port_cb_r[N](space, 0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
+		if (newval != m_port_input[N])
+		{
+			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02x)\n",
+					char('A' + N), newval, ~m_port_ddr[N] & ~m_port_mask[N], m_port_input[N]);
+		}
+		m_port_input[N] = newval;
+	}
 	return m_port_mask[N] | (m_port_latch[N] & m_port_ddr[N]) | (m_port_input[N] & ~m_port_ddr[N]);
 }
 
@@ -225,6 +265,8 @@ template <std::size_t N> WRITE8_MEMBER(m68705_device::port_latch_w)
 {
 	data &= ~m_port_mask[N];
 	u8 const diff = m_port_latch[N] ^ data;
+	if (diff)
+		LOGIOPORT("write PORT%c latch: %02X & %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N], m_port_latch[N]);
 	m_port_latch[N] = data;
 	if (diff & m_port_ddr[N])
 		port_cb_w<N>();
@@ -235,6 +277,7 @@ template <std::size_t N> WRITE8_MEMBER(m68705_device::port_ddr_w)
 	data &= ~m_port_mask[N];
 	if (data != m_port_ddr[N])
 	{
+		LOGIOPORT("write DDR%c: %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N]);
 		m_port_ddr[N] = data;
 		port_cb_w<N>();
 	}
@@ -254,6 +297,7 @@ READ8_MEMBER(m68705_device::tdr_r)
 
 WRITE8_MEMBER(m68705_device::tdr_w)
 {
+	LOGTIMER("write TDR: %02X * (1 << %u)\n", data, tcr_ps());
 	m_tdr = data;
 }
 
@@ -290,20 +334,23 @@ WRITE8_MEMBER(m68705_device::tcr_w)
 
 	if (tcr_topt())
 	{
-		m_tcr = (m_tcr & 0x3f) | (data & 0xc0);
+		LOGTIMER("write TCR: TIR=%u (%s) TIM=%u\n",
+				BIT(data, 7), (tcr_tir() && !BIT(data, 7)) ? "cleared" : "unaffected", BIT(data, 6));
+		m_tcr = (m_tcr & ((data & 0x80) | 0x3f)) | (data & 0x40);
 	}
 	else
 	{
+		LOGTIMER("write TCR: TIR=%u (%s) TIM=%u TIN=%u TIE=%u PSC=%u PS=(1 << %u)\n",
+				BIT(data, 7), (tcr_tir() && !BIT(data, 7)) ? "cleared" : "unaffected", BIT(data, 6),
+				BIT(data, 5), BIT(data, 4),
+				BIT(data, 3), data & 0x07);
 		if (BIT(data, 3))
 			m_prescaler = 0;
-		m_tcr = (m_tcr & 0x08) | (data & 0xf7);
+		m_tcr = (m_tcr & ((data & 0x80) | 0x08)) | (data & 0x77);
 	}
 
-	// TODO: this is tied up with /INT2 on R/U devices
-	if (tcr_tir() && !tcr_tim())
-		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
+	// this is a level-sensitive interrupt (unlike the edge-triggered inputs)
+	execute_set_input(M68705_INT_TIMER, (tcr_tir() && !tcr_tim()) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(m68705_device::misc_r)
@@ -333,12 +380,19 @@ WRITE8_MEMBER(m68705_device::pcr_w)
 	// 1  /PGE   RW  Program Enable
 	// 0  /PLE   RW  Programming Latch Enable
 
+	LOGEPROM("write PCR: /PGE=%u%s /PLE=%u\n", BIT(data, 1), BIT(data, 0) ? " [inhibited]" : "", BIT(data, 0));
+
 	// lock out /PGE if /PLE is not asserted
 	data |= ((data & 0x01) << 1);
 
 	// write EPROM if /PGE is asserted (erase requires UV so don't clear bits)
-	if (pcr_vpon() && !pcr_pge() && !BIT(data, 1))
-		m_user_rom[m_pl_addr] |= m_pl_data;
+	if (!pcr_pge() && !BIT(data, 1))
+	{
+		LOGEPROM("write EPROM%s: %04X = %02X | %02X\n",
+				pcr_vpon() ? "" : " prevented when Vpp low", m_pl_addr, m_pl_data, m_user_rom[m_pl_addr]);
+		if (pcr_vpon())
+			m_user_rom[m_pl_addr] |= m_pl_data;
+	}
 
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
 }
@@ -443,7 +497,10 @@ void m68705_device::device_reset()
 	m_pcr |= 0xfb; // b2 (/VPON) is driven by external input and hence unaffected by reset
 
 	if (CLEAR_LINE != m_vihtp)
+	{
+		LOG("loading bootstrap vector\n");
 		RM16(0xfff6, &m_pc);
+	}
 }
 
 void m68705_device::execute_set_input(int inputnum, int state)
@@ -464,6 +521,8 @@ void m68705_device::execute_set_input(int inputnum, int state)
 
 			if (state != CLEAR_LINE)
 				m_pending_interrupts |= 1 << inputnum;
+			else if (M68705_INT_TIMER == inputnum)
+				m_pending_interrupts &= ~(1 << inputnum); // this one's is level-sensitive
 		}
 	}
 }
@@ -484,7 +543,7 @@ void m68705_device::nvram_write(emu_file &file)
 
 void m68705_device::interrupt()
 {
-	if ((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | M68705_INT_MASK)) != 0 )
+	if (m_pending_interrupts & M68705_INT_MASK)
 	{
 		if ((CC & IFLAG) == 0)
 		{
@@ -495,18 +554,24 @@ void m68705_device::interrupt()
 			SEI;
 			standard_irq_callback(0);
 
-			if ((m_pending_interrupts & (1 << M68705_IRQ_LINE)) != 0 )
+			if (BIT(m_pending_interrupts, M68705_IRQ_LINE))
 			{
+				LOGINT("servicing /INT interrupt\n");
 				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
 				RM16(0xfffa, &m_pc);
 			}
-			else if ((m_pending_interrupts & (1 << M68705_INT_TIMER)) != 0)
+			else if (BIT(m_pending_interrupts, M68705_INT_TIMER))
 			{
-				m_pending_interrupts &= ~(1 << M68705_INT_TIMER);
+				LOGINT("servicing timer/counter interrupt\n");
 				RM16(0xfff8, &m_pc);
+			}
+			else
+			{
+				throw emu_fatalerror("Unknown pending interrupt");
 			}
 		}
 		m_icount -= 11;
+		burn_cycles(11);
 	}
 }
 
@@ -521,6 +586,7 @@ void m68705_device::burn_cycles(unsigned count)
 
 		if (decrements && (decrements >= m_tdr))
 		{
+			LOGTIMER("timer/counter expired%s%s\n", tcr_tir() ? " [overrun]" : "", tcr_tim() ? " [masked]" : "");
 			m_tcr |= 0x80;
 			if (!tcr_tim())
 				set_input_line(M68705_INT_TIMER, ASSERT_LINE);
