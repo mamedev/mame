@@ -11,57 +11,112 @@
  *
  *
  *       ||
- * ||    ||  CPU-20
+ * ||    ||  CPU-21 - main board
  * ||||--||_____________________________________________________________
  * ||||--||                                                             |
  * ||    ||                                                           _ |__
  *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P1 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
+ * RST o-[|                                                          | |   |
+ *       ||                   +-------+                              | |   |
+ * ABT o-[|                   |  XTAL |                              | |   |
+ *       ||                   | 50MHz |    +-----------------------+ | |   |
+ * RUN   C|                   +-------+    |     MPCC              | | |   |
+ * HALT  C|                   +-------+    |    R68561P            | | |VME|
+ * BM    C|                   |  XTAL |    +-----------------------+ | |   |
+ *       ||                   | 40MHz |    +-----------------------+ | |P1 |
+ *       ||                   +-------+    |     PIT               | | |   |
+ * FLMA  C|                   +-------+    |   MC68230P8           | | |   |
+ * EPROM C|                   |  XTAL |    +-----------------------+ | |   |
+ * 2WST  C|                   | 32MHz |                              | |   |
+ * 4WST  C|                   +-------+                              | |   |
+ * 6WST  C|                                                          | |   |
+ * 8WST  C|                                                          |_|   |
+ * 12WST C|                                   +--------------------+   |___|
+ * 14WST C|                                   |    BIM             |   |
+ *       ||                                   |  MC68153L          |   |
+ *       ||                                   +--------------------+   |
+ * CSH o-[|                                                            |
  *       ||                                                            |
+ * R/H o-[|                                                            |
  *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
+ * DIP0   -    +----------------+                                      |
+ *  .     -    |                |                                      |___
+ *  .     -    |                |    +---+                            _|   |
+ *  .     -    |   CPU          |    |   |+------------+             | |   |
+ *  .     -    |   M68020       |    |   || 27128      |             | |   |
+ *  .     -    |                |    |   || EPROM      |             | |   |
+ *  .     -    |                |    |   |+------------+             | |   |
+ * DIP7   -    |                |    | F |                           | |VME|
+ *       ||    +----------------+    | L |+------------+             | |   |
+ *       ||                          | M || 27128      |             | |P2 |
+ *      [|||O  +------------+        | E || EPROM      |             | |   |
+ *     +-||||  |            |        |   |+------------+             | |   |
+ *     | ||||  |  FPU       |        | m |                           | |   |
+ *     | ||||  |  68881     |        | e |+------------+             | |   |
+ *     | ||||  |            |        | m || 27128      |             | |   |
+ *     | ||||  |            |        |   || EPROM      |             | |   |
+ * P4  | ||||  +------------+        | b |+------------+             | |   |
+ *     | ||||                        | u |                           | |   |
+ *     +-||||                        | s |+------------+             |_|   |
+ *      [|||O                        |   || 27128      |               |___|
+ * ||    ||                          |   || EPROM      |                |
+ * ||||--||                          +---++------------+                |
+ * ||||--||-------------------------------------------------------------+
+ * ||
+ *
+ *
+ *       ||
+ * ||    ||  CPU-21 - slave board (SRAM-22 - connected via FLME mem bus)
+ * ||||--||_____________________________________________________________
+ * ||||--||                                                             |
+ * ||    ||    64 x 64Kbit SRAM = 512KB                               __|__
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *       ||   |IMS1600    | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *  RUN  C|   |           | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *       ||   |           | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |VME|
+ *  SEL0 C|   |           | |           | |           | |           || |   |
+ *  SEL1 C|   +-----------+ +-----------+ +-----------+ +-----------+| |P1 |
+ *       ||   |           | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *       ||   |           | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *       ||   |           | |           | |           | |           || |   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+| |   |
+ *       ||   |           | |           | |           | |           ||_|   |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+  |___|
+ *       ||   |           | |           | |           | |           |  |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+  |
+ *       ||   |           | |           | |           | |           |  |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+  |
+ *       ||   |           | |           |                              |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+  |
+ *       ||   |           | |           | |           | |           |  |
+ *       ||   +-----------+ +-----------+ +-----------+ +-----------+  |
  *       ||                                                            |___
- *       ||                                                           _|   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P2 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
- * ||    ||                                                              +
- * ||||--||                                                              |
- * ||||--||--------------------------------------------------------------+
+ *       ||                          +---++-----------+ +-----------+ _|   |
+ *       ||                          |   ||           | |           || |   |
+ *       ||                          |   |+-----------+ +-----------+| |   |
+ *       ||                          |   ||           | |           || |   |
+ *       ||                          |   |+-----------+ +-----------+| |   |
+ *       ||                          | F ||           | |           || |VME|
+ *       ||                          | L |+-----------+ +-----------+| |   |
+ *       ||                          | M |                           | |P2 |
+ *      [|||O                        | E |                           | |   |
+ *     +-||||                        |   |                           | |   |
+ *     | ||||                        | m |                           | |   |
+ *     | ||||                        | e |                           | |   |
+ *     | ||||                        | m |                           | |   |
+ *     | ||||                        |   |                           | |   |
+ * P8? | ||||                        | b |                           | |   |
+ *     | ||||                        | u | +-----------------------+ | |   |
+ *     +-||||                        | s | |      MPCC             | |_|   |
+ *      [|||O                        |   | |     R68561P           |   |___|
+ * ||    ||                          |   | +-----------------------+   |
+ * ||||--||                          +---+                    (XTAL)   |
+ * ||||--||------------------------------------------------------------+
  * ||
  *
  * History of Force Computers
@@ -103,9 +158,11 @@ Basadressen av I / O-enheter:
  * FBFF0000-FBFFFFFF        VME A16 D8-D32
  * FC000000-FCFEFFFF        VME A24 D8-D16
  * FCFF0000-FCFFFFFF        VME A16 D8-D16
+ * FF800000                 MPCC
+ * FF800200                 MPCC1 - on daughter board
+ * FF800600                 MPCC2 - on daughter board
  * FF800800                 BIM
  * FF800C00                 PIT
- * FF800000                 MPCC
  * FF800A00                 RTC
  * --------------------------------------------------------------------------
  *
@@ -194,6 +251,8 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 		, m_pit (*this, "pit")
 		, m_bim  (*this, "bim")
 		, m_mpcc  (*this, "mpcc")
+		, m_mpcc2  (*this, "mpcc2")
+		, m_mpcc3  (*this, "mpcc3")
 	{
 	}
 	DECLARE_READ32_MEMBER (bootvect_r);
@@ -206,11 +265,18 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 
+	/* PIT callbacks */
+	DECLARE_READ8_MEMBER (pita_r);
+	DECLARE_READ8_MEMBER (pitb_r);
+	DECLARE_READ8_MEMBER (pitc_r);
+
 private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
 	required_device<mpcc68561_device> m_mpcc;
+	required_device<mpcc68561_device> m_mpcc2;
+	required_device<mpcc68561_device> m_mpcc3;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint32_t  *m_sysrom;
@@ -228,7 +294,9 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, cpu20_state)
 	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
 	AM_RANGE (0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0xffffffff)
-//	AM_RANGE (0xff800200, 0xff80020f) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
+	AM_RANGE (0xff800200, 0xff80021f) AM_DEVREADWRITE8("mpcc2", mpcc68561_device, read, write, 0xffffffff)
+//	AM_RANGE (0xff800200, 0xff8003ff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
+	AM_RANGE (0xff800600, 0xff80061f) AM_DEVREADWRITE8("mpcc3", mpcc68561_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800800, 0xff80080f) AM_DEVREADWRITE8("bim", bim68153_device, read, write, 0xff00ff00)
 //	AM_RANGE (0xff800a00, 0xff800a0f) AM_DEVREADWRITE8("rtc", rtc_device, read, write, 0x00ff00ff)
 	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0xffffffff)
@@ -315,6 +383,48 @@ void cpu20_state::update_irq_to_maincpu()
 	}
 }
 
+/* 8 configuration DIP switches
+
+ Baud   B3 B2 B1 B0
+   9600  0  0  0  1
+  28800  0  0  1  0
+  38400  1  0  1  0
+  57600  0  0  1  1
+
+ B3: 8 bit 38400 baud
+
+ B4:
+
+ B5:
+
+ B6: Auto execute FF00C0000
+
+ B7: memory size?
+*/
+#define BR7N9600   0x01
+#define BR7N28800  0x02
+#define BR7N38400  0x06
+#define BR7N57600  0x03
+#define BR8N38400  0x08
+#define FORCEBUG   0x30
+READ8_MEMBER (cpu20_state::pita_r){
+	LOG("%s\n", FUNCNAME);
+
+	return FORCEBUG | BR7N9600;
+}
+
+/* Enabling/Disabling of VME IRQ 1-7 */
+READ8_MEMBER (cpu20_state::pitb_r){
+	LOG("%s\n", FUNCNAME);
+	return 0xff;
+}
+
+/* VME bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
+READ8_MEMBER (cpu20_state::pitc_r){
+	LOG("%s\n", FUNCNAME);
+	return 0xff;
+}
+
 static SLOT_INTERFACE_START(fccpu20_vme_cards)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
@@ -330,15 +440,17 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu20_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", "vme1", fccpu20_vme_cards, nullptr)
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_8_664MHz)
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_32MHz / 4) /* Crystal not verified */
+	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu20_state, pita_r))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu20_state, pitb_r))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu20_state, pitc_r))
 	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("bim", bim68153_device, int2_w))
 
-//	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL_8_664MHz)
-
-	MCFG_MC68153_ADD("bim", XTAL_16MHz / 2)	
+	/* BIM */
+	MCFG_MC68153_ADD("bim", XTAL_32MHz / 8)
 	MCFG_BIM68153_OUT_INT_CB(WRITELINE(cpu20_state, bim_irq_callback))
 		/*INT0 - Abort switch */
 		/*INT1 - MPCC@8.064 MHz aswell */
@@ -347,16 +459,43 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 
 	/* MPCC */
 #define RS232P1_TAG      "rs232p1"
-	MCFG_MPCC68561_ADD ("mpcc", XTAL_16MHz, 0, 0)
+#define RS232P2_TAG      "rs232p2"
+#define RS232P3_TAG      "rs232p3"
+	// MPCC
+	MCFG_MPCC68561_ADD ("mpcc", XTAL_32MHz / 4, 0, 0)
 	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
 	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
 	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	// RS232
+	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int1_w))
+	/* Additional MPCC sits on slave boards like SRAM-22 */
+	// MPCC2
+	MCFG_MPCC68561_ADD ("mpcc2", XTAL_32MHz / 4, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int3_w))
+	// MPCC3
+	MCFG_MPCC68561_ADD ("mpcc3", XTAL_32MHz / 4, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int3_w))
+
+	// MPCC - RS232
 	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, rx_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, write_rx))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, cts_w))
 
-//	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int1_w))
+	// MPCC2 - RS232
+	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc2", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc2", mpcc68561_device, cts_w))
+
+	// MPCC3 - RS232
+	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, cts_w))
+
 MACHINE_CONFIG_END
 
 /* ROM definitions */
