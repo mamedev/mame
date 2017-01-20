@@ -369,8 +369,20 @@ ROM_END
 
 ROM_START( polyplay2 )
 	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
+	ROM_LOAD( "2_1.ROM",           0x0000, 0x2000, CRC(d728ca42) SHA1(7359a59ba7f205b3ac95c8a0946093f24bdaa4da) )
+	ROM_LOAD( "2_2.ROM",           0x2000, 0x2000, CRC(52316236) SHA1(88c159621d40953240c5d2f1d6dcebb8f5e1ee81) )
+	ROM_LOAD( "2_3.ROM",           0x4000, 0x2000, CRC(e199d303) SHA1(fea2c3c659222553f36b3e922c6ac017f7111025) )
+	ROM_LOAD( "2_4.ROM",           0x6000, 0x2000, CRC(1324c2e2) SHA1(c0102d5abbb2f4dbb5b8dff5ad515bc3f2af9166) )
+	ROM_LOAD( "2_5.ROM",           0x8000, 0x2000, CRC(2e959fe9) SHA1(1f0a80bb26d0ae332d4a4313ec22ab7eefcf1e34) )
+	ROM_LOAD( "2_6.ROM",           0xA000, 0x2000, CRC(85774542) SHA1(420349a0d812bc0052a77cbc6c5ab84262e58b32) )
+
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "1_1.bin",           0x0000, 0x0800, CRC(4f028af9) SHA1(319537234069b43cfffafe567cc599ae05f24e23) )
+ROM_END
+
+ROM_START( polyplay2c )
+	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
 	ROM_LOAD( "2_1.bin",           0x0000, 0x2000, CRC(bf22f44f) SHA1(dd412b45f49ceffe336d905043c7af2447c577a0) )
-	
 	ROM_LOAD( "2_2.bin",           0x2000, 0x2000, CRC(e54b8be8) SHA1(23037102eab60fd03c349ad154b2498139e84dd4) )
 	ROM_LOAD( "2_3.bin",           0x4000, 0x2000, CRC(ac43ec6b) SHA1(1662e10d80d47c1e3c54d4ef232c0d671fecce96) )
 	ROM_LOAD( "2_4.bin",           0x6000, 0x2000, CRC(703f3d46) SHA1(5ab571cb63ffdbce86b6e452988402e5c1098009) )
@@ -381,5 +393,6 @@ ROM_START( polyplay2 )
 ROM_END
 
 /* game driver */
-GAME( 1986, polyplay,  0, polyplay_zre,   polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0 )
-GAME( 1989, polyplay2, 0, polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0 )
+GAME( 1986, polyplay,   0,         polyplay_zre,   polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0 )
+GAME( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)", 0 )
+GAME( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0 )
