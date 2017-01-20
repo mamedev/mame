@@ -120,9 +120,10 @@ public:
 	DECLARE_READ8_MEMBER( iack );
 
 	/* Callbacks to be called by others for signals driven by connected devices */
-	DECLARE_WRITE_LINE_MEMBER( write_rx ); // bit transitions from serial device
-	DECLARE_WRITE_LINE_MEMBER( cts_w ) {} // { m_chanA->cts_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcd_w ) {} // { m_chanA->dcd_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	DECLARE_WRITE_LINE_MEMBER( dsr_w );
+	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w ) {} // { m_chanA->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txc_w ) {} // { m_chanA->txc_w(state); }
 
@@ -249,6 +250,7 @@ protected:
 	};
 
 	uint8_t m_rdr;
+	uint8_t do_rdr();
 	// TODO: investigate if 4 x 16 bit wide FIFO is needed for 16 bit mode
 	util::fifo<uint8_t, 8> m_rx_data_fifo;
 
@@ -318,7 +320,19 @@ protected:
 		REG_TIER_TFERR	= 0x02, // TX Frame error interrupt
 	};
 
+	// SISR - Serial Interface Status Register
 	uint8_t m_sisr;
+	uint8_t do_sisr();
+	void do_sisr(uint8_t data);
+	enum
+	{
+		REG_SISR_CTST	= 0x80, // Clear To Send Transition Status
+		REG_SISR_DSRT	= 0x40, // Data Set Ready Transition Status
+		REG_SISR_DCDT	= 0x20, // Data Carrier Detect Transition Status
+		REG_SISR_CTSLVL	= 0x10, // Clear To Send Level
+		REG_SISR_DSRLVL	= 0x08, // Data Set Ready Level
+		REG_SISR_DCDLVL	= 0x04, // Data Carrier Detect Level
+	};
 
 	// SICR - Serial Interface Control Register
 	uint8_t m_sicr;
