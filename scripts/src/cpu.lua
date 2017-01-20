@@ -612,7 +612,6 @@ if (CPUS["HCD62121"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.cpp",
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.h",
-		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121_ops.h",
 	}
 end
 
