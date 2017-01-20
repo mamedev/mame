@@ -10,7 +10,7 @@ uniform vec4 u_passthrough;
 uniform int u_phosphor_mode;
 uniform vec4 u_phosphor_time;
 uniform vec4 u_phosphor_beta;
-uniform float u_delta_time;
+uniform vec4 u_delta_time;
 
 // Samplers
 SAMPLER2D(s_tex, 0);

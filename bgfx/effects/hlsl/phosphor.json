@@ -31,6 +31,6 @@
     	{ "name": "u_phosphor_mode", "type": "int", "values": [ 2 ] },
 	{ "name": "u_phosphor_time", "type": "vec4", "values": [ 0.02, 0.20, 0.20, 0.0 ] },
 	{ "name": "u_phosphor_beta", "type": "vec4", "values": [ 1.0, 1.0, 1.0, 0.0 ] },
-	{ "name": "u_delta_time", "type": "float", "values": [ 0.0 ]}
+	{ "name": "u_delta_time", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
     ]
 }
