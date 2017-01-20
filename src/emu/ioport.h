@@ -80,6 +80,7 @@ enum ioport_group
 	IPG_PLAYER8,
 	IPG_PLAYER9,
 	IPG_PLAYER10,
+	IPG_PLAYER_LAST = IPG_PLAYER10,
 	IPG_OTHER,
 	IPG_TOTAL_GROUPS,
 	IPG_INVALID
@@ -802,33 +803,37 @@ class input_type_entry
 	friend class simple_list<input_type_entry>;
 	friend class ioport_manager;
 
+	static const char *s_tokens[IPT_COUNT];
+
 public:
 	// construction/destruction
-	input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard);
-	input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment);
+	input_type_entry(ioport_type type, ioport_group group, int player);
 
 	// getters
 	input_type_entry *next() const { return m_next; }
 	ioport_type type() const { return m_type; }
+	bool is_analog() const { return m_type > IPT_ANALOG_FIRST && m_type < IPT_ANALOG_LAST; }
+	bool is_osd() const { return m_type >= IPT_OSD_1 && m_type <= IPT_OSD_16; }
 	ioport_group group() const { return m_group; }
 	u8 player() const { return m_player; }
-	const char *token() const { return m_token; }
-	const char *name() const { return m_name; }
+	const char *token() const { return m_token.c_str(); }
+	const char *name() const { return m_name.c_str(); }
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
 	void restore_default_seq();
 
 	// setters
-	void configure_osd(const char *token, const char *name);
+	void configure_osd(const char *token, const char *name) { assert(is_osd()); m_token = token; m_name = name; }
+	void set_name(std::string &&name) { m_name = std::move(name); }
 
 private:
 	// internal state
 	input_type_entry *  m_next;             // next description in the list
 	ioport_type         m_type;             // IPT_* for this entry
 	ioport_group        m_group;            // which group the port belongs to
-	u8               m_player;           // player number (0 is player 1)
-	const char *        m_token;            // token used to store settings
-	const char *        m_name;             // user-friendly name
+	u8                  m_player;           // player number (0 is player 1)
+	std::string         m_token;            // token used to store settings
+	std::string         m_name;             // user-friendly name
 	input_seq           m_defseq[SEQ_TYPE_TOTAL];// default input sequence
 	input_seq           m_seq[SEQ_TYPE_TOTAL];// currently configured sequences
 };
@@ -1408,7 +1413,6 @@ public:
 	ioport_group type_group(ioport_type type, int player);
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq);
-	static bool type_is_analog(ioport_type type) { return (type > IPT_ANALOG_FIRST && type < IPT_ANALOG_LAST); }
 	bool type_class_present(ioport_type_class inputclass);
 
 	// other helpers
@@ -1427,6 +1431,7 @@ public:
 
 private:
 	// internal helpers
+	void type_alloc(ioport_type type, ioport_group group, int player);
 	void init_port_types();
 	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
 
