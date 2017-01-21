@@ -9874,8 +9874,8 @@ ROM_END
 /* 0037A */ GAME( 2004, dragntr2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 2 (Rev A) (GDS-0037A)", GAME_FLAGS )
 // 0038
 // 0039  Initial D Arcade Stage Ver. 3 Cycraft Edition (GDS-0039)
-/* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )
-/* 0039B */ GAME( 2006, inidv3cy, naomi2,  naomigd,  naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B) (GDS-0039B)", GAME_FLAGS )
+/* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomi2gd,  naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )
+/* 0039B */ GAME( 2006, inidv3cy, naomi2,  naomi2gd,  naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B) (GDS-0039B)", GAME_FLAGS )
 // 0040
 // 0041  Dragon Treasure 3 (GDS-0041)
 /* 0041A */ GAME( 2005, dragntr3, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Dragon Treasure 3 (Rev A) (GDS-0041A)", GAME_FLAGS )
