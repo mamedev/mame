@@ -252,6 +252,14 @@ WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
 }
 
 
+INPUT_CHANGED_MEMBER( osborne1_state::reset_key )
+{
+	// This key affects NMI
+	if (!m_ub6a_q)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
 DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
@@ -442,10 +450,6 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	// The beeper is gated so it's active four out of every ten scanlines
 	m_beep_state = (ra & 0x04) ? 1 : 0;
 	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
-
-	// Check reset key if necessary - it affects NMI
-	if (!m_ub6a_q)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
 }

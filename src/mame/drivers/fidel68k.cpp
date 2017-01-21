@@ -57,7 +57,7 @@ Hardware info:
 - other special: magnet sensors, external module slot, serial port
 
 IRQ source is a 4,9152MHz quartz crystal (Y3) connected to a 74HC4060 (U8,
-ripple counter/divider). From Q12 output (counter=8192) we obtain the IRQ signal
+ripple counter/divider). From Q13 output (counter=8192) we obtain the IRQ signal
 applied to IPL1 of 68000 (pin 24) 4,9152 MHz / 8192 = 600 Hz.
 
 The module slot pinout is different from SCC series. The data on those appears
@@ -153,8 +153,7 @@ B0000x-xxxxxx: see V7, -800000
 
 ******************************************************************************/
 
-#include "emu.h"
-#include "includes/fidelz80.h"
+#include "includes/fidelbase.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
@@ -165,11 +164,11 @@ B0000x-xxxxxx: see V7, -800000
 #include "fidel_eag_68k.lh" // clickable
 
 
-class fidel68k_state : public fidelz80base_state
+class fidel68k_state : public fidelbase_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag),
+		: fidelbase_state(mconfig, type, tag),
 		m_ram(*this, "ram")
 	{ }
 
@@ -203,7 +202,7 @@ public:
 WRITE8_MEMBER(fidel68k_state::fexcel68k_mux_w)
 {
 	// a1-a3,d0: 74259
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
@@ -222,7 +221,7 @@ void fidel68k_state::eag_prepare_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	uint8_t seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
@@ -258,7 +257,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	uint16_t sel = 1 << (data & 0xf);
+	u16 sel = 1 << (data & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();
@@ -557,11 +556,11 @@ static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
 	MCFG_CPU_PROGRAM_MAP(fexcel68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nf, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
 
 	/* sound hardware */
@@ -576,11 +575,13 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(XTAL_4_9152MHz/0x2000)) // 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_4_9152MHz/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(XTAL_4_9152MHz/0x2000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
 
 	MCFG_RAM_ADD("ram")
@@ -596,7 +597,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -605,7 +606,6 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 
 	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
@@ -615,7 +615,6 @@ static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
@@ -623,7 +622,6 @@ static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
@@ -631,7 +629,10 @@ static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
+
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
+	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
+	MCFG_DEVICE_REMOVE("irq_off")
 MACHINE_CONFIG_END
 
 

@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )

@@ -20,21 +20,22 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
+		, m_strm(plib::pfmt("{1}.log")(this->name()))
+		, m_writer(m_strm)
 		{
-			pstring filename = plib::pfmt("{1}.log")(this->name());
-			m_strm = plib::make_unique<plib::pofilestream>(filename);
 		}
 
 		NETLIB_UPDATEI()
 		{
 			/* use pstring::sprintf, it is a LOT faster */
-			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I())));
+			m_writer.writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I())));
 		}
 
 		NETLIB_RESETI() { }
 	protected:
 		analog_input_t m_I;
-		std::unique_ptr<plib::pofilestream> m_strm;
+		plib::pofilestream m_strm;
+		plib::putf8_writer m_writer;
 	};
 
 	NETLIB_OBJECT_DERIVED(logD, log)
@@ -46,7 +47,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			m_strm->writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I() - m_I2())));
+			m_writer.writeline(plib::pfmt("{1} {2}").e(netlist().time().as_double(),".9").e(static_cast<double>(m_I() - m_I2())));
 		}
 
 		NETLIB_RESETI() { }

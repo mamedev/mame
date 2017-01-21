@@ -501,8 +501,7 @@ public:
 	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void extract_packed_float(uint32_t data, float &first, float &second, float &third);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
+	int read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
@@ -589,7 +588,7 @@ public:
 	uint32_t primitives_total_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	uint32_t vertex_indexes[1024]; // vertex indices sent by the software to the 3d accelerator
 	int vertex_count;
 	unsigned int vertex_first;
 	int vertex_accumulated;

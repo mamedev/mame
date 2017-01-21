@@ -12,6 +12,15 @@
 #include "emu.h"
 #include "includes/flstory.h"
 
+READ8_MEMBER(flstory_state::flstory_mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
 WRITE8_MEMBER(flstory_state::onna34ro_mcu_w)
 {
 	uint16_t score_adr = m_workram[0x29e] * 0x100 + m_workram[0x29d];

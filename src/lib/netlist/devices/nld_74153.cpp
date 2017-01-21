@@ -119,15 +119,15 @@ namespace netlist
 	NETLIB_UPDATE(74153)
 	{
 		m_sub.m_chan = (m_A() | (m_B()<<1));
-		m_sub.do_update();
+		m_sub.update_dev();
 	}
 
 
 	NETLIB_UPDATE(74153_dip)
 	{
 		m_2.m_chan = m_1.m_chan = (m_A() | (m_B()<<1));
-		m_1.do_update();
-		m_2.do_update();
+		m_1.update_dev();
+		m_2.update_dev();
 	}
 
 	NETLIB_DEVICE_IMPL(74153)

@@ -14,15 +14,17 @@
 #include "cpu/cop400/cop400.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+//#include "rendlay.h"
 
 // internal artwork
 #include "bship82.lh" // clickable
 #include "ctstein.lh" // clickable
-#include "einvaderc.lh" // test-layout(but still playable)
+#include "einvaderc.lh"
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
 #include "lightfgt.lh" // clickable
+#include "mdallas.lh"
 #include "qkracer.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
@@ -42,33 +44,33 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<5> m_inp_matrix; // max 5
+	optional_ioport_array<6> m_inp_matrix; // max 6
 
 	// misc common
-	uint8_t m_l;                          // MCU port L write data
-	uint8_t m_g;                          // MCU port G write data
-	uint8_t m_d;                          // MCU port D write data
-	int m_so;                             // MCU SO line state
-	int m_sk;                             // MCU SK line state
-	uint16_t m_inp_mux;                   // multiplexed inputs mask
+	u8 m_l;                         // MCU port L write data
+	u8 m_g;                         // MCU port G write data
+	u8 m_d;                         // MCU port D write data
+	int m_so;                       // MCU SO line state
+	int m_sk;                       // MCU SK line state
+	u16 m_inp_mux;                  // multiplexed inputs mask
 
-	uint16_t read_inputs(int columns);
+	u16 read_inputs(int columns);
 
 	// display common
-	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                   // display matrix number of rows
-	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
+	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 
-	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	uint32_t m_display_cache[0x20];       // (internal use)
-	uint8_t m_display_decay[0x20][0x20];  // (internal use)
+	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u32 m_display_cache[0x20];      // (internal use)
+	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(uint32_t digits, uint32_t mask);
-	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -128,7 +130,7 @@ void hh_cop400_state::machine_reset()
 
 void hh_cop400_state::display_update()
 {
-	uint32_t active_state[0x20];
+	u32 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -141,7 +143,7 @@ void hh_cop400_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -196,7 +198,7 @@ void hh_cop400_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_cop400_state::set_display_segmask(uint32_t digits, uint32_t mask)
+void hh_cop400_state::set_display_segmask(u32 digits, u32 mask)
 {
 	// set a segment mask per selected digit, but leave unselected ones alone
 	for (int i = 0; i < 0x20; i++)
@@ -207,12 +209,12 @@ void hh_cop400_state::set_display_segmask(uint32_t digits, uint32_t mask)
 	}
 }
 
-void hh_cop400_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
+void hh_cop400_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	uint32_t mask = (1 << maxx) - 1;
+	u32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -223,10 +225,10 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t
 
 // generic input handlers
 
-uint16_t hh_cop400_state::read_inputs(int columns)
+u16 hh_cop400_state::read_inputs(int columns)
 {
 	// active low
-	uint16_t ret = 0xffff;
+	u16 ret = 0xffff;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -313,7 +315,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
@@ -379,8 +381,8 @@ WRITE8_MEMBER(h2hbaskb_state::write_g)
 WRITE8_MEMBER(h2hbaskb_state::write_l)
 {
 	// D2,D3 double as multiplexer
-	uint16_t mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
-	uint16_t sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
+	u16 mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
+	u16 sel = (m_g | m_d << 4 | m_g << 8 | m_d << 12) & mask;
 
 	// D2+G0,G1 are 7segs
 	set_display_segmask(3, 0x7f);
@@ -437,7 +439,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pf
+	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
@@ -468,8 +470,6 @@ MACHINE_CONFIG_END
   The first version was on TMS1100 (see hh_tms1k.c), this is the reprogrammed
   second release with a gray case instead of black.
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class einvaderc_state : public hh_cop400_state
@@ -498,8 +498,8 @@ void einvaderc_state::prepare_display()
 	set_display_segmask(7, 0x7f);
 
 	// update display
-	uint8_t l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
-	uint16_t grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
+	u8 l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
+	u16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
 	display_matrix(8, 10, l, grid);
 }
 
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP444L, 900000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -564,6 +564,11 @@ static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(einvaderc_state, write_so))
 	MCFG_COP400_WRITE_L_CB(WRITE8(einvaderc_state, write_l))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(913, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
 
@@ -668,7 +673,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pf
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
@@ -769,8 +774,8 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
 	MCFG_COP400_READ_L_TRISTATE_CB(READ8(funrlgl_state, read_l_tristate))
@@ -779,6 +784,146 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Dalla$ (J.R. handheld)
+  * COP444 MCU label COP444L-HYN/N
+  * 8-digit 7seg display, 1-bit sound
+  
+  This is a board game, only the handheld device is emulated here.
+
+***************************************************************************/
+
+class mdallas_state : public hh_cop400_state
+{
+public:
+	mdallas_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag),
+		m_dac(*this, "dac")
+	{ }
+
+	required_device<dac_bit_interface> m_dac;
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_READ8_MEMBER(read_in);
+};
+
+// handlers
+
+void mdallas_state::prepare_display()
+{
+	set_display_segmask(0xff, 0xff);
+	display_matrix(8, 8, m_l, ~(m_d << 4 | m_g));
+}
+
+WRITE8_MEMBER(mdallas_state::write_l)
+{
+	// L: digit segment data
+	m_l = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(mdallas_state::write_d)
+{
+	// D: select digit, input mux high
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 3);
+	m_d = data & 0xf;
+	prepare_display();
+}
+
+WRITE8_MEMBER(mdallas_state::write_g)
+{
+	// G: select digit, input mux low
+	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
+	m_g = data & 0xf;
+	prepare_display();
+}
+
+READ8_MEMBER(mdallas_state::read_in)
+{
+	// IN: multiplexed inputs
+	return read_inputs(6) & 0xf;
+}
+
+
+// config
+
+/* physical button layout and labels is like this:
+
+    <  ON>  [YES]   [NO]   [NEXT]
+    [W]     [N]     [S]    [E]
+    [7]     [8]     [9]    [STATUS]
+    [4]     [5]     [6]    [ASSETS]
+    [1]     [2]     [3]    [START]
+    [CLEAR] [0]     [MOVE] [ENTER]
+*/
+
+static INPUT_PORTS_START( mdallas )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Move")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Start")
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Assets")
+
+	PORT_START("IN.3") // G3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Status")
+
+	PORT_START("IN.4") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("West") // W
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Next")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("East") // E
+
+	PORT_START("IN.5") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("No")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Yes")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("South") // S
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mdallas, mdallas_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
+	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(mdallas_state, write_g))
+	MCFG_COP400_READ_IN_CB(READ8(mdallas_state, read_in))
+	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mdallas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -841,7 +986,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( plus1, plus1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
@@ -898,7 +1043,7 @@ public:
 
 void lightfgt_state::prepare_display()
 {
-	uint8_t grid = (m_so | m_d << 1) ^ 0x1f;
+	u8 grid = (m_so | m_d << 1) ^ 0x1f;
 	display_matrix(5, 5, m_l, grid);
 }
 
@@ -969,7 +1114,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pf
+	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
@@ -1124,7 +1269,7 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 static MACHINE_CONFIG_START( bship82, bship82_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
 	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write)) // G: 4-bit signed DAC
@@ -1256,7 +1401,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( qkracer, qkracer_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(qkracer_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(qkracer_state, write_g))
@@ -1295,6 +1440,9 @@ ROM_END
 ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
+
+	ROM_REGION( 80636, "svg", 0)
+	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) ) // by hap, ver. 18 jan 2017
 ROM_END
 
 
@@ -1307,6 +1455,12 @@ ROM_END
 ROM_START( funrlgl )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "cop410l_b_nhz", 0x0000, 0x0200, CRC(4065c3ce) SHA1(f0bc8125d922949e0d7ab1ba89c805a836d20e09) )
+ROM_END
+
+
+ROM_START( mdallas )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "copl444l-hyn_n", 0x0000, 0x0800, CRC(7848b78c) SHA1(778d24512180892f58c49df3c72ca77b2618d63b) )
 ROM_END
 
 
@@ -1340,10 +1494,11 @@ CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Cas
 
 CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball/Hockey/Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   driver_device, 0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -18,7 +18,7 @@
  *        define a model param on core device
  */
 /* Format: external name,netlist device,model */
-static const char *s_lib_map =
+static const pstring s_lib_map =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
 "SN74ALS08D,  TTL_7408_DIP,  74ALSXX\n"
@@ -44,9 +44,10 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 static lib_map_t read_lib_map(const pstring lm)
 {
 	plib::pistringstream istrm(lm);
+	plib::putf8_reader reader(istrm);
 	lib_map_t m;
 	pstring line;
-	while (istrm.readline(line))
+	while (reader.readline(line))
 	{
 		plib::pstring_vector_t split(line, ",");
 		m[split[0].trim()] = { split[1].trim(), split[2].trim() };
@@ -185,21 +186,21 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 {
 	{
 		int i = 0;
-		while (m_units[i].m_unit != "-" )
+		while (pstring(m_units[i].m_unit, pstring::UTF8) != "-" )
 		{
 			if (m_units[i].m_mult <= std::abs(val))
 				break;
 			i++;
 		}
-		return plib::pfmt(m_units[i].m_func.c_str())(val / m_units[i].m_mult);
+		return plib::pfmt(pstring(m_units[i].m_func, pstring::UTF8))(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
 {
 	int i = 0;
-	while (m_units[i].m_unit != "-")
+	while (pstring(m_units[i].m_unit, pstring::UTF8) != "-")
 	{
-		if (m_units[i].m_unit == unit)
+		if (pstring(m_units[i].m_unit, pstring::UTF8) == unit)
 			return m_units[i].m_mult;
 		i++;
 	}
@@ -401,19 +402,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
     Eagle converter
 -------------------------------------------------*/
 
-nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm)
+nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &strm)
 	: plib::ptokenizer(strm)
 	, m_convert(convert)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("/*", "*/", "//");
 	set_string_char('\'');
@@ -435,7 +430,8 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg, int line_num, con
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 	plib::pistringstream istrm(contents);
-	tokenizer tok(*this, istrm);
+	plib::putf8_reader reader(istrm);
+	tokenizer tok(*this, reader);
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");
@@ -543,19 +539,13 @@ void nl_convert_eagle_t::convert(const pstring &contents)
     RINF converter
 -------------------------------------------------*/
 
-nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::pistream &strm)
+nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &strm)
 	: plib::ptokenizer(strm)
 	, m_convert(convert)
 {
 	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
 	set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("","","//"); // FIXME:needs to be confirmed
 	set_string_char('"');
@@ -589,7 +579,8 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg, int line_num, cons
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
 	plib::pistringstream istrm(contents);
-	tokenizer tok(*this, istrm);
+	plib::putf8_reader reader(istrm);
+	tokenizer tok(*this, reader);
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");

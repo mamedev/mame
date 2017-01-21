@@ -1,0 +1,107 @@
+<mamelayout version="2">
+	<element name="sysled" defstate="0">
+		<disk state="1">
+			<color red="0.55" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="l1">
+		<text string="A">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l2">
+		<text string="B">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l3">
+		<text string="C">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l4">
+		<text string="D">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l5">
+		<text string="E">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l6">
+		<text string="F">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l7">
+		<text string="G">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="l8">
+		<text string="H">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
+
+		<bezel name="led1" element="sysled">
+			<bounds x="15" y="76" width="10" height="10" />
+		</bezel>
+		<bezel name="led2" element="sysled">
+			<bounds x="15" y="96" width="10" height="10" />
+		</bezel>
+		<bezel name="led3" element="sysled">
+			<bounds x="15" y="116" width="10" height="10" />
+		</bezel>
+		<bezel name="led4" element="sysled">
+			<bounds x="15" y="136" width="10" height="10" />
+		</bezel>
+		<bezel name="led5" element="sysled">
+			<bounds x="15" y="156" width="10" height="10" />
+		</bezel>
+		<bezel name="led6" element="sysled">
+			<bounds x="15" y="176" width="10" height="10" />
+		</bezel>
+		<bezel name="led7" element="sysled">
+			<bounds x="15" y="196" width="10" height="10" />
+		</bezel>
+		<bezel name="led8" element="sysled">
+			<bounds x="15" y="216" width="10" height="10" />
+		</bezel>
+
+		<bezel name="label1" element="l1">
+			<bounds x="0" y="73" width="15" height="16" />
+		</bezel>
+		<bezel name="label2" element="l2">
+			<bounds x="0" y="93" width="15" height="16" />
+		</bezel>
+		<bezel name="label3" element="l3">
+			<bounds x="0" y="113" width="15" height="16" />
+		</bezel>
+		<bezel name="label4" element="l4">
+			<bounds x="0" y="133" width="15" height="16" />
+		</bezel>
+		<bezel name="label5" element="l5">
+			<bounds x="0" y="153" width="15" height="16" />
+		</bezel>
+		<bezel name="label6" element="l6">
+			<bounds x="0" y="173" width="15" height="16" />
+		</bezel>
+		<bezel name="label7" element="l7">
+			<bounds x="0" y="193" width="15" height="16" />
+		</bezel>
+		<bezel name="label8" element="l8">
+			<bounds x="0" y="213" width="15" height="16" />
+		</bezel>
+	</view>
+</mamelayout>

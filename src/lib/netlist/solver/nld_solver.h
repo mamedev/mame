@@ -20,10 +20,13 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
+#ifndef NL_AUTO_DEVICES
+
 #define SOLVER(name, freq)                                                 \
 		NET_REGISTER_DEV(SOLVER, name)                                      \
 		PARAM(name.FREQ, freq)
 
+#endif
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
@@ -42,38 +45,37 @@ NETLIB_OBJECT(solver)
 	NETLIB_CONSTRUCTOR(solver)
 	, m_fb_step(*this, "FB_step")
 	, m_Q_step(*this, "Q_step")
-	, m_sync_delay(*this, "SYNC_DELAY", NLTIME_FROM_NS(10).as_double())
 	, m_freq(*this, "FREQ", 48000.0)
 
 	/* iteration parameters */
-	, m_sor(*this, "SOR_FACTOR", 1.059)
-	, m_iterative_solver(*this, "ITERATIVE", "SOR")
+	, m_gs_sor(*this, "SOR_FACTOR", 1.059)
+	, m_method(*this, "METHOD", "MAT_CR")
 	, m_accuracy(*this, "ACCURACY", 1e-7)
-	, m_gs_threshold(*this, "GS_THRESHOLD", 6)      // below this value, gaussian elimination is used
 	, m_gs_loops(*this, "GS_LOOPS",9)              // Gauss-Seidel loops
 
 	/* general parameters */
 	, m_gmin(*this, "GMIN", NETLIST_GMIN_DEFAULT)
 	, m_pivot(*this, "PIVOT", 0)                    // use pivoting - on supported solvers
 	, m_nr_loops(*this, "NR_LOOPS", 250)            // Newton-Raphson loops
+	, m_nr_recalc_delay(*this, "NR_RECALC_DELAY", NLTIME_FROM_NS(10).as_double()) // Delay to next solve attempt if nr loops exceeded
 	, m_parallel(*this, "PARALLEL", 0)
 
 	/* automatic time step */
-	, m_dynamic(*this, "DYNAMIC_TS", 0)
-	, m_lte(*this, "DYNAMIC_LTE", 5e-5)                     // diff/timestep
-	, m_min_timestep(*this, "MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
+	, m_dynamic_ts(*this, "DYNAMIC_TS", 0)
+	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
+	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution
 	{
 		// internal staff
 
-		connect_late(m_fb_step, m_Q_step);
+		connect(m_fb_step, m_Q_step);
 	}
 
 	virtual ~NETLIB_NAME(solver)();
 
 	void post_start();
-	void stop() override;
+	void stop();
 
 	inline nl_double gmin() { return m_gmin(); }
 
@@ -87,21 +89,19 @@ protected:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
-	param_double_t m_sync_delay;
 	param_double_t m_freq;
-	param_double_t m_sor;
-	param_str_t m_iterative_solver;
+	param_double_t m_gs_sor;
+	param_str_t m_method;
 	param_double_t m_accuracy;
-	param_int_t m_gs_threshold;
 	param_int_t m_gs_loops;
 	param_double_t m_gmin;
 	param_logic_t  m_pivot;
 	param_int_t m_nr_loops;
+	param_double_t m_nr_recalc_delay;
 	param_int_t m_parallel;
-	param_logic_t  m_dynamic;
-	param_double_t m_lte;
-	param_double_t m_min_timestep;
-
+	param_logic_t  m_dynamic_ts;
+	param_double_t m_dynamic_lte;
+	param_double_t m_dynamic_min_ts;
 
 	param_logic_t  m_log_stats;
 

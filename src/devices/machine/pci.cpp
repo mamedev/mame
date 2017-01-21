@@ -23,6 +23,8 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 	AM_RANGE(0x2c, 0x2f) AM_WRITENOP
 	AM_RANGE(0x30, 0x33) AM_READWRITE  (expansion_base_r,    expansion_base_w)
 	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                                 0x000000ff)
+	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(interrupt_line_r,     interrupt_line_w,    0x000000ff)
+	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(interrupt_pin_r,      interrupt_pin_w,     0x0000ff00)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, pci_bridge_device)
@@ -67,6 +69,8 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	pclass = 0xffffff;
 	subsystem_id = 0xffffffff;
 	is_multifunction_device = false;
+	intr_pin = 0x0;
+	intr_line = 0xff;
 }
 
 void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
@@ -243,6 +247,30 @@ WRITE32_MEMBER(pci_device::expansion_base_w)
 READ8_MEMBER(pci_device::capptr_r)
 {
 	return 0x00;
+}
+
+READ8_MEMBER(pci_device::interrupt_line_r)
+{
+	logerror("interrupt_line_r = %02x\n", intr_line);
+	return intr_line;
+}
+
+WRITE8_MEMBER(pci_device::interrupt_line_w)
+{
+	COMBINE_DATA(&intr_line);
+	logerror("interrupt_line_w %02x\n", data);
+}
+
+READ8_MEMBER(pci_device::interrupt_pin_r)
+{
+	logerror("interrupt_pin_r = %02x\n", intr_pin);
+	return intr_pin;
+}
+
+WRITE8_MEMBER(pci_device::interrupt_pin_w)
+{
+	COMBINE_DATA(&intr_pin);
+	logerror("interrupt_pin_w = %02x\n", data);
 }
 
 void pci_device::set_remap_cb(mapper_cb _remap_cb)
@@ -747,28 +775,6 @@ WRITE16_MEMBER(pci_bridge_device::iolimitu_w)
 {
 	COMBINE_DATA(&iolimitu);
 	logerror("iolimitu_w %04x\n", iolimitu);
-}
-
-READ8_MEMBER  (pci_bridge_device::interrupt_line_r)
-{
-	logerror("interrupt_line_r\n");
-	return 0xff;
-}
-
-WRITE8_MEMBER (pci_bridge_device::interrupt_line_w)
-{
-	logerror("interrupt_line_w %02x\n", data);
-}
-
-READ8_MEMBER  (pci_bridge_device::interrupt_pin_r)
-{
-	logerror("interrupt_pin_r\n");
-	return 0xff;
-}
-
-WRITE8_MEMBER (pci_bridge_device::interrupt_pin_w)
-{
-	logerror("interrupt_pin_w %02x\n", data);
 }
 
 READ16_MEMBER (pci_bridge_device::bridge_control_r)

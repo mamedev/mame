@@ -24,7 +24,6 @@ public:
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
 
-	DECLARE_MACHINE_RESET(dc_console);
 	DECLARE_READ64_MEMBER(dc_pdtra_r);
 	DECLARE_WRITE64_MEMBER(dc_pdtra_w);
 	DECLARE_READ64_MEMBER(dc_arm_r);

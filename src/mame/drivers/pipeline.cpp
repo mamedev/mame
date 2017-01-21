@@ -66,46 +66,34 @@ Stephh's notes (based on the games Z80 code and some tests) :
 */
 
 #include "emu.h"
+
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "sound/2203intf.h"
-#include "machine/i8255.h"
 #include "cpu/z80/z80daisy.h"
-#include "cpu/m6805/m6805.h"
+
+#include "machine/i8255.h"
+#include "machine/z80ctc.h"
+
+#include "sound/2203intf.h"
 
 
 class pipeline_state : public driver_device
 {
 public:
 	pipeline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_vram1(*this, "vram1"),
-		m_vram2(*this, "vram2") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	required_shared_ptr<uint8_t> m_vram1;
-	required_shared_ptr<uint8_t> m_vram2;
-
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
-
-	uint8_t m_vidctrl;
-	std::unique_ptr<uint8_t[]> m_palram;
-	uint8_t m_toMCU;
-	uint8_t m_fromMCU;
-	uint8_t m_ddrA;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_vram1(*this, "vram1")
+		, m_vram2(*this, "vram2")
+		{
+		}
 
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
-	DECLARE_READ8_MEMBER(mcu_portA_r);
-	DECLARE_WRITE8_MEMBER(mcu_ddrA_w);
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
@@ -117,17 +105,31 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pipeline);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+
+protected:
+	required_device<cpu_device>			m_maincpu;
+	required_device<m68705r_device>		m_mcu;
+	required_device<gfxdecode_device>	m_gfxdecode;
+	required_device<palette_device>		m_palette;
+
+	required_shared_ptr<u8>	m_vram1;
+	required_shared_ptr<u8>	m_vram2;
+
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
+
+	u8						m_vidctrl;
+	std::unique_ptr<u8[]>	m_palram;
+	u8						m_fromMCU;
 };
 
 
 void pipeline_state::machine_start()
 {
-	save_item(NAME(m_toMCU));
 	save_item(NAME(m_fromMCU));
-	save_item(NAME(m_ddrA));
 }
 
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
@@ -151,7 +153,7 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 
 void pipeline_state::video_start()
 {
-	m_palram=std::make_unique<uint8_t[]>(0x1000);
+	m_palram=std::make_unique<u8[]>(0x1000);
 	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2->set_transparent_pen(0);
@@ -160,7 +162,7 @@ void pipeline_state::video_start()
 	save_pointer(NAME(m_palram.get()), 0x1000);
 }
 
-uint32_t pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap1->draw(screen, bitmap, cliprect, 0,0);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0,0);
@@ -204,7 +206,7 @@ READ8_MEMBER(pipeline_state::protection_r)
 
 TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 {
-	m_toMCU = param;
+	m_mcu->pa_w(m_mcu->space(AS_PROGRAM), 0, param);
 }
 
 WRITE8_MEMBER(pipeline_state::protection_w)
@@ -241,23 +243,6 @@ WRITE8_MEMBER(pipeline_state::mcu_portA_w)
 	m_fromMCU=data;
 }
 
-READ8_MEMBER(pipeline_state::mcu_portA_r)
-{
-	return (m_fromMCU&m_ddrA)|(m_toMCU& ~m_ddrA);
-}
-
-WRITE8_MEMBER(pipeline_state::mcu_ddrA_w)
-{
-	m_ddrA=data;
-}
-
-static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, pipeline_state )
-	AM_RANGE(0x0000, 0x0000) AM_READ(mcu_portA_r) AM_WRITE(mcu_portA_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(mcu_ddrA_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( pipeline )
@@ -266,7 +251,7 @@ static INPUT_PORTS_START( pipeline )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -345,10 +330,10 @@ static const z80_daisy_config daisy_chain_sound[] =
 PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 {
 	int r,g,b,i,c;
-	uint8_t *prom1 = &memregion("proms")->base()[0x000];
-	uint8_t *prom2 = &memregion("proms")->base()[0x100];
+	u8 *prom1 = &memregion("proms")->base()[0x000];
+	u8 *prom2 = &memregion("proms")->base()[0x100];
 
-	for(i=0;i<0x100;i++)
+	for (i=0;i<0x100;i++)
 	{
 		c=prom1[i]|(prom2[i]<<4);
 		r=c&7;
@@ -366,15 +351,15 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 7372800/2)
 	MCFG_CPU_PROGRAM_MAP(cpu0_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipeline_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipeline_state, nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(cpu1_mem)
 	MCFG_CPU_IO_MAP(sound_port)
 
-	MCFG_CPU_ADD("mcu", M68705, 7372800/2)
-	MCFG_CPU_PROGRAM_MAP(mcu_mem)
+	MCFG_CPU_ADD("mcu", M68705R3, 7372800/2)
+	MCFG_M68705_PORTA_W_CB(WRITE8(pipeline_state, mcu_portA_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 7372800/2 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

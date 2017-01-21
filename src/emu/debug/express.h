@@ -116,13 +116,14 @@ protected:
 	};
 
 	// construction/destruction
-	symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref);
+	symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref);
 public:
 	virtual ~symbol_entry();
 
 	// getters
 	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
+	const std::string &format() const { return m_format; }
 
 	// type checking
 	bool is_function() const { return (m_type == SMT_FUNCTION); }
@@ -138,6 +139,7 @@ protected:
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
 	std::string     m_name;                     // name of the symbol
+	std::string		m_format;					// format of symbol (or empty if unspecified)
 	void *          m_ref;                      // internal reference
 };
 
@@ -181,7 +183,7 @@ public:
 	// symbol access
 	void add(const char *name, read_write rw, u64 *ptr = nullptr);
 	void add(const char *name, u64 constvalue);
-	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
+	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);

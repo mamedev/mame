@@ -8,7 +8,7 @@
 
 
 // TODO:
-//  * Automatic scrolling for console and log views
+//  * Automatic scrolling for console view
 //  * Keyboard shortcuts in error log and device windows
 //  * Don't accept keyboard input while the game is running
 //  * Interior focus rings - standard/exterior focus rings look really ugly here

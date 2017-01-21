@@ -211,6 +211,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/apd_dsk.h,FORMATS["APD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["APD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/apd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/apd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/apf_apt.h,FORMATS["APF_APT"] = true
 --------------------------------------------------
 

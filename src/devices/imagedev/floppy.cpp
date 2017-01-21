@@ -110,6 +110,13 @@ const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
 // ALPS 5.25" drives
 const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
 
+// IBM 8" drives
+const device_type IBM_6360 = &device_creator<ibm_6360>;
+
+
+template class device_finder<floppy_connector, false>;
+template class device_finder<floppy_connector, true>;
+
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -177,6 +184,8 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		sides(0),
 		form_factor(0),
 		motor_always_on(false),
+		dskchg_writable(false),
+		has_trk00_sensor(true),
 		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
@@ -311,6 +320,8 @@ void floppy_image_device::device_start()
 {
 	rpm = 0;
 	motor_always_on = false;
+	dskchg_writable = false;
+	has_trk00_sensor = true;
 
 	idx = 0;
 
@@ -446,6 +457,9 @@ image_init_result floppy_image_device::call_load()
 		mon_w(0);
 	} else if(!mon)
 		ready_counter = 2;
+
+	if (dskchg_writable)
+		dskchg = 1;
 
 	return image_init_result::PASS;
 }
@@ -629,7 +643,9 @@ bool floppy_image_device::twosid_r()
 void floppy_image_device::stp_w(int state)
 {
 	// Before spin-up is done, ignore step pulses
-	if (ready_counter > 0) return;
+	// TODO: There are reports about drives supporting step operation with
+	// stopped spindle. Need to check that on real drives.
+	// if (ready_counter > 0) return;
 
 	if ( stp != state ) {
 		stp = state;
@@ -648,7 +664,7 @@ void floppy_image_device::stp_w(int state)
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
 			}
 			/* Update disk detection if applicable */
-			if (exists())
+			if (exists() && !dskchg_writable)
 			{
 				if (dskchg==0) dskchg = 1;
 			}
@@ -693,7 +709,7 @@ void floppy_image_device::seek_phase_w(int phases)
 		logerror("%s: track %d.%d\n", tag(), cyl, subcyl);
 
 	/* Update disk detection if applicable */
-	if (exists())
+	if (exists() && !dskchg_writable)
 		if (dskchg==0)
 			dskchg = 1;
 }
@@ -752,8 +768,14 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
+	if(!image || mon)
+		return attotime::never;
+
 	// If the drive is still spinning up, pretend that no transitions will come
-	if(!image || mon || ready_counter > 0)
+	// TODO: Implement a proper spin-up ramp for transition times, also in order
+	// to cover potential copy protection measures that have direct device
+	// access (mz)
+	if (ready_counter > 0)
 		return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
@@ -2037,6 +2059,7 @@ void sony_oa_d31v::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 70;
 	sides = 1;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
@@ -2072,6 +2095,7 @@ void sony_oa_d32w::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 80;
 	sides = 2;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
@@ -2108,6 +2132,7 @@ void sony_oa_d32v::setup_characteristics()
 	form_factor = floppy_image::FF_35;
 	tracks = 80;
 	sides = 1;
+	dskchg_writable = true;
 	set_rpm(600);
 }
 
@@ -2258,3 +2283,33 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
+
+//-------------------------------------------------
+//  IBM 6360 -- 8" single-sided single density
+//-------------------------------------------------
+
+ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+{
+}
+
+ibm_6360::~ibm_6360()
+{
+}
+
+void ibm_6360::setup_characteristics()
+{
+	form_factor = floppy_image::FF_8;
+	tracks = 77;
+	sides = 1;
+	motor_always_on = true;
+	has_trk00_sensor = false;
+	set_rpm(360);
+}
+
+void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+}
+

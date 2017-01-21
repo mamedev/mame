@@ -430,6 +430,12 @@ void z80ctc_device::ctc_channel::write(uint8_t data)
 	// this must be a control word
 	else if ((data & CONTROL) == CONTROL_WORD)
 	{
+		// (mode change without reset?)
+		if ((m_mode & MODE) == MODE_TIMER && (data & MODE) == MODE_COUNTER && (data & RESET) == 0)
+		{
+			m_timer->adjust(attotime::never);
+		}
+
 		// set the new mode
 		m_mode = data;
 		VPRINTF_CHANNEL(("CTC ch.%d mode = %02x\n", m_index, data));

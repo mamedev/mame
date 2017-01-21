@@ -98,6 +98,7 @@ private:
 	void execute_printf(int ref, int params, const char **param);
 	void execute_logerror(int ref, int params, const char **param);
 	void execute_tracelog(int ref, int params, const char **param);
+	void execute_tracesym(int ref, int params, const char **param);
 	void execute_quit(int ref, int params, const char **param);
 	void execute_do(int ref, int params, const char **param);
 	void execute_step(int ref, int params, const char **param);

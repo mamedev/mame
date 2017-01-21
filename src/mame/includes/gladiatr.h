@@ -83,8 +83,6 @@ public:
 		, m_in2(*this, "IN2")
 		, m_coins(*this, "COINS")
 		, m_tclk_val(false)
-		, m_in0_val(0xff)
-		, m_in1_val(0xff)
 		, m_cctl_p1(0xff)
 		, m_cctl_p2(0xff)
 		, m_ucpu_p1(0xff)
@@ -123,6 +121,11 @@ public:
 	DECLARE_WRITE8_MEMBER(csnd_p1_w);
 	DECLARE_READ8_MEMBER(csnd_p2_r);
 
+	DECLARE_INPUT_CHANGED_MEMBER(p1_s1);
+	DECLARE_INPUT_CHANGED_MEMBER(p1_s2);
+	DECLARE_INPUT_CHANGED_MEMBER(p2_s1);
+	DECLARE_INPUT_CHANGED_MEMBER(p2_s2);
+
 	DECLARE_DRIVER_INIT(gladiatr);
 
 	DECLARE_MACHINE_RESET(gladiator);
@@ -137,7 +140,6 @@ private:
 	required_ioport m_coins;
 
 	bool    m_tclk_val;
-	u8      m_in0_val, m_in1_val;
 	u8      m_cctl_p1, m_cctl_p2;
 	u8      m_ucpu_p1, m_csnd_p1;
 

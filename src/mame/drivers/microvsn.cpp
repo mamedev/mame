@@ -481,7 +481,7 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 }
 
 
-static const uint16_t microvision_output_pla_0[0x20] =
+static const u16 microvision_output_pla_0[0x20] =
 {
 	/* O output PLA configuration currently unknown */
 	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
@@ -491,7 +491,7 @@ static const uint16_t microvision_output_pla_0[0x20] =
 };
 
 
-static const uint16_t microvision_output_pla_1[0x20] =
+static const u16 microvision_output_pla_1[0x20] =
 {
 	/* O output PLA configuration currently unknown */
 	/* Reversed bit order */
