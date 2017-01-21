@@ -4465,6 +4465,7 @@ public:
 	{ }
 
 	required_device<hlcd0569_device> m_lcd;
+
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
