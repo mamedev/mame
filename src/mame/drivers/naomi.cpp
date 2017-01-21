@@ -23,7 +23,6 @@
 Sega Naomi is Dreamcast based Arcade hardware.
 
 Compatibility list (as per 26-jun-2013)
-- sfz3ugd: currently dies at disclaimer screen (regression);
 - sprtjam: garbage on initial attract mode screen (regression).
 - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
 - vtennisg: crashes after stage screen.
@@ -43,7 +42,6 @@ Compatibility list (as per 26-jun-2013)
 0C046608: NOP
 
 (24-jun-2016)
-- shangril: swapped mahjong inputs (M -> N, C -> B etc.)
 
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
@@ -83,11 +81,15 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - Monkey Ball: asserts when attempts to load the gameplay;
+	- marstv: locks up during anchor talking (does same in Demul);
+	- marstv: missing graphics at stage select, renderer fault or something else?
+    - Monkey Ball: asserts when attempts to load a stage;
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
     - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
     - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
+	- sfz3ugd: currently dies at disclaimer screen (regression);
+	- shangril: swapped mahjong inputs (M -> N, C -> B etc.);
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
     - Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
