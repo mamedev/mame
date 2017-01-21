@@ -52,6 +52,9 @@
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
     "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
+    * bit 28 (mode bit 0)
+	"M2" type carts: ROM_OFFSET - master/slave ROM board select
+
     * bit 0 can be set for "M4" type carts, function unknown
 
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
