@@ -2921,6 +2921,19 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="mitsmous">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Mitsumi Mouse Driver</description>
+		<year>1994</year>
+		<publisher>Mitsumi</publisher>
+		<info name="version" value="7.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="mouse disk1.img" size="1474560" crc="df5ebedd" sha1="1e66014840879965547804943842a1428dd588ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="neccd110">
 		<description>NEC Atapi-IDE CD-Rom Driver (Rev D011V110.ENG019)</description>
 		<year>1995</year>
@@ -3420,6 +3433,38 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="desk3hd">
+		<description>DeskMate (3.05, 3.5" 1.44MB)</description>
+		<year>1990</year>
+		<publisher>Tandy</publisher>
+		<info name="version" value="03.05.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="deskmte1.dsk" size="1474560" crc="c85598c1" sha1="605ca187208932b29da5357a339737db47827fa4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="deskmte2.dsk" size="1474560" crc="9d14fc5c" sha1="5e0d3ac6e1ae422cf87b958b35c83b7f25887f59" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="deskmte3.dsk" size="1474560" crc="0cbe386b" sha1="fa695147fea64d5ba3a6f785538c043e961f9cbd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="deskmte4.dsk" size="1474560" crc="200dc9a3" sha1="dabc84e8507b7de442f7089a1c8e8f4061bd1be6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="deskmte5.dsk" size="1474560" crc="c2ed638a" sha1="82b897d4a10c8897c2a467152a14d739b10aeb1f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos7d">
 		<description>PC DOS 7 (Demonstration)</description>
 		<year>1994</year>
@@ -3440,6 +3485,47 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="mkorig disk1.img" size="1474560" crc="c1a77a4e" sha1="80eac5d9774514eb6798ddc25f22328b55c76ed5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moneynet">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Reuters Money Network</description>
+		<year>1994</year>
+		<publisher>Reuters</publisher>
+		<info name="version" value="2.0R3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk1.img" size="1474560" crc="c9422588" sha1="ded7282d49e32b21de24c9c64de1a1450ba84de7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk2.img" size="1474560" crc="8941e8e1" sha1="50dfc034d9a6ffd7626d58efb292f0ab0535fb09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk3.img" size="1474560" crc="dcfc9b90" sha1="3968bdc94bf594d00fd966a531cf919380fd7aae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodigy">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Prodigy Service</description>
+		<year>1994</year>
+		<publisher>Prodigy</publisher>
+		<info name="version" value="9.18" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodigy disk1.img" size="1474560" crc="81c34e95" sha1="9ce2a7b88e4da7f9ac1196c05aa772c398355766" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodigy disk2.img" size="1474560" crc="99c0c50a" sha1="6842d1cd7c3c6f94a04cd104e79e1a0ebde8d8b4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4147,6 +4233,24 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="boppin">
+		<description>Boppin' (Super Ultimate, v1.1)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Accursed Toys" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 1).img" size="1474560" crc="cd253923" sha1="f51aa14b960bf1517ccac19c4f8d379744d32a3d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chipdale">
 		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
 		<year>1990</year>
@@ -4163,6 +4267,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8" offset="0"/>
@@ -4175,6 +4280,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96" offset="0"/>
@@ -4192,6 +4298,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c" offset="0"/>
@@ -4204,6 +4311,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0" offset="0"/>
@@ -4217,6 +4325,7 @@ Missing files come here
 		<year>1991</year>
 		<publisher>FormGen</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.5" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726" offset="0"/>
@@ -4241,6 +4350,7 @@ Missing files come here
 		<year>1991</year>
 		<publisher>FormGen</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk1.img" size="737280" crc="841adabf" sha1="8253cd16647975ee2675adffd81c79a31946f080" offset="0" />
@@ -4263,6 +4373,7 @@ Missing files come here
 		<year>1991</year>
 		<publisher>FormGen</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332" offset="0"/>
@@ -4280,6 +4391,7 @@ Missing files come here
 		<year>1991</year>
 		<publisher>FormGen</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3" offset="0"/>
@@ -4302,6 +4414,7 @@ Missing files come here
 		<year>1991</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f" offset="0"/>
@@ -4890,20 +5003,62 @@ Missing files come here
 		</part>
 	</software>
 
-<!--
-    This is not a real dump, it was constructed using WinImage for use with MESS
-    Also circulating with CRC fb591430
-    <software name="ptombs">
-        <description>Pharaoh's Tomb (Shareware)</description>
-        <year>1994</year>
-        <publisher>Apogee</publisher>
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="368640">
-                <rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
--->
+	<software name="mystict">
+		<description>Mystic Towers</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Animation FX" />
+		<info name="version" value="1.11" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mystic Towers (USA) (v1.11).img" size="1474560" crc="970fc40e" sha1="daa034e1c25cf77814d0df081e38dba95ee76139" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omf2097" supported="partial">
+		<description>One Must Fall 2097</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 1).img" size="1474560" crc="d3c22bef" sha1="37ecfac3dcf2e58485c54188346c069bf0fe1221" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 2).img" size="1474560" crc="21d0a22c" sha1="355522989a8146180ece03dd1170d887a59666c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 3).img" size="1474560" crc="ff7f2994" sha1="2e05e23d1962611f75e50e3f8ca58db245852ac0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 4).img" size="1474560" crc="ff8c6380" sha1="29dd79f459cbc886d46e291a4bc3b7b68594317d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 5).img" size="1474560" crc="2258ca74" sha1="6669ac792b3727e272656703ea0505af90208cae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paganitz">
+		<description>Paganitzu</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Trilobyte" />
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Paganitzu (USA) (v1.02).img" size="1474560" crc="7efa4aa3" sha1="7520c44be7451ff07065471b905f93f60d507234" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="raptor12">
 		<description>Raptor - Call of the Shadows</description>
@@ -4923,6 +5078,28 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="05443ceb" sha1="3b8bd610d90677a830f9b4e297e4a89343cb86a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roc">
+		<description>Realms of Chaos</description>
+		<year>1995</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Realms of Chaos (USA) (v1.0) (Disk 1).img" size="1474560" crc="5bf4b35f" sha1="9e369bf6157b959074a14fdde580281a587cd09f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Realms of Chaos (USA) (v1.0) (Disk 2).img" size="1474560" crc="a220fe92" sha1="a67676cc1be7477886707b12de286c57f05b86b7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Realms of Chaos (USA) (v1.0) (Disk 3).img" size="1474560" crc="4611a516" sha1="157f4bb42c1293feb5bac9d7452619711bb4c1dd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
