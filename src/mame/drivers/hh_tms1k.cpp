@@ -172,6 +172,7 @@
 #include "h2hbaseb.lh"
 #include "h2hboxing.lh"
 #include "h2hfootb.lh"
+#include "horseran.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
 #include "mathmagi.lh"
@@ -4475,6 +4476,17 @@ public:
 
 WRITE32_MEMBER(horseran_state::lcd_output_w)
 {
+	// only 3 rows used
+	if (offset > 2)
+		return;
+	
+	// output segments (lamp row*100 + col)
+	for (int i = 0; i < 24; i++)
+		output().set_lamp_value(offset*100 + i+1, data >> i & 1);
+	
+	// col5-11 and col13-19 are 7segs
+	for (int i = 0; i < 2; i++)
+		output().set_digit_value(offset << 1 | i, BITSWAP8(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
 }
 
 WRITE16_MEMBER(horseran_state::write_r)
@@ -4570,8 +4582,7 @@ static MACHINE_CONFIG_START( horseran, horseran_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(horseran_state, lcd_output_w))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
-	//MCFG_DEFAULT_LAYOUT(layout_horseran)
+	MCFG_DEFAULT_LAYOUT(layout_horseran)
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -8710,7 +8721,7 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 
 CONS( 1978, elecbowl,  0,        0, elecbowl,  elecbowl,  driver_device, 0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
-COMP( 1979, horseran,  0,        0, horseran,  horseran,  driver_device, 0, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1979, horseran,  0,        0, horseran,  horseran,  driver_device, 0, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
