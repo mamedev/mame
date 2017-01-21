@@ -56,6 +56,7 @@ public:
 	{ return downcast<m68705_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
 
 protected:
+	// state index constants
 	enum
 	{
 		M68705_A = M6805_A,

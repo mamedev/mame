@@ -69,6 +69,13 @@ ROM_START( m68705u3 )
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
+constexpr u16 M68705_VECTOR_BOOTSTRAP   = 0xfff6;
+constexpr u16 M68705_VECTOR_TIMER       = 0xfff8;
+//constexpr u16 M68705_VECTOR_INT2        = 0xfff8;
+constexpr u16 M68705_VECTOR_INT         = 0xfffa;
+//constexpr u16 M68705_VECTOR_SWI         = 0xfffc;
+constexpr u16 M68705_VECTOR_RESET       = 0xfffe;
+
 } // anonymous namespace
 
 
@@ -500,7 +507,12 @@ void m68705_device::device_reset()
 	if (CLEAR_LINE != m_vihtp)
 	{
 		LOG("loading bootstrap vector\n");
-		RM16(0xfff6, &m_pc);
+		rm16(M68705_VECTOR_BOOTSTRAP, m_pc);
+	}
+	else
+	{
+		LOG("loading reset vector\n");
+		rm16(M68705_VECTOR_RESET, m_pc);
 	}
 }
 
@@ -548,10 +560,10 @@ void m68705_device::interrupt()
 	{
 		if ((CC & IFLAG) == 0)
 		{
-			PUSHWORD(m_pc);
-			PUSHBYTE(m_x);
-			PUSHBYTE(m_a);
-			PUSHBYTE(m_cc);
+			pushword(m_pc);
+			pushbyte(m_x);
+			pushbyte(m_a);
+			pushbyte(m_cc);
 			SEI;
 			standard_irq_callback(0);
 
@@ -559,12 +571,12 @@ void m68705_device::interrupt()
 			{
 				LOGINT("servicing /INT interrupt\n");
 				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
-				RM16(0xfffa, &m_pc);
+				rm16(M68705_VECTOR_INT, m_pc);
 			}
 			else if (BIT(m_pending_interrupts, M68705_INT_TIMER))
 			{
 				LOGINT("servicing timer/counter interrupt\n");
-				RM16(0xfff8, &m_pc);
+				rm16(M68705_VECTOR_TIMER, m_pc);
 			}
 			else
 			{
