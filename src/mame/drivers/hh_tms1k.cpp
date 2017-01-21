@@ -4460,20 +4460,30 @@ class horseran_state : public hh_tms1k_state
 {
 public:
 	horseran_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_lcd(*this, "lcd")
 	{ }
 
+	required_device<hlcd0569_device> m_lcd;
+	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
 
+WRITE32_MEMBER(horseran_state::lcd_output_w)
+{
+}
+
 WRITE16_MEMBER(horseran_state::write_r)
 {
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
 	// R2: HLCD0569 _CS
+	m_lcd->write_cs(data >> 2 & 1);
+	m_lcd->write_data(data >> 1 & 1);
+	m_lcd->write_clock(data & 1);
 	
 	// R3-R10: input mux
 	m_inp_mux = data >> 3 & 0xff;
@@ -4557,7 +4567,9 @@ static MACHINE_CONFIG_START( horseran, horseran_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(horseran_state, write_r))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("lcd", HLCD0569, 1115) // 223nf cap
+	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uf
+	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(horseran_state, lcd_output_w))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 	//MCFG_DEFAULT_LAYOUT(layout_horseran)
 
 	/* no sound! */
