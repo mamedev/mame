@@ -28432,11 +28432,16 @@ ss2005                          // 2005.04 Super Shanghai 2005 (Rev A)
 ss2005o                         // 2005.03 Super Shanghai 2005
 sstrkfgt                        // 2000.10 Sega Strike Fighter (Rev A)
 sstrkfgta                       // 2000.10 Sega Strike Fighter (Rev A, no training mode)
-starhrcl                        // 2000.11.28 Star Horse (satellite)
-starhrct                        // 2000.12 Star Horse (server)
-starhrpr                        // 2009.07.27 Star Horse Progress Returns (satellite)
-starhrse                        // 2000.?? Star Horse (big screens)
-starhrsp                        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
+shorse                          // 2000.11.28 Star Horse (satellite)
+shorsem                         // 2000.??    Star Horse (main screens)
+shorsel                         // 2000.12    Star Horse (live and backup)
+//shors2k1                      // 2002.01.09 Star Horse 2001 (satellite, Rev B)
+shorsep                         // 2003.12.01 Star Horse Progress (satellite, Rev A)
+shorsepm                        // 2003.??    Star Horse Progress (main screens, Rev B)
+shorseps                        // 2003.12.02 Star Horse Progress (sound & backup, Rev A)
+shorsepb                        // 2000.??    Star Horse Progress (backup data)
+shorsepl                        // 2003.12.02 Star Horse Progress (live, Rev A)
+shorsepr                        // 2009.07.27 Star Horse Progress Returns (satellite)
 starseek                        // 2001.07 Dokidoki Idol Star Seeker
 suchie3                         // 1999.09 Idol Janshi Su-Chi-Pi 3
 sushibar                        // 2003 Sushi Bar

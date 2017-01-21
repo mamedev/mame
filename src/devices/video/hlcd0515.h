@@ -46,8 +46,8 @@
    COL11 19 |           | 22 COL13
      GND 20 |___________| 21 COL12
 
-    OSC is tied to a capacitor, the result frequency is 50000 * cap(in uF),
-    eg. 0.01uF cap = 500Hz.
+    OSC is tied to a capacitor, the result frequency is 50000 * cap(in uF), eg. 0.01uF cap = 500Hz.
+    Internally, this is divided by 2, and by number of rows to get display refresh frequency.
 */
 
 class hlcd0515_device : public device_t
@@ -70,16 +70,16 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	int m_cs;
-	int m_clock;
-	int m_data;
+	int m_cs;       // input pin state
+	int m_clock;    // "
+	int m_data;     // "
 	int m_count;
 	u8 m_control;
-	bool m_blank;
-	u8 m_rowmax;
-	u8 m_rowout;
-	u8 m_rowsel;
-	u32 m_ram[8];
+	bool m_blank;	// display blank/visible
+	u8 m_rowmax;    // number of rows output by lcd (max 8)
+	u8 m_rowout;    // current row for lcd output
+	u8 m_rowsel;    // current row for data in/out
+	u32 m_ram[8];   // 8x25bit ram
 	
 	emu_timer *m_lcd_timer;
 
