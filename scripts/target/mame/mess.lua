@@ -1328,6 +1328,8 @@ createMESSProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/includes/amiga.h",
+	MAME_DIR .. "src/mame/machine/a1200kbd.cpp",
+	MAME_DIR .. "src/mame/machine/a1200kbd.h",
 	MAME_DIR .. "src/mame/machine/amigakbd.cpp",
 	MAME_DIR .. "src/mame/machine/amigakbd.h",
 }

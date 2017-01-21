@@ -20,10 +20,12 @@
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/amigafdc.h"
+#include "machine/a1200kbd.h"
 #include "machine/amigakbd.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
 #include "softlist.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -1694,6 +1696,18 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
+	// keyboard
+#if 0
+	MCFG_DEVICE_REMOVE("kbd")
+	MCFG_DEVICE_ADD("kbd", A1200KBD, 0)
+	MCFG_A1200_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_A1200_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_A1200_KEYBOARD_KRST_CALLBACK(WRITELINE(amiga_state, kbreset_w))
+
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", a1200kbd_device, kdat_w))
+#endif
+
 	// todo: pcmcia
 MACHINE_CONFIG_END
 
@@ -2064,10 +2078,6 @@ ROM_START( a1200 )
 	ROM_SYSTEM_BIOS(2, "logica2", "Logica Diagnostic 2.0")
 	ROMX_LOAD("logica2.u6a", 0x00000, 0x40000, CRC(566bc3f9) SHA1(891d3b7892843517d800d24593168b1d8f1646ca), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
 	ROMX_LOAD("logica2.u6b", 0x00002, 0x40000, CRC(aac94759) SHA1(da8a4f9ae1aa84f5e2a5dcc5c9d7e4378a9698b7), ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(3))
-
-	ROM_REGION(0x4000, "keyboard", 0)
-	ROM_LOAD("391508-01.u13", 0x0000, 0x1040, NO_DUMP) // COMMODORE | 391508-01 REV0 | KEYBOARD MPU (MC68HC05C4AFN)
-	ROM_LOAD("391508-02.u13", 0x0000, 0x2f40, NO_DUMP) // Amiga Tech REV1 Keyboard MPU (MC68HC05C12FN)
 ROM_END
 
 #define rom_a1200n  rom_a1200
