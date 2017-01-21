@@ -315,7 +315,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ctstein, ctstein_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP421, 860000) // approximation - RC osc. R=12K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
@@ -439,7 +439,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pf
+	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 900000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP444L, 900000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
 	MCFG_COP400_WRITE_D_CB(WRITE8(einvaderc_state, write_d))
@@ -673,7 +673,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pf
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
@@ -774,7 +774,7 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pf
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
@@ -914,7 +914,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mdallas, mdallas_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pf
+	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_L_CB(WRITE8(mdallas_state, write_l))
 	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
@@ -986,7 +986,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( plus1, plus1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
@@ -1114,7 +1114,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pf
+	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
@@ -1269,7 +1269,7 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 static MACHINE_CONFIG_START( bship82, bship82_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
 	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write)) // G: 4-bit signed DAC
@@ -1401,7 +1401,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( qkracer, qkracer_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(qkracer_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(qkracer_state, write_g))
