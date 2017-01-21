@@ -132,6 +132,7 @@
 
 #include "includes/hh_tms1k.h"
 #include "machine/tms1024.h"
+#include "video/hlcd0515.h"
 #include "sound/beep.h"
 #include "sound/sn76477.h"
 #include "sound/s14001a.h"
@@ -4555,6 +4556,8 @@ static MACHINE_CONFIG_START( horseran, horseran_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(horseran_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(horseran_state, write_r))
 
+	/* video hardware */
+	MCFG_DEVICE_ADD("lcd", HLCD0569, 1115) // 223nf cap
 	//MCFG_DEFAULT_LAYOUT(layout_horseran)
 
 	/* no sound! */
