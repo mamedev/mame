@@ -139,6 +139,7 @@
 		case addr_mode::IX: IDXBYTE(b); break; \
 		case addr_mode::IX1: IDX1BYTE(b); break; \
 		case addr_mode::IX2: IDX2BYTE(b); break; \
+		default: b = 0; break; \
 		} } while (false)
 
 /* Macros for branch instructions */
