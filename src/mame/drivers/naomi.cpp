@@ -22,26 +22,6 @@
 
 Sega Naomi is Dreamcast based Arcade hardware.
 
-Compatibility list (as per 26-jun-2013)
-- sprtjam: garbage on initial attract mode screen (regression).
-- puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
-- vtennisg: crashes after stage screen.
-
-(25-mar-2015)
-- sl2007:
-0C04697A: MOV.L   @($28,R14),R0 ;8c167734
-0C04697C: TST     R0,R0
-0C04697E: BT      $0C046998
-0C046980: BRA     $0C046990
-0C04698E: BT      $0C046998
-0C046990: MOV.L   @($28,R14),R3
-0C046992: MOV     #$FD,R5
-0C046994: JSR     R3
-0C046608: NOP
-0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
-0C046608: NOP
-
-(24-jun-2016)
 
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
@@ -86,14 +66,28 @@ TODO (game-specific):
     - Monkey Ball: asserts when attempts to load a stage;
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
+	- puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
     - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
     - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
 	- sfz3ugd: currently dies at disclaimer screen (regression);
 	- shangril: swapped mahjong inputs (M -> N, C -> B etc.);
+	- sprtjam: garbage on initial attract mode screen (regression).
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
-    - Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
+    - vtennisg: crashes after stage screen or the attract mode (PVR or SH-4 bug, most likely);
     - World Kicks (both sets): "NAOMIM2: unhandled board write a0800600, 0000" after Naomi logo
+	- sl2007:
+		0C04697A: MOV.L   @($28,R14),R0 ;8c167734
+		0C04697C: TST     R0,R0
+		0C04697E: BT      $0C046998
+		0C046980: BRA     $0C046990
+		0C04698E: BT      $0C046998
+		0C046990: MOV.L   @($28,R14),R3
+		0C046992: MOV     #$FD,R5
+		0C046994: JSR     R3
+		0C046608: NOP
+		0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
+		0C046608: NOP
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 Guru's Readmes
