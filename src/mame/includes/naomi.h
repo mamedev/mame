@@ -82,6 +82,7 @@ class naomi_state : public dc_state
 
 	uint8_t m_mp_mux;
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
+	DECLARE_INPUT_CHANGED_MEMBER(naomi_mastercpu_cheat_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
