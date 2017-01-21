@@ -150,7 +150,7 @@ void tms0970_cpu_device::op_setr()
 {
 	// SETR: set output register
 	// DDIG line is a coincidence between the selected output pla row(s) and segment pla row(s)
-	int ddig = (m_opla->read(m_a) & m_o) ? 1 : 0;
+	int ddig = (~m_opla->read(m_a) & m_o) ? 0 : 1;
 	m_r = (m_r & ~(1 << m_y)) | (ddig << m_y);
 }
 
