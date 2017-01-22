@@ -6,16 +6,14 @@
  */
 
 #include <cstring>
-//FIXME:: pstring should be locale free
-#include <cctype>
-#include <cstdlib>
-#include <cstdio>
 #include <algorithm>
 #include <stack>
 
 #include "pstring.h"
 #include "palloc.h"
 #include "plists.h"
+
+template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 template<typename F>
 pstring_t<F>::~pstring_t()
@@ -373,7 +371,7 @@ void pstringbuffer::pcat(const pstring &s)
  * This improves startup performance by 30%.
  */
 
-#if 1
+#if 0
 
 static std::stack<pstr_t *> *stk = nullptr;
 
@@ -416,8 +414,8 @@ static inline std::size_t countleadbits(std::size_t x)
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	bool b = s->dec_and_check();
+	if ( b && s != &m_zero)
 	{
 		if (stk != nullptr)
 		{
@@ -472,8 +470,8 @@ void pstring_t<F>::resetmem()
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	bool b = s->dec_and_check();
+	if ( b && s != &m_zero)
 	{
 		plib::pfree_array(((char *)s));
 	}
