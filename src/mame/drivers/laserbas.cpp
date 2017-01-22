@@ -141,42 +141,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 {
-	int x, x_max, dx, pixaddr;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	int x = 0;
+	int x_max = 0x100;
+	int dx = 1;
 
 	if (m_flipscreen)
 	{
-		y=0x100-y-1-0x20;
-		dx = -1;
-		x = 0x100-1;
+		y = 0xdf - y;
+		x = 0xff;
 		x_max = -1;
-	}
-	else
-	{
-		dx = 1;
-		x = 0;
-		x_max = 0x100;
+		dx = -1;
 	}
 
-	pixaddr=y<<8;
+	int pixaddr = y << 8;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	uint32_t *b = &bitmap.pix32(y);
 
+	while (x != x_max)
 	{
-		while ( x != x_max )
-		{
-			uint32_t offset = (pixaddr>>1)&0x7fff;
-			uint8_t p1    =   m_vram[offset];
-			uint8_t p2    =   m_vram[offset+0x8000]; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
+		int offset = (pixaddr >> 1) & 0x7fff;
+		int shift = (pixaddr & 1) * 4; // two 4 bit pixels in one byte
+		int p1 = (m_vram[offset] >> shift) & 0xf;
+		int p2 = (m_vram[offset + 0x8000] >> shift) & 0xf; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
+		int p;
 
-			uint8_t shift =   (pixaddr & 1)?4:0; // two 4 bit pixels in one byte
-			p1 = (p1>>shift) & 0xf;
-			p2 = (p2>>shift) & 0xf;
+		if (p2)
+			p = p2;
+		else if (p1)
+			p = p1 + 16;
+		else
+			p = m_bset;
 
-			p[x] = palette[p2?:(p1?(p1+16):m_bset)]; // layer 2 | layer 1 | bg pen
+		b[x] = palette[p];
 
-			++pixaddr;
-			x += dx;
-		}
+		pixaddr++;
+		x += dx;
 	}
 }
 
