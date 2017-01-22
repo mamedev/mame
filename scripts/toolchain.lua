@@ -840,7 +840,8 @@ function toolchain(_buildDir, _subDir)
 --			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 --			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 --		}
-		if (os.isfile("$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include/list")) then
+		checkndk13 = os.getenv("ANDROID_NDK_ROOT") .. "/sources/cxx-stl/llvm-libc++/libcxx/include/list"	
+		if (os.isfile(checkndk13)) then
 			includedirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
 			}
@@ -876,7 +877,7 @@ function toolchain(_buildDir, _subDir)
 			"android",
 			"log",
 		}
-		if (os.isfile("$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include/list")) then
+		if (os.isfile(checkndk13)) then
 			links {
 				"c++_static",
 			}
