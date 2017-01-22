@@ -104,9 +104,9 @@ i/o ports:
             bit 7 = coin sensor (+IRQ to make the game acknowledge it)
 
   85        PIO PORT B
-            bit 0-4 = light organ (unemulated :)) )
-            bit 5-7 = sound parameter (unemulated, it's very difficult to
-                      figure out how those work)
+            bit 0-2 = light organ
+			bit 3-4 = control panel (not connected)
+            bit 5-7 = sound parameter (not used on production units?)
 
   86        PIO CTRL A
 
@@ -135,6 +135,7 @@ this.)
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "includes/polyplay.h"
+#include "polyplay.lh"
 
 static const z80_daisy_config daisy_chain_zre[] =
 {
@@ -150,6 +151,11 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 	{ Z80SIO_TAG },
 	{ nullptr }
 };
+
+INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
 
 /* I/O Port handling */
 WRITE_LINE_MEMBER(polyplay_state::ctc_zc2_w)
@@ -176,14 +182,47 @@ READ8_MEMBER(polyplay_state::pio_portb_r)
 
 WRITE8_MEMBER(polyplay_state::pio_portb_w)
 {
-	/* ZRE
-pio_portb_w: 78
-	*/
+	uint8_t lightState = data & 0x07;
+	//uint8_t soundState = data & 0xe0;
 
-	/* ZRE-PP
-pio_portb_w: f8
-	*/
-	osd_printf_verbose("pio_portb_w: %02x\n", data);
+	// there is a DS8205D attached to bit 0 and 1
+	switch (lightState)
+	{
+		case 0:
+			output().set_lamp_value(1, 1); 
+			output().set_lamp_value(2, 0); 
+			output().set_lamp_value(3, 0); 
+			output().set_lamp_value(4, 0); 
+			break;
+		
+		case 1:
+			output().set_lamp_value(1, 0); 
+			output().set_lamp_value(2, 1); 
+			output().set_lamp_value(3, 0); 
+			output().set_lamp_value(4, 0); 
+			break;
+		
+		case 2:
+			output().set_lamp_value(1, 0); 
+			output().set_lamp_value(2, 0); 
+			output().set_lamp_value(3, 1); 
+			output().set_lamp_value(4, 0); 
+			break;
+		
+		case 3:
+			output().set_lamp_value(1, 0); 
+			output().set_lamp_value(2, 0); 
+			output().set_lamp_value(3, 0); 
+			output().set_lamp_value(4, 1); 
+			break;
+			
+		default:
+			output().set_lamp_value(1, 0); 
+			output().set_lamp_value(2, 0); 
+			output().set_lamp_value(3, 0); 
+			output().set_lamp_value(4, 0); 
+			break;
+	}
 }
 
 INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
@@ -274,6 +313,7 @@ static MACHINE_CONFIG_START( polyplay_zre, polyplay_state )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
 	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zre)
 	MCFG_CPU_IO_MAP(polyplay_io_zre)
+	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
@@ -393,6 +433,6 @@ ROM_START( polyplay2c )
 ROM_END
 
 /* game driver */
-GAME( 1986, polyplay,   0,         polyplay_zre,   polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0 )
-GAME( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)", 0 )
-GAME( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0 )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )
