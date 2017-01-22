@@ -210,33 +210,25 @@ WRITE8_MEMBER(laserbas_state::videoctrl_w)
 
 READ8_MEMBER(laserbas_state::z1_r)
 {
-	uint8_t res = 0;
-
 	m_z1data[0] = m_z1data[1];
 	m_z1data[1] = m_z1data[2];
 	m_z1data[2] = m_z1data[3];
 	m_z1data[3] = offset;
 
-#define x(o) (1 & (m_z1data[o / 10] >> (o % 10)))
-#define nx(o) (1 & ~(m_z1data[o / 10] >> (o % 10)))
-#define MUX2(s, a, b) ((s) ? (a) : (b))
+	auto const x = [this] (unsigned i, unsigned b) { return BIT(m_z1data[i], b); };
+	auto const nx = [this] (unsigned i, unsigned b) { return BIT(~m_z1data[i], b); };
+	auto const MUX2 = [] (bool s, uint16_t a, uint16_t b) { return s ? a : b; };
 
-	res =
-		MUX2(x(36) & x(33), x(31) ^ x(35), (nx(33) & (nx(20) | nx(36))) | (nx(36) & x(24))) << 7
-		| MUX2(x(36), MUX2(x(33), x(29), nx(23) | x(30)), x(33) & x(15)) << 6
-		| MUX2(x(36), nx(33) & x(27), x(32) | x(33)) << 5
-		| MUX2(x(36), MUX2(x(33), nx(24), nx(35)), MUX2(nx(33), x(4), MUX2(nx(26), x(5) & x(23), MUX2(x(23), x(19), nx(13) | x(20))))) << 4
-		| MUX2(x(36), x(33) & x(11), MUX2(x(33), x(25) | nx(31), x(24))) << 3
-		| MUX2(x(33), MUX2(x(36), x(28), x(20)), MUX2(x(36), nx(11), nx(39))) << 2
-		| MUX2(x(36), MUX2(x(23), MUX2(x(26), nx(18), nx(10)) | x(33), MUX2(x(26), x(1), x(29)) & nx(33)), MUX2(x(33), x(7), x(17))) << 1
-		| MUX2(x(33), MUX2(x(36), x(22), nx(26)), MUX2(x(36), x(14), x(21))) << 0
-	;
+	uint8_t const bit7 = MUX2(x(3,6) & x(3,3), x(3,1) ^ x(3,5), (nx(3,3) & (nx(2,0) | nx(3,6))) | (nx(3,6) & x(2,4)));
+	uint8_t const bit6 = MUX2(x(3,6), MUX2(x(3,3), x(2,9), nx(2,3) | x(3,0)), x(3,3) & x(1,5));
+	uint8_t const bit5 = MUX2(x(3,6), nx(3,3) & x(2,7), x(3,2) | x(3,3));
+	uint8_t const bit4 = MUX2(x(3,6), MUX2(x(3,3), nx(2,4), nx(3,5)), MUX2(nx(3,3), x(0,4), MUX2(nx(2,6), x(0,5) & x(2,3), MUX2(x(2,3), x(1,9), nx(1,3) | x(2,0)))));
+	uint8_t const bit3 = MUX2(x(3,6), x(3,3) & x(1,1), MUX2(x(3,3), x(2,5) | nx(3,1), x(2,4)));
+	uint8_t const bit2 = MUX2(x(3,3), MUX2(x(3,6), x(2,8), x(2,0)), MUX2(x(3,6), nx(1,1), nx(3,9)));
+	uint8_t const bit1 = MUX2(x(3,6), MUX2(x(2,3), MUX2(x(2,6), nx(1,8), nx(1,0)) | x(3,3), MUX2(x(2,6), x(0,1), x(2,9)) & nx(3,3)), MUX2(x(3,3), x(0,7), x(1,7)));
+	uint8_t const bit0 = MUX2(x(3,3), MUX2(x(3,6), x(2,2), nx(2,6)), MUX2(x(3,6), x(1,4), x(2,1)));
 
-#undef MUX2
-#undef nx
-#undef x
-
-	return res;
+	return (bit7 << 7) | (bit6 << 6) | (bit5 << 5) | (bit4 << 4) | (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | (bit0 << 0);
 }
 
 READ8_MEMBER(laserbas_state::track_lo_r)
