@@ -35,7 +35,7 @@ static void writeusage(std::wostream &output, bool write_word_usage, const struc
 		L"%s %s %s %s\n",
 		(write_word_usage ? L"Usage:" : L"      "),
 		wstring_from_utf8(cmdname),
-		c->name,
+		wstring_from_utf8(c->name),
 		c->usage ? wstring_from_utf8(c->usage) : std::wstring());
 }
 
