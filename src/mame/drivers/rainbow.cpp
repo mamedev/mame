@@ -44,7 +44,7 @@ NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before sta
 until shutdown. "Hot swapping" wasn't possible on the original system (our GUI just doesn't forbid it).
 
 To create a DEC RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
->chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd
+>chdman createhd -c none -chs 153,4,16 -ss 512 -o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
 Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot from a properly formatted
@@ -56,34 +56,32 @@ handled wrongly, so shared mem. just below $8000 is tainted by Z80 stack data. A
 Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
 
 
-CORVUS HARD DISK (CP/M 1.x only)
---------------------------------
-In theory, it should be possible to use up to 4 Corvus Disks with up to 20 MB each. 
-MS DOS 2.x and CP/M 2.0 were once supported, but are untested (in part because no drivers have survived).
+CORVUS HARD DISK
+----------------
+Up to 4 Corvus Disks with up to 20 MB each can be emulated (to be mounted as hard disks 2 - 5). 
+MS DOS 2.x and CP/M v2.x were once supported, but are untested (in part because no binary drivers have survived).
 
 To get a Corvus 11 drive up and running under CP/M 1.x, you'll need drcdutil.td0 from Donald Maslin's Archive.
 
 First, create a 11 MB hard disk:
 >Chdman createhd -c none -chs 306,4,20 -ss 512 -o CORVUS11.chd
-(worked for me, definitive CHS parameters for Corvus B/H drives are hard to come by)
+[ -chs 306,2,20 for the 6 MB model and  -chs 306,6,20 for the 20 MB type ]
 
-HINT: hard disk 1 is linked to DEC's controller. So it is vital that CORVUS11.chd is mounted as hard disk 2 in emulation!
-
-Then make a copy of your CP/M 86-80 V1.x boot disk. This copy will be patched to make the Corvus hard drive usable!
-
+Then make a copy of your CP/M 86-80 V1.x boot disk. This copy must be patched to make the Corvus hard drive usable!
 With 'drcdutil.td0' mounted in A: and a write enabled (non TeleDisk) image of CPM 1.x in B: type:
 b:>SUBMIT A:hinstall
 
-This should replace the following CP/M files on B:
+This replaces the following CP/M files on B:
    B:Z80CCP.SYS  <- A:HZ80CCP.SYS
    B:Z80.SYS     <- A:HZ80.SYS
    B:PRMTVPV.SYS <- A:HPRMTVPV.SYS
 
-Due to a typo in HINSTALL.SUB, the last PIP must be executed manually:
+Due to a missing drive specification in HINSTALL.SUB, the last PIP must be invoked manually:
 b:>PIP B:PRMTVPVT.SYS=A:HPRMTVPV.SYS[V]
 
-Finally, boot from the newly patched CP/M disk and invoke CLINK2TN (command must be invoked after each cold boot).
-CLINK2TN has hard coded params valid for a Corvus 11 MB hard disk only. It needs a patched CP/M 1.x and will not run on CP/M 2.
+Finally, boot from the newly patched CP/M disk and type CLINK2TN (a step necessary after each cold boot).
+CLINK2TN can only be used together with a Corvus 11 MB hard disk. It needs a patched CP/M 1.x disk and won't run on CP/M 2.x.
+[ use CLINK2FV for the 6 MB model and CLINK2TW for the 20 MB type ]
 
 Two steps are needed to initialize the new disk:
 Step 1: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Starting disc address?  2320", "Number of Sectors? 64"
@@ -91,7 +89,7 @@ Step 2: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Sta
 Done.
 
 Required steps vary with 5 and 20 MB models (look into the *.DOC files in DRCDUTIL.TD0 / CLINK86.A86 / DRIVEL.COM).
-Parameters for initialization can be taken from Chapter 2 of the Disk System Installion Guide for TRS-80 II (uses same type H drives).
+Parameters for initialization can be taken from Chapter 2 of the Disk System Installion Guide for TRS-80 II (same type H drives).
 
 
 COLOR EMULATION (NEC 7220 + extra hardware)
