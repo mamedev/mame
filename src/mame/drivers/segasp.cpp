@@ -298,6 +298,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_aw_base, segasp_state )
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)
 
+	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
