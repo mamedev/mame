@@ -7,7 +7,7 @@
 #include "machine/z80sio.h"
 #include "sound/speaker.h"
 
-#define POLYPLAY_MAIN_CLOCK XTAL_9_8304MHz 
+#define POLYPLAY_MAIN_CLOCK XTAL_9_8304MHz
 
 #define Z80CPU_TAG     "maincpu"
 #define Z80CTC_TAG     "z80ctc"
@@ -59,10 +59,10 @@ public:
 	uint8_t m_flipflop2;
 	required_device<speaker_sound_device> m_speaker1;
 	required_device<speaker_sound_device> m_speaker2;
-	
+
 	/* video */
 	virtual void video_start() override;
-	DECLARE_WRITE8_MEMBER(polyplay_characterram_w); 
+	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
 	DECLARE_PALETTE_INIT(polyplay);
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

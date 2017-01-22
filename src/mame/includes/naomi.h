@@ -91,7 +91,7 @@ public:
 	required_shared_ptr<uint64_t> pvr2_texture_ram;
 	required_shared_ptr<uint64_t> pvr2_framebuffer_ram;
 	required_shared_ptr<uint64_t> elan_ram;
-	
+
 	DECLARE_DRIVER_INIT(naomi2);
 };
 
@@ -102,9 +102,9 @@ public:
 		: dc_state(mconfig, type, tag),
 		m_awflash(*this, "awflash")
 	   { }
-	
+
 	required_device<macronix_29l001mc_device> m_awflash;
-	
+
 	DECLARE_READ64_MEMBER( aw_flash_r );
 	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
@@ -116,9 +116,9 @@ public:
 	DECLARE_DRIVER_INIT(xtrmhnt2);
 
 	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
-	
+
 protected:
-	uint8_t aw_ctrl_type;	
+	uint8_t aw_ctrl_type;
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };
 

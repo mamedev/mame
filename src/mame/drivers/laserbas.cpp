@@ -8,7 +8,7 @@
 TODO:
 - Video: weird palette changes, Laserbase colors, missing bg scrolling between stages (CRT address lines + m_hset ( or m_vset ?))
 - Sound: sound related i/o writes ( out_w handler )
-- Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB 
+- Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB
 TS 20.01.2017
 
 There's incomplete schematics available. It's missing a couple of important elements (analog sound, interrupts).
@@ -110,7 +110,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out_5_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -128,12 +128,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 {
 	int scanline = param;
 
-	if(scanline == 0 || scanline == 135) 
+	if(scanline == 0 || scanline == 135)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE );
 	}
 
-	if(scanline == 240 && m_nmi) 
+	if(scanline == 240 && m_nmi)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -144,23 +144,23 @@ MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 	int x, x_max, dx, pixaddr;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix32(y);
-	
+
 	if (m_flipscreen)
 	{
 		y=0x100-y-1-0x20;
 		dx = -1;
-		x = 0x100-1;     
+		x = 0x100-1;
 		x_max = -1;
 	}
 	else
 	{
 		dx = 1;
-		x = 0;     
+		x = 0;
 		x_max = 0x100;
 	}
 
 	pixaddr=y<<8;
-	     
+
 	{
 		while ( x != x_max )
 		{
@@ -198,8 +198,8 @@ WRITE8_MEMBER(laserbas_state::videoctrl_w)
 		m_flipscreen = !(data & 0x80);
 		m_vset = (data>>3)&7; // inc-ed on interrupts ( 8 ints / frame ?)
 		m_hset = data&7;
-	} 
-	else 
+	}
+	else
 	{
 		data^=0xff;
 		m_bset = data>>4; // bg pen
@@ -284,7 +284,7 @@ void laserbas_state::write_pit_out(int num, int state)
 	if((!state)& m_cnt_out[num]){ // 0->1 rising edge CLK
 		m_counter[num] = (m_counter[num]+1)&0x0f; // 4 bit counters 74393
 	}
-	int data =(state) | ((m_counter[num]&7)<<1); // combine output from 8253 with counter bits 0-3 
+	int data =(state) | ((m_counter[num]&7)<<1); // combine output from 8253 with counter bits 0-3
 	data<<=4;
 	if(m_counter[num]&8) data^=0x0f; // counter bit 4 xors the data ( 7486 x 6)
 	switch(num){
@@ -295,7 +295,7 @@ void laserbas_state::write_pit_out(int num, int state)
 		case 4: m_dac5->write(data);break;
 		case 5: m_dac6->write(data);break;
 	}
-	
+
 	m_cnt_out[num]=state;
 }
 
@@ -441,12 +441,12 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16) 
+	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac3", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac4", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac5", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16) 
+	MCFG_SOUND_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	
+
 MACHINE_CONFIG_END
 
 /*
@@ -545,6 +545,6 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
-GAME( 1980, futflash, 		 0, laserbas, laserbas, driver_device, 0, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, futflash,        0, laserbas, laserbas, driver_device, 0, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, laserbas, futflash, laserbas, laserbas, driver_device, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, laserbasa,futflash, laserbas, laserbas, driver_device, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

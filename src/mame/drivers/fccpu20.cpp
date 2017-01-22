@@ -6,7 +6,7 @@
  *
  * The only purpose of this driver is to be able to start the VME board as
  * a single board computer and not as a slot device. It allows the board to
- * have a layout and number of other goodies as board driver too but the chassi 
+ * have a layout and number of other goodies as board driver too but the chassi
  * emulated here is really imaginary representing any chassi that provides power
  * and used without any other VME board installed.
  *
@@ -57,7 +57,7 @@
  *
  *---------------------------------------------------------------------------
  *  TODO:
- *  - Add front layout 
+ *  - Add front layout
  ****************************************************************************/
 
 #include "emu.h"
@@ -77,7 +77,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(cpu20_vme_cards)
 	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
-SLOT_INTERFACE_END	
+SLOT_INTERFACE_END
 
 /* Machine configuration */
 MACHINE_CONFIG_START (cpu20, cpu20_state)

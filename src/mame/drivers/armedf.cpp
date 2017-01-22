@@ -338,7 +338,7 @@ Notes:
     ---- -x-- ---- ---- disable fg layer
     ---- --x- ---- ---- disable sprite
     ---- ---x ---- ---- disable tx layer
-	---- ---- 1--1 ---- unknown
+    ---- ---- 1--1 ---- unknown
     ---- ---- ---- --x- coin counter 1
     ---- ---- ---- ---x coin counter 0
 */
@@ -1584,7 +1584,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 

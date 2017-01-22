@@ -58,7 +58,7 @@ Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
 
 CORVUS HARD DISK
 ----------------
-Up to 4 Corvus Disks with up to 20 MB each can be emulated (to be mounted as hard disks 2 - 5). 
+Up to 4 Corvus Disks with up to 20 MB each can be emulated (to be mounted as hard disks 2 - 5).
 MS DOS 2.x and CP/M v2.x were once supported, but are untested (in part because no binary drivers have survived).
 
 To get a Corvus 11 drive up and running under CP/M 1.x, you'll need drcdutil.td0 from Donald Maslin's Archive.
@@ -110,7 +110,7 @@ COLOR EMULATION (NEC 7220 + extra hardware)
 THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
    The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
    (DIP setting COLOR_MONITOR).
-   
+
    An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
    As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
    A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
@@ -455,7 +455,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"
-#include "machine/corvushd.h" 
+#include "machine/corvushd.h"
 
 #include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
@@ -488,8 +488,8 @@ public:
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
-		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER 
-		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER 
+		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER
+		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER
 		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
 		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER
 		m_inp9(*this, "MONO MONITOR TYPE"),
@@ -505,7 +505,7 @@ public:
 
 		m_fdc(*this, FD1793_TAG),
 		m_hdc(*this, "hdc"),
-		m_corvus_hdc(*this, "corvus"), 
+		m_corvus_hdc(*this, "corvus"),
 
 		m_mpsc(*this, "upd7201"),
 		m_dbrg_A(*this, "com8116_a"),
@@ -660,7 +660,7 @@ private:
 	required_device<fd1793_t> m_fdc;
 	optional_device<wd2010_device> m_hdc;
 
-	required_device<corvus_hdc_t> m_corvus_hdc; 
+	required_device<corvus_hdc_t> m_corvus_hdc;
 
 	required_device<upd7201_device> m_mpsc;
 	required_device<com8116_device> m_dbrg_A;
@@ -954,7 +954,7 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 
 // Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
-AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_t, read, write) 
+AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_t, read, write)
 AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
 
 // ===========================================================
@@ -1074,7 +1074,7 @@ PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("CORVUS HARD DISKS") 
+PORT_START("CORVUS HARD DISKS")
 PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1229,7 +1229,7 @@ void rainbow_state::machine_reset()
 	}
 
 	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present
-			io.unmap_readwrite(0x20, 0x20);  
+			io.unmap_readwrite(0x20, 0x20);
 
 	// *********** FLOPPY DISK CONTROLLER [ NOT OPTIONAL ]
 	m_unit = INVALID_DRIVE;
@@ -2148,7 +2148,7 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return  (((m_inp5->read() == 1) ? 0 : 1) |
-		     ((m_inp7->read() == 1) ? 0 : 4) | // Floppy is always present (bit 1 zero)
+			 ((m_inp7->read() == 1) ? 0 : 4) | // Floppy is always present (bit 1 zero)
 #ifdef      OLD_RAM_BOARD_PRESENT
 		((m_inp8->read() > MOTHERBOARD_RAM) ? 0 : 8) |
 #else
@@ -3288,7 +3288,7 @@ MCFG_WD2010_IN_INDEX_CB(VCC) //    "
 MCFG_HARDDISK_ADD("decharddisk1")
 /// ******************************** / HARD DISK CONTROLLER ****************************************
 
-MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0) 
+MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0)
 MCFG_HARDDISK_ADD("harddisk1")
 MCFG_HARDDISK_INTERFACE("corvus_hdd")
 MCFG_HARDDISK_ADD("harddisk2")

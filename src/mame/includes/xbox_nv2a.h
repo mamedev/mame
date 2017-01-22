@@ -108,7 +108,7 @@ public:
 		{
 			union
 			{
-				uint32_t i; 
+				uint32_t i;
 				float f;
 			} cnv;
 

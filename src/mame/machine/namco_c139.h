@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Namco C139 - Serial I/F Controller
+    Namco C139 - Serial I/F Controller
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@ public:
 	DECLARE_ADDRESS_MAP(regs_map, 16);
 
 	DECLARE_READ16_MEMBER(status_r);
-	
+
 	DECLARE_READ16_MEMBER(ram_r);
 	DECLARE_WRITE16_MEMBER(ram_w);
 

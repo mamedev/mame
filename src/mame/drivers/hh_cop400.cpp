@@ -801,7 +801,7 @@ MACHINE_CONFIG_END
   Mattel Dalla$ (J.R. handheld)
   * COP444 MCU label COP444L-HYN/N
   * 8-digit 7seg display, 1-bit sound
-  
+
   This is a board game, only the handheld device is emulated here.
 
 ***************************************************************************/

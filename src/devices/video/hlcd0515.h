@@ -75,12 +75,12 @@ protected:
 	int m_data;     // "
 	int m_count;
 	u8 m_control;
-	bool m_blank;	// display blank/visible
+	bool m_blank;   // display blank/visible
 	u8 m_rowmax;    // number of rows output by lcd (max 8)
 	u8 m_rowout;    // current row for lcd output
 	u8 m_rowsel;    // current row for data in/out
 	u32 m_ram[8];   // 8x25bit ram
-	
+
 	emu_timer *m_lcd_timer;
 
 	// callbacks

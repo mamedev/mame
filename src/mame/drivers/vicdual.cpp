@@ -2549,7 +2549,7 @@ ROM_END
 
 /* Fully working PCB set from my full-size Sub Hunter upright machine.
 
-Essentally this pcb set is a Taito-made license of 
+Essentally this pcb set is a Taito-made license of
 'Depthcharge' by Gremlin.
 
 PCB markings are:

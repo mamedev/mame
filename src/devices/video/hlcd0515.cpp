@@ -99,7 +99,7 @@ void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	if (m_rowout > m_rowmax)
 		m_rowout = 0;
-	
+
 	// write to COL/ROW pins
 	m_write_cols(m_rowout, m_blank ? m_ram[m_rowout] : 0, 0xffffffff);
 	m_rowout++;
@@ -114,7 +114,7 @@ void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int par
 WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 {
 	state = (state) ? 1 : 0;
-	
+
 	// start serial sequence on falling edge
 	if (!state && m_cs)
 	{
@@ -128,7 +128,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 {
 	state = (state) ? 1 : 0;
-	
+
 	// clock/shift data on falling edge
 	if (!m_cs && m_count < 30 && !state && m_clock)
 	{
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 				m_ram[m_rowsel] = (m_ram[m_rowsel] & ~mask) | (m_data ? mask : 0);
 			}
 		}
-		
+
 		m_count++;
 	}
 

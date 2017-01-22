@@ -4,7 +4,7 @@
 
     TODO:
 
-	- keyboard
+    - keyboard
     - LDV1000 mode
     - PR7820 INT/_EXT line
     - coin counter
@@ -334,9 +334,9 @@ WRITE_LINE_MEMBER(thayers_state::kbclk_w)
 		}
 
 		if (LOG) logerror("rx bit %u\n",m_rx_bit);
-		
+
 		if (BIT(m_rx_bit, 3)) {
-	    	// 1, 0, 1, Q9, P3, P2, P1, P0, 1, 1
+			// 1, 0, 1, Q9, P3, P2, P1, P0, 1, 1
 			bool q9 = (m_keylatch == 9);
 			m_keydata = 0xa0 | q9 << 4 | m_row[m_keylatch]->read();
 			if (LOG) logerror("keydata %02x keylatch %u\n",m_keydata,m_keylatch);

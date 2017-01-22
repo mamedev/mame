@@ -13,7 +13,7 @@
 
 extern const device_type VME_FCCPU20;
 
-class vme_fccpu20_card_device : 
+class vme_fccpu20_card_device :
 	public device_t
 	,public device_vme_card_interface
 {

@@ -4,7 +4,7 @@
 
     Amiga 1200 Keyboard
 
-	Skeleton device, needs MC68HC05Cx device support
+    Skeleton device, needs MC68HC05Cx device support
 
 ***************************************************************************/
 

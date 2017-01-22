@@ -61,33 +61,33 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-	- marstv: locks up during anchor talking (does same in Demul);
-	- marstv: missing graphics at stage select, renderer fault or something else?
+    - marstv: locks up during anchor talking (does same in Demul);
+    - marstv: missing graphics at stage select, renderer fault or something else?
     - Monkey Ball: asserts when attempts to load a stage;
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
-	- puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
+    - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
     - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
     - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
-	- sfz3ugd: currently dies at disclaimer screen (regression);
-	- shangril: swapped mahjong inputs (M -> N, C -> B etc.);
-	- sprtjam: garbage on initial attract mode screen (regression).
+    - sfz3ugd: currently dies at disclaimer screen (regression);
+    - shangril: swapped mahjong inputs (M -> N, C -> B etc.);
+    - sprtjam: garbage on initial attract mode screen (regression).
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
     - vtennisg: crashes after stage screen or the attract mode (PVR or SH-4 bug, most likely);
     - World Kicks (both sets): "NAOMIM2: unhandled board write a0800600, 0000" after Naomi logo
-	- sl2007:
-		0C04697A: MOV.L   @($28,R14),R0 ;8c167734
-		0C04697C: TST     R0,R0
-		0C04697E: BT      $0C046998
-		0C046980: BRA     $0C046990
-		0C04698E: BT      $0C046998
-		0C046990: MOV.L   @($28,R14),R3
-		0C046992: MOV     #$FD,R5
-		0C046994: JSR     R3
-		0C046608: NOP
-		0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
-		0C046608: NOP
+    - sl2007:
+        0C04697A: MOV.L   @($28,R14),R0 ;8c167734
+        0C04697C: TST     R0,R0
+        0C04697E: BT      $0C046998
+        0C046980: BRA     $0C046990
+        0C04698E: BT      $0C046998
+        0C046990: MOV.L   @($28,R14),R3
+        0C046992: MOV     #$FD,R5
+        0C046994: JSR     R3
+        0C046608: NOP
+        0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
+        0C046608: NOP
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 Guru's Readmes
@@ -1585,7 +1585,7 @@ WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
 {
 }
 
-// TODO: was using same handler as Naomi, tbd 
+// TODO: was using same handler as Naomi, tbd
 READ64_MEMBER(atomiswave_state::aw_unknown1_r )
 {
 	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
@@ -1960,7 +1960,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aw_port, AS_IO, 64, atomiswave_state )
-//	???
+//  ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
@@ -2701,10 +2701,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( naomi_base, naomi_state )
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
-	
+
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
-	
+
 	MCFG_MIE_ADD("mie", XTAL_32MHz/2, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr) // Actual frequency unknown, most likely 1/2 of 32MHz XTAL or even 2/3 (yes, 21MHz Z80 core)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
@@ -2808,10 +2808,10 @@ static MACHINE_CONFIG_START( aw_base, atomiswave_state )
 	MCFG_CPU_IO_MAP(aw_port)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(dc_state, g1_irq))
-	
+
 	//MCFG_CPU_MODIFY("soundcpu")
 	//MCFG_CPU_PROGRAM_MAP(aw_sound_map)
-	
+
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 MACHINE_CONFIG_END
 
@@ -6918,23 +6918,23 @@ ROM_END
 // ROM board ID# 840-0078B REV.B
 /*
 ROM_START( shors2k1 )
-	NAOMI_BIOS
-	NAOMI_DEFAULT_EEPROM
+    NAOMI_BIOS
+    NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-23739b.ic22",	0x00000000,	0x00400000, CRC() SHA1() )
-	ROM_LOAD("mpr-23740.ic1",	0x00800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23741.ic2",	0x01800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23742.ic3",	0x02800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23743.ic4",	0x03800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23744.ic5",	0x04800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23745.ic6",	0x05800000,	0x01000000, CRC() SHA1() )
-	ROM_LOAD("mpr-23746.ic7",	0x06800000,	0x01000000, CRC() SHA1() )
+    ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
+    ROM_LOAD("epr-23739b.ic22", 0x00000000, 0x00400000, CRC() SHA1() )
+    ROM_LOAD("mpr-23740.ic1",   0x00800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23741.ic2",   0x01800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23742.ic3",   0x02800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23743.ic4",   0x03800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23744.ic5",   0x04800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23745.ic6",   0x05800000, 0x01000000, CRC() SHA1() )
+    ROM_LOAD("mpr-23746.ic7",   0x06800000, 0x01000000, CRC() SHA1() )
 
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "sflash.ic46",   0x000000, 0x000084, CRC() SHA1() )
+    ROM_REGION(0x84, "some_eeprom", 0)
+    ROM_LOAD( "sflash.ic46",   0x000000, 0x000084, CRC() SHA1() )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+    ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 */
 
@@ -6953,13 +6953,13 @@ ROM_START( shorsepm )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x6800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-24087b.ic22",	0x00000000,	0x00400000, CRC(9388f109) SHA1(b441bacd1af14ba0488c0f25fd6e6657b1de0cf6) )
-	ROM_LOAD("mpr-24088.ic1",	0x00800000,	0x01000000, CRC(386d9a06) SHA1(c923be8a60a15bc7a747aa4a3c0ed66cc00aae79) )
-	ROM_LOAD("mpr-24089.ic2",	0x01800000,	0x01000000, CRC(404e231b) SHA1(fa6f4c9a8463c3216468330a819efe8ecf31e278) )
-	ROM_LOAD("mpr-24090.ic3",	0x02800000,	0x01000000, CRC(48fb173d) SHA1(e5de093c96b6aebafe6ec8f36bad5a033590ad34) )
-	ROM_LOAD("mpr-24091.ic4",	0x03800000,	0x01000000, CRC(7c92174c) SHA1(8e53f31a2a9e088caf46344e6850dfbb2b9cc638) )
-	ROM_LOAD("mpr-24092.ic5",	0x04800000,	0x01000000, CRC(d32299a6) SHA1(e9bf05f9e8691d0ee4fb15346958b5bea738da30) )
-	ROM_LOAD("mpr-24093.ic6",	0x05800000,	0x01000000, CRC(6491dd68) SHA1(8777ceae12d8267bd9867385d0dc1facc6dac66c) )
+	ROM_LOAD("epr-24087b.ic22", 0x00000000, 0x00400000, CRC(9388f109) SHA1(b441bacd1af14ba0488c0f25fd6e6657b1de0cf6) )
+	ROM_LOAD("mpr-24088.ic1",   0x00800000, 0x01000000, CRC(386d9a06) SHA1(c923be8a60a15bc7a747aa4a3c0ed66cc00aae79) )
+	ROM_LOAD("mpr-24089.ic2",   0x01800000, 0x01000000, CRC(404e231b) SHA1(fa6f4c9a8463c3216468330a819efe8ecf31e278) )
+	ROM_LOAD("mpr-24090.ic3",   0x02800000, 0x01000000, CRC(48fb173d) SHA1(e5de093c96b6aebafe6ec8f36bad5a033590ad34) )
+	ROM_LOAD("mpr-24091.ic4",   0x03800000, 0x01000000, CRC(7c92174c) SHA1(8e53f31a2a9e088caf46344e6850dfbb2b9cc638) )
+	ROM_LOAD("mpr-24092.ic5",   0x04800000, 0x01000000, CRC(d32299a6) SHA1(e9bf05f9e8691d0ee4fb15346958b5bea738da30) )
+	ROM_LOAD("mpr-24093.ic6",   0x05800000, 0x01000000, CRC(6491dd68) SHA1(8777ceae12d8267bd9867385d0dc1facc6dac66c) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
@@ -6971,13 +6971,13 @@ ROM_START( shorseps )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x6800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-24097a.ic22",	0x00000000,	0x00400000, CRC(ec61a9e8) SHA1(a418be12eeaa4a9c43d1c5dc87ecb5c48857a436) )
-	ROM_LOAD("mpr-24098.ic1",	0x00800000,	0x01000000, CRC(c55b45be) SHA1(3dd42a8e21323026742ae764f0a22d96475b55e0) )
-	ROM_LOAD("mpr-24099.ic2",	0x01800000,	0x01000000, CRC(e3f0f02e) SHA1(66bcbc251b43688bdc0000a1a9fd463d01ee4e04) )
-	ROM_LOAD("mpr-24100.ic3",	0x02800000,	0x01000000, CRC(a5f3cbe9) SHA1(a290d0b1c2c249cbc0473357bde73e4187c96c0d) )
-	ROM_LOAD("mpr-24101.ic4",	0x03800000,	0x01000000, CRC(daaf9531) SHA1(5a9651c69d3dd6367cf7f92546ffbb4be65635de) )
-	ROM_LOAD("mpr-24102.ic5",	0x04800000,	0x01000000, CRC(55121ff3) SHA1(c5bc7839b8f9c93a2e600589ce5e158742afda0e) )
-	ROM_LOAD("mpr-24103.ic6",	0x05800000,	0x01000000, CRC(bfbc3569) SHA1(c8ba7df05d675a15b3eb7c941e9ba231a30e746a) )
+	ROM_LOAD("epr-24097a.ic22", 0x00000000, 0x00400000, CRC(ec61a9e8) SHA1(a418be12eeaa4a9c43d1c5dc87ecb5c48857a436) )
+	ROM_LOAD("mpr-24098.ic1",   0x00800000, 0x01000000, CRC(c55b45be) SHA1(3dd42a8e21323026742ae764f0a22d96475b55e0) )
+	ROM_LOAD("mpr-24099.ic2",   0x01800000, 0x01000000, CRC(e3f0f02e) SHA1(66bcbc251b43688bdc0000a1a9fd463d01ee4e04) )
+	ROM_LOAD("mpr-24100.ic3",   0x02800000, 0x01000000, CRC(a5f3cbe9) SHA1(a290d0b1c2c249cbc0473357bde73e4187c96c0d) )
+	ROM_LOAD("mpr-24101.ic4",   0x03800000, 0x01000000, CRC(daaf9531) SHA1(5a9651c69d3dd6367cf7f92546ffbb4be65635de) )
+	ROM_LOAD("mpr-24102.ic5",   0x04800000, 0x01000000, CRC(55121ff3) SHA1(c5bc7839b8f9c93a2e600589ce5e158742afda0e) )
+	ROM_LOAD("mpr-24103.ic6",   0x05800000, 0x01000000, CRC(bfbc3569) SHA1(c8ba7df05d675a15b3eb7c941e9ba231a30e746a) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
@@ -6990,8 +6990,8 @@ ROM_START( shorsepb )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x1800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("rom1.ic1s",		0x00800000,	0x00800000, CRC(d1305180) SHA1(07078484ba938af9c1124521e90b1b4540c63fbd) )
-	ROM_LOAD("rom2.ic2s",		0x01000000,	0x00800000, CRC(cfb9881d) SHA1(97632db5a99e15fd9256db195bf6ae60f848df74) )
+	ROM_LOAD("rom1.ic1s",       0x00800000, 0x00800000, CRC(d1305180) SHA1(07078484ba938af9c1124521e90b1b4540c63fbd) )
+	ROM_LOAD("rom2.ic2s",       0x01000000, 0x00800000, CRC(cfb9881d) SHA1(97632db5a99e15fd9256db195bf6ae60f848df74) )
 
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(fe8f8f5c) SHA1(839461ab736e0228dec7e2512e1692d6ecc4e664) )
@@ -7006,18 +7006,18 @@ ROM_START( shorsepl )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb800000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-24107a.ic22",	0x00000000,	0x00400000, CRC(8df0f545) SHA1(b89c0d4bf1d5e95176251b6ea42b1d9f885d14bf) )
-	ROM_LOAD("mpr-24108.ic1",	0x00800000,	0x01000000, CRC(e8e9c09c) SHA1(5e3d938fa5958c40c59511eef1f2607af7768cc9) )
-	ROM_LOAD("mpr-24109.ic2",	0x01800000,	0x01000000, CRC(a5c103d0) SHA1(8f138146a95553c725298c179776ee312beda6d0) )
-	ROM_LOAD("mpr-24110.ic3",	0x02800000,	0x01000000, CRC(58a5a8c2) SHA1(913d9e5f00a657e407855f00bf6db0af621ae2ca) )
-	ROM_LOAD("mpr-24111.ic4",	0x03800000,	0x01000000, CRC(dcb17013) SHA1(f5523089f0844d43c1bab2044b5de241455e7526) )
-	ROM_LOAD("mpr-24112.ic5",	0x04800000,	0x01000000, CRC(711e656b) SHA1(ef3dc54c92a3347da3c5ca697f2ad550906bd44b) )
-	ROM_LOAD("mpr-24113.ic6",	0x05800000,	0x01000000, CRC(d6c7d611) SHA1(48955388e86a9f5aa44319501fd339cc662d5647) )
-	ROM_LOAD("mpr-24114.ic7",	0x06800000,	0x01000000, CRC(cb1846b7) SHA1(49d0e51921c2c48b07290cd344b5df73df6d333e) )
-	ROM_LOAD("mpr-24115.ic8",	0x07800000,	0x01000000, CRC(73c5168d) SHA1(d999b8d2c3b554ca4c256c1da2a5ad3741a6b3fd) )
-	ROM_LOAD("mpr-24116.ic9",	0x08800000,	0x01000000, CRC(e074c41a) SHA1(77d8c5a98bd42d199e8e5a5e53b40fe3a1d5a349) )
-	ROM_LOAD("mpr-24117.ic10",	0x09800000,	0x01000000, CRC(d6d33ab2) SHA1(1f4c182ac9eebe7b3d0a14f8984f59ffd6979ac0) )
-	ROM_LOAD("mpr-24118.ic11",	0x0a800000,	0x01000000, CRC(99b64022) SHA1(e324f8f042dac1849692a05d8d7aa71d80c36ff3) )
+	ROM_LOAD("epr-24107a.ic22", 0x00000000, 0x00400000, CRC(8df0f545) SHA1(b89c0d4bf1d5e95176251b6ea42b1d9f885d14bf) )
+	ROM_LOAD("mpr-24108.ic1",   0x00800000, 0x01000000, CRC(e8e9c09c) SHA1(5e3d938fa5958c40c59511eef1f2607af7768cc9) )
+	ROM_LOAD("mpr-24109.ic2",   0x01800000, 0x01000000, CRC(a5c103d0) SHA1(8f138146a95553c725298c179776ee312beda6d0) )
+	ROM_LOAD("mpr-24110.ic3",   0x02800000, 0x01000000, CRC(58a5a8c2) SHA1(913d9e5f00a657e407855f00bf6db0af621ae2ca) )
+	ROM_LOAD("mpr-24111.ic4",   0x03800000, 0x01000000, CRC(dcb17013) SHA1(f5523089f0844d43c1bab2044b5de241455e7526) )
+	ROM_LOAD("mpr-24112.ic5",   0x04800000, 0x01000000, CRC(711e656b) SHA1(ef3dc54c92a3347da3c5ca697f2ad550906bd44b) )
+	ROM_LOAD("mpr-24113.ic6",   0x05800000, 0x01000000, CRC(d6c7d611) SHA1(48955388e86a9f5aa44319501fd339cc662d5647) )
+	ROM_LOAD("mpr-24114.ic7",   0x06800000, 0x01000000, CRC(cb1846b7) SHA1(49d0e51921c2c48b07290cd344b5df73df6d333e) )
+	ROM_LOAD("mpr-24115.ic8",   0x07800000, 0x01000000, CRC(73c5168d) SHA1(d999b8d2c3b554ca4c256c1da2a5ad3741a6b3fd) )
+	ROM_LOAD("mpr-24116.ic9",   0x08800000, 0x01000000, CRC(e074c41a) SHA1(77d8c5a98bd42d199e8e5a5e53b40fe3a1d5a349) )
+	ROM_LOAD("mpr-24117.ic10",  0x09800000, 0x01000000, CRC(d6d33ab2) SHA1(1f4c182ac9eebe7b3d0a14f8984f59ffd6979ac0) )
+	ROM_LOAD("mpr-24118.ic11",  0x0a800000, 0x01000000, CRC(99b64022) SHA1(e324f8f042dac1849692a05d8d7aa71d80c36ff3) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END

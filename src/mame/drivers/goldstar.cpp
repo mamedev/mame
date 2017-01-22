@@ -927,17 +927,17 @@ ADDRESS_MAP_END
     B800 = 9B (A, B, C, all input)
     B810 = 9B (A, B, C, all input)
     B820 = 90 (A input, B & C output)
-	
+
     RAM/ROM/NVRAM are OK.
 
-	Reels RAM and scroll are OK.
-	(only reel 2 seems to be used by the game)
+    Reels RAM and scroll are OK.
+    (only reel 2 seems to be used by the game)
 
-	Video & atr RAM are OK.
+    Video & atr RAM are OK.
 
     PSG is OK.
 
-    AY8910 ports are OK.	
+    AY8910 ports are OK.
 */
 static ADDRESS_MAP_START( mbstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -11503,7 +11503,7 @@ ROM_END
 /*
   Mega Bonus Star II (Millennium Edition, Euro)
   Auto-Data Graz, 2002.
-  
+
   W4 derivative hardware...
 
   PCB has a daughterboard with:
@@ -11570,7 +11570,7 @@ ROM_END
                     +-----------+
 
   40-Pin DIP Pin Identification for Z86C15 MCU (for reference):
-  
+
   ---------------------------------------------------------
   Pin    Symbol    Function                       Direction
   ---------------------------------------------------------

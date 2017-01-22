@@ -261,7 +261,7 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 		bitmap.fill(0);
-	
+
 	// Text output
 	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{

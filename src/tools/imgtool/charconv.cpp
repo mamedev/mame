@@ -78,7 +78,7 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *sr
 		{
 			ch = 0xFFFD;
 			rc = 1;
-		}	
+		}
 		iter += rc;
 
 		// do the reverse lookup

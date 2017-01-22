@@ -143,7 +143,7 @@ public:
 	}
 
 	void set_mat(const nl_double a11, const nl_double a12, const nl_double r1,
-			     const nl_double a21, const nl_double a22, const nl_double r2)
+				 const nl_double a21, const nl_double a22, const nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, r1);

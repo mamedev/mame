@@ -1608,9 +1608,9 @@ project "utf8proc"
 	kind "StaticLib"
 
   defines {
-    "UTF8PROC_DLLEXPORT="
+	"UTF8PROC_DLLEXPORT="
   }
-  
+
 	configuration "Debug"
 		defines {
 			"verbose=-1",

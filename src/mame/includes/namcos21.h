@@ -70,7 +70,7 @@ public:
 	optional_device<cpu_device> m_dsp;
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
 	optional_device<namco_c148_device> m_gpu_intc;
-	
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_maskram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
@@ -158,12 +158,12 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
-		
+
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
-	
+
 	DECLARE_DRIVER_INIT(driveyes);
 	DECLARE_DRIVER_INIT(winrun);
 	DECLARE_DRIVER_INIT(starblad);

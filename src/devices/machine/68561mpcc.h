@@ -157,32 +157,32 @@ protected:
 	void trigger_interrupt(int source);
 	enum
 	{
-		INT_TX_TDRA,	// Tx char available
-		INT_TX_TFC,		// Tx frame complete
-		INT_TX_TUNRN,	// Tx underrun detected
-		INT_TX_TFERR,	// Tx frame error detected
-		INT_RX_RDA,		// Rx interrupt on Receiver Data Available
-		INT_RX_EOF,		// Rx interrupt on End of frame
-		INT_RX_CPERR,	// Rx interrupt on CRC or Parity error
-		INT_RX_FRERR,	// Rx interrupt on Frame error
-		INT_RX_ROVRN,	// Rx interrupt on Receiver overrun
-		INT_RX_RAB,		// Rx interrupt on Abort/Break
-		INT_SR_CTS, 	// Serial interface interrupt on CTS asserted
-		INT_SR_DSR, 	// Serial interface interrupt on DSR asserted
-		INT_SR_DCD, 	// Serial interface interrupt on DCD asserted
+		INT_TX_TDRA,    // Tx char available
+		INT_TX_TFC,     // Tx frame complete
+		INT_TX_TUNRN,   // Tx underrun detected
+		INT_TX_TFERR,   // Tx frame error detected
+		INT_RX_RDA,     // Rx interrupt on Receiver Data Available
+		INT_RX_EOF,     // Rx interrupt on End of frame
+		INT_RX_CPERR,   // Rx interrupt on CRC or Parity error
+		INT_RX_FRERR,   // Rx interrupt on Frame error
+		INT_RX_ROVRN,   // Rx interrupt on Receiver overrun
+		INT_RX_RAB,     // Rx interrupt on Abort/Break
+		INT_SR_CTS,     // Serial interface interrupt on CTS asserted
+		INT_SR_DSR,     // Serial interface interrupt on DSR asserted
+		INT_SR_DCD,     // Serial interface interrupt on DCD asserted
 	};
 
 	enum
 	{
-		RX_INT_PRIO = 0x00,	// Highest interrupt priority
+		RX_INT_PRIO = 0x00, // Highest interrupt priority
 		TX_INT_PRIO = 0x01,
-		SR_INT_PRIO = 0x02	// Lowest interrupt priority
+		SR_INT_PRIO = 0x02  // Lowest interrupt priority
 	};
 
 	enum
 	{
-		INT_REQ = 0x01,	// Interrupt requested
-		INT_ACK = 0x02	// Interrupt acknowledged
+		INT_REQ = 0x01, // Interrupt requested
+		INT_ACK = 0x02  // Interrupt acknowledged
 	};
 
 	// Variants in the MPCC family
@@ -217,22 +217,22 @@ protected:
 	devcb_write_line    m_out_int_cb;
 
 	/*
-     *  Register handling
-     */
+	 *  Register handling
+	 */
 	// RSR - Rx Status Register
 	uint8_t m_rsr;
 	uint8_t do_rsr();
 	void do_rsr(uint8_t data);
 	enum
 	{
-		REG_RSR_RDA		= 0x80, // Rx Data available
-		REG_RSR_EOF		= 0x40, // End of frame detected (BOP and BSC modes)
-		REG_RSR_RHW 	= 0x20, // Odd number of frame data bytes reeived in 16 bit mode.
-		REG_RSR_CPERR	= 0x10, // CRC or parity error detected
-		REG_RSR_FRERR	= 0x08, // Frame error detected
-		REG_RSR_ROVRN	= 0x04, // Rx overrun detected
-		REG_RSR_RAB		= 0x02, // Rx Abort break detected
-		REG_RSR_RIDLE	= 0x01, // Rx idle detcted (15+ high consecutive bits accounted for)
+		REG_RSR_RDA     = 0x80, // Rx Data available
+		REG_RSR_EOF     = 0x40, // End of frame detected (BOP and BSC modes)
+		REG_RSR_RHW     = 0x20, // Odd number of frame data bytes reeived in 16 bit mode.
+		REG_RSR_CPERR   = 0x10, // CRC or parity error detected
+		REG_RSR_FRERR   = 0x08, // Frame error detected
+		REG_RSR_ROVRN   = 0x04, // Rx overrun detected
+		REG_RSR_RAB     = 0x02, // Rx Abort break detected
+		REG_RSR_RIDLE   = 0x01, // Rx idle detcted (15+ high consecutive bits accounted for)
 	};
 
 	// RCR - Rx Control Register
@@ -261,12 +261,12 @@ protected:
 	uint8_t do_rier();
 	void do_rier(uint8_t data);
 	enum {
-		REG_RIER_RDA	= 0x80, // Rx interrupt on Receiver Data Available
-		REG_RIER_EOF	= 0x40, // Rx interrupt on End of frame
-		REG_RIER_CPERR	= 0x10, // Rx interrupt on CRC or Parity error
-		REG_RIER_FRERR	= 0x08, // Rx interrupt on Frame error
-		REG_RIER_ROVRN	= 0x04, // Rx interrupt on Receiver overrun
-		REG_RIER_RAB	= 0x02, // Rx interrupt on Abort/Break
+		REG_RIER_RDA    = 0x80, // Rx interrupt on Receiver Data Available
+		REG_RIER_EOF    = 0x40, // Rx interrupt on End of frame
+		REG_RIER_CPERR  = 0x10, // Rx interrupt on CRC or Parity error
+		REG_RIER_FRERR  = 0x08, // Rx interrupt on Frame error
+		REG_RIER_ROVRN  = 0x04, // Rx interrupt on Receiver overrun
+		REG_RIER_RAB    = 0x02, // Rx interrupt on Abort/Break
 	};
 
 	// TSR - Tx Status Register
@@ -287,14 +287,14 @@ protected:
 	void do_tcr(uint8_t data);
 	enum
 	{
-		REG_TCR_TEN		= 0x80, // Tx enable
-		REG_TCR_TDSREN	= 0x40, // DMA enable
-		REG_TCR_TICS	= 0x20, // Tx Idle Char Select, 'A' variant differs
-		REG_TCR_THW		= 0x10, // Indicates that last 16 bit word has only 8 bits, in 16 bits mode only
-		REG_TCR_TLAST	= 0x08, // Indicates the last byte to be written in to TDR (BOP, BCS or COP)
-		REG_TCR_TSYN	= 0x04, // SYN enable (BCS or COP)
-		REG_TCR_TABT	= 0x02, // Abort command (BOP)
-		REG_TCR_TRES	= 0x01, // Tx Reset command
+		REG_TCR_TEN     = 0x80, // Tx enable
+		REG_TCR_TDSREN  = 0x40, // DMA enable
+		REG_TCR_TICS    = 0x20, // Tx Idle Char Select, 'A' variant differs
+		REG_TCR_THW     = 0x10, // Indicates that last 16 bit word has only 8 bits, in 16 bits mode only
+		REG_TCR_TLAST   = 0x08, // Indicates the last byte to be written in to TDR (BOP, BCS or COP)
+		REG_TCR_TSYN    = 0x04, // SYN enable (BCS or COP)
+		REG_TCR_TABT    = 0x02, // Abort command (BOP)
+		REG_TCR_TRES    = 0x01, // Tx Reset command
 	};
 
 	// TDR - Tx Data Register (write only)
@@ -314,10 +314,10 @@ protected:
 	void do_tier(uint8_t data);
 	enum
 	{
-		REG_TIER_TDRA	= 0x80, // TX Character available interrupt
-		REG_TIER_TFC	= 0x40, // TX Frame complete interrupt
-		REG_TIER_TUNRN	= 0x04, // TX Underrun interrupt
-		REG_TIER_TFERR	= 0x02, // TX Frame error interrupt
+		REG_TIER_TDRA   = 0x80, // TX Character available interrupt
+		REG_TIER_TFC    = 0x40, // TX Frame complete interrupt
+		REG_TIER_TUNRN  = 0x04, // TX Underrun interrupt
+		REG_TIER_TFERR  = 0x02, // TX Frame error interrupt
 	};
 
 	// SISR - Serial Interface Status Register
@@ -326,12 +326,12 @@ protected:
 	void do_sisr(uint8_t data);
 	enum
 	{
-		REG_SISR_CTST	= 0x80, // Clear To Send Transition Status
-		REG_SISR_DSRT	= 0x40, // Data Set Ready Transition Status
-		REG_SISR_DCDT	= 0x20, // Data Carrier Detect Transition Status
-		REG_SISR_CTSLVL	= 0x10, // Clear To Send Level
-		REG_SISR_DSRLVL	= 0x08, // Data Set Ready Level
-		REG_SISR_DCDLVL	= 0x04, // Data Carrier Detect Level
+		REG_SISR_CTST   = 0x80, // Clear To Send Transition Status
+		REG_SISR_DSRT   = 0x40, // Data Set Ready Transition Status
+		REG_SISR_DCDT   = 0x20, // Data Carrier Detect Transition Status
+		REG_SISR_CTSLVL = 0x10, // Clear To Send Level
+		REG_SISR_DSRLVL = 0x08, // Data Set Ready Level
+		REG_SISR_DCDLVL = 0x04, // Data Carrier Detect Level
 	};
 
 	// SICR - Serial Interface Control Register
@@ -340,10 +340,10 @@ protected:
 	void do_sicr(uint8_t data);
 	enum
 	{
-		REG_SICR_RTSLVL	= 0x80, // RTS level
-		REG_SICR_DTRLVL	= 0x40, // DTR level
-		REG_SICR_ECHO  	= 0x04, // Echo Mode
-		REG_SICR_TEST  	= 0x02, // Test Mode
+		REG_SICR_RTSLVL = 0x80, // RTS level
+		REG_SICR_DTRLVL = 0x40, // DTR level
+		REG_SICR_ECHO   = 0x04, // Echo Mode
+		REG_SICR_TEST   = 0x02, // Test Mode
 	};
 
 	uint8_t m_sivnr;
@@ -354,9 +354,9 @@ protected:
 	void do_sier(uint8_t data);
 	enum
 	{
-		REG_SIER_CTS	= 0x80,
-		REG_SIER_DSR	= 0x40,
-		REG_SIER_DCD	= 0x20,
+		REG_SIER_CTS    = 0x80,
+		REG_SIER_DSR    = 0x40,
+		REG_SIER_DCD    = 0x20,
 	};
 
 	// PSR1 Protocol Selection Register 1
@@ -365,10 +365,10 @@ protected:
 	void do_psr1(uint8_t data);
 	enum
 	{
-		REG_PSR1_ADRZ		= 0x08, // Zero adress option (BOP) (A models only)
-		REG_PSR1_IPARS		= 0x04, // IPARS option (COP)
-		REG_PSR1_CTLEX		= 0x02, // Control field width 8/16 bit (BOP) (A models only)
-		REG_PSR1_ADDEX		= 0x01, // Address extend option (BOP) (A models only)
+		REG_PSR1_ADRZ       = 0x08, // Zero adress option (BOP) (A models only)
+		REG_PSR1_IPARS      = 0x04, // IPARS option (COP)
+		REG_PSR1_CTLEX      = 0x02, // Control field width 8/16 bit (BOP) (A models only)
+		REG_PSR1_ADDEX      = 0x01, // Address extend option (BOP) (A models only)
 	};
 
 	// PSR2 Protocol Selection Register 2
@@ -377,25 +377,25 @@ protected:
 	void do_psr2(uint8_t data);
 	enum
 	{
-		REG_PSR2_WDBYT		= 0x80, // 8/16 bit data bus selector
-		REG_PSR2_STP_MSK	= 0x60, // Stop bits selection field
-		REG_PSR2_STP_1  	= 0x00, // 1   Stop bits
-		REG_PSR2_STP_1_5   	= 0x20, // 1.5 Stop bits
-		REG_PSR2_STP_2  	= 0x40, // 2   Stop bits
-		REG_PSR2_CHLN_MSK	= 0x18, // char len selection field
-		REG_PSR2_CHLN_5		= 0x00, // 5 bit char len
-		REG_PSR2_CHLN_6		= 0x08, // 6 bit char len
-		REG_PSR2_CHLN_7		= 0x10, // 7 bit char len
-		REG_PSR2_CHLN_8		= 0x18, // 8 bit char len
-		REG_PSR2_PSEL_MSK	= 0x07, // Protocol selection field
-		REG_PSR2_PSEL_BOPP	= 0x00, // Protocol selection BOP Primary
-		REG_PSR2_PSEL_BOPS	= 0x01, // Protocol selection BOP Secondary
-		REG_PSR2_PSEL_RSV	= 0x02, // Protocol selection Reserved
-		REG_PSR2_PSEL_COP	= 0x03, // Protocol selection COP
-		REG_PSR2_PSEL_BCSE	= 0x04, // Protocol selection BCS EBCDIC
-		REG_PSR2_PSEL_BCSA	= 0x05, // Protocol selection BCS ASCII
-		REG_PSR2_PSEL_ASCII	= 0x06, // Protocol selection ASYNC
-		REG_PSR2_PSEL_ISOC	= 0x07, // Protocol selection ISOC
+		REG_PSR2_WDBYT      = 0x80, // 8/16 bit data bus selector
+		REG_PSR2_STP_MSK    = 0x60, // Stop bits selection field
+		REG_PSR2_STP_1      = 0x00, // 1   Stop bits
+		REG_PSR2_STP_1_5    = 0x20, // 1.5 Stop bits
+		REG_PSR2_STP_2      = 0x40, // 2   Stop bits
+		REG_PSR2_CHLN_MSK   = 0x18, // char len selection field
+		REG_PSR2_CHLN_5     = 0x00, // 5 bit char len
+		REG_PSR2_CHLN_6     = 0x08, // 6 bit char len
+		REG_PSR2_CHLN_7     = 0x10, // 7 bit char len
+		REG_PSR2_CHLN_8     = 0x18, // 8 bit char len
+		REG_PSR2_PSEL_MSK   = 0x07, // Protocol selection field
+		REG_PSR2_PSEL_BOPP  = 0x00, // Protocol selection BOP Primary
+		REG_PSR2_PSEL_BOPS  = 0x01, // Protocol selection BOP Secondary
+		REG_PSR2_PSEL_RSV   = 0x02, // Protocol selection Reserved
+		REG_PSR2_PSEL_COP   = 0x03, // Protocol selection COP
+		REG_PSR2_PSEL_BCSE  = 0x04, // Protocol selection BCS EBCDIC
+		REG_PSR2_PSEL_BCSA  = 0x05, // Protocol selection BCS ASCII
+		REG_PSR2_PSEL_ASCII = 0x06, // Protocol selection ASYNC
+		REG_PSR2_PSEL_ISOC  = 0x07, // Protocol selection ISOC
 	};
 
 	uint8_t m_ar1;
@@ -412,20 +412,20 @@ protected:
 	uint8_t do_brdr2();
 	void do_brdr2(uint8_t data);
 
-	// CCR - Clock Control Register	
+	// CCR - Clock Control Register
 	uint8_t m_ccr;
 	uint8_t do_ccr();
 	void do_ccr(uint8_t data);
 	enum
 	{
-		REG_CCR_PSCDIV		= 0x10, // Internal prescaler Divider x2 or x3
-		REG_CCR_TCLO		= 0x08, // TxC input/output selection
-		REG_CCR_RCLKIN		= 0x04, // RxC from internal/external source selection
-		REG_CCR_CLKDIV_MSK	= 0x03, // External RxC prescaler Divider
-		REG_CCR_CLKDIV_X1	= 0x00, // x1  - ISOC only
-		REG_CCR_CLKDIV_X16	= 0x01, // x16 - ASYNC only
-		REG_CCR_CLKDIV_X32	= 0x02, // x32 - ASYNC only
-		REG_CCR_CLKDIV_X64	= 0x03, // x64 - ASYNC only
+		REG_CCR_PSCDIV      = 0x10, // Internal prescaler Divider x2 or x3
+		REG_CCR_TCLO        = 0x08, // TxC input/output selection
+		REG_CCR_RCLKIN      = 0x04, // RxC from internal/external source selection
+		REG_CCR_CLKDIV_MSK  = 0x03, // External RxC prescaler Divider
+		REG_CCR_CLKDIV_X1   = 0x00, // x1  - ISOC only
+		REG_CCR_CLKDIV_X16  = 0x01, // x16 - ASYNC only
+		REG_CCR_CLKDIV_X32  = 0x02, // x32 - ASYNC only
+		REG_CCR_CLKDIV_X64  = 0x03, // x64 - ASYNC only
 	};
 
 	// ECR - Error Control Regsiter
@@ -434,14 +434,14 @@ protected:
 	void do_ecr(uint8_t data);
 	enum
 	{
-		REG_ECR_PAREN	= 0x80, // Parity Enable
-		REG_ECR_ODDPAR	= 0x40, // Odd/Even Parity
-		REG_ECR_CFCRC	= 0x08, // CRC Enable
-		REG_ECR_CRCPRE	= 0x04, // CRC Preset 0 (BSC) or 1 (BOP)
-		REG_ECR_CRCSEL_MSK	= 0x03, // CRC Polynominal Selection Mask
-		REG_ECR_CRCSEL_V41	= 0x00, // CCITT V.41 (BOP) CRC Polynomial
-		REG_ECR_CRCSEL_C16	= 0x01, // CRC-16 (BSC) CRC Polynomial
-		REG_ECR_CRCSEL_VRC	= 0x02, // VRC/LRC (BSC, ASCII, non-transp) CRC Polynomial
+		REG_ECR_PAREN   = 0x80, // Parity Enable
+		REG_ECR_ODDPAR  = 0x40, // Odd/Even Parity
+		REG_ECR_CFCRC   = 0x08, // CRC Enable
+		REG_ECR_CRCPRE  = 0x04, // CRC Preset 0 (BSC) or 1 (BOP)
+		REG_ECR_CRCSEL_MSK  = 0x03, // CRC Polynominal Selection Mask
+		REG_ECR_CRCSEL_V41  = 0x00, // CCITT V.41 (BOP) CRC Polynomial
+		REG_ECR_CRCSEL_C16  = 0x01, // CRC-16 (BSC) CRC Polynomial
+		REG_ECR_CRCSEL_VRC  = 0x02, // VRC/LRC (BSC, ASCII, non-transp) CRC Polynomial
 	};
 
 };

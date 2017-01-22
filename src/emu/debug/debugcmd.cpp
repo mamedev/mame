@@ -726,7 +726,7 @@ void debugger_commands::execute_tracelog(int ref, int params, const char *param[
 
 
 /*-------------------------------------------------
-	execute_tracesym - execute the tracesym command
+    execute_tracesym - execute the tracesym command
 -------------------------------------------------*/
 
 void debugger_commands::execute_tracesym(int ref, int params, const char *param[])

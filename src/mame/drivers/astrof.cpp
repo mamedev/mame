@@ -1196,20 +1196,20 @@ ROM_END
 
 /* Star Fighter (VGG)
 CPUs
-QTY 	Type 	clock 	position 	function
-1x 	R6502-13 	2a 	8-bit Microprocessor - main
-1x 	TBA810 		2f 	Audio Amplifier - sound
-1x 	oscillator 	10595 	9c 	
+QTY     Type    clock   position    function
+1x  R6502-13    2a  8-bit Microprocessor - main
+1x  TBA810      2f  Audio Amplifier - sound
+1x  oscillator  10595   9c
 
 ROMs
-QTY 	Type 	position 	status
-6x 	TMS2716 	0-5 	dumped
-1x 	MMI6341-1J 	12c 	dumped
+QTY     Type    position    status
+6x  TMS2716     0-5     dumped
+1x  MMI6341-1J  12c     dumped
 
 RAMs
-QTY 	Type 	position
-19x 	ITT4027 	1-19
-2x 	2114L3PC 	5b,6b
+QTY     Type    position
+19x     ITT4027     1-19
+2x  2114L3PC    5b,6b
 
 Others
 1x 22x2 edge connector

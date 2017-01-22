@@ -155,7 +155,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_MVME350 = &device_creator<vme_mvme350_card_device>;
@@ -178,8 +178,8 @@ static ADDRESS_MAP_START( mvme350_mem, AS_PROGRAM, 16, vme_mvme350_card_device )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
-//	machine_config_additions - device-specific
-//	machine configurations
+//  machine_config_additions - device-specific
+//  machine configurations
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( mvme350 )
@@ -236,10 +236,10 @@ void vme_mvme350_card_device::device_start()
 	/* From MVME166 Single Board Computer Installation Guide:
 
 	   Controller Type     First board    Second board
-                           CLUN Address   CLUN Address
+	                       CLUN Address   CLUN Address
 	  ---------------------------------------------------
 	   MVME350 - Streaming $04  $FFFF5000 $05  $FFFF5100
-	   Tape Controller 
+	   Tape Controller
 	  ---------------------------------------------------
 	*/
 	uint32_t base = 0xFFFF5000;

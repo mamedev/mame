@@ -2,9 +2,9 @@
 // copyright-holders:Curt Coder
 /*
 
-	TODO:
+    TODO:
 
-	- GR is always 0
+    - GR is always 0
 
 */
 
@@ -99,7 +99,7 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 			if (rc3 && txt) {
 				rc_ = 7;
 			}
-			
+
 			uint16_t charrom_addr = (m_ucr << 11) | (rc_ << 8) | ((BIT(rd, 7) && m_fs) << 7) | (rd & 0x7f);
 			uint8_t crd = m_char_rom->base()[charrom_addr & 0xfff];
 			bool crd0 = BIT(crd, 0);

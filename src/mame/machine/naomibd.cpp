@@ -53,7 +53,7 @@
     "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
     * bit 28 (mode bit 0)
-	"M2" type carts: ROM_OFFSET - master/slave ROM board select
+    "M2" type carts: ROM_OFFSET - master/slave ROM board select
 
     * bit 0 can be set for "M4" type carts, function unknown
 

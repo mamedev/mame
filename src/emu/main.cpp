@@ -109,10 +109,10 @@ static std::string extension_to_type(const std::string& extension)
 	return "text/plain";
 }
 
-machine_manager::machine_manager(emu_options& options, osd_interface& osd) 
-  : m_osd(osd), 
-    m_options(options), 
-    m_machine(nullptr),
+machine_manager::machine_manager(emu_options& options, osd_interface& osd)
+  : m_osd(osd),
+	m_options(options),
+	m_machine(nullptr),
 	m_io_context(std::make_shared<asio::io_context>())
 {
 }
@@ -184,7 +184,7 @@ void machine_manager::start_http_server()
 			*send_stream << "update_machine";
 			m_wsserver->send(connection, send_stream);
 		};
-	
+
 		m_server->on_upgrade = [this](auto socket, auto request) {
 			auto connection = std::make_shared<webpp::ws_server::Connection>(socket);
 			connection->method = std::move(request->method);

@@ -2219,21 +2219,21 @@ ROM_END
      ---------------+--+------------------          ---------------+--+------------------          ---------------+--+------------------
                     |01| GND                                   GND |01| GND                                   +5V |01| +5V
        GEARS SWITCH |02| GND                                       |02|                                       +5V |02| +5V
-     50 PTS COIN-IN |03| GND                                       |03|                                           |03|  
-                    |04| GND                                   +5V |04| +5V                                       |04|  
-     25 PTS COIN-IN |05| GND                                       |05| COMMON ACCEL + BREAK (HI)                 |05|  
-                +5V |06| +5V                             BRAKE POT |06| ACCEL POT                                 |06|  
+     50 PTS COIN-IN |03| GND                                       |03|                                           |03|
+                    |04| GND                                   +5V |04| +5V                                       |04|
+     25 PTS COIN-IN |05| GND                                       |05| COMMON ACCEL + BREAK (HI)                 |05|
+                +5V |06| +5V                             BRAKE POT |06| ACCEL POT                                 |06|
                 +5V |07| +5V                                       |07| COMMON ACCEL + BREAK (LO)                 |07| GND
-                +5V |08| +5V                                       |08| GND                                       |08| VIDEO GND 
+                +5V |08| +5V                                       |08| GND                                       |08| VIDEO GND
                     |09|                       AUDIO SIGNAL 4(***) |09| AUDIO SIGNAL 1(***)            VIDEO SYNC |09| VIDEO BLUE
                     |10|                       AUDIO SIGNAL 3(***) |10| AUDIO SIGNAL 2(***)           VIDEO GREEN |10| VIDEO RED
-               +12V |11|                                       GND |11| GND                                       |11| 
+               +12V |11|                                       GND |11| GND                                       |11|
      WHEEL X SIGNAL |12|                                           |12|                                           |12|
      WHEEL Z SIGNAL |13|                                           |13|                                           |13|
                 -5V |14|                                           |14|                                           |14|
-  AUDIO SIGNAL 1(*) |15| AMP AUDIO SIGNAL (**)                     |15|                                       GND |15| GND  
-  AUDIO SIGNAL 2(*) |16| AMP AUDIO SIGNAL (**)                     |16|                                       GND |16| GND 
-  AUDIO SIGNAL 3(*) |17|                                           |17|                                       GND |17| GND 
+  AUDIO SIGNAL 1(*) |15| AMP AUDIO SIGNAL (**)                     |15|                                       GND |15| GND
+  AUDIO SIGNAL 2(*) |16| AMP AUDIO SIGNAL (**)                     |16|                                       GND |16| GND
+  AUDIO SIGNAL 3(*) |17|                                           |17|                                       GND |17| GND
   AUDIO SIGNAL 4(*) |18|                                           |18|                                       GND |18| GND
 
 
@@ -2321,7 +2321,7 @@ ROM_START( polepos2bs )
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
 	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, CRC(47226cda) SHA1(03115ead04b11e7ef3ef08d32d4d61a56dc35190) )    /* redumped. the former one has bit6 stuck */
 
-//	ROM_REGION( 0x2000, "pals", 0 )
+//  ROM_REGION( 0x2000, "pals", 0 )
 //  ...not dumped yet...
 ROM_END
 

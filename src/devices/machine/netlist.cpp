@@ -248,7 +248,7 @@ void netlist_mame_rom_t::custom_netlist_additions(netlist::setup_t &setup)
 	if (memregion(m_region_tag) == nullptr)
 		fatalerror("device %s region %s not found\n", basetag(), m_region_tag);
 	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_data_memregion_t>(setup,
-			m_name,	memregion(m_region_tag)->base() + m_offset, m_size));
+			m_name, memregion(m_region_tag)->base() + m_offset, m_size));
 }
 
 void netlist_mame_rom_t::device_start()

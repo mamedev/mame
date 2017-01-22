@@ -85,9 +85,9 @@ write - enable slave CPU, gpu, etc most of bits is unclear
 SH4 XTAL is 33MHz, SH4 MD0-2 pins is 001 or 011 (CPU core clk = XTAL*6, preipheral clk = XTAL, bus clk is XTAL or XTAL*2)
 
 TODO:
-	devicify NAND
-	somehow hook PVR2 renderer here
-	add sound
+    devicify NAND
+    somehow hook PVR2 renderer here
+    add sound
 
 */
 
@@ -206,9 +206,9 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 		else
 			m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-//	logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
-//	logbinary(dat);
-//	logerror("\n");
+//  logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
+//  logbinary(dat);
+//  logerror("\n");
 }
 
 READ64_MEMBER(atvtrack_state::nand_data_r)
@@ -319,7 +319,7 @@ WRITE32_MEMBER(atvtrack_state::gpu_w)
 	{
 	case 0x00/4:
 		// not really required, game code will go even if GPU CPU shows no signs of live
-		if (data)	// internal CPU start ?
+		if (data)   // internal CPU start ?
 			m_subcpu->space(AS_PROGRAM).write_byte(0x18001350, 1); // simulate GPUs internal CPU reply to skip busy loop
 		break;
 	case 0x70/4:
@@ -369,7 +369,7 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 	// bit  7     IO - data bit                 *1        always 1           / set to 30 during slave CPU test, then to 10
 	// bit  6     IO - data bit     Test                  ADC CS, ~DAC CS    unused
 	// bit  5     IO - data bit     Down                  ADC CLK, ~DAC CLK  unused
-	// bit  4     IO - data bit     Service               DAC data JP6       lamp 
+	// bit  4     IO - data bit     Service               DAC data JP6       lamp
 	// bit  3     IO - data bit     Up                    ADC data JP5       coin counter
 	// bit  2     I  - unk, (SD: 1 = FPGA ready after config)
 	// bit  1      O - data bits operation direction: 0 - output, 1 - input (SD: FPGA config data)
@@ -389,9 +389,9 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 			if (data & 0x0100)
 				m_slaverun = true;
 		}
-//		logerror("SH4 16bit i/o port write ");
-//		logbinary((uint32_t)data,15,0);
-//		logerror("\n");
+//      logerror("SH4 16bit i/o port write ");
+//      logbinary((uint32_t)data,15,0);
+//      logerror("\n");
 	}
 #ifdef SPECIALMODE
 	if (offset == SH4_IOPORT_DMA/8) {
@@ -424,7 +424,7 @@ uint32_t atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rg
 void get_altera10ke_eab(u8* dst, u8 *pof, int eab)
 {
 	// extract Altera FLEX 10KE 4kbit Embedded Array Block (EAB)
-	u32 startbit = 0x45b * 8 + 1 + (0x25e6 * 8) * eab;	// base ofsset actually depends on POF header size, however this EPC1PC8 dump havent it (bad dumper software?)
+	u32 startbit = 0x45b * 8 + 1 + (0x25e6 * 8) * eab;  // base ofsset actually depends on POF header size, however this EPC1PC8 dump havent it (bad dumper software?)
 
 	for (u32 bit = 0; bit < 4096; bit++)
 	{

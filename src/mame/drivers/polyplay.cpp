@@ -23,10 +23,10 @@ TODO:
   - get other rom versions and games
   - document the light-organ related stuff
 
-		
-NOTES: 
-  The hardware is based on the K1520 PC system, with video output coming through a standard Colormat TV. 
-	  
+
+NOTES:
+  The hardware is based on the K1520 PC system, with video output coming through a standard Colormat TV.
+
   There are at least two revisions:
 
   - Revision 1 -
@@ -35,14 +35,14 @@ NOTES:
   012-7100     ZRE     CPU-Board K2521 (3KiB ROM, 1KiB RAM)
   012-7040     PFS-1   ROM Board K3820 #1 - Games 1 to 4 (16KiB ROM)
   012-7040     PFS-2   ROM Board K3820 #2 - Games 5 to 8 (16KiB ROM)
-	  
+
   - Revision 2 -
   2319-84-01   FAZ     Graphics card (Color and Sound Logic)
   2319-84-02   ABS     Graphics card (1KiB ROM for Charset)
   02 899-0101  ZRE-PP  CPU-Board (56KiB ROM, 64KiB* RAM)
 
   Basically revision 2 combines the ZRE, PFS-1 and PFS-2 onto a single board.
-  
+
 
 memory map:
   - Revision 1 -
@@ -55,7 +55,7 @@ memory map:
                      Hirschjagd            (1c00 - 27ff)
                      Hase und Wolf         (2800 - 3fff)
                      Schmetterlingsfang    (4000 - 4fff)
-							  
+
   5000 - 8fff PFS-2  Schiessbude           (5000 - 5fff)
                      Autorennen            (6000 - 73ff)
                      opto-akust. Merkspiel (7400 - 7fff)
@@ -88,7 +88,7 @@ i/o ports:
   80 - 83 ZRE-PP UB857D  (Z80 CTC)
   84 - 87 ZRE-PP UB855D  (Z80 PIO)
   ?? - ?? ZRE-PP UB8560D (Z80 SIO)
-  
+
   read:
   83        CTC COUNT 3 (IN1)
             used as hardware random number generator
@@ -103,7 +103,7 @@ i/o ports:
             bit 6 = bookkeeping (Summe Spiele)
             bit 7 = coin sensor (+IRQ to make the game acknowledge it)
 
-  85        PIO PORT B 
+  85        PIO PORT B
             bit 0-4 = light organ (unemulated :)) )
             bit 5-7 = sound parameter (unemulated, it's very difficult to
                       figure out how those work)
@@ -203,11 +203,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( polyplay_mem_zrepp, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	
+
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	
+
 	AM_RANGE(0xd000, 0xd7ff) AM_ROM AM_REGION("gfx1", 0)
-	
+
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
 
@@ -281,14 +281,14 @@ static MACHINE_CONFIG_START( polyplay_zre, polyplay_state )
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(polyplay_state, ctc_zc0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(polyplay_state, ctc_zc1_w))
 	//MCFG_Z80CTC_ZC2_CB(WRITELINE(polyplay_state, ctc_zc2_w))
-	
+
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, POLYPLAY_MAIN_CLOCK / 4) /* UB855D */
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(polyplay_state, pio_porta_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(polyplay_state, pio_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(polyplay_state, pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(polyplay_state, pio_portb_w))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

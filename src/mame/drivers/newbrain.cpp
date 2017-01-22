@@ -31,8 +31,8 @@
 
     TODO:
 
-	- COPINT @ 84Hz instead of 50Hz? (with clock 3240506 is 50Hz)
-	- CLKINT arrives too late and COP reads the VFD data before CPU writes it
+    - COPINT @ 84Hz instead of 50Hz? (with clock 3240506 is 50Hz)
+    - CLKINT arrives too late and COP reads the VFD data before CPU writes it
     - VFD does not receive data from main CPU
     - bitmapped video
     - accurate video timing
@@ -270,7 +270,7 @@ WRITE8_MEMBER( newbrain_state::enrg_w )
 
 	// clock enable
 	int clk = BIT(data, 0);
-	
+
 	if (m_clk != clk) {
 		m_clk = clk;
 		check_interrupt();
@@ -497,7 +497,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 	if (!m_cop_k6 && k6) {
 		m_403_d = m_y[m_405_q & 0x0f]->read() & 0x0f;
-		
+
 		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_403_d);
 	}
 

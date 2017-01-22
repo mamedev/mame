@@ -70,7 +70,7 @@
  *
  * History of Force Computers
  *---------------------------
- * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened 
+ * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened
  *      in Munich, Germany, and a Japanese headquarter in Tokyo
  * 1996 Force was aquired by Solectron Corporation in 1996
  * 2004 Force was sold off from Solectron to Motorola
@@ -644,7 +644,7 @@ void cpu30_state::update_irq_to_maincpu()
 static SLOT_INTERFACE_START(fccpu30_vme_cards)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END	
+SLOT_INTERFACE_END
 
 /*
  * Machine configuration

@@ -804,7 +804,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokiob, tokio )
-	
+
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_REMOVE("bmcu")
 

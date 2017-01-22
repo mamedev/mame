@@ -241,91 +241,91 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
-    <software name="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
-        <year>2010?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084604(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-7" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="C84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
+		<year>2010?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084604(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="kfpanda" supported="no">
-        <description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
-        <year>2008?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084124(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="kfpanda" supported="no">
+		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084124(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="dora" supported="no">
-        <description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084024(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="dora" supported="no">
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084024(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="kleinstn" supported="no">
-        <description>Kleine Einsteins (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084164(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <dataarea name="rom" size="8388608">
-                <rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="kleinstn" supported="no">
+		<description>Kleine Einsteins (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084164(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="tinker" supported="no">
-        <description>TinkerBell (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084324(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-7" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="tinker" supported="no">
+		<description>TinkerBell (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084324(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="pooh" supported="no">
-        <description>Winnie Puuh - Die Honigjagd (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-084384(GE)" />
-        <part name="cart" interface="vsmilem_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="pooh" supported="no">
+		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084384(GE)" />
+		<part name="cart" interface="vsmilem_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

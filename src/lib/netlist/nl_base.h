@@ -97,7 +97,7 @@ class NETLIB_NAME(name) : public device_t
 	public: virtual bool is_dynamic() const override { return expr; }
 
 	/*! Add this to a device definition to mark the device as a time-stepping device.
-     *
+	 *
 	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
 	 *  the capacitor and inductor devices uses this.
 	 *
@@ -256,7 +256,7 @@ namespace netlist
 		double R_low() const { return m_R_low; }
 		double R_high() const { return m_R_high; }
 
-		double m_fixed_V;		    //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		double m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5. */
 		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		double m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
 		double m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"

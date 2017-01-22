@@ -4,10 +4,10 @@
 
     Amiga 1200 Keyboard
 
-	Skeleton device, needs MC68HC05Cx device support
+    Skeleton device, needs MC68HC05Cx device support
 
-	391508-01 = Rev 0 is MC68HC05C4AFN
-	391508-02 = Rev 1 is MC68HC05C12FN
+    391508-01 = Rev 0 is MC68HC05C4AFN
+    391508-02 = Rev 1 is MC68HC05C12FN
 
 ***************************************************************************/
 

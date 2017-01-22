@@ -2,12 +2,12 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-	hp9895.cpp
+    hp9895.cpp
 
-	HP9895 floppy disk drive
+    HP9895 floppy disk drive
 
-	Reference manual:
-	HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
+    Reference manual:
+    HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
 
 *********************************************************************/
 

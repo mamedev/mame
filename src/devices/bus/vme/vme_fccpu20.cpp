@@ -186,7 +186,7 @@
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
-#define LOG_INT		0x08
+#define LOG_INT     0x08
 
 #define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
@@ -208,7 +208,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_FCCPU20 = &device_creator<vme_fccpu20_card_device>;
@@ -225,10 +225,10 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_card_device)
 	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
 	AM_RANGE (0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800200, 0xff80021f) AM_DEVREADWRITE8("mpcc2", mpcc68561_device, read, write, 0xffffffff)
-//	AM_RANGE (0xff800200, 0xff8003ff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
+//  AM_RANGE (0xff800200, 0xff8003ff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xff00ff00)
 	AM_RANGE (0xff800600, 0xff80061f) AM_DEVREADWRITE8("mpcc3", mpcc68561_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800800, 0xff80080f) AM_DEVREADWRITE8("bim", bim68153_device, read, write, 0xff00ff00)
-//	AM_RANGE (0xff800a00, 0xff800a0f) AM_DEVREADWRITE8("rtc", rtc_device, read, write, 0x00ff00ff)
+//  AM_RANGE (0xff800a00, 0xff800a0f) AM_DEVREADWRITE8("rtc", rtc_device, read, write, 0x00ff00ff)
 	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -483,8 +483,8 @@ const tiny_rom_entry *vme_fccpu20_card_device::device_rom_region() const
  * :pit Reg 13 <- 00 - CPRH
  * :pit Reg 10 <- e1 - TCR - PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled
                            - PC2 used as I/O pin,CLK and x32 prescaler are used
-						   - Timer reload the preload values when reaching 0 (zero)
-						   - Timer is enabled
+                           - Timer reload the preload values when reaching 0 (zero)
+                           - Timer is enabled
  * MPCC setup
  * : Reg 19 <- 1e - PSR2: Byte mode, 1 Stop bit, 8 bit data, ASYNC mode
  * : Reg 1c <- 8a - BRDR1: Baud Rate Divider 1

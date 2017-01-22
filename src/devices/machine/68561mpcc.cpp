@@ -7,10 +7,10 @@
 
     The variants in the MPCC family are as follows:
 
-	- 68560  with an 8 bit data bus
-	- 68560A with an 8 bit data bus and some enhancements
-	- 68561  with a 16 bit data bus
-	- 68561A with a 16 bit data bus and some enhancements
+    - 68560  with an 8 bit data bus
+    - 68560A with an 8 bit data bus and some enhancements
+    - 68561  with a 16 bit data bus
+    - 68561A with a 16 bit data bus and some enhancements
 
 FEATURES
 ------------------------------------------------------------------
@@ -255,26 +255,26 @@ void mpcc_device::device_reset()
 	transmit_register_reset();
 
 	// Device reset values
-	m_rsr 	= 0x00;
-	m_rcr 	= 0x01;
+	m_rsr   = 0x00;
+	m_rcr   = 0x01;
 	m_rivnr = 0x0f;
-	m_rier 	= 0x00;
-	m_tsr 	= 0x80;
-	m_tcr 	= 0x01;
+	m_rier  = 0x00;
+	m_tsr   = 0x80;
+	m_tcr   = 0x01;
 	m_tivnr = 0x0f;
-	m_tier 	= 0x00;
-	m_sisr 	= 0x00;
-	m_sicr 	= 0x00;
+	m_tier  = 0x00;
+	m_sisr  = 0x00;
+	m_sicr  = 0x00;
 	m_sivnr = 0x0f;
-	m_sier 	= 0x00;
-	m_psr1 	= 0x00;
-	m_psr2 	= 0x00;
-	m_ar1 	= 0x00;
-	m_ar2 	= 0x00;
+	m_sier  = 0x00;
+	m_psr1  = 0x00;
+	m_psr2  = 0x00;
+	m_ar1   = 0x00;
+	m_ar2   = 0x00;
 	m_brdr1 = 0x01;
 	m_brdr2 = 0x00;
-	m_ccr 	= 0x00;
-	m_ecr 	= 0x04;
+	m_ccr   = 0x00;
+	m_ecr   = 0x04;
 
 	// Clear fifos
 	m_tx_data_fifo.clear();
@@ -599,7 +599,7 @@ void mpcc_device::tra_complete()
 {
 	// check if transmitter is enabled and we are not sending BREAK level
 	if ((m_tcr & REG_TCR_TEN) && !(m_tcr & REG_TCR_TICS))
-	{	// check if there are more data in the fifo
+	{   // check if there are more data in the fifo
 		if (!m_tx_data_fifo.empty())
 		{
 			transmit_register_setup(m_tx_data_fifo.dequeue()); // Reload the shift register
@@ -653,7 +653,7 @@ void mpcc_device::rcv_complete()
 	data = get_received_char();
 	LOGRX("%s %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
 
-	//	receive_data(data);
+	//  receive_data(data);
 	if (m_rx_data_fifo.full())
 	{
 		// receive overrun error detected, new data is lost
@@ -928,7 +928,7 @@ void mpcc_device::do_tdr(uint8_t data)
 	}
 	else // ..there is still room
 	{
-		m_tx_data_fifo.enqueue(data);		
+		m_tx_data_fifo.enqueue(data);
 		if (m_tx_data_fifo.full())
 		{
 			m_tsr &= ~REG_TSR_TDRA; // Mark fifo as full

@@ -214,7 +214,7 @@ WRITE8_MEMBER( tms9927_device::write )
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
 osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
-			/* Recomputing parameters here will break the scrollup on the Attachè 
+			/* Recomputing parameters here will break the scrollup on the Attachè
 			   and probably other machines due to m_start_datarow being reset ! */
 			//recompute_parameters(false);
 			break;

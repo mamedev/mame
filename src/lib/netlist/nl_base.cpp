@@ -285,16 +285,16 @@ void netlist_t::register_dev(plib::owned_ptr<core_device_t> dev)
 
 void netlist_t::remove_dev(core_device_t *dev)
 {
-    m_devices.erase(
-        std::remove_if(
-            m_devices.begin(),
+	m_devices.erase(
+		std::remove_if(
+			m_devices.begin(),
 			m_devices.end(),
-            [&] (plib::owned_ptr<core_device_t> const& p)
-            {
-    			return p.get() == dev;
-            }),
+			[&] (plib::owned_ptr<core_device_t> const& p)
+			{
+				return p.get() == dev;
+			}),
 			m_devices.end()
-        );
+		);
 }
 
 

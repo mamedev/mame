@@ -1659,7 +1659,7 @@ ROM_START( roboarmy )
 	ROM_LOAD16_WORD_SWAP( "032-p1.p1", 0x000000, 0x080000, CRC(cd11cbd4) SHA1(23163e3da2f07e830a7f4a02aea1cb01a54ccbf3) ) /* TC534200 */
 
 	NEO_SFIX_128K( "032-s1.s1", CRC(ac0daa1b) SHA1(93bae4697dc403fce19422752a514326ccf66a91) ) /* TC531000 */
- 
+
 	NEO_BIOS_AUDIO_128K( "032-m1.m1", CRC(35ec952d) SHA1(8aed30e26d7e2c70dbce5de752df416091066f7b) ) /* TC531001 */
 
 	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
@@ -1676,7 +1676,7 @@ ROM_END
 ROM_START( roboarma ) /* MVS AND AES VERSION*/
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "032-epr.p1", 0x000000, 0x080000, CRC(27c773cb) SHA1(597ca73f142b1129cc7780540bb9cfacd47bc6ce) ) /* D27C4000 */
-	/* Found on legitimate Robo Army MVS and AES Carts. Debug code button which check control a sound test has been patched out because in a multislot situation that code could have been enabled 
+	/* Found on legitimate Robo Army MVS and AES Carts. Debug code button which check control a sound test has been patched out because in a multislot situation that code could have been enabled
 	that would stop roboarmy from working, sending it into an infinite loop ; correct chip label unknown */
 
 	NEO_SFIX_128K( "032-s1.s1", CRC(ac0daa1b) SHA1(93bae4697dc403fce19422752a514326ccf66a91) ) /* TC531000 */
@@ -2828,7 +2828,7 @@ ROM_START( samsho2ka ) /* KOREAN VERSION */
 	ROM_LOAD16_WORD_SWAP( "063-p1-kan.p1", 0x100000, 0x100000, CRC(147cc6d7) SHA1(8e22305f41a0688786ff55437c25948e6c8fda58) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 	// Basically samsho2k without loading ep1 and ep2 over p1-kan ; The game has been confirmed to exist in this state
-	
+
 	NEO_SFIX_128K( "063-s1-kan.s1", CRC(ff08f80b) SHA1(240c6a1c52edebb49cc99ea08484c6a2d61ebf84) )
 
 	NEO_BIOS_AUDIO_128K( "063-m1.m1", CRC(56675098) SHA1(90429fc40d056d480d0e2bbefbc691d9fa260fc4) ) /* TC531001 */
@@ -8791,8 +8791,8 @@ GAME( 1993, fatfurspa,  fatfursp, neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1995, savagere,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Savage Reign / Fu'un Mokushiroku - Kakutou Sousei", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssideki2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Super Sidekicks 2 - The World Championship / Tokuten Ou 2 - Real Fight Football (NGM-061 ~ NGH-061)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, samsho2,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Samurai Shodown II / Shin Samurai Spirits - Haohmaru Jigokuhen (NGM-063 ~ NGH-063)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, samsho2k,   samsho2,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 1)", MACHINE_SUPPORTS_SAVE ) 
-GAME( 1994, samsho2ka,  samsho2,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 2)", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1994, samsho2k,   samsho2,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, samsho2ka,  samsho2,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, fatfury3,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - Haruka-naru Tatakai (NGM-069 ~ NGH-069)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ssideki3,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - Eikou e no Michi", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, kof95,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '95 (NGM-084)", MACHINE_SUPPORTS_SAVE )

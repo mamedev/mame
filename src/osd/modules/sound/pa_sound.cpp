@@ -2,9 +2,9 @@
 // copyright-holders:intealls, R.Belmont
 /***************************************************************************
 
-	pa_sound.c
+    pa_sound.c
 
-	PortAudio interface.
+    PortAudio interface.
 
 *******************************************************************c********/
 

@@ -6405,7 +6405,7 @@ static void generic_mac_get_info(const imgtool_class *imgclass, uint32_t state, 
 		case IMGTOOLINFO_PTR_GET_ICON_INFO:                 info->get_iconinfo = mac_image_geticoninfo; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = mac_image_suggesttransfer; break;
 		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_mac; break;
-		case IMGTOOLINFO_PTR_CHARCONVERTER:					info->charconverter = &charconverter_macos_roman; break;
+		case IMGTOOLINFO_PTR_CHARCONVERTER:                 info->charconverter = &charconverter_macos_roman; break;
 	}
 }
 

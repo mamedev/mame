@@ -232,7 +232,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		break;
 	case CTRL_VSYNC_CLEAR:
 			//VSYNC_IE (0x1)
-			//VSYNC_POL (0x2)	off=negative true, on=positive true
+			//VSYNC_POL (0x2)   off=negative true, on=positive true
 			// 0x1 VBlank clear?
 		if (changeData & 0x1) {
 			if ((data & 0x0001) == 0) {

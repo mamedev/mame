@@ -99,7 +99,7 @@ private:
 	required_device<floppy_connector>   m_floppy0;
 	required_device<floppy_connector>   m_floppy1;
 
-    required_device<ieee488_device>     m_ieee;
+	required_device<ieee488_device>     m_ieee;
 
 	uint8_t m_intmask;
 	uint8_t m_tx_rx_rdy;
