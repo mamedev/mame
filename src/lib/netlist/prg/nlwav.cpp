@@ -35,8 +35,8 @@ plib::pstdin pin_strm;
 plib::pstdout pout_strm;
 plib::pstderr perr_strm;
 
-plib::pstream_fmt_writer_t pout(pout_strm);
-plib::pstream_fmt_writer_t perr(perr_strm);
+plib::putf8_fmt_writer pout(pout_strm);
+plib::putf8_fmt_writer perr(perr_strm);
 
 nlwav_options_t opts;
 
@@ -145,6 +145,7 @@ static void convert()
 {
 	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : new plib::pofilestream(opts.opt_out()));
 	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : new plib::pifilestream(opts.opt_inp()));
+	plib::putf8_reader reader(*fin);
 	wav_t *wo = new wav_t(*fo, 48000);
 
 	double dt = 1.0 / static_cast<double>(wo->sample_rate());
@@ -162,7 +163,7 @@ static void convert()
 	//short sample = 0;
 	pstring line;
 
-	while(fin->readline(line))
+	while(reader.readline(line))
 	{
 #if 1
 		double t = 0.0; double v = 0.0;
@@ -227,7 +228,7 @@ static void convert()
 	}
 }
 
-static void usage(plib::pstream_fmt_writer_t &fw)
+static void usage(plib::putf8_fmt_writer &fw)
 {
 	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
 			"nltool [options]").c_str());

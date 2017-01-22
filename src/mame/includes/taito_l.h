@@ -134,7 +134,7 @@ protected:
 
 	required_device<cpu_device> m_audio_cpu;
 	required_region_ptr<u8>     m_audio_prg;
-	required_memory_bank        m_audio_bnk;
+	optional_memory_bank        m_audio_bnk;
 
 	required_ioport             m_dswa;
 	required_ioport             m_dswb;
@@ -146,10 +146,10 @@ protected:
 };
 
 
-class taitol_3cpu_state : public taitol_2cpu_state
+class fhawk_state : public taitol_2cpu_state
 {
 public:
-	taitol_3cpu_state(const machine_config &mconfig, device_type type, const char *tag)
+	fhawk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_2cpu_state(mconfig, type, tag)
 		, m_slave_prg(*this, "slave")
 		, m_slave_bnk(*this, "bank6")
@@ -176,11 +176,11 @@ protected:
 };
 
 
-class champwr_state : public taitol_3cpu_state
+class champwr_state : public fhawk_state
 {
 public:
 	champwr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taitol_3cpu_state(mconfig, type, tag)
+		: fhawk_state(mconfig, type, tag)
 		, m_msm(*this, "msm")
 		, m_adpcm_rgn(*this, "adpcm")
 		, m_adpcm_pos(0)

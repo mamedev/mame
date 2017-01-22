@@ -968,6 +968,7 @@ project "portaudio"
 		buildoptions {
 			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+			"/wd4057", -- warning C4057: 'function': 'xxx' differs in indirection to slightly different base types from 'xxx'
 		}
 
 	configuration { }
@@ -999,6 +1000,10 @@ project "portaudio"
 		}
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win",
+		}
+
+		configuration { "mingw*" }
+		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
 		}
 
@@ -1603,9 +1608,9 @@ project "utf8proc"
 	kind "StaticLib"
 
   defines {
-    "UTF8PROC_DLLEXPORT="
+	"UTF8PROC_DLLEXPORT="
   }
-  
+
 	configuration "Debug"
 		defines {
 			"verbose=-1",

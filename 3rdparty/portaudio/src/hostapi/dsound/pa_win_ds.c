@@ -47,11 +47,12 @@
 */
 //#define PA_WIN_DS_USE_WMME_TIMER
 
+#define _WIN32_WINNT 0x0400 /* required to get waitable timer APIs */
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h> /* strlen() */
 
-#define _WIN32_WINNT 0x0400 /* required to get waitable timer APIs */
 #include <initguid.h> /* make sure ds guids get defined */
 #include <windows.h>
 #include <objbase.h>
@@ -279,7 +280,7 @@ typedef struct PaWinDsStream
     UINT                 inputBufferSizeBytes;
 
     
-    int              hostBufferSizeFrames; /* input and output host ringbuffers have the same number of frames */
+    unsigned long    hostBufferSizeFrames; /* input and output host ringbuffers have the same number of frames */
     double           framesWritten;
     double           secondsPerHostByte; /* Used to optimize latency calculation for outTime */
     double           pollingPeriodSeconds;

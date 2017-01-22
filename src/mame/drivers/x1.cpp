@@ -644,7 +644,7 @@ uint16_t x1_state::check_keyboard_press()
 						if (scancode >= 0x2c && scancode <= 0x5f)
 							scancode = kanatable[scancode - 0x2c][1];
 					}
-					
+
 					if (scancode >= 0x41 && scancode < 0x5a)
 						scancode += 0x20;  // lowercase
 				}
@@ -658,7 +658,7 @@ uint16_t x1_state::check_keyboard_press()
 								scancode = kanatable[scancode - 0x2c][2];
 						}
 					}
-					
+
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
 					if(scancode == 0x30)

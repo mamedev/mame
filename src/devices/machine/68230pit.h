@@ -131,7 +131,8 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
 
-	void h1_set (uint8_t state);
+	// TODO: remove these methods and replace it with a call to methods below in force68k.cpp
+	void h1_set (uint8_t state){ if (state) m_psr |= 1; else m_psr &= ~1; }
 	void portb_setbit (uint8_t bit, uint8_t state);
 
 	// Bit updaters
@@ -139,6 +140,11 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	void pb_update_bit(uint8_t bit, uint8_t state);
 	void pc_update_bit(uint8_t bit, uint8_t state);
 	void update_tin(uint8_t);
+
+	DECLARE_WRITE_LINE_MEMBER( h1_w );
+	DECLARE_WRITE_LINE_MEMBER( h2_w );
+	DECLARE_WRITE_LINE_MEMBER( h3_w );
+	DECLARE_WRITE_LINE_MEMBER( h4_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ){ pa_update_bit(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ){ pa_update_bit(1, state); }
@@ -267,6 +273,17 @@ protected:
 	enum {
 		REG_PCDR_TIN_BIT        = 2,   // BIT number
 		REG_PCDR_TIN            = 0x04 // bit position
+	};
+
+	enum {
+		REG_PSR_H1S    = 0x01,
+		REG_PSR_H2S    = 0x02,
+		REG_PSR_H3S    = 0x04,
+		REG_PSR_H4S    = 0x08,
+		REG_PSR_H1L    = 0x10,
+		REG_PSR_H2L    = 0x20,
+		REG_PSR_H3L    = 0x40,
+		REG_PSR_H4L    = 0x80,
 	};
 
 	enum {

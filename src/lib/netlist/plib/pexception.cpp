@@ -11,9 +11,9 @@
 #include "pfmtlog.h"
 
 #if (defined(__x86_64__) || defined(__i386__)) && defined(__linux__)
-#define HAS_FEENABLE_EXCEPT		(1)
+#define HAS_FEENABLE_EXCEPT     (1)
 #else
-#define HAS_FEENABLE_EXCEPT		(0)
+#define HAS_FEENABLE_EXCEPT     (0)
 #endif
 
 namespace plib {

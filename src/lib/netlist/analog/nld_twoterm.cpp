@@ -12,7 +12,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 // ----------------------------------------------------------------------------------------
 // generic_diode
@@ -255,8 +255,8 @@ NETLIB_TIMESTEP(L)
 
 NETLIB_RESET(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 	set(m_D.G(), 0.0, m_D.Ieq());
@@ -264,8 +264,8 @@ NETLIB_RESET(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 }
@@ -300,6 +300,13 @@ NETLIB_UPDATE(VS)
 	NETLIB_NAME(twoterm)::update();
 }
 
+NETLIB_TIMESTEP(VS)
+{
+	this->set(1.0 / m_R(),
+			m_compiled.evaluate(std::vector<double>({netlist().time().as_double()})),
+			0.0);
+}
+
 // ----------------------------------------------------------------------------------------
 // nld_CS
 // ----------------------------------------------------------------------------------------
@@ -319,5 +326,24 @@ NETLIB_UPDATE(CS)
 	NETLIB_NAME(twoterm)::update();
 }
 
-	} //namespace devices
+NETLIB_TIMESTEP(CS)
+{
+	const double I = m_compiled.evaluate(std::vector<double>({netlist().time().as_double()}));
+	set_mat(0.0, 0.0, -I,
+			0.0, 0.0,  I);
+}
+
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, R)
+		NETLIB_DEVICE_IMPL_NS(analog, POT)
+		NETLIB_DEVICE_IMPL_NS(analog, POT2)
+		NETLIB_DEVICE_IMPL_NS(analog, C)
+		NETLIB_DEVICE_IMPL_NS(analog, L)
+		NETLIB_DEVICE_IMPL_NS(analog, D)
+		NETLIB_DEVICE_IMPL_NS(analog, VS)
+		NETLIB_DEVICE_IMPL_NS(analog, CS)
+	}
+
 } // namespace netlist

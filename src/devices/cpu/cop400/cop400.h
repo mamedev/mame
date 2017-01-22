@@ -64,14 +64,11 @@ enum
 	COP400_SA,
 	COP400_SB,
 	COP400_SC,
-	COP400_N,
 	COP400_A,
 	COP400_B,
 	COP400_C,
 	COP400_G,
-	COP400_H,
 	COP400_Q,
-	COP400_R,
 	COP400_EN,
 	COP400_SIO,
 	COP400_SKL,
@@ -87,7 +84,7 @@ enum
 	COP400_IN2,
 	COP400_IN3,
 
-	/* COP404 */
+	/* COP404L */
 	COP400_MB,
 	COP400_DUAL,
 	COP400_SEL10,
@@ -194,13 +191,14 @@ protected:
 	enum {
 		COP410_FEATURE = 0x01,
 		COP420_FEATURE = 0x02,
-		COP444_FEATURE = 0x04,
-		COP440_FEATURE = 0x08
+		COP444L_FEATURE = 0x04,
+		COP424C_FEATURE = 0x08
 	};
 
 	enum {
 		TIMER_SERIAL,
 		TIMER_COUNTER,
+		TIMER_COUNTER_T,
 		TIMER_INIL
 	};
 
@@ -223,15 +221,12 @@ protected:
 	uint8_t   m_a;              /* 4-bit accumulator */
 	uint8_t   m_b;              /* 5/6/7-bit RAM address register */
 	int     m_c;              /* 1-bit carry register */
-	uint8_t   m_n;              /* 2-bit stack pointer (COP440 only) */
 	uint8_t   m_en;             /* 4-bit enable register */
 	uint8_t   m_g;              /* 4-bit general purpose I/O port */
 	uint8_t   m_q;              /* 8-bit latch for L port */
-	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers (not present in COP440) */
+	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
 	uint8_t   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
-	uint8_t   m_h;              /* 4-bit general purpose I/O port (COP440 only) */
-	uint8_t   m_r;              /* 8-bit general purpose I/O port (COP440 only) */
 	uint8_t   m_flags;          // used for I/O only
 
 	/* counter */
@@ -247,11 +242,11 @@ protected:
 	uint8_t   m_si;             /* serial input */
 
 	/* skipping logic */
-	int m_skip;               /* skip next instruction */
+	bool m_skip;               /* skip next instruction */
 	int m_skip_lbi;           /* skip until next non-LBI instruction */
-	int m_last_skip;          /* last value of skip */
-	int m_halt;               /* halt mode */
-	int m_idle;               /* idle mode */
+	bool m_last_skip;          /* last value of skip */
+	bool m_halt;               /* halt mode */
+	bool m_idle;               /* idle mode */
 
 	/* execution logic */
 	int m_InstLen[256];       /* instruction length in bytes */
@@ -272,9 +267,12 @@ protected:
 	static const cop400_opcode_func COP420_OPCODE_23_MAP[256];
 	static const cop400_opcode_func COP420_OPCODE_33_MAP[256];
 	static const cop400_opcode_func COP420_OPCODE_MAP[256];
-	static const cop400_opcode_func COP444_OPCODE_23_MAP[256];
-	static const cop400_opcode_func COP444_OPCODE_33_MAP[256];
-	static const cop400_opcode_func COP444_OPCODE_MAP[256];
+	static const cop400_opcode_func COP444L_OPCODE_23_MAP[256];
+	static const cop400_opcode_func COP444L_OPCODE_33_MAP[256];
+	static const cop400_opcode_func COP444L_OPCODE_MAP[256];
+	static const cop400_opcode_func COP424C_OPCODE_23_MAP[256];
+	static const cop400_opcode_func COP424C_OPCODE_33_MAP[256];
+	static const cop400_opcode_func COP424C_OPCODE_MAP[256];
 
 	void serial_tick();
 	void counter_tick();
@@ -333,7 +331,7 @@ protected:
 	void lbi(uint8_t opcode);
 	void lei(uint8_t opcode);
 	void xabr(uint8_t opcode);
-	void cop444_xabr(uint8_t opcode);
+	void cop444l_xabr(uint8_t opcode);
 	void skc(uint8_t opcode);
 	void ske(uint8_t opcode);
 	void skgz(uint8_t opcode);
@@ -359,11 +357,12 @@ protected:
 	void cop410_op33(uint8_t opcode);
 	void cop420_op23(uint8_t opcode);
 	void cop420_op33(uint8_t opcode);
-	void cop444_op23(uint8_t opcode);
-	void cop444_op33(uint8_t opcode);
+	void cop444l_op23(uint8_t opcode);
+	void cop444l_op33(uint8_t opcode);
+	void cop424c_op23(uint8_t opcode);
+	void cop424c_op33(uint8_t opcode);
 	void skgbz(int bit);
 	void skmbz(int bit);
-
 };
 
 
@@ -431,56 +430,92 @@ public:
 
 
 /* COP444 family */
-// COP404 is a ROMless version of the COP444, which can emulate a COP410C/COP411C, COP424C/COP425C, or a COP444C/COP445C
-class cop404_cpu_device : public cop400_cpu_device
+// COP404L is a ROMless version of the COP444, which can emulate a COP410/COP411, COP424/COP425, or a COP444/COP445
+class cop404l_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cop404l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// COP424 is functionally equivalent to COP444, with only 1K ROM and 64x4 bytes RAM
-class cop424_cpu_device : public cop400_cpu_device
+class cop444l_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// COP425 is a 24-pin package version of the COP424, lacking the IN ports
-class cop425_cpu_device : public cop400_cpu_device
-{
-public:
-	// construction/destruction
-	cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// COP426 is a 20-pin package version of the COP424, with only L0-L7, G2-G3, D2-D3 ports
-class cop426_cpu_device : public cop400_cpu_device
-{
-public:
-	// construction/destruction
-	cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-class cop444_cpu_device : public cop400_cpu_device
-{
-public:
-	// construction/destruction
-	cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cop444l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // COP445 is a 24-pin package version of the COP444, lacking the IN ports
-class cop445_cpu_device : public cop400_cpu_device
+class cop445l_cpu_device : public cop400_cpu_device
 {
 public:
 	// construction/destruction
-	cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cop445l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP404C
+class cop404c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop404c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP424C is functionally equivalent to COP444C, with only 1K ROM and 64x4 bytes RAM
+class cop424c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop424c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP425C is a 24-pin package version of the COP424C, lacking the IN ports
+class cop425c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop425c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP426C is a 20-pin package version of the COP424C, with only L0-L7, G2-G3, D2-D3 ports
+class cop426c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop426c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP444C
+class cop444c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop444c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP445C
+class cop445c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop445c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// COP446C
+class cop446c_cpu_device : public cop400_cpu_device
+{
+public:
+	// construction/destruction
+	cop446c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -491,12 +526,15 @@ extern const device_type COP402;
 extern const device_type COP420;
 extern const device_type COP421;
 extern const device_type COP422;
-extern const device_type COP404;
-extern const device_type COP424;
-extern const device_type COP425;
-extern const device_type COP426;
-extern const device_type COP444;
-extern const device_type COP445;
-
+extern const device_type COP404L;
+extern const device_type COP444L;
+extern const device_type COP445L;
+extern const device_type COP404C;
+extern const device_type COP424C;
+extern const device_type COP425C;
+extern const device_type COP426C;
+extern const device_type COP444C;
+extern const device_type COP445C;
+extern const device_type COP446C;
 
 #endif  /* __COP400__ */

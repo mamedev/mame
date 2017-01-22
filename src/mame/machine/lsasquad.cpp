@@ -95,9 +95,9 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 	//logerror("%04x: mcu_status_r\n",space.device().safe_pc());
 	if (m_bmcu)
 	{
-		if (!m_bmcu->get_main_sent())
+		if (CLEAR_LINE == m_bmcu->host_semaphore_r())
 			res |= 0x01;
-		if (!m_bmcu->get_mcu_sent())
+		if (CLEAR_LINE == m_bmcu->mcu_semaphore_r())
 			res |= 0x02;
 	}
 
@@ -113,9 +113,9 @@ READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
 	//logerror("%04x: mcu_status_r\n",space.device().safe_pc());
 	if (m_bmcu)
 	{
-		if (!m_bmcu->get_main_sent())
+		if (CLEAR_LINE == m_bmcu->host_semaphore_r())
 			res |= 0x01;
-		if (!m_bmcu->get_mcu_sent())
+		if (CLEAR_LINE == m_bmcu->mcu_semaphore_r())
 			res |= 0x02;
 	}
 

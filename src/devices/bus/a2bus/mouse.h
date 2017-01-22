@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_MOUSE__
-#define __A2BUS_MOUSE__
+#ifndef MAME_DEVICES_A2BUS_MOUSE_H
+#define MAME_DEVICES_A2BUS_MOUSE_H
 
 #include "emu.h"
 #include "a2bus.h"
@@ -33,10 +33,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ8_MEMBER(pia_in_a);
-	DECLARE_READ8_MEMBER(pia_in_b);
 	DECLARE_WRITE8_MEMBER(pia_out_a);
 	DECLARE_WRITE8_MEMBER(pia_out_b);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
@@ -44,15 +41,9 @@ public:
 
 	DECLARE_READ8_MEMBER(mcu_port_a_r);
 	DECLARE_READ8_MEMBER(mcu_port_b_r);
-	DECLARE_READ8_MEMBER(mcu_port_c_r);
 	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_b_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_c_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_a_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_b_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_c_w);
-	DECLARE_READ8_MEMBER(mcu_timer_r);
-	DECLARE_WRITE8_MEMBER(mcu_timer_w);
 
 protected:
 	virtual void device_start() override;
@@ -64,30 +55,20 @@ protected:
 	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
 	required_device<pia6821_device> m_pia;
-	required_device<m68705_device> m_mcu;
-	required_ioport m_mouseb, m_mousex, m_mousey;
+	required_device<m68705p_device> m_mcu;
+	required_ioport m_mouseb;
+	required_ioport_array<2> m_mousexy;
 
 private:
-	uint8_t *m_rom;
-	bool m_started;
+	template <unsigned AXIS, u8 DIR, u8 CLK> void update_axis();
+
+	required_region_ptr<uint8_t> m_rom;
 	int m_rom_bank;
-	uint8_t m_ddr_a;
-	uint8_t m_ddr_b;
-	uint8_t m_ddr_c;
-	uint8_t m_port_a_out;
-	uint8_t m_port_b_out;
-	uint8_t m_port_c_out;
-	uint8_t m_port_a_in;
-	uint8_t m_port_b_in;
-	uint8_t m_port_c_in;
-	uint8_t m_timer_cnt;
-	uint8_t m_timer_ctl;
-	uint8_t m_mask_option;
-	int last_mx, last_my, count_x, count_y;
-	emu_timer *m_timer, *m_read_timer;
+	uint8_t m_port_a_in, m_port_b_in;
+	int m_last[2], m_count[2];
 };
 
 // device type definition
 extern const device_type A2BUS_MOUSE;
 
-#endif /* __A2BUS_MOUSE__ */
+#endif // MAME_DEVICES_A2BUS_MOUSE_H

@@ -130,7 +130,7 @@ void taitol_2cpu_state::state_register()
 	save_item(NAME(m_mux_ctrl));
 }
 
-void taitol_3cpu_state::state_register()
+void fhawk_state::state_register()
 {
 	taitol_2cpu_state::state_register();
 
@@ -141,7 +141,7 @@ void taitol_3cpu_state::state_register()
 
 void champwr_state::state_register()
 {
-	taitol_3cpu_state::state_register();
+	fhawk_state::state_register();
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
@@ -209,7 +209,7 @@ void taitol_2cpu_state::taito_machine_reset()
 	m_mux_ctrl = 0;
 }
 
-void taitol_3cpu_state::taito_machine_reset()
+void fhawk_state::taito_machine_reset()
 {
 	taitol_2cpu_state::taito_machine_reset();
 
@@ -220,7 +220,7 @@ void taitol_3cpu_state::taito_machine_reset()
 
 void champwr_state::taito_machine_reset()
 {
-	taitol_3cpu_state::taito_machine_reset();
+	fhawk_state::taito_machine_reset();
 
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;
@@ -367,7 +367,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_3cpu_state::rombank2switch_w)
+WRITE8_MEMBER(fhawk_state::rombank2switch_w)
 {
 	data &= 0xf;
 
@@ -391,7 +391,7 @@ READ8_MEMBER(taitol_state::rombankswitch_r)
 	return m_cur_rombank;
 }
 
-READ8_MEMBER(taitol_3cpu_state::rombank2switch_r)
+READ8_MEMBER(fhawk_state::rombank2switch_r)
 {
 	return m_cur_rombank2;
 }
@@ -634,13 +634,13 @@ READ8_MEMBER(horshoes_state::trackx_hi_r)
 
 
 
-static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8, fhawk_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
@@ -656,7 +656,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_3cpu_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -666,7 +666,7 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, taitol_3cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
@@ -676,7 +676,7 @@ static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_3cpu_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
@@ -688,7 +688,7 @@ WRITE8_MEMBER(taitol_2cpu_state::sound_bankswitch_w)
 	m_audio_bnk->set_base(&m_audio_prg[(data & 0x03) * 0x4000]);
 }
 
-static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_3cpu_state )
+static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -753,14 +753,6 @@ static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-#if 0
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
-#endif
 ADDRESS_MAP_END
 
 
@@ -1686,7 +1678,7 @@ static GFXDECODE_START( taito_l )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(taitol_3cpu_state::portA_w)
+WRITE8_MEMBER(fhawk_state::portA_w)
 {
 	if (m_cur_audio_bnk != (data & 0x03))
 	{
@@ -1700,7 +1692,7 @@ WRITE8_MEMBER(taitol_3cpu_state::portA_w)
 }
 
 
-static MACHINE_CONFIG_START( fhawk, taitol_3cpu_state )
+static MACHINE_CONFIG_START( fhawk, fhawk_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1741,7 +1733,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_3cpu_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_3cpu_state, portA_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fhawk_state, portA_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1768,7 +1760,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( champwr, fhawk, champwr_state )
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_3cpu_state, portA_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(champwr_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(champwr_state, msm5205_volume_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
@@ -1779,7 +1771,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( raimais, fhawk )
+static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2532,22 +2524,11 @@ ROM_END
 DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 {
 	u8 tab[256];
-	u8 *p;
+	for (unsigned i = 0; i < sizeof(tab); i++)
+		tab[i] = BITSWAP8(i, 0, 1, 2, 3, 4, 5, 6, 7);
 
-	for (int i = 0; i < 256; i++)
-	{
-		int v = 0;
-		for (int j = 0; j < 8; j++)
-			if (i & (1 << j))
-				v |= 1 << (7 - j);
-		tab[i] = v;
-	}
-	p = memregion("maincpu")->base();
-	for (int i = 0; i < 0x10000; i++)
-	{
-		*p = tab[*p];
-		p++;
-	}
+	for (unsigned i = 0; i < m_main_prg.length(); i++)
+		m_main_prg[i] = tab[m_main_prg[i]];
 }
 
 

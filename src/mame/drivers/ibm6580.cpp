@@ -6,37 +6,37 @@ IBM 6580 Displaywriter.
 
 A green-screen dedicated word-processing workstation. It uses 8" floppy
 disks. It could have up to 224k of ram.  Consists of:
-	Electronics Module 6580
-	Display 3300
-	Keyboard 5330 [a "beamspring"-type]
-	Dual Diskette Unit 6360
+    Electronics Module 6580
+    Display 3300
+    Keyboard 5330 [a "beamspring"-type]
+    Dual Diskette Unit 6360
 Optional:
-	Printers: 5215, 5218, 5228
-	Printer Sharing feature
-	Mag Card Unit
-	Asynchronous and Bisynchronous communications features
-	66-line display and adapter (800x1056 px, 8x16 character cell)
+    Printers: 5215, 5218, 5228
+    Printer Sharing feature
+    Mag Card Unit
+    Asynchronous and Bisynchronous communications features
+    66-line display and adapter (800x1056 px, 8x16 character cell)
 
 
 All chips have IBM part numbers on them.  F.e. on system board:
-	8493077 - 8086
-	4178619 - 8251A
-	4178617 - 8257-5
-	4178623 - 8259A
-	4178628 - 8255A-5
-	4178625 - 8253-5
+    8493077 - 8086
+    4178619 - 8251A
+    4178617 - 8257-5
+    4178623 - 8259A
+    4178628 - 8255A-5
+    4178625 - 8253-5
 
 
 IRQ levels per PSM p. 6-5
-    0	incoming data for printer sharing/3277 DE
-    1	transfer data to commo data link
-    2	printer and mag card data xfer
-    3	keyboard incoming data
-    4	diskette
-    5	(not in use)
-    6	software timer [50 ms period]
-    7	error on commo data link
-    nmi	"or when a dump switch operation is initiated" ["memory record" button]
+    0   incoming data for printer sharing/3277 DE
+    1   transfer data to commo data link
+    2   printer and mag card data xfer
+    3   keyboard incoming data
+    4   diskette
+    5   (not in use)
+    6   software timer [50 ms period]
+    7   error on commo data link
+    nmi "or when a dump switch operation is initiated" ["memory record" button]
 
 
 To do:
@@ -119,10 +119,10 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 
 
 uint8_t gfx_expand[16] = {
-	0x00,	0x03,	0x0c,	0x0f,
-	0x30,	0x33,	0x3c,	0x3f,
-	0xc0,	0xc3,	0xcc,	0xcf,
-	0xf0,	0xf3,	0xfc,	0xff
+	0x00,   0x03,   0x0c,   0x0f,
+	0x30,   0x33,   0x3c,   0x3f,
+	0xc0,   0xc3,   0xcc,   0xcf,
+	0xf0,   0xf3,   0xfc,   0xff
 };
 
 
@@ -294,7 +294,7 @@ READ8_MEMBER(ibm6580_state::video_r)
 	switch (offset)
 	{
 	case 8:
-		data = 1;	// 25-line video board ID.  66-line is 0x40.
+		data = 1;   // 25-line video board ID.  66-line is 0x40.
 		data |= (m_screen->hblank() ? 8 : 0);
 		data |= (m_screen->vblank() ? 4 : 0);
 		// pure guesswork.  0x2, 0x10 and 0x20 are unknown video signals.
@@ -315,8 +315,8 @@ READ8_MEMBER(ibm6580_state::video_r)
 
 void ibm6580_state::vblank_w(screen_device &screen, bool state)
 {
-//	if (state)
-//		m_pic8259->ir6_w(state);
+//  if (state)
+//      m_pic8259->ir6_w(state);
 
 	if (ioport("DUMP")->read())
 		m_p40 |= 4;
@@ -403,7 +403,7 @@ WRITE8_MEMBER(ibm6580_state::led_w)
 		break;
 
 	default:
-//		printf ("LED 0x%08x: unknown\n", data);
+//      printf ("LED 0x%08x: unknown\n", data);
 		break;
 	}
 }
@@ -601,22 +601,22 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 
 	switch (offset)
 	{
-	case 0:	// 8150 -- mcu reset?
+	case 0: // 8150 -- mcu reset?
 		m_floppy_mcu_sr.enqueue(0x00);
 		m_floppy_mcu_sr.enqueue(0x00);
 		break;
 
-	case 1:	// 8152
+	case 1: // 8152
 		m_fdc->soft_reset();
 		break;
 
-	case 5:	// 815A
+	case 5: // 815A
 		m_fdc->fifo_w(space, offset, data);
 		if (m_floppy_idle)
 			m_floppy_idle = false;
 		break;
 
-	case 6:	// 815C
+	case 6: // 815C
 		m_floppy_mcu_cr.enqueue(data);
 		m_floppy_mcu_cr_fifo++;
 		if (floppy_mcu_cr_full())
@@ -631,7 +631,7 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 
 	switch (offset)
 	{
-	case 0:	// 8150
+	case 0: // 8150
 		// bit 4 -- ?? ready
 		// bit 5 -- mcu busy
 		// bit 6 -- ?? idle
@@ -639,14 +639,14 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 			data |= 0x40;
 		break;
 
-	case 4:	// 8158
+	case 4: // 8158
 		data = m_fdc->msr_r(space, offset);
 		break;
 
-	case 5:	// 815a
+	case 5: // 815a
 		data = m_fdc->fifo_r(space, offset);
 
-	case 6:	// 815c
+	case 6: // 815c
 		if (!m_floppy_mcu_sr.empty())
 			data = m_floppy_mcu_sr.dequeue();
 		break;
@@ -665,7 +665,7 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 			f->dskchg_r(), f->idx_r(), f->get_cyl()
 			));
 		else
-		DBG_LOG(2,"Floppy", ("%02x == %02x (idle %d irq %d drq %d)\n", 
+		DBG_LOG(2,"Floppy", ("%02x == %02x (idle %d irq %d drq %d)\n",
 			0x8150 + (offset << 1), data,
 			m_floppy_idle, m_fdc->get_irq(), m_fdc->get_drq()
 			));
@@ -677,17 +677,17 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 
 static ADDRESS_MAP_START(ibm6580_mem, AS_PROGRAM, 16, ibm6580_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM	// system RAM
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM   // system RAM
 	AM_RANGE(0x90000, 0x90001) AM_WRITE(unk_latch_w)
-	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")	// 66-line vram starts at 0xec000
+	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")  // 66-line vram starts at 0xec000
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
 	ADDRESS_MAP_UNMAP_HIGH
 //
-//	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE8("upd8251", i8251_device, data_r, data_w)
-//	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE8("upd8251", i8251_device, status_r, control_w)
+//  AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE8("upd8251", i8251_device, data_r, data_w)
+//  AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE8("upd8251", i8251_device, status_r, control_w)
 //
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE (pic_latch_w)
@@ -702,7 +702,7 @@ static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
 	AM_RANGE(0x5000, 0x500f) AM_UNMAP
 	AM_RANGE(0x6000, 0x601f) AM_UNMAP
 	AM_RANGE(0x8060, 0x807f) AM_UNMAP
-	AM_RANGE(0x8150, 0x815f) AM_READWRITE8(floppy_r, floppy_w, 0x00ff)	// HLE of floppy board
+	AM_RANGE(0x8150, 0x815f) AM_READWRITE8(floppy_r, floppy_w, 0x00ff)  // HLE of floppy board
 	AM_RANGE(0x81a0, 0x81af) AM_UNMAP
 	AM_RANGE(0xc000, 0xc00f) AM_UNMAP
 	AM_RANGE(0xe000, 0xe02f) AM_READWRITE8(video_r, video_w, 0x00ff)
@@ -868,11 +868,11 @@ void ibm6580_state::video_start()
 }
 
 FLOPPY_FORMATS_MEMBER( ibm6580_state::floppy_formats )
-    FLOPPY_HFE_FORMAT,
-    FLOPPY_IPF_FORMAT,
-    FLOPPY_MFI_FORMAT,
-    FLOPPY_TD0_FORMAT,
-    FLOPPY_IMD_FORMAT
+	FLOPPY_HFE_FORMAT,
+	FLOPPY_IPF_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_TD0_FORMAT,
+	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END0
 
 static SLOT_INTERFACE_START( dw_floppies )
@@ -921,9 +921,9 @@ static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(ibm6580_state, floppy_intrq))
-//	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+//  MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq0_w))
-//	MCFG_UPD765_HDL_CALLBACK(WRITELINE(ibm6580_state, floppy_hdl))
+//  MCFG_UPD765_HDL_CALLBACK(WRITELINE(ibm6580_state, floppy_hdl))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", ibm6580_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", ibm6580_state::floppy_formats)
 

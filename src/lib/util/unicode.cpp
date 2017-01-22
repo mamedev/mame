@@ -389,7 +389,7 @@ std::string utf8_from_wstring(const std::wstring &string)
 
 //-------------------------------------------------
 //  internal_normalize_unicode - uses utf8proc to
-//	normalize unicode
+//  normalize unicode
 //-------------------------------------------------
 
 static std::string internal_normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool null_terminated)
@@ -437,7 +437,7 @@ static std::string internal_normalize_unicode(const char *s, size_t length, unic
 
 //-------------------------------------------------
 //  normalize_unicode - uses utf8proc to normalize
-//	unicode
+//  unicode
 //-------------------------------------------------
 
 std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form)
@@ -448,7 +448,7 @@ std::string normalize_unicode(const std::string &s, unicode_normalization_form n
 
 //-------------------------------------------------
 //  normalize_unicode - uses utf8proc to normalize
-//	unicode
+//  unicode
 //-------------------------------------------------
 
 std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form)
@@ -459,7 +459,7 @@ std::string normalize_unicode(const char *s, unicode_normalization_form normaliz
 
 //-------------------------------------------------
 //  normalize_unicode - uses utf8proc to normalize
-//	unicode
+//  unicode
 //-------------------------------------------------
 
 std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form)

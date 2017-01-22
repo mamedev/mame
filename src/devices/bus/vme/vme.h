@@ -53,7 +53,7 @@
 #include "emu.h"
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 #define VME_BUS_TAG        "vme"
@@ -78,7 +78,7 @@ public:
 		DS0,
 		DS1,
 		BERR,
-	    DTACK,
+		DTACK,
 		WRITE
 	};
 
@@ -152,7 +152,7 @@ public:
 	void set_vme_device();
 
 	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);	
+	virtual DECLARE_WRITE8_MEMBER(write8);
 	device_t *m_device;
 
 	// inline configuration
@@ -175,7 +175,7 @@ public:
 	   Short addressing AM codes indicate that address lines A02-A15 are being used to select a BYTE(0-3) group.
 	   Standard addressing AM codes ,indicate that address lines A02-A23 are being used to select a BYTE(0-3) group.
 	   Extended addressing AM codes indicate that address lines A02-A31 are being used to select a BYTE(0-3) group.*/
-	enum 
+	enum
 	{   // Defined and User Defined Address Modifier Values, The rest us Reserved between 0x00 and 0x3F
 		AMOD_EXTENDED_NON_PRIV_DATA = 0x09,
 		AMOD_EXTENDED_NON_PRIV_PRG  = 0x0A,
@@ -196,7 +196,7 @@ public:
 	};
 };
 
-#define MCFG_VME_SLOT_ADD(_tag, _slot_tag, _slot_intf,_def_slot)	\
+#define MCFG_VME_SLOT_ADD(_tag, _slot_tag, _slot_intf,_def_slot)    \
 	MCFG_DEVICE_ADD(_slot_tag, VME_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	vme_slot_device::static_set_vme_slot(*device, _tag, _slot_tag);

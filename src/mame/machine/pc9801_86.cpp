@@ -4,8 +4,8 @@
 
     NEC PC-9801-86 sound card
 
-    Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an 
-	additional DAC port
+    Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
+    additional DAC port
 
     TODO:
     - joystick code should be shared between -26, -86 and -118

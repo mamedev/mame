@@ -314,6 +314,7 @@ m20.cpp
 m24.cpp
 m5.cpp
 m6805evs.cpp
+m68705prg.cpp
 m79152pc.cpp
 mac.cpp
 mac128.cpp
@@ -345,6 +346,7 @@ mikromik.cpp
 mikrosha.cpp
 mini2440.cpp
 minicom.cpp
+miniforce.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -396,6 +398,7 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag6502.cpp
+novag68k.cpp
 ob68k1a.cpp
 octopus.cpp
 odyssey2.cpp

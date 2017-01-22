@@ -296,6 +296,7 @@ VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
 VIDEOS["HD63484"] = true
 --VIDEOS["HD66421"] = true
+--VIDEOS["HLCD0515"] = true
 VIDEOS["HUC6202"] = true
 VIDEOS["HUC6260"] = true
 --VIDEOS["HUC6261"] = true
@@ -351,7 +352,7 @@ MACHINES["TPI6525"] = true
 MACHINES["RIOT6532"] = true
 MACHINES["6821PIA"] = true
 MACHINES["6840PTM"] = true
---MACHINES["68561MPCC"] = true
+--MACHINES["MPCC68561"] = true
 MACHINES["ACIA6850"] = true
 MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
@@ -3547,7 +3548,6 @@ files {
 	MAME_DIR .. "src/mame/video/asuka.cpp",
 	MAME_DIR .. "src/mame/drivers/bigevglf.cpp",
 	MAME_DIR .. "src/mame/includes/bigevglf.h",
-	MAME_DIR .. "src/mame/machine/bigevglf.cpp",
 	MAME_DIR .. "src/mame/video/bigevglf.cpp",
 	MAME_DIR .. "src/mame/drivers/bking.cpp",
 	MAME_DIR .. "src/mame/includes/bking.h",
@@ -3641,7 +3641,6 @@ files {
 	MAME_DIR .. "src/mame/video/ninjaw.cpp",
 	MAME_DIR .. "src/mame/drivers/nycaptor.cpp",
 	MAME_DIR .. "src/mame/includes/nycaptor.h",
-	MAME_DIR .. "src/mame/machine/nycaptor.cpp",
 	MAME_DIR .. "src/mame/video/nycaptor.cpp",
 	MAME_DIR .. "src/mame/drivers/opwolf.cpp",
 	MAME_DIR .. "src/mame/includes/opwolf.h",
@@ -3668,7 +3667,6 @@ files {
 	MAME_DIR .. "src/mame/video/rastan.cpp",
 	MAME_DIR .. "src/mame/drivers/retofinv.cpp",
 	MAME_DIR .. "src/mame/includes/retofinv.h",
-	MAME_DIR .. "src/mame/machine/retofinv.cpp",
 	MAME_DIR .. "src/mame/video/retofinv.cpp",
 	MAME_DIR .. "src/mame/drivers/rollrace.cpp",
 	MAME_DIR .. "src/mame/includes/rollrace.h",

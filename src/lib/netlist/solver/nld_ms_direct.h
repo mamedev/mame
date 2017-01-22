@@ -195,9 +195,6 @@ matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	if (m_dim < nets.size())
-		log().fatal("Dimension {1} less than {2}", m_dim, nets.size());
-
 	matrix_solver_t::setup_base(nets);
 
 	/* add RHS element */

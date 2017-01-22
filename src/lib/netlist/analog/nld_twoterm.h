@@ -34,10 +34,13 @@
 #define NLD_TWOTERM_H_
 
 #include "nl_base.h"
+#include "plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Macros
 // -----------------------------------------------------------------------------
+
+#ifndef NL_AUTO_DEVICES
 
 #define RES(name, p_R)                                                         \
 		NET_REGISTER_DEV(RES, name)                                            \
@@ -74,6 +77,8 @@
 		NET_REGISTER_DEV(CS, name)                                             \
 		NETDEV_PARAMI(name, I, pI)
 
+#endif
+
 // -----------------------------------------------------------------------------
 // Generic macros
 // -----------------------------------------------------------------------------
@@ -101,7 +106,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 // -----------------------------------------------------------------------------
 // nld_twoterm
@@ -138,7 +143,7 @@ public:
 	}
 
 	void set_mat(const nl_double a11, const nl_double a12, const nl_double r1,
-			     const nl_double a21, const nl_double a22, const nl_double r2)
+				 const nl_double a21, const nl_double a22, const nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, r1);
@@ -216,7 +221,7 @@ NETLIB_OBJECT(POT)
 		register_subalias("2", m_R1.m_N);
 		register_subalias("3", m_R2.m_N);
 
-		connect_late(m_R2.m_P, m_R1.m_N);
+		connect(m_R2.m_P, m_R1.m_N);
 
 	}
 
@@ -276,7 +281,7 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_IS_TIMESTEP()
+	NETLIB_IS_TIMESTEP(true)
 	NETLIB_TIMESTEPI();
 
 	param_double_t m_C;
@@ -308,7 +313,7 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_IS_TIMESTEP()
+	NETLIB_IS_TIMESTEP(true)
 	NETLIB_TIMESTEPI();
 
 	param_double_t m_L;
@@ -358,6 +363,45 @@ private:
 	nl_double m_Vcrit;
 };
 
+/*! Class representing the diode model paramers.
+ *  This is the model representation of the diode model. Typically, SPICE uses
+ *  the following parameters. A "Y" in the first column indicates that the
+ *  parameter is actually used in netlist.
+ *
+ *   |NL? |name  |parameter                        |units|default| example|area  |
+ *   |:--:|:-----|:--------------------------------|:----|------:|-------:|:----:|
+ *   | Y  |IS    |saturation current               |A    |1.0e-14| 1.0e-14|   *  |
+ *   |    |RS    |ohmic resistanc                  |Ohm  |      0|      10|   *  |
+ *   | Y  |N     |emission coefficient             |-    |      1|       1|      |
+ *   |    |TT    |transit-time                     |sec  |      0|   0.1ns|      |
+ *   |    |CJO   |zero-bias junction capacitance   |F    |      0|     2pF|   *  |
+ *   |    |VJ    |junction potential               |V    |      1|     0.6|      |
+ *   |    |M     |grading coefficient              |-    |    0.5|     0.5|      |
+ *   |    |EG    |band-gap energy                  |eV   |   1.11| 1.11 Si|      |
+ *   |    |XTI   |saturation-current temp.exp      |-    |      3|3.0 pn. 2.0 Schottky| |
+ *   |    |KF    |flicker noise coefficient        |-    |      0|        |      |
+ *   |    |AF    |flicker noise exponent           |-    |      1|        |      |
+ *   |    |FC    |coefficient for forward-bias depletion capacitance formula|-|0.5|| |
+ *   |    |BV    |reverse breakdown voltage        |V    |infinite|     40|      |
+ *   |    |IBV   |current at breakdown voltage     |V    |  0.001|        |      |
+ *   |    |TNOM  |parameter measurement temperature|deg C|     27|      50|      |
+ *
+ */
+
+class diode_model_t : public param_model_t
+{
+public:
+	diode_model_t(device_t &device, const pstring name, const pstring val)
+	: param_model_t(device, name, val)
+	, m_IS(*this, "IS")
+	, m_N(*this, "N")
+	{}
+
+	value_t m_IS;    //!< saturation current.
+	value_t m_N;     //!< emission coefficient.
+};
+
+
 // -----------------------------------------------------------------------------
 // nld_D
 // -----------------------------------------------------------------------------
@@ -373,11 +417,20 @@ public:
 		register_subalias("K", m_N);
 	}
 
-	NETLIB_IS_DYNAMIC()
+	template <class CLASS>
+	NETLIB_NAME(D)(CLASS &owner, const pstring name, const pstring model)
+	: NETLIB_NAME(twoterm)(owner, name)
+	, m_model(*this, "MODEL", model)
+	, m_D(*this, "m_D")
+	{
+		register_subalias("A", m_P);
+		register_subalias("K", m_N);
+	}
 
+	NETLIB_IS_DYNAMIC(true)
 	NETLIB_UPDATE_TERMINALSI();
 
-	param_model_t m_model;
+	diode_model_t m_model;
 
 protected:
 	NETLIB_RESETI();
@@ -400,10 +453,16 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
 	, m_R(*this, "R", 0.1)
 	, m_V(*this, "V", 0.0)
+	, m_func(*this,"FUNC", "")
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);
+		if (m_func() != "")
+			m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
 	}
+
+	NETLIB_IS_TIMESTEP(m_func() != "")
+	NETLIB_TIMESTEPI();
 
 protected:
 	NETLIB_UPDATEI();
@@ -411,6 +470,8 @@ protected:
 
 	param_double_t m_R;
 	param_double_t m_V;
+	param_str_t m_func;
+	plib::pfunction m_compiled;
 };
 
 // -----------------------------------------------------------------------------
@@ -422,16 +483,24 @@ NETLIB_OBJECT_DERIVED(CS, twoterm)
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
+	, m_func(*this,"FUNC", "")
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);
+		if (m_func() != "")
+			m_compiled.compile_postfix(std::vector<pstring>({{"T"}}), m_func());
 	}
+
+	NETLIB_IS_TIMESTEP(m_func() != "")
+	NETLIB_TIMESTEPI();
+protected:
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();
-protected:
 
 	param_double_t m_I;
+	param_str_t m_func;
+	plib::pfunction m_compiled;
 };
 
 

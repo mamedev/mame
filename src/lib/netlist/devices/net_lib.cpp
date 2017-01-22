@@ -9,58 +9,64 @@
 ****************************************************************************/
 
 #include "net_lib.h"
-#include "nld_system.h"
 #include "nl_factory.h"
 #include "solver/nld_solver.h"
 
+
 #define xstr(s) # s
+
+#if 0
 #define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
 #define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
+#endif
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip;
 
-#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
+//#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
+#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (pstring(# name), pstring(xstr(nic)), pstring(defparam)) );
 #define ENTRYX(nic, name, defparam) { NETLIB_DEVICE_DECL(nic) ENTRYX1(NETLIB_NAME(nic), name, defparam, decl_ ## nic) }
 
 namespace netlist
 {
+	using namespace netlist::analog;
+
 	namespace devices
 	{
 static void initialize_factory(factory::list_t &factory)
 {
-	ENTRY(R,                    RES,                    "R")
-	ENTRY(POT,                  POT,                    "R")
-	ENTRY(POT2,                 POT2,                   "R")
-	ENTRY(C,                    CAP,                    "C")
-	ENTRY(L,                    IND,                    "L")
-	ENTRY(D,                    DIODE,                  "MODEL")
-	ENTRY(VCVS,                 VCVS,                   "")
-	ENTRY(VCCS,                 VCCS,                   "")
-	ENTRY(CCCS,                 CCCS,                   "")
-	ENTRY(LVCCS,                LVCCS,                  "")
-	ENTRY(VS,                   VS,                     "V")
-	ENTRY(CS,                   CS,                     "I")
-	ENTRY(OPAMP,                OPAMP,                  "MODEL")
+	ENTRYX(R,                   RES,                    "R")
+	ENTRYX(POT,                 POT,                    "R")
+	ENTRYX(POT2,                POT2,                   "R")
+	ENTRYX(C,                   CAP,                    "C")
+	ENTRYX(L,                   IND,                    "L")
+	ENTRYX(D,                   DIODE,                  "MODEL")
+	ENTRYX(VS,                  VS,                     "V")
+	ENTRYX(CS,                  CS,                     "I")
+	ENTRYX(VCVS,                VCVS,                   "")
+	ENTRYX(VCCS,                VCCS,                   "")
+	ENTRYX(CCCS,                CCCS,                   "")
+	ENTRYX(LVCCS,               LVCCS,                  "")
+	ENTRYX(opamp,               OPAMP,                  "MODEL")
 	ENTRYX(dummy_input,         DUMMY_INPUT,            "")
 	ENTRYX(frontier,            FRONTIER_DEV,           "+I,+G,+Q")   // not intended to be used directly
 	ENTRYX(function,            AFUNC,                  "N,FUNC")   // only for macro devices - NO FEEDBACK loops
-	ENTRY(QBJT_EB,              QBJT_EB,                "MODEL")
-	ENTRY(QBJT_switch,          QBJT_SW,                "MODEL")
+	ENTRYX(QBJT_EB,             QBJT_EB,                "MODEL")
+	ENTRYX(QBJT_switch,         QBJT_SW,                "MODEL")
 	ENTRYX(logic_input,         TTL_INPUT,              "IN")
 	ENTRYX(logic_input,         LOGIC_INPUT,            "IN,FAMILY")
 	ENTRYX(analog_input,        ANALOG_INPUT,           "IN")
 	ENTRYX(log,                 LOG,                    "+I")
 	ENTRYX(logD,                LOGD,                   "+I,+I2")
 	ENTRYX(clock,               CLOCK,                  "FREQ")
-	ENTRYX(extclock,            EXTCLOCK,               "FREQ")
+	ENTRYX(extclock,            EXTCLOCK,               "FREQ,PATTERN")
 	ENTRYX(mainclock,           MAINCLOCK,              "FREQ")
 	ENTRYX(gnd,                 GND,                    "")
 	ENTRYX(netlistparams,       PARAMETER,              "")
-	ENTRY(solver,               SOLVER,                 "FREQ")
+	ENTRYX(solver,              SOLVER,                 "FREQ")
 	ENTRYX(res_sw,              RES_SWITCH,             "+IN,+P1,+P2")
-	ENTRY(switch1,              SWITCH,                 "")
-	ENTRY(switch2,              SWITCH2,                "")
-	ENTRYX(nicRSFF,             NETDEV_RSFF,            "+S,+R")
+	ENTRYX(switch1,             SWITCH,                 "")
+	ENTRYX(switch2,             SWITCH2,                "")
+	ENTRYX(nicRSFF,             NETDEV_RSFF,            "")
 	ENTRYX(nicDelay,            NETDEV_DELAY,           "")
 	ENTRYX(2716,                EPROM_2716,             "+GQ,+EPQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
 	ENTRYX(2102A,               RAM_2102A,              "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")

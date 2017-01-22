@@ -950,7 +950,7 @@ static MACHINE_CONFIG_DERIVED( quizard1, quizard )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
@@ -967,7 +967,7 @@ static MACHINE_CONFIG_DERIVED( quizard4, quizard )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
 
@@ -1058,12 +1058,12 @@ ROM_END
 
 /*  Quizard notes
 
-	The MCU controls the protection sequence, which in turn controls the game display language.
-	Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
-	just the CD, but not between games as a new MCU is required.
+    The MCU controls the protection sequence, which in turn controls the game display language.
+    Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
+    just the CD, but not between games as a new MCU is required.
 
-	The only dumped MCUs are German region ones for Quizard 1 and 4.
-	A Czech Quizard 4 MCU was located but it was an 89c51 type instead
+    The only dumped MCUs are German region ones for Quizard 1 and 4.
+    A Czech Quizard 4 MCU was located but it was an 89c51 type instead
 
 */
 

@@ -132,82 +132,13 @@ namespace netlist
 
 	NETLIB_UPDATE(function)
 	{
-		//nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
-		//OUTANALOG(m_Q, val);
-		nl_double stack[20];
-		unsigned ptr = 0;
-		std::size_t e = m_precompiled.size();
-		for (std::size_t i = 0; i<e; i++)
+		for (std::size_t i=0; i < static_cast<unsigned>(m_N()); i++)
 		{
-			rpn_inst &rc = m_precompiled[i];
-			switch (rc.m_cmd)
-			{
-				case ADD:
-					ptr--;
-					stack[ptr-1] = stack[ptr] + stack[ptr-1];
-					break;
-				case MULT:
-					ptr--;
-					stack[ptr-1] = stack[ptr] * stack[ptr-1];
-					break;
-				case SUB:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] - stack[ptr];
-					break;
-				case DIV:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] / stack[ptr];
-					break;
-				case POW:
-					ptr--;
-					stack[ptr-1] = std::pow(stack[ptr-1], stack[ptr]);
-					break;
-				case PUSH_INPUT:
-					stack[ptr++] = (*m_I[static_cast<unsigned>(rc.m_param)])();
-					break;
-				case PUSH_CONST:
-					stack[ptr++] = rc.m_param;
-					break;
-			}
+			m_vals[i] = (*m_I[i])();
 		}
-		m_Q.push(stack[ptr-1]);
+		m_Q.push(m_precompiled.evaluate(m_vals));
 	}
 
-	void NETLIB_NAME(function)::compile()
-	{
-		plib::pstring_vector_t cmds(m_func(), " ");
-		m_precompiled.clear();
-
-		for (std::size_t i=0; i < cmds.size(); i++)
-		{
-			pstring cmd = cmds[i];
-			rpn_inst rc;
-			if (cmd == "+")
-				rc.m_cmd = ADD;
-			else if (cmd == "-")
-				rc.m_cmd = SUB;
-			else if (cmd == "*")
-				rc.m_cmd = MULT;
-			else if (cmd == "/")
-				rc.m_cmd = DIV;
-			else if (cmd == "pow")
-				rc.m_cmd = POW;
-			else if (cmd.startsWith("A"))
-			{
-				rc.m_cmd = PUSH_INPUT;
-				rc.m_param = cmd.substr(1).as_long();
-			}
-			else
-			{
-				bool err = false;
-				rc.m_cmd = PUSH_CONST;
-				rc.m_param = cmd.as_double(&err);
-				if (err)
-					netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
-			}
-			m_precompiled.push_back(rc);
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(dummy_input)
 	NETLIB_DEVICE_IMPL(frontier)

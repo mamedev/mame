@@ -48,6 +48,7 @@
 	[regScroll setHasVerticalScroller:YES];
 	[regScroll setAutohidesScrollers:YES];
 	[regScroll setBorderType:NSBezelBorder];
+	[regScroll setDrawsBackground:NO];
 	[regScroll setDocumentView:regView];
 	[regView release];
 
@@ -59,6 +60,7 @@
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
 	[dasmScroll setBorderType:NSBezelBorder];
+	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
 
@@ -70,6 +72,7 @@
 	[consoleScroll setHasVerticalScroller:YES];
 	[consoleScroll setAutohidesScrollers:YES];
 	[consoleScroll setBorderType:NSBezelBorder];
+	[consoleScroll setDrawsBackground:NO];
 	[consoleScroll setDocumentView:consoleView];
 	[consoleView release];
 

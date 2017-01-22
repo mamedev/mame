@@ -28,11 +28,11 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		NETLIB_SUB(vdd_vss) m_supply;
-		NETLIB_SUB(R_base) m_R;
+		NETLIB_SUB(vdd_vss)        m_supply;
+		analog::NETLIB_SUB(R_base) m_R;
 
-		analog_input_t m_control;
-		param_double_t m_base_r;
+		analog_input_t             m_control;
+		param_double_t             m_base_r;
 	};
 
 	NETLIB_RESET(CD4066_GATE)

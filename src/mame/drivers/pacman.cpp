@@ -6583,6 +6583,56 @@ ROM_START( woodpeca )
 ROM_END
 
 
+/*
+Guru-Readme for Number Crash (Hanshin Goraku 1983)
+
+|----------------------------------------------------------------------|
+|        74107   Z80A          LS157  MB7052.4A LS158                  |
+|        LS368 18.432MHz                LS377   LS157                  |
+| LS16   LS367   DIP28A        LS194    LS00    7475            93422  |
+|        LS367                 LS194    LS273   LS20                   |
+| DSW(8) LS367 P1.7E  NC-1.6E  NC-9.5E  LS157   7489  7461       LS161 |
+|2       LS367 LS08   NC-2.6F  NC-10.5F LS86    7489  LS283      LS283 |
+|2             LS138  NC-3.6H  NC-11.5H                          LS174 |
+|W             4099            NC-12.5J LS245   LS158 LS86             |
+|A             LS02   NC-4.6K                   LS157             LS283|
+|Y             LS139  NC-5.6L  LS139                  AM27S03.2K  LS174|
+|              LS42                     2114    P2.3M AM27S03.2L  P3.1M|
+|              LS367  NC-6.6M  LS74     2114    LS74                   |
+|     MB3713                   LS08     2114          LS273      4066  |
+|                     NC-7.6N           2114    LS10  LS02             |
+|                     NC-8.6P  DIP28B   2114                     7416  |
+|         VOLUME      LS367             2114    7416  7416       7416  |
+|----------------------------------------------------------------------|
+Notes: (All IC's shown)
+      Z80A   - Clock input 3.072MHz [18.432/6]
+      7489   - Texas Instruments 7489 64-bit Random Access Read-Write Memory
+      2114   - 1k x 4-bit SRAM
+      AM27S03- AMD AM27S03 (74S189 / 3101 compatible) 64-bit (16word x 4-bit) Inverting-Output Bipolar RAM
+      93422  - AMD 93422 256 x 4-bit TTL Bipolar RAM
+      NC-*   - 2716 EPROM
+      P1     - Fujitsu MB7051 Bipolar PROM
+      P2/3   - Harris 7611 Bipolar PROM
+      MB7052 - Fujitsu MB7052 Bipolar PROM
+      DIP28A - Plug-in daughterboard containing logic
+               |----------|
+               |   LS373  |
+               |   LS245  |
+               |LS02  LS00|
+               |LS74  LS04|
+               |----------|
+
+      DIP28B - Plug-in daughterboard containing logic
+               |----------------------------|
+               |LS257 LS253 LS253 LS253 LS00|
+               |                            |
+               |LS86 LS86 LS86 LS02 LS368   |
+               |----------------------------|
+
+      VSync  - 60.5721Hz
+      HSync  - 15.3892kHz
+*/
+
 ROM_START( numcrash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nc-1.6e",      0x0000, 0x0800, CRC(c85a79ba) SHA1(938b6b2920b14a4f0fbcd09fe25873bfd8ddc245) )

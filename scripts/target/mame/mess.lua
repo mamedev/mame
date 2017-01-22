@@ -296,6 +296,7 @@ VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
 --VIDEOS+= HD63484"] = true
 VIDEOS["HD66421"] = true
+VIDEOS["HLCD0515"] = true
 VIDEOS["HUC6202"] = true
 VIDEOS["HUC6260"] = true
 VIDEOS["HUC6261"] = true
@@ -354,7 +355,7 @@ MACHINES["GAYLE"] = true
 MACHINES["6522VIA"] = true
 MACHINES["6821PIA"] = true
 MACHINES["6840PTM"] = true
-MACHINES["68561MPCC"] = true
+MACHINES["MPCC68561"] = true
 MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
@@ -729,6 +730,7 @@ FORMATS["ADAM_DSK"] = true
 FORMATS["AFS_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["AP2_DSK"] = true
+FORMATS["APD_DSK"] = true
 FORMATS["APF_APT"] = true
 FORMATS["APOLLO_DSK"] = true
 FORMATS["APPLIX_DSK"] = true
@@ -1326,6 +1328,8 @@ createMESSProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/includes/amiga.h",
+	MAME_DIR .. "src/mame/machine/a1200kbd.cpp",
+	MAME_DIR .. "src/mame/machine/a1200kbd.h",
 	MAME_DIR .. "src/mame/machine/amigakbd.cpp",
 	MAME_DIR .. "src/mame/machine/amigakbd.h",
 }
@@ -1896,7 +1900,7 @@ files {
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
 	MAME_DIR .. "src/mame/drivers/fidelz80.cpp",
-	MAME_DIR .. "src/mame/includes/fidelz80.h",
+	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel68k.cpp",
 }
@@ -2249,6 +2253,7 @@ files {
 createMESSProjects(_target, _subtarget, "motorola")
 files {
 	MAME_DIR .. "src/mame/drivers/m6805evs.cpp",
+	MAME_DIR .. "src/mame/drivers/m68705prg.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd2.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 }
@@ -2378,6 +2383,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/mk2.cpp",
 	MAME_DIR .. "src/mame/drivers/novag6502.cpp",
+	MAME_DIR .. "src/mame/drivers/novagbase.h",
+	MAME_DIR .. "src/mame/drivers/novag68k.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
 	MAME_DIR .. "src/mame/includes/ssystem3.h",
 	MAME_DIR .. "src/mame/video/ssystem3.cpp",
@@ -3304,8 +3311,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
---	MAME_DIR .. "src/mame/drivers/fcisio.cpp",
---	MAME_DIR .. "src/mame/drivers/fcscsi.cpp",
+--  MAME_DIR .. "src/mame/drivers/fcisio.cpp",
+--  MAME_DIR .. "src/mame/drivers/fcscsi.cpp",
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gamate.cpp",
@@ -3418,6 +3425,9 @@ files {
 	MAME_DIR .. "src/mame/includes/xor100.h",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
 	MAME_DIR .. "src/mame/drivers/zorba.cpp",
+	MAME_DIR .. "src/mame/includes/zorba.h",
+	MAME_DIR .. "src/mame/machine/zorbakbd.cpp",
+	MAME_DIR .. "src/mame/machine/zorbakbd.h",
 }
 
 end

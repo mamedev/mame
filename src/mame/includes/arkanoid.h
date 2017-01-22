@@ -54,7 +54,7 @@ public:
 	uint8_t m_hexaa_from_sub;
 
 	/* devices */
-	required_ioport_array<2> m_muxports;
+	optional_ioport_array<2> m_muxports;
 	required_device<cpu_device> m_maincpu;
 	optional_device<arkanoid_mcu_device_base> m_mcuintf;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hexaa_f000_w);
 	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
 	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
 	DECLARE_DRIVER_INIT(block2);
 	DECLARE_DRIVER_INIT(arkblock);

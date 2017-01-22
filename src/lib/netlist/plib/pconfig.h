@@ -56,6 +56,7 @@ typedef __int128_t INT128;
 #define P_PREVENT_COPYING(name)               \
 	private:                                  \
 		name(const name &);                   \
+		name(const name &&);                  \
 		name &operator=(const name &);
 
 //============================================================

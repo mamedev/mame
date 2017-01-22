@@ -19,106 +19,79 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
+#ifndef NL_AUTO_DEVICES
+
 #define OPAMP(name, model)                                                     \
 		NET_REGISTER_DEV(OPAMP, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
 
+#endif
 // ----------------------------------------------------------------------------------------
 // Devices ...
 // ----------------------------------------------------------------------------------------
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
-NETLIB_OBJECT(OPAMP)
-{
-	NETLIB_CONSTRUCTOR(OPAMP)
-	, m_RP(*this, "RP1")
-	, m_G1(*this, "G1")
-	, m_VCC(*this, "VCC")
-	, m_GND(*this, "GND")
-	, m_model(*this, "MODEL", "LM324")
-	, m_VH(*this, "VH")
-	, m_VL(*this, "VL")
-	, m_VREF(*this, "VREF")
+
+	/*! Class representing the opamp model parameters.
+	 *  The opamp model was designed based on designs from
+	 *  http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm.
+	 *  Currently 2 different types are supported: Type 1 and Type 3. Type 1
+	 *  is less complex and should run faster than Type 3.
+	 *
+	 *  This is an extension to the traditional SPICE approach which
+	 *  assumes that you will be using an manufacturer model. These models may
+	 *  have copyrights incompatible with the netlist license. Thus they may not
+	 *  be suitable for certain implementations of netlist.
+	 *
+	 *  For the typical use cases in low frequency (< 100 KHz) applications at
+	 *  which netlist is targeted, this model is certainly suitable. All parameters
+	 *  can be determined from a typical opamp datasheet.
+	 *
+	 *   |Type|name  |parameter                                      |units|default| example|
+	 *   |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
+	 *   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
+	 *   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
+	 *   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
+	 *   |1,3 |RI    |input resistance                               |Ohm  |       |1M      |
+	 *   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
+	 *   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
+	 *   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
+	 *   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
+	 *   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
+	 */
+
+	class opamp_model_t : public param_model_t
 	{
-		m_type = static_cast<int>(m_model.model_value("TYPE"));
+	public:
+		opamp_model_t(device_t &device, const pstring name, const pstring val)
+		: param_model_t(device, name, val)
+		, m_TYPE(*this, "TYPE")
+		, m_FPF(*this, "FPF")
+		, m_SLEW(*this, "SLEW")
+		, m_RI(*this, "RI")
+		, m_RO(*this, "RO")
+		, m_UGF(*this, "UGF")
+		, m_VLL(*this, "VLL")
+		, m_VLH(*this, "VLH")
+		, m_DAB(*this, "DAB")
+		{}
 
-		if (m_type == 1)
-		{
-			register_subalias("PLUS", "G1.IP");
-			register_subalias("MINUS", "G1.IN");
-			register_subalias("OUT", "G1.OP");
+		value_t m_TYPE;   //!< Model Type, 1 and 3 are supported
+		value_t m_FPF;    //!< frequency of first pole
+		value_t m_SLEW;   //!< unity gain slew rate
+		value_t m_RI;     //!< input resistance
+		value_t m_RO;     //!< output resistance
+		value_t m_UGF;    //!< unity gain frequency (transition frequency)
+		value_t m_VLL;    //!< low output swing minus low supply rail
+		value_t m_VLH;    //!< high supply rail minus high output swing
+		value_t m_DAB;    //!< Differential Amp Bias - total quiescent current
+	};
 
-			connect_late("G1.ON", "VREF");
-			connect_late("RP1.2", "VREF");
-			connect_late("RP1.1", "G1.OP");
 
-		}
-		else if (m_type == 3)
-		{
-			register_sub("CP1", m_CP);
-			register_sub("EBUF", m_EBUF);
-			register_sub("DN", m_DN);
-			register_sub("DP", m_DP);
-
-			m_DP->m_model.setTo("D(IS=1e-15 N=1)");
-			m_DN->m_model.setTo("D(IS=1e-15 N=1)");
-
-			register_subalias("PLUS", "G1.IP");
-			register_subalias("MINUS", "G1.IN");
-			register_subalias("OUT", "EBUF.OP");
-
-			connect_late("EBUF.ON", "VREF");
-
-			connect_late("G1.ON", "VREF");
-			connect_late("RP1.2", "VREF");
-			connect_late("CP1.2", "VREF");
-			connect_late("EBUF.IN", "VREF");
-
-			connect_late("RP1.1", "G1.OP");
-			connect_late("CP1.1", "RP1.1");
-
-			connect_late("DP.K", "VH");
-			connect_late("VL", "DN.A");
-			connect_late("DP.A", "DN.K");
-			connect_late("DN.K", "RP1.1");
-			connect_late("EBUF.IP", "RP1.1");
-		}
-		else
-			netlist().log().fatal("Unknown opamp type: {1}", m_type);
-
-	}
-
-	NETLIB_UPDATEI();
-	NETLIB_RESETI();
-	NETLIB_UPDATE_PARAMI()
-	{
-	}
-
-private:
-
-	NETLIB_SUB(R_base) m_RP;
-	NETLIB_SUB(VCCS) m_G1;
-	NETLIB_SUBXX(C) m_CP;
-	NETLIB_SUBXX(VCVS) m_EBUF;
-	NETLIB_SUBXX(D) m_DP;
-	NETLIB_SUBXX(D) m_DN;
-
-	analog_input_t m_VCC;
-	analog_input_t m_GND;
-
-	param_model_t m_model;
-	analog_output_t m_VH;
-	analog_output_t m_VL;
-	analog_output_t m_VREF;
-
-	/* state */
-	int m_type;
-};
-
-	} //namespace devices
+	} //namespace analog
 } // namespace netlist
 
 #endif /* NLD_OPAMPS_H_ */

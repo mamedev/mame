@@ -13,7 +13,7 @@
 
     arkanoid    The earlier revisions. They each differ in the country byte. These
     arkanoiduo    versions work fine both the bootleg A75-06.IC16 MCU rom and the
-    arkanoidjb    genuine decapped Taito A75__06.IC16 M68705 MCU.
+    arkanoidjb    genuine decapped Taito A75__06.IC16 MC68705 MCU.
     arkanoidu   USA version. A later revision, code has been inserted NOT patched.
                   The 68705 code for this one was not available; Brad Oliver[?]
                   made it up from the bootleg A75-06.IC16 by changing the level
@@ -45,9 +45,9 @@
     player will die for no reason.
 
 Measured Clocks:
-   Z80 - 5997077Hz (6Mhz)
-M68705 - 2998533Hz (3Mhz)
-YM2149 - 2998531Hz (3Mhz)
+    Z80 - 5997077Hz (6Mhz)
+MC68705 - 2998533Hz (3Mhz)
+ YM2149 - 2998531Hz (3Mhz)
 ****************************************************************************
 
 Game Credits:
@@ -968,7 +968,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("mcu", arkanoid_mcu_device_base, semaphore_r, nullptr)   /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state, arkanoid_semaphore_input_r, nullptr) // Z80 and MCU Semaphores
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )

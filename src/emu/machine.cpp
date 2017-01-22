@@ -1184,7 +1184,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 void running_machine::export_http_api()
 {
 	if (!options().http()) return;
-	
+
 	m_manager.http_server()->on_get("/api/machine", [this](auto response, auto request)
 	{
 		rapidjson::StringBuffer s;
@@ -1195,7 +1195,7 @@ void running_machine::export_http_api()
 
 		writer.Key("devices");
 		writer.StartArray();
-				
+
 		device_iterator iter(this->root_device());
 		for (device_t &device : iter)
 			writer.String(device.tag());

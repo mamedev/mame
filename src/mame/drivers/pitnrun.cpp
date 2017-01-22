@@ -66,22 +66,25 @@ K1000233A
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/pitnrun.h"
+
 #include "cpu/m6805/m68705.h"
+#include "cpu/z80/z80.h"
+
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+
 #include "sound/ay8910.h"
-#include "includes/pitnrun.h"
 
 
 INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
 {
-	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 {
-		m_nmi = data & 1;
+	m_nmi = data & 1;
 }
 
 WRITE8_MEMBER(pitnrun_state::hflip_w)
@@ -134,15 +137,6 @@ static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
 	AM_RANGE(0x90, 0x96) AM_WRITENOP
 	AM_RANGE(0x97, 0x97) AM_WRITENOP
 	AM_RANGE(0x98, 0x98) AM_WRITENOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pitnrun_mcu_map, AS_PROGRAM, 8, pitnrun_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m68705_portA_r,m68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(m68705_portB_r,m68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(m68705_portC_r)
-	AM_RANGE(0x0003, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -231,8 +225,12 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL_18_432MHz/6)     /* verified on pcb */
+	MCFG_M68705_PORTA_R_CB(READ8(pitnrun_state, m68705_portA_r))
+	MCFG_M68705_PORTB_R_CB(READ8(pitnrun_state, m68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(pitnrun_state, m68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(pitnrun_state, m68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(pitnrun_state, m68705_portB_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

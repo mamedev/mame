@@ -10,11 +10,11 @@
 *                  CS*   3 |             | 38  A1
 *                 DTACK* 4 |             | 37  D7
 *                 IACK*  5 |             | 36  D6
-*                IACKIN* 6 |             | 35  D5  
-*               IACKOUT* 7 |             | 34  D4    
-*                 IRQ1*  8 |             | 33  D3 
-*                  GND   9 |             | 32  D2 
-*                  GND  10 |             | 31  GND   
+*                IACKIN* 6 |             | 35  D5
+*               IACKOUT* 7 |             | 34  D4
+*                 IRQ1*  8 |             | 33  D3
+*                  GND   9 |             | 32  D2
+*                  GND  10 |             | 31  GND
 *                  Vcc  11 |             | 30  VCC
 *                 IRQ2* 12 |   MC68153   | 29  D1
 *                 IRQ3* 13 |  EI68C153   | 28  D0
@@ -206,7 +206,7 @@ protected:
 	devcb_write_line    m_out_intal1_cb;
 
 	// Daisy chain signals
-	devcb_read8		    m_out_iackout_cb;
+	devcb_read8         m_out_iackout_cb;
 	int m_iackin;
 	int m_irq_level;
 };

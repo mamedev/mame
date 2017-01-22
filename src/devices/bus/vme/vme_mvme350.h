@@ -8,7 +8,7 @@
 
 extern const device_type VME_MVME350;
 
-class vme_mvme350_card_device : 
+class vme_mvme350_card_device :
 	public device_t
 	,public device_vme_card_interface
 {
@@ -21,8 +21,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// Shared memory methods to be exported to the VME bus
-//	virtual DECLARE_READ16_MEMBER (read16) override;
-//	virtual DECLARE_WRITE16_MEMBER (write16) override;
+//  virtual DECLARE_READ16_MEMBER (read16) override;
+//  virtual DECLARE_WRITE16_MEMBER (write16) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

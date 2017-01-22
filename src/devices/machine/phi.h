@@ -2,9 +2,9 @@
 // copyright-holders:F. Ulivi
 /*********************************************************************
 
-	phi.h
+    phi.h
 
-	HP PHI (Processor-to-Hpib-Interface) (1AA6-6x04)
+    HP PHI (Processor-to-Hpib-Interface) (1AA6-6x04)
 
 *********************************************************************/
 
@@ -12,45 +12,45 @@
 #define _PHI_H_
 
 // Set read and write callbacks to access DIO bus on IEEE-488
-#define MCFG_PHI_DIO_READWRITE_CB(_read , _write)	\
-	phi_device::set_dio_read_cb(*device , DEVCB_##_read);				\
+#define MCFG_PHI_DIO_READWRITE_CB(_read , _write)   \
+	phi_device::set_dio_read_cb(*device , DEVCB_##_read);               \
 	phi_device::set_dio_write_cb(*device , DEVCB_##_write);
 
 // Set write callbacks to access uniline signals on IEEE-488
-#define MCFG_PHI_EOI_WRITE_CB(_write)	\
+#define MCFG_PHI_EOI_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_EOI , DEVCB_##_write);
 
-#define MCFG_PHI_DAV_WRITE_CB(_write)	\
+#define MCFG_PHI_DAV_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_DAV , DEVCB_##_write);
 
-#define MCFG_PHI_NRFD_WRITE_CB(_write)	\
+#define MCFG_PHI_NRFD_WRITE_CB(_write)  \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NRFD , DEVCB_##_write);
 
-#define MCFG_PHI_NDAC_WRITE_CB(_write)	\
+#define MCFG_PHI_NDAC_WRITE_CB(_write)  \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NDAC , DEVCB_##_write);
 
-#define MCFG_PHI_IFC_WRITE_CB(_write)	\
+#define MCFG_PHI_IFC_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_IFC , DEVCB_##_write);
 
-#define MCFG_PHI_SRQ_WRITE_CB(_write)	\
+#define MCFG_PHI_SRQ_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_SRQ , DEVCB_##_write);
 
-#define MCFG_PHI_ATN_WRITE_CB(_write)	\
+#define MCFG_PHI_ATN_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_ATN , DEVCB_##_write);
 
-#define MCFG_PHI_REN_WRITE_CB(_write)	\
+#define MCFG_PHI_REN_WRITE_CB(_write)   \
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_REN , DEVCB_##_write);
 
 // Set write callback for INT signal
-#define MCFG_PHI_INT_WRITE_CB(_write)			\
+#define MCFG_PHI_INT_WRITE_CB(_write)           \
 	phi_device::set_int_write_cb(*device , DEVCB_##_write);
 
 // Set write callback for DMARQ signal
-#define MCFG_PHI_DMARQ_WRITE_CB(_write)			\
+#define MCFG_PHI_DMARQ_WRITE_CB(_write)         \
 	phi_device::set_dmarq_write_cb(*device , DEVCB_##_write);
 
 // Depth of inbound/outbound FIFOs
-#define PHI_FIFO_SIZE	8
+#define PHI_FIFO_SIZE   8
 
 class phi_device : public device_t
 {
@@ -102,22 +102,22 @@ public:
 	// Mapping of PHI register bits:
 	// Reg. bit PHI bit
 	// =================
-	// 15		0
-	// 14		1
-	// 13		=0=
-	// 12		=0=
-	// 11		=0=
-	// 10		=0=
-	// 9		=0=
-	// 8		=0=
-	// 7		8
-	// 6		9
-	// 5		10
-	// 4		11
-	// 3		12
-	// 2		13
-	// 1		14
-	// 0		15
+	// 15       0
+	// 14       1
+	// 13       =0=
+	// 12       =0=
+	// 11       =0=
+	// 10       =0=
+	// 9        =0=
+	// 8        =0=
+	// 7        8
+	// 6        9
+	// 5        10
+	// 4        11
+	// 3        12
+	// 2        13
+	// 1        14
+	// 0        15
 	DECLARE_WRITE16_MEMBER(reg16_w);
 	DECLARE_READ16_MEMBER(reg16_r);
 	DECLARE_WRITE8_MEMBER(reg8_w);
@@ -153,8 +153,8 @@ private:
 
 	// SH (Source Handshake) states
 	enum {
-		PHI_SH_SIDS,	// & SIWS
-		PHI_SH_SGNS,	// & SWNS
+		PHI_SH_SIDS,    // & SIWS
+		PHI_SH_SGNS,    // & SWNS
 		PHI_SH_SDYS,
 		PHI_SH_STRS
 	};
@@ -167,7 +167,7 @@ private:
 		PHI_AH_ANRS,
 		PHI_AH_ACRS,
 		PHI_AH_ACDS,
-		PHI_AH_ACDS_FROZEN,	// Non-standard state: IF CMD rejected because of even parity
+		PHI_AH_ACDS_FROZEN, // Non-standard state: IF CMD rejected because of even parity
 		PHI_AH_AWNS
 	};
 
@@ -180,16 +180,16 @@ private:
 		PHI_T_SPAS,
 		PHI_T_TACS,
 		// The following are non-standard states for IDENTIFY sequencing
-		PHI_T_ID1,	// Untalked
-		PHI_T_ID2,	// Addressed by secondary address
-		PHI_T_ID3,	// Sending 1st byte
-		PHI_T_ID4,	// Waiting to send 2nd byte
-		PHI_T_ID5,	// Sending 2nd byte
-		PHI_T_ID6	// 2nd byte sent, end of sequence
+		PHI_T_ID1,  // Untalked
+		PHI_T_ID2,  // Addressed by secondary address
+		PHI_T_ID3,  // Sending 1st byte
+		PHI_T_ID4,  // Waiting to send 2nd byte
+		PHI_T_ID5,  // Sending 2nd byte
+		PHI_T_ID6   // 2nd byte sent, end of sequence
 	};
 
 	int m_t_state;
-	bool m_t_spms;	// False: SPIS, true: SPMS
+	bool m_t_spms;  // False: SPIS, true: SPMS
 
 	// L (Listener) states
 	enum {

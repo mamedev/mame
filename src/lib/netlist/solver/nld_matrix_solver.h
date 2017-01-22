@@ -8,11 +8,8 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
-#include <type_traits>
-
-//#include "solver/nld_solver.h"
 #include "nl_base.h"
-#include "plib/pstream.h"
+#include "nl_errstr.h"
 
 namespace netlist
 {
@@ -110,7 +107,10 @@ public:
 
 	virtual ~matrix_solver_t();
 
-	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
+	void setup(analog_net_t::list_t &nets)
+	{
+		vsetup(nets);
+	}
 
 	void solve_base();
 
@@ -133,11 +133,9 @@ public:
 public:
 	int get_net_idx(detail::net_t *net);
 
-	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
-
 	virtual void log_stats();
 
-	virtual void create_solver_code(plib::postream &strm)
+	virtual void create_solver_code(plib::putf8_fmt_writer &strm)
 	{
 		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
 	}

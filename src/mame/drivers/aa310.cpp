@@ -87,6 +87,7 @@
 #include "cpu/arm/arm.h"
 #include "includes/archimds.h"
 #include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
 #include "machine/i2cmem.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -351,7 +352,8 @@ INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
 	FLOPPY_ACORN_ADFS_NEW_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT
+	FLOPPY_ACORN_ADFS_OLD_FORMAT,
+	FLOPPY_APD_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( aa310_floppies )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mariusz Wojcieszek, R. Belmont
 /*
-	2681 DUART
+    2681 DUART
     68681 DUART
     28C94 QUART
 
@@ -52,8 +52,8 @@ static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
-#define CHANC_TAG	"chc"
-#define CHAND_TAG	"chd"
+#define CHANC_TAG   "chc"
+#define CHAND_TAG   "chd"
 
 // device type definition
 const device_type MC68681 = &device_creator<mc68681_device>;
@@ -357,12 +357,12 @@ READ8_MEMBER( sc28c94_device::read )
 {
 	uint8_t r = 0;
 	offset &= 0x1f;
-	
+
 	if (offset < 0x10)
 	{
 		return mc68681_base_device::read(space, offset, mem_mask);
 	}
-	
+
 	switch (offset)
 	{
 		case 0x10: /* MR1A/MR2C */
@@ -370,14 +370,14 @@ READ8_MEMBER( sc28c94_device::read )
 		case 0x13: /* Rx Holding Register C */
 			r = m_chanC->read_chan_reg(offset & 3);
 			break;
-			
+
 		case 0x18: /* MR1D/MR2D */
 		case 0x19: /* SRD */
 		case 0x1b: /* RHRD */
 			r = m_chanD->read_chan_reg(offset & 3);
 			break;
 	}
-	
+
 	return r;
 }
 
@@ -488,12 +488,12 @@ READ8_MEMBER( mc68681_base_device::read )
 WRITE8_MEMBER( sc28c94_device::write )
 {
 	offset &= 0x1f;
-	
+
 	if (offset < 0x10)
 	{
 		mc68681_base_device::write(space, offset, data, mem_mask);
 	}
-	
+
 	switch(offset)
 	{
 		case 0x10: /* MRC */
@@ -502,7 +502,7 @@ WRITE8_MEMBER( sc28c94_device::write )
 		case 0x13: /* THRC */
 			m_chanC->write_chan_reg(offset&3, data);
 			break;
-			
+
 		case 0x18: /* MRC */
 		case 0x19: /* CSRC */
 		case 0x1a: /* CRC */
@@ -882,7 +882,7 @@ void mc68681_channel::tra_callback()
 	if ((MR2&0xC0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
-        //printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
+		//printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
 		if (m_ch == 0)
 		{
 			m_uart->write_a_tx(bit);
@@ -1254,7 +1254,7 @@ void mc68681_channel::write_TX(uint8_t data)
          printf("Write %02x to TX when TX not ready!\n", data);
     }*/
 
-  	//printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
+	//printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
 
 	tx_ready = 0;
 	SR &= ~STATUS_TRANSMITTER_READY;

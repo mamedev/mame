@@ -473,11 +473,6 @@ uint8_t i8255_device::read_pc()
 	{
 		// read data from port
 		data |= m_in_pc_cb(0) & mask;
-		if (port_c_upper_mode() == MODE_OUTPUT)
-		{
-			// read data from output latch
-			data |= m_output[PORT_C] & mask;
-		}
 	}
 
 	return data;

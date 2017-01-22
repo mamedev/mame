@@ -94,7 +94,7 @@
  *
  * VME side A24 address map - Dual ported RAM
  * ----------------------------------------------------------
- * Offset Range     Description 
+ * Offset Range     Description
  * ----------------------------------------------------------
  * 000000 - 0007FF  BIM
  * 000800 - 000FFF  Status registers
@@ -158,7 +158,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_FCISIO1 = &device_creator<vme_fcisio1_card_device>;
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_FRAGMENT (fcisio1)
 	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
-//	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", fcisio_terminal)
+//  MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", fcisio_terminal)
 
 	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
