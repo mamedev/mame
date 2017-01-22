@@ -1,8 +1,8 @@
-// license: BSD-3-Clause
+// license: GPL-2.0+
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Amiga 1200 Keyboard
+	Amiga 1200 Keyboard
 
     Skeleton device, needs MC68HC05Cx device support
 
@@ -11,21 +11,21 @@
 
 ***************************************************************************/
 
-#include "a1200kbd.h"
+#include "a1200.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A1200KBD = &device_creator<a1200kbd_device>;
+const device_type A1200_KBD = &device_creator<a1200_kbd_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mc68hc05c12_map, AS_PROGRAM, 8, a1200kbd_device )
+static ADDRESS_MAP_START( mc68hc05c12_map, AS_PROGRAM, 8, a1200_kbd_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("mpu", 0)
@@ -37,7 +37,7 @@ static MACHINE_CONFIG_FRAGMENT( a1200kbd_rev1 )
 	MCFG_CPU_PROGRAM_MAP(mc68hc05c12_map)
 MACHINE_CONFIG_END
 
-machine_config_constructor a1200kbd_device::device_mconfig_additions() const
+machine_config_constructor a1200_kbd_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( a1200kbd_rev1 );
 }
@@ -53,7 +53,7 @@ ROM_START( a1200kbd_rev1 )
 	ROM_LOAD("391508-02.bin", 0x0000, 0x2000, BAD_DUMP CRC(2a77eec4) SHA1(301ec6a69404457d912c89e3fc54095eda9f0e93))
 ROM_END
 
-const tiny_rom_entry *a1200kbd_device::device_rom_region() const
+const tiny_rom_entry *a1200_kbd_device::device_rom_region() const
 {
 	return ROM_NAME( a1200kbd_rev1 );
 }
@@ -65,7 +65,7 @@ const tiny_rom_entry *a1200kbd_device::device_rom_region() const
 static INPUT_PORTS_START( a1200_us_keyboard )
 INPUT_PORTS_END
 
-ioport_constructor a1200kbd_device::device_input_ports() const
+ioport_constructor a1200_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( a1200_us_keyboard );
 }
@@ -76,14 +76,12 @@ ioport_constructor a1200kbd_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  a1200kbd_device - constructor
+//  a1200_kbd_device - constructor
 //-------------------------------------------------
 
-a1200kbd_device::a1200kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, A1200KBD, "Amiga 1200 Keyboard Rev 1", tag, owner, clock, "a1200kbd_r1", __FILE__),
-	m_write_kclk(*this),
-	m_write_kdat(*this),
-	m_write_krst(*this),
+a1200_kbd_device::a1200_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, A1200_KBD, "Amiga 1200 Keyboard Rev 1", tag, owner, clock, "a1200kbd_r1", __FILE__),
+	device_amiga_keyboard_interface(mconfig, *this),
 	m_mpu(*this, "mpu")
 {}
 
@@ -91,19 +89,15 @@ a1200kbd_device::a1200kbd_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a1200kbd_device::device_start()
+void a1200_kbd_device::device_start()
 {
-	// resolve callbacks
-	m_write_kclk.resolve_safe();
-	m_write_kdat.resolve_safe();
-	m_write_krst.resolve_safe();
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void a1200kbd_device::device_reset()
+void a1200_kbd_device::device_reset()
 {
 }
 
@@ -112,6 +106,6 @@ void a1200kbd_device::device_reset()
 //  INTERFACE
 //**************************************************************************
 
-WRITE_LINE_MEMBER( a1200kbd_device::kdat_w )
+WRITE_LINE_MEMBER( a1200_kbd_device::kdat_w )
 {
 }

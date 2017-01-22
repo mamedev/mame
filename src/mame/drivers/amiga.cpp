@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
+#include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
@@ -20,8 +21,6 @@
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
 #include "machine/amigafdc.h"
-#include "machine/a1200kbd.h"
-#include "machine/amigakbd.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
 #include "softlist.h"
@@ -1320,7 +1319,7 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amigakbd_device, kdat_w))
+	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w))
 
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
@@ -1360,10 +1359,10 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
-	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_CALLBACK(WRITELINE(amiga_state, kbreset_w))
+	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", "a500_us")
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(DEVWRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(amiga_state, kbreset_w))
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
@@ -1698,14 +1697,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 
 	// keyboard
 #if 0
-	MCFG_DEVICE_REMOVE("kbd")
-	MCFG_DEVICE_ADD("kbd", A1200KBD, 0)
-	MCFG_A1200_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_A1200_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_A1200_KEYBOARD_KRST_CALLBACK(WRITELINE(amiga_state, kbreset_w))
-
-	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", a1200kbd_device, kdat_w))
+	MCFG_DEVICE_MODIFY("kbd")
+	MCFG_SLOT_DEFAULT_OPTION("a1200_us")
 #endif
 
 	// todo: pcmcia
