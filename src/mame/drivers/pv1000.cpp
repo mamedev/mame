@@ -147,7 +147,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
 		m_cart(*this, "cartslot"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -187,7 +187,7 @@ public:
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(gfxram_w) AM_REGION("gfxram", 0)
 ADDRESS_MAP_END
 

@@ -78,6 +78,8 @@ IO ports and memory map changes. Dip switches differ too.
 WRITE8_MEMBER(kchamp_state::control_w)
 {
 	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(kchamp_state::sound_reset_w)
@@ -90,18 +92,8 @@ WRITE8_MEMBER(kchamp_state::sound_control_w)
 {
 	m_msm->reset_w(!(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);
-}
-
-WRITE8_MEMBER(kchamp_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
-}
-
-WRITE8_MEMBER(kchamp_state::sound_msm_w)
-{
-	m_msm_data = data;
-	m_msm_play_lo_nibble = 1;
+	if (!m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
@@ -123,7 +115,7 @@ static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_WRITE(sound_command_w)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -138,7 +130,7 @@ static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("adpcm_select", ls157_device, ab_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
 
@@ -155,7 +147,11 @@ READ8_MEMBER(kchamp_state::sound_reset_r)
 WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 {
 	if (offset == 0)
+	{
 		m_sound_nmi_enable = ((data >> 7) & 1);
+		if (!m_sound_nmi_enable)
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 	else
 		m_dac->set_output_gain(0, BIT(data,0) ? 1.0 : 0);
 }
@@ -176,7 +172,7 @@ static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa8, 0xa8) AM_READWRITE(sound_reset_r, sound_command_w)
+	AM_RANGE(0xa8, 0xa8) AM_READ(sound_reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8, kchamp_state )
@@ -346,23 +342,19 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(kchamp_state::msmint)
 {
-	if (m_msm_play_lo_nibble)
-		m_msm->data_w(m_msm_data & 0x0f);
-	else
-		m_msm->data_w((m_msm_data >> 4) & 0x0f);
+	if (!state)
+		return;
 
-	m_msm_play_lo_nibble ^= 1;
+	m_msm_play_lo_nibble = !m_msm_play_lo_nibble;
+	m_adpcm_select->select_w(m_msm_play_lo_nibble);
 
-	if (!(m_counter ^= 1))
-	{
-		if (m_sound_nmi_enable)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	if (m_msm_play_lo_nibble && m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /********************
@@ -372,7 +364,7 @@ WRITE_LINE_MEMBER(kchamp_state::msmint)
 INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 {
 	if (m_sound_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -386,9 +378,7 @@ MACHINE_START_MEMBER(kchamp_state,kchampvs)
 {
 	MACHINE_START_CALL_MEMBER(kchamp);
 
-	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_play_lo_nibble));
-	save_item(NAME(m_counter));
 }
 
 void kchamp_state::machine_reset()
@@ -431,12 +421,16 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // at 4C
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kchamp_state, msmint))         /* interrupt function */
@@ -483,6 +477,7 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/12) /* Guess based on actual pcb recordings of karatedo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
@@ -744,18 +739,14 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	m_decrypted_opcodes[A] = rom[A];  /* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
 
-	m_counter = 0;
-	m_msm_data = 0;
-	m_msm_play_lo_nibble = 0;
+	m_msm_play_lo_nibble = true;
 }
 
 
 DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 {
 	decrypt_code();
-	m_counter = 0;
-	m_msm_data = 0;
-	m_msm_play_lo_nibble = 1;
+	m_msm_play_lo_nibble = true;
 }
 
 

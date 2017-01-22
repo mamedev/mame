@@ -55,7 +55,7 @@ int wd177x_format::compute_track_size(const format &f) const
 	return track_size;
 }
 
-void wd177x_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors) const
+void wd177x_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
 {
 	if(f.sector_base_id == -1) {
 		for(int i=0; i<f.sector_count; i++) {
@@ -200,7 +200,6 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 	uint8_t sectdata[40*512];
 	desc_s sectors[40];
-	build_sector_description(f, sectdata, sectors);
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
@@ -209,6 +208,7 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 			else
 				desc[16].p1 = get_track_dam_mfm(f, head, track);
 
+			build_sector_description(f, sectdata, sectors, track, head);
 			io_generic_read(io, sectdata, get_image_offset(f, head, track), track_size);
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
@@ -330,10 +330,10 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 
 	uint8_t sectdata[40*512];
 	desc_s sectors[40];
-	build_sector_description(f, sectdata, sectors);
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
+			build_sector_description(f, sectdata, sectors, track, head);
 			extract_sectors(image, f, sectors, track, head);
 			io_generic_write(io, sectdata, get_image_offset(f, head, track), track_size);
 		}

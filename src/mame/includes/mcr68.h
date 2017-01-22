@@ -17,7 +17,7 @@ public:
 	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_sounds_good(*this, "sg"),
-		m_turbo_chip_squeak(*this, "tcs"),
+		m_turbo_cheap_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") ,
@@ -28,7 +28,7 @@ public:
 	{ }
 
 	optional_device<midway_sounds_good_device> m_sounds_good;
-	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
+	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 
 	required_shared_ptr<uint16_t> m_videoram;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz & Westley M. Martinez
 //============================================================
 //
 //  timeparameter.cpp - Time-based dynamic shader param
@@ -8,8 +8,9 @@
 
 #include "timeparameter.h"
 
-bgfx_time_parameter::bgfx_time_parameter(std::string name, parameter_type type, double limit)
+bgfx_time_parameter::bgfx_time_parameter(std::string name, parameter_type type, bool reset, double limit)
 	: bgfx_parameter(name, type)
+	, m_reset(reset)
 	, m_current_time(0)
 	, m_limit(limit)
 {
@@ -22,12 +23,16 @@ float bgfx_time_parameter::value()
 
 void bgfx_time_parameter::tick(double delta)
 {
-	m_current_time += delta;
-	if (m_limit != 0)
-	{
-		while (m_current_time >= m_limit)
+	if (!m_reset) {
+		m_current_time += delta;
+		if (m_limit != 0)
 		{
-			m_current_time -= m_limit;
+			while (m_current_time >= m_limit)
+			{
+				m_current_time -= m_limit;
+			}
 		}
 	}
+	else
+		m_current_time = delta;
 }

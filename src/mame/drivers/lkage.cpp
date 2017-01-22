@@ -156,13 +156,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_map_mcu, AS_PROGRAM, 8, lkage_state )
 	AM_IMPORT_FROM(lkage_map)
-	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
-	AM_RANGE(0xf087, 0xf087) AM_DEVREAD("bmcu", taito68705_mcu_device, mcu_status_r)
+	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0xf087, 0xf087) AM_READ(mcu_status_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_map_boot, AS_PROGRAM, 8, lkage_state )
 	AM_IMPORT_FROM(lkage_map)
-	AM_RANGE(0xf062, 0xf062) AM_READWRITE(fake_mcu_r,fake_mcu_w)
+	AM_RANGE(0xf062, 0xf062) AM_READWRITE(fake_mcu_r, fake_mcu_w)
 	AM_RANGE(0xf087, 0xf087) AM_READ(fake_status_r)
 ADDRESS_MAP_END
 
@@ -604,7 +604,7 @@ ROM_START( lkage )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -634,7 +634,7 @@ ROM_START( lkageo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -664,7 +664,7 @@ ROM_START( lkageoo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -847,7 +847,7 @@ ROM_START( bygone )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a53_07.ic54",   0x0000, 0x8000, CRC(72f69a77) SHA1(dfc1050a4123b3c83ae733ece1b6fe2836beb901) )
 
-	ROM_REGION( 0x10000, "bmcu:mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a51_09.ic53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) /* the same as lkage */
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -864,7 +864,16 @@ ROM_START( bygone )
 ROM_END
 
 
-/*Note: This probably uses another MCU dump,which is undumped.*/
+READ8_MEMBER(lkage_state::mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
+// Note: This probably uses another MCU program, which is undumped.
 
 READ8_MEMBER(lkage_state::fake_mcu_r)
 {

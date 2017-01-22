@@ -51,8 +51,6 @@
 #include "includes/llc.h"
 #include "llc1.lh"
 
-#define KEYBOARD_TAG "keyboard"
-
 /* Address maps */
 static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
@@ -234,7 +232,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(llc_state, kbd_put))
 MACHINE_CONFIG_END
 

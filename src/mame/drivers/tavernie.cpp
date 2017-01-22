@@ -62,8 +62,6 @@ Z - more scan lines per row (cursor is bigger)
 #include "sound/beep.h"
 #include "tavernie.lh"
 
-#define KEYBOARD_TAG "keyboard"
-
 class tavernie_state : public driver_device
 {
 public:
@@ -356,7 +354,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tavernie_state, kbd_put))
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // unknown clock

@@ -56,14 +56,12 @@
 #include "sound/wave.h"
 #include "imagedev/snapquik.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class binbug_state : public driver_device
 {
 public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_rs232(*this, KEYBOARD_TAG),
+		m_rs232(*this, "keyboard"),
 		m_cass(*this, "cassette"),
 		m_p_videoram(*this, "videoram"),
 		m_p_attribram(*this, "attribram"),
@@ -309,7 +307,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, default_rs232_devices, "keyboard")
+	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */

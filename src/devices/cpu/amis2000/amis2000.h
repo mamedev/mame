@@ -44,7 +44,7 @@ class amis2000_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	amis2000_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t bu_bits, uint8_t callstack_bits, uint8_t callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	amis2000_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -67,7 +67,7 @@ public:
 	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(object); }
-	static void set_7seg_table(device_t &device, const uint8_t *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
+	static void set_7seg_table(device_t &device, const u8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
 
 protected:
 	// device-level overrides
@@ -75,20 +75,20 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); } // "
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 4); } // "
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 2; }
+	virtual u32 execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual u32 disasm_max_opcode_bytes() const override { return 1; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -98,33 +98,33 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	uint8_t m_bu_bits;
-	uint16_t m_bu_mask;
-	uint8_t m_callstack_bits;   // number of program counter bits held in callstack
-	uint16_t m_callstack_mask;
-	uint8_t m_callstack_depth;  // callstack levels: 3 on 2000/2150, 5 on 2200/2400
-	uint16_t m_callstack[5];    // max 5
+	u8 m_bu_bits;
+	u16 m_bu_mask;
+	u8 m_callstack_bits;  // number of program counter bits held in callstack
+	u16 m_callstack_mask;
+	u8 m_callstack_depth; // callstack levels: 3 on 2000/2150, 5 on 2200/2400
+	u16 m_callstack[5];   // max 5
 	int m_icount;
-	uint16_t m_pc;              // 13-bit program counter
-	uint8_t m_ppr;              // prepared page register (PP 1)
-	uint8_t m_pbr;              // prepared bank register (PP 2)
-	bool m_skip;                // skip next opcode, including PP prefixes
-	uint8_t m_op;
-	uint8_t m_prev_op;          // previous opcode, needed for PP, LAI, LB*
-	uint8_t m_f;                // generic flags: 2 on 2000/2150, 6 on 2200/2400
-	uint8_t m_carry;            // carry flag
-	uint8_t m_bl;               // 4-bit ram index x
-	uint8_t m_bu;               // 2/3-bit ram index y
-	uint8_t m_acc;              // 4-bit accumulator
-	uint8_t m_e;                // 4-bit generic register
-	uint8_t m_ki_mask;          // 4-bit k/i-pins select latch
-	uint8_t m_d;                // 8-bit d-pins latch
-	bool m_d_active;            // d-pins available for direct i/o(floating), or outputting d-latch
-	uint8_t m_d_polarity;       // invert d-latch output
-	uint16_t m_a;               // 13-bit a-pins latch (master strobe latch)
+	u16 m_pc;             // 13-bit program counter
+	u8 m_ppr;             // prepared page register (PP 1)
+	u8 m_pbr;             // prepared bank register (PP 2)
+	bool m_skip;          // skip next opcode, including PP prefixes
+	u8 m_op;
+	u8 m_prev_op;         // previous opcode, needed for PP, LAI, LB*
+	u8 m_f;               // generic flags: 2 on 2000/2150, 6 on 2200/2400
+	u8 m_carry;           // carry flag
+	u8 m_bl;              // 4-bit ram index x
+	u8 m_bu;              // 2/3-bit ram index y
+	u8 m_acc;             // 4-bit accumulator
+	u8 m_e;               // 4-bit generic register
+	u8 m_ki_mask;         // 4-bit k/i-pins select latch
+	u8 m_d;               // 8-bit d-pins latch
+	bool m_d_active;      // d-pins available for direct i/o(floating), or outputting d-latch
+	u8 m_d_polarity;      // invert d-latch output
+	u16 m_a;              // 13-bit a-pins latch (master strobe latch)
 
 	// i/o handlers
-	const uint8_t *m_7seg_table;
+	const u8 *m_7seg_table;
 	devcb_read8 m_read_k;
 	devcb_read8 m_read_i;
 	devcb_read8 m_read_d;
@@ -133,8 +133,8 @@ protected:
 	devcb_write_line m_write_f;
 
 	// misc internal helpers
-	uint8_t ram_r();
-	void ram_w(uint8_t data);
+	u8 ram_r();
+	void ram_w(u8 data);
 	void pop_callstack();
 	void push_callstack();
 	void d_latch_out(bool active);
@@ -203,21 +203,21 @@ protected:
 class amis2000_cpu_device : public amis2000_base_device
 {
 public:
-	amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class amis2150_cpu_device : public amis2000_base_device
 {
 public:
-	amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class amis2152_cpu_device : public amis2000_base_device
 {
 public:
-	amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -225,7 +225,7 @@ protected:
 	virtual void device_reset() override;
 
 	// digital-to-frequency converter
-	uint8_t m_d2f_latch;
+	u8 m_d2f_latch;
 	emu_timer *m_d2f_timer;
 	int m_fout_state;
 

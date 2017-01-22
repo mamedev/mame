@@ -84,6 +84,7 @@ public:
 		friend class linkedlist_t<LC>;
 
 		element_t() : m_next(nullptr) {}
+		virtual ~element_t() = default;
 
 		LC *next() const noexcept { return m_next; }
 	private:

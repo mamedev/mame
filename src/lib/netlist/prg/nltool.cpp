@@ -30,7 +30,7 @@ public:
 	tool_options_t() :
 		plib::options(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static", "run|convert|listdevices|static"),
+		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header", "run|convert|listdevices|static|header"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for files"),
@@ -77,8 +77,8 @@ public:
 static plib::pstdout pout_strm;
 static plib::pstderr perr_strm;
 
-static plib::pstream_fmt_writer_t pout(pout_strm);
-static plib::pstream_fmt_writer_t perr(perr_strm);
+static plib::putf8_fmt_writer pout(pout_strm);
+static plib::putf8_fmt_writer perr(perr_strm);
 
 static NETLIST_START(dummy)
 	/* Standard stuff */
@@ -128,19 +128,16 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t(const pstring &aname)
-	: netlist::netlist_t(aname), m_setup(nullptr)
+	: netlist::netlist_t(aname)
 	{
 	}
 
 	~netlist_tool_t()
 	{
-		if (m_setup != nullptr)
-			plib::pfree(m_setup);
 	}
 
 	void init()
 	{
-		m_setup = plib::palloc<netlist::setup_t>(*this);
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,
@@ -151,19 +148,18 @@ public:
 		// read the netlist ...
 
 		for (auto & d : defines)
-			m_setup->register_define(d);
+			setup().register_define(d);
 
 		for (auto & r : roms)
-			m_setup->register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(*m_setup, r));
+			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
 
-		m_setup->register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(*m_setup, filename));
-		m_setup->include(name);
+		setup().register_source(plib::make_unique_base<netlist::source_t,
+				netlist::source_file_t>(setup(), filename));
+		setup().include(name);
 		log_setup(logs);
 
 		// start devices
-		m_setup->start_devices();
-		m_setup->resolve_inputs();
+		this->start();
 		// reset
 		this->reset();
 	}
@@ -174,19 +170,16 @@ public:
 		for (auto & log : logs)
 		{
 			pstring name = "log_" + log;
-			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
-			m_setup->register_link(name + ".I", log);
+			/*netlist_device_t *nc = */ setup().register_dev("LOG", name);
+			setup().register_link(name + ".I", log);
 		}
 	}
-
-	netlist::setup_t &setup() { return *m_setup; }
 
 protected:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
-	netlist::setup_t *m_setup;
 };
 
 void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
@@ -210,21 +203,15 @@ void usage(tool_options_t &opts)
 
 struct input_t
 {
-#if 0
-	input_t()
-	: m_param(nullptr), m_value(0.0)
-	{
-	}
-#endif
 	input_t(const netlist::setup_t &setup, const pstring &line)
 	{
 		char buf[400];
 		double t;
 		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
-		if ( e!= 3)
+		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
-		m_param = setup.find_param(buf, true);
+		m_param = setup.find_param(pstring(buf, pstring::UTF8), true);
 	}
 
 	void setparam()
@@ -249,7 +236,6 @@ struct input_t
 	netlist::netlist_time m_time;
 	netlist::param_t *m_param;
 	double m_value;
-
 };
 
 static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fname)
@@ -258,8 +244,9 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 	if (fname != "")
 	{
 		plib::pifilestream f(fname);
+		plib::putf8_reader r(f);
 		pstring l;
-		while (f.readline(l))
+		while (r.readline(l))
 		{
 			if (l != "")
 			{
@@ -339,6 +326,81 @@ static void static_compile(tool_options_t &opts)
 
 }
 
+static void mac_out(const pstring s, const bool cont = true)
+{
+	static const unsigned RIGHT = 72;
+	if (cont)
+	{
+		unsigned adj = 0;
+		for (auto x : s)
+			adj += (x == '\t' ? 3 : 0);
+		pout("{1}\\\n", s.rpad(" ", RIGHT-1-adj));
+	}
+	else
+		pout("{1}\n", s);
+}
+
+static void create_header(tool_options_t &opts)
+{
+	netlist_tool_t nt("netlist");
+
+	nt.init();
+
+	nt.log().verbose.set_enabled(false);
+	nt.log().warning.set_enabled(false);
+
+	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
+			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().include("dummy");
+
+	pout("// license:GPL-2.0+\n");
+	pout("// copyright-holders:Couriersud\n");
+	pout("#ifndef NLD_DEVINC_H\n");
+	pout("#define NLD_DEVINC_H\n");
+	pout("\n");
+	pout("#include \"nl_setup.h\"\n");
+	pout("#ifndef __PLIB_PREPROCESSOR__\n");
+	pout("\n");
+	pout("/* ----------------------------------------------------------------------------\n");
+	pout(" *  Netlist Macros\n");
+	pout(" * ---------------------------------------------------------------------------*/\n");
+	pout("\n");
+
+	pstring last_source("");
+
+	for (auto &e : nt.setup().factory())
+	{
+		if (last_source != e->sourcefile())
+		{
+			last_source = e->sourcefile();
+			pout("{1}\n", pstring("// ").rpad("-", 72));
+			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
+			pout("{1}\n", pstring("// ").rpad("-", 72));
+		}
+		auto v = plib::pstring_vector_t(e->param_desc(), ",");
+		pstring vs;
+		for (auto s : v)
+			vs += ", p" + s.replace("+","").replace(".","_");
+		mac_out("#define " + e->name() + "(name" + vs + ")");
+		mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");                                        \
+
+		for (auto s : v)
+		{
+			pstring r(s.replace("+","").replace(".","_"));
+			if (s.startsWith("+"))
+				mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
+			else
+				mac_out("\tNETDEV_PARAMI(name, " + r + ", p" + r + ")");
+		}
+		mac_out("", false);
+	}
+	pout("#endif // __PLIB_PREPROCESSOR__\n");
+	pout("#endif\n");
+	nt.stop();
+
+}
+
+
 /*-------------------------------------------------
     listdevices - list all known devices
 -------------------------------------------------*/
@@ -359,8 +421,7 @@ static void listdevices(tool_options_t &opts)
 	nt.setup().include("dummy");
 
 
-	nt.setup().start_devices();
-	nt.setup().resolve_inputs();
+	nt.start();
 
 	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
 
@@ -432,7 +493,7 @@ static void listdevices(tool_options_t &opts)
 -------------------------------------------------*/
 
 #if 0
-static const char *pmf_verbose[] =
+static const pstring pmf_verbose[] =
 {
 	"NL_PMF_TYPE_VIRTUAL",
 	"NL_PMF_TYPE_GNUC_PMF",
@@ -487,6 +548,8 @@ int main(int argc, char *argv[])
 			run(opts);
 		else if (cmd == "static")
 			static_compile(opts);
+		else if (cmd == "header")
+			create_header(opts);
 		else if (cmd == "convert")
 		{
 			pstring contents;
@@ -523,7 +586,7 @@ int main(int argc, char *argv[])
 				result = c.result();
 			}
 			/* present result */
-			pout_strm.write(result.c_str());
+			pout.write(result);
 		}
 		else
 		{

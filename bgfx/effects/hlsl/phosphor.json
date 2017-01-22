@@ -28,6 +28,9 @@
     	{ "name": "s_tex",         "type": "int",  "values": [ 1.0 ] },
     	{ "name": "s_prev",        "type": "int",  "values": [ 1.0 ] },
     	{ "name": "u_passthrough", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-    	{ "name": "u_phosphor",    "type": "vec4", "values": [ 0.7, 0.7, 0.7, 0.0 ] }
+    	{ "name": "u_phosphor_mode", "type": "vec4", "values": [ 2.0, 0.0, 0.0, 0.0 ] },
+	{ "name": "u_phosphor_time", "type": "vec4", "values": [ 0.02, 0.20, 0.20, 0.0 ] },
+	{ "name": "u_phosphor_beta", "type": "vec4", "values": [ 1.0, 1.0, 1.0, 0.0 ] },
+	{ "name": "u_delta_time", "type": "vec4", "values": [ 0.0, 0.0, 0.0, 0.0 ] }
     ]
 }

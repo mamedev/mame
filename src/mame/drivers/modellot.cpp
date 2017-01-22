@@ -20,8 +20,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class modellot_state : public driver_device
 {
 public:
@@ -167,7 +165,7 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 

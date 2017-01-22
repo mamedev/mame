@@ -129,7 +129,7 @@ Configuration Settings
 | 
 | **cubic_distortion** (*Cubic Distortion Amount*)
 | 
-| 	This setting determines strength of the qubic distortion of the screen image.
+| 	This setting determines strength of the cubic distortion of the screen image.
 | 
 |   Both distortion factors can be negative to compensate each other. e.g. distortion 0.5 and cubic_distortion -0.5
 | 
@@ -187,7 +187,7 @@ Configuration Settings
 | 
 | **defocus** (*Defocus*)
 | 
-| 	This option will defocus the display, blurring individual pixels like an extremely badly maintained monitor. Specify as X,Y values (e.g. **defocus 1,1**)
+| 	This option will defocus the display, blurring individual pixels like an extremely badly-maintained monitor. Specify as X,Y values (e.g. **defocus 1,1**)
 | 
 | **converge_x** (*Linear Convergence X, RGB*)
 | **converge_y** (*Linear Convergence Y, RGB*)
@@ -227,7 +227,26 @@ Configuration Settings
 | 	How long the color channel stays on the screen, also called phosphor ghosting. 0 gives absolutely no ghost effect, and 1 will leave a contrail behind that is only overwritten by a higher color value.
 | 
 | 	This also affects vector games quite a bit.
-| 
+| **phosphor_mode** (*Phosphor Persistence Mode*)
+|
+|       The model used for phosphor persistence.  Off will have no effect.  Exponential has a gradual, near-constant decay, while Inverse Power has a fast initial decay which slows to a long, persistent tail.  Inverse Power is more accurate for most screen types.
+|
+| **phosphor_time** (*Phosphor Persistence Time Constant, RGB*)
+|
+|       In exponential mode, this is the amount of time *in seconds* for a pixel to decay to 35% of its perceived brightness.  In inverse power mode, it corresponds to the amount of time *in centiseconds* for a pixel to decay to 35% of its perceived brightness when beta is 1.
+|
+| **phosphor_beta** (*Phosphor Persistence beta, RGB*)
+|
+|       In inverse power mode, beta affects the speed of decay and overall persistence.  A higher beta will have a shorter overall persistence, but a curve which is slightly more linear.
+|
+| **lcd_rise_time** (*LCD Rise Time, RGB*)
+|
+|       This affects ghosting as seen in LCDs.  A value of 0 means there is no ghosting for dark to light transitions, while a value of 1 requires one second to fully transition from maximum darkness to maximum brightness.
+|
+| **lcd_fall_time** (*LCD Fall Time, RGB*)
+|
+|       This affects ghosting as seen in LCDs.  The effect is the same as rise time, but is for light to dark transitions.
+|
 | **saturation** (*Color Saturation*)
 | 
 | 	Color saturation can be adjusted here.

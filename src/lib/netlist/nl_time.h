@@ -33,7 +33,7 @@ namespace netlist
 	public:
 
 		using internal_type = TYPE;
-		using mult_type = std::uint_fast64_t;
+		using mult_type = std::uint64_t;
 		static constexpr internal_type resolution = RES;
 
 		constexpr ptime() noexcept : m_time(0) {}
@@ -127,7 +127,7 @@ namespace netlist
 #if (PHAS_INT128)
 	using netlist_time = ptime<UINT128, NETLIST_INTERNAL_RES>;
 #else
-	using netlist_time = ptime<std::uint_fast64_t, NETLIST_INTERNAL_RES>;
+	using netlist_time = ptime<std::uint64_t, NETLIST_INTERNAL_RES>;
 #endif
 }
 

@@ -23,8 +23,6 @@
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class zrt80_state : public driver_device
 {
 public:
@@ -302,7 +300,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 
 	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zrt80_state, kbd_put))
 MACHINE_CONFIG_END
 

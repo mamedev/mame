@@ -81,7 +81,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	for (unsigned k=0; k<iN; k++)
 	{
-		terms_t * RESTRICT row = this->m_terms[k];
+		terms_for_net_t * RESTRICT row = this->m_terms[k];
 		mat.ia[k] = nz;
 
 		for (unsigned j=0; j<row->m_nz.size(); j++)
@@ -97,7 +97,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		for (unsigned j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
 			for (unsigned i = mat.ia[k]; i<nz; i++)
-				if (this->m_terms[k]->net_other()[j] == static_cast<int>(mat.ja[i]))
+				if (this->m_terms[k]->connected_net_idx()[j] == static_cast<int>(mat.ja[i]))
 				{
 					m_term_cr[k].push_back(i);
 					break;
@@ -140,7 +140,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = this->m_terms[k]->other_curanalog();
+		const nl_double * const * RESTRICT other_cur_analog = this->m_terms[k]->connected_net_V();
 
 		new_V[k] = this->m_nets[k]->m_cur_Analog;
 

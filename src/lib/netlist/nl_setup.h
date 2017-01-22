@@ -71,7 +71,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
-		setup.register_lib_entry(# name);
+		setup.register_lib_entry(# name, __FILE__);
 
 #define INCLUDE(name)                                                          \
 		setup.include(# name);
@@ -80,6 +80,9 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		setup.namespace_push(# name);                                          \
 		NETLIST_NAME(model)(setup);                                            \
 		setup.namespace_pop();
+
+#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                  \
+		setup.register_frontier(# attach, r_in, r_out);
 
 // -----------------------------------------------------------------------------
 // truthtable defines
@@ -105,7 +108,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		netlist::devices::tt_factory_create(setup, desc);       \
+		netlist::devices::tt_factory_create(setup, desc, __FILE__);       \
 	}
 
 
@@ -202,7 +205,7 @@ namespace netlist
 
 		void register_dev(const pstring &classname, const pstring &name);
 
-		void register_lib_entry(const pstring &name);
+		void register_lib_entry(const pstring &name, const pstring &sourcefile);
 
 		void register_model(const pstring &model_in);
 		void register_alias(const pstring &alias, const pstring &out);
@@ -238,9 +241,10 @@ namespace netlist
 		/* parse a source */
 
 		void include(const pstring &netlist_name);
+
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring name);
 
-		bool parse_stream(plib::pistream &istrm, const pstring &name);
+		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
 
 		/* register a source */
 
@@ -257,15 +261,16 @@ namespace netlist
 
 		/* model / family related */
 
-		const logic_family_desc_t *family_from_model(const pstring &model);
 		const pstring model_value_str(model_map_t &map, const pstring &entity);
 		nl_double model_value(model_map_t &map, const pstring &entity);
 
 		void model_parse(const pstring &model, model_map_t &map);
 
+		const logic_family_desc_t *family_from_model(const pstring &model);
+
 		/* FIXME: truth table trampoline */
 
-		void tt_factory_create(tt_desc &desc);
+		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
@@ -312,7 +317,7 @@ namespace netlist
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
-	};
+};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources
@@ -353,7 +358,7 @@ namespace netlist
 	{
 	public:
 		source_mem_t(setup_t &setup, const char *mem)
-		: source_t(setup), m_str(mem)
+		: source_t(setup), m_str(mem, pstring::UTF8)
 		{
 		}
 

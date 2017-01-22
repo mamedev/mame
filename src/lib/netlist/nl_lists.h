@@ -16,13 +16,40 @@
 #include "plib/plists.h"
 #include "plib/pchrono.h"
 
-
 // ----------------------------------------------------------------------------------------
 // timed queue
 // ----------------------------------------------------------------------------------------
 
+
 namespace netlist
 {
+
+	//FIXME: move to an appropriate place
+	template<bool enabled_ = true>
+	class pspin_lock
+	{
+	public:
+		pspin_lock() { }
+		void acquire() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
+		void release() noexcept { m_lock.clear(std::memory_order_release); }
+	private:
+		std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
+	};
+
+	template<>
+	class pspin_lock<false>
+	{
+	public:
+		void acquire() const noexcept { }
+		void release() const noexcept { }
+	};
+
+	#if HAS_OPENMP && USE_OPENMP
+		using tqlock = pspin_lock<true>;
+	#else
+		using tqlock = pspin_lock<false>;
+	#endif
+
 	template <class Element, class Time>
 	class timed_queue
 	{
@@ -38,21 +65,18 @@ namespace netlist
 		timed_queue(unsigned list_size)
 		: m_list(list_size)
 		{
-	#if HAS_OPENMP && USE_OPENMP
-			m_lock = 0;
-	#endif
+			m_lock.acquire();
 			clear();
+			m_lock.release();
 		}
 
-			std::size_t capacity() const { return m_list.size(); }
-			bool empty() const { return (m_end == &m_list[1]); }
+		std::size_t capacity() const { return m_list.size(); }
+		bool empty() const { return (m_end == &m_list[1]); }
 
-		void push(const Time t, Element o) noexcept
+		void push(Element o, const Time t) noexcept
 		{
-	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
-			while (m_lock.exchange(1)) { }
-	#endif
+			m_lock.acquire();
 			entry_t * i = m_end;
 			for (; t > (i - 1)->m_exec_time; --i)
 			{
@@ -62,9 +86,7 @@ namespace netlist
 			*i = { t, o };
 			++m_end;
 			m_prof_call.inc();
-	#if HAS_OPENMP && USE_OPENMP
-			m_lock = 0;
-	#endif
+			m_lock.release();
 		}
 
 		entry_t pop() noexcept              { return *(--m_end); }
@@ -73,9 +95,7 @@ namespace netlist
 		void remove(const Element &elem) noexcept
 		{
 			/* Lock */
-	#if HAS_OPENMP && USE_OPENMP
-			while (m_lock.exchange(1)) { }
-	#endif
+			m_lock.acquire();
 			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
 			{
 				if (i->m_object == elem)
@@ -86,21 +106,17 @@ namespace netlist
 						*i = *(i+1);
 						++i;
 					}
-	#if HAS_OPENMP && USE_OPENMP
-					m_lock = 0;
-	#endif
+					m_lock.release();
 					return;
 				}
 			}
-	#if HAS_OPENMP && USE_OPENMP
-			m_lock = 0;
-	#endif
+			m_lock.release();
 		}
 
-		void retime(const Time t, const Element &elem) noexcept
+		void retime(const Element &elem, const Time t) noexcept
 		{
 			remove(elem);
-			push(t, elem);
+			push(elem, t);
 		}
 
 		void clear()
@@ -122,9 +138,7 @@ namespace netlist
 
 	private:
 
-	#if HAS_OPENMP && USE_OPENMP
-		volatile std::atomic<int> m_lock;
-	#endif
+		tqlock m_lock;
 		entry_t * m_end;
 		std::vector<entry_t> m_list;
 

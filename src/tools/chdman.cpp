@@ -75,6 +75,7 @@ const int MODE_GDI = 2;
 #define COMMAND_ADD_METADATA "addmeta"
 #define COMMAND_DEL_METADATA "delmeta"
 #define COMMAND_DUMP_METADATA "dumpmeta"
+#define COMMAND_LIST_TEMPLATES "listtemplates"
 
 // option strings
 #define OPTION_INPUT "input"
@@ -104,6 +105,7 @@ const int MODE_GDI = 2;
 #define OPTION_FIX "fix"
 #define OPTION_NUMPROCESSORS "numprocessors"
 #define OPTION_SIZE "size"
+#define OPTION_TEMPLATE "template"
 
 
 //**************************************************************************
@@ -126,6 +128,7 @@ static void do_extract_ld(parameters_t &params);
 static void do_add_metadata(parameters_t &params);
 static void do_del_metadata(parameters_t &params);
 static void do_dump_metadata(parameters_t &params);
+static void do_list_templates(parameters_t &params);
 
 
 
@@ -169,6 +172,17 @@ struct avi_info
 	uint32_t bytes_per_frame;
 };
 
+// ======================> hd_template
+
+struct hd_template
+{
+	const char *manufacturer;
+	const char *model;
+	uint32_t cylinders;
+	uint32_t heads;
+	uint32_t sectors;
+	uint32_t sector_size;
+};
 
 // ======================> metadata_index_info
 
@@ -580,6 +594,7 @@ static const option_description s_options[] =
 	{ OPTION_FIX,                   "f",    false, ": fix the SHA-1 if it is incorrect" },
 	{ OPTION_VERBOSE,               "v",    false, ": output additional information" },
 	{ OPTION_SIZE,                  "s",    true, ": <bytes>: size of the output file" },
+	{ OPTION_TEMPLATE,              "tp",   true, ": <id>: use hard disk template (see listtemplates)" },
 };
 
 
@@ -629,6 +644,7 @@ static const command_description s_commands[] =
 			OPTION_INPUT_LENGTH_HUNKS,
 			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
+			OPTION_TEMPLATE,
 			OPTION_IDENT,
 			OPTION_CHS,
 			OPTION_SIZE,
@@ -754,7 +770,23 @@ static const command_description s_commands[] =
 			REQUIRED OPTION_TAG,
 			OPTION_INDEX
 		}
-	}
+	},
+
+	{ COMMAND_LIST_TEMPLATES, do_list_templates, ": list hard disk templates",
+		{
+		}
+	},
+};
+
+
+// hard disk templates
+static const hd_template s_hd_templates[] =
+{
+	{ "Conner", "CFA170A", 332, 16, 63, 512 }, // 163 MB
+	{ "Rodime", "R0201",   321,  2, 16, 512 }, //   5 MB
+	{ "Rodime", "R0202",   321,  4, 16, 512 }, //  10 MB
+	{ "Rodime", "R0203",   321,  6, 16, 512 }, //  15 MB
+	{ "Rodime", "R0204",   321,  8, 16, 512 }, //  20 MB
 };
 
 
@@ -1790,6 +1822,23 @@ static void do_create_hd(parameters_t &params)
 		// ignore CHS for > 8GB drives
 		if (cylinders * heads * sectors >= 16514064)
 			cylinders = 0;
+	}
+
+	// process template
+	auto template_str = params.find(OPTION_TEMPLATE);
+	if (template_str != params.end())
+	{
+		uint32_t id = parse_number(template_str->second->c_str());
+
+		if (id >= ARRAY_LENGTH(s_hd_templates))
+			report_error(1, "Template '%d' is invalid\n", id);
+
+		cylinders = s_hd_templates[id].cylinders;
+		heads = s_hd_templates[id].heads;
+		sectors = s_hd_templates[id].sectors;
+		sector_size = s_hd_templates[id].sector_size;
+
+		printf("Template:     %s %s\n", s_hd_templates[id].manufacturer, s_hd_templates[id].model);
 	}
 
 	// extract geometry from the parent if we have one
@@ -2856,6 +2905,32 @@ static void do_dump_metadata(parameters_t &params)
 		output_file.reset();
 		osd_file::remove(*output_file_str->second);
 		throw;
+	}
+}
+
+
+//-------------------------------------------------
+//  do_dump_metadata - dump metadata from a CHD
+//-------------------------------------------------
+
+static void do_list_templates(parameters_t &params)
+{
+	printf("\n");
+	printf("ID  Manufacturer  Model           Cylinders  Heads  Sectors  Sector Size  Total Size\n");
+	printf("------------------------------------------------------------------------------------\n");
+
+	for (int id = 0; id < ARRAY_LENGTH(s_hd_templates); id++)
+	{
+		printf("%2d  %-13s %-15s %9d  %5d  %7d  %11d  %7d MB\n",
+			id,
+			s_hd_templates[id].manufacturer,
+			s_hd_templates[id].model,
+			s_hd_templates[id].cylinders,
+			s_hd_templates[id].heads,
+			s_hd_templates[id].sectors,
+			s_hd_templates[id].sector_size,
+			(s_hd_templates[id].cylinders * s_hd_templates[id].heads * s_hd_templates[id].sectors * s_hd_templates[id].sector_size) / 1024 / 1024
+		);
 	}
 }
 

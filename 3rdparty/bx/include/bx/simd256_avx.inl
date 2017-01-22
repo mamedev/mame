@@ -38,34 +38,34 @@ namespace bx
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_avx_t_t simd_splat(float _a)
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd_splat(float _a)
 	{
 		return _mm256_set1_ps(_a);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_avx_t_t simd_isplat(uint32_t _a)
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd_isplat(uint32_t _a)
 	{
 		const __m256i splat          = _mm256_set1_epi32(_a);
-		const simd256_avx_t_t result = _mm256_castsi256_ps(splat);
+		const simd256_avx_t result = _mm256_castsi256_ps(splat);
 
 		return result;
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_avx_t_t simd_itof(simd256_avx_t_t _a)
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd_itof(simd256_avx_t _a)
 	{
 		const __m256i  itof          = _mm256_castps_si256(_a);
-		const simd256_avx_t_t result = _mm256_cvtepi32_ps(itof);
+		const simd256_avx_t result = _mm256_cvtepi32_ps(itof);
 
 		return result;
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_avx_t_t simd_ftoi(simd256_avx_t_t _a)
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd_ftoi(simd256_avx_t _a)
 	{
 		const __m256i ftoi           = _mm256_cvtps_epi32(_a);
-		const simd256_avx_t_t result = _mm256_castsi256_ps(ftoi);
+		const simd256_avx_t result = _mm256_castsi256_ps(ftoi);
 
 		return result;
 	}

@@ -234,7 +234,7 @@ WRITE8_MEMBER(joctronic_state::resint_w)
 WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
 {
 	m_soundbank->set_entry((data & 0xc0) >> 6);
-	m_oki->playmode_w(BIT(data, 1) ? MSM5205_S48_4B : MSM5205_S96_4B); // to S1 on MSM5205
+	m_oki->s1_w(BIT(data, 1));
 	m_oki->reset_w(BIT(data, 0));
 }
 
@@ -395,11 +395,13 @@ MACHINE_CONFIG_END
 / Punky Willy (1986)
 /-------------------------------------------------------------------*/
 ROM_START(punkywil)
+	// Both ROMs are 27128, according to a text file accompanying
+	// the bad dump (which had a 512K overdump of the sound ROM)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // underdumped 2764, 27128 or 27256
+	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // 0c6c (???)
 
 	ROM_REGION(0x4000, "soundcpu", 0)
-	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee))
+	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee)) // d55c (???)
 ROM_END
 
 

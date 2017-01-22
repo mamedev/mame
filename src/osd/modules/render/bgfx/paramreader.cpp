@@ -43,8 +43,9 @@ bgfx_parameter* parameter_reader::read_from_value(const Value& value, std::strin
 	}
 	else if (type == bgfx_parameter::parameter_type::PARAM_TIME)
 	{
+		bool reset = value["reset"].GetBool();
 		float limit = float(value["limit"].GetDouble());
-		return new bgfx_time_parameter(name, type, limit);
+		return new bgfx_time_parameter(name, type, reset, limit);
 	}
 	else
 	{

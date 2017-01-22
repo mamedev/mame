@@ -8,11 +8,8 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
-#include <type_traits>
-
-//#include "solver/nld_solver.h"
 #include "nl_base.h"
-#include "plib/pstream.h"
+#include "nl_errstr.h"
 
 namespace netlist
 {
@@ -24,37 +21,37 @@ namespace netlist
 	{
 		int m_pivot;
 		nl_double m_accuracy;
-		nl_double m_lte;
+		nl_double m_dynamic_lte;
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
-		nl_double m_sor;
-		bool m_dynamic;
+		nl_double m_gs_sor;
+		bool m_dynamic_ts;
 		unsigned m_gs_loops;
 		unsigned m_nr_loops;
-		netlist_time m_nt_sync_delay;
+		netlist_time m_nr_recalc_delay;
 		bool m_log_stats;
 	};
 
 
-class terms_t
+class terms_for_net_t
 {
-	P_PREVENT_COPYING(terms_t)
+	P_PREVENT_COPYING(terms_for_net_t)
 
 public:
-	terms_t();
+	terms_for_net_t();
 
 	void clear();
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() { return m_term.size(); }
+	inline std::size_t count() { return m_terms.size(); }
 
-	inline terminal_t **terms() { return m_term.data(); }
-	inline int *net_other() { return m_net_other.data(); }
+	inline terminal_t **terms() { return m_terms.data(); }
+	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
 	inline nl_double *gt() { return m_gt.data(); }
 	inline nl_double *go() { return m_go.data(); }
 	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
+	inline nl_double **connected_net_V() { return m_connected_net_V.data(); }
 
 	void set_pointers();
 
@@ -70,12 +67,12 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	std::vector<int> m_net_other;
+	std::vector<int> m_connected_net_idx;
 	std::vector<nl_double> m_go;
 	std::vector<nl_double> m_gt;
 	std::vector<nl_double> m_Idr;
-	std::vector<nl_double *> m_other_curanalog;
-	std::vector<terminal_t *> m_term;
+	std::vector<nl_double *> m_connected_net_V;
+	std::vector<terminal_t *> m_terms;
 
 };
 
@@ -110,7 +107,10 @@ public:
 
 	virtual ~matrix_solver_t();
 
-	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
+	void setup(analog_net_t::list_t &nets)
+	{
+		vsetup(nets);
+	}
 
 	void solve_base();
 
@@ -133,11 +133,9 @@ public:
 public:
 	int get_net_idx(detail::net_t *net);
 
-	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
-
 	virtual void log_stats();
 
-	virtual void create_solver_code(plib::postream &strm)
+	virtual void create_solver_code(plib::putf8_fmt_writer &strm)
 	{
 		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
 	}
@@ -163,11 +161,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	std::vector<terms_t *> m_terms;
+	std::vector<terms_for_net_t *> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
-	std::vector<terms_t *> m_rails_temp;
+	std::vector<terms_for_net_t *> m_rails_temp;
 
 	const solver_parameters_t &m_params;
 
@@ -244,7 +242,7 @@ void matrix_solver_t::build_LE_A()
 		}
 
 		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->net_other();
+		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			child.A(k,net_other[i]) -= go[i];
@@ -266,7 +264,7 @@ void matrix_solver_t::build_LE_RHS()
 		const std::size_t terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];

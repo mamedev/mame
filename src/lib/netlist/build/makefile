@@ -50,6 +50,7 @@ POBJS := \
 	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
+	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
@@ -115,11 +116,13 @@ NLOBJS := \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nld_truthtable.o \
+	$(NLOBJ)/macro/nlm_base.o \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \
 	$(NLOBJ)/macro/nlm_opamp.o \
 	$(NLOBJ)/macro/nlm_other.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 	$(NLOBJ)/solver/nld_solver.o \
+	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 
 ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
@@ -167,9 +170,10 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang mingw doc
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
-#-Wno-weak-vtables
+# 
+# Mostly done: -Wno-weak-vtables -Wno-cast-align
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 #
 

@@ -93,6 +93,7 @@ public:
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
 	required_device<dac_byte_interface> m_dac;
+	required_device<dac_1bit_device> m_sbs;
 	required_device<wave_device> m_wave;
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;

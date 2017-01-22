@@ -1194,6 +1194,42 @@ ROM_START( acombat4 )
 	ROM_LOAD( "74471.cpu",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 
+/* Star Fighter (VGG)
+CPUs
+QTY 	Type 	clock 	position 	function
+1x 	R6502-13 	2a 	8-bit Microprocessor - main
+1x 	TBA810 		2f 	Audio Amplifier - sound
+1x 	oscillator 	10595 	9c 	
+
+ROMs
+QTY 	Type 	position 	status
+6x 	TMS2716 	0-5 	dumped
+1x 	MMI6341-1J 	12c 	dumped
+
+RAMs
+QTY 	Type 	position
+19x 	ITT4027 	1-19
+2x 	2114L3PC 	5b,6b
+
+Others
+1x 22x2 edge connector
+1x trimmer (volume)(1f)
+1x 8 DIP switches bank (1e)
+1x 4 DIP switches bank (6e)*/
+
+ROM_START( strfight )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sf00.bin",       0xd000, 0x0800, CRC(35662bf6) SHA1(f8e4a116c6eedc25949dd4c2744e83a3cc6a4a41) )
+	ROM_LOAD( "sf01.bin",       0xd800, 0x0800, CRC(535f97bd) SHA1(7ea3e02627364db0ae6cbbfc5452a85624540c12) )
+	ROM_LOAD( "sf02.bin",       0xe000, 0x0800, CRC(2146c290) SHA1(82a7334fbe1a05fc3a58db881c46be6368cab4fd) )
+	ROM_LOAD( "sf03.bin",       0xe800, 0x0800, CRC(53e7ac18) SHA1(131016eac8785141bccc446b024d556f12f7484d) )
+	ROM_LOAD( "sf04.bin",       0xf000, 0x0800, CRC(059dd113) SHA1(23f908e8f456843a3360ece713dba8d2b4d16a63) )
+	ROM_LOAD( "sf05.bin",       0xf800, 0x0800, CRC(f4669140) SHA1(45b53ed9e65d16fd463df812cbf3d796bd30424f) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6341-1j.12c", 0x0000, 0x0200, CRC(528034d3) SHA1(29ef9cfe2540f9a1fb9d0184a4c8fd74a4d6e6ba) )
+ROM_END
+
 ROM_START( sstarbtl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
@@ -1357,6 +1393,7 @@ GAME( 1979, acombat,  astrof,   abattle,  abattle, astrof_state,  afire,   ROT90
 GAME( 1979, acombato, astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg",               "Astro Combat (older, PZ)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat3, astrof,   abattle,  abattle, astrof_state,  acombat3,ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat4, astrof,   abattle,  abattle, astrof_state,  abattle, ROT90, "bootleg (Proel)",       "Astro Combat (encrypted)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, strfight, astrof,   abattle,  abattle, astrof_state,  acombat3,ROT90, "bootleg (VGG)",         "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, sstarbtl, astrof,   abattle,  abattle, astrof_state,  sstarbtl,ROT90, "bootleg",               "Super Star Battle", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, driver_device,0,       ROT90, "Data East",            "Space Fighter Mark II (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

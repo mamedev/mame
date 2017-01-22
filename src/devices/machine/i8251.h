@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __I8251_H__
-#define __I8251_H__
+#ifndef MAME_DEVICES_MACHINE_I8251_H
+#define MAME_DEVICES_MACHINE_I8251_H
 
 
 //**************************************************************************
@@ -42,7 +42,6 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
@@ -82,6 +81,16 @@ public:
 	};
 
 protected:
+	i8251_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -92,9 +101,9 @@ protected:
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
-		bool is_tx_enabled(void) const;
-		void check_for_tx_start(void);
-		void start_tx(void);
+	bool is_tx_enabled() const;
+	void check_for_tx_start();
+	void start_tx();
 
 
 	enum
@@ -155,5 +164,10 @@ public:
 extern const device_type I8251;
 extern const device_type V53_SCU;
 
+extern template class device_finder<i8251_device, false>;
+extern template class device_finder<i8251_device, true>;
+extern template class device_finder<v53_scu_device, false>;
+extern template class device_finder<v53_scu_device, true>;
 
-#endif /* __I8251_H__ */
+
+#endif // MAME_DEVICES_MACHINE_I8251_H

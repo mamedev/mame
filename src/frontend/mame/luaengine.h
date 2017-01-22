@@ -120,6 +120,7 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
+	void resume(void *ptr, int nparam);
 	void register_function(sol::function func, const char *id);
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);

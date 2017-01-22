@@ -100,7 +100,7 @@ class ucom4_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -141,11 +141,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); } // "
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 4); } // "
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 2; }
+	virtual u32 execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
@@ -153,9 +153,9 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -169,30 +169,30 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;             // MCU family (43/44/45)
-	int m_stack_levels;       // number of callstack levels
-	uint16_t m_stack[3];      // max 3
-	uint8_t m_port_out[0x10]; // last value written to output port
-	uint8_t m_op;
-	uint8_t m_prev_op;        // previous opcode
-	uint8_t m_arg;            // opcode argument for 2-byte opcodes
-	uint8_t m_bitmask;        // opcode bit argument
-	bool m_skip;              // skip next opcode
+	int m_family;        // MCU family (43/44/45)
+	int m_stack_levels;  // number of callstack levels
+	u16 m_stack[3];      // max 3
+	u8 m_port_out[0x10]; // last value written to output port
+	u8 m_op;
+	u8 m_prev_op;        // previous opcode
+	u8 m_arg;            // opcode argument for 2-byte opcodes
+	u8 m_bitmask;        // opcode bit argument
+	bool m_skip;         // skip next opcode
 	int m_icount;
 	emu_timer *m_timer;
 
-	uint16_t m_pc;            // program counter
-	uint16_t m_prev_pc;
-	uint8_t m_acc;            // 4-bit accumulator
-	uint8_t m_dpl;            // 4-bit data pointer low (RAM x)
-	uint8_t m_dph;            // 4-bit(?) data pointer high (RAM y)
-	uint8_t m_dph_mask;
-	uint8_t m_carry_f;        // carry flag
-	uint8_t m_carry_s_f;      // carry save flag
-	uint8_t m_timer_f;        // timer out flag
-	uint8_t m_int_f;          // interrupt flag
-	uint8_t m_inte_f;         // interrupt enable flag
-	int m_int_line;           // interrupt pin state
+	u16 m_pc;            // program counter
+	u16 m_prev_pc;
+	u8 m_acc;            // 4-bit accumulator
+	u8 m_dpl;            // 4-bit data pointer low (RAM x)
+	u8 m_dph;            // 4-bit(?) data pointer high (RAM y)
+	u8 m_dph_mask;
+	u8 m_carry_f;        // carry flag
+	u8 m_carry_s_f;      // carry save flag
+	u8 m_timer_f;        // timer out flag
+	u8 m_int_f;          // interrupt flag
+	u8 m_inte_f;         // interrupt enable flag
+	int m_int_line;      // interrupt pin state
 
 	// i/o handlers
 	devcb_read8 m_read_a;
@@ -208,23 +208,23 @@ protected:
 	devcb_write8 m_write_h;
 	devcb_write8 m_write_i;
 
-	virtual uint8_t input_r(int index);
-	virtual void output_w(int index, uint8_t data);
+	virtual u8 input_r(int index);
+	virtual void output_w(int index, u8 data);
 
 	// misc internal helpers
 	void increment_pc();
 	void fetch_arg();
 	void do_interrupt();
 
-	uint8_t ram_r();
-	void ram_w(uint8_t data);
+	u8 ram_r();
+	void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
 
 	bool check_op_43();
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
-	uint8_t ucom43_reg_r(int index);
-	void ucom43_reg_w(int index, uint8_t data);
+	u8 ucom43_reg_r(int index);
+	void ucom43_reg_w(int index, u8 data);
 
 	// opcode handlers
 	void op_illegal();
@@ -316,32 +316,32 @@ protected:
 class upd553_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class upd557l_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual uint8_t input_r(int index) override;
-	virtual void output_w(int index, uint8_t data) override;
+	virtual u8 input_r(int index) override;
+	virtual void output_w(int index, u8 data) override;
 };
 
 
 class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class upd552_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 

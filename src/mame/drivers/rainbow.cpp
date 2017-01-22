@@ -2,74 +2,6 @@
 // ENABLE BY UNCOMMENTING.  ADDITIONALLY, SET SMOOTH SCROLL IN EMULATION (DISABLE BY SETTING JUMP SCROLL. To enter SETUP hit ScrollLock)-
 //#define BOOST_DEBUG_PERFORMANCE
 
-
-/* GDC COLOR EMULATION
-//-------------------- Differences to VT240: ---------------------------------------------------
-// - Registers of graphics option not directly mapped (indirect access via mode register)
-// - write mask is 16 bits wide (not only 8)
-// - scroll register is 8 bits wide - not 16.
-// - no "LINE ERASE MODE", 7220 DMA lines are unused. No ZOOM hardware (factor must always be 1)
-
-// Two modes: highres and medres mode (different bank length..?)
-// - MEDRES: palette of 16 colors out of 4096.   384 x 240
-// - HIGRES: palette of  4 colors out of 4096.   800 x 240
-// Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long.
-------------------------------------------------------------------------------------------------
-
-THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
-// The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-// (DIP setting COLOR_MONITOR).
-//
-// An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
-// As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
-// A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
-
-EMULATION SPECIFIC
-// DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
-// (helps debugging semi broken programs, for example Doodle).
-
-SCREEN 1 vs. SCREEN 2 IN EMULATION
-// All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
-// If you select MONO_MONITOR via DIP, output from GDC will appear on screen 2 in 16 shades of grey.
-// The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
-
-BUGS
-- GDC diagnostic disk fails on 9 of 13 tests (tests 4 and 6 - 13).
-
-Details
-a. (Rainbow driver) : interaction between DEC's external hardware and the NEC 7220 isn't fully understood (see page 173 of AA-AE36A)
-   It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'.
-   For now, we provide sane defaults for both vector and bitmap units without disturbing display mode(s) or the NEC 7220.
-b. the HBLANK / VBLANK ratio is plainly wrong (quick test / subtest #6),
-c. IRQs are flagged as 'erratic' (quick test / subtest #12).
-d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when quick test #4 floods the queue)
-e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel)
-
-UNIMPLEMENTED:
-- Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
-
-UNKNOWN IMPLEMENTATION DETAILS:
-1. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
-
-2. UNVERIFIED DIVIDERS (31.188 Mhz / 32) is at least close to 1 Mhz (as on the VT240, which uses a very similar design)
-
-3. UPD7220 / CORE oddities
-
-To obtain pixel exact graphics use 'Graphics Only' in Video Options  plus command line switches -nowindow -aspect1 auto -nokeepaspect
-(Over-Under or Side-by-Side modes always distorted on my 1600 x 900 laptop)
-
-Programs with initialization / redraw / reentrance problems (invocation order after reset matters in emulation):
-
-- CANON (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
-  plus 'Monitor Aligment' (from the GDC test disk).             Sloppy programming or a bug related to a) to e)...?
-
- Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-                    (the partial update system gets very confused because it expects both the screens to end at the same time
-                    and if that isn't the case large parts of one screen end up not updating at all)
-
-The following games work well: MMIND (MasterMind), (G)OTELO (requires GSX), PACMAN, SCRAM (last one uses scroll extensively).
-*/
-
 // license:GPL-2.0+
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /***************************************************************************************************
@@ -96,13 +28,13 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF DECEMBER 2016
--------------------------
+STATE AS OF JANUARY 2017
+------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 The public domain file RBCONVERT.ZIP documents how model 'A' differs from version B.
 
-There is some evidence that the The Design Maturity Test (DMT disk) was designed for the Rainbow-100-A.
+There is some evidence that the The Design Maturity Test was designed for the Rainbow-100-A.
 NVRAM files from -A and -B machines are not interchangeable. If problems arise, delete the NVRAM file.
 
 CPM 2.1 / DOS2.11 / DOS 3.x and UCSD systems (fort_sys, pas_sys) + diag disks boot.
@@ -111,7 +43,7 @@ It is possible to boot DOS 3.10 from floppy A: and later use a hard disk attache
 NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before startup. It should remain there
 until shutdown. "Hot swapping" wasn't possible on the original system (our GUI just doesn't forbid it).
 
-To create a RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
+To create a DEC RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
 >chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
@@ -122,6 +54,113 @@ CTRL-SETUP (soft reboot) always triggers ERROR 19 (64 K RAM err.). One explanati
 handled wrongly, so shared mem. just below $8000 is tainted by Z80 stack data. A reentrance problem?
 
 Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
+
+
+CORVUS HARD DISK (CP/M 1.x only)
+--------------------------------
+In theory, it should be possible to use up to 4 Corvus Disks with up to 20 MB each. 
+MS DOS 2.x and CP/M 2.0 were once supported, but are untested (in part because no drivers have survived).
+
+To get a Corvus 11 drive up and running under CP/M 1.x, you'll need drcdutil.td0 from Donald Maslin's Archive.
+
+First, create a 11 MB hard disk:
+>Chdman createhd -c none -chs 306,4,20 -ss 512 -o CORVUS11.chd
+(worked for me, definitive CHS parameters for Corvus B/H drives are hard to come by)
+
+HINT: hard disk 1 is linked to DEC's controller. So it is vital that CORVUS11.chd is mounted as hard disk 2 in emulation!
+
+Then make a copy of your CP/M 86-80 V1.x boot disk. This copy will be patched to make the Corvus hard drive usable!
+
+With 'drcdutil.td0' mounted in A: and a write enabled (non TeleDisk) image of CPM 1.x in B: type:
+b:>SUBMIT A:hinstall
+
+This should replace the following CP/M files on B:
+   B:Z80CCP.SYS  <- A:HZ80CCP.SYS
+   B:Z80.SYS     <- A:HZ80.SYS
+   B:PRMTVPV.SYS <- A:HPRMTVPV.SYS
+
+Due to a typo in HINSTALL.SUB, the last PIP must be executed manually:
+b:>PIP B:PRMTVPVT.SYS=A:HPRMTVPV.SYS[V]
+
+Finally, boot from the newly patched CP/M disk and invoke CLINK2TN (command must be invoked after each cold boot).
+CLINK2TN has hard coded params valid for a Corvus 11 MB hard disk only. It needs a patched CP/M 1.x and will not run on CP/M 2.
+
+Two steps are needed to initialize the new disk:
+Step 1: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Starting disc address?  2320", "Number of Sectors? 64"
+Step 2: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Starting disc address?  48592", "Number of Sectors? 64"
+Done.
+
+Required steps vary with 5 and 20 MB models (look into the *.DOC files in DRCDUTIL.TD0 / CLINK86.A86 / DRIVEL.COM).
+Parameters for initialization can be taken from Chapter 2 of the Disk System Installion Guide for TRS-80 II (uses same type H drives).
+
+
+COLOR EMULATION (NEC 7220 + extra hardware)
+-------------------------------------------
+
+-------------------- Differences to VT240: ---------------------------------------------------
+   - Registers of graphics option not directly mapped (indirect access via mode register)
+   - write mask is 16 bits wide (not only 8)
+   - scroll register is 8 bits wide - not 16.
+   - no "LINE ERASE MODE", 7220 DMA lines are unused. No ZOOM hardware (factor must always be 1)
+
+   Two modes: highres and medres mode (different bank length..?)
+   - MEDRES: palette of 16 colors out of 4096.   384 x 240
+   - HIGRES: palette of  4 colors out of 4096.   800 x 240
+   Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long.
+------------------------------------------------------------------------------------------------
+
+THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
+   The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
+   (DIP setting COLOR_MONITOR).
+   
+   An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
+   As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
+   A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
+
+EMULATION SPECIFIC
+   DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
+   (helps debugging semi broken programs, for example Doodle).
+
+SCREEN 1 vs. SCREEN 2 IN EMULATION
+   All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
+   If you select MONO_MONITOR via DIP, output from GDC will appear on screen 2 in 16 shades of grey.
+   The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
+
+BUGS
+- GDC diagnostic disk fails on 9 of 13 tests (tests 4 and 6 - 13).
+
+Details
+a. (Rainbow driver) : interaction between DEC's external hardware and the NEC 7220 isn't fully understood (see page 173 of AA-AE36A)
+   It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'.
+   For now, we provide sane defaults for both vector and bitmap units without disturbing display mode(s) or the NEC 7220.
+b. the Hblank / Vblank ratio is plainly wrong (quick test / subtest #6),
+c. IRQs are flagged as 'erratic' (quick test / subtest #12).
+d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when quick test #4 floods the queue)
+e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel)
+
+UNIMPLEMENTED:
+- Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
+
+UNKNOWN IMPLEMENTATION DETAILS:
+1. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R...?
+
+2. UNVERIFIED DIVIDERS (31.188 Mhz / 32) is at least close to 1 Mhz (as on the VT240, which uses a very similar design)
+
+3. UPD7220 / CORE oddities
+
+To obtain pixel exact graphics use 'Graphics Only' in Video Options and cmd.line switches -nowindow -aspect1 auto -nokeepaspect
+(Over-Under or Side-by-Side modes always distorted on my 1600 x 900 laptop)
+
+Programs with initialization / redraw / reentrance problems (invocation order after reset matters in emulation):
+
+- Canon (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
+  plus 'Monitor Aligment' (from the GDC test disk).             Sloppy programming or a bug related to a) to e)...?
+
+ Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
+                    (the partial update system gets very confused because it expects both the screens to end at the same time
+                    and if that isn't the case large parts of one screen end up not updating at all)
+
+The following games work well: Tetris, Pacman, MasterMind (MMIND), (G)otelo (needs GSX),  Scram (uses scroll extensively).
 
 CURRENTY UNEMULATED
 -------------------
@@ -418,6 +457,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"
+#include "machine/corvushd.h" 
 
 #include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
@@ -450,8 +490,8 @@ public:
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
-		m_inp5(*this, "HARD DISK PRESENT"), // DO NOT CHANGE ORDER (also: COMMUNICATION EXTENSION)
-		m_inp6(*this, "FLOPPY CONTROLLER"), // DO NOT CHANGE ORDER
+		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER 
+		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER 
 		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
 		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER
 		m_inp9(*this, "MONO MONITOR TYPE"),
@@ -467,6 +507,7 @@ public:
 
 		m_fdc(*this, FD1793_TAG),
 		m_hdc(*this, "hdc"),
+		m_corvus_hdc(*this, "corvus"), 
 
 		m_mpsc(*this, "upd7201"),
 		m_dbrg_A(*this, "com8116_a"),
@@ -525,6 +566,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(hdc_drive_ready);
 	DECLARE_READ_LINE_MEMBER(hdc_write_fault);
+
+	DECLARE_READ8_MEMBER(corvus_status_r);
 
 	DECLARE_READ8_MEMBER(i8088_latch_r);
 	DECLARE_WRITE8_MEMBER(i8088_latch_w);
@@ -618,6 +661,8 @@ private:
 
 	required_device<fd1793_t> m_fdc;
 	optional_device<wd2010_device> m_hdc;
+
+	required_device<corvus_hdc_t> m_corvus_hdc; 
 
 	required_device<upd7201_device> m_mpsc;
 	required_device<com8116_device> m_dbrg_A;
@@ -909,6 +954,11 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // ===========================================================
 // 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
+
+// Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
+AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_t, read, write) 
+AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
+
 // ===========================================================
 // 0x30 -> 0x3f ***** Option Select 3
 // ===========================================================
@@ -919,20 +969,11 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // ===========================================================
 // 0x50 - 0x57 ***** COLOR GRAPHICS OPTION:
 
-// * Color graphics option (uses NEC upd7220 GDC).         REFERENCE: Programmer's Reference: AA-AE36A-TV.
+// * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
 // Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
-
-// Color graphics independent from text output if 8088 port $0a (bit 2) is zero.
-
-// This driver offers a DIP switch to enable or disable COLOR GRAPHICS altogether (affects "system_parameter_r" ...)
-
-// EXTRA HARDWARE (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-AM_RANGE(0x50, 0x55) AM_WRITE(GDC_EXTRA_REGISTER_w)
-AM_RANGE(0x50, 0x55) AM_READ(GDC_EXTRA_REGISTER_r)
-
-//  56h   Data written is loaded into the GDC's FIFO and flagged as a parameter.
-//  57h   Data written is loaded into the GDC's FIFO and flagged as a command.
-AM_RANGE (0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // GDC-NEW
+// (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
+AM_RANGE(0x50, 0x55) AM_READWRITE(GDC_EXTRA_REGISTER_r, GDC_EXTRA_REGISTER_w)
+AM_RANGE(0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // 56 param, 57 command
 
 // ===========================================================
 // 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
@@ -1029,13 +1070,14 @@ PORT_DIPSETTING(0xC0000, "768 K (100-B MEMORY OPTION)")
 PORT_DIPSETTING(0xD0000, "832 K (100-B MEMORY OPTION)") // see END_OF_RAM
 PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
 
-PORT_START("FLOPPY CONTROLLER") // floppy controller is not optional
-PORT_DIPNAME(0x01, 0x01, "FLOPPY CONTROLLER") PORT_TOGGLE
+// EXT.COMM.card -or- RD51 HD. controller (marketed later).
+PORT_START("DEC HARD DISK") // BUNDLE_OPTION
+PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK") PORT_TOGGLE
+PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
-// EXT.COMM.card -or- RD51 HD. controller (marketed later).
-PORT_START("HARD DISK PRESENT") // BUNDLE_OPTION
-PORT_DIPNAME(0x01, 0x00, "HARD DISK PRESENT") PORT_TOGGLE
+PORT_START("CORVUS HARD DISKS") 
+PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
@@ -1152,11 +1194,11 @@ void rainbow_state::machine_reset()
 
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
 
-	//  *********** HARD DISK CONTROLLER...
+	//  *********** HARD DISK CONTROLLERS...
+	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
 	if (m_inp5->read() == 0x01) // ...PRESENT?
 	{
 		// Install 8088 read / write handler
-		address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
 		io.unmap_readwrite(0x60, 0x60);
 		io.install_read_handler(0x60, 0x60, read8_delegate(FUNC(rainbow_state::hd_status_60_r), this));
 		io.install_write_handler(0x60, 0x60, write8_delegate(FUNC(rainbow_state::hd_status_60_w), this));
@@ -1177,7 +1219,7 @@ void rainbow_state::machine_reset()
 				output().set_value("led1", 1);
 
 				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
-				popmessage("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
+				popmessage("DEC %u (%3.2f) MB HARD DISK MOUNTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
@@ -1187,6 +1229,9 @@ void rainbow_state::machine_reset()
 			}
 		}
 	}
+
+	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present
+			io.unmap_readwrite(0x20, 0x20);  
 
 	// *********** FLOPPY DISK CONTROLLER [ NOT OPTIONAL ]
 	m_unit = INVALID_DRIVE;
@@ -1554,7 +1599,30 @@ READ8_MEMBER(rainbow_state::rtc_r)
 	return rom[RTC_BASE + offset];  // return ROM
 #endif
 }
-// ------------------------/ ClikClok (for model B; DS1315)  ---------------------------------
+// ------------------------/ ClikClok (for model B; DS1315)  -------------------------------
+
+
+// --------------------------------- Corvus (B/H)  -----------------------------------------
+// PORT 0x21 : Corvus status register (ready / direction)
+READ8_MEMBER(rainbow_state::corvus_status_r)
+{
+	if(m_inp6->read() == 0) // Corvus controller
+	{
+		popmessage("Corvus controller invoked - but not switched on. Check DIP and perform a reset.");
+		return 0;
+	}
+		else
+	{
+		output().set_value("led2", 0);
+		MOTOR_DISABLE_counter = 5;
+
+		uint8_t status = m_corvus_hdc->status_r(space, 0);
+		uint8_t data = (status & 0x80) ? 1 : 0; // 0x80 BUSY (Set = Busy, Clear = Ready)
+		data        |= (status & 0x40) ? 0 : 2; // 0x40 DIR. (Controller -> Host, or Host->Controller)
+		return data;
+	}
+}
+// ---------------------------------/ Corvus (B/H)  ----------------------------------------
 
 
 // ---------------------------- RD51 HARD DISK CONTROLLER ----------------------------------
@@ -1591,7 +1659,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 		return nullptr;
 
 	harddisk_image_device *img = nullptr;
-	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("harddisk1").c_str()));
+	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("decharddisk1").c_str()));
 
 	if (!img)
 		return nullptr;
@@ -1615,7 +1683,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	else
 	{
 		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
-		popmessage("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
+		popmessage("DEC %u (%3.2f) MB HARD DISK REJECTED.\nGEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
@@ -2082,14 +2150,13 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return  (((m_inp5->read() == 1) ? 0 : 1) |
-		((m_inp6->read() == 1) ? 0 : 2) |
-		((m_inp7->read() == 1) ? 0 : 4) |
+		     ((m_inp7->read() == 1) ? 0 : 4) | // Floppy is always present (bit 1 zero)
 #ifdef      OLD_RAM_BOARD_PRESENT
 		((m_inp8->read() > MOTHERBOARD_RAM) ? 0 : 8) |
 #else
-		8  |
+		8  |  // unverified
 #endif
-		16 | 32 | 64 | 128  // to be verified.
+		16 | 32 | 64 | 128  // unverified
 			);
 }
 
@@ -2581,7 +2648,7 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 		if (m_crtc->MHFU(MHFU_VALUE) > 10) // + more than (10 * 16.666) msecs gone (108 ms would be by the book)
 		{
 			m_crtc->MHFU(MHFU_RESET_and_DISABLE);
-			popmessage("\n**** WATCHDOG TRIPPED:nVBL IRQ not acknowledged within (at least) 108 milliseconds. ****\n");
+			popmessage("**** WATCHDOG TRIPPED:nVBL IRQ not acknowledged within (at least) 108 milliseconds. ****");
 
 			if (m_inp12->read() == 0x01) // (DIP) for watchdog active?
 				cmd_timer->adjust(attotime::from_msec(RESET_DURATION_MS));
@@ -2768,6 +2835,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 		output().set_value("driveled3", 0); // DRIVE 3 (D)
 
 		output().set_value("led1", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
+		output().set_value("led2", 1);  // 1 = OFF (One of the CPU LEDs as DRIVE LED)
 	}
 }
 
@@ -3219,8 +3287,18 @@ MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLET
 MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
 MCFG_WD2010_IN_INDEX_CB(VCC) //    "
 
-MCFG_HARDDISK_ADD("harddisk1")
+MCFG_HARDDISK_ADD("decharddisk1")
 /// ******************************** / HARD DISK CONTROLLER ****************************************
+
+MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0) 
+MCFG_HARDDISK_ADD("harddisk1")
+MCFG_HARDDISK_INTERFACE("corvus_hdd")
+MCFG_HARDDISK_ADD("harddisk2")
+MCFG_HARDDISK_INTERFACE("corvus_hdd")
+MCFG_HARDDISK_ADD("harddisk3")
+MCFG_HARDDISK_INTERFACE("corvus_hdd")
+MCFG_HARDDISK_ADD("harddisk4")
+MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 

@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
 	DECLARE_READ8_MEMBER(rumba_mcu_r);
 	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
 	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);

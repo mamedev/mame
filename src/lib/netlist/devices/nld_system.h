@@ -54,9 +54,6 @@
 		NET_C(cG,  name.G)                                                      \
 		NET_C(cOUT, name.Q)
 
-#define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                  \
-		setup.register_frontier(# attach, r_in, r_out);
-
 #define RES_SWITCH(name, cIN, cP1, cP2)                                         \
 		NET_REGISTER_DEV(RES_SWITCH, name)                                      \
 		NET_C(cIN, name.I)                                                      \
@@ -71,5 +68,6 @@
 		NET_REGISTER_DEV(AFUNC, name)                                           \
 		PARAM(name.N, p_N)                                                      \
 		PARAM(name.FUNC, p_F)
+
 
 #endif /* NLD_SYSTEM_H_ */

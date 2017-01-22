@@ -124,91 +124,105 @@ WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 }
 
 
-READ16_MEMBER(tigeroad_state::pushman_68705_r)
+READ16_MEMBER(pushman_state::mcu_comm_r)
 {
-	if (offset == 0)
-		return m_latch;
-
-	if (offset == 3 && m_new_latch)
+	switch (offset & 0x03)
 	{
-		m_new_latch = 0;
-		return 0;
+	case 0: // read and acknowledge MCU reply
+		if (!space.debugger_access())
+			m_mcu_semaphore = false;
+		return m_mcu_latch;
+	case 2: // expects bit 0 to be high when MCU has accepted command (other bits ignored)
+		return m_host_semaphore ? 0x0000 : 0x0001;
+	case 3: // expects bit 0 to be low when MCU has sent response (other bits ignored)
+		return m_mcu_semaphore ? 0x0000 : 0x0001;
 	}
-	if (offset == 3 && !m_new_latch)
-		return 0xff;
-
-	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
+	logerror("unknown MCU read offset %X & %04X\n", offset, mem_mask);
+	return 0x0000;
 }
 
-WRITE16_MEMBER(tigeroad_state::pushman_68705_w)
+WRITE16_MEMBER(pushman_state::mcu_comm_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[2 * offset + 1] = data & 0xff;
-
-	if (offset == 1)
+	switch (offset & 0x01)
 	{
-		m_mcu->set_input_line(M68705_IRQ_LINE, HOLD_LINE);
-		space.device().execute().spin();
-		m_new_latch = 0;
+	case 0:
+		COMBINE_DATA(&m_host_latch);
+		break;
+	case 1:
+		m_mcu->pd_w(space, 0, data & 0x00ff);
+		m_host_semaphore = true;
+		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+		break;
 	}
 }
+
+WRITE8_MEMBER(pushman_state::mcu_pa_w)
+{
+	m_mcu_output = (m_mcu_output & 0xff00) | (u16(data) & 0x00ff);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pb_w)
+{
+	m_mcu_output = (m_mcu_output & 0x00ff) | (u16(data) << 8);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pc_w)
+{
+	if (BIT(data, 0))
+	{
+		m_mcu->pa_w(space, 0, 0xff);
+		m_mcu->pb_w(space, 0, 0xff);
+	}
+	else
+	{
+		m_host_semaphore = false;
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_mcu->pa_w(space, 0, (m_host_latch >> 8) & 0x00ff);
+		m_mcu->pb_w(space, 0, (m_host_latch >> 0) & 0x00ff);
+	}
+
+	if (BIT(m_mcu_latch_ctl, 1) && !BIT(data, 1))
+	{
+		m_mcu_latch = m_mcu_output & (BIT(m_mcu_latch_ctl, 0) ? 0xffff : m_host_latch);
+		m_mcu_semaphore = true;
+	}
+
+	m_mcu_latch_ctl = data;
+}
+
 
 /* ElSemi - Bouncing balls protection. */
-READ16_MEMBER(tigeroad_state::bballs_68705_r)
+READ16_MEMBER(bballs_state::bballs_68705_r)
 {
-	if (offset == 0)
-		return m_latch;
-	if (offset == 3 && m_new_latch)
+	switch (offset)
 	{
-		m_new_latch = 0;
-		return 0;
+	case 0: // read and acknowledge MCU reply
+		if (!space.debugger_access())
+			m_mcu_semaphore = false;
+		return m_mcu_latch;
+	case 2: // pretend MCU accepts command instantly
+		return 0x0001;
+	case 3: // expects bit 0 to be low when MCU has sent response (other bits ignored)
+		return m_mcu_semaphore ? 0x0000 : 0x0001;
 	}
-	if (offset == 3 && !m_new_latch)
-		return 0xff;
-
-	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
+	logerror("unknown 68705 read offset %X & %04X\n", offset, mem_mask);
+	return 0x0000;
 }
 
-WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
+WRITE16_MEMBER(bballs_state::bballs_68705_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[2 * offset + 1] = data & 0xff;
-
-	if (offset == 0)
+	m_mcu_latch = 0;
+	if ((data >> 8) <= 0x0f)
 	{
-		m_latch = 0;
-		if (m_shared_ram[0] <= 0xf)
-		{
-			m_latch = m_shared_ram[0] << 2;
-			if (m_shared_ram[1])
-				m_latch |= 2;
-			m_new_latch = 1;
-		}
-		else if (m_shared_ram[0])
-		{
-			if (m_shared_ram[1])
-				m_latch |= 2;
-			m_new_latch = 1;
-		}
+		m_mcu_latch = (data >> 6) & 0x03fc;
+		if (data & 0x00ff)
+			m_mcu_latch |= 2;
+		m_mcu_semaphore = true;
 	}
-}
-
-
-READ8_MEMBER(tigeroad_state::pushman_68000_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE8_MEMBER(tigeroad_state::pushman_68000_w)
-{
-	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
+	else if (data >> 8)
 	{
-		m_latch = (m_shared_ram[1] << 8) | m_shared_ram[0];
-		m_new_latch = 1;
+		if (data & 0x00ff)
+			m_mcu_latch |= 2;
+		m_mcu_semaphore = true;
 	}
-	m_shared_ram[offset] = data;
 }
