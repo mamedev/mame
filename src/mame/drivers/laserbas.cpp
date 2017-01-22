@@ -404,7 +404,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK*4)
+	MCFG_CPU_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
 	MCFG_CPU_IO_MAP(laserbas_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", laserbas_state, laserbas_scanline, "screen", 0, 1)
