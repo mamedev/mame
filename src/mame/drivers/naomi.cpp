@@ -6916,27 +6916,25 @@ ROM_END
 // currently we have only Satellite unit ROM board dumped, server/control and large screen units is missing.
 // ID# 837-14114-01-91
 // ROM board ID# 840-0078B REV.B
-/*
 ROM_START( shors2k1 )
     NAOMI_BIOS
     NAOMI_DEFAULT_EEPROM
 
     ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD("epr-23739b.ic22", 0x00000000, 0x00400000, CRC() SHA1() )
-    ROM_LOAD("mpr-23740.ic1",   0x00800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23741.ic2",   0x01800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23742.ic3",   0x02800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23743.ic4",   0x03800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23744.ic5",   0x04800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23745.ic6",   0x05800000, 0x01000000, CRC() SHA1() )
-    ROM_LOAD("mpr-23746.ic7",   0x06800000, 0x01000000, CRC() SHA1() )
+	ROM_LOAD("epr-23739b.ic22",	0x00000000,	0x00400000, CRC(2d19b6a2) SHA1(1cf0294a32a870b34164786db9df29dd23cf790a) )
+	ROM_LOAD("mpr-23740.ic1",	0x00800000,	0x01000000, CRC(e84f8611) SHA1(4b6f174cac37b6c50d2151e25bba52c87ac738fe) )
+	ROM_LOAD("mpr-23741.ic2",	0x01800000,	0x01000000, CRC(5fd84c54) SHA1(2913a1d67674de2cc0165ec0e7556288ca2ea6c6) )
+	ROM_LOAD("mpr-23742.ic3",	0x02800000,	0x01000000, CRC(240e1779) SHA1(ac25c217e9772d16465f26d1ad7f514d745e9ec2) )
+	ROM_LOAD("mpr-23743.ic4",	0x03800000,	0x01000000, CRC(d9dc0a12) SHA1(d374a09d6e7a94075720b137879e64daca197ef8) )
+	ROM_LOAD("mpr-23744.ic5",	0x04800000,	0x01000000, CRC(95759982) SHA1(e09c20d1acad55f8cfb38dfec7c55ec97165190c) )
+	ROM_LOAD("mpr-23745.ic6",	0x05800000,	0x01000000, CRC(0eda5807) SHA1(589aac6262dc4168793fd41bb88760123408328f) )
+	ROM_LOAD("mpr-23746.ic7",	0x06800000,	0x01000000, CRC(955bb184) SHA1(05436d4eed330bc0b71897650d9df601453cde6f) )
 
     ROM_REGION(0x84, "some_eeprom", 0)
-    ROM_LOAD( "sflash.ic46",   0x000000, 0x000084, CRC() SHA1() )
+    ROM_LOAD( "sflash.ic46",   0x000000, 0x000084, CRC(bfce576f) SHA1(c3aa638c280a12df71a09c55adc2b87c37cf4f90) )
 
     ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
-*/
 
 
 /***** Star Horse 2002 *****/
@@ -9837,7 +9835,7 @@ ROM_END
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
 /* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
-/* 0078       GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS ) */
+/* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )
 /* 0088    */ GAME( 2001, drbyocwc,  derbyocw, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club World Edition (Rev C)", GAME_FLAGS )

@@ -28436,7 +28436,7 @@ sstrkfgta                       // 2000.10 Sega Strike Fighter (Rev A, no traini
 shorse                          // 2000.11.28 Star Horse (satellite)
 shorsem                         // 2000.??    Star Horse (main screens)
 shorsel                         // 2000.12    Star Horse (live and backup)
-//shors2k1                      // 2002.01.09 Star Horse 2001 (satellite, Rev B)
+shors2k1                        // 2002.01.09 Star Horse 2001 (satellite, Rev B)
 shorsep                         // 2003.12.01 Star Horse Progress (satellite, Rev A)
 shorsepm                        // 2003.??    Star Horse Progress (main screens, Rev B)
 shorseps                        // 2003.12.02 Star Horse Progress (sound & backup, Rev A)
