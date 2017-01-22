@@ -97,6 +97,7 @@
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
+#include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 #include "machine/clock.h"
@@ -163,6 +164,7 @@ static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(miniforce_vme_cards)
+	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
 SLOT_INTERFACE_END	
@@ -173,7 +175,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START (miniforce, miniforce_state)
 //	MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, "fccpu20")
 	MCFG_VME_SLOT_ADD ("vme", "slot2", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot3", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot4", miniforce_vme_cards, nullptr)
