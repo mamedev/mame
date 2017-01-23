@@ -54,7 +54,6 @@ function maintargetosdoptions(_target,_subtarget)
 					"SDL2",
 					"Imm32",
 					"Version",
-					"Ole32",
 					"OleAut32",
 				}
 			configuration { "vs*" }
@@ -92,6 +91,7 @@ function maintargetosdoptions(_target,_subtarget)
 				}
 		end
 		links {
+			"Ole32",
 			"psapi",
 		}
 		configuration { "mingw*" }
