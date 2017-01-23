@@ -128,6 +128,13 @@ static int parsePath(char* path, char* gamePath, char* gameName)
          if (path[i] == '.')
             dotIndex = i;
    }
+   if (slashIndex < 0 && dotIndex >0){
+        strcpy(gamePath, ".\0");
+        strncpy(gameName, path , dotIndex );
+        gameName[dotIndex] = 0;
+        return 1;
+   }
+    
    if (slashIndex < 0 || dotIndex < 0)
       return 0;
 
