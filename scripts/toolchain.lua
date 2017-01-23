@@ -840,6 +840,7 @@ function toolchain(_buildDir, _subDir)
 --			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 --			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 --		}
+if os.getenv("ANDROID_NDK_ROOT") then		
 		checkndk13 = os.getenv("ANDROID_NDK_ROOT") .. "/sources/cxx-stl/llvm-libc++/libcxx/include/list"	
 		if (os.isfile(checkndk13)) then
 			includedirs {
@@ -850,6 +851,7 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			}
 		end
+end
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
@@ -877,6 +879,7 @@ function toolchain(_buildDir, _subDir)
 			"android",
 			"log",
 		}
+if os.getenv("ANDROID_NDK_ROOT") then
 		if (os.isfile(checkndk13)) then
 			links {
 				"c++_static",
@@ -889,6 +892,7 @@ function toolchain(_buildDir, _subDir)
 				"android_support",
 			}
 		end
+end
 		links {
 			"gcc",
 		}
