@@ -19,6 +19,7 @@
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
@@ -4823,7 +4824,6 @@ WRITE16_MEMBER(comp4_state::write_o)
 	// O0: leds common
 	// other bits: N/C
 	m_o = data;
-	display_matrix(11, 1, m_r, m_o);
 }
 
 READ8_MEMBER(comp4_state::read_k)
