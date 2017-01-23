@@ -1082,12 +1082,10 @@ namespace netlist
 
 		void do_update() NL_NOEXCEPT
 		{
-			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-				(this->*m_static_update)();
-			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-				m_static_update(this);
+			#if (NL_USE_PMF_VIRTUAL)
+			update();
 			#else
-				update();
+			m_static_update.call(this);
 			#endif
 		}
 
@@ -1104,14 +1102,9 @@ namespace netlist
 
 	private:
 		bool m_hint_deactivate;
-	#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-		typedef void (core_device_t::*net_update_delegate)();
-	#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-		using net_update_delegate = MEMBER_ABI void (*)(core_device_t *);
-	#endif
 
-	#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
-		net_update_delegate m_static_update;
+	#if (!NL_USE_PMF_VIRTUAL)
+		plib::pmfp_base<void> m_static_update;
 	#endif
 	};
 
@@ -1277,11 +1270,11 @@ namespace netlist
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, pstring::from_utf8(owner.name()) + pstring(".") + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, from_utf8(owner.name()) + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), pstring::from_utf8(owner.name()) + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), from_utf8(owner.name()) + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
 		void rebuild_lists(); /* must be called after post_load ! */
@@ -1298,6 +1291,10 @@ namespace netlist
 		void print_stats() const;
 
 	private:
+
+		/* helper for save above */
+		static pstring from_utf8(const char *c) { return pstring(c, pstring::UTF8); }
+		static pstring from_utf8(const pstring &c) { return c; }
 
 		core_device_t *pget_single_device(const pstring classname, bool (*cc)(core_device_t *));
 

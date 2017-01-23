@@ -371,7 +371,7 @@ void pstringbuffer::pcat(const pstring &s)
  * This improves startup performance by 30%.
  */
 
-#if 0
+#if 1
 
 static std::stack<pstr_t *> *stk = nullptr;
 

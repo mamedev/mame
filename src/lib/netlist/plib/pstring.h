@@ -23,7 +23,7 @@
 
 struct pstr_t
 {
-	pstr_t(const int alen) { init(alen); }
+	pstr_t(const std::size_t alen) { init(alen); }
 	void init(const std::size_t alen)
 	{
 		m_ref_count = 1;
@@ -168,13 +168,6 @@ public:
 	code_t code_at(const size_type pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
 
 	const pstring_t ucase() const;
-
-	// FIXME: do something with encoding
-	// FIXME: belongs into derived class
-	// This is only used in state saving to support "owners" whose name() function
-	// returns char*.
-	static pstring_t from_utf8(const mem_t *c) { return pstring_t(c, UTF8); }
-	static pstring_t from_utf8(const pstring_t &c) { return c; }
 
 	static void resetmem();
 

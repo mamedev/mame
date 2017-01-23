@@ -578,7 +578,7 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner)
 	, m_hint_deactivate(false)
-#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+#if (!NL_USE_PMF_VIRTUAL)
 	, m_static_update()
 #endif
 {
@@ -591,7 +591,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
 	, m_hint_deactivate(false)
-#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+#if (!NL_USE_PMF_VIRTUAL)
 	, m_static_update()
 #endif
 {
@@ -607,14 +607,8 @@ core_device_t::~core_device_t()
 
 void core_device_t::set_delegate_pointer()
 {
-#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = pFunc;
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
-	m_static_update = plib::mfp::get_mfp<net_update_delegate>(&core_device_t::update, this);
+#if (!NL_USE_PMF_VIRTUAL)
+	m_static_update.set_base(&core_device_t::update, this);
 #endif
 }
 

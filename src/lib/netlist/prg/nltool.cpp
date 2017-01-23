@@ -502,12 +502,30 @@ static const pstring pmf_verbose[] =
 };
 #endif
 
+struct tt
+{
+	void test(int a) {printf ("test :%d\n", a);}
+	int test1() { return 1;}
+};
+
+plib::pmfp<void, int> atest;
+plib::pmfp<int> atest1;
 
 int main(int argc, char *argv[])
 {
 	tool_options_t opts;
 	int ret;
 
+	tt x;
+
+	atest.set(&tt::test, &x);
+	atest1.set(&tt::test1, &x);
+
+	atest(1);
+	int a = atest1();
+
+	printf("%d\n", a);
+	//return 1 ;
 	/* make SIGFPE actually deliver signals on supoorted platforms */
 	plib::fpsignalenabler::global_enable(true);
 	plib::fpsignalenabler sigen(plib::FP_ALL & ~plib::FP_INEXACT & ~plib::FP_UNDERFLOW);
