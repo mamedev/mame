@@ -41,13 +41,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> a500_kbd_device
+// ======================> a500_kbd_us_device
 
-class a500_kbd_device : public device_t, public device_amiga_keyboard_interface
+class a500_kbd_us_device : public device_t, public device_amiga_keyboard_interface
 {
 public:
 	// construction/destruction
-	a500_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner,	uint32_t clock,
+		device_type type, const char *name, const char *shortname);
 
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
@@ -118,7 +120,19 @@ private:
 	uint8_t m_control;
 };
 
+// ======================> a500_kbd_de_device
+
+class a500_kbd_de_device : public a500_kbd_us_device
+{
+public:
+	a500_kbd_de_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
 // device type definition
-extern const device_type A500_KBD;
+extern const device_type A500_KBD_US;
+extern const device_type A500_KBD_DE;
 
 #endif // DEVICES_BUS_AMIGA_KEYBOARD_A500_H
