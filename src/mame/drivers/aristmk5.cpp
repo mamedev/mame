@@ -249,7 +249,6 @@ private:
 	emu_timer *     m_mk5_2KHz_timer;
 	emu_timer *     m_mk5_VSYNC_timer;
 	emu_timer *     m_spi_timer;
-	uint8_t         m_ext_latch;
 	uint8_t         m_sram_bank;
 	uint8_t         m_ldor_shift_reg;
 	uint8_t         m_hopper_test;
