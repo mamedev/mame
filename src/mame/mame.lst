@@ -12215,7 +12215,7 @@ fb01                            // 1986 FB-01
 fc100                           //
 
 @source:fccpu20.cpp
-fccpu20
+fccpu20sbc
 
 @source:fccpu30.cpp
 fccpu30
