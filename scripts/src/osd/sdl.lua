@@ -113,7 +113,7 @@ function maintargetosdoptions(_target,_subtarget)
 	configuration { "mingw*" or "vs*" }
 		targetprefix "sdl"
 		links {
-			"psapi"
+			"psapi",
 			"Ole32",
 		}
 	configuration { }
