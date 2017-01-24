@@ -66,10 +66,35 @@
 #define IOGA_DMA_FLOPPY  2
 #define IOGA_DMA_SERIAL  3
 
+// dma write values
+#define IOGA_DMA_CTRL_WMASK   0xfd000e00
+#define IOGA_DMA_CTRL_RESET_L 0x61000000 // do not clear bus error bit
+#define IOGA_DMA_CTRL_RESET   0x60400000 // clear bus error bit
+
+#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
+#define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet
+#define IOGA_DMA_CTRL_UNK2    0x67000600 // forced berr with nmi and interrupts disabled
+
+// read values
+#define IOGA_DMA_CTRL_BUSY 0x02000000
+#define IOGA_DMA_CTRL_BERR 0x00400000  // iogadiag code expects 0x60400000 on bus error
+// iogadiag expects 0x64400800 after forced berr with nmi/interrupts disabled
+
+
+// bus arbitration bus grant bits
+#define IOGA_ARBCTL_BGR_ETHC 0x0001
+#define IOGA_ARBCTL_BGR_SCSI 0x0002
+#define IOGA_ARBCTL_BGR_PLOT 0x0004
+#define IOGA_ARBCTL_BGR_FDC  0x0008
+#define IOGA_ARBCTL_BGR_SER0 0x0010
+#define IOGA_ARBCTL_BGR_SER1 0x0020
+#define IOGA_ARBCTL_BGR_SER2 0x0040
+#define IOGA_ARBCTL_BGR_ETHB 0x0080
+#define IOGA_ARBCTL_BGR_ETHA 0x0100
+
 class interpro_ioga_device : public device_t
 {
 public:
-	// construction/destruction
 	interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
@@ -80,7 +105,7 @@ public:
 
 	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual DECLARE_ADDRESS_MAP(map, 32);
 
 	// external interrupt lines
 	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_irq_line(2, state); }

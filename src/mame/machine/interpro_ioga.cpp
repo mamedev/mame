@@ -1,6 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+/*
+ * An implementation of the IOGA device found on Intergraph InterPro family workstations. There is no
+ * public documentation on this device, so the implementation is being built to follow the logic of the
+ * system boot ROM and its diagnostic tests.
+ *
+ * The device handles most of the I/O for the system, including timers, interrupts, DMA and target device
+ * interfacing. There remains a significant amount of work to be completed before the boot diagnostics will
+ * pass without errors, let alone successfully booting CLIX.
+ *
+ * Please be aware that code in here is not only broken, it's likely wrong in many cases.
+ *
+ * TODO
+ *   - too long to list
+ */
 #include "interpro_ioga.h"
 
 #define VERBOSE 0
@@ -64,8 +78,9 @@ void interpro_ioga_device::device_start()
 	m_out_int_func.resolve();
 
 	// TODO: parameterise the cammu name and space number
+	// grab the main memory space from the mmu so we can do DMA to/from it
 	device_memory_interface *mmu;
-	siblingdevice("cammu")->interface(mmu);
+	siblingdevice("mmu")->interface(mmu);
 	m_memory_space = &mmu->space(AS_0);
 
 	for (int i = 0; i < IOGA_DMA_CHANNELS; i++)
@@ -595,32 +610,6 @@ void interpro_ioga_device::drq(int state, int channel)
 		m_dma_timer->adjust(attotime::zero, channel);
 	}
 }
-// write values
-#define IOGA_DMA_CTRL_WMASK   0xfd000e00
-#define IOGA_DMA_CTRL_RESET_L 0x61000000 // do not clear bus error bit
-#define IOGA_DMA_CTRL_RESET   0x60400000 // clear bus error bit
-
-#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
-#define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet
-#define IOGA_DMA_CTRL_UNK2    0x67000600 // forced berr with nmi and interrupts disabled
-
-// read values
-#define IOGA_DMA_CTRL_BUSY 0x02000000
-#define IOGA_DMA_CTRL_BERR 0x00400000  // iogadiag code expects 0x60400000 on bus error
-// iogadiag expects 0x64400800 after forced berr with nmi/interrupts disabled
-
-
-
-#define IOGA_ARBCTL_BGR_ETHC 0x0001
-#define IOGA_ARBCTL_BGR_SCSI 0x0002
-#define IOGA_ARBCTL_BGR_PLOT 0x0004
-#define IOGA_ARBCTL_BGR_FDC  0x0008
-#define IOGA_ARBCTL_BGR_SER0 0x0010
-#define IOGA_ARBCTL_BGR_SER1 0x0020
-#define IOGA_ARBCTL_BGR_SER2 0x0040
-#define IOGA_ARBCTL_BGR_ETHB 0x0080
-#define IOGA_ARBCTL_BGR_ETHA 0x0100
-
 /*
 0x94: error address reg: expect 0x7f200000 after bus error (from dma virtual address)
 0x98: error cycle type: expect 0x52f0 (after failed dma?)

@@ -79,6 +79,7 @@ CPU_DISASSEMBLE( avr8 );
 CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cdp1801 );
 CPU_DISASSEMBLE( cdp1802 );
+CPU_DISASSEMBLE( clipper );
 CPU_DISASSEMBLE( coldfire );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
@@ -248,6 +249,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ccpu",        _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
 	{ "cdp1801",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
 	{ "cdp1802",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
+	{ "clipper",     _16le,  0, CPU_DISASSEMBLE_NAME(clipper) },
 	{ "coldfire",    _16be,  0, CPU_DISASSEMBLE_NAME(coldfire) },
 	{ "cop410",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
