@@ -1658,7 +1658,7 @@ ROM_END
 
 
 // 630 - 10 Credit Multiplier / 9 Line Multiline.
-// The Chariot Challenge - NSW/ACT - A - 10/08/98.
+// The Chariot Challenge - Venezuela - A - 10/08/98.
 // 04J00714
 ROM_START( chariotc )
 	ARISTOCRAT_MK5_BIOS
@@ -2021,6 +2021,24 @@ ROM_START( dolphntrb )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( dolphntrce )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("ahg1606.u7",  0x0000000, 0x0080000, CRC(d468edf7) SHA1(100672d09184e06130ce253749bd9e20ee0a06d4) )
+	ROM_LOAD32_WORD("ahg1606.u11", 0x0000002, 0x0080000, CRC(0fe64635) SHA1(b504216e59984951b46701019f87cad759ab60f2) )
+	ROM_LOAD32_WORD("ahg1606.u8",  0x0100000, 0x0080000, CRC(a53a2de4) SHA1(1741af795f88e867021f3c08d8990611d893a8e8) )
+	ROM_LOAD32_WORD("ahg1606.u12", 0x0100002, 0x0080000, CRC(c2e268a2) SHA1(6aeb27ae844dbf495c64be210bcac97f4c7a6969) )
+	ROM_LOAD32_WORD("ahg1606.u9",  0x0200000, 0x0080000, CRC(fe9146f7) SHA1(95bef8910d213d588d45ec2639828a31aab6603c) )
+	ROM_LOAD32_WORD("ahg1606.u13", 0x0200002, 0x0080000, CRC(d6aa89fe) SHA1(eccb49d49f533aeed9fefb14018bcc06d3fdaf23) )
+	ROM_LOAD32_WORD("ahg1606.u10", 0x0300000, 0x0080000, CRC(0be76189) SHA1(a458f620f48b9f4a73f59d31ba98864c5a64e1d7) )
+	ROM_LOAD32_WORD("ahg1606.u14", 0x0300002, 0x0080000, CRC(c6c59ed6) SHA1(0ce8e5824c5937ffe2eeb34320db9dc568bca7cb) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
 
 // 602/1 - 10 Credit Multiplier / 9 Line Multiline.
 // Dolphin Treasure - Export B - 06/12/96.
@@ -2058,6 +2076,17 @@ ROM_START( dolphntru )
 	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) )
 ROM_END
 
+ROM_START( drgneye )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("0100521v.u7",  0x0000000, 0x0080000, CRC(db9c952d) SHA1(4cbe3ffe6cf0bb112cb9a2d7a4ff0b28154d32c1) )
+	ROM_LOAD32_WORD("0100521v.u11", 0x0000002, 0x0080000, CRC(2bb47749) SHA1(796f610e5202b5eb26a6e901d43ee5d9e3f95332) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( dynajack )
 	ARISTOCRAT_MK5_BIOS
@@ -2303,6 +2332,24 @@ ROM_START( goldpyra )
 	ROM_LOAD32_WORD( "ahg1206-99.u11", 0x000002, 0x80000, BAD_DUMP CRC(3cc221ea) SHA1(a71d16b818110f5b632e996e9f2fcb8be17b2aee) )
 	ROM_LOAD32_WORD( "ahg1206-99.u8",  0x100000, 0x80000, BAD_DUMP CRC(df1ffb31) SHA1(1cf9d008b1f8fdb06ba050c97dae79f272c8063c) )
 	ROM_LOAD32_WORD( "ahg1206-99.u12", 0x100002, 0x80000, BAD_DUMP CRC(d2c8f786) SHA1(a9efa35c8f2833a2b77f092398ca959d5fe6194e) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( goldpyrb )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	// these are the 'bios' for Casino games (could be moved to a different base set)
+	ROM_LOAD32_WORD( "0700474v.u7",  0x000000, 0x80000, CRC(04b7dcbf) SHA1(eded1223336181bb08f9593247f1f79d96278b75) )
+	ROM_LOAD32_WORD( "0700474v.u11", 0x000002, 0x80000, CRC(a89ce1b5) SHA1(411b474a111f23ebd834bea5af0bf0cf3926d590) )
+
+	ROM_LOAD32_WORD( "0100878v.u8",  0x100000, 0x80000, CRC(c3184f1c) SHA1(3f808b465175108d48ca5b2560e4546b30a7fd72) )
+	ROM_LOAD32_WORD( "0100878v.u12", 0x100002, 0x80000, CRC(acb3de77) SHA1(e0e337d6efbd6ee8e0c0ec2653c3dc0bd5741ff4) )
+	ROM_LOAD32_WORD( "0100878v.u9",  0x200000, 0x80000, CRC(0a2f6903) SHA1(11fd913f8c3a677ae07c7ec50548a82c1eaf63ee) )
+	ROM_LOAD32_WORD( "0100878v.u13", 0x200002, 0x80000, CRC(0df660be) SHA1(73d370d90655dada34f2b5b2209652632c34a22e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -2745,6 +2792,25 @@ ROM_START( marmagic )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( marmagicua )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "ehg1558.u7",  0x000000, 0x80000, CRC(7c2602ae) SHA1(f5a13154448041575e4bea1399ed0a5a0888d493) )
+	ROM_LOAD32_WORD( "ehg1558.u11", 0x000002, 0x80000, CRC(4fe3b18a) SHA1(cc36eddd264de1a088c16e1b741168130d895bd7) )
+	ROM_LOAD32_WORD( "ehg1558.u8",  0x100000, 0x80000, CRC(c9ff4bd8) SHA1(5766d7c39e753fb2a2412a41338dcfd4e31b642b) )
+	ROM_LOAD32_WORD( "ehg1558.u12", 0x100002, 0x80000, CRC(d00cd217) SHA1(2be7c1ef6c0a39d1c7ed391feeaf0f42a6471bae) )
+	ROM_LOAD32_WORD( "ehg1558.u9",  0x200000, 0x80000, CRC(879e4b14) SHA1(52d9540dd3ed51d42a31d1a7effe75e995e95330) )
+	ROM_LOAD32_WORD( "ehg1558.u13", 0x200002, 0x80000, CRC(770872a1) SHA1(cd430385a3dfc080decfa2402d7dbad0db912e15) )
+	ROM_LOAD32_WORD( "ehg1558.u10", 0x300000, 0x80000, CRC(4301eb40) SHA1(1a32c61df2ab04c365135378d97d18bbb0b50179) )
+	ROM_LOAD32_WORD( "ehg1558.u14", 0x300002, 0x80000, CRC(a2096cb3) SHA1(c2bba35396f9c83b17d692a384b6406f3441c8f5) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+
 
 // US003 - Multi credit / Multi line.
 // Margarita Magic [Reel Game] - NSW/ACT - A - 07/07/2000.
@@ -3180,6 +3246,51 @@ ROM_START( petshop )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( petshopa )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("0100731v.u7",  0x0000000, 0x0080000, CRC(01cffccc) SHA1(a39d943e700fff34d82bcff8c61f2586ee65e673) )
+	ROM_LOAD32_WORD("0100731v.u11", 0x0000002, 0x0080000, CRC(a8e906c5) SHA1(f6dd7bcf5fa90933c9741699f0c1e07b685ccb40) )
+	ROM_LOAD32_WORD("0100731v.u8",  0x0100000, 0x0080000, CRC(757e1296) SHA1(e14508bbaa3439a93c8b716267a2198ed3c54728) )
+	ROM_LOAD32_WORD("0100731v.u12", 0x0100002, 0x0080000, CRC(6e74cd57) SHA1(9092e656cbd8627b208b81ca0d737483a779bce1) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( phantpay )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("0500005v.u7",  0x0000000, 0x0080000, CRC(2cfc44a7) SHA1(a2a93047311d7a1f45e2915478ba2a11d5179194) )
+	ROM_LOAD32_WORD("0500005v.u11", 0x0000002, 0x0080000, CRC(3e91ed2a) SHA1(92d49bd78d329ad53cb2063af2d324eada3f53d1) )
+	ROM_LOAD32_WORD("0500005v.u8",  0x0100000, 0x0080000, CRC(ab1e77e9) SHA1(5a8da1210214ccc89dfde2e28f5142036a743172) )
+	ROM_LOAD32_WORD("0500005v.u12", 0x0100002, 0x0080000, CRC(d43a092a) SHA1(5f851bd179b14ef3983b460ed932810f3713d3e5) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( penpir2 )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	// these are the 'bios' for Casino games (could be moved to a different base set)
+	ROM_LOAD32_WORD( "0700474v.u7",  0x000000, 0x80000, CRC(04b7dcbf) SHA1(eded1223336181bb08f9593247f1f79d96278b75) )
+	ROM_LOAD32_WORD( "0700474v.u11", 0x000002, 0x80000, CRC(a89ce1b5) SHA1(411b474a111f23ebd834bea5af0bf0cf3926d590) )
+
+	ROM_LOAD32_WORD( "0100869v.u8",  0x100000, 0x80000, CRC(5a87f637) SHA1(0fee8140637e9f923727e8c358c9f59b8319855d) )
+	ROM_LOAD32_WORD( "0100869v.u12", 0x100002, 0x80000, CRC(2aef04c1) SHA1(7415f436960c7b4a43634161ca317b2ae34ee745) )
+	ROM_LOAD32_WORD( "0100869v.u9",  0x200000, 0x80000, CRC(05de2653) SHA1(7d3f9d50013d8137cef285940b04209cfdae4a1d) )
+	ROM_LOAD32_WORD( "0100869v.u13", 0x200002, 0x80000, CRC(e1dbfd58) SHA1(687b7254279734e1835e1713d032b5aa2cf70812) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( przfight )
 	ARISTOCRAT_MK5_BIOS
@@ -3373,6 +3484,20 @@ ROM_START( qnilemax )
 	ROM_LOAD32_WORD("0401072v.u13", 0x0200002, 0x0080000, CRC(1b77bbd0) SHA1(c93d2f844032631d9594d02fa6ac41e21025a8ea) )
 	ROM_LOAD32_WORD("0401072v.u10", 0x0300000, 0x0080000, CRC(8491dbc4) SHA1(f0d4e470f0774a6aac168334390c116fd3d1075e) )
 	ROM_LOAD32_WORD("0401072v.u14", 0x0300002, 0x0080000, CRC(4fbccf72) SHA1(97d6bb400caf78cb673a324d48d2580f1bbb1acd) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( qtbird )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("0500009v.u7",  0x0000000, 0x0080000, CRC(f294fc0a) SHA1(f3d60ca6008445f535fce027f5ec3fe82ae552c3) )
+	ROM_LOAD32_WORD("0500009v.u11", 0x0000002, 0x0080000, CRC(328b7e04) SHA1(5c49f60b7c88d6e94e7ab464fad4eee6806f327a) )
+	ROM_LOAD32_WORD("0500009v.u8",  0x0100000, 0x0080000, CRC(764b5568) SHA1(a097992499044b7ca017a8c85387dc1ea94ff27a) )
+	ROM_LOAD32_WORD("0500009v.u12", 0x0100002, 0x0080000, CRC(bb8344a9) SHA1(8b0e904b937c7f34470ad946076240b0c54bf434) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -3780,7 +3905,7 @@ ROM_START( wamazon )
 	ROM_LOAD32_WORD("0200285v.u7",  0x0000000, 0x0080000, CRC(bfa21358) SHA1(6b76656401b3dbbace8d4335951468b9885fc7f0) )
 	ROM_LOAD32_WORD("0200285v.u11", 0x0000002, 0x0080000, CRC(54b2a375) SHA1(635fde5c678b908fa58c0e04ba9b7a84fac1f7fe) )
 	ROM_LOAD32_WORD("0200285v.u8",  0x0100000, 0x0080000, CRC(4e39f128) SHA1(91d3c6a9e5c30275c3f8967dde55214df097f2ba) )
-	ROM_LOAD32_WORD("0200285v.u12", 0x0100002, 0x0080000, CRC(2cd12986) SHA1(b6b0bd6dd8c964498edc3763cb5c450795042a8d) )
+	ROM_LOAD32_WORD("0200285v.u12", 0x0100002, 0x0080000, BAD_DUMP CRC(2cd12986) SHA1(b6b0bd6dd8c964498edc3763cb5c450795042a8d) ) // actually a bad dump of u7 from oscara5!
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -3906,6 +4031,33 @@ ROM_START( wcougaru )
 	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) )
 ROM_END
 
+ROM_START( wizways )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("0200396v.u7",  0x0000000, 0x0080000, CRC(85fca945) SHA1(ca48a907b4f6c1b665ae053e2992681f02166cb1) )
+	ROM_LOAD32_WORD("0200396v.u11", 0x0000002, 0x0080000, CRC(677c855f) SHA1(a4ec8e6151271af292379ead28214ef9163bfdc3) )
+	ROM_LOAD32_WORD("0200396v.u8",  0x0100000, 0x0080000, CRC(4b1192ae) SHA1(2537249ccfc8c507762ac2c46d05ef13fa3d0bf9) )
+	ROM_LOAD32_WORD("0200396v.u12", 0x0100002, 0x0080000, CRC(934d7286) SHA1(205f72b62d83667e9068141346bda3bcb9742a83) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( wnpost )
+	ARISTOCRAT_MK5_BIOS
+
+	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD("rhg041804.u7",  0x0000000, 0x0080000, CRC(73274802) SHA1(9838a63d5f4e1bf31675ac15c34a17e709f2f647) )
+	ROM_LOAD32_WORD("rhg041804.u11", 0x0000002, 0x0080000, CRC(4f076a94) SHA1(2962429c930ffc17e2f37a006215ee6f1c649953) )
+	ROM_LOAD32_WORD("rhg041804.u8",  0x0100000, 0x0080000, CRC(b1830ffa) SHA1(c23a97bfdfe9e408f0ec8053646d6c8c8e06a263) )
+	ROM_LOAD32_WORD("rhg041804.u12", 0x0100002, 0x0080000, CRC(ff70b305) SHA1(3c832ed20b1d00318fd3d2428bb469735f68965b) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
 
 ROM_START( wthing )
 	ARISTOCRAT_MK5_BIOS
@@ -3965,7 +4117,7 @@ GAMEL( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4124/1, B - 31/07/01 - BAD DUMP
 GAMEL( 1999, adonisce,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 602/9, C - 06/07/99
 GAMEL( 1996, baddog,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 386/56, A - 17/12/96
-GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS, layout_aristmk5 )  // 594/1, A - 30/07/96
+GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS, layout_aristmk5 )  // 594/1, A - 30/07/96 - doesn't boot, 'needs VLC comms instead of QCOM' (or bad?)
 GAMEL( 1998, bootsctn,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 616/1, B - 11/12/98
 GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098,   A - 25/08/99 - BAD DUMP
 GAMEL( 1996, bumblbug,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 593, D - 5/07/96
@@ -3978,11 +4130,11 @@ GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, ar
 GAMEL( 1998, cashchama, cashcham, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0200437V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 603(a), D - 18/02/98
 GAMEL( 1998, cashchamnz,cashcham, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",       MACHINE_FLAGS, layout_aristmk5 )  // MV4067, A - 31/08/98
 GAMEL( 1997, cashcra5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 607, C - 14/07/97
-GAMEL( 1998, chariotc,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 630,      A - 10/08/98, Rev 12
+GAMEL( 1998, chariotc,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",   MACHINE_FLAGS, layout_aristmk5 )  // 630,      A - 10/08/98, Rev 12
 GAMEL( 1998, chariotca, chariotc, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 630/1, A - 10/08/98
 GAMEL( 2001, checkma5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // JB011, B - 06/07/01
 GAMEL( 1996, chickna5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                  MACHINE_FLAGS, layout_aristmk5 )  // 596, A - 27/08/96
-GAMEL( 1998, chickna5u, chickna5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                 MACHINE_FLAGS, layout_aristmk5_us )  // 596,      C - 23/02/98 - BAD DUMP
+GAMEL( 1998, chickna5u, chickna5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                 MACHINE_FLAGS, layout_aristmk5_us )  // 596,      C - 23/02/98
 GAMEL( 1998, chickna5qld,chickna5,aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",               MACHINE_FLAGS, layout_aristmk5 )  // 596, C - 23/02/98
 GAMEL( 1998, coralrc2,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 577/7, A - 29/12/98
 GAMEL( 1998, cuckoo,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (0200753V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 615/1, D - 03/07/98
@@ -3995,6 +4147,8 @@ GAMEL( 1996, dolphntr,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1996, dolphntra, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 602/1,    B - 06/12/96, Rev 1.24.4.0
 GAMEL( 1996, dolphntrb, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 602, B - 10/12/96
 GAMEL( 1996, dolphntru, dolphntr, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 602/1,    B - 06/12/96
+GAMEL( 1999, dolphntrce,dolphntr, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure - Cash Express (AHG1606, US)",MACHINE_FLAGS, layout_aristmk5_us ) // (MV4090, D - 22/12/99)
+GAMEL( 1997, drgneye,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dragon's Eye (0100521V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 ) // (610, A - 09/05/97)
 GAMEL( 2000, dynajack,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (01J00081, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // JB004, A - 12/07/2000
 GAMEL( 1998, eldorda5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 623, B - 24/03/98
 GAMEL( 1995, eforsta5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (0400122V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 570/3,    E - 23/06/95
@@ -4006,6 +4160,7 @@ GAMEL( 1999, genmagi,   aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, 
 GAMEL( 1998, gnomeatw,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",   MACHINE_FLAGS, layout_aristmk5 )  // 625, C - 18/12/98
 GAMEL( 1997, goldpyr,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // MV4091,   B - 13/05/97
 GAMEL( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // 602/2,    B - 13/05/97 - BAD DUMP
+GAMEL( 1998, goldpyrb,  goldpyr,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",         MACHINE_FLAGS, layout_aristmk5 ) // (602/5, C - 19/06/98)
 GAMEL( 2000, goldenra,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 661, A - 10/04/00
 GAMEL( 1999, incasun,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )  // 631/3 B, B - 03/05/99
 GAMEL( 1999, incasunsp, incasun,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",   MACHINE_FLAGS, layout_aristmk5 )  // 631/3 B, B - 03/05/99
@@ -4025,6 +4180,7 @@ GAMEL( 2000, magimaska, magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_sta
 GAMEL( 1997, magtcha5,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 606, A - 06/03/97
 GAMEL( 2000, marmagic,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // JB005,    A - 07/07/00
 GAMEL( 2000, marmagicu, marmagic, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // US003,    A - 07/07/00 - BAD DUMP
+GAMEL( 2000, marmagicua,marmagic, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // (US003, 07/07/2000)
 GAMEL( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 559/2,    E - 14/02/96
 GAMEL( 1997, monmouse,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 607/1, B - 08/04/97
 GAMEL( 2001, montree,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",           MACHINE_FLAGS, layout_aristmk5 )  // MV4126, C - 12/04/01
@@ -4042,6 +4198,9 @@ GAMEL( 1996, pengpaya,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1997, pengpayb,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/3(a), D - 03/06/97
 GAMEL( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // 586/7(b)  B - 14/07/97
 GAMEL( 1998, petshop,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5_us )  // 618, A - 09/03/98 - BAD DUMP
+GAMEL( 1998, petshopa,  petshop,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  //  (618/1, A - 17/04/98)
+GAMEL( 1995, phantpay,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // (570/1, E - 12/09/95)
+GAMEL( 1998, penpir2,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",             MACHINE_FLAGS, layout_aristmk5 )  // (619/3, A - 17/12/98)
 GAMEL( 1996, przfight,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 578/4, B - 08/08/96
 GAMEL( 1998, qcash,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 603/6, C  - 23/07/98
 GAMEL( 1997, qnile,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4, B - 13/05/97
@@ -4050,30 +4209,33 @@ GAMEL( 1997, qnileb,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1997, qnilec,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4,    B - 13/05/97
 GAMEL( 1997, qnileu,    qnile,    aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",       MACHINE_FLAGS, layout_aristmk5_us )  // MV4091,   B - 13/05/97
 GAMEL( 1999, qnilemax,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS, layout_aristmk5 )  // 602/4, D - 18/06/99
+GAMEL( 1994, qtbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT) ",             MACHINE_FLAGS, layout_aristmk5 )  //  (581, A - 27/10/94)
 GAMEL( 2000, rainwrce,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_FLAGS, layout_aristmk5 )  // 655, B - 02/03/00
 GAMEL( 1998, reelrock,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628,      A - 13/07/98
 GAMEL( 1997, retrsam,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 608, A - 17/04/97
 GAMEL( 1997, retrsama,  retrsam,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200506V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 608, A - 17/04/97
 GAMEL( 1997, retrsamb,  retrsam,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0200549V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 608, A - 17/04/97
 GAMEL( 1997, sumospin,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sumo Spins (0200606V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 622, A - 08/12/97
-GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 578, G - 26/07/99
+GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 578, G - 26/07/99 - doesn't boot (maybe bad?)
 GAMEL( 1998, sbuk3,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 626, A - 22/04/98
 GAMEL( 1995, swhr2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 577/1, C - 07/09/95
 GAMEL( 1998, swhr2u,    swhr2,    aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // MV4061,   A - 29/06/98 - BAD DUMP
 GAMEL( 1995, swhr2v,    swhr2,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",        MACHINE_FLAGS, layout_aristmk5 )  // 577/1,    C - 07/09/95
-GAMEL( 199?, topbana,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // BAD DUMP
+GAMEL( 199?, topbana,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  //
 GAMEL( 2000, trstrove,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // JB001/3, A - 5/10/00
 GAMEL( 2002, tritreat,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 692, A - 17/05/02
 GAMEL( 2001, trojhors,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // JB001/5, A - 30/10/01
 GAMEL( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 577/3,    D - 24/09/97 - BAD DUMP
 GAMEL( 1998, unicornd,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 631/1, A - 31/08/98
 GAMEL( 2000, unicorndnz,unicornd, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",     MACHINE_FLAGS, layout_aristmk5 )  // MV4113/1, A - 05/04/2000
-GAMEL( 1996, wamazon,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 506/6, A - 7/5/96
+GAMEL( 1996, wamazon,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 506/6, A - 7/5/96 - BAD DUMP
 GAMEL( 1996, wamazona,  wamazon,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200507V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 506/8, A - 10/10/96
 GAMEL( 1996, wamazonv,  wamazon,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (01J01996, Venezuela)",            MACHINE_FLAGS, layout_aristmk5 )  // 506/8, A - 10/10/96
 GAMEL( 1996, wildbill,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 543/8, C - 15/08/96
 GAMEL( 1996, wcougar,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 569/9, B - 27/2/96
 GAMEL( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 569/8,    D - 19/05/97
+GAMEL( 1996, wizways,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT) ",              MACHINE_FLAGS, layout_aristmk5 )  // (598/3, A - 04/11/96)
+GAMEL( 1997, wnpost,    aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",       MACHINE_FLAGS, layout_aristmk5_us )  // (541/2, G - 11/02/97)
 GAMEL( 1999, wthing,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 608/4, B - 14/12/99
 GAMEL( 1999, wtiger,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS, layout_aristmk5 )  // 638/1,    B - 08/07/99
 
