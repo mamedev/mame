@@ -200,9 +200,24 @@ private:
 	void update_interrupt(int state);
 
 	void drq(int state, int channel);
-
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
+	address_space *m_memory_space;
+
+	// dma channels
+	struct dma
+	{
+		uint32_t real_address;
+		uint32_t virtual_address;
+		uint32_t transfer_count;
+		uint32_t control;
+
+		bool dma_active;
+		int drq_state;
+		devcb_read8 device_r;
+		devcb_write8 device_w;
+	} m_dma_channel[IOGA_DMA_CHANNELS];
+	uint32_t m_dma_plotter_eosl;
 
 	devcb_write_line m_fdc_tc_func;
 
@@ -223,23 +238,7 @@ private:
 	emu_timer *m_timer[4];
 
 	// dma state
-	address_space *m_memory_space;
 	emu_timer *m_dma_timer;
-
-	// dma channels
-	struct dma
-	{
-		uint32_t real_address;
-		uint32_t virtual_address;
-		uint32_t transfer_count;
-		uint32_t control;
-
-		bool dma_active;
-		int drq_state;
-		devcb_read8 device_r;
-		devcb_write8 device_w;
-	} m_dma_channel[IOGA_DMA_CHANNELS];
-	uint32_t m_dma_plotter_eosl;
 
 	uint32_t dma_r(address_space &space, offs_t offset, uint32_t mem_mask, int channel);
 	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask, int channel);
