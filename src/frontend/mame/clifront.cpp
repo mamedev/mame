@@ -334,10 +334,9 @@ int cli_frontend::execute(int argc, char **argv)
 
 		manager->start_luaengine();
 
-#if !defined(__LIBRETRO__)
 		manager->start_context();
-#endif
-      start_execution(manager, argc, argv, option_errors);
+
+      		start_execution(manager, argc, argv, option_errors);
 #if defined(__LIBRETRO__)
       return m_result;
 #endif
