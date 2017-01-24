@@ -7,11 +7,11 @@
     driven by one or more output bits
 
 **********************************************************************/
+#ifndef MAME_DEVICES_SOUND_SPEAKER_H
+#define MAME_DEVICES_SOUND_SPEAKER_H
 
 #pragma once
 
-#ifndef __SOUND_SPEAKER_H__
-#define __SOUND_SPEAKER_H__
 
 // Length of anti-aliasing filter kernel, measured in number of intermediate samples
 enum
@@ -89,5 +89,7 @@ private:
 
 extern const device_type SPEAKER_SOUND;
 
+extern template class device_finder<speaker_sound_device, false>;
+extern template class device_finder<speaker_sound_device, true>;
 
-#endif /* __SPEAKER_H__ */
+#endif // MAME_DEVICES_SOUND_SPEAKER_H

@@ -8,6 +8,7 @@
 #include "machine/cdicdic.h"
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
+#include "cpu/mcs51/mcs51.h"
 
 /*----------- driver state -----------*/
 
@@ -106,20 +107,16 @@ public:
 
 	DECLARE_MACHINE_RESET(cdimono1);
 	DECLARE_MACHINE_RESET(cdimono2);
-	DECLARE_MACHINE_RESET(quizard12);
-	DECLARE_MACHINE_RESET(quizard17);
-	DECLARE_MACHINE_RESET(quizard18);
-	DECLARE_MACHINE_RESET(quizard22);
-	DECLARE_MACHINE_RESET(quizard23);
-	DECLARE_MACHINE_RESET(quizard32);
-	DECLARE_MACHINE_RESET(quizard34);
-	DECLARE_MACHINE_RESET(quizard4r40);
-	DECLARE_MACHINE_RESET(quizard4r41);
-	DECLARE_MACHINE_RESET(quizard4r42);
+	DECLARE_MACHINE_RESET(quizard1);
+	DECLARE_MACHINE_RESET(quizard2);
+	DECLARE_MACHINE_RESET(quizard3);
+	DECLARE_MACHINE_RESET(quizard4);
 	DECLARE_READ8_MEMBER(servo_io_r);
 	DECLARE_WRITE8_MEMBER(servo_io_w);
 	DECLARE_READ8_MEMBER(slave_io_r);
 	DECLARE_WRITE8_MEMBER(slave_io_w);
+
+	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

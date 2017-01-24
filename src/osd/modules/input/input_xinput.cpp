@@ -12,15 +12,12 @@
 #if defined(OSD_WINDOWS)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 // XInput header
 #include <xinput.h>
 
 #undef interface
-#undef min
-#undef max
 
 // MAME headers
 #include "emu.h"

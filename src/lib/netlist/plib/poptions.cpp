@@ -22,8 +22,20 @@ namespace plib {
 	{
 	}
 
+	option_group::~option_group()
+	{
+	}
+
+	option_example::~option_example()
+	{
+	}
+
 	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
 	: option_base(parent, help), m_short(ashort), m_long(along),  m_has_argument(has_argument)
+	{
+	}
+
+	option::~option()
 	{
 	}
 
@@ -90,11 +102,11 @@ namespace plib {
 
 	int options::parse(int argc, char *argv[])
 	{
-		m_app = argv[0];
+		m_app = pstring(argv[0], pstring::UTF8);
 
 		for (int i=1; i<argc; )
 		{
-			pstring arg(argv[i]);
+			pstring arg(argv[i], pstring::UTF8);
 			option *opt = nullptr;
 			pstring opt_arg;
 			bool has_equal_arg = false;
@@ -136,7 +148,7 @@ namespace plib {
 				else
 				{
 					i++; // FIXME: are there more arguments?
-					if (opt->parse(argv[i]) != 0)
+					if (opt->parse(pstring(argv[i], pstring::UTF8)) != 0)
 						return i - 1;
 				}
 			}

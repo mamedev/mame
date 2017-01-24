@@ -140,10 +140,10 @@ Updates by Bryan McPhail, 12/12/2004:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/2203intf.h"
 #include "includes/xain.h"
+
+#include "cpu/m6809/m6809.h"
+#include "sound/2203intf.h"
 
 #define MASTER_CLOCK        XTAL_12MHz
 #define CPU_CLOCK           MASTER_CLOCK / 8
@@ -257,21 +257,6 @@ WRITE8_MEMBER(xain_state::irqB_clear_w)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(xain_state::m68705_r)
-{
-	m_mcu_ready = 1;
-	return m_from_mcu;
-}
-
-WRITE8_MEMBER(xain_state::m68705_w)
-{
-	m_from_main = data;
-	m_mcu_accept = 0;
-
-	if (m_mcu != nullptr)
-		m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
 CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
 {
 	return m_vblank;
@@ -284,108 +269,24 @@ CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
 
 ***************************************************************************/
 
-READ8_MEMBER(xain_state::m68705_port_a_r)
-{
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER(xain_state::m68705_port_a_w)
-{
-	m_port_a_out = data;
-}
-
-WRITE8_MEMBER(xain_state::m68705_ddr_a_w)
-{
-	m_ddr_a = data;
-}
-
-READ8_MEMBER(xain_state::m68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
-
-WRITE8_MEMBER(xain_state::m68705_port_b_w)
-{
-	if ((m_ddr_b & 0x02) && (~data & 0x02))
-	{
-		m_port_a_in = m_from_main;
-	}
-	/* Rising edge of PB1 */
-	else if ((m_ddr_b & 0x02) && (~m_port_b_out & 0x02) && (data & 0x02))
-	{
-		m_mcu_accept = 1;
-		m_mcu->set_input_line(0, CLEAR_LINE);
-	}
-
-	/* Rising edge of PB2 */
-	if ((m_ddr_b & 0x04) && (~m_port_b_out & 0x04) && (data & 0x04))
-	{
-		m_mcu_ready = 0;
-		m_from_mcu = m_port_a_out;
-	}
-
-	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(xain_state::m68705_ddr_b_w)
-{
-	m_ddr_b = data;
-}
-
-READ8_MEMBER(xain_state::m68705_port_c_r)
-{
-	m_port_c_in = 0;
-
-	if (!m_mcu_accept)
-		m_port_c_in |= 0x01;
-	if (m_mcu_ready)
-		m_port_c_in |= 0x02;
-
-	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
-}
-
-WRITE8_MEMBER(xain_state::m68705_port_c_w)
-{
-	m_port_c_out = data;
-}
-
-WRITE8_MEMBER(xain_state::m68705_ddr_c_w)
-{
-	m_ddr_c = data;
-}
-
 CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
-	uint8_t res = 0;
-
-	if (m_mcu != nullptr)
-	{
-		if (m_mcu_ready == 1)
-			res |= 0x01;
-		if (m_mcu_accept == 1)
-			res |= 0x02;
-	}
-	else
-	{
-		return 3;
-	}
-
-	return res;
+	// bit 0 is host MCU flag, bit 1 is host semaphore flag (both active low)
+	return
+			((m_mcu && (CLEAR_LINE != m_mcu->mcu_semaphore_r())) ? 0x00 : 0x01) |
+			((m_mcu && (CLEAR_LINE != m_mcu->host_semaphore_r())) ? 0x00 : 0x02);
 }
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	m_mcu_ready = 1;
-	m_mcu_accept = 1;
-
-	if (m_mcu != nullptr)
-		m_mcu->set_input_line(0, CLEAR_LINE);
+	if (m_mcu)
+		m_mcu->reset_w(PULSE_LINE);
 
 	return 0xff;
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
+static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bgram1_w) AM_SHARE("bgram1")
@@ -397,20 +298,24 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a02, 0x3a02) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(scrollyP1_w)
 	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3a04, 0x3a04) AM_READ(m68705_r)
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(m68705_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
+	AM_IMPORT_FROM(bootleg_map)
+	AM_RANGE(0x3a04, 0x3a04) AM_DEVREAD("mcu", taito68705_mcu_device, data_r)
+	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
+	AM_RANGE(0x3a0e, 0x3a0e) AM_DEVWRITE("mcu", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
@@ -420,20 +325,6 @@ static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(cpuB_bankswitch_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, xain_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m68705_port_a_r, m68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(m68705_port_b_r, m68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m68705_port_c_r, m68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(m68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(m68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(m68705_ddr_c_w)
-//  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
-//  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
@@ -559,23 +450,6 @@ void xain_state::machine_start()
 	membank("bank2")->set_entry(0);
 
 	save_item(NAME(m_vblank));
-
-	if (m_mcu)
-	{
-		save_item(NAME(m_from_main));
-		save_item(NAME(m_from_mcu));
-		save_item(NAME(m_ddr_a));
-		save_item(NAME(m_ddr_b));
-		save_item(NAME(m_ddr_c));
-		save_item(NAME(m_port_a_out));
-		save_item(NAME(m_port_b_out));
-		save_item(NAME(m_port_c_out));
-		save_item(NAME(m_port_a_in));
-		save_item(NAME(m_port_b_in));
-		save_item(NAME(m_port_c_in));
-		save_item(NAME(m_mcu_ready));
-		save_item(NAME(m_mcu_accept));
-	}
 }
 
 static MACHINE_CONFIG_START( xsleena, xain_state )
@@ -591,9 +465,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_CPU_ADD("audiocpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("mcu", M68705, MCU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-
+	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -628,6 +500,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
@@ -652,7 +527,7 @@ ROM_START( xsleena )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
-	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_REGION( 0x800, "mcu:mcu", 0 )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -706,7 +581,7 @@ ROM_START( xsleenaj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
-	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_REGION( 0x800, "mcu:mcu", 0 )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -760,7 +635,7 @@ ROM_START( solrwarr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
-	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_REGION( 0x800, "mcu:mcu", 0 )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )

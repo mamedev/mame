@@ -14,35 +14,26 @@
 #include "palloc.h"
 
 namespace plib {
+
+pstream::~pstream()
+{
+}
+
 // -----------------------------------------------------------------------------
 // pistream: input stream
 // -----------------------------------------------------------------------------
 
-bool pistream::readline(pstring &line)
+pistream::~pistream()
 {
-	char c = 0;
-	m_linebuf.clear();
-	if (!this->readbyte(c))
-	{
-		line = "";
-		return false;
-	}
-	while (true)
-	{
-		if (c == 10)
-			break;
-		else if (c != 13) /* ignore CR */
-			m_linebuf += c;
-		if (!this->readbyte(c))
-			break;
-	}
-	line = m_linebuf;
-	return true;
 }
 
 // -----------------------------------------------------------------------------
 // postream: output stream
 // -----------------------------------------------------------------------------
+
+postream::~postream()
+{
+}
 
 void postream::write(pistream &strm)
 {
@@ -58,7 +49,7 @@ void postream::write(pistream &strm)
 
 pifilestream::pifilestream(const pstring &fname)
 : pistream(0)
-, m_file(fopen(fname.cstr(), "rb"))
+, m_file(fopen(fname.c_str(), "rb"))
 , m_pos(0)
 , m_actually_close(true)
 , m_filename(fname)
@@ -142,12 +133,16 @@ pstdin::pstdin()
 	/* nothing to do */
 }
 
+pstdin::~pstdin()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Output file stream
 // -----------------------------------------------------------------------------
 
 pofilestream::pofilestream(const pstring &fname)
-: postream(0), m_file(fopen(fname.cstr(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
+: postream(0), m_file(fopen(fname.c_str(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
 {
 	if (m_file == nullptr)
 		throw file_open_e(m_filename);
@@ -209,6 +204,11 @@ pstream::pos_type pofilestream::vtell()
 		return static_cast<pos_type>(ret);
 }
 
+postringstream::~postringstream()
+{
+}
+
+
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
@@ -218,12 +218,20 @@ pstderr::pstderr()
 {
 }
 
+pstderr::~pstderr()
+{
+}
+
 // -----------------------------------------------------------------------------
 // pstdout: write to stdout
 // -----------------------------------------------------------------------------
 
 pstdout::pstdout()
 : pofilestream(stdout, "<stdout>", false)
+{
+}
+
+pstdout::~pstdout()
 {
 }
 
@@ -271,6 +279,10 @@ void pimemstream::vseek(const pos_type n)
 pimemstream::pos_type pimemstream::vtell()
 {
 	return m_pos;
+}
+
+pistringstream::~pistringstream()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -332,5 +344,44 @@ pstream::pos_type pomemstream::vtell()
 {
 	return m_pos;
 }
+
+bool putf8_reader::readline(pstring &line)
+{
+	pstring::code_t c = 0;
+	m_linebuf.clear();
+	if (!this->readcode(c))
+	{
+		line = "";
+		return false;
+	}
+	while (true)
+	{
+		if (c == 10)
+			break;
+		else if (c != 13) /* ignore CR */
+			m_linebuf += pstring(c);
+		if (!this->readcode(c))
+			break;
+	}
+	line = m_linebuf;
+	return true;
+}
+
+putf8_fmt_writer::putf8_fmt_writer(postream &strm)
+: pfmt_writer_t()
+, putf8_writer(strm)
+{
+}
+
+putf8_fmt_writer::~putf8_fmt_writer()
+{
+}
+
+void putf8_fmt_writer::vdowrite(const pstring &ls) const
+{
+	write(ls);
+}
+
+
 
 }

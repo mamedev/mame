@@ -14,15 +14,13 @@
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class k8915_state : public driver_device
 {
 public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_p_videoram(*this, "p_videoram")
+		m_p_videoram(*this, "videoram")
 	{
 	}
 
@@ -67,7 +65,7 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -166,7 +164,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))
 MACHINE_CONFIG_END
 

@@ -342,19 +342,25 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
 
 	/* low 3 bits select the function */
 	offset &= 7;
+
+	m_sel_select = 0;
+
 	switch (offset)
 	{
 		case 1: /* SEL1 */
 		case 2: /* SEL2 */
 		case 3: /* SEL3 */
 		case 4: /* SEL4 */
-		default:
-			/* just ignore */
+			m_sel_select = offset;
 			break;
 
 		case 6: /* CC1 */
 		case 7: /* CC2 */
 			space.machine().bookkeeping().coin_counter_w(offset - 6, data);
+			break;
+
+		default:
+			/* just ignore */
 			break;
 	}
 }
@@ -362,16 +368,44 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
 
 WRITE16_MEMBER( harddriv_state::hd68k_wr1_write )
 {
-	if (offset == 0) { //   logerror("Shifter Interface Latch = %02X\n", data);
-	} else {                logerror("/WR1(%04X)=%02X\n", offset, data);
+	if (offset == 0) {
+		// logerror("Shifter Interface Latch = %02X\n", data);
+		data = data >> 8;
+		switch (m_sel_select)
+		{
+			case 1: /* SEL1 */
+				m_sel1_data = data;
+				machine().output().set_value("SEL1", m_sel1_data);
+			break;
+
+			case 2: /* SEL2 */
+				m_sel2_data = data;
+				machine().output().set_value("SEL2", m_sel2_data);
+			break;
+
+			case 3: /* SEL3 */
+				m_sel3_data = data;
+				machine().output().set_value("SEL3", m_sel3_data);
+			break;
+
+			case 4: /* SEL4 */
+				m_sel4_data = data;
+				machine().output().set_value("SEL4", m_sel4_data);
+			break;
+		}
+	} else {
+		logerror("/WR1(%04X)=%02X\n", offset, data);
 	}
 }
 
 
 WRITE16_MEMBER( harddriv_state::hd68k_wr2_write )
 {
-	if (offset == 0) { //   logerror("Steering Wheel Latch = %02X\n", data);
-	} else {                logerror("/WR2(%04X)=%02X\n", offset, data);
+	if (offset == 0) {
+		// logerror("Steering Wheel Latch = %02X\n", data);
+		machine().output().set_value("wheel", data >> 8);
+	} else {
+		logerror("/WR2(%04X)=%02X\n", offset, data);
 	}
 }
 
@@ -387,11 +421,14 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 	{
 		case 0: /* CR2 */
 		case 1: /* CR1 */
-			machine().output().set_led_value(offset, data);
 			break;
 		case 2: /* LC1 */
+			// used for seat locking on harddriv
+			machine().output().set_led_value(1, data);
 			break;
 		case 3: /* LC2 */
+			// used for "abort" button lamp
+			machine().output().set_led_value(2, data);
 			break;
 		case 4: /* ZP1 */
 			m_m68k_zp1 = data;

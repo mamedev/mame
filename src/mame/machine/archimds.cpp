@@ -43,27 +43,20 @@ void archimedes_state::archimedes_request_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= mask;
 
-	if (m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A])
-	{
+	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) || (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B]))
 		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
-
-	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) == 0)
-	{
+	else
 		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-	}
 }
 
 void archimedes_state::archimedes_request_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] |= mask;
 
-	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
-	{
-		generic_pulse_irq_line(*m_maincpu, ARM_IRQ_LINE, 1);
-		//m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-		//m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
+	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) || (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B]))
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
 void archimedes_state::archimedes_request_fiq(int mask)
@@ -90,7 +83,7 @@ void archimedes_state::archimedes_clear_irq_a(int mask)
 void archimedes_state::archimedes_clear_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] &= ~mask;
-	//archimedes_request_irq_b(0);
+	archimedes_request_irq_b(0);
 }
 
 void archimedes_state::archimedes_clear_fiq(int mask)

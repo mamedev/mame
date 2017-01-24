@@ -10,7 +10,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
@@ -45,8 +45,10 @@ namespace netlist
 
 		this->set(1.0 / m_R(), V, 0.0);
 	}
+	} //namespace analog
 
-	NETLIB_DEVICE_IMPL(r2r_dac)
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac)
+	}
 
-	} //namespace devices
 } // namespace netlist

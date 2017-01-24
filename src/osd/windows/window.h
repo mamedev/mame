@@ -10,7 +10,6 @@
 #define __WIN_WINDOW__
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <mmsystem.h>

@@ -294,6 +294,15 @@ WRITE8_MEMBER(fortyl_state::pix1_w)
 	m_pix1 = data;
 }
 
+READ8_MEMBER(fortyl_state::fortyl_mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
 WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
 {
 //  if (data > 7)
@@ -628,8 +637,8 @@ WRITE8_MEMBER(fortyl_state::to_main_w)
 static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* M5517P on main board */
-	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r) AM_WRITE(pix1_mcu_w)      //pixel layer related
+	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(fortyl_mcu_status_r, pix1_mcu_w)      //pixel layer related
 	AM_RANGE(0x8802, 0x8802) AM_WRITE(bank_select_w)
 	AM_RANGE(0x8803, 0x8803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
 	AM_RANGE(0x8804, 0x8804) AM_READWRITE(from_snd_r, sound_command_w)
@@ -1011,8 +1020,6 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 
 MACHINE_RESET_MEMBER(fortyl_state,40love)
 {
-	m_mcu->set_input_line(0, CLEAR_LINE);
-
 	MACHINE_RESET_CALL_MEMBER(common);
 }
 
@@ -1046,9 +1053,7 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
 
-	MCFG_CPU_ADD("mcu",M68705,18432000/6) /* OK */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* high interleave to ensure proper synchronization of CPUs */
 	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
@@ -1107,9 +1112,7 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
 
-//  MCFG_CPU_ADD("mcu",M68705,18432000/6)
-//  MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
-//  MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+//  MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
 
 	MCFG_MACHINE_START_OVERRIDE(fortyl_state,undoukai)
 	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,undoukai)  /* init machine */
@@ -1175,7 +1178,7 @@ ROM_START( 40love )
 	ROM_LOAD( "a30-12.u38", 0x8000, 0x2000, CRC(f7afd475) SHA1(dd09d5ca7fec5e0454f9efb8ebc722561010f124) )
 	ROM_LOAD( "a30-13.u39", 0xa000, 0x2000, CRC(e806630f) SHA1(09022aae88ea0171a0aacf3260fa3a95e8faeb21) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) SHA1(60bc77e03b9be434bb97a374a2fedeb8d049a660) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )

@@ -230,10 +230,9 @@ Interrupts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
-#include "rendlay.h"
 #include "includes/qix.h"
-#include "cpu/m6809/m6809.h"
+
+#include "rendlay.h"
 #include "machine/nvram.h"
 
 #include "elecyoyo.lh"
@@ -286,24 +285,6 @@ static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Coin CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, qix_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_SHARE("68705_port_out")
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(qix_68705_portC_r, qix_68705_portC_w)
-	AM_RANGE(0x0004, 0x0007) AM_WRITEONLY AM_SHARE("68705_ddr")
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -669,8 +650,11 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC) /* 1.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
+	MCFG_M68705_PORTB_R_CB(READ8(qix_state, qix_68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(qix_state, qix_68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(qix_state, qix_68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(qix_state, qix_68705_portB_w))
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 

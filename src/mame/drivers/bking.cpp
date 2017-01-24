@@ -78,6 +78,15 @@ READ8_MEMBER(bking_state::bking3_ext_check_r)
 	return 0x31; //no "bad rom.", no "bad ext."
 }
 
+READ8_MEMBER(bking_state::bking3_mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
 static ADDRESS_MAP_START( bking_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -120,8 +129,8 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
-	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0x4f, 0x4f) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r) AM_WRITE(unk_w)
+	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x4f, 0x4f) AM_READWRITE(bking3_mcu_status_r, unk_w)
 	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
 	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
@@ -140,68 +149,6 @@ static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
 ADDRESS_MAP_END
 
-#if 0
-READ8_MEMBER(bking_state::bking3_68705_port_a_r)
-{
-	//printf("port_a_r = %02X\n",(m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a));
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER(bking_state::bking3_68705_port_a_w)
-{
-	m_port_a_out = data;
-//  printf("port_a_out = %02X\n",data);
-}
-
-WRITE8_MEMBER(bking_state::bking3_68705_ddr_a_w)
-{
-	m_ddr_a = data;
-}
-
-READ8_MEMBER(bking_state::bking3_68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
-
-WRITE8_MEMBER(bking_state::bking3_68705_port_b_w)
-{
-//  if(data != 0xff)
-//      printf("port_b_out = %02X\n",data);
-
-	if (~data & 0x02)
-	{
-		m_port_a_in = from_main;
-		if (main_sent) m_mcu->set_input_line(0, CLEAR_LINE);
-		main_sent = 0;
-	}
-
-	if (~data & 0x04)
-	{
-		/* 68705 is writing data for the Z80 */
-		from_mcu = m_port_a_out;
-		mcu_sent = 1;
-	}
-
-	if(data != 0xff && data != 0xfb && data != 0xfd)
-		printf("port_b_w = %X\n",data);
-
-	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(bking_state::bking3_68705_ddr_b_w)
-{
-	m_ddr_b = data;
-}
-
-READ8_MEMBER(bking_state::bking3_68705_port_c_r)
-{
-	int port_c_in = 0;
-	if (main_sent) port_c_in |= 0x01;
-	if (!mcu_sent) port_c_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",space.device().safe_pc(),port_c_in);
-	return port_c_in;
-}
-#endif
 
 static INPUT_PORTS_START( bking )
 	PORT_START("IN0")
@@ -440,8 +387,6 @@ void bking_state::machine_reset()
 
 MACHINE_RESET_MEMBER(bking_state,bking3)
 {
-	m_mcu->set_input_line(0, CLEAR_LINE);
-
 	bking_state::machine_reset();
 
 	/* misc */
@@ -505,9 +450,7 @@ static MACHINE_CONFIG_DERIVED( bking3, bking )
 	MCFG_CPU_MODIFY("main_cpu")
 	MCFG_CPU_IO_MAP(bking3_io_map)
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
@@ -774,7 +717,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-19.4d",    0x1000, 0x1000, CRC(817f9c2a) SHA1(7365ecf2700e1fd13016408f5493f8d51aab5bbd) )
 	ROM_LOAD( "a24-20.4b",    0x2000, 0x1000, CRC(0e9e16d6) SHA1(43c69602a8d9c34c527ce54472db84168acc4ef4) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a24_22.ic17",  0x000000, 0x000800, CRC(27c497d5) SHA1(c6c72bbf0537da53148fa0a56d412ab46129d29c) )  //M68705P5S uC 3MHz xtal
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */

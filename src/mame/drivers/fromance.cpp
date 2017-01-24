@@ -37,9 +37,9 @@ Memo:
 
 - 2player's input is not supported.
 
-- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic 
-  changes. Actually same custom component as other V-System games of the era, 
-  @seealso aerofgt.cpp 
+- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic
+  changes. Actually same custom component as other V-System games of the era,
+  @seealso aerofgt.cpp
 
 - nekkyoku: soft reset enables flip screen without any real reason.
 

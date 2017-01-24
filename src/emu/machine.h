@@ -242,6 +242,7 @@ void retro_loop();
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }
 	void debug_break();
+	void export_http_api();
 
 	// TODO: Do saves and loads still require scheduling?
 	void immediate_save(const char *filename);

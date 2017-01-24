@@ -330,8 +330,13 @@ int cli_frontend::execute(int argc, char **argv)
 
 		load_translation(m_options);
 
+		manager->start_http_server();
+
 		manager->start_luaengine();
 
+#if !defined(__LIBRETRO__)
+		manager->start_context();
+#endif
       start_execution(manager, argc, argv, option_errors);
 #if defined(__LIBRETRO__)
       return m_result;

@@ -11,7 +11,7 @@
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 class diode
 {
@@ -82,9 +82,9 @@ NETLIB_UPDATE(QBJT_switch)
 
 NETLIB_UPDATE_PARAM(QBJT_switch)
 {
-	nl_double IS = m_model.model_value("IS");
-	nl_double BF = m_model.model_value("BF");
-	nl_double NF = m_model.model_value("NF");
+	nl_double IS = m_model.m_IS;
+	nl_double BF = m_model.m_BF;
+	nl_double NF = m_model.m_NF;
 	//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 	set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
@@ -165,19 +165,22 @@ NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
 	const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
-	m_D_EB.set_mat(gee, gec - gee, gce - gee, gee - gec, Ie, -Ie);
-	m_D_CB.set_mat(gcc, gce - gcc, gec - gcc, gcc - gce, Ic, -Ic);
-	m_D_EC.set_mat( 0,    -gec,      -gce,        0,       0,   0);
+	m_D_EB.set_mat(      gee, gec - gee,  -Ie,
+				   gce - gee, gee - gec,   Ie);
+	m_D_CB.set_mat(      gcc, gce - gcc,  -Ic,
+				   gec - gcc, gcc - gce,   Ic);
+	m_D_EC.set_mat(        0,      -gec,    0,
+						-gce,         0,    0);
 }
 
 
 NETLIB_UPDATE_PARAM(QBJT_EB)
 {
-	nl_double IS = m_model.model_value("IS");
-	nl_double BF = m_model.model_value("BF");
-	nl_double NF = m_model.model_value("NF");
-	nl_double BR = m_model.model_value("BR");
-	nl_double NR = m_model.model_value("NR");
+	nl_double IS = m_model.m_IS;
+	nl_double BF = m_model.m_BF;
+	nl_double NF = m_model.m_NF;
+	nl_double BR = m_model.m_BR;
+	nl_double NR = m_model.m_NR;
 	//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 	set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
@@ -189,5 +192,11 @@ NETLIB_UPDATE_PARAM(QBJT_EB)
 	m_gD_BC.set_param(IS / m_alpha_r, NR, netlist().gmin());
 }
 
-	} //namespace devices
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB)
+		NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch)
+	}
+
 } // namespace netlist

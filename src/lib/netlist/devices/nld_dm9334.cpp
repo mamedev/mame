@@ -113,7 +113,7 @@ namespace netlist
 			}
 		}
 
-		uint_fast8_t q = m_last_Q;
+		unsigned q = m_last_Q;
 
 		if (!m_CQ())
 		{

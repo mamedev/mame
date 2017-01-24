@@ -186,7 +186,7 @@ public:
 	uint16_t port_b_tattass(int unused);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	void deco32_set_audio_output(uint8_t raw_data);
-	
+
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);

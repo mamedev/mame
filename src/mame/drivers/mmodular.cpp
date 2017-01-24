@@ -27,10 +27,6 @@
  Academy 65C02 4.9152mhz
  Monte Carlo IV, Mega IV and any others not listed above have correct ROM/RAM and maybe LCD, not much else for now
 
- Novag boards: (should go in different .c eventually)
- Super Forte and Super Expert are the same, except one is touch board, other is magnetic.
- The Diablo 68000 is Super Expert board but 68K based
-
  Notes by Cowering (2011)
 
  TODO:   add Bavaria sensor support (unknown1,2,3 handlers in current driver)
@@ -105,10 +101,6 @@ static uint8_t montecivtopnew = 0, montecivbotnew = 0;
 //Mephisto Mega IV latch
 uint8_t latch2400 = 0;
 
-uint8_t diablo68_3c0000 = 0;
-
-uint8_t sfortea_latch = 0;
-
 
 INPUT_PORTS_EXTERN( chessboard );
 
@@ -134,15 +126,7 @@ public:
 	uint8_t latch_data;
 	DECLARE_WRITE8_MEMBER(write_polgar_IO);
 	DECLARE_WRITE8_MEMBER(write_LCD_polgar);
-	DECLARE_READ8_MEMBER(read_1ff1_sfortea);
-	DECLARE_READ8_MEMBER(read_1ff0_sfortea);
-	DECLARE_WRITE8_MEMBER(write_latch_sfortea);
-	DECLARE_WRITE8_MEMBER(write_lcd_IO_sfortea);
 	DECLARE_WRITE8_MEMBER(write_LCD_academy);
-//  DECLARE_WRITE16_MEMBER(diablo68_aciawrite);
-//  DECLARE_READ16_MEMBER(diablo68_aciaread);
-	DECLARE_WRITE16_MEMBER(diablo68_reg_select);
-	DECLARE_WRITE16_MEMBER(diablo68_write_LCD);
 	DECLARE_WRITE8_MEMBER(milano_write_LED);
 	DECLARE_WRITE8_MEMBER(megaiv_write_LED);
 	DECLARE_WRITE8_MEMBER(academy_write_LED);
@@ -181,12 +165,9 @@ public:
 	DECLARE_DRIVER_INIT(polgar);
 	DECLARE_MACHINE_START(polgar);
 	DECLARE_MACHINE_RESET(polgar);
-	DECLARE_MACHINE_START(sfortea);
-	DECLARE_MACHINE_RESET(sfortea);
 	DECLARE_MACHINE_START(van32);
 	DECLARE_MACHINE_RESET(van16);
 	DECLARE_MACHINE_RESET(monteciv);
-	DECLARE_MACHINE_START(diablo68);
 	DECLARE_MACHINE_START(van16);
 	DECLARE_MACHINE_RESET(academy);
 	DECLARE_PALETTE_INIT(chess_lcd);
@@ -268,127 +249,10 @@ WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 
 }
 
-READ8_MEMBER(polgar_state::read_1ff1_sfortea)
-{
-	uint8_t data;
-	data = ioport("BUTTONS_SFOR1")->read();
-	logerror("1ff0 data %02x\n",data);
-	return 0;
-//  return data;
-}
-
-READ8_MEMBER(polgar_state::read_1ff0_sfortea)
-{
-	uint8_t data;
-	data = ioport("BUTTONS_SFOR2")->read();
-	logerror("1ff0 data %02x\n",data);
-	return 0;
-//  return data;
-
-//  static uint8_t temp = 0;
-//  temp++;
-//  logerror("read 1ff0 %02x\n",temp);
-//  printf("read 1ff0 %02x\n",temp);
-
-//  return (0x00);
-}
-
-
-
-WRITE8_MEMBER(polgar_state::write_latch_sfortea)
-{
-	sfortea_latch = data;
-	logerror("latch data %02x\n",data);
-//  printf("latch data %02x\n",data);
-
-}
-
-WRITE8_MEMBER(polgar_state::write_lcd_IO_sfortea)
-{
-/* bits
-7
-6 paired with 5
-5
-4
-3 irq on off?
-2 select HD44780
-1
-0 LCD command/data select
-*/
-
-
-	if (BIT(sfortea_latch,2))
-	{
-		if(BIT(sfortea_latch,0)) {
-			m_lcdc->data_write(space, 0, data);
-			logerror("LCD DTA = %02x\n",data);
-		} else {
-			if (BIT(data,7)) {
-				if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
-			}
-			m_lcdc->control_write(space, 0, data);
-			logerror("LCD CMD = %02x\n",data);
-		}
-	}
-}
 
 WRITE8_MEMBER(polgar_state::write_LCD_academy)
 {
 	m_lcdc->write(space, offset & 1, data);
-}
-
-//  AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ(diablo68_write_LCD)
-//  AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ(diablo68_reg_select)
-
-/*WRITE16_MEMBER(polgar_state::diablo68_aciawrite)
-{
-//  device_t *acia = machine().device("acia65c51");
-//  acia_6551_w(acia, offset & 0x03, data >> 8);
-//  printf("ACIA write data %04x offset %02x\n",data,offset);
-    logerror("ACIA write data %04x offset %02x\n",data,offset);
-}
-
-READ16_MEMBER(polgar_state::diablo68_aciaread)
-{
-//  device_t *acia = machine().device("acia65c51");
-    uint16_t result;
-//  result = acia_6551_r(acia, offset & 0x03);
-//  logerror("ACIA read offset %02x\n",offset);
-//  printf("ACIA read offset %02x\n",offset);
-
-    result <<= 8;
-
-    return result;
-}
-*/
-
-WRITE16_MEMBER(polgar_state::diablo68_reg_select)
-{
-	diablo68_3c0000 = data >> 8;
-	//printf("3c0000 = %04x\n",data>>8);
-	logerror("3c0000 = %04x\n",data>>8);
-
-}
-
-
-WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
-{
-	data >>= 8;
-	if (!(diablo68_3c0000 & 0x02)) {
-		if (BIT(data,7)) {
-			if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
-		}
-		m_lcdc->control_write(space, 0, data);
-//      logerror("Control %02x\n", data);
-//      printf("Control %02x\n", data);
-	} else {
-		m_lcdc->data_write(space, 0, data);
-//      printf("LCDdata %04x [%c]\n", data,data);
-//      logerror("LCDdata %04x [%c]\n", data,data);
-	}
-
-	//logerror("LCD Status  Data = %d\n",data);
-
 }
 
 WRITE8_MEMBER(polgar_state::milano_write_LED)
@@ -994,16 +858,6 @@ MACHINE_START_MEMBER(polgar_state,polgar)
 	common_chess_start();
 }
 
-MACHINE_START_MEMBER(polgar_state,sfortea)
-{
-	common_chess_start();
-}
-
-MACHINE_START_MEMBER(polgar_state,diablo68)
-{
-	common_chess_start();
-}
-
 MACHINE_START_MEMBER(polgar_state,van16)
 {
 }
@@ -1014,11 +868,6 @@ MACHINE_RESET_MEMBER(polgar_state,van16)
 }
 
 MACHINE_RESET_MEMBER(polgar_state,polgar)
-{
-	common_chess_start();
-}
-
-MACHINE_RESET_MEMBER(polgar_state,sfortea)
 {
 	common_chess_start();
 }
@@ -1072,16 +921,6 @@ static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )   // LCD Instr. Reg + Beeper
 	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(write_LCD_polgar )          // LCD Char Reg.
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8, polgar_state )
-	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
-	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE(write_latch_sfortea)    // IO control
-	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE(write_lcd_IO_sfortea)   // LCD Char Reg.
-//  AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE_LEGACY("acia65c51", acia_6551_r,acia_6551_w)
-	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ(read_1ff1_sfortea )
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ(read_1ff0_sfortea )
-	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1257,19 +1096,6 @@ static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16, polgar_state )
-	AM_RANGE( 0x00000000, 0x0000ffff ) AM_ROM // OS
-//  AM_RANGE( 0x00200000, 0x0020ffff ) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE( 0x00ff0000, 0x00ff7fff ) AM_ROM AM_REGION("maincpu",10000) // Opening Book
-//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciaread)
-//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciawrite)
-//  AM_RANGE( 0x00300002, 0x00300003 ) AM_READ(diablo68_flags)
-	AM_RANGE( 0x003a0000, 0x003a0001 ) AM_WRITE(diablo68_write_LCD)
-	AM_RANGE( 0x003c0000, 0x003c0001 ) AM_WRITE(diablo68_reg_select)
-	AM_RANGE( 0x00280000, 0x0028ffff ) AM_RAM  // hash tables
-	AM_RANGE( 0x00ff8000, 0x00ffffff ) AM_RAM
-ADDRESS_MAP_END
-
 
 /* Input ports */
 
@@ -1294,39 +1120,6 @@ static INPUT_PORTS_START( polgar )
 //  PORT_START("KEY1_8")
 //  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
 
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sfortea )
-	PORT_START("BUTTONS_SFOR1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("ENT") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("UP") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("LEFT") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_8)
-
-	PORT_START("BUTTONS_SFOR2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("ENT") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("UP") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("LEFT") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_F8)
-
-/*  PORT_START("BUTTONS_SFOR3")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("ENT") PORT_CODE(KEYCODE_1)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_2)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("UP") PORT_CODE(KEYCODE_3)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_4)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("LEFT") PORT_CODE(KEYCODE_5)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_6)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_7)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_8)
-*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( academy )
@@ -1499,22 +1292,6 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sfortea, polgar_state )
-	MCFG_CPU_ADD("maincpu",M65C02,5000000)
-	MCFG_CPU_PROGRAM_MAP(sfortea_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_START_OVERRIDE(polgar_state, sfortea )
-	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, sfortea )
-	MCFG_FRAGMENT_ADD( chess_common )
-
-	/* acia */
-//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, nullptr)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_M6502_irq, attotime::from_hz(600))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(100))
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( alm32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
@@ -1562,22 +1339,6 @@ static MACHINE_CONFIG_DERIVED( megaiv, monteciv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 4915200 )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( diablo68, polgar_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MCFG_CPU_PROGRAM_MAP(diablo68_mem)
-	MCFG_MACHINE_START_OVERRIDE(polgar_state,diablo68)
-	MCFG_FRAGMENT_ADD( chess_common )
-
-	/* acia */
-//  MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, nullptr)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_timer", polgar_state, timer_update_irq2, attotime::from_hz(60))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(30))
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
-
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( van16, polgar_state )
@@ -1649,13 +1410,6 @@ ROM_START(polgar)
 	ROM_LOAD("polgar.bin", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
 ROM_END
 
-ROM_START(sfortea)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("sfalo.bin", 0x0000, 0x8000, CRC(86e0230a) SHA1(0d6e18a17e636b8c7292c8f331349d361892d1a8))
-	ROM_LOAD("sfahi.bin", 0x8000, 0x8000, CRC(81c02746) SHA1(0bf68b68ade5a3263bead88da0a8965fc71483c1))
-	ROM_LOAD("sfabook.bin", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957))
-ROM_END
-
 ROM_START( alm16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000,CRC(EE5B6EC4) SHA1(30920C1B9E16FFAE576DA5AFA0B56DA59ADA3DBB))
@@ -1665,27 +1419,6 @@ ROM_END
 ROM_START( alm32 )
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD("alm32.bin", 0x00000, 0x20000,CRC(38F4B305) SHA1(43459A057FF29248C74D656A036AC325202B9C15))
-ROM_END
-
-ROM_START(sforteb)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("forte_b.lo", 0x0000, 0x8000, CRC(48bfe5d6) SHA1(323642686b6d2fb8db2b7d50c6cd431058078ce1))
-	ROM_LOAD("forte_b.hi1", 0x8000, 0x8000, CRC(9778ca2c) SHA1(d8b88b9768a1a9171c68cbb0892b817d68d78351))
-	ROM_LOAD("forte_b.hi0", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6))
-ROM_END
-
-ROM_START(sforteba)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("forte b_l.bin", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca))
-	ROM_LOAD("forte b_h.bin", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9))
-	ROM_LOAD("forte_b.hi0", 0x10000, 0x8000, BAD_DUMP CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6))
-ROM_END
-
-ROM_START(sexpertb)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("seb69u3.bin", 0x0000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02))
-	ROM_LOAD("seb69u1.bin", 0x8000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356))
-	ROM_LOAD("seb605u2.bin", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6))
 ROM_END
 
 ROM_START(academy)
@@ -1706,21 +1439,6 @@ ROM_START(milano)
 ROM_END
 
 
-ROM_START(sfortec)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("sfclow.bin", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f))
-	ROM_LOAD("sfchi.bin", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340))
-	ROM_LOAD("sfcbook.bin", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8))
-ROM_END
-
-
-ROM_START(sexpertc)
-	ROM_REGION(0x18000,"maincpu",0) // Version 3.6 of firmware
-	ROM_LOAD("seclow.bin", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7))
-	ROM_LOAD("sechi.bin", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa))
-	ROM_LOAD("secbook.bin", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af))
-ROM_END
-
 ROM_START( lyon16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000,CRC(497BD41A) SHA1(3FFEFEEAC694F49997C10D248EC6A7AA932898A4))
@@ -1737,13 +1455,6 @@ ROM_START(monteciv)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("mciv.bin", 0x8000, 0x8000, CRC(c4887694) SHA1(7f482d2a40fcb3125266e7a5407da315b4f9b49c))
 
-ROM_END
-
-ROM_START( diablo68 )
-	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000,CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9))
-	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000,CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5))
-	ROM_LOAD16_BYTE("book.bin", 0x10000, 0x8000,CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108))
 ROM_END
 
 ROM_START( van16 )
@@ -1796,22 +1507,15 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 
 /*       YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT     COMPANY                      FULLNAME                     FLAGS */
 	CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
-	CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 //CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

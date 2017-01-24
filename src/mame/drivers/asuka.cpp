@@ -271,16 +271,16 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 
 WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 {
-	if (m_adpcm_data != -1)
+	if (!state)
+		return;
+
+	m_adpcm_ff = !m_adpcm_ff;
+	m_adpcm_select->select_w(m_adpcm_ff);
+
+	if (m_adpcm_ff)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
-		m_adpcm_data = -1;
-	}
-	else
-	{
-		m_adpcm_data = memregion("ymsnd")->base()[m_adpcm_pos];
+		m_adpcm_select->ba_w(m_sound_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
@@ -292,6 +292,7 @@ WRITE8_MEMBER(asuka_state::asuka_msm5205_address_w)
 WRITE8_MEMBER(asuka_state::asuka_msm5205_start_w)
 {
 	m_msm->reset_w(0);
+	m_adpcm_ff = false;
 }
 
 WRITE8_MEMBER(asuka_state::asuka_msm5205_stop_w)
@@ -778,7 +779,7 @@ void asuka_state::machine_start()
 	membank("audiobank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x04000);
 
 	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_ff));
 
 	save_item(NAME(m_current_round));
 	save_item(NAME(m_current_bank));
@@ -792,7 +793,7 @@ void asuka_state::machine_start()
 void asuka_state::machine_reset()
 {
 	m_adpcm_pos = 0;
-	m_adpcm_data = -1;
+	m_adpcm_ff = false;
 	m_current_round = 0;
 	m_current_bank = 0;
 	m_video_ctrl = 0;
@@ -930,6 +931,9 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
@@ -1063,6 +1067,9 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(asuka_state, asuka_msm5205_vck))  /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")

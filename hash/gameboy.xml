@@ -24894,7 +24894,20 @@
 		</part>
 	</software>
 
-	<software name="zoopj" cloneof="zool">
+	<software name="zoop">
+		<description>Zoop (Euro, USA)</description>
+		<year>1995</year>
+		<publisher>Viacom NewMedia</publisher>
+		<info name="serial" value="DMG-AZPE-USA, DMG-AZPP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="65536">
+				<rom name="zoop (usa, europe).bin" size="65536" crc="14f8b6bb" sha1="1e0390d456066b9fbe1faff5f7404d4593a2b839" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoopj" cloneof="zoop">
 		<!-- Notes: SGB enhanced -->
 		<description>Zoop (Jpn)</description>
 		<year>1997</year>
@@ -24906,19 +24919,6 @@
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="zoop (japan).bin" size="65536" crc="10e1a10c" sha1="89a74970761700d591c2affc47c9306f49d22ba8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoop">
-		<description>Zoop (Euro, USA)</description>
-		<year>1995</year>
-		<publisher>Viacom NewMedia</publisher>
-		<info name="serial" value="DMG-AZPE-USA, DMG-AZPP-EUR"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="zoop (usa, europe).bin" size="65536" crc="14f8b6bb" sha1="1e0390d456066b9fbe1faff5f7404d4593a2b839" offset="0" />
 			</dataarea>
 		</part>
 	</software>

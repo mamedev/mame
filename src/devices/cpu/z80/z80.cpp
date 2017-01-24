@@ -3146,32 +3146,28 @@ void z80_device::take_nmi()
 
 void z80_device::take_interrupt()
 {
-	int irq_vector;
-
 	PRVPC = 0xffff; // HACK: segag80r protection kludge
 
-	/* Check if processor was halted */
+	// check if processor was halted
 	leave_halt();
 
-	/* Clear both interrupt flip flops */
+	// clear both interrupt flip flops
 	m_iff1 = m_iff2 = 0;
 
-	/* Daisy chain mode? If so, call the requesting device */
-	if (daisy_chain_present())
-		irq_vector = daisy_call_ack_device();
-
-	/* else call back the cpu interface to retrieve the vector */
-	else
-		irq_vector = m_irq_callback(*this, 0);
-
-	/* Say hi */
+	// say hi
 	m_irqack_cb(true);
 
+	// fetch the IRQ vector
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
 	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( m_im == 2 )
 	{
+		// Zilog's datasheet claims that "the least-significant bit must be a zero."
+		// However, experiments have confirmed that IM 2 vectors do not have to be
+		// even, and all 8 bits will be used; even $FF is handled normally.
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		push(m_pc);
 		rm16(irq_vector, m_pc);
@@ -3414,8 +3410,6 @@ void z80_device::device_start()
 	m_direct = &m_program->direct();
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 	m_io = &space(AS_IO);
-
-	m_irq_callback = device_irq_acknowledge_delegate(FUNC(z80_device::standard_irq_callback_member), this);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;            /* Zero flag is set */

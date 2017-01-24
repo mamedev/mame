@@ -86,6 +86,7 @@ More chips (from eBay auction):
 #include "emu.h"
 #include "cpu/i960/i960.h"
 #include "sound/ymz280b.h"
+#include "machine/nvram.h"
 
 class igt_gameking_state : public driver_device
 {
@@ -191,7 +192,9 @@ static ADDRESS_MAP_START( igt_gameking_mem, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
 
-	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM
+	// it's unclear how much of this is saved and how much total RAM there is.
+	AM_RANGE(0x10000000, 0x1001ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x10020000, 0x100fffff) AM_RAM
 
 	AM_RANGE(0x18000000, 0x181fffff) AM_RAM // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
@@ -255,6 +258,7 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
 ROM_START( ms3 )
@@ -275,6 +279,9 @@ ROM_START( ms3 )
 
 	ROM_REGION( 0x200000, "snd", 0 )
 	ROM_LOAD( "1h5053xx.u6",  0x000000, 0x080000, CRC(6735c65a) SHA1(198cacec5441aa615c0de63a0b4e47265636bcee) )
+
+	ROM_REGION( 0x20000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(acbbc6d9) SHA1(6e86d24ad3793b41f1f23f80f9bdb22767abc3bf) )
 ROM_END
 
 ROM_START( ms72c )
@@ -295,6 +302,9 @@ ROM_START( ms72c )
 
 	ROM_REGION( 0x200000, "snd", 0 )
 	ROM_LOAD( "1H5008FA Multistar 7.u6", 0x000000, 0x100000, CRC(69656637) SHA1(28c2cf48856ee4f820146fdbd0f3c7e307892dc6) )
+
+	ROM_REGION( 0x20000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(b5e42dbc) SHA1(f6afadb6877bca2cef40725b001c7918f9c99359) )
 ROM_END
 
 

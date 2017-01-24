@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -16,10 +16,11 @@
 #include "error.h"
 #include "uint32_t.h"
 
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,  BX_MAKEFOURCC('R', 'W', 0, 1) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_READ,  BX_MAKEFOURCC('R', 'W', 0, 2) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_WRITE, BX_MAKEFOURCC('R', 'W', 0, 3) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_EOF,   BX_MAKEFOURCC('R', 'W', 0, 4) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_READ,         BX_MAKEFOURCC('R', 'W', 0, 2) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_WRITE,        BX_MAKEFOURCC('R', 'W', 0, 3) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_EOF,          BX_MAKEFOURCC('R', 'W', 0, 4) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_ALREADY_OPEN, BX_MAKEFOURCC('R', 'W', 0, 5) );
 
 namespace bx
 {
@@ -222,6 +223,41 @@ namespace bx
 	struct BX_NO_VTABLE WriterSeekerI : public WriterI, public SeekerI
 	{
 	};
+
+	/// Align reader stream.
+	inline int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_reader);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			const int64_t offset  = bx::seek(_reader, size);
+			if (offset != aligned)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "Align: read truncated.");
+			}
+			return int32_t(offset - current);
+		}
+
+		return 0;
+	}
+
+	/// Align writer stream (pads stream with zeros).
+	inline int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_writer);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			return writeRep(_writer, 0, size, _err);
+		}
+
+		return 0;
+	}
 
 	struct BX_NO_VTABLE ReaderOpenI
 	{

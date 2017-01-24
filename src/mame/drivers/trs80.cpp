@@ -143,7 +143,7 @@ There don't seem to be any JV1 boot disks for Model III/4.
 static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8, trs80_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("p_videoram")
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
 	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
 	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("p_videoram")
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( meritum_map, AS_PROGRAM, 8, trs80_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("p_videoram")
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

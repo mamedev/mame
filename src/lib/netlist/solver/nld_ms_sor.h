@@ -67,7 +67,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	 * omega = 2.0 / (1.0 + std::sqrt(1-rho))
 	 */
 
-	const nl_double ws = this->m_params.m_sor;
+	const nl_double ws = this->m_params.m_gs_sor;
 
 	nl_double w[storage_N];
 	nl_double one_m_w[storage_N];
@@ -84,7 +84,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
-		const nl_double * const *other_cur_analog = this->m_terms[k]->other_curanalog();
+		const nl_double * const *other_cur_analog = this->m_terms[k]->connected_net_V();
 
 		new_V[k] = this->m_nets[k]->m_cur_Analog;
 
@@ -137,7 +137,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		nl_double err = 0;
 		for (unsigned k = 0; k < iN; k++)
 		{
-			const int * RESTRICT net_other = this->m_terms[k]->net_other();
+			const int * RESTRICT net_other = this->m_terms[k]->connected_net_idx();
 			const std::size_t railstart = this->m_terms[k]->m_railstart;
 			const nl_double * RESTRICT go = this->m_terms[k]->go();
 

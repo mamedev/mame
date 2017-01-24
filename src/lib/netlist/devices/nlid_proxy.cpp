@@ -17,9 +17,81 @@ namespace netlist
 	namespace devices
 	{
 
+	// -----------------------------------------------------------------------------
+	// nld_base_proxy
+	// -----------------------------------------------------------------------------
+
+	nld_base_proxy::nld_base_proxy(netlist_t &anetlist, const pstring &name,
+			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
+			: device_t(anetlist, name)
+	{
+		m_logic_family = inout_proxied->logic_family();
+		m_term_proxied = inout_proxied;
+		m_proxy_term = proxy_inout;
+	}
+
+	nld_base_proxy::~nld_base_proxy()
+	{
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// nld_a_to_d_proxy
+	// ----------------------------------------------------------------------------------------
+
+	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
+			logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
+			: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
+	, m_Q(*this, "Q")
+	{
+	}
+
+	nld_base_a_to_d_proxy::~nld_base_a_to_d_proxy() {}
+
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
+	, m_I(*this, "I")
+	{
+	}
+
+	nld_a_to_d_proxy::~nld_a_to_d_proxy()
+	{
+	}
+
+	NETLIB_RESET(a_to_d_proxy)
+	{
+	}
+
+	NETLIB_UPDATE(a_to_d_proxy)
+	{
+		nl_assert(m_logic_family != nullptr);
+		// FIXME: Variable supply voltage!
+		double supply_V = logic_family().fixed_V();
+		if (supply_V == 0.0) supply_V = 5.0;
+
+		if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
+			out().push(1, NLTIME_FROM_NS(1));
+		else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
+			out().push(0, NLTIME_FROM_NS(1));
+		else
+		{
+			// do nothing
+		}
+	}
+
 	// ----------------------------------------------------------------------------------------
 	// nld_d_to_a_proxy
 	// ----------------------------------------------------------------------------------------
+
+	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
+	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+	, m_I(*this, "I")
+	{
+	}
+
+	nld_base_d_to_a_proxy::~nld_base_d_to_a_proxy()
+	{
+	}
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
@@ -28,20 +100,22 @@ namespace netlist
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const char *power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
+		const pstring power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 		//register_sub(m_RV);
 		//register_term("1", m_RV.m_P);
 		//register_term("2", m_RV.m_N);
 
 		register_subalias("Q", m_RV.m_P);
 
-		connect_late(m_RV.m_N, m_GNDHack);
+		connect(m_RV.m_N, m_GNDHack);
 		bool f = false;
 		for (int i = 0; i < 3; i++)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0], detail::device_object_t::type_t::INPUT, false);
-			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1], detail::device_object_t::type_t::INPUT, false);
+			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
+					detail::device_object_t::type_t::INPUT, false);
+			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
+					detail::device_object_t::type_t::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
 				/* alternative logic */
@@ -49,13 +123,13 @@ namespace netlist
 			}
 		}
 		if (!f)
-			netlist().log().warning("D/A Proxy: Found no valid combination of power terminals on device {1}", out_proxied->device().name());
+			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else
-			netlist().log().warning("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
+			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 #if (0)
-		printf("%s %s\n", out_proxied->name().cstr(), out_proxied->device().name().cstr());
+		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
 		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::type_t::OUTPUT, false);
-		if (x) printf("==> %s\n", x->name().cstr());
+		if (x) printf("==> %s\n", x->name().c_str());
 #endif
 	}
 

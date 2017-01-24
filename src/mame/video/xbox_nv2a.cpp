@@ -2216,6 +2216,103 @@ void dumpcombiners(uint32_t *m)
 }
 #endif
 
+void nv2a_renderer::extract_packed_float(uint32_t data, float &first, float &second, float &third)
+{
+	int32_t p1, p2, p3;
+	int32_t e1, e2, e3;
+	int32_t m1, m2, m3;
+	float scale, decimal;
+	union
+	{
+		float f;
+		uint32_t i;
+	} i2f;
+
+	// convert r11g11b10f to 3 float values
+	// each 32 bit words contains 2 11 bit float values and one 10 bit float value
+	p1 = data & 0b11111111111;
+	p2 = (data >> 11) & 0b11111111111;
+	p3 = (data >> 22) & 0b1111111111;
+	// 11 bit values have 6 bits of mantissa and 5 of exponent, 10 bit values have 5 bits of mantissa and 5 of exponent
+	m1 = p1 & 0b111111;
+	e1 = (p1 >> 6) & 0b11111;
+	m2 = p2 & 0b111111;
+	e2 = (p2 >> 6) & 0b11111;
+	m3 = p3 & 0b11111;
+	e3 = (p3 >> 5) & 0b11111;
+	// the following is based on routine UF11toF32 in appendix G of the "OpenGL Programming Guide 8th edition" book
+	if (e1 == 0) {
+		if (m1 != 0) {
+			scale = 1.0 / (1 << 20);
+			first = scale * m1;
+		}
+		else
+			first = 0;
+	}
+	else if (e1 == 31) {
+		i2f.i = 0x7f800000 | m1;
+		first = i2f.f;
+	}
+	else {
+		e1 -= 15;
+		if (e1 < 0) {
+			scale = 1.0 / (1 << -e1);
+		}
+		else {
+			scale = 1 << e1;
+		}
+		decimal = 1.0 + (float)m1 / 64;
+		first = scale * decimal;
+	}
+	if (e2 == 0) {
+		if (m2 != 0) {
+			scale = 1.0 / (1 << 20);
+			second = scale * m2;
+		}
+		else
+			second = 0;
+	}
+	else if (e2 == 31) {
+		i2f.i = 0x7f800000 | m2;
+		second = i2f.f;
+	}
+	else {
+		e2 -= 15;
+		if (e2 < 0) {
+			scale = 1.0 / (1 << -e2);
+		}
+		else {
+			scale = 1 << e2;
+		}
+		decimal = 1.0 + (float)m2 / 64;
+		second = scale * decimal;
+	}
+	if (e3 == 0) {
+		if (m3 != 0) {
+			scale = 1.0 / (1 << 20);
+			third = scale * m3;
+		}
+		else
+			third = 0;
+	}
+	else if (e3 == 31) {
+		i2f.i = 0x7f800000 | m3;
+		third = i2f.f;
+	}
+	else {
+		e3 -= 15;
+		if (e3 < 0) {
+			scale = 1.0 / (1 << -e3);
+		}
+		else {
+			scale = 1 << e3;
+		}
+		decimal = 1.0 + (float)m3 / 32;
+		third = scale * decimal;
+	}
+}
+
+
 void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib)
 {
 	uint32_t u;
@@ -2233,26 +2330,24 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 			d = d + 4;
 		}
 		break;
-	case NV2A_VTXBUF_TYPE::UBYTE:
+	case NV2A_VTXBUF_TYPE::UBYTE_OGL:
 		u = space.read_dword(address + 0);
 		for (c = l-1; c >= 0; c--) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
 			u = u >> 8;
 		}
 		break;
-	case  NV2A_VTXBUF_TYPE::UBYTE2:
+	case  NV2A_VTXBUF_TYPE::UBYTE_D3D:
 		u = space.read_dword(address + 0);
 		for (c = 0; c < l; c++) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
 			u = u >> 8;
 		}
 		break;
-	case NV2A_VTXBUF_TYPE::UNKNOWN_6: // ???
+	case NV2A_VTXBUF_TYPE::FLOAT_PACKED: // 3 floating point numbers packed into 32 bits
 		u = space.read_dword(address + 0);
-		vertex.attribute[attrib].fv[0] = (u & 0xff) / 255.0; // b
-		vertex.attribute[attrib].fv[1] = ((u & 0xff00) >> 8) / 255.0;  // g
-		vertex.attribute[attrib].fv[2] = ((u & 0xff0000) >> 16) / 255.0;  // r
-		vertex.attribute[attrib].fv[3] = ((u & 0xff000000) >> 24) / 255.0;  // a
+		extract_packed_float(u, vertex.attribute[attrib].fv[0], vertex.attribute[attrib].fv[1], vertex.attribute[attrib].fv[2]);
+		vertex.attribute[attrib].fv[3] = 1.0;
 		break;
 	default:
 		vertex.attribute[attrib].fv[0] = 0;
@@ -2263,73 +2358,28 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 	}
 }
 
-/* Read vertices data from system memory. Method 0x1800 */
-int nv2a_renderer::read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit)
+/* Read vertices data from system memory. Method 0x1800 and 0x1808 */
+int nv2a_renderer::read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit)
 {
-	uint32_t data;
-	uint32_t m, i, c;
+	uint32_t m;
 	int a, b;
 
 #ifdef MAME_DEBUG
 	memset(destination, 0, sizeof(vertex_nv)*limit);
 #endif
-	c = 0;
 	for (m = 0; m < limit; m++) {
-		if (indexesleft_count == 0) {
-			data = space.read_dword(address);
-			i = indexesleft_first + indexesleft_count;
-			indexesleft[i & 1023] = data & 0xffff;
-			indexesleft[(i + 1) & 1023] = (data >> 16) & 0xffff;
-			indexesleft_count = indexesleft_count + 2;
-			address += 4;
-			c++;
-		}
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
 		b = enabled_vertex_attributes;
 		for (a = 0; a < 16; a++) {
 			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + indexesleft[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
+				read_vertex(space, vertexbuffer_address[a] + vertex_indexes[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
 			}
 			b = b >> 1;
 		}
 		indexesleft_first = (indexesleft_first + 1) & 1023;
 		indexesleft_count--;
 	}
-	return (int)c;
-}
-
-/* Read vertices data from system memory. Method 0x1808 */
-int nv2a_renderer::read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit)
-{
-	uint32_t data;
-	uint32_t m, i, c;
-	int a, b;
-
-#ifdef MAME_DEBUG
-	memset(destination, 0, sizeof(vertex_nv)*limit);
-#endif
-	c = 0;
-	for (m = 0; m < limit; m++) {
-		if (indexesleft_count == 0) {
-			data = space.read_dword(address);
-			i = indexesleft_first + indexesleft_count;
-			indexesleft[i & 1023] = data;
-			indexesleft_count = indexesleft_count + 1;
-			address += 4;
-			c++;
-		}
-		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
-		b = enabled_vertex_attributes;
-		for (a = 0; a < 16; a++) {
-			if (b & 1) {
-				read_vertex(space, vertexbuffer_address[a] + indexesleft[indexesleft_first] * vertexbuffer_stride[a], destination[m], a);
-			}
-			b = b >> 1;
-		}
-		indexesleft_first = (indexesleft_first + 1) & 1023;
-		indexesleft_count--;
-	}
-	return (int)c;
+	return limit;
 }
 
 /* Read vertices data from system memory. Method 0x1810 */
@@ -2338,6 +2388,9 @@ int nv2a_renderer::read_vertices_0x1810(address_space & space, vertex_nv *destin
 	uint32_t m;
 	int a, b;
 
+#ifdef MAME_DEBUG
+	memset(destination, 0, sizeof(vertex_nv)*limit);
+#endif
 	for (m = 0; m < limit; m++) {
 		memcpy(&destination[m], &persistvertexattr, sizeof(persistvertexattr));
 		b = enabled_vertex_attributes;
@@ -2447,8 +2500,8 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, nv2avertex_t *desti
 		// copy data for poly.c
 		for (m = 0; m < count; m++) {
 			destination[m].w = vert[m].attribute[0].fv[3];
-			destination[m].x = vert[m].attribute[0].fv[0] * supersample_factor_x;
-			destination[m].y = vert[m].attribute[0].fv[1] * supersample_factor_y;
+			destination[m].x = (vert[m].attribute[0].fv[0] - 0.53125) * supersample_factor_x;
+			destination[m].y = (vert[m].attribute[0].fv[1] - 0.53125) * supersample_factor_y;
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = vert[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
@@ -2753,15 +2806,16 @@ int nv2a_renderer::clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo)
 
 uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
-#if 0
 	nv2avertex_t *vi[3];
-	nv2avertex_t vo[16];
+	nv2avertex_t vo[8];
 	int nv;
-#endif
 
 	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
 		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
-#if 0
+	if (enable_clipping_w == false)
+		return 0;
+	if ((_v1.w <= 0) && (_v2.w <= 0) && (_v3.w <= 0))
+		return 0;
 	// assign the elements of the array
 	vi[0] = &_v1;
 	vi[1] = &_v2;
@@ -2816,7 +2870,6 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 	}
 	for (int n = 1; n <= (nv - 2); n++)
 		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[n], vo[n + 1]);
-#endif
 	return 0;
 }
 
@@ -2930,6 +2983,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 				machine().logerror("Unsupported primitive %d\n", int(primitive_type));
 			vertex_count++;
 		}
+		source++;
 	}
 	primitives_total_count += primitives_count - pc;
 }
@@ -2979,7 +3033,13 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 			{
 				printf("%d %d\n\r", (int)primitive_type, vertex_first);
 				for (int n = 0; n < vertex_first; n++)
-					printf("%d X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", n, vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
+				{
+					if (indexesleft_count > 0)
+						printf("%d i:%d ", n, vertex_indexes[n]);
+					else
+						printf("%d ", n);
+					printf("X:%f Y:%f Z:%f W:%f x:%f y:%f\n\r", vertex_software[n].attribute[0].fv[0], vertex_software[n].attribute[0].fv[1], vertex_software[n].attribute[0].fv[2], vertex_software[n].attribute[0].fv[3], vertex_xy[n].x, vertex_xy[n].y);
+				}
 			}
 #endif
 		vertex_count = 0;
@@ -2990,12 +3050,10 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		primitives_count = 0;
 		primitive_type = (NV2A_BEGIN_END)data;
 		if (data != 0) {
-			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
+			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0))
 				render_spans_callback = render_delegate(&nv2a_renderer::render_register_combiners, this);
-			}
-			else if (texture[0].enabled) {
+			else if (texture[0].enabled)
 				render_spans_callback = render_delegate(&nv2a_renderer::render_texture_simple, this);
-			}
 			else
 				render_spans_callback = render_delegate(&nv2a_renderer::render_color, this);
 		}
@@ -3028,36 +3086,25 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		// vertices are selected from the vertex buffer using an array of indexes
 		// each dword after 1800 contains two 16 bit index values to select the vartices
 		// each dword after 1808 contains a 32 bit index value to select the vartices
-		while (1) {
-			int c;
-
-			if ((countlen * mult + indexesleft_count) < 4)
-				break;
-			if (mult == 1)
-				c = read_vertices_0x1808(space, vertex_software + vertex_first, address, 1);
-			else
-				c = read_vertices_0x1800(space, vertex_software + vertex_first, address, 1);
-			address = address + c * 4;
-			countlen = countlen - c;
-			assemble_primitive(vertex_software + vertex_first, 1, render_spans_callback);
-			vertex_first = (vertex_first + 4) & 1023;
-		}
 		while (countlen > 0) {
 			int n;
 
 			data = space.read_dword(address);
 			n = indexesleft_first + indexesleft_count;
 			if (mult == 2) {
-				indexesleft[n & 1023] = data & 0xffff;
-				indexesleft[(n + 1) & 1023] = (data >> 16) & 0xffff;
+				vertex_indexes[n & 1023] = data & 0xffff;
+				vertex_indexes[(n + 1) & 1023] = (data >> 16) & 0xffff;
 				indexesleft_count = indexesleft_count + 2;
 			}
 			else {
-				indexesleft[n & 1023] = data;
+				vertex_indexes[n & 1023] = data;
 				indexesleft_count = indexesleft_count + 1;
 			}
 			address += 4;
 			countlen--;
+			read_vertices_0x180x(space, vertex_software + vertex_first, address, mult);
+			assemble_primitive(vertex_software + vertex_first, mult, render_spans_callback);
+			vertex_first = (vertex_first + mult) & 1023;
 		}
 	}
 	if (maddress == 0x1818) {
@@ -3078,7 +3125,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 			}
 			address = address + c * 4;
 			assemble_primitive(vertex_software + vertex_first, 1, render_spans_callback);
-			vertex_first = (vertex_first + 4) & 1023;
+			vertex_first = (vertex_first + 1) & 1023;
 		}
 	}
 	if ((maddress >= 0x1880) && (maddress < 0x1900))
@@ -3175,19 +3222,19 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		vertexbuffer_kind[bit] = (NV2A_VTXBUF_TYPE)(data & 15);
 		vertexbuffer_size[bit] = (data >> 4) & 15;
 		switch (vertexbuffer_kind[bit]) {
-		case NV2A_VTXBUF_TYPE::UBYTE2:
+		case NV2A_VTXBUF_TYPE::UBYTE_D3D:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::FLOAT:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE::UBYTE:
+		case NV2A_VTXBUF_TYPE::UBYTE_OGL:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE::USHORT:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 2) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE::UNKNOWN_6:
+		case NV2A_VTXBUF_TYPE::FLOAT_PACKED:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
 			break;
 		default:
@@ -3345,7 +3392,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	}
 	if (maddress == 0x0130) {
 		countlen--;
-		if (waitvblank_used == 1)
+		if (enable_waitvblank == true)
 			return 1; // block until next vblank
 		else
 			return 0;
@@ -3617,7 +3664,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		maddress = (maddress - 0x0a20) / 4;
 		*(uint32_t *)(&matrix.translate[maddress]) = data;
 		// set corresponding vertex shader constant too
-		vertexprogram.exec.c_constant[59].iv[maddress] = data; // constant -37
+		vertexprogram.exec.c_constant[59].iv(maddress, data); // constant -37
 #ifdef LOG_NV2A
 		if (maddress == 3)
 			machine().logerror("viewport translate = {%f %f %f %f}\n", matrix.translate[0], matrix.translate[1], matrix.translate[2], matrix.translate[3]);
@@ -3629,7 +3676,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		maddress = (maddress - 0x0af0) / 4;
 		*(uint32_t *)(&matrix.scale[maddress]) = data;
 		// set corresponding vertex shader constant too
-		vertexprogram.exec.c_constant[58].iv[maddress] = data; // constant -38
+		vertexprogram.exec.c_constant[58].iv(maddress, data); // constant -38
 #ifdef LOG_NV2A
 		if (maddress == 3)
 			machine().logerror("viewport scale = {%f %f %f %f}\n", matrix.scale[0], matrix.scale[1], matrix.scale[2], matrix.scale[3]);
@@ -3688,7 +3735,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	if ((maddress >= 0x0b80) && (maddress < 0x0c00)) {
 		//machine().logerror("VP_UPLOAD_CONST\n");
 		if (vertexprogram.upload_parameter_index < 192) {
-			vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].iv[vertexprogram.upload_parameter_component] = data;
+			vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].iv(vertexprogram.upload_parameter_component, data);
 		}
 		else
 			machine().logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
@@ -3831,16 +3878,22 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	return 0;
 }
 
-int nv2a_renderer::toggle_register_combiners_usage()
+bool nv2a_renderer::toggle_register_combiners_usage()
 {
 	combiner.used = 1 - combiner.used;
-	return combiner.used;
+	return combiner.used != 0;
 }
 
-int nv2a_renderer::toggle_wait_vblank_support()
+bool nv2a_renderer::toggle_wait_vblank_support()
 {
-	waitvblank_used = 1 - waitvblank_used;
-	return waitvblank_used;
+	enable_waitvblank = !enable_waitvblank;
+	return enable_waitvblank;
+}
+
+bool nv2a_renderer::toggle_clipping_w_support()
+{
+	enable_clipping_w = !enable_clipping_w;
+	return enable_clipping_w;
 }
 
 void nv2a_renderer::debug_grab_texture(int type, const char *filename)

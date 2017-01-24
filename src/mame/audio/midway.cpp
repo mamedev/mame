@@ -33,7 +33,7 @@
 
 extern const device_type MIDWAY_SSIO = &device_creator<midway_ssio_device>;
 extern const device_type MIDWAY_SOUNDS_GOOD = &device_creator<midway_sounds_good_device>;
-extern const device_type MIDWAY_TURBO_CHIP_SQUEAK = &device_creator<midway_turbo_chip_squeak_device>;
+extern const device_type MIDWAY_TURBO_CHEAP_SQUEAK = &device_creator<midway_turbo_cheap_squeak_device>;
 extern const device_type MIDWAY_SQUAWK_N_TALK = &device_creator<midway_squawk_n_talk_device>;
 
 
@@ -653,15 +653,15 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 
 
 //**************************************************************************
-//  TURBO CHIP SQUEAK BOARD
+//  TURBO CHEAP SQUEAK BOARD
 //**************************************************************************
 
 //-------------------------------------------------
-//  midway_turbo_chip_squeak_device - constructor
+//  midway_turbo_cheap_squeak_device - constructor
 //-------------------------------------------------
 
-midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_TURBO_CHIP_SQUEAK, "Midway Turbo Chip Squeak Sound Board", tag, owner, clock, "midtcs", __FILE__),
+midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, "Midway Turbo Cheap Squeak Sound Board", tag, owner, clock, "midtcs", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -676,7 +676,7 @@ midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_c
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_turbo_chip_squeak_device::read)
+READ8_MEMBER(midway_turbo_cheap_squeak_device::read)
 {
 	return m_status;
 }
@@ -687,7 +687,7 @@ READ8_MEMBER(midway_turbo_chip_squeak_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::write)
+WRITE8_MEMBER(midway_turbo_cheap_squeak_device::write)
 {
 	synchronize(0, data);
 }
@@ -697,7 +697,7 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::write)
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::reset_write)
+WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::reset_write)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -707,7 +707,7 @@ WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
+WRITE8_MEMBER(midway_turbo_cheap_squeak_device::porta_w)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -718,7 +718,7 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::portb_w)
+WRITE8_MEMBER(midway_turbo_cheap_squeak_device::portb_w)
 {
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
@@ -730,7 +730,7 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::portb_w)
 //  irq_w - IRQ line state changes
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::irq_w)
+WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
 {
 	int combined_state = m_pia->irq_a_state() | m_pia->irq_b_state();
 	m_cpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -742,7 +742,7 @@ WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::irq_w)
 //-------------------------------------------------
 
 // address map verified from schematics
-static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, midway_turbo_chip_squeak_device )
+static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, midway_turbo_cheap_squeak_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -754,15 +754,15 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
+static MACHINE_CONFIG_FRAGMENT(midway_turbo_cheap_squeak)
 	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_turbo_chip_squeak_device, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_turbo_chip_squeak_device, portb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_turbo_cheap_squeak_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
 
 	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -775,9 +775,9 @@ MACHINE_CONFIG_END
 //  the device's machine fragment
 //-------------------------------------------------
 
-machine_config_constructor midway_turbo_chip_squeak_device::device_mconfig_additions() const
+machine_config_constructor midway_turbo_cheap_squeak_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( midway_turbo_chip_squeak );
+	return MACHINE_CONFIG_NAME( midway_turbo_cheap_squeak );
 }
 
 
@@ -785,7 +785,7 @@ machine_config_constructor midway_turbo_chip_squeak_device::device_mconfig_addit
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void midway_turbo_chip_squeak_device::device_start()
+void midway_turbo_cheap_squeak_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
@@ -796,7 +796,7 @@ void midway_turbo_chip_squeak_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void midway_turbo_chip_squeak_device::device_reset()
+void midway_turbo_cheap_squeak_device::device_reset()
 {
 }
 
@@ -805,7 +805,7 @@ void midway_turbo_chip_squeak_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_turbo_chip_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_pia->portb_w((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);

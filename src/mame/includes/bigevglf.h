@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 #include "sound/msm5232.h"
+#include "machine/taito68705interface.h"
 
 class bigevglf_state : public driver_device
 {
@@ -11,7 +12,7 @@ public:
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -38,18 +39,6 @@ public:
 	uint8_t    m_sound_state;
 
 	/* MCU related */
-	uint8_t    m_from_mcu;
-	int      m_mcu_sent;
-	int      m_main_sent;
-	uint8_t    m_port_a_in;
-	uint8_t    m_port_a_out;
-	uint8_t    m_ddr_a;
-	uint8_t    m_port_b_in;
-	uint8_t    m_port_b_out;
-	uint8_t    m_ddr_b;
-	uint8_t    m_port_c_in;
-	uint8_t    m_port_c_out;
-	uint8_t    m_ddr_c;
 	int      m_mcu_coin_bit5;
 
 	/* misc */
@@ -59,7 +48,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	DECLARE_WRITE8_MEMBER(beg_banking_w);
 	DECLARE_WRITE8_MEMBER(beg_fromsound_w);
 	DECLARE_READ8_MEMBER(beg_fromsound_r);
@@ -78,18 +67,6 @@ public:
 	DECLARE_READ8_MEMBER(beg_trackball_y_r);
 	DECLARE_WRITE8_MEMBER(beg_port08_w);
 	DECLARE_READ8_MEMBER(sub_cpu_mcu_coin_port_r);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(bigevglf_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(bigevglf_mcu_w);
-	DECLARE_READ8_MEMBER(bigevglf_mcu_r);
-	DECLARE_READ8_MEMBER(bigevglf_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(bigevglf_palette_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_gfxcontrol_w);
 	DECLARE_WRITE8_MEMBER(bigevglf_vidram_addr_w);

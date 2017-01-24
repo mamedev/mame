@@ -57,7 +57,7 @@ namespace plib
 		ename (e v) : m_v(v) { } \
 		bool set_from_string (const pstring &s) { \
 			static const char *strings = # __VA_ARGS__; \
-			int f = from_string_int(strings, s.cstr()); \
+			int f = from_string_int(strings, s.c_str()); \
 			if (f>=0) { m_v = static_cast<e>(f); return true; } else { return false; } \
 		} \
 		operator e() const {return m_v;} \

@@ -17,7 +17,7 @@
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -25,7 +25,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END

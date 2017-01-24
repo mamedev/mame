@@ -30,9 +30,9 @@ Micro Surgeon (Imagic)
 *CrossFire (Sierra OnLine)
 *Mine Shaft (Sierra OnLine)
 
-FaceMaker (Spinaker)
-KinderComp (Spinaker)
-Fraction Fever (Spinaker)
+FaceMaker (Spinnaker)
+KinderComp (Spinnaker)
+*Fraction Fever (Spinnaker)
 -->
 
 	<software name="basic">
@@ -85,6 +85,17 @@ Fraction Fever (Spinaker)
 				<rom size="8192" offset="0xa000" loadflag="reload" />
 				<rom size="8192" offset="0xc000" loadflag="reload" />
 				<rom size="8192" offset="0xe000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fracfevr">
+		<description>Fraction Fever</description>
+		<year>1983</year>
+		<publisher>Spinnaker</publisher>
+		<part name="cart1" interface="ibmpcjr_cart">
+			<dataarea name="rom" size = "8192">
+				<rom name="fraction.bin" size="8192" crc="28bb80e0" sha1="2ab31a435fa2f0c07226f3f7cf073f2b2a6c1c2c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -31,6 +31,7 @@
 	[logScroll setHasVerticalScroller:YES];
 	[logScroll setAutohidesScrollers:YES];
 	[logScroll setBorderType:NSNoBorder];
+	[logScroll setDrawsBackground:NO];
 	[logScroll setDocumentView:logView];
 	[logView release];
 	[window setContentView:logScroll];

@@ -72,6 +72,9 @@
 #define UTF8_UP                 "\xe2\x86\x91"      /* cursor up */
 #define UTF8_DOWN               "\xe2\x86\x93"      /* cursor down */
 
+enum class unicode_normalization_form { C, D, KC, KD };
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -96,6 +99,15 @@ int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar);
 std::string utf8_from_uchar(char32_t uchar);
 int utf16_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
 int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar);
+
+// converting UTF-8 strings to/from "wide" strings
+std::wstring wstring_from_utf8(const std::string &utf8string);
+std::string utf8_from_wstring(const std::wstring &string);
+
+// unicode normalization
+std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form);
+std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form);
+std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form);
 
 // misc UTF-8 helpers
 const char *utf8_previous_char(const char *utf8string);

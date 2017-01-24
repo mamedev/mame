@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 
@@ -18,7 +18,6 @@ public:
 		m_mcu_ram(*this, "mcu_ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -54,8 +53,6 @@ public:
 
 	/* fake mcu */
 	uint8_t       m_from_mcu;
-	int         m_mcu_sent;
-	int         m_main_sent;
 	uint8_t       m_mcu_in[2][16];
 	uint8_t       m_mcu_out[2][16];
 	int         m_mcu_cmd;
@@ -75,8 +72,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
-	optional_device<buggychl_mcu_device> m_bmcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -95,6 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_READ8_MEMBER(fortyl_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
 	DECLARE_READ8_MEMBER(fortyl_pixram_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);

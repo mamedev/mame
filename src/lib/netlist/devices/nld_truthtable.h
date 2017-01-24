@@ -26,7 +26,7 @@
 		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
-		static const char *m_desc[];                                            \
+		static const pstring m_desc[];                                         \
 	}
 
 
@@ -159,19 +159,19 @@ namespace netlist
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-				truthtable_t *ttp, const char *desc[])
+				truthtable_t *ttp, const pstring *desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
 		, m_active(*this, "m_active", 1)
 		, m_ttp(ttp)
 		{
-			while (*desc != nullptr && **desc != 0 )
+			while (*desc != "" )
 				{
 					m_desc.push_back(*desc);
 					desc++;
 				}
-			startxx();
+			init();
 		}
 
 		template <class C>
@@ -184,10 +184,10 @@ namespace netlist
 		, m_ttp(ttp)
 		{
 			m_desc = desc;
-			startxx();
+			init();
 		}
 
-		void startxx()
+		void init()
 		{
 			set_hint_deactivate(true);
 
@@ -220,7 +220,7 @@ namespace netlist
 				const std::size_t idx = plib::container::indexof(inout, tmp);
 				if (idx != plib::container::npos)
 				{
-					connect_late(m_Q[i], m_I[idx]);
+					connect(m_Q[i], m_I[idx]);
 					// disable ignore for this inputs altogether.
 					// FIXME: This shouldn't be necessary
 					disabled_ignore |= (1<<idx);
@@ -235,7 +235,7 @@ namespace netlist
 
 			desc.setup(m_desc, disabled_ignore * 0);
 	#if 0
-			printf("%s\n", name().cstr());
+			printf("%s\n", name().c_str());
 			for (int j=0; j < m_size; j++)
 				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
@@ -251,7 +251,7 @@ namespace netlist
 			for (std::size_t i = 0; i < m_NI; i++)
 				m_I[i].activate();
 			for (std::size_t i=0; i<m_NO;i++)
-				if (this->m_Q[i].net().num_cons()>0)
+				if (this->m_Q[i].has_net() && this->m_Q[i].net().num_cons()>0)
 					m_active++;
 		}
 
@@ -261,7 +261,7 @@ namespace netlist
 		}
 
 	public:
-		void inc_active() noexcept override
+		void inc_active() NL_NOEXCEPT override
 		{
 			if (m_NI > 1)
 				if (++m_active == 1)
@@ -270,7 +270,7 @@ namespace netlist
 				}
 		}
 
-		void dec_active() noexcept override
+		void dec_active() NL_NOEXCEPT override
 		{
 			/* FIXME:
 			 * Based on current measurements there is no point to disable
@@ -366,24 +366,20 @@ namespace netlist
 		plib::pstring_vector_t m_desc;
 	};
 
-	class netlist_base_factory_truthtable_t : public base_factory_t
+	class netlist_base_factory_truthtable_t : public factory::element_t
 	{
 		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 	public:
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: base_factory_t(name, classname, def_param), m_family(family_TTL())
-		{}
+				const pstring &def_param, const pstring &sourcefile);
 
-		virtual ~netlist_base_factory_truthtable_t()
-		{
-		}
+		virtual ~netlist_base_factory_truthtable_t();
 
 		plib::pstring_vector_t m_desc;
 		const logic_family_desc_t *m_family;
 	};
 
-	void tt_factory_create(setup_t &setup, tt_desc &desc);
+	void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile);
 
 	} //namespace devices
 } // namespace netlist

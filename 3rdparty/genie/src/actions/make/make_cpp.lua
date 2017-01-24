@@ -101,10 +101,15 @@
 				prj.archivesplit_size=200
 			end
 			if (not prj.options.ArchiveSplit) then
+                _p('ifeq (posix,$(SHELLTYPE))')
+                _p('\t$(SILENT) rm -f  $(TARGET)')
+                _p('else')
+                _p('\t$(SILENT) if exist $(subst /,\\\\,$(TARGET)) del $(subst /,\\\\,$(TARGET))')
+                _p('endif')
 				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 			else
 				_p('\t$(call RM,$(TARGET))')
-				_p('\t$(call max_args,$(SILENT) $(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
+				_p('\t@$(call max_args,$(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 				_p('\t$(SILENT) $(LINKCMD_NDX)')
 			end
 		else
