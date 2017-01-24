@@ -3,10 +3,12 @@
 /*
 
   Hughes HLCD 0515/0569 LCD Driver
+  
+  0515: 25 columns(also size of buffer/ram)
+  0569: 24 columns, no DATA OUT pin, display blank has no effect
 
   TODO:
-  - What's the difference between 0515 and 0569? For now assume 0569 is a cost-reduced chip,
-    lacking the data out pin.
+  - read mode is untested
   - MAME bitmap update callback when needed
 
 */
@@ -21,20 +23,19 @@ const device_type HLCD0569 = &device_creator<hlcd0569_device>;
 //  constructor
 //-------------------------------------------------
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, HLCD0515, "HLCD 0515 LCD Driver", tag, owner, clock, "hlcd0515", __FILE__),
-	m_write_cols(*this), m_write_data(*this)
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 colmax, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_colmax(colmax), m_write_cols(*this), m_write_data(*this)
 {
 }
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_write_cols(*this), m_write_data(*this)
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hlcd0515_device(mconfig, HLCD0515, "HLCD 0515 LCD Driver", tag, owner, clock, 25, "hlcd0515", __FILE__)
 {
 }
 
 hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0569, "HLCD 0569 LCD Driver", tag, owner, clock, "hlcd0569", __FILE__)
+	: hlcd0515_device(mconfig, HLCD0569, "HLCD 0569 LCD Driver", tag, owner, clock, 24, "hlcd0569", __FILE__)
 {
 }
 
@@ -64,6 +65,7 @@ void hlcd0515_device::device_start()
 	m_rowmax = 0;
 	m_rowout = 0;
 	m_rowsel = 0;
+	m_buffer = 0;
 	memset(m_ram, 0, sizeof(m_ram));
 
 	// register for savestates
@@ -76,6 +78,7 @@ void hlcd0515_device::device_start()
 	save_item(NAME(m_rowmax));
 	save_item(NAME(m_rowout));
 	save_item(NAME(m_rowsel));
+	save_item(NAME(m_buffer));
 	save_item(NAME(m_ram));
 }
 
@@ -101,7 +104,7 @@ void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_rowout = 0;
 
 	// write to COL/ROW pins
-	m_write_cols(m_rowout, m_blank ? m_ram[m_rowout] : 0, 0xffffffff);
+	m_write_cols(m_rowout, m_blank ? 0 : m_ram[m_rowout], 0xffffffff);
 	m_rowout++;
 }
 
@@ -111,68 +114,92 @@ void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  handlers
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
+void hlcd0515_device::set_control()
 {
-	state = (state) ? 1 : 0;
+	// clock 0,1,2: row select
+	m_rowsel = m_control >> 2 & 7;
 
-	// start serial sequence on falling edge
-	if (!state && m_cs)
+	// clock 3(,4): initialize
+	if (m_control & 2)
 	{
-		m_count = 0;
-		m_control = 0;
+		m_rowmax = m_rowsel;
+		m_blank = bool(~m_control & 1);
 	}
 
-	m_cs = state;
+	// clock 4: read/write mode
+	if (m_control & 1)
+		m_buffer = m_ram[m_rowsel];
 }
+
+void hlcd0569_device::set_control()
+{
+	hlcd0515_device::set_control();
+	m_blank = false; // 0569 doesn't support display blanking
+}
+
+
+void hlcd0515_device::clock_data(int col)
+{
+	if (m_control & 1)
+	{
+		if (col < m_colmax)
+			m_buffer <<= 1;
+
+		m_write_data(m_buffer >> m_colmax & 1);
+	}
+	else
+	{
+		if (col < m_colmax)
+			m_buffer >>= 1;
+
+		// always write last column
+		u32 mask = 1 << (m_colmax - 1);
+		m_buffer = (m_buffer & ~mask) | (m_data ? mask : 0);
+	}
+}
+
 
 WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 {
 	state = (state) ? 1 : 0;
 
 	// clock/shift data on falling edge
-	if (!m_cs && m_count < 30 && !state && m_clock)
+	if (!m_cs && !state && m_clock)
 	{
 		if (m_count < 5)
 		{
 			// 5-bit mode/control
 			m_control = m_control << 1 | m_data;
-
 			if (m_count == 4)
-			{
-				// clock 0,1,2: row select
-				// clock 3: initialize
-				// clock 4: read/write
-				m_rowsel = m_control >> 2 & 7;
-				if (m_control & 2)
-				{
-					m_rowmax = m_rowsel;
-					m_blank = bool(m_control & 1);
-				}
-			}
+				set_control();
 		}
 
 		else
-		{
-			if (m_control & 1)
-			{
-				// read data, output
-				m_write_data(m_ram[m_rowsel] >> (m_count - 5) & 1);
-			}
-			else
-			{
-				// write data
-				u32 mask = 1 << (m_count - 5);
-				m_ram[m_rowsel] = (m_ram[m_rowsel] & ~mask) | (m_data ? mask : 0);
-			}
-		}
-
-		m_count++;
+			clock_data(m_count - 5);
+		
+		if (m_count < (m_colmax + 5))
+			m_count++;
 	}
 
 	m_clock = state;
 }
 
-WRITE_LINE_MEMBER(hlcd0515_device::write_data)
+
+WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 {
-	m_data = (state) ? 1 : 0;
+	state = (state) ? 1 : 0;
+
+	// finish serial sequence on rising edge
+	if (state && !m_cs)
+	{
+		// transfer to ram
+		if (~m_control & 1)
+			m_ram[m_rowsel] = m_buffer;
+		
+		m_count = 0;
+		m_control = 0;
+		m_buffer = 0;
+	}
+
+	m_cs = state;
 }

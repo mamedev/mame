@@ -13,10 +13,10 @@
 
     TODO (MK-5 specific):
     - Fix remaining errors
-    - If all tests passes, this msg is printed on the keyboard serial port:
-    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n
-    Unrecoverable error occurred. System will now restart"
-    Apparently it looks like some sort of protection device ...
+    - Layouts for various configurations
+    - Bill acceptor
+    - Serial printer
+    - Default NVRAM
 
     code DASMing of POST (adonis):
     - bp 0x3400224:
@@ -179,9 +179,11 @@
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
+#include "machine/ticket.h"
 #include "sound/volt_reg.h"
 
 #include "aristmk5.lh"
+#include "aristmk5_us.lh"
 
 class aristmk5_state : public archimedes_state
 {
@@ -191,26 +193,35 @@ public:
 		, m_eeprom(*this, "eeprom%d", 0)
 		, m_rtc(*this, "rtc")
 		, m_nvram(*this, "nvram")
+		, m_hopper(*this, "hopper")
 		, m_sram(*this, "sram")
+		, m_p1(*this, "P1")
+		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
 		 { }
 
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
-	DECLARE_READ32_MEMBER(mk5_ioc_r);
-	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
 	DECLARE_READ32_MEMBER(Ns5r50);
-	DECLARE_WRITE32_MEMBER(sram_banksel_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(rtc_w);
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_READ32_MEMBER(ldor_r);
-	DECLARE_WRITE32_MEMBER(ldor_clk_w);
+	DECLARE_WRITE8_MEMBER(sram_banksel_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(eeprom_usa_w);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_WRITE8_MEMBER(rtc_usa_w);
+	DECLARE_WRITE8_MEMBER(hopper_w);
+	DECLARE_READ8_MEMBER(eeprom_r);
+	DECLARE_READ8_MEMBER(ldor_r);
+	DECLARE_WRITE8_MEMBER(ldor_clk_w);
 	DECLARE_WRITE8_MEMBER(buttons_lamps_w);
 	DECLARE_WRITE8_MEMBER(other_lamps_w);
 	DECLARE_WRITE8_MEMBER(bill_acceptor_lamps_w);
 	DECLARE_READ8_MEMBER(sram_r);
 	DECLARE_WRITE8_MEMBER(sram_w);
+	DECLARE_WRITE8_MEMBER(spi_mux_w);
+	DECLARE_WRITE8_MEMBER(spi_data_w);
+	DECLARE_READ8_MEMBER(spi_int_ack_r);
+	DECLARE_WRITE8_MEMBER(spi_int_ack_w);
+	DECLARE_READ8_MEMBER(spi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
 	DECLARE_DRIVER_INIT(aristmk5);
@@ -218,26 +229,129 @@ public:
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
+	TIMER_CALLBACK_MEMBER(spi_timer);
 
 	INPUT_CHANGED_MEMBER(coin_start);
 	CUSTOM_INPUT_MEMBER(coin_r);
+	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	CUSTOM_INPUT_MEMBER(hopper_r);
 
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
 	required_device<nvram_device> m_nvram;
+	required_device<ticket_dispenser_device> m_hopper;
 	required_memory_region m_sram;
+	required_ioport m_p1;
+	required_ioport m_p2;
 	required_ioport m_extra_ports;
 
 	emu_timer *     m_mk5_2KHz_timer;
 	emu_timer *     m_mk5_VSYNC_timer;
-	uint8_t         m_ext_latch;
+	emu_timer *     m_spi_timer;
 	uint8_t         m_sram_bank;
-	uint8_t         m_flyback;
 	uint8_t         m_ldor_shift_reg;
+	uint8_t         m_hopper_test;
 	uint64_t        m_coin_start_cycles;
+	uint8_t         m_coin_div;
+	uint8_t         m_spi_mux;
+	uint8_t         m_spi_latch;
+	uint8_t         m_spi_bits;
+	uint32_t        m_spi_data[8];
 };
 
+
+WRITE8_MEMBER(aristmk5_state::spi_mux_w)
+{
+	uint8_t spi_mux = (data >> 4) & 7;
+
+	if (spi_mux == m_spi_mux)
+		return;
+
+	m_spi_mux = spi_mux;
+
+	switch (m_spi_mux)
+	{
+	case 0:	// Test
+	case 3:	// not used
+		break;
+
+	case 1:	// Top box lamps
+		break;
+
+	case 2:	// Mechanical meters
+		for(int i=0; i<4; i++)
+			output().set_lamp_value(32 + i, BIT(m_spi_data[m_spi_mux], 1 + i));		// Tower Lamps
+		break;
+
+	case 4:	// Door inputs
+		m_spi_data[m_spi_mux] = m_p1->read();
+		break;
+
+	case 5:	// Door outputs
+		for(int i=0; i<32; i++)
+			output().set_lamp_value(i, BIT(m_spi_data[m_spi_mux], i));
+		break;
+		
+	case 6:	// Main board slow I/O
+		m_spi_data[m_spi_mux] = m_p2->read() & ~((data  & 0x80) ? 0 : 0x100);
+		break;
+
+	case 7:	// Main board security registers
+		break;
+	}
+}
+
+WRITE8_MEMBER(aristmk5_state::spi_data_w)
+{
+	m_spi_latch = data;
+	m_spi_bits = 0;
+
+	// start the SPI clock
+	m_spi_timer->adjust(attotime::from_hz((double)MASTER_CLOCK / 9 / 512 / 2), 0, attotime::from_hz((double)MASTER_CLOCK / 9 / 512 / 2));
+}
+
+READ8_MEMBER(aristmk5_state::spi_data_r)
+{
+	return m_spi_latch; 
+}
+
+READ8_MEMBER(aristmk5_state::spi_int_ack_r)
+{
+	archimedes_clear_irq_b(0x08);
+	return 0;
+}
+
+WRITE8_MEMBER(aristmk5_state::spi_int_ack_w)
+{
+	archimedes_clear_irq_b(0x08);
+}
+
+TIMER_CALLBACK_MEMBER(aristmk5_state::spi_timer)
+{
+	if (m_spi_mux == 0 || m_spi_mux == 3)
+	{
+		m_spi_latch = (((m_spi_latch & 1) << 7) ^ 0x80) | ((m_spi_latch >> 1) & 0x7f);
+	}
+	else
+	{
+		static int mux_bits[8] = { 0, 16, 16, 0, 24, 32, 24, 8 };
+
+		uint32_t mux_mask = ((uint32_t)1 << (mux_bits[m_spi_mux] - 1)) - 1;
+		uint32_t spi_in_bit = m_spi_data[m_spi_mux] & 1;
+		uint32_t spi_out_bit = m_spi_latch & 1;
+
+		m_spi_data[m_spi_mux] = (spi_out_bit << (mux_bits[m_spi_mux] - 1)) | ((m_spi_data[m_spi_mux] >> 1) & mux_mask);
+		m_spi_latch = (spi_in_bit << 7) | ((m_spi_latch >> 1) & 0x7f);
+	}
+
+	// SPI interrupt
+	if (++m_spi_bits == 8)
+	{
+		m_spi_timer->adjust(attotime::never);
+		archimedes_request_irq_b(0x08);
+	}
+}
 
 WRITE_LINE_MEMBER(aristmk5_state::uart_irq_callback)
 {
@@ -249,7 +363,7 @@ WRITE_LINE_MEMBER(aristmk5_state::uart_irq_callback)
 
 TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 {
-	m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
+	archimedes_request_irq_a(0x08); //turn vsync bit on
 	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
@@ -300,7 +414,7 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
 	*/
 
 
-	m_ioc_regs[IRQ_STATUS_A] &= ~0x08;
+	archimedes_clear_irq_a(0x08);
 
 	/*          bit 1              bit 0 */
 	if((data &~(0x02)) && (data & (0x01))) // external video crystal is enabled. 25 mhz
@@ -323,7 +437,7 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
 
 TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
 {
-	m_ioc_regs[IRQ_STATUS_A] |= 0x01;
+	archimedes_request_irq_a(0x01);
 	m_mk5_2KHz_timer->adjust(attotime::never);
 
 }
@@ -350,54 +464,9 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 
 
 	// reset 2KHz timer
-	m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
-	m_ioc_regs[IRQ_STATUS_A] &= ~0x01;
-	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_mk5_2KHz_timer->adjust(attotime::from_hz((double)MASTER_CLOCK / 9 / 4096));
+	archimedes_clear_irq_a(0x01);
 	return 0xffffffff;
-}
-
-/* same as plain AA but with the I2C unconnected */
-READ32_MEMBER(aristmk5_state::mk5_ioc_r)
-{
-	uint32_t ioc_addr;
-
-	ioc_addr = offset*4;
-	ioc_addr >>= 16;
-	ioc_addr &= 0x37;
-
-	if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
-	{
-		int vert_pos;
-
-		vert_pos = m_screen->vpos();
-		m_flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
-
-		//i2c_data = (i2cmem_sda_read(machine().device("i2cmem")) & 1);
-
-		return (m_flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
-	}
-
-	return archimedes_ioc_r(space,offset,mem_mask);
-}
-
-WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
-{
-	uint32_t ioc_addr;
-
-	ioc_addr = offset*4;
-	ioc_addr >>= 16;
-	ioc_addr &= 0x37;
-
-	if(!m_ext_latch)
-	{
-		if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
-		{
-			m_ioc_regs[CONTROL] = data & 0x7c;
-			return;
-		}
-		else
-			archimedes_ioc_w(space,offset,data,mem_mask);
-	}
 }
 
 READ32_MEMBER(aristmk5_state::Ns5r50)
@@ -405,7 +474,7 @@ READ32_MEMBER(aristmk5_state::Ns5r50)
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-READ32_MEMBER(aristmk5_state::eeprom_r)
+READ8_MEMBER(aristmk5_state::eeprom_r)
 {
 	uint8_t data = 0x00;
 	if (m_eeprom[0]->do_read() && m_eeprom[1]->do_read())
@@ -417,46 +486,60 @@ READ32_MEMBER(aristmk5_state::eeprom_r)
 	return data;
 }
 
-WRITE32_MEMBER(aristmk5_state::rtc_w)
+WRITE8_MEMBER(aristmk5_state::hopper_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_rtc->ce_w(BIT(data, 5));
-
-		if (BIT(data, 6))
-			m_rtc->io_w(BIT(data, 3));
-
-		m_rtc->sclk_w(BIT(data, 4));
-	}
+	m_hopper->write(space, 0, (data & 0x02) ? 0x80 : 0);
+	m_hopper_test = BIT(data, 2);
 }
 
-WRITE32_MEMBER(aristmk5_state::eeprom_w)
+WRITE8_MEMBER(aristmk5_state::rtc_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom[0]->cs_write(BIT(data, 5));
-		m_eeprom[1]->cs_write(BIT(data, 6));
-		m_eeprom[0]->di_write(BIT(data, 3));
-		m_eeprom[1]->di_write(BIT(data, 3));
-		m_eeprom[0]->clk_write(BIT(data, 4));
-		m_eeprom[1]->clk_write(BIT(data, 4));
-	}
+	m_rtc->ce_w(BIT(data, 5));
+
+	if (BIT(data, 6))
+		m_rtc->io_w(BIT(data, 3));
+
+	m_rtc->sclk_w(BIT(data, 4));
 }
 
-READ32_MEMBER(aristmk5_state::ldor_r)
+WRITE8_MEMBER(aristmk5_state::rtc_usa_w)
+{
+	rtc_w(space, offset, data, mem_mask);
+	m_hopper_test = BIT(data, 2);
+}
+
+WRITE8_MEMBER(aristmk5_state::eeprom_w)
+{
+	m_coin_div = data & 1;
+
+	m_eeprom[0]->cs_write(BIT(data, 5));
+	m_eeprom[1]->cs_write(BIT(data, 6));
+	m_eeprom[0]->di_write(BIT(data, 3));
+	m_eeprom[1]->di_write(BIT(data, 3));
+	m_eeprom[0]->clk_write(BIT(data, 4));
+	m_eeprom[1]->clk_write(BIT(data, 4));
+}
+
+WRITE8_MEMBER(aristmk5_state::eeprom_usa_w)
+{
+	eeprom_w(space, offset, data, mem_mask);
+	m_hopper->write(space, 0, (data & 0x04) ? 0x80 : 0);
+}
+
+READ8_MEMBER(aristmk5_state::ldor_r)
 {
 	if (m_extra_ports->read() & 0x01)
 		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
 
-	return (m_ldor_shift_reg & 0x80);
+	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && m_hopper->line_r()) ? 0x10 : 0x00);
 }
 
-WRITE32_MEMBER(aristmk5_state::ldor_clk_w)
+WRITE8_MEMBER(aristmk5_state::ldor_clk_w)
 {
 	m_ldor_shift_reg = (m_ldor_shift_reg << 1) | BIT(data, 0);
 }
 
-WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
+WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
 {
 	/*
 
@@ -537,36 +620,16 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
-	AM_RANGE(0x03010440, 0x03010443) AM_WRITE(rtc_w)
-	AM_RANGE(0x03010450, 0x03010453) AM_WRITE(eeprom_w)
-	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
-
-	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
-	AM_RANGE(0x03010700, 0x03010703) AM_READ_PORT("P6")
-	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
-	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
-	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
-	AM_RANGE(0x03010584, 0x03010587) AM_READ_PORT("P4")
-	AM_RANGE(0x03012184, 0x03012187) AM_READ_PORT("P5")
-
-	AM_RANGE(0x03012020, 0x03012023) AM_READ(ldor_r)
-	AM_RANGE(0x03012070, 0x03012073) AM_WRITE(ldor_clk_w)
-
-	AM_RANGE(0x03012000, 0x0301201f) AM_WRITE8(buttons_lamps_w, 0x000000ff)
-	AM_RANGE(0x03012030, 0x0301203f) AM_WRITE8(other_lamps_w, 0x000000ff)
-	AM_RANGE(0x03012380, 0x0301238f) AM_WRITE8(bill_acceptor_lamps_w, 0x000000ff)
+	AM_RANGE(0x03010420, 0x03010423) AM_WRITE8(sram_banksel_w, 0x000000ff) // SRAM bank select write
 
 	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
 	AM_RANGE(0x03010600, 0x0301061f) AM_DEVREADWRITE8("uart_1a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03010680, 0x0301069f) AM_DEVREADWRITE8("uart_1b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
+	
+	AM_RANGE(0x03010700, 0x03010703) AM_READ_PORT("P6")
+	AM_RANGE(0x03010800, 0x03010803) AM_READ8(eeprom_r, 0x000000ff)
 	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
 	AM_RANGE(0x03220000, 0x0323ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
@@ -575,8 +638,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
 	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
-
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
+	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
 	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
@@ -589,17 +651,58 @@ ADDRESS_MAP_END
 /* U.S games have no dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
+
+	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_usa_w, 0x000000ff)
+	AM_RANGE(0x03010450, 0x03010453) AM_WRITE8(eeprom_usa_w, 0x000000ff)
+
+	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
+	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
+	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
+	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
+	AM_RANGE(0x03010584, 0x03010587) AM_READ_PORT("P4")
+
+	AM_RANGE(0x03012020, 0x03012023) AM_READ8(ldor_r, 0x000000ff)
+	AM_RANGE(0x03012070, 0x03012073) AM_WRITE8(ldor_clk_w, 0x000000ff)
+	AM_RANGE(0x03012184, 0x03012187) AM_READ_PORT("P5")
+
+	AM_RANGE(0x03012000, 0x0301201f) AM_WRITE8(buttons_lamps_w, 0x000000ff)
+	AM_RANGE(0x03012030, 0x0301203f) AM_WRITE8(other_lamps_w, 0x000000ff)
+	AM_RANGE(0x03012380, 0x0301238f) AM_WRITE8(bill_acceptor_lamps_w, 0x000000ff)
+
+	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+
 	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
+
+	AM_RANGE(0x03010430, 0x03010433) AM_WRITE8(hopper_w, 0x000000ff)
+	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_w, 0x000000ff)
+	AM_RANGE(0x03010450, 0x03010453) AM_WRITE8(eeprom_w, 0x000000ff)
+
+	AM_RANGE(0x03010400, 0x03010403) AM_WRITE8(spi_mux_w, 0x000000ff)
+	AM_RANGE(0x03010470, 0x03010473) AM_WRITE8(spi_data_w, 0x000000ff)
+	AM_RANGE(0x03010850, 0x03010853) AM_READWRITE8(spi_int_ack_r, spi_int_ack_w, 0x000000ff)
+	AM_RANGE(0x03010870, 0x03010873) AM_READ8(spi_data_r, 0x000000ff)
+
+	AM_RANGE(0x03014000, 0x0301401f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03014020, 0x0301403f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	
 	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+CUSTOM_INPUT_MEMBER(aristmk5_state::hopper_r)
+{
+	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
+}
+
+CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
 {
 	//  ---x  Coin Acceptor
 	//  --x-  Credit Sense
@@ -607,6 +710,9 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
 	//  x---  Diverter Optic
 
 	uint8_t data = 0x07;
+
+	if (!m_coin_div)
+		data |= 0x08;
 
 	if (m_coin_start_cycles)
 	{
@@ -626,13 +732,37 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
 	return data;
 }
 
+CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+{
+	uint8_t data = 0x01;
+
+	if (m_coin_start_cycles)
+	{
+		attotime diff = m_maincpu->cycles_to_attotime(m_maincpu->total_cycles() - m_coin_start_cycles);
+
+		if (diff > attotime::from_msec(10) && diff < attotime::from_msec(15))
+			data &= ~0x01;
+		if (diff > attotime::from_msec(0) && diff < attotime::from_msec(20))
+			data |= 0x10;
+		if (diff > attotime::from_msec(15) && diff < attotime::from_msec(30))
+			data |= 0x08;
+		if (diff > attotime::from_msec(25) && !m_coin_div)
+			data |= 0x02;
+
+		if (diff > attotime::from_msec(30))
+			m_coin_start_cycles = 0;
+	}
+
+	return data;
+}
+
 INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 {
 	if (newval && !m_coin_start_cycles)
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-static INPUT_PORTS_START( aristmk5 )
+static INPUT_PORTS_START( aristmk5_usa )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x03, 0x03, "System Mode" )
@@ -684,25 +814,83 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_START("P3")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_SERVICE)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V) PORT_NAME("Reset Key")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
 	PORT_BIT(0x00000040, IP_ACTIVE_LOW , IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
-	PORT_START("P6")
-	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_KEYPAD)   // Battery
-
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
 
 	PORT_START("P5")
-	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_KEYPAD)  // Meters
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
+
+	PORT_START("P6")
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( aristmk5 )
+	/* This simulates the ROM swap */
+	PORT_START("ROM_LOAD")
+	PORT_CONFNAME( 0x03, 0x03, "System Mode" )
+	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
+	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.00 Mode" )
+	PORT_CONFSETTING(    0x02, "USA Set Chip v4.02.04 Mode" )
+	PORT_CONFSETTING(    0x03, "Game Mode" )
+
+	PORT_START("P1")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x00ff0000, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_V) PORT_NAME("Reset Key")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_SERVICE)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_OTHER)		// Hopper full
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_OTHER)		// Hopper empty
+	PORT_BIT(0x00000100, IP_ACTIVE_LOW,  IPT_KEYPAD)	PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door optical sensor")
+	PORT_BIT(0x0000fe00, IP_ACTIVE_HIGH, IPT_UNUSED)	// Unused optical security sensors
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_NAME("Logic door")
+	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_Z) PORT_TOGGLE PORT_NAME("Topbox door")
+	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_X) PORT_TOGGLE PORT_NAME("Meter cage")
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW,  IPT_KEYPAD)	PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
+	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)	// Unused mechanical security switch
+
+	PORT_START("P3")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)	PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, hopper_r, nullptr)
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_SPECIAL)	PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+
+	PORT_START("P6")
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)          // Battery
+
+	PORT_START("EXTRA")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)         PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
 INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
@@ -845,12 +1033,13 @@ void aristmk5_state::machine_start()
 
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
 	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));
+	m_spi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::spi_timer), this));
 }
 
 void aristmk5_state::machine_reset()
 {
 	archimedes_reset();
-	m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125)); // 8MHz / 4096
+	m_mk5_2KHz_timer->adjust(attotime::from_hz((double)MASTER_CLOCK / 9 / 4096)); // 8MHz / 4096
 	m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // default bit 1 & bit 2 == 0
 
 	m_ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
@@ -876,13 +1065,13 @@ void aristmk5_state::machine_reset()
 	m_ldor_shift_reg = 0x55;
 	m_coin_start_cycles = 0;
 	m_sram_bank = 0;
+	m_hopper_test = 1;
+	m_coin_div = 0;
+	m_spi_mux = 0;
+	m_spi_latch = 0;
+	m_spi_bits = 0;
+	memset(m_spi_data, 0, sizeof(m_spi_data));
 }
-
-
-#if 0
-#define NVRAM_SIZE 256
-#define NVRAM_PAGE_SIZE 0   /* max size of one write request */
-#endif
 
 
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
@@ -892,9 +1081,6 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
-//  MCFG_I2CMEM_ADD("i2cmem")
-//  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
-//  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
 	/* TODO: this isn't supposed to access a keyboard ... */
 	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
 
@@ -941,6 +1127,8 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 
 	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
 
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
@@ -959,6 +1147,14 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( aristmk5_touch, aristmk5 )
+	MCFG_DEVICE_MODIFY("uart_0a")
+	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
+
+	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aristmk5_usa, aristmk5 )
@@ -3766,19 +3962,19 @@ GAME( 1995, aristmk5,  0,        aristmk5,     aristmk5, aristmk5_state, aristmk
 // Dates listed below are for the combination (reel layout), not release dates
 GAMEL( 1998, adonis,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 602/9,    A - 25/05/98, Rev 10
 GAMEL( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 602/9,    A - 25/05/98, Rev 9
-GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                         MACHINE_FLAGS, layout_aristmk5 )  // MV4124/1, B - 31/07/01 - BAD DUMP
+GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4124/1, B - 31/07/01 - BAD DUMP
 GAMEL( 1999, adonisce,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 602/9, C - 06/07/99
 GAMEL( 1996, baddog,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 386/56, A - 17/12/96
 GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS, layout_aristmk5 )  // 594/1, A - 30/07/96
 GAMEL( 1998, bootsctn,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 616/1, B - 11/12/98
-GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",               MACHINE_FLAGS, layout_aristmk5 )  // MV4098,   A - 25/08/99 - BAD DUMP
+GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098,   A - 25/08/99 - BAD DUMP
 GAMEL( 1996, bumblbug,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 593, D - 5/07/96
 GAMEL( 1996, bumblbugql,bumblbug, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",           MACHINE_FLAGS, layout_aristmk5 )  // 593,      D - 5/07/96
-GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",                 MACHINE_FLAGS, layout_aristmk5 )  // 593,      D - 05/07/97 - BAD DUMP
+GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 593,      D - 05/07/97 - BAD DUMP
 GAMEL( 1995, buttdeli,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 571/4, A - 19/12/95
 GAMEL( 1999, cashcat,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0300863V, New Zealand)",             MACHINE_FLAGS, layout_aristmk5 )  // MV4089, A - 4/1/99
 GAMEL( 1997, cashcham,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0100438V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 603/1, C  - 15/4/97
-GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",              MACHINE_FLAGS, layout_aristmk5 )  // 603(a),   B - 06/12/96 - BAD DUMP
+GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // 603(a),   B - 06/12/96 - BAD DUMP
 GAMEL( 1998, cashchama, cashcham, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0200437V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 603(a), D - 18/02/98
 GAMEL( 1998, cashchamnz,cashcham, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",       MACHINE_FLAGS, layout_aristmk5 )  // MV4067, A - 31/08/98
 GAMEL( 1997, cashcra5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 607, C - 14/07/97
@@ -3786,50 +3982,50 @@ GAMEL( 1998, chariotc,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1998, chariotca, chariotc, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 630/1, A - 10/08/98
 GAMEL( 2001, checkma5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // JB011, B - 06/07/01
 GAMEL( 1996, chickna5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                  MACHINE_FLAGS, layout_aristmk5 )  // 596, A - 27/08/96
-GAMEL( 1998, chickna5u, chickna5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // 596,      C - 23/02/98 - BAD DUMP
+GAMEL( 1998, chickna5u, chickna5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                 MACHINE_FLAGS, layout_aristmk5_us )  // 596,      C - 23/02/98 - BAD DUMP
 GAMEL( 1998, chickna5qld,chickna5,aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Chicken (0200530V, Queensland)",               MACHINE_FLAGS, layout_aristmk5 )  // 596, C - 23/02/98
 GAMEL( 1998, coralrc2,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Coral Riches II (0100919V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 577/7, A - 29/12/98
 GAMEL( 1998, cuckoo,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (0200753V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 615/1, D - 03/07/98
-GAMEL( 2000, cuckoou,   cuckoo,   aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (CHG1195, US)",                         MACHINE_FLAGS, layout_aristmk5 )  // MV4104,   C - 02/02/00
+GAMEL( 2000, cuckoou,   cuckoo,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cuckoo (CHG1195, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4104,   C - 02/02/00
 GAMEL( 1995, dstbloom,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Desert Bloom (0200111V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 577/2, A - 12/10/95
 GAMEL( 1999, diamdove,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Dove (0101018V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 640, B - 19/05/99
 GAMEL( 1996, dmdfever,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Fever (0200302V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 483/7, E - 05/09/96
-GAMEL( 1997, dimtouch,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Touch (0400433V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 604,      E - 30/06/97
+GAMEL( 1997, dimtouch,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Touch (0400433V, NSW/ACT)",      MACHINE_FLAGS, layout_aristmk5 )  // 604,      E - 30/06/97
 GAMEL( 1996, dolphntr,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 602/1,    B - 06/12/96, Rev 3
 GAMEL( 1996, dolphntra, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 602/1,    B - 06/12/96, Rev 1.24.4.0
 GAMEL( 1996, dolphntrb, dolphntr, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (0100388V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 602, B - 10/12/96
-GAMEL( 1996, dolphntru, dolphntr, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",            MACHINE_FLAGS, layout_aristmk5 )  // 602/1,    B - 06/12/96
+GAMEL( 1996, dolphntru, dolphntr, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dolphin Treasure (FHG4077-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 602/1,    B - 06/12/96
 GAMEL( 2000, dynajack,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (01J00081, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // JB004, A - 12/07/2000
 GAMEL( 1998, eldorda5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "El Dorado (0100652V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 623, B - 24/03/98
 GAMEL( 1995, eforsta5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (0400122V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 570/3,    E - 23/06/95
-GAMEL( 1997, eforsta5u, eforsta5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",            MACHINE_FLAGS, layout_aristmk5 )  // MV4033,   B - 10/02/97
+GAMEL( 1997, eforsta5u, eforsta5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // MV4033,   B - 10/02/97
 GAMEL( 2000, fortellr,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fortune Teller (01J00131, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // JB006, D - 24/11/2000
-GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",                 MACHINE_FLAGS, layout_aristmk5 )  // MV4084/1, A - 30/10/98 - POSSIBLE BAD DUMP
+GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4084/1, A - 30/10/98 - POSSIBLE BAD DUMP
 GAMEL( 2001, geisha,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Geisha (0101408V, New Zealand)",               MACHINE_FLAGS, layout_aristmk5 )  // MV4127,   A - 05/03/01
-GAMEL( 1999, genmagi,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // ???,   C - 15/02/99
+GAMEL( 1999, genmagi,   aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // ???,   C - 15/02/99
 GAMEL( 1998, gnomeatw,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",   MACHINE_FLAGS, layout_aristmk5 )  // 625, C - 18/12/98
-GAMEL( 1997, goldpyr,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",             MACHINE_FLAGS, layout_aristmk5 )  // MV4091,   B - 13/05/97
-GAMEL( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",             MACHINE_FLAGS, layout_aristmk5 )  // 602/2,    B - 13/05/97 - BAD DUMP
+GAMEL( 1997, goldpyr,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // MV4091,   B - 13/05/97
+GAMEL( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // 602/2,    B - 13/05/97 - BAD DUMP
 GAMEL( 2000, goldenra,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 661, A - 10/04/00
 GAMEL( 1999, incasun,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )  // 631/3 B, B - 03/05/99
 GAMEL( 1999, incasunsp, incasun,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",   MACHINE_FLAGS, layout_aristmk5 )  // 631/3 B, B - 03/05/99
 GAMEL( 2000, incasunnz, incasun,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",             MACHINE_FLAGS, layout_aristmk5 )  // MV4113, A - 6/3/00
-GAMEL( 2000, incasunu,  incasun,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                       MACHINE_FLAGS, layout_aristmk5 )  // MV4130/3, A - 05/09/00
+GAMEL( 2000, incasunu,  incasun,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                   MACHINE_FLAGS, layout_aristmk5_us )  // MV4130/3, A - 05/09/00
 GAMEL( 1998, indrema5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628/1,    B - 15/12/98
 GAMEL( 1996, jungjuic,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",         MACHINE_FLAGS, layout_aristmk5 )  // 566/3, F - 06/03/96
 GAMEL( 1995, kgalah,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 613/6, A - 21/07/95
-GAMEL( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // MV4137,   A - 12/09/01 - BAD DUMP
+GAMEL( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                 MACHINE_FLAGS, layout_aristmk5_us )  // MV4137,   A - 12/09/01 - BAD DUMP
 GAMEL( 1998, kookabuk,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 661, A - 03/04/98
 GAMEL( 1997, locoloot,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 599/2, C - 17/06/97
 GAMEL( 1998, locolootnz,locoloot, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",            MACHINE_FLAGS, layout_aristmk5 )  // MV4064, A - 8/7/98
 GAMEL( 1997, lonewolf,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 621, A - 29/10/97
-GAMEL( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                MACHINE_FLAGS, layout_aristmk5 )  // MV4033,   B - 10/02/97 - BAD DUMP
-GAMEL( 2000, magimask,  aristmk5, aristmk5_usa_touch, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (DHG1309, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // MV4115,   A - 09/05/00
-GAMEL( 2000, magimaska, magimask, aristmk5_usa_touch, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1548, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // MV4115,   A - 09/05/00
-GAMEL( 1997, magtcha5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 606, A - 06/03/97
+GAMEL( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // MV4033,   B - 10/02/97 - BAD DUMP
+GAMEL( 2000, magimask,  aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (DHG1309, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4115,   A - 09/05/00
+GAMEL( 2000, magimaska, magimask, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1548, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4115,   A - 09/05/00
+GAMEL( 1997, magtcha5,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Touch (0200455V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 606, A - 06/03/97
 GAMEL( 2000, marmagic,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // JB005,    A - 07/07/00
-GAMEL( 2000, marmagicu, marmagic, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                MACHINE_FLAGS, layout_aristmk5 )  // US003,    A - 07/07/00 - BAD DUMP
-GAMEL( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",            MACHINE_FLAGS, layout_aristmk5 )  // 559/2,    E - 14/02/96
+GAMEL( 2000, marmagicu, marmagic, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // US003,    A - 07/07/00 - BAD DUMP
+GAMEL( 1996, minemine,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 559/2,    E - 14/02/96
 GAMEL( 1997, monmouse,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 607/1, B - 08/04/97
 GAMEL( 2001, montree,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Tree (0201397V, New Zealand)",           MACHINE_FLAGS, layout_aristmk5 )  // MV4126, C - 12/04/01
 GAMEL( 1996, mountmon,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (0100294V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  //595/3, B - 11/06/96
@@ -3838,22 +4034,22 @@ GAMEL( 1996, mystgard,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1999, orchidms,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Orchid Mist (0200849V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 601/3, C - 03/02/99
 GAMEL( 1996, oscara5,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Oscar (0200348V, NSW/ACT)",                    MACHINE_FLAGS, layout_aristmk5 )  // 593/2, C - 20/09/96
 GAMEL( 1999, pantmag,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Panther Magic (0101046V, NSW/ACT)",            MACHINE_FLAGS, layout_aristmk5 )  // 594/7, A - 06/10/99
-GAMEL( 2001, partygrs,  aristmk5, aristmk5_usa_touch, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // MV4115/6, A - 10/11/01
-GAMEL( 2001, partygrsa, partygrs, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",                     MACHINE_FLAGS, layout_aristmk5 )  // MV4115/3, B - 06/02/01 - BAD DUMP
+GAMEL( 2001, partygrs,  aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4115/6, A - 10/11/01
+GAMEL( 2001, partygrsa, partygrs, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4115/3, B - 06/02/01 - BAD DUMP
 GAMEL( 2000, peaflut,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // JB001, A - 10/03/00
 GAMEL( 1997, pengpay,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/4(a), D - 03/06/97
 GAMEL( 1996, pengpaya,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/4, C - 12/11/96
 GAMEL( 1997, pengpayb,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/3(a), D - 03/06/97
-GAMEL( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",                MACHINE_FLAGS, layout_aristmk5 )  // 586/7(b)  B - 14/07/97
-GAMEL( 1998, petshop,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )  // 618, A - 09/03/98 - BAD DUMP
+GAMEL( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // 586/7(b)  B - 14/07/97
+GAMEL( 1998, petshop,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5_us )  // 618, A - 09/03/98 - BAD DUMP
 GAMEL( 1996, przfight,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 578/4, B - 08/08/96
 GAMEL( 1998, qcash,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 603/6, C  - 23/07/98
 GAMEL( 1997, qnile,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4, B - 13/05/97
 GAMEL( 1997, qnilea,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300440V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/3, B - 13/05/97
 GAMEL( 1997, qnileb,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4,    B - 13/05/97
 GAMEL( 1997, qnilec,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4,    B - 13/05/97
-GAMEL( 1997, qnileu,    qnile,    aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",           MACHINE_FLAGS, layout_aristmk5 )  // MV4091,   B - 13/05/97
-GAMEL( 1999, qnilemax,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS, layout_aristmk5 )  // 602/4, D - 18/06/99
+GAMEL( 1997, qnileu,    qnile,    aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",       MACHINE_FLAGS, layout_aristmk5_us )  // MV4091,   B - 13/05/97
+GAMEL( 1999, qnilemax,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS, layout_aristmk5 )  // 602/4, D - 18/06/99
 GAMEL( 2000, rainwrce,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_FLAGS, layout_aristmk5 )  // 655, B - 02/03/00
 GAMEL( 1998, reelrock,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628,      A - 13/07/98
 GAMEL( 1997, retrsam,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 608, A - 17/04/97
@@ -3863,13 +4059,13 @@ GAMEL( 1997, sumospin,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 578, G - 26/07/99
 GAMEL( 1998, sbuk3,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 626, A - 22/04/98
 GAMEL( 1995, swhr2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 577/1, C - 07/09/95
-GAMEL( 1998, swhr2u,    swhr2,    aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",              MACHINE_FLAGS, layout_aristmk5 )  // MV4061,   A - 29/06/98 - BAD DUMP
+GAMEL( 1998, swhr2u,    swhr2,    aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (PHG0742-02, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // MV4061,   A - 29/06/98 - BAD DUMP
 GAMEL( 1995, swhr2v,    swhr2,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",        MACHINE_FLAGS, layout_aristmk5 )  // 577/1,    C - 07/09/95
-GAMEL( 199?, topbana,   aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // BAD DUMP
+GAMEL( 199?, topbana,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // BAD DUMP
 GAMEL( 2000, trstrove,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // JB001/3, A - 5/10/00
 GAMEL( 2002, tritreat,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 692, A - 17/05/02
 GAMEL( 2001, trojhors,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // JB001/5, A - 30/10/01
-GAMEL( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",            MACHINE_FLAGS, layout_aristmk5 )  // 577/3,    D - 24/09/97 - BAD DUMP
+GAMEL( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 577/3,    D - 24/09/97 - BAD DUMP
 GAMEL( 1998, unicornd,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 631/1, A - 31/08/98
 GAMEL( 2000, unicorndnz,unicornd, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",     MACHINE_FLAGS, layout_aristmk5 )  // MV4113/1, A - 05/04/2000
 GAMEL( 1996, wamazon,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (0200285V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 506/6, A - 7/5/96
@@ -3877,7 +4073,7 @@ GAMEL( 1996, wamazona,  wamazon,  aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1996, wamazonv,  wamazon,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Amazon (01J01996, Venezuela)",            MACHINE_FLAGS, layout_aristmk5 )  // 506/8, A - 10/10/96
 GAMEL( 1996, wildbill,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 543/8, C - 15/08/96
 GAMEL( 1996, wcougar,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 569/9, B - 27/2/96
-GAMEL( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",                 MACHINE_FLAGS, layout_aristmk5 )  // 569/8,    D - 19/05/97
+GAMEL( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 569/8,    D - 19/05/97
 GAMEL( 1999, wthing,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 608/4, B - 14/12/99
 GAMEL( 1999, wtiger,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS, layout_aristmk5 )  // 638/1,    B - 08/07/99
 

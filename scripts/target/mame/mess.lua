@@ -608,6 +608,7 @@ BUSES["ADAMNET"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
 BUSES["APRICOT_KEYBOARD"] = true
+BUSES["AMIGA_KEYBOARD"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BBC_FDC"] = true
@@ -1328,10 +1329,6 @@ createMESSProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/includes/amiga.h",
-	MAME_DIR .. "src/mame/machine/a1200kbd.cpp",
-	MAME_DIR .. "src/mame/machine/a1200kbd.h",
-	MAME_DIR .. "src/mame/machine/amigakbd.cpp",
-	MAME_DIR .. "src/mame/machine/amigakbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "amstrad")

@@ -12060,6 +12060,7 @@ fax                             // (c) 1983
 fax2                            // (c) 1983
 hardhat                         // (c) 1982
 mtrap                           // (c) 1981
+mtrap2                          // (c) 1981
 mtrap3                          // (c) 1981
 mtrap4                          // (c) 1981
 mtrapb                          // bootleg
@@ -28435,7 +28436,7 @@ sstrkfgta                       // 2000.10 Sega Strike Fighter (Rev A, no traini
 shorse                          // 2000.11.28 Star Horse (satellite)
 shorsem                         // 2000.??    Star Horse (main screens)
 shorsel                         // 2000.12    Star Horse (live and backup)
-//shors2k1                      // 2002.01.09 Star Horse 2001 (satellite, Rev B)
+shors2k1                        // 2002.01.09 Star Horse 2001 (satellite, Rev B)
 shorsep                         // 2003.12.01 Star Horse Progress (satellite, Rev A)
 shorsepm                        // 2003.??    Star Horse Progress (main screens, Rev B)
 shorseps                        // 2003.12.02 Star Horse Progress (sound & backup, Rev A)
@@ -28805,6 +28806,7 @@ kof99                           // 0251 (c) 1999 SNK
 kof99e                          // 0251 (c) 1999 SNK
 kof99h                          // 0251 (c) 1999 SNK
 kof99k                          // 0152 (c) 1999 SNK
+kof99ka                         // 0152 (c) 1999 SNK
 kof99p                          // 0251 (c) 1999 SNK
 kog                             // bootleg of kof97
 kotm                            // 0016 (c) 1991 SNK
@@ -34661,9 +34663,11 @@ sarukani                        // 1997.01 (c) 1997 Kaneko / Mediaworks (Japan)
 sengekis                        // 1997.?? (c) 1997 Kaneko / Warashi (Asia)
 sengekisj                       // 1997.07 (c) 1997 Kaneko / Warashi (Japan)
 senknow                         // 1999.04 (c) 1999 Kaneko / Kouyousha (Japan)
-skns                            //
+skns                            // - BIOS - various regions
 teljan                          // 1999.11 (c) 1999 Electro Design Co. (Japan)
-vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Europe)
+vblokbrka                       // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+
 
 @source:suprridr.cpp
 suprridr                        // (c) 1983 Venture Line + Taito license

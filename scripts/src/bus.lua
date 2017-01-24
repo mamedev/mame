@@ -2647,6 +2647,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/amiga/keyboard/keyboard.h,BUSES["AMIGA_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["AMIGA_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/amiga/zorro/zorro.h,BUSES["ZORRO"] = true
 ---------------------------------------------------
 
