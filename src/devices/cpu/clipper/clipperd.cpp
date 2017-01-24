@@ -3,21 +3,31 @@
 
 #include "emu.h"
 
-// enable C400 instruction decoding
-#define C400
+/*
+ * TODO
+ *   * dynamically switch between C400 and C100/C300 instruction sets
+ *   * handle failures of addressing mode decoding more elegantly
+ *   * improve address decoding to use streams
+ *   * detect various cases of illegal instruction encoding
+ */
 
+// enable C400 instruction decoding
+#define C400_INSTRUCTIONS 1
+
+// the CLIPPER addressing modes (unshifted)
 enum
 {
-	ADDR_MODE_PC32 = 0x10,
+	ADDR_MODE_PC32 =  0x10,
 	ADDR_MODE_ABS32 = 0x30,
 	ADDR_MODE_REL32 = 0x60,
-	ADDR_MODE_PC16 = 0x90,
+	ADDR_MODE_PC16 =  0x90,
 	ADDR_MODE_REL12 = 0xa0,
 	ADDR_MODE_ABS16 = 0xb0,
-	ADDR_MODE_PCX = 0xd0,
-	ADDR_MODE_RELX = 0xe0
+	ADDR_MODE_PCX =   0xd0,
+	ADDR_MODE_RELX =  0xe0
 };
 
+// macros for decoding various operand fields
 #define R1 ((insn[0] & 0x00f0) >> 4)
 #define R2 (insn[0] & 0x000f)
 
@@ -32,10 +42,13 @@ enum
 #define ADDR_RX ((insn[1] & 0xf0) >> 4)
 #define ADDR_I12 (((int16_t)insn[1]) >> 4)
 
-// branch condition code mnemonics - the forms beginning with 'c' are
-// supposed to be used for branches following comparison instructions,
-// while those beginning with 'r' are for use after move or logical
-// instructions
+/* 
+ * Branch condition code mnemonics - the forms beginning with 'c' are
+ * supposed to be used for branches following comparison instructions,
+ * while those beginning with 'r' are for use after move or logical
+ * instructions. We use the first form because we can't know which type
+ * should be used without some kind of dynamic information.
+ */
 static const char *const cc[] =
 {
 	"",
@@ -56,6 +69,9 @@ static const char *const cc[] =
 	"fn"
 };
 
+/*
+ * Decode an addressing mode into a string. 
+ */
 char *address (offs_t pc, uint16_t *insn)
 {
 	static char buffer[32];
@@ -76,13 +92,19 @@ char *address (offs_t pc, uint16_t *insn)
 	return buffer;
 }
 
+/*
+ * CLIPPER instructions are composed of 1, 2, 3 or 4 16-bit "parcels". The first parcel contains
+ * the opcode and enough information to work out how many additional parcels might be required. The
+ * instruction set is fairly typically RISC-ish, except for these variable length instructions, the
+ * 8 addressing modes, and the "macro instructions", which are actually "subroutines" embedded in
+ * an on-CPU macro instruction ROM. It appears at least some of these macro instructions were removed
+ * from the C400 and generate traps which can be used to implement them in software instead.
+ */
 CPU_DISASSEMBLE(clipper)
 {
 	uint16_t *insn = (uint16_t *)oprom;
 	uint32_t flags = DASMFLAG_SUPPORTED;
 	offs_t bytes;
-
-	// TODO: substitute for 'fp' and 'sp' register names?
 
 	switch (insn[0] >> 8)
 	{
@@ -135,13 +157,13 @@ CPU_DISASSEMBLE(clipper)
 
 	case 0x44: util::stream_format(stream, "call    r%d,(r%d)", R2, R1); bytes = 2; flags |= DASMFLAG_STEP_OVER; break;
 	case 0x45: util::stream_format(stream, "call    r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; flags |= DASMFLAG_STEP_OVER; break;
-#ifdef C400
+#if C400_INSTRUCTIONS
 	case 0x46: util::stream_format(stream, "loadd2  (r%d),f%d", R1, R2); bytes = 2; break;
 	case 0x47: util::stream_format(stream, "loadd2  %s,f%d", address(pc, insn), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 #endif
 	case 0x48: util::stream_format(stream, "b%-4s   (r%d)", cc[R2], R1); bytes = 2; break;
 	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
-#ifdef C400
+#if C400_INSTRUCTIONS
 	// delayed branches
 	case 0x4a: util::stream_format(stream, "cdb     r%d,(r%d)", R2, R1); bytes = 2; break;
 	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
@@ -232,11 +254,10 @@ CPU_DISASSEMBLE(clipper)
 
 	case 0xae: util::stream_format(stream, "notq    $%d,r%d", R1, R2); bytes = 2; break;
 
-#ifdef C400
+#if C400_INSTRUCTIONS
 	case 0xb0: util::stream_format(stream, "abss    f%d,f%d", R1, R2); bytes = 2; break;
 	case 0xb2: util::stream_format(stream, "absd    f%d,f%d", R1, R2); bytes = 2; break;
 #endif
-
 
 	case 0xb4:
 	case 0xb5:
@@ -305,7 +326,7 @@ CPU_DISASSEMBLE(clipper)
 		case 0x03: util::stream_format(stream, "restur  r%d", (insn[1] & 0xf0) >> 4); break;
 		case 0x04: util::stream_format(stream, "reti    r%d", (insn[1] & 0xf0) >> 4); flags |= DASMFLAG_STEP_OUT; break;
 		case 0x05: util::stream_format(stream, "wait"); break;
-#ifdef C400
+#if C400_INSTRUCTIONS
 		case 0x07: util::stream_format(stream, "loadts  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
 #endif
 		default:
@@ -315,7 +336,7 @@ CPU_DISASSEMBLE(clipper)
 		bytes = 4;
 		break;
 
-#ifdef C400
+#if C400_INSTRUCTIONS
 	case 0xbc: util::stream_format(stream, "waitd"); bytes = 2; break;
 	case 0xc0: util::stream_format(stream, "s%-4s   r%d", cc[R2], R1); bytes = 2; break;
 #endif
