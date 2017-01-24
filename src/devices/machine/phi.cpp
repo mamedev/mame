@@ -33,6 +33,8 @@
 // Debugging
 #define VERBOSE 1
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define VERBOSE_0 0
+#define LOG_0(x)  do { if (VERBOSE_0) logerror x; } while (0)
 
 // Macros to clear/set single bits
 #define BIT_MASK(n) (1U << (n))
@@ -250,7 +252,7 @@ void phi_device::set_ext_signal(phi_488_signal_t signal , int state)
 	state = !state;
 	if (m_ext_signals[ signal ] != state) {
 		m_ext_signals[ signal ] = state;
-		LOG(("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+		LOG_0(("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
 			 m_ext_signals[ PHI_488_EOI ] ,
 			 m_ext_signals[ PHI_488_DAV ] ,
 			 m_ext_signals[ PHI_488_NRFD ] ,
@@ -409,7 +411,7 @@ void phi_device::device_reset()
 
 void phi_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG(("tmr %d enabled %d\n" , id , timer.enabled()));
+	LOG_0(("tmr %d enabled %d\n" , id , timer.enabled()));
 	update_fsm();
 }
 
@@ -521,7 +523,7 @@ uint8_t phi_device::get_dio(void)
 void phi_device::set_dio(uint8_t data)
 {
 	if (data != m_dio) {
-		LOG(("DIO=%02x\n" , data));
+		LOG_0(("DIO=%02x\n" , data));
 		m_dio = data;
 		if (!m_loopback) {
 			m_dio_write_func(~data);
@@ -542,7 +544,7 @@ void phi_device::set_signal(phi_488_signal_t signal , bool state)
 {
 	if (state != m_signals[ signal ]) {
 		m_signals[ signal ] = state;
-		LOG(("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+		LOG_0(("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
 			 m_signals[ PHI_488_EOI ] ,
 			 m_signals[ PHI_488_DAV ] ,
 			 m_signals[ PHI_488_NRFD ] ,
@@ -565,9 +567,16 @@ void phi_device::pon_msg(void)
 	m_t_spms = false;
 	m_l_state = PHI_L_LIDS;
 	m_sr_state = PHI_SR_NPRS;
-	m_pp_state = PHI_PP_PPIS;
 	m_pp_pacs = false;
-	m_ppr_msg = my_address();
+	uint8_t addr = my_address();
+	if (addr <= 7) {
+		// If address <= 7, PP is automatically enabled and configured for PPR = ~address
+		m_ppr_msg = addr ^ 7;
+		m_pp_state = PHI_PP_PPSS;
+	} else {
+		m_ppr_msg = 0;
+		m_pp_state = PHI_PP_PPIS;
+	}
 	m_s_sense = true;
 	m_c_state = PHI_C_CIDS;
 	m_be_counter = 0;
@@ -610,10 +619,10 @@ void phi_device::update_fsm(void)
 	// TODO: RL FSM
 	// Loop until all changes settle
 	while (changed) {
-		LOG(("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PACS %d PPR %u S %d C %d\n" ,
+		LOG_0(("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PACS %d PPR %u S %d C %d\n" ,
 			 m_sh_state , m_ah_state , m_t_state , m_t_spms , m_l_state , m_sr_state ,
 			 m_pp_state , m_pp_pacs , m_ppr_msg , m_s_sense , m_c_state));
-		LOG(("O E/F=%d/%d I E/F=%d/%d\n" , m_fifo_out.empty() , m_fifo_out.full() , m_fifo_in.empty() , m_fifo_in.full()));
+		LOG_0(("O E/F=%d/%d I E/F=%d/%d\n" , m_fifo_out.empty() , m_fifo_out.full() , m_fifo_in.empty() , m_fifo_in.full()));
 		changed = false;
 
 		// SH FSM
@@ -641,7 +650,7 @@ void phi_device::update_fsm(void)
 				if ((m_nba_origin = nba_msg(new_byte , new_eoi)) != NBA_NONE) {
 					m_sh_state = PHI_SH_SDYS;
 					m_sh_dly_timer->adjust(attotime::from_nsec(DELAY_T1));
-					LOG(("SH DLY enabled %d\n" , m_sh_dly_timer->enabled()));
+					LOG_0(("SH DLY enabled %d\n" , m_sh_dly_timer->enabled()));
 				}
 				break;
 
@@ -653,6 +662,7 @@ void phi_device::update_fsm(void)
 
 			case PHI_SH_STRS:
 				if (!get_signal(PHI_488_NDAC)) {
+					LOG(("TX %02x/%d\n" , m_dio , m_signals[ PHI_488_EOI ]));
 					m_sh_state = PHI_SH_SGNS;
 					clear_nba((nba_origin_t)m_nba_origin);
 				}
@@ -669,15 +679,13 @@ void phi_device::update_fsm(void)
 
 		// SH outputs
 		// EOI is controlled by SH & C FSMs
-		bool eoi_signal;
+		bool eoi_signal = false;
+		uint8_t dio_byte = 0;
 		set_signal(PHI_488_DAV , m_sh_state == PHI_SH_STRS);
 		if (m_sh_state == PHI_SH_SDYS || m_sh_state == PHI_SH_STRS) {
 			nba_msg(new_byte , new_eoi);
-			set_dio(new_byte);
+			dio_byte = new_byte;
 			eoi_signal = new_eoi;
-		} else {
-			set_dio(0);
-			eoi_signal = false;
 		}
 
 		// AH FSM
@@ -883,8 +891,9 @@ void phi_device::update_fsm(void)
 			changed = true;
 		}
 		// PP outputs
-		if (m_pp_state == PHI_PP_PPAS && m_s_sense == !!BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT) && m_ppr_msg <= 7) {
-			set_dio(1 << m_ppr_msg);
+		if (m_pp_state == PHI_PP_PPAS && m_s_sense == !!BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT)) {
+			LOG(("PP %u\n" , m_ppr_msg));
+			dio_byte |= (1U << m_ppr_msg);
 		}
 
 		// C FSM
@@ -988,6 +997,7 @@ void phi_device::update_fsm(void)
 				   m_c_state == PHI_C_CAWS || m_c_state == PHI_C_CTRS);
 		eoi_signal = eoi_signal || m_c_state == PHI_C_CPWS || m_c_state == PHI_C_CPPS;
 		set_signal(PHI_488_EOI , eoi_signal);
+		set_dio(dio_byte);
 	}
 
 	// Update status register
@@ -1307,11 +1317,11 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 	if (m_l_state == PHI_L_LACS) {
 		if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
 			// No room for received byte, stall handshake
-			LOG(("..stalled\n"));
+			LOG_0(("..stalled\n"));
 			return false;
 		} else {
 			m_fifo_in.enqueue(word);
-			LOG(("..OK\n"));
+			LOG_0(("..OK\n"));
 			if (m_t_state != PHI_T_TACS && m_t_state != PHI_T_ID3 &&
 				m_t_state != PHI_T_ID5 && m_t_state != PHI_T_SPAS) {
 				// If PHI didn't send this byte to itself, set data freeze
@@ -1320,7 +1330,7 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 		}
 	}
 	if (end_of_transfer) {
-		LOG(("End of byte transfer enable\n"));
+		LOG_0(("End of byte transfer enable\n"));
 		m_fifo_out.dequeue();
 		m_be_counter = 0;
 	} else {
