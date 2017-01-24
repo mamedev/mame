@@ -137,6 +137,7 @@ enum clipper_exception_vectors
 	EXCEPTION_INTERRUPT_BASE               = 0x800,
 };
 
+// trap source values are shifted into the correct field in the psw
 enum clipper_cpu_trap_sources
 {
 	CTS_NO_CPU_TRAP            = 0 << 24,
@@ -157,6 +158,10 @@ enum clipper_memory_trap_sources
 	MTS_WRITE_PROTECT_FAULT           = 7 << 28,
 };
 
+// convenience macros for frequently used instruction fields
+#define R1 (m_info.r1)
+#define R2 (m_info.r2)
+
 // convenience macros for dealing with the psw
 #define PSW(mask) (m_psw & PSW_##mask)
 #define SSW(mask) (m_ssw & SSW_##mask)
@@ -176,27 +181,27 @@ enum clipper_memory_trap_sources
 #define UF_SUB(a, b) ((b > 0) && (a < INT_MIN + b))
 
 // CLIPPER logic for carry and overflow flags
-#define C_ADD(a, b) ((uint32_t)a + (uint32_t)b < (uint32_t)a)
-#define V_ADD(a, b) (OF_ADD((int32_t)a, (int32_t)b) || UF_ADD((int32_t)a, (int32_t)b))
-#define C_SUB(a, b) ((uint32_t)a < (uint32_t)b)
-#define V_SUB(a, b) (OF_SUB((int32_t)a, (int32_t)b) || UF_SUB((int32_t)a, (int32_t)b))
+#define C_ADD(a, b) ((u32)a + (u32)b < (u32)a)
+#define V_ADD(a, b) (OF_ADD((s32)a, (s32)b) || UF_ADD((s32)a, (s32)b))
+#define C_SUB(a, b) ((u32)a < (u32)b)
+#define V_SUB(a, b) (OF_SUB((s32)a, (s32)b) || UF_SUB((s32)a, (s32)b))
 
 class clipper_device : public cpu_device
 {
 public:
-	clipper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
-	bool supervisor_mode() { return SSW(U) == 0; }
-	bool mapped_mode() { return SSW(M) != 0; }
+	DECLARE_READ_LINE_MEMBER(ssw) { return m_ssw; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; };
-	virtual uint32_t execute_max_cycles() const override { return 1; }; // FIXME: don't know, especially macro instructions
-	virtual uint32_t execute_input_lines() const override { return 2; }; // number of input/interrupt lines (irq/nmi)
+	virtual u32 execute_min_cycles() const override { return 1; };
+	virtual u32 execute_max_cycles() const override { return 1; }; // FIXME: don't know, especially macro instructions
+	virtual u32 execute_input_lines() const override { return 2; }; // number of input/interrupt lines (irq/nmi)
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -213,17 +218,17 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; } // largest instruction
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	// core registers
-	uint32_t m_pc;
-	uint32_t m_psw;
-	uint32_t m_ssw;
+	u32 m_pc;
+	u32 m_psw;
+	u32 m_ssw;
 
 	// integer registers
-	int32_t *m_r;     // active registers
-	int32_t m_ru[16]; // user registers
-	int32_t m_rs[16]; // supervisor registers
+	s32 *m_r;     // active registers
+	s32 m_ru[16]; // user registers
+	s32 m_rs[16]; // supervisor registers
 
 	// floating registers
 	double m_f[16];
@@ -236,37 +241,54 @@ private:
 	address_space *m_data;
 
 	int m_icount;
-	int m_interrupt_cycles;
 
 	int m_irq;
 	int m_nmi;
 
+	// decoded instruction information
 	struct
 	{
-		// decoded operand information
-		union {
-			int32_t imm;
-			uint32_t r2 : 4;
-			uint16_t macro;
-		} op;
+		u8 opcode, subopcode;
+		u8 r1, r2;
+
+		s32 imm;
+		u16 macro;
 
 		// total size of instruction in bytes
-		uint32_t size;
+		u32 size;
 
 		// computed effective address
-		uint32_t address;
+		u32 address;
 	} m_info;
 
-	void clipper_device::decode_instruction(uint16_t insn);
-	int clipper_device::execute_instruction(uint16_t insn);
+	void clipper_device::decode_instruction(u16 insn);
+	int clipper_device::execute_instruction();
+	bool clipper_device::evaluate_branch();
 
-	// condition code evaluation
-	void clipper_device::evaluate_cc2f(double v0, double v1);
-
-	bool clipper_device::evaluate_branch(uint32_t condition);
-
-	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts = CTS_NO_CPU_TRAP, uint32_t mts = MTS_NO_MEMORY_TRAP);
+	uint32_t clipper_device::intrap(u32 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP);
 };
 
-extern const device_type CLIPPER;
+class clipper_c100_device : public clipper_device
+{
+public:
+	clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class clipper_c300_device : public clipper_device
+{
+public:
+	clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class clipper_c400_device : public clipper_device
+{
+public:
+	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+extern const device_type CLIPPER_C100;
+extern const device_type CLIPPER_C300;
+extern const device_type CLIPPER_C400;
+
+extern CPU_DISASSEMBLE(clipper);
 #endif /* __CLIPPER_H__ */

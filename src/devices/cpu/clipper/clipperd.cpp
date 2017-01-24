@@ -5,10 +5,10 @@
 
 /*
  * TODO
- *   * dynamically switch between C400 and C100/C300 instruction sets
- *   * handle failures of addressing mode decoding more elegantly
- *   * improve address decoding to use streams
- *   * detect various cases of illegal instruction encoding
+ *   - dynamically switch between C400 and C100/C300 instruction sets
+ *   - handle failures of addressing mode decoding more elegantly
+ *   - improve address decoding to use streams
+ *   - detect various cases of illegal instruction encoding
  */
 
 // enable C400 instruction decoding
@@ -72,7 +72,7 @@ static const char *const cc[] =
 /*
  * Decode an addressing mode into a string. 
  */
-char *address (offs_t pc, uint16_t *insn)
+char *address (offs_t pc, u16 *insn)
 {
 	static char buffer[32];
 
@@ -102,8 +102,8 @@ char *address (offs_t pc, uint16_t *insn)
  */
 CPU_DISASSEMBLE(clipper)
 {
-	uint16_t *insn = (uint16_t *)oprom;
-	uint32_t flags = DASMFLAG_SUPPORTED;
+	u16 *insn = (u16 *)oprom;
+	u32 flags = DASMFLAG_SUPPORTED;
 	offs_t bytes;
 
 	switch (insn[0] >> 8)
@@ -310,7 +310,7 @@ CPU_DISASSEMBLE(clipper)
 		case 0x3f: util::stream_format(stream, "loadfs  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
 
 		default:
-			util::stream_format(stream, "macro   0x%04x 0x%04x ; invalid", insn[0], insn[1]);
+			util::stream_format(stream, "macro   0x%04x 0x%04x", insn[0], insn[1]);
 			break;
 		}
 		bytes = 4;
@@ -330,7 +330,7 @@ CPU_DISASSEMBLE(clipper)
 		case 0x07: util::stream_format(stream, "loadts  r%d,f%d", (insn[1] & 0xf0) >> 4, insn[1] & 0xf); break;
 #endif
 		default:
-			util::stream_format(stream, "macro   0x%04x %04x", insn[0], insn[1]);
+			util::stream_format(stream, "macro   0x%04x 0x%04x", insn[0], insn[1]);
 			break;
 		}
 		bytes = 4;
