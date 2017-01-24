@@ -34663,9 +34663,11 @@ sarukani                        // 1997.01 (c) 1997 Kaneko / Mediaworks (Japan)
 sengekis                        // 1997.?? (c) 1997 Kaneko / Warashi (Asia)
 sengekisj                       // 1997.07 (c) 1997 Kaneko / Warashi (Japan)
 senknow                         // 1999.04 (c) 1999 Kaneko / Kouyousha (Japan)
-skns                            //
+skns                            // - BIOS - various regions
 teljan                          // 1999.11 (c) 1999 Electro Design Co. (Japan)
-vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Europe)
+vblokbrka                       // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+
 
 @source:suprridr.cpp
 suprridr                        // (c) 1983 Venture Line + Taito license
