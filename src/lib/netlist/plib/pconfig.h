@@ -41,6 +41,9 @@ typedef __int128_t INT128;
 #endif
 
 #if defined(__GNUC__)
+#ifdef RESTRICT
+#undef RESTRICT
+#endif
 #define RESTRICT                __restrict__
 #define ATTR_UNUSED             __attribute__((__unused__))
 #else
@@ -240,7 +243,7 @@ namespace plib {
 		inline R call(O *obj, Targs... args) const
 		{
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
-			return (*reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
+			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
 	private:
 		generic_function m_func;

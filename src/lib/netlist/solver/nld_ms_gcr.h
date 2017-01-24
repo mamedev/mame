@@ -96,7 +96,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	bool touched[storage_N][storage_N] = { { false } };
 	for (unsigned k = 0; k < iN; k++)
 	{
-		for (auto & j : this->m_terms[k]->m_nz)
+		for (auto &j : this->m_terms[k]->m_nz)
 			touched[k][j] = true;
 	}
 
@@ -255,7 +255,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t *t = this->m_terms[k];
+		terms_for_net_t *t = this->m_terms[k].get();
 		nl_double gtot_t = 0.0;
 		nl_double RHS_t = 0.0;
 

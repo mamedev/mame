@@ -297,12 +297,12 @@ void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 1
+#if 0
 			case 1:
-				ms = create_solver<1,1>(1, use_specific);
+				ms = create_solver<1,1>(1, false);
 				break;
 			case 2:
-				ms = create_solver<2,2>(2, use_specific);
+				ms = create_solver<2,2>(2, false);
 				break;
 			case 3:
 				ms = create_solver<3,3>(3, use_specific);
@@ -321,6 +321,9 @@ void NETLIB_NAME(solver)::post_start()
 				break;
 			case 8:
 				ms = create_solver<8,8>(8, use_specific);
+				break;
+			case 9:
+				ms = create_solver<9,9>(9, use_specific);
 				break;
 			case 10:
 				ms = create_solver<10,10>(10, use_specific);

@@ -161,7 +161,7 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	std::vector<terms_for_net_t *> m_terms;
+	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 

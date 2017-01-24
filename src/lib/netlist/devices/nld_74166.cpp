@@ -82,7 +82,7 @@ namespace netlist
 		netlist_time delay = NLTIME_FROM_NS(26);
 		if (m_CLRQ())
 		{
-			bool clear_unset = !m_last_CLRQ();
+			bool clear_unset = !m_last_CLRQ;
 			if (clear_unset)
 			{
 				delay = NLTIME_FROM_NS(35);

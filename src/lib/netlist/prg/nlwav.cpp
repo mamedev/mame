@@ -1,13 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include <plib/poptions.h>
 #include <cstdio>
 #include <cstring>
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pstream.h"
+#include "plib/poptions.h"
 #include "nl_setup.h"
-#include <memory>
 
 class nlwav_options_t : public plib::options
 {
@@ -143,10 +142,10 @@ private:
 
 static void convert()
 {
-	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : new plib::pofilestream(opts.opt_out()));
-	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : new plib::pifilestream(opts.opt_inp()));
+	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opts.opt_out()));
+	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opts.opt_inp()));
 	plib::putf8_reader reader(*fin);
-	wav_t *wo = new wav_t(*fo, 48000);
+	wav_t *wo = plib::palloc<wav_t>(*fo, 48000U);
 
 	double dt = 1.0 / static_cast<double>(wo->sample_rate());
 	double ct = dt;
@@ -213,11 +212,11 @@ static void convert()
 		//printf("%f %f\n", t, v);
 #endif
 	}
-	delete wo;
+	plib::pfree(wo);
 	if (opts.opt_inp() != "-")
-		delete fin;
+		plib::pfree(fin);
 	if (opts.opt_out() != "-")
-		delete fo;
+		plib::pfree(fo);
 
 	if (!opts.opt_quiet())
 	{

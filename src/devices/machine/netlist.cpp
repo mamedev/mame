@@ -619,11 +619,11 @@ void netlist_mame_cpu_device_t::device_start()
 		netlist::detail::net_t *n = netlist().m_nets[i].get();
 		if (n->is_logic())
 		{
-			state_add(i*2, n->name().c_str(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
+			state_add(i*2, n->name().c_str(), *downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name().c_str(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name().c_str(), *downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 

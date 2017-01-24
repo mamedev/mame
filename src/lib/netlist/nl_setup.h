@@ -285,7 +285,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		/* needed by proxy */
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::core_terminal_t::type_t atype, bool required = true);
 
 	private:
 
@@ -300,7 +300,7 @@ namespace netlist
 		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
-		pstring objtype_as_str(detail::device_object_t &in) const;
+		pstring termtype_as_str(detail::core_terminal_t &in) const;
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
