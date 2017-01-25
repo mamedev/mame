@@ -127,7 +127,7 @@ namespace netlist
 		analog::NETLIB_SUB(twoterm) m_RV;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
-	};
+};
 
 	} //namespace devices
 } // namespace netlist

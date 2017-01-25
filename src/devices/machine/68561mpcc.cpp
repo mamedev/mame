@@ -7,10 +7,10 @@
 
     The variants in the MPCC family are as follows:
 
-	- 68560  with an 8 bit data bus
-	- 68560A with an 8 bit data bus and some enhancements
-	- 68561  with a 16 bit data bus
-	- 68561A with a 16 bit data bus and some enhancements
+    - 68560  with an 8 bit data bus
+    - 68560A with an 8 bit data bus and some enhancements
+    - 68561  with a 16 bit data bus
+    - 68561A with a 16 bit data bus and some enhancements
 
 FEATURES
 ------------------------------------------------------------------
@@ -55,8 +55,9 @@ FEATURES
 #define LOG_DCD     0x200
 #define LOG_SYNC    0x400
 #define LOG_CHAR    0x800
+#define LOG_RX     0x1000
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
 
 #define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
 #define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
@@ -72,6 +73,7 @@ FEATURES
 #define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
 #define LOGCHAR(...)  LOGMASK(LOG_CHAR,    __VA_ARGS__)
+#define LOGRX(...)    LOGMASK(LOG_RX,      __VA_ARGS__)
 
 #if VERBOSE & LOG_PRINTF
 #define logerror printf
@@ -237,6 +239,8 @@ void mpcc_device::device_start()
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_ecr));
 	LOG(" - MPCC variant %02x\n", m_variant);
+
+	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 //-------------------------------------------------
@@ -246,26 +250,35 @@ void mpcc_device::device_reset()
 {
 	LOGSETUP("%s %s \n",tag(), FUNCNAME);
 
-	m_rsr 	= 0x00;
-	m_rcr 	= 0x01;
+	// Reset RS232 emulation
+	receive_register_reset();
+	transmit_register_reset();
+
+	// Device reset values
+	m_rsr   = 0x00;
+	m_rcr   = 0x01;
 	m_rivnr = 0x0f;
-	m_rier 	= 0x00;
-	m_tsr 	= 0x80;
-	m_tcr 	= 0x01;
+	m_rier  = 0x00;
+	m_tsr   = 0x80;
+	m_tcr   = 0x01;
 	m_tivnr = 0x0f;
-	m_tier 	= 0x00;
-	m_sisr 	= 0x00;
-	m_sicr 	= 0x00;
+	m_tier  = 0x00;
+	m_sisr  = 0x00;
+	m_sicr  = 0x00;
 	m_sivnr = 0x0f;
-	m_sier 	= 0x00;
-	m_psr1 	= 0x00;
-	m_psr2 	= 0x00;
-	m_ar1 	= 0x00;
-	m_ar2 	= 0x00;
+	m_sier  = 0x00;
+	m_psr1  = 0x00;
+	m_psr2  = 0x00;
+	m_ar1   = 0x00;
+	m_ar2   = 0x00;
 	m_brdr1 = 0x01;
 	m_brdr2 = 0x00;
-	m_ccr 	= 0x00;
-	m_ecr 	= 0x04;
+	m_ccr   = 0x00;
+	m_ecr   = 0x04;
+
+	// Clear fifos
+	m_tx_data_fifo.clear();
+	m_rx_data_fifo.clear();
 
 	// Init out callbacks to known inactive state
 	m_out_txd_cb(1);
@@ -279,6 +292,269 @@ void mpcc_device::device_reset()
 /*
  * Serial device implementation
  */
+
+void mpcc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+WRITE_LINE_MEMBER(mpcc_device::cts_w)
+{
+	if (state == CLEAR_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr &= ~REG_SISR_CTSLVL;
+		if ( (old_sisr & REG_SISR_CTSLVL) &&
+			 (m_sicr & REG_SICR_RTSLVL) &&
+			 (m_tcr  & REG_TCR_TEN))
+		{
+			m_sisr |= REG_SISR_CTST;
+			if (m_sier & REG_SIER_CTS)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of TxC
+				trigger_interrupt(INT_SR_CTS);
+				// TODO: Make sure TxC has negative transition after CTS goes inactive before INT can be reset in SISR7
+			}
+		}
+	}
+	else
+		m_sisr |= REG_SISR_CTSLVL;
+}
+
+WRITE_LINE_MEMBER(mpcc_device::dsr_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr |= REG_SISR_DSRLVL;
+		if ( !(old_sisr & REG_SISR_DSRLVL) &&
+			 !(m_rcr  & REG_RCR_RRES))
+		{
+			m_sisr |= REG_SISR_DSRT;
+			if (m_sier & REG_SIER_DSR)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of RxC
+				trigger_interrupt(INT_SR_DSR);
+				// TODO: Make sure RxC has negative transition after DSR goes inactive before INT can be reset in SISR6
+			}
+		}
+	}
+	else
+		m_sisr &= ~REG_SISR_DSRLVL;
+}
+
+WRITE_LINE_MEMBER(mpcc_device::dcd_w)
+{
+	if (state == CLEAR_LINE)
+	{
+		uint8_t old_sisr = m_sisr;
+
+		m_sisr &= ~REG_SISR_DCDLVL;
+		if ( (old_sisr & REG_SISR_DCDLVL) &&
+			 !(m_rcr & REG_RCR_RRES))
+		{
+			m_sisr |= REG_SISR_DCDT;
+			if (m_sier & REG_SIER_DCD)
+			{
+				// TODO: make sure interrupt is issued with the next negative transition of RxC
+				trigger_interrupt(INT_SR_DCD);
+				// TODO: Make sure RxC has negative transition before INT can be reset in SISR5
+			}
+		}
+	}
+	else
+		m_sisr |= REG_SISR_DCDLVL;
+}
+
+//-------------------------------------------------
+// get_brg_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_brg_rate()
+{
+	uint32_t rate;
+	uint32_t brg_const;
+
+	brg_const = (m_brdr1 | m_brdr2 << 8); // Baud rate divider
+	brg_const += (m_ccr & REG_CCR_PSCDIV) ? 3 : 2; // Add prescaler factor
+	brg_const += (m_psr2 & REG_PSR2_PSEL_MSK) == REG_PSR2_PSEL_ASCII ? 2 : 1; // Add K factor
+	rate = clock() / brg_const;
+
+	return rate;
+}
+
+//-------------------------------------------------
+// get_tx_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_tx_rate()
+{
+	uint32_t rate;
+
+	// Check if TxC is an input and use it instead of the BRG
+	if ((m_ccr & REG_CCR_TCLO) == 0)
+	{
+		rate = m_txc;
+	}
+	else
+	{
+		rate = get_brg_rate();
+	}
+
+	return rate;
+}
+
+//-------------------------------------------------
+// get_clock_div - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_clock_div()
+{
+	uint32_t clk_div = 1;
+
+	switch (m_ccr & REG_CCR_CLKDIV_MSK)
+	{
+	case REG_CCR_CLKDIV_X1 : clk_div =  1; break;
+	case REG_CCR_CLKDIV_X16: clk_div = 16; break;
+	case REG_CCR_CLKDIV_X32: clk_div = 32; break;
+	case REG_CCR_CLKDIV_X64: clk_div = 64; break;
+	}
+
+	return clk_div;
+}
+
+//-------------------------------------------------
+// get_rx_rate - helper function
+//-------------------------------------------------
+uint32_t mpcc_device::get_rx_rate()
+{
+	uint32_t rate;
+
+	// Check if TxC is an input and use it instead of the BRG
+	if ((m_ccr & REG_CCR_RCLKIN) == 0)
+	{
+		rate = m_rxc / get_clock_div();
+	}
+	else
+	{
+		rate = get_brg_rate();
+	}
+
+	return rate;
+}
+
+//-------------------------------------------------
+//  get_word_length - get word length
+//-------------------------------------------------
+uint32_t mpcc_device::get_word_length()
+{
+	int bits = 5;
+
+	switch (m_psr2 & REG_PSR2_CHLN_MSK)
+	{
+	case REG_PSR2_CHLN_5:  bits = 5;   break;
+	case REG_PSR2_CHLN_6:  bits = 6;   break;
+	case REG_PSR2_CHLN_7:  bits = 7;   break;
+	case REG_PSR2_CHLN_8:  bits = 8;   break;
+	}
+
+	return bits;
+}
+
+//-------------------------------------------------
+//  get_stop_bits - translate stop bit settings for serial interface
+//-------------------------------------------------
+device_serial_interface::stop_bits_t mpcc_device::get_stop_bits()
+{
+	switch (m_psr2 & REG_PSR2_STP_MSK)
+	{
+	case REG_PSR2_STP_1:   return STOP_BITS_1;
+	case REG_PSR2_STP_1_5: return STOP_BITS_1_5;
+	case REG_PSR2_STP_2:   return STOP_BITS_2;
+	}
+
+	return STOP_BITS_0;
+}
+
+//-------------------------------------------------
+//  get_parity - translate parity settings for serial interface
+//-------------------------------------------------
+device_serial_interface::parity_t mpcc_device::get_parity()
+{
+	parity_t parity;
+
+	if (m_ecr & REG_ECR_PAREN)
+	{
+		if (m_ecr & REG_ECR_ODDPAR)
+			parity = PARITY_ODD;
+		else
+			parity = PARITY_EVEN;
+	}
+	else
+	{
+		parity = PARITY_NONE;
+	}
+	return parity;
+}
+
+//-------------------------------------------------
+//  update_serial -
+//-------------------------------------------------
+void mpcc_device::update_serial()
+{
+	int         data_bits = get_word_length();
+	stop_bits_t stop_bits = get_stop_bits();
+	parity_t    parity    = get_parity();
+
+	LOGSETUP(" %s() %s Setting data frame %d+%d%c%s\n", FUNCNAME, m_owner->tag(), 1,
+		 data_bits, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O',
+		stop_bits == STOP_BITS_1 ? "1" : (stop_bits == STOP_BITS_2 ? "2" : "1.5"));
+
+	set_data_frame(1, data_bits, parity, stop_bits);
+
+	// Setup the Receiver
+	//  check if the receiver is in reset mode
+	if  (m_rcr & REG_RCR_RRES)
+	{
+		LOGSETUP("- Rx in reset\n");
+		set_rcv_rate(0);
+	}
+	// Rx is running
+	else
+	{
+		LOGSETUP("- Rx enabled\n");
+		m_brg_rate = get_rx_rate();
+
+		LOGSETUP("- BRG rate %d\n", m_brg_rate);
+		set_rcv_rate(m_brg_rate);
+	}
+
+	// Setup the Transmitter
+	//  check if Rx is in reset
+	if  (m_tcr & REG_TCR_TRES)
+	{
+		LOGSETUP("- Tx in reset\n");
+		set_tra_rate(0);
+	}
+	// Tx is running
+	else
+	{
+		// Check that Tx is enabled
+		if (m_tcr & REG_TCR_TEN)
+		{
+			LOGSETUP("- Tx enabled\n");
+			m_brg_rate = get_tx_rate();
+
+			LOGSETUP("- BRG rate %d\n", m_brg_rate);
+			set_tra_rate(m_brg_rate);
+		}
+		else
+		{
+			LOGSETUP("- Tx disabled\n");
+			set_tra_rate(0);
+		}
+	}
+}
+
 //-------------------------------------------------
 //  tra_callback - is called for each bit that needs to be transmitted
 //-------------------------------------------------
@@ -288,6 +564,7 @@ void mpcc_device::tra_callback()
 	if (!(m_tcr & REG_TCR_TEN))
 	{
 		// transmit idle TODO: Support TCR TICS bit
+		LOGTX("%s idle bit\n", FUNCNAME);
 		m_out_txd_cb(1);
 	}
 #if 0
@@ -303,6 +580,7 @@ void mpcc_device::tra_callback()
 	{
 		// Get the next bit
 		int db = transmit_register_get_data_bit();
+		LOGTX("%s bit: %d\n", FUNCNAME, db ? 1 : 0);
 
 		// transmit data
 		m_out_txd_cb(db);
@@ -321,7 +599,7 @@ void mpcc_device::tra_complete()
 {
 	// check if transmitter is enabled and we are not sending BREAK level
 	if ((m_tcr & REG_TCR_TEN) && !(m_tcr & REG_TCR_TICS))
-	{	// check if there are more data in the fifo
+	{   // check if there are more data in the fifo
 		if (!m_tx_data_fifo.empty())
 		{
 			transmit_register_setup(m_tx_data_fifo.dequeue()); // Reload the shift register
@@ -330,6 +608,7 @@ void mpcc_device::tra_complete()
 		else
 		{
 			m_out_rts_cb(CLEAR_LINE); // TODO: respect the RTSLV bit
+			m_sicr &= ~REG_SICR_RTSLVL;
 		}
 
 		// Check if Tx interrupts are enabled
@@ -363,19 +642,18 @@ void mpcc_device::rcv_callback()
 	}
 }
 
-
 //-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
-
 void mpcc_device::rcv_complete()
 {
 	uint8_t data;
 
 	receive_register_extract();
 	data = get_received_char();
+	LOGRX("%s %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
 
-	//	receive_data(data);
+	//  receive_data(data);
 	if (m_rx_data_fifo.full())
 	{
 		// receive overrun error detected, new data is lost
@@ -504,31 +782,31 @@ READ8_MEMBER( mpcc_device::read )
 
 	switch(offset)
 	{
-	case 0x00: data = m_rsr; logerror("MPCC: Reg RSR not implemented\n"); break;
-	case 0x01: data = m_rcr; logerror("MPCC: Reg RCR not implemented\n"); break;
-	case 0x02: data = m_rdr; logerror("MPCC: Reg RDR not implemented\n"); break;
+	case 0x00: data = do_rsr(); break;
+	case 0x01: data = do_rcr(); break;
+	case 0x02: data = do_rdr(); break;
 	case 0x04: data = m_rivnr; logerror("MPCC: Reg RIVNR not implemented\n"); break;
-	case 0x05: data = m_rier; logerror("MPCC: Reg RIER not implemented\n"); break;
+	case 0x05: data = do_rier(); break;
 	case 0x08: data = m_tsr; break; logerror("MPCC: Reg TSR not implemented\n"); break;
-	case 0x09: data = m_tcr; logerror("MPCC: Reg TCR not implemented\n"); break;
-	//case 0x0a: data = m_tdr; break;
-	case 0x0c: data = m_tivnr; logerror("MPCC: Reg TIVNR not implemented\n"); break;
-	case 0x0d: data = m_tier; logerror("MPCC: Reg TIER not implemented\n"); break;
-	case 0x10: data = m_sisr; logerror("MPCC: Reg SISR not implemented\n"); break;
-	case 0x11: data = m_sicr; logerror("MPCC: Reg SICR not implemented\n"); break;
+	case 0x09: data = do_tcr(); break;
+	//case 0x0a: data = m_tdr; break; // TDR is a write only register
+	case 0x0c: data = do_tivnr(); break;
+	case 0x0d: data = do_tier(); break;
+	case 0x10: data = do_sisr(); break;
+	case 0x11: data = do_sicr(); break;
 	case 0x14: data = m_sivnr; logerror("MPCC: Reg SIVNR not implemented\n"); break;
-	case 0x15: data = m_sier; logerror("MPCC: Reg SIER not implemented\n"); break;
-	case 0x18: data = m_psr1; logerror("MPCC: Reg PSR1 not implemented\n"); break;
-	case 0x19: data = m_psr2; logerror("MPCC: Reg PSR2 not implemented\n"); break;
+	case 0x15: data = do_sier(); break;
+	case 0x18: data = do_psr1(); break;
+	case 0x19: data = do_psr2(); break;
 	case 0x1a: data = m_ar1; logerror("MPCC: Reg AR1 not implemented\n"); break;
 	case 0x1b: data = m_ar2; logerror("MPCC: Reg AR2 not implemented\n"); break;
-	case 0x1c: data = m_brdr1; logerror("MPCC: Reg BRDR1 not implemented\n"); break;
-	case 0x1d: data = m_brdr2; logerror("MPCC: Reg BRDR2 not implemented\n"); break;
-	case 0x1e: data = m_ccr; logerror("MPCC: Reg CCR not implemented\n"); break;
-	case 0x1f: data = m_ecr; logerror("MPCC: Reg ECR not implemented\n"); break;
+	case 0x1c: data = do_brdr1(); break;
+	case 0x1d: data = do_brdr2(); break;
+	case 0x1e: data = do_ccr(); break;
+	case 0x1f: data = do_ecr(); break;
 	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
 	}
-	LOGSETUP(" * %s Reg %02x -> %02x  \n", m_owner->tag(), offset, data);
+	LOGR(" * %s Reg %02x -> %02x  \n", m_owner->tag(), offset, data);
 	return data;
 }
 
@@ -540,34 +818,108 @@ WRITE8_MEMBER( mpcc_device::write )
 	LOGSETUP(" * %s Reg %02x <- %02x  \n", m_owner->tag(), offset, data);
 	switch(offset)
 	{
-	case 0x00: m_rsr = data; logerror("MPCC: Reg RSR not implemented\n"); break;
-	case 0x01: m_rcr = data; logerror("MPCC: Reg RCR not implemented\n"); break;
-	//case 0x02: m_rdr = data; break;
+	case 0x00: do_rsr(data); break;
+	case 0x01: do_rcr(data); break;
+	//case 0x02: m_rdr = data; break; // RDR is a read only register
 	case 0x04: m_rivnr = data; logerror("MPCC: Reg RIVNR not implemented\n"); break;
-	case 0x05: m_rier = data; logerror("MPCC: Reg RIER not implemented\n"); break;
+	case 0x05: do_rier(data); break;
 	case 0x08: m_tsr = data; logerror("MPCC: Reg TSR not implemented\n"); break;
-	case 0x09: m_tcr = data; logerror("MPCC: Reg TCR not implemented\n"); break;
-	case 0x0a: m_tdr = data; LOGCHAR("*%c", data); do_tdr_w(data); break;
-	case 0x0c: m_tivnr = data; logerror("MPCC: Reg TIVNR not implemented\n"); break;
-	case 0x0d: m_tier = data; logerror("MPCC: Reg TIER not implemented\n"); break;
-	case 0x10: m_sisr = data; logerror("MPCC: Reg SISR not implemented\n"); break;
-	case 0x11: m_sicr = data; logerror("MPCC: Reg SICR not implemented\n"); break;
+	case 0x09: do_tcr(data); break;
+	case 0x0a: m_tdr = data; LOGCHAR("*%c", data); do_tdr(data); break;
+	case 0x0c: do_tivnr(data); break;
+	case 0x0d: do_tier(data); break;
+	case 0x10: do_sisr(data); break;
+	case 0x11: do_sicr(data); break;
 	case 0x14: m_sivnr = data; logerror("MPCC: Reg SIVNR not implemented\n"); break;
-	case 0x15: m_sier = data; logerror("MPCC: Reg SIER not implemented\n"); break;
-	case 0x18: m_psr1 = data; logerror("MPCC: Reg PSR1 not implemented\n"); break;
-	case 0x19: m_psr2 = data; logerror("MPCC: Reg PSR2 not implemented\n"); break;
+	case 0x15: do_sier(data); break;
+	case 0x18: do_psr1(data); break;
+	case 0x19: do_psr2(data); break;
 	case 0x1a: m_ar1 = data; logerror("MPCC: Reg AR1 not implemented\n"); break;
 	case 0x1b: m_ar2 = data; logerror("MPCC: Reg AR2 not implemented\n"); break;
-	case 0x1c: m_brdr1 = data; logerror("MPCC: Reg BRDR1 not implemented\n"); break;
-	case 0x1d: m_brdr2 = data; logerror("MPCC: Reg BRDR2 not implemented\n"); break;
-	case 0x1e: m_ccr = data; logerror("MPCC: Reg CCR not implemented\n"); break;
-	case 0x1f: m_ecr = data; logerror("MPCC: Reg ECR not implemented\n"); break;
+	case 0x1c: do_brdr1(data); break;
+	case 0x1d: do_brdr2(data); break;
+	case 0x1e: do_ccr(data); break;
+	case 0x1f: do_ecr(data); break;
 	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
 	}
 }
 
-void mpcc_device::do_tdr_w(uint8_t data)
+void mpcc_device::do_rsr(uint8_t data)
 {
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_rsr = data;
+}
+
+uint8_t mpcc_device::do_rsr()
+{
+	uint8_t data = m_rsr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_rcr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_rcr = data;
+	LOGSETUP(" - Rx DMA      : %s\n", (m_rcr & REG_RCR_RDSREN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx DONE out : %s\n", (m_rcr & REG_RCR_DONEEN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx RSYN out : %s\n", (m_rcr & REG_RCR_RSYNEN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx strip SYN: %s\n", (m_rcr & REG_RCR_STRSYN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx Abort    : %s\n", (m_rcr & REG_RCR_RABTEN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx Mode     : %s\n", (m_rcr & REG_RCR_RRES  ) ? "reset" : "normal");
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_rcr()
+{
+	uint8_t data = m_rcr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+uint8_t mpcc_device::do_rdr()
+{
+	uint8_t data = 0;
+
+	if (!m_rx_data_fifo.empty())
+	{
+		// load data from the FIFO
+		data = m_rx_data_fifo.dequeue();
+	}
+	else
+	{
+		LOGRX("data_read: Attempt to read out character from empty FIFO\n");
+		logerror("data_read: Attempt to read out character from empty FIFO\n");
+	}
+
+	LOGRX("%s <- %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
+	return data;
+}
+
+
+void mpcc_device::do_rier(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_rier = data;
+	LOGSETUP(" - Rx INT on Rx data available    : %s\n", (m_rier & REG_RIER_RDA)   ? "enabled" : "disabled");
+	LOGSETUP(" - Rx INT on End of Frame         : %s\n", (m_rier & REG_RIER_EOF)   ? "enabled" : "disabled");
+	LOGSETUP(" - Rx INT on CRC/Parity error     : %s\n", (m_rier & REG_RIER_CPERR) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx INT on Frame error          : %s\n", (m_rier & REG_RIER_FRERR) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx INT on Receiver overrun     : %s\n", (m_rier & REG_RIER_ROVRN) ? "enabled" : "disabled");
+	LOGSETUP(" - Rx INT on Abort/Break          : %s\n", (m_rier & REG_RIER_RAB)   ? "enabled" : "disabled");
+}
+
+uint8_t mpcc_device::do_rier()
+{
+	uint8_t data = m_rier;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_tdr(uint8_t data)
+{
+	LOG("%s -> %d [%c]\n", FUNCNAME, data, isprint(data) ? data : ' ');
 	// Check of Tx fifo has room
 	if (m_tx_data_fifo.full())
 	{
@@ -576,10 +928,268 @@ void mpcc_device::do_tdr_w(uint8_t data)
 	}
 	else // ..there is still room
 	{
-		m_tx_data_fifo.enqueue(data);		
+		m_tx_data_fifo.enqueue(data);
 		if (m_tx_data_fifo.full())
 		{
 			m_tsr &= ~REG_TSR_TDRA; // Mark fifo as full
 		}
 	}
+
+	// Check if Tx is enabled
+	if (m_tcr & REG_TCR_TEN)
+	{
+		LOGTX("- TX is enabled\n");
+		if (is_transmit_register_empty()) // Is the shift register loaded?
+		{
+			LOGTX("- Setting up transmitter\n");
+			transmit_register_setup(m_tx_data_fifo.dequeue()); // Load the shift register, reload is done in tra_complete()
+			m_tsr |= REG_TSR_TDRA; // Now there is a slot in the FIFO available again
+		}
+		else
+		{
+			LOGTX("- Transmitter not empty\n");
+		}
+	}
+}
+
+void mpcc_device::do_tcr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_tcr = data;
+	LOGSETUP(" - Tx                : %s\n", (m_tcr & REG_TCR_TEN)    ? "enabled" : "disabled");
+	LOGSETUP(" - Tx DMA            : %s\n", (m_tcr & REG_TCR_TDSREN) ? "enabled" : "disabled");
+	LOGSETUP(" - Tx Idle character : %s\n", (m_tcr & REG_TCR_TICS)   ? "AR2"     : "high");
+	LOGSETUP(" - Tx Half Word next : %s\n", (m_tcr & REG_TCR_THW)    ? "yes"     : "no");
+	LOGSETUP(" - Tx Last character : %s\n", (m_tcr & REG_TCR_TLAST)  ? "yes"     : "no");
+	LOGSETUP(" - Tx SYN            : %s\n", (m_tcr & REG_TCR_TSYN)   ? "enabled" : "disabled");
+	LOGSETUP(" - Tx Abort command  : %s\n", (m_tcr & REG_TCR_TABT)   ? "active"  : "inactive");
+	LOGSETUP(" - Tx Mode           : %s\n", (m_tcr & REG_TCR_TRES)   ? "reset"   : "normal");
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_tcr()
+{
+	uint8_t data = m_tcr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_tivnr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_tivnr = data;
+	LOGSETUP(" - Tx Int vector: %02x\n", m_tivnr);
+}
+
+uint8_t mpcc_device::do_tivnr()
+{
+	uint8_t data = m_tivnr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_tier(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_tier = data;
+	LOGSETUP(" - Tx INT on FIFO slot available  : %s\n", (m_tier & REG_TIER_TDRA) ? "enabled" : "disabled");
+	LOGSETUP(" - Tx INT on Frame complete       : %s\n", (m_tier & REG_TIER_TFC ) ? "enabled" : "disabled");
+	LOGSETUP(" - Tx INT on Underrun             : %s\n", (m_tier & REG_TIER_TUNRN) ? "enabled" : "disabled");
+	LOGSETUP(" - Tx INT on Frame error          : %s\n", (m_tier & REG_TIER_TFERR) ? "enabled" : "disabled");
+}
+
+uint8_t mpcc_device::do_tier()
+{
+	uint8_t data = m_tier;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_sisr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	if (data & REG_SISR_CTST) m_sisr &= ~REG_SISR_CTST;
+	if (data & REG_SISR_DSRT) m_sisr &= ~REG_SISR_DSRT;
+	if (data & REG_SISR_DCDT) m_sisr &= ~REG_SISR_DCDT;
+
+	LOGSETUP(" - CTS %d transitioned: %d\n", (m_sisr & REG_SISR_CTSLVL) ? 1 :0, (m_sisr & REG_SISR_CTST) ? 1 : 0);
+	LOGSETUP(" - DSR %d transitioned: %d\n", (m_sisr & REG_SISR_DSRLVL) ? 1 :0, (m_sisr & REG_SISR_DSRT) ? 1 : 0);
+	LOGSETUP(" - DCD %d transitioned: %d\n", (m_sisr & REG_SISR_DCDLVL) ? 1 :0, (m_sisr & REG_SISR_DCDT) ? 1 : 0);
+}
+
+uint8_t mpcc_device::do_sisr()
+{
+	uint8_t data = m_sisr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_sicr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+
+	// If RTS is activated the RTS output latch can only be reset by an empty FIFO.
+	if ( !(m_sicr & REG_SICR_RTSLVL) &&
+		 (data & REG_SICR_RTSLVL))
+	{
+		m_out_rts_cb(ASSERT_LINE); // TODO: respect the RTSLV bit
+	}
+
+	m_sicr = data;
+
+	if (m_sicr & REG_SICR_DTRLVL)
+	{
+		m_out_dtr_cb(ASSERT_LINE);
+	}
+	else
+	{
+		m_out_dtr_cb(CLEAR_LINE);
+	}
+
+	LOGSETUP(" - RTS level : %s\n", (m_sicr & REG_SICR_RTSLVL) ? "high" : "low");
+	LOGSETUP(" - DTR level : %s\n", (m_sicr & REG_SICR_DTRLVL) ? "high" : "low");
+	LOGSETUP(" - Echo Mode : %s\n", (m_sicr & REG_SICR_ECHO)   ? "enabled" : "disabled");
+	LOGSETUP(" - Test Mode : %s\n", (m_sicr & REG_SICR_TEST)   ? "enabled" : "disabled");
+}
+
+uint8_t mpcc_device::do_sicr()
+{
+	uint8_t data = m_sicr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_sier(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_sier = data;
+	LOGSETUP(" - Serial interface INT on CTS: %s\n", (m_sier & REG_SIER_CTS) ? "enabled" : "disabled");
+	LOGSETUP(" - Serial interface INT on DSR: %s\n", (m_sier & REG_SIER_DSR) ? "enabled" : "disabled");
+	LOGSETUP(" - Serial interface INT on DCD: %s\n", (m_sier & REG_SIER_DCD) ? "enabled" : "disabled");
+}
+
+uint8_t mpcc_device::do_sier()
+{
+	uint8_t data = m_sier;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_psr1(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_psr1 = data;
+	LOGSETUP(" - Zero Address option: %s\n", (m_psr1 & REG_PSR1_ADRZ)  ? "enabled" : "disabled" );
+	LOGSETUP(" - IPARS option       : %s\n", (m_psr1 & REG_PSR1_IPARS) ? "enabled" : "disabled" );
+	LOGSETUP(" - Control Field Width: %s\n", (m_psr1 & REG_PSR1_CTLEX) ? "16 bit"  : "8 bit" );
+	LOGSETUP(" - Address Extend     : %s\n", (m_psr1 & REG_PSR1_ADDEX) ? "enabled" : "disabled" );
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_psr1()
+{
+	uint8_t data = m_psr1;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_psr2(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_psr2 = data;
+	LOGSETUP(" - %s data bus\n", (m_psr2 & REG_PSR2_WDBYT) ? "16 bit (not implemented)" : "8 bit" );
+	LOGSETUP(" - %s stop bits\n",(m_psr2 & REG_PSR2_STP_MSK) == REG_PSR2_STP_1 ? "1" :
+		( (m_psr2 & REG_PSR2_STP_MSK) == REG_PSR2_STP_1_5 ? "1.5" :
+		  ( (m_psr2 & REG_PSR2_STP_MSK) == REG_PSR2_STP_2 ? "2" : "Unknown")));
+	LOGSETUP(" - %d bit characters\n", 5 + ((m_psr2 & REG_PSR2_CHLN_MSK) >> 3));
+	LOGSETUP(" - Protocol %d %s\n", m_psr2 & REG_PSR2_PSEL_MSK, (m_psr2 & REG_PSR2_PSEL_MSK) != REG_PSR2_PSEL_ASCII ? "(not implemented)" : "");
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_psr2()
+{
+	uint8_t data = m_psr2;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+/*
+ * Clocks and Baud Rates
+ */
+void mpcc_device::do_brdr1(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_brdr1 = data;
+	LOGSETUP(" - Baudrate Divider 1: %02x\n", m_brdr1);
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_brdr1()
+{
+	uint8_t data = m_brdr1;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_brdr2(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_brdr2 = data;
+	LOGSETUP(" - Baudrate Divider 2: %02x\n", m_brdr2);
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_brdr2()
+{
+	uint8_t data = m_brdr2;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_ccr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_ccr = data;
+	LOGSETUP(" - Prescaler: x%d\n", (m_ccr & REG_CCR_PSCDIV) ? 3 : 2);
+	LOGSETUP(" - TxC used as: %s\n", (m_ccr & REG_CCR_TCLO) ? "output" : "input");
+	LOGSETUP(" - RxC taken from: %s source, (ASYNC mode only)\n", (m_ccr & REG_CCR_TCLO) ? "internal" : "external");
+	LOGSETUP(" - External RxC divisor: x%d\n",(m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X1 ? 1 :
+			 ( (m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X16 ? 16 :
+			   ( (m_ccr & REG_CCR_CLKDIV_MSK) == REG_CCR_CLKDIV_X32 ? 32 : 64)));
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_ccr()
+{
+	uint8_t data = m_ccr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
+
+void mpcc_device::do_ecr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_ecr = data;
+	LOGSETUP(" - Parity         : %s\n", (m_ecr & REG_ECR_PAREN) ? "enabled" : "disabled");
+	LOGSETUP(" - Parity         : %s\n", (m_ecr & REG_ECR_ODDPAR) ? "odd" : "even");
+	LOGSETUP(" - CRC            : %s\n", (m_ecr & REG_ECR_CFCRC) ? "enabled" : "disabled");
+	LOGSETUP(" - CRC Polynominal: %s\n", (m_ecr & REG_ECR_CRCSEL_MSK) == REG_ECR_CRCSEL_V41 ? "CCITT V.41 (BOP)" :
+			 ( (m_ecr & REG_ECR_CRCSEL_MSK) == REG_ECR_CRCSEL_C16 ? "CRC-16 (BSC)" :
+			   ( (m_ecr & REG_ECR_CRCSEL_MSK) == REG_ECR_CRCSEL_VRC ? "VRC/LRC (BSC, ASCII, non-transp)" :
+				 "Not used")));
+
+	update_serial();
+}
+
+uint8_t mpcc_device::do_ecr()
+{
+	uint8_t data = m_ecr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
 }

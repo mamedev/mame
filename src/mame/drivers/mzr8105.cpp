@@ -188,8 +188,8 @@ static ADDRESS_MAP_START (mzr8105_mem, AS_PROGRAM, 16, mzr8105_state)
 	AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 	AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
 	AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
-//	AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//	AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
+//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -198,7 +198,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(mzr8105_vme_cards)
 	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-SLOT_INTERFACE_END	
+SLOT_INTERFACE_END
 
 /*
  * Machine configuration

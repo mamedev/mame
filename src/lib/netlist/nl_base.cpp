@@ -135,24 +135,6 @@ const logic_family_desc_t *family_CD4XXX()
 	return &obj;
 }
 
-class logic_family_std_proxy_t : public logic_family_desc_t
-{
-public:
-	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
-};
-
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
-		const pstring &name, logic_output_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-}
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-}
 
 // ----------------------------------------------------------------------------------------
 // queue_t
@@ -199,7 +181,7 @@ void detail::queue_t::on_post_load()
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
-		detail::net_t *n = netlist().find_net(m_names[i].m_buf);
+		detail::net_t *n = netlist().find_net(pstring(m_names[i].m_buf, pstring::UTF8));
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
 		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
 		this->push(n, netlist_time::from_raw(m_times[i]));
@@ -303,48 +285,18 @@ void netlist_t::register_dev(plib::owned_ptr<core_device_t> dev)
 
 void netlist_t::remove_dev(core_device_t *dev)
 {
-    m_devices.erase(
-        std::remove_if(
-            m_devices.begin(),
+	m_devices.erase(
+		std::remove_if(
+			m_devices.begin(),
 			m_devices.end(),
-            [&] (plib::owned_ptr<core_device_t> const& p)
-            {
-    			return p.get() == dev;
-            }),
+			[&] (plib::owned_ptr<core_device_t> const& p)
+			{
+				return p.get() == dev;
+			}),
 			m_devices.end()
-        );
+		);
 }
 
-const logic_family_desc_t *netlist_t::family_from_model(const pstring &model)
-{
-	model_map_t map;
-	setup().model_parse(model, map);
-
-	if (setup().model_value_str(map, "TYPE") == "TTL")
-		return family_TTL();
-	if (setup().model_value_str(map, "TYPE") == "CD4XXX")
-		return family_CD4XXX();
-
-	for (auto & e : m_family_cache)
-		if (e.first == model)
-			return e.second.get();
-
-	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
-
-	ret->m_fixed_V = setup().model_value(map, "FV");
-	ret->m_low_thresh_PCNT = setup().model_value(map, "IVL");
-	ret->m_high_thresh_PCNT = setup().model_value(map, "IVH");
-	ret->m_low_VO = setup().model_value(map, "OVL");
-	ret->m_high_VO = setup().model_value(map, "OVH");
-	ret->m_R_low = setup().model_value(map, "ORL");
-	ret->m_R_high = setup().model_value(map, "ORH");
-
-	auto retp = ret.get();
-
-	m_family_cache.emplace_back(model, std::move(ret));
-
-	return retp;
-}
 
 
 void netlist_t::start()
@@ -600,6 +552,21 @@ void netlist_t::print_stats() const
 	}
 }
 
+core_device_t *netlist_t::pget_single_device(const pstring classname, bool (*cc)(core_device_t *))
+{
+	core_device_t *ret = nullptr;
+	for (auto &d : m_devices)
+	{
+		if (cc(d.get()))
+		{
+			if (ret != nullptr)
+				this->log().fatal(MF_1_MORE_THAN_ONE_1_DEVICE_FOUND, classname);
+			else
+				ret = d.get();
+		}
+	}
+	return ret;
+}
 
 
 // ----------------------------------------------------------------------------------------
@@ -651,6 +618,11 @@ void core_device_t::set_delegate_pointer()
 #endif
 }
 
+plib::plog_base<NL_DEBUG> &core_device_t::log()
+{
+	return netlist().log();
+}
+
 // ----------------------------------------------------------------------------------------
 // device_t
 // ----------------------------------------------------------------------------------------
@@ -698,7 +670,7 @@ void device_t::connect(const pstring &t1, const pstring &t2)
 void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	if (!setup().connect(t1, t2))
-		netlist().log().fatal(MF_2_ERROR_CONNECTING_1_TO_2, t1.name(), t2.name());
+		log().fatal(MF_2_ERROR_CONNECTING_1_TO_2, t1.name(), t2.name());
 }
 
 
@@ -706,9 +678,9 @@ void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_term
 // family_setter_t
 // -----------------------------------------------------------------------------
 
-detail::family_setter_t::family_setter_t(core_device_t &dev, const char *desc)
+detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring desc)
 {
-	dev.set_logic_family(dev.netlist().family_from_model(desc));
+	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
 }
 
 detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *desc)
@@ -1174,7 +1146,7 @@ param_ptr_t::~param_ptr_t()
 
 void param_model_t::changed()
 {
-	netlist().log().fatal("Models can not be changed at runtime");
+	netlist().log().fatal(MF_1_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, name());
 	m_map.clear();
 }
 
@@ -1200,8 +1172,6 @@ std::unique_ptr<plib::pistream> param_data_t::stream()
 {
 	return device().netlist().setup().get_data_stream(Value());
 }
-
-
 
 	namespace devices
 	{

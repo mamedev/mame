@@ -1493,16 +1493,18 @@ end
 
 if (BUSES["VME"]~=null) then
 	files {
-    MAME_DIR .. "src/devices/bus/vme/vme.cpp",
-    MAME_DIR .. "src/devices/bus/vme/vme.h",
-    MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
-    MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
-    MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
-    MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
-    MAME_DIR .. "src/devices/bus/vme/vme_fcisio.cpp",
-    MAME_DIR .. "src/devices/bus/vme/vme_fcisio.h",
-    MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.cpp",
-    MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
+		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcisio.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcisio.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
 	}
 end
 
@@ -2640,6 +2642,22 @@ if (BUSES["A1BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a1bus/a1cassette.h",
 		MAME_DIR .. "src/devices/bus/a1bus/a1cffa.cpp",
 		MAME_DIR .. "src/devices/bus/a1bus/a1cffa.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/amiga/keyboard/keyboard.h,BUSES["AMIGA_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["AMIGA_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.h",
 	}
 end
 

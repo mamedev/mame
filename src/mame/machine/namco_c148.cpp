@@ -2,27 +2,27 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Namco C148 - CPU Bus Manager
+    Namco C148 - CPU Bus Manager
 
-	Does some Memory Decode, Interrupt Handling, 3 bit PIO port, Bus Controller
+    Does some Memory Decode, Interrupt Handling, 3 bit PIO port, Bus Controller
 
-	Based off implementation from K.Wilkins and Phil Stroffolino
-	
-	TODO: 
-	- hookup C116 device, @see mame/includes/namcoic.h
-	
+    Based off implementation from K.Wilkins and Phil Stroffolino
+
+    TODO:
+    - hookup C116 device, @see mame/includes/namcoic.h
+
 =============================================================================
 Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
     Bus Controller?                1C0XXX
     ????????                       1C2XXX
     ????????                       1C4XXX
-	-x- master priority bit?
+    -x- master priority bit?
     Master/Slave IRQ level         1C6XXX              D00-D02
     EXIRQ level                    1C8XXX              D00-D02
     POSIRQ level                   1CAXXX              D00-D02
     SCIRQ level                    1CCXXX              D00-D02
     VBLANK IRQ level               1CEXXX              D00-D02
-	xxx irq level for specific irq.
+    xxx irq level for specific irq.
     ????????                       1D0XXX
     ????????                       1D4000 trigger master/slave INT?
 
@@ -35,9 +35,9 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
     EEPROM Ready status            1E0XXX         R    D01
     Sound CPU Reset control        1E2XXX           W  D01
     Slave 68000 & IO CPU Reset     1E4XXX           W  D01
-	xxx PIO ports, per-HW / CPU specific
+    xxx PIO ports, per-HW / CPU specific
     Watchdog reset kicker          1E6XXX           W
-	xxx Unknown at current stage if internal or external to the C148
+    xxx Unknown at current stage if internal or external to the C148
 
 ***************************************************************************/
 
@@ -131,11 +131,11 @@ void namco_c148_device::device_reset()
 //  IRQ section
 //**************************************************************************
 
-READ8_MEMBER( namco_c148_device::pos_irq_level_r ) 	  	{ return m_irqlevel.pos & 7; }
-READ8_MEMBER( namco_c148_device::vblank_irq_level_r ) 	{ return m_irqlevel.vblank & 7; }
-READ8_MEMBER( namco_c148_device::cpu_irq_level_r )    	{ return m_irqlevel.cpu & 7; }
-READ8_MEMBER( namco_c148_device::ex_irq_level_r ) 	  	{ return m_irqlevel.ex & 7; }
-READ8_MEMBER( namco_c148_device::sci_irq_level_r ) 		{ return m_irqlevel.sci & 7; }
+READ8_MEMBER( namco_c148_device::pos_irq_level_r )      { return m_irqlevel.pos & 7; }
+READ8_MEMBER( namco_c148_device::vblank_irq_level_r )   { return m_irqlevel.vblank & 7; }
+READ8_MEMBER( namco_c148_device::cpu_irq_level_r )      { return m_irqlevel.cpu & 7; }
+READ8_MEMBER( namco_c148_device::ex_irq_level_r )       { return m_irqlevel.ex & 7; }
+READ8_MEMBER( namco_c148_device::sci_irq_level_r )      { return m_irqlevel.sci & 7; }
 
 inline void namco_c148_device::flush_irq_acks()
 {
@@ -146,23 +146,23 @@ inline void namco_c148_device::flush_irq_acks()
 		m_hostcpu->set_input_line(i,CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_c148_device::pos_irq_level_w ) 	{ m_irqlevel.pos = data & 7; 	flush_irq_acks(); if(data != 0) { LOG(("%s: pos IRQ level = %02x\n",this->tag(),data)); }	}
-WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w ) 	{ m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG(("%s: vblank IRQ level = %02x\n",this->tag(),data));	}
-WRITE8_MEMBER( namco_c148_device::cpu_irq_level_w )		{ m_irqlevel.cpu = data & 7;	flush_irq_acks(); LOG(("%s: cpu IRQ level = %02x\n",this->tag(),data));	}
-WRITE8_MEMBER( namco_c148_device::ex_irq_level_w )		{ m_irqlevel.ex = data & 7;		flush_irq_acks(); LOG(("%s: ex IRQ level = %02x\n",this->tag(),data));	}
-WRITE8_MEMBER( namco_c148_device::sci_irq_level_w )		{ m_irqlevel.sci = data & 7;	flush_irq_acks(); LOG(("%s: sci IRQ level = %02x\n",this->tag(),data));	}
+WRITE8_MEMBER( namco_c148_device::pos_irq_level_w )     { m_irqlevel.pos = data & 7;    flush_irq_acks(); if(data != 0) { LOG(("%s: pos IRQ level = %02x\n",this->tag(),data)); }   }
+WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w )  { m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG(("%s: vblank IRQ level = %02x\n",this->tag(),data));  }
+WRITE8_MEMBER( namco_c148_device::cpu_irq_level_w )     { m_irqlevel.cpu = data & 7;    flush_irq_acks(); LOG(("%s: cpu IRQ level = %02x\n",this->tag(),data)); }
+WRITE8_MEMBER( namco_c148_device::ex_irq_level_w )      { m_irqlevel.ex = data & 7;     flush_irq_acks(); LOG(("%s: ex IRQ level = %02x\n",this->tag(),data));  }
+WRITE8_MEMBER( namco_c148_device::sci_irq_level_w )     { m_irqlevel.sci = data & 7;    flush_irq_acks(); LOG(("%s: sci IRQ level = %02x\n",this->tag(),data)); }
 
-READ16_MEMBER( namco_c148_device::vblank_irq_ack_r ) 	{ m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); return 0; }
-READ16_MEMBER( namco_c148_device::pos_irq_ack_r ) 		{ m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE); 	return 0; }
-READ16_MEMBER( namco_c148_device::cpu_irq_ack_r ) 		{ m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE); 	return 0; }
-READ16_MEMBER( namco_c148_device::ex_irq_ack_r ) 		{ m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE); 	return 0; }
-READ16_MEMBER( namco_c148_device::sci_irq_ack_r ) 		{ m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); 	return 0; }
+READ16_MEMBER( namco_c148_device::vblank_irq_ack_r )    { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); return 0; }
+READ16_MEMBER( namco_c148_device::pos_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);    return 0; }
+READ16_MEMBER( namco_c148_device::cpu_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE);    return 0; }
+READ16_MEMBER( namco_c148_device::ex_irq_ack_r )        { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE);     return 0; }
+READ16_MEMBER( namco_c148_device::sci_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE);    return 0; }
 
-WRITE16_MEMBER( namco_c148_device::vblank_irq_ack_w ) 	{ m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::pos_irq_ack_w ) 		{ m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::cpu_irq_ack_w ) 		{ m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::ex_irq_ack_w ) 		{ m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE); }
-WRITE16_MEMBER( namco_c148_device::sci_irq_ack_w ) 		{ m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); }
+WRITE16_MEMBER( namco_c148_device::vblank_irq_ack_w )   { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); }
+WRITE16_MEMBER( namco_c148_device::pos_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE); }
+WRITE16_MEMBER( namco_c148_device::cpu_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE); }
+WRITE16_MEMBER( namco_c148_device::ex_irq_ack_w )       { m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE); }
+WRITE16_MEMBER( namco_c148_device::sci_irq_ack_w )      { m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); }
 
 //**************************************************************************
 //  Comm ports

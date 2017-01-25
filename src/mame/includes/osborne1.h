@@ -81,6 +81,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
+
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

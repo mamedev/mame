@@ -108,7 +108,7 @@ protected:
 	std::shared_ptr<asio::io_context>   m_io_context;
 	std::unique_ptr<webpp::http_server> m_server;
 	std::unique_ptr<webpp::ws_server>   m_wsserver;
-	std::thread						    m_server_thread;
+	std::thread                         m_server_thread;
 };
 
 

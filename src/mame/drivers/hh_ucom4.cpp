@@ -67,6 +67,7 @@ TODO:
 ***************************************************************************/
 
 #include "includes/hh_ucom4.h"
+#include "video/hlcd0515.h"
 
 // internal artwork
 #include "efball.lh"
@@ -1669,16 +1670,19 @@ class mcompgin_state : public hh_ucom4_state
 {
 public:
 	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+		: hh_ucom4_state(mconfig, type, tag),
+		m_lcd(*this, "lcd")
 	{ }
 
-	void prepare_display();
+	required_device<hlcd0569_device> m_lcd;
+
+	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
 };
 
 // handlers
 
-void mcompgin_state::prepare_display()
+WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
 }
 
@@ -1718,7 +1722,9 @@ static MACHINE_CONFIG_START( mcompgin, mcompgin_state )
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(mcompgin_state, unk_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(mcompgin_state, unk_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	MCFG_DEVICE_ADD("lcd", HLCD0569, 1000) // C=?
+	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(mcompgin_state, lcd_output_w))
 	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
 
 	/* sound hardware */

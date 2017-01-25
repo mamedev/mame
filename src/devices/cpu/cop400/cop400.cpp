@@ -10,28 +10,28 @@
 
     Type        ROM     RAM     G       D       IN
 
-    COP410      512x8   32x4                    N/A 
-    COP411      512x8   32x4    0-2     0-1     N/A 
+    COP410      512x8   32x4                    N/A
+    COP411      512x8   32x4    0-2     0-1     N/A
     COP413      512x8   32x4            N/A     N/A
-    COP401      N/A     32x4                    N/A 
+    COP401      N/A     32x4                    N/A
 
     COP420      1024x8  64x4
-    COP421      1024x8  64x4                    N/A 
-    COP422      1024x8  64x4    2-3     2-3     N/A 
+    COP421      1024x8  64x4                    N/A
+    COP422      1024x8  64x4    2-3     2-3     N/A
     COP402      N/A     64x4
 
     COP444L     2048x8  128x4
-    COP445L     2048x8  128x4                   N/A 
+    COP445L     2048x8  128x4                   N/A
     COP404L     N/A     128x4
 
     COP424C     1024x8  64x4
-    COP425C     1024x8  64x4                    N/A 
+    COP425C     1024x8  64x4                    N/A
     COP426C     1024x8  64x4    2-3     2-3
-    
+
     COP444C     2048x8  128x4
-    COP445C     2048x8  128x4                   N/A 
+    COP445C     2048x8  128x4                   N/A
     COP446C     2048x8  128x4   2-3     2-3
-	COP404C     N/A     128x4
+    COP404C     N/A     128x4
 
 ****************************************************************************
 
@@ -47,7 +47,7 @@
 
     TODO:
 
-	- COP410L/COP410C
+    - COP410L/COP410C
     - save internal RAM when CKO is RAM power supply pin
     - COP404L opcode map switching, dual timer, microbus enable
 

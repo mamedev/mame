@@ -43,13 +43,13 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_w );
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
-	
+
 	DECLARE_READ8_MEMBER( mem_r )
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
 		return m_bdmem->read8(space, offset);
 	}
-	
+
 	DECLARE_WRITE8_MEMBER( mem_w )
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
@@ -65,7 +65,7 @@ public:
 		}
 		return 0xff;
 	}
-	
+
 	DECLARE_WRITE8_MEMBER( io_w )
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);

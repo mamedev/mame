@@ -166,11 +166,11 @@ NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
 	m_D_EB.set_mat(      gee, gec - gee,  -Ie,
-			       gce - gee, gee - gec,   Ie);
+				   gce - gee, gee - gec,   Ie);
 	m_D_CB.set_mat(      gcc, gce - gcc,  -Ic,
-			       gec - gcc, gcc - gce,   Ic);
+				   gec - gcc, gcc - gce,   Ic);
 	m_D_EC.set_mat(        0,      -gec,    0,
-			            -gce,         0,    0);
+						-gce,         0,    0);
 }
 
 

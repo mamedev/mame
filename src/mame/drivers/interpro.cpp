@@ -81,7 +81,10 @@ READ32_MEMBER(interpro_state::idprom_r)
 	LOG_IDPROM("idprom read offset 0x%x mask 0x%08x at 0x%08x\n", offset, mem_mask, space.device().safe_pc());
 
 	// abitrary fake number for now, not working properly
-	uint32_t speed = 70000000;
+	u32 speed = 70000000;
+	u32 speed1 = speed >> 24;
+	u32 speed2 = speed >> 16;
+	u32 speed3 = speed >> 8;
 
 	static uint8_t idprom[] = {
 		// module type id
@@ -97,7 +100,7 @@ READ32_MEMBER(interpro_state::idprom_r)
 		// if they're empty, a default value of 50 000 000 is used
 		// perhaps this is a system speed (50MHz)?
 		0x2, 0x34, 0x56, 0x78,
-		(speed >> 24) & 0xff, (speed >> 16) & 0xff, (speed >> 8) & 0xff, (speed >> 0) & 0xff,
+		(u8)speed1, (u8)speed2, (u8)speed3, (u8)speed,
 
 		// reserved bytes
 		0xff, 0xff, 
@@ -198,7 +201,7 @@ WRITE8_MEMBER(interpro_state::scsi_w)
 // driver init
 DRIVER_INIT_MEMBER(interpro_state, ip2800)
 {
-	address_space &as = m_mmu->space(AS_1);
+	//address_space &as = m_mmu->space(AS_1);
 }
 
 // these maps point the cpu virtual addresses to the mmu
@@ -341,5 +344,5 @@ ROM_START(ip2800)
 	ROM_LOAD_OPTIONAL("ip2830_eeprom.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS			INIT	COMPANY         FULLNAME         FLAGS */
-COMP( 1990, ip2800,          0, 0,      ip2800,		ip2800,	interpro_state, ip2800, "Intergraph",   "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT     COMPANY         FULLNAME         FLAGS */
+COMP( 1990, ip2800,     0,      0,      ip2800,     ip2800, interpro_state, ip2800, "Intergraph",   "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

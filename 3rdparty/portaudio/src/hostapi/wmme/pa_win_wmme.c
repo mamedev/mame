@@ -463,7 +463,7 @@ PaWinMmeDeviceInfo;
 #define PA_ENV_BUF_SIZE_  (32)
 #define PA_REC_IN_DEV_ENV_NAME_  ("PA_RECOMMENDED_INPUT_DEVICE")
 #define PA_REC_OUT_DEV_ENV_NAME_  ("PA_RECOMMENDED_OUTPUT_DEVICE")
-static PaDeviceIndex GetEnvDefaultDeviceID( char *envName )
+static PaDeviceIndex GetEnvDefaultDeviceID( const char *envName )
 {
     PaDeviceIndex recommendedIndex = paNoDevice;
     DWORD   hresult;

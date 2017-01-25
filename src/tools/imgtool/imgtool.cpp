@@ -92,8 +92,8 @@ static std::string extract_padded_string(const char *source, size_t len)
 
 //-------------------------------------------------
 //  extract_padded_filename - this is a common
-//	enough scenario that it is justified to have
-//	this in common code
+//  enough scenario that it is justified to have
+//  this in common code
 //-------------------------------------------------
 
 std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length)

@@ -275,7 +275,7 @@ netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
 		ret = new xtype(desc.name, desc.classname, desc.def_param, s); } break
 
 #define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
-	                ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s)
+					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s)
 
 void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 {
@@ -299,7 +299,7 @@ void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 	}
 	ret->m_desc = desc.desc;
 	if (desc.family != "")
-		ret->m_family = setup.netlist().family_from_model(desc.family);
+		ret->m_family = setup.family_from_model(desc.family);
 	setup.factory().register_device(std::unique_ptr<netlist_base_factory_truthtable_t>(ret));
 }
 

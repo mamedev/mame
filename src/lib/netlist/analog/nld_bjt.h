@@ -67,8 +67,8 @@ namespace netlist
 	 *   |    |MJE |B-E junction exponential factor |- |0.33|0.33| |
 	 *   |    |TF |ideal forward transit time |sec |0|0.1ns | |
 	 *   |    |XTF|coefficient for bias dependence of TF |- |0| | |
-	 *   |    |VTF |voltage describing VBC 	dependence of TF |V |infinite | | |
-	 *   |    |ITF |high-current parameter 	for effect on TF |A |0| |* |
+	 *   |    |VTF |voltage describing VBC  dependence of TF |V |infinite | | |
+	 *   |    |ITF |high-current parameter  for effect on TF |A |0| |* |
 	 *   |    |PTF |excess phase at freq=1.0/(TF*2PI) Hz |deg |0| | |
 	 *   |    |CJC |B-C zero-bias depletion capacitance |F |0|2pF |* |
 	 *   |    |VJC |B-C built-in potential |V |0.75|0.5| |
@@ -83,7 +83,7 @@ namespace netlist
 	 *   |    |XTI|temperature exponent for effect on IS |- |3| | |
 	 *   |    |KF |flicker-noise coefficient |- |0| | |
 	 *   |    |AF |flicker-noise exponent |- |1| | |
-	 *   |    |FC |coefficient for forward-bias	depletion capacitance formula |- |0.5| | |
+	 *   |    |FC |coefficient for forward-bias depletion capacitance formula |- |0.5| | |
 	 *   |    |TNOM |Parameter measurement temperature |C |27|50| |
 	 */
 
@@ -102,7 +102,7 @@ namespace netlist
 		value_t m_IS; //!< transport saturation current
 		value_t m_BF; //!< ideal maximum forward beta
 		value_t m_NF; //!< forward current emission coefficient
-		value_t m_BR; //!< ideal maximum reverse beta 
+		value_t m_BR; //!< ideal maximum reverse beta
 		value_t m_NR; //!< reverse current emission coefficient
 	};
 

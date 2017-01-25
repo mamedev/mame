@@ -97,6 +97,7 @@
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
+#include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 #include "machine/clock.h"
@@ -138,11 +139,11 @@ miniforce_state(const machine_config &mconfig, device_type type, const char *tag
 static ADDRESS_MAP_START (miniforce_mem, AS_PROGRAM, 32, miniforce_state)
 	ADDRESS_MAP_UNMAP_HIGH
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
-//	AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
-//	AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
-//	AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
-//	AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//	AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
+//  AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
+//  AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
+//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
+//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 #endif
 
@@ -163,17 +164,18 @@ static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(miniforce_vme_cards)
+	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END	
+SLOT_INTERFACE_END
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START (miniforce, miniforce_state)
-//	MCFG_CPU_PROGRAM_MAP (miniforce_mem)
+//  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, "fccpu20")
 	MCFG_VME_SLOT_ADD ("vme", "slot2", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot3", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot4", miniforce_vme_cards, nullptr)

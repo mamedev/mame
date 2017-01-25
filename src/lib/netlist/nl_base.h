@@ -97,7 +97,7 @@ class NETLIB_NAME(name) : public device_t
 	public: virtual bool is_dynamic() const override { return expr; }
 
 	/*! Add this to a device definition to mark the device as a time-stepping device.
-     *
+	 *
 	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
 	 *  the capacitor and inductor devices uses this.
 	 *
@@ -256,7 +256,7 @@ namespace netlist
 		double R_low() const { return m_R_low; }
 		double R_high() const { return m_R_high; }
 
-		double m_fixed_V;		    //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		double m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5. */
 		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		double m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
 		double m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"
@@ -990,7 +990,7 @@ namespace netlist
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 		model_map_t m_map;
-	};
+};
 
 
 	class param_data_t : public param_str_t
@@ -1001,6 +1001,28 @@ namespace netlist
 		std::unique_ptr<plib::pistream> stream();
 	protected:
 		virtual void changed() override;
+	};
+
+	// -----------------------------------------------------------------------------
+	// rom parameter
+	// -----------------------------------------------------------------------------
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name);
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1069,6 +1091,8 @@ namespace netlist
 			#endif
 		}
 
+		plib::plog_base<NL_DEBUG> &log();
+
 	public:
 		virtual void timestep(ATTR_UNUSED const nl_double st) { }
 		virtual void update_terminals() { }
@@ -1135,7 +1159,7 @@ namespace netlist
 	struct detail::family_setter_t
 	{
 		family_setter_t() { }
-		family_setter_t(core_device_t &dev, const char *desc);
+		family_setter_t(core_device_t &dev, const pstring desc);
 		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
 	};
 
@@ -1215,7 +1239,6 @@ namespace netlist
 		void remove_dev(core_device_t *dev);
 
 		detail::net_t *find_net(const pstring &name);
-		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1230,22 +1253,16 @@ namespace netlist
 			return tmp;
 		}
 
-		template<class device_class>
-		device_class *get_single_device(const char *classname)
+		template<class C>
+		static bool check_class(core_device_t *p)
 		{
-			device_class *ret = nullptr;
-			for (auto &d : m_devices)
-			{
-				device_class *dev = dynamic_cast<device_class *>(d.get());
-				if (dev != nullptr)
-				{
-					if (ret != nullptr)
-						this->log().fatal("more than one {1} device found", classname);
-					else
-						ret = dev;
-				}
-			}
-			return ret;
+			return dynamic_cast<C *>(p) != nullptr;
+		}
+
+		template<class C>
+		C *get_single_device(const pstring classname)
+		{
+			return dynamic_cast<C *>(pget_single_device(classname, check_class<C>));
 		}
 
 		/* logging and name */
@@ -1260,24 +1277,30 @@ namespace netlist
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, pstring::from_utf8(owner.name()) + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), pstring::from_utf8(owner.name()) + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
 		void rebuild_lists(); /* must be called after post_load ! */
 
 		plib::dynlib &lib() { return *m_lib; }
 
+		// FIXME: find something better
 		/* sole use is to manage lifetime of net objects */
 		std::vector<plib::owned_ptr<detail::net_t>> m_nets;
+		/* sole use is to manage lifetime of family objects */
+		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 	protected:
 		void print_stats() const;
 
 	private:
+
+		core_device_t *pget_single_device(const pstring classname, bool (*cc)(core_device_t *));
+
 		/* mostly rw */
 		netlist_time                        m_time;
 		detail::queue_t                     m_queue;
@@ -1302,8 +1325,6 @@ namespace netlist
 		nperfcount_t    m_perf_inp_active;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
-		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 };
 
 	// -----------------------------------------------------------------------------
@@ -1321,43 +1342,24 @@ namespace netlist
 		object_array_t(core_device_t &dev, init names)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, names.p[i]);
+				this->emplace(i, dev, pstring(names.p[i], pstring::UTF8));
 		}
-	};
-
-	// -----------------------------------------------------------------------------
-	// rom parameter
-	// -----------------------------------------------------------------------------
-
-	template <typename ST, std::size_t AW, std::size_t DW>
-	class param_rom_t final: public param_data_t
-	{
-	public:
-
-		param_rom_t(device_t &device, const pstring name)
-		: param_data_t(device, name)
-		{
-			auto f = stream();
-			if (f != nullptr)
-				f->read(&m_data[0],1<<AW);
-			else
-				device.netlist().log().warning("Rom {1} not found", Value());
-		}
-
-		const ST & operator[] (std::size_t n) { return m_data[n]; }
-
-	protected:
-		virtual void changed() override
-		{
-			stream()->read(&m_data[0],1<<AW);
-		}
-	private:
-		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	inline param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring name)
+	: param_data_t(device, name)
+	{
+		auto f = stream();
+		if (f != nullptr)
+			f->read(&m_data[0],1<<AW);
+		else
+			device.netlist().log().warning("Rom {1} not found", Value());
+	}
 
 	inline bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
 	{

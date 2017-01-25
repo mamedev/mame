@@ -2548,6 +2548,150 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="desk3">
+		<description>DeskMate (3.05, 5.25")</description>
+		<year>1990</year>
+		<publisher>Tandy</publisher>
+		<info name="version" value="03.05.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1: Startup Disk, Install" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk1.img" size="368640" crc="7f4182af" sha1="a02a7dec082d3434c3cde29ad05aef9eda9f4765" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2: Desktop, Text" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk2.img" size="368640" crc="6fb5aa52" sha1="f9c89a60103af2de38a301932670476984604a2f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3: PC-Link, Telecom, Worksheet" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk3.img" size="368640" crc="455605a7" sha1="69e48cd7d7fc3a8514465225a7540566dd6347e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4: Address Book, Calendar" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk4.img" size="368640" crc="3b32b34a" sha1="2715d4353089dca2637d5162f75418f1e7d6f074" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5: Filer, Form Setup" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk5.img" size="368640" crc="8e93ebd4" sha1="1caa9be0c23bac65130b33b08ce8350c5e597794" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6: Printer Drivers" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk6.img" size="368640" crc="a0f81483" sha1="f95558e665fd5109467a009060a96e59baf88faa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7: Dictionary, Hangman" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk7.img" size="368640" crc="0ad16680" sha1="5159c89219597bcd685f7a046789a0c6ca88f9c6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8: Draw" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk8.img" size="368640" crc="d63bfb96" sha1="7895cc697cf216acf1822589682a79e958c0905b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9: Fonts" />
+			<dataarea name="flop" size = "368640">
+				<rom name="dm305dk9.img" size="368640" crc="770cd60d" sha1="a1af30d1a0ed4c38deafa59e94c822e4f73ae282" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desk3_35" cloneof="desk3">
+		<description>DeskMate (3.05, 3.5")</description>
+		<year>1990</year>
+		<publisher>Tandy</publisher>
+		<info name="version" value="03.05.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="f3af8c6b" sha1="06a9875ab8c4ce4ce50bf344f3002ef7d512d711" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk2.img" size="737280" crc="603cf56c" sha1="8c3d1876134744fe111ae33840afd0af7d93bfb1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk3.img" size="737280" crc="bf9271d6" sha1="d35cf946d1894872ed385f7bb9b4842958ef90ec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk4.img" size="737280" crc="5835eaa4" sha1="eae3d11fb24835a3b214179a205e5d52de76f41c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk5.img" size="737280" crc="35ca8ddc" sha1="49fcade64969354039d67d78cf9c8398324cea13" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desq">
+		<description>DESQ</description>
+		<year>1984</year>
+		<publisher>Quarterdeck</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01.img" size="368640" crc="e86a110e" sha1="05f5ac86738151e7832ec8c96b842772aefd2e86" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk02.img" size="368640" crc="2d51542d" sha1="bc0962df0258778b1abcc2c5bd2bf51ad9f4a91c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk03.img" size="368640" crc="fb8ea51c" sha1="eca5d960f6bddd0dd6df73a8157173808ad9e64c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk04.img" size="368640" crc="8924e6a2" sha1="1ef62eeca2c3bbb8adc89aa020d4c303d5b29677" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desqview">
+		<description>DESQview 1.03</description>
+		<year>1986</year>
+		<publisher>Quarterdeck</publisher>
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk1.img" size="368640" crc="8fef17cc" sha1="e3ac9097d60e847c169cb14d806099c5d8f5e0e5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desqviewa" cloneof="desqview">
+		<description>DESQview 1.02</description>
+		<year>1986</year>
+		<publisher>Quarterdeck</publisher>
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk1_102.img" size="368640" crc="0deed6f2" sha1="843642c4266f8d2b318a4ddb7b0aa90abcf495e1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diag202a">
 		<description>IBM System Diagnostics v 2.02 (Version A)</description>
 		<year>198?</year>
@@ -3798,6 +3942,37 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<!-- "Thoroughbred Passport" copy-protection dongle not emulated -->
+	<software name="tbos" supported="no">
+		<description>Thoroughbred/OS 6.6.2-6</description>
+		<year>1987</year>
+		<publisher>Concept Omega</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="THOROUGHBRED/OS SYSTEM (T/OS)"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="disk01.img" size="368640" crc="cbeee231" sha1="b993172879455cff1b41817e9b608eb0496ce167" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="THOROUGHBRED/OS SUPPLEMENTAL (ULIB)"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="disk02.img" size="368640" crc="1315222c" sha1="21d9d4485881b31ab193e3c0ef05c316b9eebd57" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="THOROUGHBRED/OS DIAGNOSTIC (DISPAK)"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="disk03.img" size="368640" crc="a4edcdf5" sha1="3883330fac69a8fb6dd63aaddd8bab6ccf2562d6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="THOROUGHBRED/OS TAPE DRIVER"/>
+			<dataarea name="flop" size = "368640">
+				<rom name="disk04.img" size="368640" crc="bfb908dd" sha1="ce0376208143395e06e48c45879354e09b49cf45" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xenix86">
 		<description>SCO XENIX System V release 2.1.3 for i8086</description>
 		<year>1986</year>
@@ -3990,6 +4165,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="arcadefb.360" size="368640" crc="da3a302f" sha1="61a3b9dcb9ffd72326abf4df89c35ffa2a288288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arctadv">
+		<description>Arctic Adventure</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Arctic Adventure (USA) (v2.0).img" size="737280" crc="a6606d54" sha1="c9c4546746742c8c5c0faa8eace2f033fa4d61b3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4525,6 +4712,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ptomb">
+		<description>Pharaoh's Tomb</description>
+		<year>1990</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Micro F/X" />
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pharaoh's Tomb (USA) (v3.0).img" size="737280" crc="0923275f" sha1="cab3ad6cecda45f44d1721b9da1a93d6b4cfc6d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
 	<software name="purplesa" supported="no">
 		<description>Purple Saturn Day</description>
@@ -4538,6 +4738,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "339570">
 				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agidemos">
+		<description>Sierra Demo</description>
+		<year>1987</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="agidemos.dsk" size="368640" crc="2441c877" sha1="fe0302191a2173727eeb69316c1dc3e814761f85" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

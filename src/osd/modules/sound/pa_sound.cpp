@@ -2,9 +2,9 @@
 // copyright-holders:intealls, R.Belmont
 /***************************************************************************
 
-	pa_sound.c
+    pa_sound.c
 
-	PortAudio interface.
+    PortAudio interface.
 
 *******************************************************************c********/
 
@@ -49,78 +49,75 @@ public:
 	virtual void set_mastervolume(int attenuation);
 
 private:
-	/* Lock free SPSC ring buffer */
+	// Lock free SPSC ring buffer
 	template <typename T>
 	struct audio_buffer {
 		T*               buf;
 		int              size;
 		int              reserve;
-		std::atomic<int> rd_pos, wr_pos;
+		std::atomic<int> playpos, writepos;
 
-		audio_buffer(int size, int reserve) : size(size), reserve(reserve) {
-			rd_pos = wr_pos = 0;
+		audio_buffer(int size, int reserve) : size(size + reserve), reserve(reserve) {
+			playpos = writepos = 0;
 			buf = new T[size]();
 		}
 
 		~audio_buffer() { delete[] buf; }
 
 		int count() {
-			int diff;
-			diff = wr_pos - rd_pos;
-			diff = diff < 0 ? size + diff : diff;
-			diff -= reserve;
-			return diff < 0 ? 0 : diff;
+			int diff = writepos - playpos;
+			return diff < 0 ? size + diff : diff;
 		}
 
-		void increment_wrpos(int n) {
-			wr_pos = (wr_pos + n) % size;
+		void increment_writepos(int n) {
+			writepos.store((writepos + n) % size);
 		}
 
 		int write(const T* src, int n, int attenuation) {
-			n = std::min<int>(n, size - count());
+			n = std::min<int>(n, size - reserve - count());
 
-			if (wr_pos + n > size) {
-				att_memcpy(buf + wr_pos, src, sizeof(T) * (size - wr_pos), attenuation);
-				att_memcpy(buf, src + (size - wr_pos), sizeof(T) * (n - (size - wr_pos)), attenuation);
+			if (writepos + n > size) {
+				att_memcpy(buf + writepos, src, sizeof(T) * (size - writepos), attenuation);
+				att_memcpy(buf, src + (size - writepos), sizeof(T) * (n - (size - writepos)), attenuation);
 			} else {
-				att_memcpy(buf + wr_pos, src, sizeof(T) * n, attenuation);
+				att_memcpy(buf + writepos, src, sizeof(T) * n, attenuation);
 			}
 
-			increment_wrpos(n);
+			increment_writepos(n);
 
 			return n;
 		}
 
-		void increment_rdpos(int n) {
-			rd_pos = (rd_pos + n) % size;
+		void increment_playpos(int n) {
+			playpos.store((playpos + n) % size);
 		}
 
 		int read(T* dst, int n) {
 			n = std::min<int>(n, count());
 
-			if (rd_pos + n > size) {
-				std::memcpy(dst, buf + rd_pos, sizeof(T) * (size - rd_pos));
-				std::memcpy(dst + (size - rd_pos), buf, sizeof(T) * (n - (size - rd_pos)));
+			if (playpos + n > size) {
+				std::memcpy(dst, buf + playpos, sizeof(T) * (size - playpos));
+				std::memcpy(dst + (size - playpos), buf, sizeof(T) * (n - (size - playpos)));
 			} else {
-				std::memcpy(dst, buf + rd_pos, sizeof(T) * n);
+				std::memcpy(dst, buf + playpos, sizeof(T) * n);
 			}
 
-			increment_rdpos(n);
+			increment_playpos(n);
 
 			return n;
 		}
 
 		int clear(int n) {
-			n = std::min<int>(n, size - count());
+			n = std::min<int>(n, size - reserve - count());
 
-			if (wr_pos + n > size) {
-				std::memset(buf + wr_pos, 0, sizeof(T) * (size - wr_pos));
-				std::memset(buf, 0, sizeof(T) * (n - (size - wr_pos)));
+			if (writepos + n > size) {
+				std::memset(buf + writepos, 0, sizeof(T) * (size - writepos));
+				std::memset(buf, 0, sizeof(T) * (n - (size - writepos)));
 			} else {
-				std::memset(buf + wr_pos, 0, sizeof(T) * n);
+				std::memset(buf + writepos, 0, sizeof(T) * n);
 			}
 
-			increment_wrpos(n);
+			increment_writepos(n);
 
 			return n;
 		}
@@ -185,7 +182,10 @@ int sound_pa::init(osd_options const &options)
 	m_overflows             = 0;
 	m_has_overflowed        = false;
 	m_has_underflowed       = false;
+	m_osd_ticks             = 0;
 	m_skip_threshold_ticks  = 0;
+	m_osd_tps               = osd_ticks_per_second();
+	m_buffer_min_ct         = INT_MAX;
 
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
@@ -193,8 +193,6 @@ int sound_pa::init(osd_options const &options)
 		osd_printf_error("PortAudio: Unable to allocate audio buffer, sound is disabled\n");
 		goto error;
 	}
-
-	m_osd_tps = osd_ticks_per_second();
 
 	err = Pa_Initialize();
 
@@ -342,7 +340,7 @@ int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
 
 			// if adjustment is less than two milliseconds, don't bother
 			if (adjust / 2 > sample_rate() / 500) {
-				m_ab->increment_rdpos(adjust);
+				m_ab->increment_playpos(adjust);
 				m_has_overflowed = true;
 			}
 
@@ -355,9 +353,8 @@ int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
 		m_ab->read(output_buffer, buf_ct);
 		std::memset(output_buffer + buf_ct, 0, (number_of_samples - buf_ct) * sizeof(s16));
 
-		// rd_pos == wr_pos only happens when buffer hasn't received any samples,
-		// i.e. before update_audio_stream has been called
-		if (m_ab->rd_pos != m_ab->wr_pos)
+		// if update_audio_stream has been called, note the underflow
+		if (m_osd_ticks)
 			m_has_underflowed = true;
 
 		m_skip_threshold_ticks = m_osd_ticks;
@@ -370,9 +367,6 @@ void sound_pa::update_audio_stream(bool is_throttled, const s16 *buffer, int sam
 {
 	if (!sample_rate())
 		return;
-
-	// for determining buffer overflows, take the sample here instead of in the callback
-	m_osd_ticks = osd_ticks();
 
 #if LOG_BUFCNT
 	if (m_log.good())
@@ -394,6 +388,9 @@ void sound_pa::update_audio_stream(bool is_throttled, const s16 *buffer, int sam
 	}
 
 	m_ab->write(buffer, samples_this_frame * 2, m_attenuation);
+
+	// for determining buffer overflows, take the sample here instead of in the callback
+	m_osd_ticks = osd_ticks();
 }
 
 void sound_pa::set_mastervolume(int attenuation)

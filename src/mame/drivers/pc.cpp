@@ -38,12 +38,12 @@ Expansion: Expansion box, with 5 ISA slots and space for a 5.25" drive and a har
 Bondwell BW230 (Pro28 series)
 =============
 Links: http://gallery.fdd5-25.net/details.php?image_id=3463&sessionid=1eaeb42abdf2758a020b16204a2a8e5a ; http://www.zonadepruebas.com/viewtopic.php?t=3696 ; ftp://ftp.whtech.com/emulators/mess/old/Complete%20MESS%20Geneve%20emulation/mess/sysinfo/bondwell.htm
-Info:	Info is hard to come by. A BW230 is nowhere to be found, the links about the Pro28 series suggest an XT compatible built around a passive backplane and a slot CPU. This is confirmed by the old MESS info.
+Info:   Info is hard to come by. A BW230 is nowhere to be found, the links about the Pro28 series suggest an XT compatible built around a passive backplane and a slot CPU. This is confirmed by the old MESS info.
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz (MESS sysinfo: 3.75)/ 8 MHz
 RAM: 512K / 640K
-Bus: at least 2x ISA:	1)	CPU, RAM, Floppy controller
-						2)	Graphics, Game, Parallel
+Bus: at least 2x ISA:   1)  CPU, RAM, Floppy controller
+                        2)  Graphics, Game, Parallel
 Video: Hercules/CGA
 Mass storage: 1x 5.25" 360K and 20/30MB Harddisk.
 
@@ -57,7 +57,7 @@ RAM: 512K / 640K
 Bus: Proprietary expansion slot, carrying almost all ISA signals
 Video: On board, MDA/Hercules/CGA
 Mass storage: 1x 5.25" 360K
-On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse, 
+On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse,
 Options: 8087 FPU
 Expansion: Expansion box: 2x ISA
 
@@ -78,8 +78,8 @@ Options: 8087 FPU
 
 Zenith SuperSport
 =======================
-Links:	http://www.focushacks.com/zenith/myzenith.html , http://retro-computing.blogspot.de/2006/08/zds-supersport-laptop.html , http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20Service%20Manual.pdf
-		http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20User%20and%20Technical%20Manual.pdf
+Links:  http://www.focushacks.com/zenith/myzenith.html , http://retro-computing.blogspot.de/2006/08/zds-supersport-laptop.html , http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20Service%20Manual.pdf
+        http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20User%20and%20Technical%20Manual.pdf
 Info: ZWL-184 to distinguish it from the later 80286 based models
 Form Factor: Laptop
 CPU: 80C88 @ 4.77 MHz or 8 MHz
@@ -99,9 +99,9 @@ Info: Multitech PC/700 mainboard
 Form Factor: Desktop
 CPU: 8088 @ 4.77MHz / 8 MHz
 RAM: 640KB
-Bus: 6x ISA:	1) MDA/Hercules/CGA and parallel port
-				2) Floppy, RTC and serial port
-				3) (optional) MFM harddisk controller
+Bus: 6x ISA:    1) MDA/Hercules/CGA and parallel port
+                2) Floppy, RTC and serial port
+                3) (optional) MFM harddisk controller
 Video: MDA/Hercules, exchangable via ISA-slot
 Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or MFM hard drive (10MB or 20MB)
 On board ports: parallel, serial, beeper
@@ -111,18 +111,18 @@ Options: 8087 FPU
 NCR PC4i
 ========
 Links: http://www.minuszerodegrees.net/manuals/NCR/NCR%20PC4i%20-%20Technical%20Reference%20Manual%20-%20January%201986.pdf
-Info:	The earlier PC4 is not quite IBM compatible, the "i" in PC4i indicates full IBM compatibility.
-		The NCR Graphics card supports a special 640x400 video mode
+Info:   The earlier PC4 is not quite IBM compatible, the "i" in PC4i indicates full IBM compatibility.
+        The NCR Graphics card supports a special 640x400 video mode
 Form Factor: All-in-one desktop
 CPU: 8088 @ 4.77 MHz
 RAM: 256K, expandable to 640K
-Bus: 7x ISA:	1)	(optional) RAM expansion board
-				2)	empty
-				3)	32K Video/Graphics board (64K option)
-				4)	(optional) Alpha board
-				5)	empty
-				6)	(optional) MFM harddisk controller
-				7)	empty
+Bus: 7x ISA:    1)  (optional) RAM expansion board
+                2)  empty
+                3)  32K Video/Graphics board (64K option)
+                4)  (optional) Alpha board
+                5)  empty
+                6)  (optional) MFM harddisk controller
+                7)  empty
 Video: K510: 4KB Alpha for internal monitor; K511: 32KB Graphics for internal monitor; K512: 32KB upgrade for K512; K140: 16KB Graphics for external monitor; K141: 4KB Alpha for external monitor
 Display: Mono or color CRT 640x400 pixel
 Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or 10 MB harddisk
@@ -133,7 +133,7 @@ Options: 8087 FPU, K101 memory upgrade in 64K steps, 1.2MB floppy and controller
 Olivetti M15
 ============
 Links:  http://www.1000bit.it/ad/bro/olivetti/olivettiM15.pdf , http://electrickery.xs4all.nl/comp/m15/ , http://electrickery.xs4all.nl/comp/m15/doc/M15_InstallationAndOperationsGuide.pdf
-		http://www.museotecnologicamente.it/olivetti-m-15-1987/ , http://www.museotecnologicamente.it/wp-content/uploads/M15_Depliant_inglese.pdf 
+        http://www.museotecnologicamente.it/olivetti-m-15-1987/ , http://www.museotecnologicamente.it/wp-content/uploads/M15_Depliant_inglese.pdf
 Info: The info brochure has a picture of a working M15. This shows the LCD display with a green background and blue text/graphics.
 Form Factor: Laptop
 CPU: 80C88 @ 4.77 MHz
@@ -145,7 +145,7 @@ Mass storage: 2x 3.5" 720K drives
 Ports: serial, parallel, ext. floppy, RTC
 Expansion: External 5.25" 360K floppy drive
 
-	
+
 IBM5550
 =======
 Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
@@ -169,12 +169,12 @@ Options: Modem, color video output
 
 Sanyo MBC-16
 ============
-Links: 
+Links:
 Info: In the MBC-16 I had, the graphics card had a Sanyo sticker on it, so I assume that was the original graphics card for the machine.
 Form Factor: Desktop
 CPU: 8088 @ 8MHz
 RAM: 640KB
-Bus: 3x ISA:	1)	ATI Graphics Solution SR https://sites.google.com/site/atiwonderseriesdatabase/
+Bus: 3x ISA:    1)  ATI Graphics Solution SR https://sites.google.com/site/atiwonderseriesdatabase/
 Video: MDA/CGA/Plantronics
 Mass storage: 1 or 2 5.25" 360K floppies, MFM harddisk on hardcard or via seperate controller
 On board ports: serial, parallel, floppy
@@ -211,7 +211,7 @@ Links: http://www.atari-computermuseum.de/pc1.htm , http://trelohra.blogspot.de/
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz or 8 MHz
 RAM: 640K
-Bus: 5x ISA:	1) Adaptec ACB-2072 RLL Controller Card
+Bus: 5x ISA:    1) Adaptec ACB-2072 RLL Controller Card
 Video: On-board MDA/CGA/Hercules/EGA
 Mass storage: 1x 5.25" 360K floppy + 30MB RLL harddisk
 On board ports: floppy, parallel, serial, mouse, speaker
@@ -221,20 +221,20 @@ Options: 8087 FPU
 Eagle 1600
 ==========
 Links: https://archive.org/details/bitsavers_eagleCompu00Brochure_9975235 , http://www.vcfed.org/forum/showthread.php?49510-Eagle-Computer-model-list , http://bitsavers.trailing-edge.com/pdf/eagleComputer/1600/1600_Series_Training_Notes.pdf
-Info:	Eagle 1620 - 8086/128K, 2 Quad density floppy drives, 4 Expansion slots available, ~1983, Eagle 1630 - 8086/128K, 1 Quad density floppy drive, 10MB HD, 3 Expansion Slots available (Same as 1620 with hard drive), ~1983Eagle 1640 - 8086/512K, 1 Quad density floppy drive, 32MB HD, 3 Expansion Slots available, ~1984
-		The native floppy format is 780K, 2 sides, 80 tracks/side, 1024 bytes/sector, 5 sectors per track. Standard 360K disks can be read 
-		Holding "T" and resetting starts a system diagnostics test
+Info:   Eagle 1620 - 8086/128K, 2 Quad density floppy drives, 4 Expansion slots available, ~1983, Eagle 1630 - 8086/128K, 1 Quad density floppy drive, 10MB HD, 3 Expansion Slots available (Same as 1620 with hard drive), ~1983Eagle 1640 - 8086/512K, 1 Quad density floppy drive, 32MB HD, 3 Expansion Slots available, ~1984
+        The native floppy format is 780K, 2 sides, 80 tracks/side, 1024 bytes/sector, 5 sectors per track. Standard 360K disks can be read
+        Holding "T" and resetting starts a system diagnostics test
 Form Factor: Desktop
 CPU: 8086 @ 8 MHz
 RAM: 128K / 512K
-Bus: 8xISA:		1) SASI board, connects to a XEBEC Sl410 SASI => MFM bridge board
-				2) Floppy controller
-				3) empty
-				4) Video/graphics controller board
-				5) empty
-				6) empty
-				7) Serial board: 2x serial, one sync/async, one async only
-				8) Parallel board
+Bus: 8xISA:     1) SASI board, connects to a XEBEC Sl410 SASI => MFM bridge board
+                2) Floppy controller
+                3) empty
+                4) Video/graphics controller board
+                5) empty
+                6) empty
+                7) Serial board: 2x serial, one sync/async, one async only
+                8) Parallel board
 Video: 80x25 text mode, 720x352 pixel graphics mode
 Mass storage: 1x 5.25" QD 780K floppy and 1x 5.25" QD 820K floppy or 10/30MB MFM harddisk
 Options: 8087 FPU, EagleNet File server, EightPort serial card, High Resolution color board and video, Video Cassette Adapter board for 80MB backup on video cassette
@@ -245,9 +245,9 @@ Links: http://minuszerodegrees.net/manuals.htm#VTech , http://minuszerodegrees.n
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz or 10 MHz
 RAM: 512K / 640K, additionally 512K or 1M EMS on board
-Bus: 8xISA:		1) Monochrome graphics/color graphics card
-				2) Multi I/O Card (Floppy, 2x serial, parallel, game, RTC)
-				3) (optional) hard disk controller
+Bus: 8xISA:     1) Monochrome graphics/color graphics card
+                2) Multi I/O Card (Floppy, 2x serial, parallel, game, RTC)
+                3) (optional) hard disk controller
 Video: MDA/CGA/Hercules
 Mass storage: 2x 5.25" 360K floppies and 1 or 2 harddisks (20MB / 30MB / 40MB)
 On board ports: speaker
@@ -259,9 +259,9 @@ Links: http://minuszerodegrees.net/manuals.htm#VTech , http://th99.classic-compu
 Form Factor: Desktop
 CPU: 8088 @ 4.77MHz or 10 MHz
 RAM: 512K / 640K, additionally 512K or 1M EMS on board
-Bus: 8x ISA:	1) Monochrome graphics/color graphics card http://th99.classic-computing.de/src/v/U-Z/52547.htm , alternatively an EGA card
-				2) Multi I/O Card (Floppy, 2x serial, 1x parallel, game, RTC) http://th99.classic-computing.de/src/i/U-Z/52519.htm
-				3) (optional) hard disk controller
+Bus: 8x ISA:    1) Monochrome graphics/color graphics card http://th99.classic-computing.de/src/v/U-Z/52547.htm , alternatively an EGA card
+                2) Multi I/O Card (Floppy, 2x serial, 1x parallel, game, RTC) http://th99.classic-computing.de/src/i/U-Z/52519.htm
+                3) (optional) hard disk controller
 Video: MDA/Hercules/CGA
 Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddisk optional
 On board ports: speaker
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_single_360K )
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END 
+MACHINE_CONFIG_END
 
 
 //Data General One
@@ -547,12 +547,12 @@ static MACHINE_CONFIG_DERIVED ( ncrpc4i, pccga )
 	//MCFG_DEVICE_MODIFY("mb:isa")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	
+
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 MACHINE_CONFIG_END
-	
+
 
 // Siemens Sicomp PC16-05
 static DEVICE_INPUT_DEFAULTS_START( siemens )
@@ -844,7 +844,7 @@ ROM_START ( ataripc1 )
 	ROMX_LOAD( "award_atari_pc_bios_3.06.bin", 0x8000, 0x8000, CRC(256427ce) SHA1(999f6af64b79f88c1d3492f386d9bee08efb50e7), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v3.08", "v3.08" )
 	ROMX_LOAD( "award_atari_pc_bios_3.08.bin", 0x8000, 0x8000, CRC(929a2443) SHA1(8e98f3c9180c55b1f5521727779c016083d27960), ROM_BIOS(2)) //same as on Atari PC3, also used on Atari PC2
-ROM_END	
+ROM_END
 
 ROM_START( ataripc3 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -888,26 +888,26 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR    NAME        		PARENT      COMPAT      MACHINE		    INPUT     INIT        			   COMPANY                            FULLNAME */
-COMP( 1984,   dgone,			ibm5150,    0,          dgone,          pccga,	  driver_device, 0,        "Data General",                    "Data General/One" , MACHINE_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
-COMP( 1985,   bw230,			ibm5150,    0,          bondwell,       bondwell, pc_state, 	 bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
-COMP( 1984,   compc1,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Commodore Business Machines",     "Commodore PC-1" , MACHINE_NOT_WORKING)
-COMP( 1987,   pc10iii,			ibm5150,    0,          pccga,          pccga, 	  driver_device, 0,        "Commodore Business Machines",     "Commodore PC-10 III" , MACHINE_NOT_WORKING)
-COMP( 1992,   iskr3104,			ibm5150,    0,          iskr3104,       pccga,    driver_device, 0,        "Schetmash",                       "Iskra 3104", MACHINE_NOT_WORKING)
-COMP( 1989,   mk88,				ibm5150,    0,          mk88,           pccga,    driver_device, 0,        "<unknown>",                       "MK-88", MACHINE_NOT_WORKING)
-COMP( 1991,   poisk2,			ibm5150,    0,          poisk2,         pccga,    driver_device, 0,        "<unknown>",                       "Poisk-2", MACHINE_NOT_WORKING)
-COMP( 1990,   mc1702,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "<unknown>",                       "Elektronika MC-1702", MACHINE_NOT_WORKING)
-COMP( 1987,   zdsupers,			ibm5150,    0,          zenith,         pccga,    driver_device, 0,        "Zenith Data Systems",             "SuperSport", 0)
-COMP( 1985,   sicpc1605,		ibm5150,    0,          siemens,        pccga,    driver_device, 0,        "Siemens",                         "Sicomp PC16-05", MACHINE_NOT_WORKING)
-COMP( 1985,   ncrpc4i,			ibm5150,    0,          ncrpc4i,        pccga,    driver_device, 0,        "NCR",                             "PC4i", MACHINE_NOT_WORKING)
-COMP( 198?,   olivm15,			ibm5150,    0,          m15,            pccga,    driver_device, 0,        "Olivetti",                        "M15", 0)
-COMP( 1983,   ibm5550,			ibm5150,    0,          ibm5550,        pccga,    driver_device, 0,        "International Business Machines", "IBM 5550", MACHINE_NOT_WORKING)
-COMP( 1985,   pc7000,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sharp",                           "PC-7000", MACHINE_NOT_WORKING)
-COMP( 1988,   sx16,				ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "SX-16", MACHINE_NOT_WORKING)
-COMP( 198?,   mbc16,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "MBC-16" , MACHINE_NOT_WORKING)
-COMP( 1987,   ataripc1,			ibm5150,    0,          ataripc1, 	    pccga,    driver_device, 0,        "Atari",                           "PC1" , 0)
-COMP( 1988,   ataripc3,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Atari",                           "PC3" , 0)
-COMP( 1989,   ssam88s,			ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Samsung",                         "Samtron 88S" , MACHINE_NOT_WORKING)
-COMP( 1983,   eagle1600,		ibm5150,    0,          eagle1600,      pccga,    driver_device, 0,        "Eagle",                           "1600" , MACHINE_NOT_WORKING)
-COMP( 1988,   laser_turbo_xt,	ibm5150,    0,    		laser_turbo_xt, 0,		  driver_device, 0,        "VTech",                           "Laser Turbo XT" , 0)
-COMP( 1989,   laser_xt3,		ibm5150,    0,      	laser_xt3,      0,		  driver_device, 0,        "VTech",                           "Laser XT/3" , 0)
+/*    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     INIT                     COMPANY                            FULLNAME */
+COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    driver_device, 0,        "Data General",                    "Data General/One" , MACHINE_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
+COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state,      bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
+COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Commodore Business Machines",     "Commodore PC-1" , MACHINE_NOT_WORKING)
+COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Commodore Business Machines",     "Commodore PC-10 III" , MACHINE_NOT_WORKING)
+COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    driver_device, 0,        "Schetmash",                       "Iskra 3104", MACHINE_NOT_WORKING)
+COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    driver_device, 0,        "<unknown>",                       "MK-88", MACHINE_NOT_WORKING)
+COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    driver_device, 0,        "<unknown>",                       "Poisk-2", MACHINE_NOT_WORKING)
+COMP( 1990,   mc1702,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "<unknown>",                       "Elektronika MC-1702", MACHINE_NOT_WORKING)
+COMP( 1987,   zdsupers,         ibm5150,    0,          zenith,         pccga,    driver_device, 0,        "Zenith Data Systems",             "SuperSport", 0)
+COMP( 1985,   sicpc1605,        ibm5150,    0,          siemens,        pccga,    driver_device, 0,        "Siemens",                         "Sicomp PC16-05", MACHINE_NOT_WORKING)
+COMP( 1985,   ncrpc4i,          ibm5150,    0,          ncrpc4i,        pccga,    driver_device, 0,        "NCR",                             "PC4i", MACHINE_NOT_WORKING)
+COMP( 198?,   olivm15,          ibm5150,    0,          m15,            pccga,    driver_device, 0,        "Olivetti",                        "M15", 0)
+COMP( 1983,   ibm5550,          ibm5150,    0,          ibm5550,        pccga,    driver_device, 0,        "International Business Machines", "IBM 5550", MACHINE_NOT_WORKING)
+COMP( 1985,   pc7000,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sharp",                           "PC-7000", MACHINE_NOT_WORKING)
+COMP( 1988,   sx16,             ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "SX-16", MACHINE_NOT_WORKING)
+COMP( 198?,   mbc16,            ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "MBC-16" , MACHINE_NOT_WORKING)
+COMP( 1987,   ataripc1,         ibm5150,    0,          ataripc1,       pccga,    driver_device, 0,        "Atari",                           "PC1" , 0)
+COMP( 1988,   ataripc3,         ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Atari",                           "PC3" , 0)
+COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Samsung",                         "Samtron 88S" , MACHINE_NOT_WORKING)
+COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    driver_device, 0,        "Eagle",                           "1600" , MACHINE_NOT_WORKING)
+COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        driver_device, 0,        "VTech",                           "Laser Turbo XT" , 0)
+COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        driver_device, 0,        "VTech",                           "Laser XT/3" , 0)

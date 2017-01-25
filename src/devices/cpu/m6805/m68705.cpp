@@ -2,6 +2,26 @@
 #include "m68705.h"
 #include "m6805defs.h"
 
+/****************************************************************************
+ * Configurable logging
+ ****************************************************************************/
+
+#define LOG_GENERAL (1U <<  0)
+#define LOG_INT     (1U <<  1)
+#define LOG_IOPORT  (1U <<  2)
+#define LOG_TIMER   (1U <<  3)
+#define LOG_EPROM   (1U <<  4)
+
+//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGINT(...)     LOGMASKED(LOG_INT,    __VA_ARGS__)
+#define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
+#define LOGTIMER(...)   LOGMASKED(LOG_TIMER,  __VA_ARGS__)
+#define LOGEPROM(...)   LOGMASKED(LOG_EPROM,  __VA_ARGS__)
+
+
 namespace {
 
 std::pair<u16, char const *> const m68705p_syms[] = {
@@ -49,10 +69,20 @@ ROM_START( m68705u3 )
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
+constexpr u16 M68705_VECTOR_BOOTSTRAP   = 0xfff6;
+constexpr u16 M68705_VECTOR_TIMER       = 0xfff8;
+//constexpr u16 M68705_VECTOR_INT2        = 0xfff8;
+constexpr u16 M68705_VECTOR_INT         = 0xfffa;
+//constexpr u16 M68705_VECTOR_SWI         = 0xfffc;
+constexpr u16 M68705_VECTOR_RESET       = 0xfffe;
+
 } // anonymous namespace
 
 
-device_type const M68705 = &device_creator<m68705_device>;
+/****************************************************************************
+ * Global variables
+ ****************************************************************************/
+
 device_type const M68705P3 = &device_creator<m68705p3_device>;
 device_type const M68705P5 = &device_creator<m68705p5_device>;
 device_type const M68705R3 = &device_creator<m68705r3_device>;
@@ -60,79 +90,7 @@ device_type const M68705U3 = &device_creator<m68705u3_device>;
 
 
 /****************************************************************************
- * M68705 device (no peripherals)
- ****************************************************************************/
-
-m68705_device::m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12, "m68705", __FILE__)
-{
-}
-
-m68705_device::m68705_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		u32 clock,
-		device_type type,
-		char const *name,
-		u32 addr_width,
-		address_map_delegate internal_map,
-		char const *shortname,
-		char const *source)
-	: m6805_base_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source)
-{
-}
-
-/* Generate interrupt - m68705 version */
-void m68705_device::interrupt()
-{
-	if ((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | M68705_INT_MASK)) != 0 )
-	{
-		if ((CC & IFLAG) == 0)
-		{
-			PUSHWORD(m_pc);
-			PUSHBYTE(m_x);
-			PUSHBYTE(m_a);
-			PUSHBYTE(m_cc);
-			SEI;
-			standard_irq_callback(0);
-
-			if ((m_pending_interrupts & (1 << M68705_IRQ_LINE)) != 0 )
-			{
-				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
-				RM16(0xfffa, &m_pc);
-			}
-			else if ((m_pending_interrupts & (1 << M68705_INT_TIMER)) != 0)
-			{
-				m_pending_interrupts &= ~(1 << M68705_INT_TIMER);
-				RM16(0xfff8, &m_pc);
-			}
-		}
-		m_icount -= 11;
-	}
-}
-
-void m68705_device::device_reset()
-{
-	m6805_base_device::device_reset();
-
-	RM16(0xfffe, &m_pc);
-}
-
-void m68705_device::execute_set_input(int inputnum, int state)
-{
-	if (m_irq_state[inputnum] != state)
-	{
-		m_irq_state[inputnum] = (state == ASSERT_LINE) ? ASSERT_LINE : CLEAR_LINE;
-
-		if (state != CLEAR_LINE)
-			m_pending_interrupts |= 1 << inputnum;
-	}
-}
-
-
-/****************************************************************************
- * M68705 "new" device
+ * MC68705 base device
  ****************************************************************************/
 
 /*
@@ -223,7 +181,7 @@ Ux Parts:
 
 */
 
-m68705_new_device::m68705_new_device(
+m68705_device::m68705_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
@@ -234,7 +192,7 @@ m68705_new_device::m68705_new_device(
 		address_map_delegate internal_map,
 		char const *shortname,
 		char const *source)
-	: m68705_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source)
+	: m6805_base_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source)
 	, device_nvram_interface(mconfig, *this)
 	, m_user_rom(*this, DEVICE_SELF, u32(1) << addr_width)
 	, m_port_open_drain{ false, false, false, false }
@@ -254,14 +212,20 @@ m68705_new_device::m68705_new_device(
 {
 }
 
-template <offs_t B> READ8_MEMBER(m68705_new_device::eprom_r)
+template <offs_t B> READ8_MEMBER(m68705_device::eprom_r)
 {
+	if (pcr_vpon() && !pcr_ple())
+		LOGEPROM("read EPROM %04X prevented when Vpp high and /PLE = 0\n", B + offset);
+
 	// read locked out when /VPON and /PLE are asserted
 	return (!pcr_vpon() || !pcr_ple()) ? m_user_rom[B + offset] : 0xff;
 }
 
-template <offs_t B> WRITE8_MEMBER(m68705_new_device::eprom_w)
+template <offs_t B> WRITE8_MEMBER(m68705_device::eprom_w)
 {
+	LOGEPROM("EPROM programming latch write%s%s: %04X = %02\n",
+			!pcr_vpon() ? " [Vpp low]" : "", !pcr_ple() ? " [disabled]" : "", B + offset, data);
+
 	// programming latch enabled when /VPON and /PLE are asserted
 	if (pcr_vpon() && pcr_ple())
 	{
@@ -278,65 +242,80 @@ template <offs_t B> WRITE8_MEMBER(m68705_new_device::eprom_w)
 	}
 }
 
-template <std::size_t N> void m68705_new_device::set_port_open_drain(bool value)
+template <std::size_t N> void m68705_device::set_port_open_drain(bool value)
 {
 	m_port_open_drain[N] = value;
 }
 
-template <std::size_t N> void m68705_new_device::set_port_mask(u8 mask)
+template <std::size_t N> void m68705_device::set_port_mask(u8 mask)
 {
+	if (configured() || started())
+		throw emu_fatalerror("Attempt to set physical port mask after configuration");
 	m_port_mask[N] = mask;
 }
 
-template <std::size_t N> READ8_MEMBER(m68705_new_device::port_r)
+template <std::size_t N> READ8_MEMBER(m68705_device::port_r)
 {
-	if (!m_port_cb_r[N].isnull()) m_port_input[N] = m_port_cb_r[N](space, 0, ~m_port_ddr[N]);
+	if (!m_port_cb_r[N].isnull())
+	{
+		u8 const newval(m_port_cb_r[N](space, 0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
+		if (newval != m_port_input[N])
+		{
+			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02x)\n",
+					char('A' + N), newval, ~m_port_ddr[N] & ~m_port_mask[N], m_port_input[N]);
+		}
+		m_port_input[N] = newval;
+	}
 	return m_port_mask[N] | (m_port_latch[N] & m_port_ddr[N]) | (m_port_input[N] & ~m_port_ddr[N]);
 }
 
-template <std::size_t N> WRITE8_MEMBER(m68705_new_device::port_latch_w)
+template <std::size_t N> WRITE8_MEMBER(m68705_device::port_latch_w)
 {
 	data &= ~m_port_mask[N];
 	u8 const diff = m_port_latch[N] ^ data;
+	if (diff)
+		LOGIOPORT("write PORT%c latch: %02X & %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N], m_port_latch[N]);
 	m_port_latch[N] = data;
 	if (diff & m_port_ddr[N])
 		port_cb_w<N>();
 }
 
-template <std::size_t N> WRITE8_MEMBER(m68705_new_device::port_ddr_w)
+template <std::size_t N> WRITE8_MEMBER(m68705_device::port_ddr_w)
 {
 	data &= ~m_port_mask[N];
 	if (data != m_port_ddr[N])
 	{
+		LOGIOPORT("write DDR%c: %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N]);
 		m_port_ddr[N] = data;
 		port_cb_w<N>();
 	}
 }
 
-template <std::size_t N> void m68705_new_device::port_cb_w()
+template <std::size_t N> void m68705_device::port_cb_w()
 {
 	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
 	m_port_cb_w[N](space(AS_PROGRAM), 0, data, mask);
 }
 
-READ8_MEMBER(m68705_new_device::tdr_r)
+READ8_MEMBER(m68705_device::tdr_r)
 {
 	return m_tdr;
 }
 
-WRITE8_MEMBER(m68705_new_device::tdr_w)
+WRITE8_MEMBER(m68705_device::tdr_w)
 {
+	LOGTIMER("write TDR: %02X * (1 << %u)\n", data, tcr_ps());
 	m_tdr = data;
 }
 
-READ8_MEMBER(m68705_new_device::tcr_r)
+READ8_MEMBER(m68705_device::tcr_r)
 {
 	// in MOR controlled mode, only TIR, TIM and TOPT are visible
 	return m_tcr | (tcr_topt() ? 0x37 : 0x00);
 }
 
-WRITE8_MEMBER(m68705_new_device::tcr_w)
+WRITE8_MEMBER(m68705_device::tcr_w)
 {
 	// 7  TIR   RW  Timer Interrupt Request Status
 	// 6  TIM   RW  Timer Interrupt Mask
@@ -363,39 +342,42 @@ WRITE8_MEMBER(m68705_new_device::tcr_w)
 
 	if (tcr_topt())
 	{
-		m_tcr = (m_tcr & 0x3f) | (data & 0xc0);
+		LOGTIMER("write TCR: TIR=%u (%s) TIM=%u\n",
+				BIT(data, 7), (tcr_tir() && !BIT(data, 7)) ? "cleared" : "unaffected", BIT(data, 6));
+		m_tcr = (m_tcr & ((data & 0x80) | 0x3f)) | (data & 0x40);
 	}
 	else
 	{
+		LOGTIMER("write TCR: TIR=%u (%s) TIM=%u TIN=%u TIE=%u PSC=%u PS=(1 << %u)\n",
+				BIT(data, 7), (tcr_tir() && !BIT(data, 7)) ? "cleared" : "unaffected", BIT(data, 6),
+				BIT(data, 5), BIT(data, 4),
+				BIT(data, 3), data & 0x07);
 		if (BIT(data, 3))
 			m_prescaler = 0;
-		m_tcr = (m_tcr & 0x08) | (data & 0xf7);
+		m_tcr = (m_tcr & ((data & 0x80) | 0x08)) | (data & 0x77);
 	}
 
-	// TODO: this is tied up with /INT2 on R/U devices
-	if (tcr_tir() && !tcr_tim())
-		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
+	// this is a level-sensitive interrupt (unlike the edge-triggered inputs)
+	execute_set_input(M68705_INT_TIMER, (tcr_tir() && !tcr_tim()) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(m68705_new_device::misc_r)
+READ8_MEMBER(m68705_device::misc_r)
 {
 	logerror("unsupported read MISC\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(m68705_new_device::misc_w)
+WRITE8_MEMBER(m68705_device::misc_w)
 {
 	logerror("unsupported write MISC = %02X\n", data);
 }
 
-READ8_MEMBER(m68705_new_device::pcr_r)
+READ8_MEMBER(m68705_device::pcr_r)
 {
 	return m_pcr;
 }
 
-WRITE8_MEMBER(m68705_new_device::pcr_w)
+WRITE8_MEMBER(m68705_device::pcr_w)
 {
 	// 7  1
 	// 6  1
@@ -406,23 +388,30 @@ WRITE8_MEMBER(m68705_new_device::pcr_w)
 	// 1  /PGE   RW  Program Enable
 	// 0  /PLE   RW  Programming Latch Enable
 
+	LOGEPROM("write PCR: /PGE=%u%s /PLE=%u\n", BIT(data, 1), BIT(data, 0) ? " [inhibited]" : "", BIT(data, 0));
+
 	// lock out /PGE if /PLE is not asserted
 	data |= ((data & 0x01) << 1);
 
 	// write EPROM if /PGE is asserted (erase requires UV so don't clear bits)
-	if (pcr_vpon() && !pcr_pge() && !BIT(data, 1))
-		m_user_rom[m_pl_addr] |= m_pl_data;
+	if (!pcr_pge() && !BIT(data, 1))
+	{
+		LOGEPROM("write EPROM%s: %04X = %02X | %02X\n",
+				pcr_vpon() ? "" : " prevented when Vpp low", m_pl_addr, m_pl_data, m_user_rom[m_pl_addr]);
+		if (pcr_vpon())
+			m_user_rom[m_pl_addr] |= m_pl_data;
+	}
 
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
 }
 
-READ8_MEMBER(m68705_new_device::acr_r)
+READ8_MEMBER(m68705_device::acr_r)
 {
 	logerror("unsupported read ACR\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(m68705_new_device::acr_w)
+WRITE8_MEMBER(m68705_device::acr_w)
 {
 	// 7  conversion complete
 	// 6
@@ -450,20 +439,20 @@ WRITE8_MEMBER(m68705_new_device::acr_w)
 	logerror("unsupported write ACR = %02X\n", data);
 }
 
-READ8_MEMBER(m68705_new_device::arr_r)
+READ8_MEMBER(m68705_device::arr_r)
 {
 	logerror("unsupported read ARR\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(m68705_new_device::arr_w)
+WRITE8_MEMBER(m68705_device::arr_w)
 {
 	logerror("unsupported write ARR = %02X\n", data);
 }
 
-void m68705_new_device::device_start()
+void m68705_device::device_start()
 {
-	m68705_device::device_start();
+	m6805_base_device::device_start();
 
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_latch));
@@ -496,9 +485,9 @@ void m68705_new_device::device_start()
 	m_pl_addr = 0xffff;
 }
 
-void m68705_new_device::device_reset()
+void m68705_device::device_reset()
 {
-	m68705_device::device_reset();
+	m6805_base_device::device_reset();
 
 	// reset digital I/O
 	port_ddr_w<0>(space(AS_PROGRAM), 0, 0x00, 0xff);
@@ -516,10 +505,18 @@ void m68705_new_device::device_reset()
 	m_pcr |= 0xfb; // b2 (/VPON) is driven by external input and hence unaffected by reset
 
 	if (CLEAR_LINE != m_vihtp)
-		RM16(0xfff6, &m_pc);
+	{
+		LOG("loading bootstrap vector\n");
+		rm16(M68705_VECTOR_BOOTSTRAP, m_pc);
+	}
+	else
+	{
+		LOG("loading reset vector\n");
+		rm16(M68705_VECTOR_RESET, m_pc);
+	}
 }
 
-void m68705_new_device::execute_set_input(int inputnum, int state)
+void m68705_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
@@ -531,25 +528,67 @@ void m68705_new_device::execute_set_input(int inputnum, int state)
 		m_vihtp = (ASSERT_LINE == state) ? ASSERT_LINE : CLEAR_LINE;
 		break;
 	default:
-		m68705_device::execute_set_input(inputnum, state);
+		if (m_irq_state[inputnum] != state)
+		{
+			m_irq_state[inputnum] = (state == ASSERT_LINE) ? ASSERT_LINE : CLEAR_LINE;
+
+			if (state != CLEAR_LINE)
+				m_pending_interrupts |= 1 << inputnum;
+			else if (M68705_INT_TIMER == inputnum)
+				m_pending_interrupts &= ~(1 << inputnum); // this one's is level-sensitive
+		}
 	}
 }
 
-void m68705_new_device::nvram_default()
+void m68705_device::nvram_default()
 {
 }
 
-void m68705_new_device::nvram_read(emu_file &file)
+void m68705_device::nvram_read(emu_file &file)
 {
 	file.read(&m_user_rom[0], m_user_rom.bytes());
 }
 
-void m68705_new_device::nvram_write(emu_file &file)
+void m68705_device::nvram_write(emu_file &file)
 {
 	file.write(&m_user_rom[0], m_user_rom.bytes());
 }
 
-void m68705_new_device::burn_cycles(unsigned count)
+void m68705_device::interrupt()
+{
+	if (m_pending_interrupts & M68705_INT_MASK)
+	{
+		if ((CC & IFLAG) == 0)
+		{
+			pushword(m_pc);
+			pushbyte(m_x);
+			pushbyte(m_a);
+			pushbyte(m_cc);
+			SEI;
+			standard_irq_callback(0);
+
+			if (BIT(m_pending_interrupts, M68705_IRQ_LINE))
+			{
+				LOGINT("servicing /INT interrupt\n");
+				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
+				rm16(M68705_VECTOR_INT, m_pc);
+			}
+			else if (BIT(m_pending_interrupts, M68705_INT_TIMER))
+			{
+				LOGINT("servicing timer/counter interrupt\n");
+				rm16(M68705_VECTOR_TIMER, m_pc);
+			}
+			else
+			{
+				throw emu_fatalerror("Unknown pending interrupt");
+			}
+		}
+		m_icount -= 11;
+		burn_cycles(11);
+	}
+}
+
+void m68705_device::burn_cycles(unsigned count)
 {
 	// handle internal timer/counter source
 	if (!tcr_tin()) // TODO: check tcr_tie() and gate on TIMER if appropriate
@@ -560,6 +599,7 @@ void m68705_new_device::burn_cycles(unsigned count)
 
 		if (decrements && (decrements >= m_tdr))
 		{
+			LOGTIMER("timer/counter expired%s%s\n", tcr_tir() ? " [overrun]" : "", tcr_tim() ? " [masked]" : "");
 			m_tcr |= 0x80;
 			if (!tcr_tim())
 				set_input_line(M68705_INT_TIMER, ASSERT_LINE);
@@ -567,6 +607,30 @@ void m68705_new_device::burn_cycles(unsigned count)
 		m_prescaler = (count + m_prescaler) & 0x7f;
 		m_tdr = (m_tdr - decrements) & 0xff;
 	}
+}
+
+template <std::size_t N> void m68705_device::add_port_latch_state()
+{
+	state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff);
+}
+
+template <std::size_t N> void m68705_device::add_port_ddr_state()
+{
+	state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff);
+}
+
+void m68705_device::add_timer_state()
+{
+	state_add(M68705_PS, "PS", m_prescaler).mask(0x7f);
+	state_add(M68705_TDR, "TDR", m_tdr).mask(0xff);
+	state_add(M68705_TCR, "TCR", m_tcr).mask(0xff);
+}
+
+void m68705_device::add_eprom_state()
+{
+	state_add(M68705_PCR, "PCR", m_pcr).mask(0xff);
+	state_add(M68705_PLA, "PLA", m_pl_addr).mask(0xffff);
+	state_add(M68705_PLD, "PLD", m_pl_data).mask(0xff);
 }
 
 
@@ -606,11 +670,26 @@ m68705p_device::m68705p_device(
 		char const *name,
 		char const *shortname,
 		char const *source)
-	: m68705_new_device(mconfig, tag, owner, clock, type, name, 11, address_map_delegate(FUNC(m68705p_device::p_map), this), shortname, source)
+	: m68705_device(mconfig, tag, owner, clock, type, name, 11, address_map_delegate(FUNC(m68705p_device::p_map), this), shortname, source)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
 	set_port_mask<3>(0xff);         // Port D isn't present
+}
+
+void m68705p_device::device_start()
+{
+	m68705_device::device_start();
+
+	add_port_latch_state<0>();
+	add_port_latch_state<1>();
+	add_port_latch_state<2>();
+	add_port_ddr_state<0>();
+	add_port_ddr_state<1>();
+	add_port_ddr_state<2>();
+	add_timer_state();
+	add_eprom_state();
+	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
 offs_t m68705p_device::disasm_disassemble(
@@ -662,7 +741,7 @@ m68705u_device::m68705u_device(
 		address_map_delegate internal_map,
 		char const *shortname,
 		char const *source)
-	: m68705_new_device(mconfig, tag, owner, clock, type, name, 12, internal_map, shortname, source)
+	: m68705_device(mconfig, tag, owner, clock, type, name, 12, internal_map, shortname, source)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 }
@@ -678,6 +757,24 @@ m68705u_device::m68705u_device(
 		char const *source)
 	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705u_device::u_map), this), shortname, source)
 {
+}
+
+void m68705u_device::device_start()
+{
+	m68705_device::device_start();
+
+	add_port_latch_state<0>();
+	add_port_latch_state<1>();
+	add_port_latch_state<2>();
+	add_port_latch_state<3>();
+	add_port_ddr_state<0>();
+	add_port_ddr_state<1>();
+	add_port_ddr_state<2>();
+	add_timer_state();
+	add_eprom_state();
+	state_add(M68705_MOR, "MOR", get_user_rom()[0x0f38]).mask(0xff);
+
+	// TODO: MISC register
 }
 
 offs_t m68705u_device::disasm_disassemble(
@@ -732,6 +829,13 @@ m68705r_device::m68705r_device(
 		char const *source)
 	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705r_device::r_map), this), shortname, source)
 {
+}
+
+void m68705r_device::device_start()
+{
+	m68705u_device::device_start();
+
+	// TODO: ADC
 }
 
 offs_t m68705r_device::disasm_disassemble(
@@ -801,7 +905,7 @@ tiny_rom_entry const *m68705r3_device::device_rom_region() const
 
 u8 m68705r3_device::get_mask_options() const
 {
-	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+	return get_user_rom()[0x0f38] & 0xf7; // no SNM bit
 }
 
 
@@ -821,5 +925,5 @@ tiny_rom_entry const *m68705u3_device::device_rom_region() const
 
 u8 m68705u3_device::get_mask_options() const
 {
-	return get_user_rom()[0x0784] & 0xf7; // no SNM bit
+	return get_user_rom()[0x0f38] & 0xf7; // no SNM bit
 }

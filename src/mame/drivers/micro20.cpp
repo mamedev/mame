@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(h4_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_4, state);

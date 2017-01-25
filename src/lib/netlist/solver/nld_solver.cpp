@@ -187,7 +187,7 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned siz
 		}
 		else
 		{
-			netlist().log().fatal("Unknown solver type: {1}\n", m_method());
+			log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
 			return nullptr;
 		}
 	}
@@ -275,13 +275,13 @@ void NETLIB_NAME(solver)::post_start()
 	//m_params.m_max_timestep = std::max(m_params.m_max_timestep, m_params.m_max_timestep::)
 
 	// Override log statistics
-	pstring p = plib::util::environment("NL_STATS");
+	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
 		m_params.m_log_stats = p.as_long();
 	else
 		m_params.m_log_stats = m_log_stats();
 
-	netlist().log().verbose("Scanning net groups ...");
+	log().verbose("Scanning net groups ...");
 	// determine net groups
 
 	net_splitter splitter;
@@ -289,7 +289,7 @@ void NETLIB_NAME(solver)::post_start()
 	splitter.run(netlist());
 
 	// setup the solvers
-	netlist().log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().m_nets.size());
+	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().m_nets.size());
 	for (auto & grp : splitter.groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
@@ -347,7 +347,7 @@ void NETLIB_NAME(solver)::post_start()
 #endif
 #endif
 			default:
-				netlist().log().warning("No specific solver found for netlist of size {1}", net_count);
+				log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);
@@ -368,7 +368,7 @@ void NETLIB_NAME(solver)::post_start()
 				}
 				else
 				{
-					netlist().log().fatal("Encountered netgroup with > 128 nets");
+					log().fatal(MF_1_NETGROUP_SIZE_EXCEEDED_1, 128);
 					ms = nullptr; /* tease compilers */
 				}
 
@@ -379,16 +379,16 @@ void NETLIB_NAME(solver)::post_start()
 		ms->set_delegate_pointer();
 		ms->setup(grp);
 
-		netlist().log().verbose("Solver {1}", ms->name());
-		netlist().log().verbose("       ==> {2} nets", grp.size());
-		netlist().log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
-		netlist().log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
+		log().verbose("Solver {1}", ms->name());
+		log().verbose("       ==> {2} nets", grp.size());
+		log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
+		log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
 		for (auto &n : grp)
 		{
-			netlist().log().verbose("Net {1}", n->name());
+			log().verbose("Net {1}", n->name());
 			for (const auto &pcore : n->m_core_terms)
 			{
-				netlist().log().verbose("   {1}", pcore->name());
+				log().verbose("   {1}", pcore->name());
 			}
 		}
 
@@ -398,8 +398,9 @@ void NETLIB_NAME(solver)::post_start()
 
 void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
 {
+	plib::putf8_fmt_writer w(strm);
 	for (auto & s : m_mat_solvers)
-		s->create_solver_code(strm);
+		s->create_solver_code(w);
 }
 
 	NETLIB_DEVICE_IMPL(solver)

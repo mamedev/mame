@@ -52,18 +52,19 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual void create_solver_code(plib::postream &strm) override;
+	virtual void create_solver_code(plib::putf8_fmt_writer &strm) override;
 
 private:
 
-	void csc_private(plib::postream &strm);
+	void csc_private(plib::putf8_fmt_writer &strm);
 
 	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
 
 	pstring static_compile_name()
 	{
 		plib::postringstream t;
-		csc_private(t);
+		plib::putf8_fmt_writer w(t);
+		csc_private(w);
 		std::hash<pstring> h;
 
 		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
@@ -185,7 +186,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 }
 
 template <unsigned m_N, unsigned storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
+void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
 {
 	const unsigned iN = N();
 	for (unsigned i = 0; i < iN - 1; i++)
@@ -197,7 +198,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 			unsigned pi = mat.diag[i];
 
 			//const nl_double f = 1.0 / m_A[pi++];
-			strm.writeline(plib::pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
+			strm("const double f{1} = 1.0 / m_A[{2}];", i,pi);
 			pi++;
 			const unsigned piie = mat.ia[i+1];
 
@@ -210,7 +211,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 					pj++;
 
 				//const nl_double f1 = - m_A[pj++] * f;
-				strm.writeline(plib::pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
+				strm("\tconst double f{1}_{2} = -f{3} * m_A[{4}];", i, j, i, pj);
 				pj++;
 
 				// subtract row i from j */
@@ -219,18 +220,18 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 					while (mat.ja[pj] < mat.ja[pii])
 						pj++;
 					//m_A[pj++] += m_A[pii++] * f1;
-					strm.writeline(plib::pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
+					strm("\tm_A[{1}] += m_A[{2}] * f{3}_{4};", pj, pii, i, j);
 					pj++; pii++;
 				}
 				//RHS[j] += f1 * RHS[i];
-				strm.writeline(plib::pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
+				strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];", j, i, j, i);
 			}
 		}
 	}
 }
 
 template <unsigned m_N, unsigned storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::create_solver_code(plib::postream &strm)
+void matrix_solver_GCR_t<m_N, storage_N>::create_solver_code(plib::putf8_fmt_writer &strm)
 {
 	//const unsigned iN = N();
 

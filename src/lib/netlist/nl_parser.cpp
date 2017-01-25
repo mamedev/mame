@@ -7,6 +7,7 @@
 
 #include "nl_parser.h"
 #include "nl_factory.h"
+#include "nl_errstr.h"
 #include "devices/nld_truthtable.h"
 
 namespace netlist
@@ -28,13 +29,7 @@ bool parser_t::parse(const pstring nlname)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	char ws[5];
-	ws[0] = ' ';
-	ws[1] = 9;
-	ws[2] = 10;
-	ws[3] = 13;
-	ws[4] = 0;
-	set_whitespace(ws);
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	set_comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
 	m_tok_param_right = register_token(")");
@@ -64,18 +59,16 @@ bool parser_t::parse(const pstring nlname)
 	while (true)
 	{
 		token_t token = get_token();
-
 		if (token.is_type(ENDOFFILE))
 		{
 			return false;
-			//error("EOF while searching for <{1}>", nlname);
 		}
 
 		if (token.is(m_tok_NETLIST_END))
 		{
 			require_token(m_tok_param_left);
 			if (!in_nl)
-				error("Unexpected NETLIST_END");
+				error (MF_0_UNEXPECTED_NETLIST_END);
 			else
 			{
 				in_nl = false;
@@ -85,7 +78,7 @@ bool parser_t::parse(const pstring nlname)
 		else if (token.is(m_tok_NETLIST_START))
 		{
 			if (in_nl)
-				error("Unexpected NETLIST_START");
+				error (MF_0_UNEXPECTED_NETLIST_START);
 			require_token(m_tok_param_left);
 			token_t name = get_token();
 			require_token(m_tok_param_right);
@@ -404,7 +397,7 @@ void parser_t::device(const pstring &dev_type)
 
 nl_double parser_t::eval_param(const token_t tok)
 {
-	static const char *macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
+	static pstring macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
 	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
@@ -415,7 +408,6 @@ nl_double parser_t::eval_param(const token_t tok)
 	for (i=1; i<6;i++)
 		if (tok.str().equals(macs[i]))
 			f = i;
-#if 1
 	if (f>0)
 	{
 		require_token(m_tok_param_left);
@@ -431,22 +423,6 @@ nl_double parser_t::eval_param(const token_t tok)
 	}
 	return ret * facs[f];
 
-#else
-	if (f>0)
-	{
-		require_token(m_tok_param_left);
-		val = get_identifier();
-	}
-	else
-		val = tok.str();
-
-	ret = val.as_double(&e);
-
-	if (e)
-		fatal("Error with parameter ...\n");
-	if (f>0)
-		require_token(m_tok_param_right);
-	return ret * facs[f];
-#endif
 }
+
 }

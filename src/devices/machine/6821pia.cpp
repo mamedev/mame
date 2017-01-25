@@ -16,7 +16,7 @@
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
-#define LOG_CA1		0x08
+#define LOG_CA1     0x08
 
 #define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 

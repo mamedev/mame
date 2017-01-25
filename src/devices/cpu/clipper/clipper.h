@@ -261,11 +261,11 @@ private:
 		u32 address;
 	} m_info;
 
-	void clipper_device::decode_instruction(u16 insn);
-	int clipper_device::execute_instruction();
-	bool clipper_device::evaluate_branch();
+	void decode_instruction(u16 insn);
+	int execute_instruction();
+	bool evaluate_branch();
 
-	uint32_t clipper_device::intrap(u32 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP);
+	uint32_t intrap(u32 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP);
 };
 
 class clipper_c100_device : public clipper_device

@@ -46,7 +46,7 @@
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
-#define LOG_PIA		0x08
+#define LOG_PIA     0x08
 
 #define VERBOSE 0 //(LOG_PIA | LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
@@ -225,8 +225,8 @@ WRITE8_MEMBER(coco_t4426_device::write)
 /*----------------------------------------------------
     pia_A_w - PIA port A write
 
- The T4426 cartridge PIA Port A is connected to 
- the CE* input of each 2764 ROM and used for banking  
+ The T4426 cartridge PIA Port A is connected to
+ the CE* input of each 2764 ROM and used for banking
  in the correct BASIC module at C000-DFFF
  The main cartridge ROM at E000-FF00 is fixed however
 -----------------------------------------------------*/

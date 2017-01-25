@@ -83,6 +83,7 @@ const address_space_config *cammu_device::memory_space_config (address_spacenum 
 	case AS_0: return &m_main_space_config;
 	case AS_1: return &m_io_space_config;
 	case AS_2: return &m_boot_space_config;
+	default: break;
 	}
 
 	return nullptr;

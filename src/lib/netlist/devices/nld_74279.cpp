@@ -56,7 +56,7 @@ namespace netlist
 		nld_74279A::truthtable_t nld_74279A::m_ttbl;
 		nld_74279B::truthtable_t nld_74279B::m_ttbl;
 
-		const char *nld_74279A::m_desc[] = {
+		const pstring nld_74279A::m_desc[] = {
 				"S,R,_Q|Q",
 				"0,X,X|1|22",
 				"1,0,X|0|27",
@@ -66,7 +66,7 @@ namespace netlist
 		};
 
 
-		const char *nld_74279B::m_desc[] = {
+		const pstring nld_74279B::m_desc[] = {
 				"S1,S2,R,_Q|Q",
 				"0,X,X,X|1|22",
 				"X,0,X,X|1|22",

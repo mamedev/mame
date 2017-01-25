@@ -6,7 +6,16 @@ Return of the Invaders
 
 driver by Jarek Parchanski, Andrea Mazzoleni
 
-the game was developed by UPL for Taito.
+UPL is said to have developed Return of the Invaders for Taito, but some digging
+in the ROMs reveals the following strings:
+
+ Programed by NAKAKUMA AKIRA
+ V 1.0 (85.3.15)
+
+ NOBUO KODERA
+ AKIRA NAKAKUMA
+ HIKARU KASAHARA
+ COMIX LTD. 1985.
 
 Notes:
 - I derived the ROM names from the board diagram in the manual. There might

@@ -100,6 +100,7 @@ matrix_solver_t::~matrix_solver_t()
 
 void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
+
 	log().debug("New solver setup\n");
 
 	m_nets.clear();
@@ -164,7 +165,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					break;
 				case terminal_t::OUTPUT:
 				case terminal_t::PARAM:
-					log().fatal("unhandled element found\n");
+					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
+							p->name());
 					break;
 			}
 		}
@@ -423,7 +425,7 @@ void matrix_solver_t::solve_base()
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
+			log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
 			m_Q_sync.net().toggle_new_Q();
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
 		}
@@ -479,7 +481,7 @@ void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 		else // if (ot<0)
 		{
 			m_rails_temp[k]->add(term, ot, true);
-			log().fatal("found term with missing othernet {1}\n", term->name());
+			log().fatal(MF_1_FOUND_TERM_WITH_MISSING_OTHERNET, term->name());
 		}
 	}
 }

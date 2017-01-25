@@ -100,7 +100,7 @@ namespace netlist
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const char *power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
+		const pstring power_syms[3][2] ={ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 		//register_sub(m_RV);
 		//register_term("1", m_RV.m_P);
 		//register_term("2", m_RV.m_N);
@@ -112,8 +112,10 @@ namespace netlist
 		for (int i = 0; i < 3; i++)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0], detail::device_object_t::type_t::INPUT, false);
-			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1], detail::device_object_t::type_t::INPUT, false);
+			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
+					detail::device_object_t::type_t::INPUT, false);
+			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
+					detail::device_object_t::type_t::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
 				/* alternative logic */
@@ -121,9 +123,9 @@ namespace netlist
 			}
 		}
 		if (!f)
-			netlist().log().warning("D/A Proxy: Found no valid combination of power terminals on device {1}", out_proxied->device().name());
+			log().warning(MW_1_NO_POWER_TERMINALS_ON_DEVICE_1, out_proxied->device().name());
 		else
-			netlist().log().warning("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
+			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 #if (0)
 		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
 		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::type_t::OUTPUT, false);

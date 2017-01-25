@@ -27,28 +27,6 @@ pistream::~pistream()
 {
 }
 
-bool pistream::readline(pstring &line)
-{
-	char c = 0;
-	m_linebuf.clear();
-	if (!this->readbyte(c))
-	{
-		line = "";
-		return false;
-	}
-	while (true)
-	{
-		if (c == 10)
-			break;
-		else if (c != 13) /* ignore CR */
-			m_linebuf += c;
-		if (!this->readbyte(c))
-			break;
-	}
-	line = m_linebuf;
-	return true;
-}
-
 // -----------------------------------------------------------------------------
 // postream: output stream
 // -----------------------------------------------------------------------------
@@ -367,9 +345,43 @@ pstream::pos_type pomemstream::vtell()
 	return m_pos;
 }
 
-pstream_fmt_writer_t::~pstream_fmt_writer_t()
+bool putf8_reader::readline(pstring &line)
+{
+	pstring::code_t c = 0;
+	m_linebuf.clear();
+	if (!this->readcode(c))
+	{
+		line = "";
+		return false;
+	}
+	while (true)
+	{
+		if (c == 10)
+			break;
+		else if (c != 13) /* ignore CR */
+			m_linebuf += pstring(c);
+		if (!this->readcode(c))
+			break;
+	}
+	line = m_linebuf;
+	return true;
+}
+
+putf8_fmt_writer::putf8_fmt_writer(postream &strm)
+: pfmt_writer_t()
+, putf8_writer(strm)
 {
 }
+
+putf8_fmt_writer::~putf8_fmt_writer()
+{
+}
+
+void putf8_fmt_writer::vdowrite(const pstring &ls) const
+{
+	write(ls);
+}
+
 
 
 }

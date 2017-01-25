@@ -7,11 +7,11 @@
 
 #include "m6805.h"
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern device_type const M68705;
 extern device_type const M68705P3;
 extern device_type const M68705P5;
 extern device_type const M68705R3;
@@ -24,12 +24,39 @@ extern device_type const M68705U3;
 
 // ======================> m68705_device
 
-class m68705_device : public m6805_base_device
+#define MCFG_M68705_PORTA_R_CB(obj) \
+	devcb = &m68705_device::set_port_cb_r<0>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTB_R_CB(obj) \
+	devcb = &m68705_device::set_port_cb_r<1>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTC_R_CB(obj) \
+	devcb = &m68705_device::set_port_cb_r<2>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTD_R_CB(obj) \
+	devcb = &m68705_device::set_port_cb_r<3>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTA_W_CB(obj) \
+	devcb = &m68705_device::set_port_cb_w<0>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTB_W_CB(obj) \
+	devcb = &m68705_device::set_port_cb_w<1>(*device, DEVCB_##obj);
+
+#define MCFG_M68705_PORTC_W_CB(obj) \
+	devcb = &m68705_device::set_port_cb_w<2>(*device, DEVCB_##obj);
+
+
+class m68705_device : public m6805_base_device, public device_nvram_interface
 {
 public:
-	m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	// static configuration helpers
+	template<std::size_t N, typename Object> static devcb_base &set_port_cb_r(device_t &device, Object &&obj)
+	{ return downcast<m68705_device &>(device).m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
+	template<std::size_t N, typename Object> static devcb_base &set_port_cb_w(device_t &device, Object &&obj)
+	{ return downcast<m68705_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
 
 protected:
+	// state index constants
 	enum
 	{
 		M68705_A = M6805_A,
@@ -37,67 +64,34 @@ protected:
 		M68705_S = M6805_S,
 		M68705_X = M6805_X,
 		M68705_CC = M6805_CC,
-		M68705_IRQ_STATE = M6805_IRQ_STATE
+		M68705_IRQ_STATE = M6805_IRQ_STATE,
+
+		M68705_LATCHA = 0x10,
+		M68705_LATCHB,
+		M68705_LATCHC,
+		M68705_LATCHD,
+		M68705_DDRA,
+		M68705_DDRB,
+		M68705_DDRC,
+		M68705_DDRD,
+
+		M68705_PS,
+		M68705_TDR,
+		M68705_TCR,
+
+		M68705_PCR,
+		M68705_PLD,
+		M68705_PLA,
+
+		M68705_MOR
 	};
 
-	m68705_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			u32 clock,
-			device_type type,
-			char const *name,
-			u32 addr_width,
-			address_map_delegate internal_map,
-			char const *shortname,
-			char const *source);
-
-	virtual void device_reset() override;
-	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void interrupt() override;
-};
-
-
-// ======================> m68705_new_device
-
-#define MCFG_M68705_PORTA_R_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_r<0>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTB_R_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_r<1>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTC_R_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_r<2>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTD_R_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_r<3>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTA_W_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_w<0>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTB_W_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_w<1>(*device, DEVCB_##obj);
-
-#define MCFG_M68705_PORTC_W_CB(obj) \
-	devcb = &m68705_new_device::set_port_cb_w<2>(*device, DEVCB_##obj);
-
-
-class m68705_new_device : public m68705_device, public device_nvram_interface
-{
-public:
-	// static configuration helpers
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_r(device_t &device, Object &&obj)
-	{ return downcast<m68705_new_device &>(device).m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
-	template<std::size_t N, typename Object> static devcb_base &set_port_cb_w(device_t &device, Object &&obj)
-	{ return downcast<m68705_new_device &>(device).m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
-
-protected:
 	enum
 	{
 		PORT_COUNT = 4
 	};
 
-	m68705_new_device(
+	m68705_device(
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
@@ -143,10 +137,16 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+	virtual void interrupt() override;
 	virtual void burn_cycles(unsigned count) override;
 
 	u8 *const get_user_rom() const { return &m_user_rom[0]; }
 	virtual u8 get_mask_options() const = 0;
+
+	template <std::size_t N> void add_port_latch_state();
+	template <std::size_t N> void add_port_ddr_state();
+	void add_timer_state();
+	void add_eprom_state();
 
 private:
 	bool    tcr_tir() const     { return BIT(m_tcr, 7); }
@@ -186,7 +186,7 @@ private:
 
 // ======================> m68705p_device
 
-class m68705p_device : public m68705_new_device
+class m68705p_device : public m68705_device
 {
 public:
 	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
@@ -206,6 +206,8 @@ protected:
 			char const *shortname,
 			char const *source);
 
+	virtual void device_start() override;
+
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
@@ -217,7 +219,7 @@ protected:
 
 // ======================> m68705u_device
 
-class m68705u_device : public m68705_new_device
+class m68705u_device : public m68705_device
 {
 public:
 	DECLARE_WRITE8_MEMBER(pa_w) { port_input_w<0>(space, offset, data, mem_mask); }
@@ -248,6 +250,8 @@ protected:
 			char const *shortname,
 			char const *source);
 
+	virtual void device_start() override;
+
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
@@ -276,6 +280,8 @@ protected:
 			char const *name,
 			char const *shortname,
 			char const *source);
+
+	virtual void device_start() override;
 
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,

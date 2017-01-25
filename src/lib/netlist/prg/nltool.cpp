@@ -77,8 +77,8 @@ public:
 static plib::pstdout pout_strm;
 static plib::pstderr perr_strm;
 
-static plib::pstream_fmt_writer_t pout(pout_strm);
-static plib::pstream_fmt_writer_t perr(perr_strm);
+static plib::putf8_fmt_writer pout(pout_strm);
+static plib::putf8_fmt_writer perr(perr_strm);
 
 static NETLIST_START(dummy)
 	/* Standard stuff */
@@ -211,7 +211,7 @@ struct input_t
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
-		m_param = setup.find_param(buf, true);
+		m_param = setup.find_param(pstring(buf, pstring::UTF8), true);
 	}
 
 	void setparam()
@@ -244,8 +244,9 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 	if (fname != "")
 	{
 		plib::pifilestream f(fname);
+		plib::putf8_reader r(f);
 		pstring l;
-		while (f.readline(l))
+		while (r.readline(l))
 		{
 			if (l != "")
 			{
@@ -492,7 +493,7 @@ static void listdevices(tool_options_t &opts)
 -------------------------------------------------*/
 
 #if 0
-static const char *pmf_verbose[] =
+static const pstring pmf_verbose[] =
 {
 	"NL_PMF_TYPE_VIRTUAL",
 	"NL_PMF_TYPE_GNUC_PMF",
@@ -530,7 +531,7 @@ int main(int argc, char *argv[])
 	{
 		pout(
 			"nltool (netlist) 0.1\n"
-			"Copyright (C) 2016 Couriersud\n"
+			"Copyright (C) 2017 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
@@ -585,7 +586,7 @@ int main(int argc, char *argv[])
 				result = c.result();
 			}
 			/* present result */
-			pout_strm.write(result.c_str());
+			pout.write(result);
 		}
 		else
 		{

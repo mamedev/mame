@@ -669,13 +669,13 @@ void jollyjgr_state::machine_reset()
 
 static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)	/* 3MHz verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)  /* 3MHz verified */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.18)		/* 59.1864Hz measured */
+	MCFG_SCREEN_REFRESH_RATE(59.18)     /* 59.1864Hz measured */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2)	/* 1.7897725MHz verified */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 

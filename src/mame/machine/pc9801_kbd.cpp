@@ -9,7 +9,7 @@
 
     - Verify untested keys:
       STOP, COPY, and vf-1 through vf-5
-	  STOP is correct, verified with branmar2
+      STOP is correct, verified with branmar2
 
     - Problems with natural keyboard (most nonprinting keys don't work)
 

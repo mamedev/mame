@@ -145,6 +145,7 @@
 	[devicesScroll setHasVerticalScroller:YES];
 	[devicesScroll setAutohidesScrollers:YES];
 	[devicesScroll setBorderType:NSNoBorder];
+	[devicesScroll setDrawsBackground:NO];
 	[devicesScroll setDocumentView:devicesView];
 	[devicesView release];
 	[[window contentView] addSubview:devicesScroll];

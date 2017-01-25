@@ -270,22 +270,6 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 WRITE_LINE_MEMBER(gladiatr_state::tclk_w)
 {
 	m_tclk_val = state != 0;
-
-	// these are actually edge-triggered, but MAME only supports polled inputs
-
-	u8 const new_in0_val(m_in0->read());
-	if (BIT(~new_in0_val & (new_in0_val ^ m_in0_val), 5))
-		m_cctl_p1 = (m_cctl_p1 & 0xfc) | BIT(~new_in0_val, 5) | (BIT(~new_in0_val, 5) << 1);
-	else
-		m_cctl_p1 = (m_cctl_p1 & 0xfe) | BIT(~new_in0_val, 5);
-	m_in0_val = new_in0_val;
-
-	u8 const new_in1_val(m_in0->read());
-	if (BIT(~new_in1_val & (new_in1_val ^ m_in1_val), 5))
-		m_cctl_p2 = (m_cctl_p2 & 0xfc) | BIT(~new_in1_val, 5) | (BIT(~new_in1_val, 5) << 1);
-	else
-		m_cctl_p2 = (m_cctl_p2 & 0xfe) | BIT(~new_in1_val, 5);
-	m_in1_val = new_in1_val;
 }
 
 READ8_MEMBER(gladiatr_state::cctl_p1_r)
@@ -367,6 +351,33 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
 	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+}
+
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p1_s1)
+{
+	// P11 gets the value of 1P-S2 at the moment 1P-S1 was pressed
+	if (oldval && !newval)
+		m_cctl_p1 = (m_cctl_p1 & 0xfd) | (BIT(m_cctl_p1, 0) << 1);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p1_s2)
+{
+	// P10 is high when 1P-S2 is pressed
+	m_cctl_p1 = (m_cctl_p1 & 0xfe) | (newval ? 0x00 : 0x01);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p2_s1)
+{
+	// P21 gets the value of 2P-S2 at the moment 2P-S1 was pressed
+	if (oldval && !newval)
+		m_cctl_p2 = (m_cctl_p2 & 0xfd) | (BIT(m_cctl_p2, 0) << 1);
+}
+
+INPUT_CHANGED_MEMBER(gladiatr_state::p2_s2)
+{
+	// P20 is high when 2P-S2 is pressed
+	m_cctl_p2 = (m_cctl_p2 & 0xfe) | (newval ? 0x00 : 0x01);
 }
 
 
@@ -622,8 +633,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s1, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -632,8 +643,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY   PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY   PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s1, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    PORT_COCKTAIL  PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )                                     // coin counter outputs
 
 	PORT_START("IN2")   // cctl p1
@@ -1143,16 +1154,12 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 	membank("bank2")->set_entry(0);
 
 	m_tclk_val = false;
-	m_in0_val = 0xff;
-	m_in1_val = 0xff;
 	m_cctl_p1 = 0xff;
 	m_cctl_p2 = 0xff;
 	m_ucpu_p1 = 0xff;
 	m_csnd_p1 = 0xff;
 
 	save_item(NAME(m_tclk_val));
-	save_item(NAME(m_in0_val));
-	save_item(NAME(m_in1_val));
 	save_item(NAME(m_cctl_p1));
 	save_item(NAME(m_cctl_p2));
 	save_item(NAME(m_ucpu_p1));
