@@ -945,6 +945,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"imp",
 		"intel",
+		"interpro",
 		"interton",
 		"intv",
 		"isc",
