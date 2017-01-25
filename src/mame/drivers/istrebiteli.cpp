@@ -5,19 +5,19 @@
     Istrebiteli driver by MetalliC
 
     TODO:
-      hardware-like noice sound generation
+      discrete schematics for noise sound generation
       accurate sprite collision
 
     how to play:
       insert one or more coins, each coin gives 2 minutes of play time, then press 1 or 2 player game start
-      hit enemy 15 or more times to get bonus game
+      hit enemy 15 or more times to get the bonus game
 
     test mode:
       insert 12 or more coins then press 2 player start
 
     notes:
-      dumped PCB is early game version, have several bugs, possible test/prototype.
-      later version was seen in St.Petersburg arcade museum, CPU board have single 8Kx8 ROM.
+      dumped PCB is from an early game version which has several bugs, perhaps it is a test/prototype.
+      latter version was seen in the St.Petersburg arcade museum, CPU board has a single 8Kx8 ROM.
 
 **************************************************************************/
 
@@ -91,7 +91,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 			smpl = (m_rom[m_rom_cnt] >> m_sample_num) & 1;
 
 		// below is huge guess
-		if ((m_prev_data & 0x40) == 0)              // b6 noice enable ?
+		if ((m_prev_data & 0x40) == 0)              // b6 enable noise ?
 			smpl &= rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 {
-	// piece of HACK
+	// kind of HACK
 	// real hardware does per-pixel sprite collision detection
 	int id = *(int*)&param;
 

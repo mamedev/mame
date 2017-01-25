@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
 	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
 	AM_RANGE(0x60, 0x6f) AM_WRITE(tiamc1_sprite_n_w) /* sprites # */
-	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprites attributes */
+	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprite attributes */
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(tiamc1_palette_w)  /* color ram */
 	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
 	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
@@ -176,14 +176,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    // sprites Y
-	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    // sprites X
-	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)    // sprites #
-	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)    // sprites attributes
-	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)     // color ram
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)   // background V scroll
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)   // background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)     // character rom offset
+	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    /* sprites Y */
+	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    /* sprites X */
+	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)    /* sprites # */
+	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)    /* sprite attributes */
+	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)     /* color ram */
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)   /* background V scroll */
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)   /* background H scroll */
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)     /* character rom offset */
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
 ADDRESS_MAP_END
@@ -235,8 +235,8 @@ static INPUT_PORTS_START( gorodki )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // right button
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // left button
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) /* right button */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) /* left button */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -267,8 +267,8 @@ static INPUT_PORTS_START( kot )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Punch / Right
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick / Left
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* Punch / Right */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* Kick / Left */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       /* pixel clock and htotal come from docs/schematics, the rest is a guesswork (originall specified by an undumped PROM) */
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_DERIVED(kot, tiamc1)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
+	MCFG_PIT8253_CLK2(SND_CLOCK)                /* guesswork */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
 
@@ -387,9 +387,9 @@ ROM_START( konek )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
 	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
-	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprite rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
-	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprite rom index 256x8 */
 
 ROM_END
 
@@ -412,9 +412,9 @@ ROM_START( sosterm )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
 	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
-	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprite rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
-	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprite rom index 256x8 */
 ROM_END
 
 ROM_START( koroleva )
@@ -436,12 +436,12 @@ ROM_START( koroleva )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
 	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
-	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprite rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
-	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprite rom index 256x8 */
 ROM_END
 
-// this game ROM board have only one 2KB main CPU RAM IC populated
+/* This game ROM board has only one 2KB main CPU RAM IC populated */
 ROM_START( bilyard )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "04.1g", 0x00000, 0x2000, CRC(a44f913d) SHA1(f01a0e931fb0f719bc7b3f1ca7802dd747c8a56f) )
@@ -461,12 +461,12 @@ ROM_START( bilyard )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
 	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
-	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprite rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
-	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprite rom index 256x8 */
 ROM_END
 
-// this game ROM board have only one 2KB main CPU RAM IC populated
+/* This game ROM board has only one 2KB main CPU RAM IC populated */
 ROM_START( gorodki )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "70.1g", 0x00000, 0x2000, CRC(bd3eb624) SHA1(acfc7e7186daf399f858a0d0cf462b0eaabb3f9e) )
@@ -486,35 +486,35 @@ ROM_START( gorodki )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "prom100.e10", 0x0000, 0x100, NO_DUMP ) /* i/o ports map 256x8 */
 	ROM_LOAD( "prom101.a01", 0x0100, 0x100, NO_DUMP ) /* video sync 256x8 */
-	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprites rom index 256x4 */
+	ROM_LOAD( "prom102.b03", 0x0200, 0x080, NO_DUMP ) /* sprite rom index 256x4 */
 	ROM_LOAD( "prom102.b06", 0x0280, 0x080, NO_DUMP ) /* buffer optimization logic 256x4 */
-	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprites rom index 256x8 */
+	ROM_LOAD( "prom102.b05", 0x0300, 0x100, NO_DUMP ) /* sprite rom index 256x8 */
 ROM_END
 
 /*
-  later (cost reduced ?) version of TIA-MC1 hardware, uses single PCB main board design,
+  Latter (cost reduced ?) version of the TIA-MC1 hardware, uses single PCB main board design,
   ROM-based tile generator, sinle bank tile map RAM, single i8253
 
   Specs:
   1x KR580VM80A (Russian: KP580BM80A. Soviet clone of i8080).
   1x KR580VV55A (Russian: KP580BB55A. Soviet clone of i8255).
-  1x KR580VI53 (Soviet clone of i8253)
+  1x KR580VI53 (Soviet clone of i8253).
   1x KR580VK28 (Russian: KP580BK28. Soviet clone of i8228: bus controllers/drivers).
 
-  1x K174YH7 (soviet clone of TBA810, 7W audio amplifier).
+  1x K174YH7 (Soviet clone of TBA810, 7W audio amplifier).
 
   3x KR573RU8 (2Kx8 SRAM).
   2x KR541RU2 (1Kx4 RAM).
   9x KR531RU8 (16x4 RAM).
 
   There are some issues with the KR580VV55A.
-  Sometimes the code tries to write through a port that was
-  previously set as input. Not sure if it's a leftover, a bug,
-  or just some differences against the i8255. Needs more research.
+  Sometimes the code tries to write to a port that was
+  previously set as an input. Not sure if it's a leftover, a bug,
+  or just some hardware differences against the i8255. Needs more research.
 
   KR580VI53/i8253 timers usage:
-  0 - used to blank part of display in horizontal direction, apparently it's CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
-  1 - used to blank part of display in vertical direction, apparently it's CLK1 is HBlank or OUT0, GATE1 is VBlank, OUT1 - blank video
+  0 - used to blank part of display in horizontal direction, apparently its CLK0 is PIXEL_CLOCK/4, GATE0 is HBlank, OUT0 - blank video
+  1 - used to blank part of display in vertical direction, apparently its CLK1 is HBlank or OUT0, GATE1 is VBlank, OUT1 - blank video
   2 - sound generation
 
 */
@@ -525,13 +525,13 @@ ROM_START( kot )
 	ROM_LOAD( "856.8", 0x04000, 0x2000, CRC(9180c98f) SHA1(4085180b9e9772e965c487e7b02d88fcae973e87) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )  // sprite gfx
+	ROM_LOAD( "850.5", 0x00000, 0x2000, CRC(5dc3a102) SHA1(e97d219f7004291438b991435b7fe5d5be01d468) )  /* sprite gfx */
 	ROM_LOAD( "851.6", 0x02000, 0x2000, CRC(7db239a0) SHA1(af5772afff9009f63e2ab95c1cb00e047f3ed7e4) )
 	ROM_LOAD( "852.7", 0x04000, 0x2000, CRC(c7700f88) SHA1(1a20cc60b083259070e4f1687b09a31fc763d47e) )
 	ROM_LOAD( "853.8", 0x06000, 0x2000, CRC(b94bf1af) SHA1(da403c51fd78f99b82304c67f2197078f4ea0bf5) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )  // tile gfx
+	ROM_LOAD( "846.1", 0x00000, 0x2000, CRC(42447f4a) SHA1(bd35f2f5e468f9191680bf2c1800e09bb9ae1691) )  /* tile gfx */
 	ROM_LOAD( "847.2", 0x02000, 0x2000, CRC(99ada5e8) SHA1(9425a515105ec9e9989aae736645b270e39420be) )
 	ROM_LOAD( "848.3", 0x04000, 0x2000, CRC(a124cff4) SHA1(d1d8e6f725a6f30058d52cdbe80b598149cd6052) )
 	ROM_LOAD( "849.4", 0x06000, 0x2000, CRC(5d27fda6) SHA1(f1afb39c7422caaa5eff53388f1b7241dd7c1cd7) )
