@@ -64,6 +64,7 @@
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
 # USE_BUNDLED_LIB_SDL2 = 1
+# USE_SYSTEM_LIB_UTF8PROC = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -458,6 +459,10 @@ endif
 
 ifdef USE_SYSTEM_LIB_PORTAUDIO
 PARAMS += --with-system-portaudio='$(USE_SYSTEM_LIB_PORTAUDIO)'
+endif
+
+ifdef USE_SYSTEM_LIB_UTF8PROC
+PARAMS += --with-system-utf8proc='$(USE_SYSTEM_LIB_UTF8PROC)'
 endif
 
 # reverse logic for this one
