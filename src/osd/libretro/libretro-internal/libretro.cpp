@@ -18,6 +18,7 @@
 extern const char bare_build_version[];
 
 int retro_pause = 0;
+bool retro_load_ok=false;
 
 //Use alternate render by default with screen resolution 640x480
 //FIXME: add option to choose alternate render resolution (or use native res)
@@ -507,7 +508,7 @@ int RLOOP=1;
 void retro_deinit(void)
 {
    printf("RETRO DEINIT\n");
-   retro_finish();
+   if(retro_load_ok)retro_finish();
 }
 
 void retro_reset (void)
@@ -528,6 +529,7 @@ void retro_run (void)
       mfirst++;
       mmain2(1,RPATH);
       printf("MAIN FIRST\n");
+      retro_load_ok=true;
       return;
    }
 
