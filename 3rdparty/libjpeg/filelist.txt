@@ -1,6 +1,6 @@
 IJG JPEG LIBRARY:  FILE LIST
 
-Copyright (C) 1994-2009, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1994-2013, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -197,6 +197,8 @@ config.guess
 config.sub
 depcomp
 missing
+ar-lib
+compile
 install-sh	Install shell script for those Unix systems lacking one.
 Makefile.in	Makefile input for configure.
 Makefile.am	Source file for use with Automake to generate Makefile.in.
@@ -206,8 +208,6 @@ mak*.*		Sample makefiles for particular systems.
 jconfig.*	Sample jconfig.h for particular systems.
 libjpeg.map	Script to generate shared library with versioned symbols.
 aclocal.m4	M4 macro definitions for use with Autoconf.
-ansi2knr.c	De-ANSIfier for pre-ANSI C compilers (courtesy of
-		L. Peter Deutsch and Aladdin Enterprises).
 
 Test files (see install.txt for test procedure):
 

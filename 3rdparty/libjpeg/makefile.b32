@@ -1,36 +1,34 @@
 # Makefile for Independent JPEG Group's software
 
-# This makefile is for Microsoft C for MS-DOS, version 6.00A and up.
-# Use NMAKE, not Microsoft's brain-damaged MAKE.
-# Thanks to Alan Wright and Chris Turner of Olivetti Research Ltd.
+# This makefile is suitable for Borland C on MS-DOS.
+# It works with Borland C++ 32-bit for DOS, revision 5.0 or later.
+# Thanks to Tom Wright and Ge' Weijers (original DOS) and
+# Joe Slater for adding 32-bit additions (needed for Borland
+# revision 5.5).
 
-# Read installation instructions before saying "nmake" !!
+# Read installation instructions before saying "make" !!
 
-# You may need to adjust these compiler options:
-CFLAGS = -AM -Oecigt -Gs -W3
-# -AM medium memory model (or use -AS for small model, if you remove features)
-# -Oecigt -Gs  maximum safe optimisation (-Ol has bugs in MSC 6.00A)
-# -W3 warning level 3
-# You might also want to add -G2 if you have an 80286, etc.
+# The name of your C compiler:
+CC= bcc32
+
+# You may need to adjust these cc options:
+CFLAGS= -O2 -w-par -w-stu -w-ccc -w-rch -w-aus
+# -w-par suppresses warnings about unused function parameters
+# -w-stu suppresses warnings about incomplete structures
+# -w-ccc suppresses warnings about compile-time-constant conditions
+# -w-rch suppresses warnings about unreachable code
 # Generally, we recommend defining any configuration symbols in jconfig.h,
 # NOT via -D switches here.
 
-# Jan-Herman Buining suggests the following switches for MS C 8.0 and a 486:
-# CFLAGS = /AM /f- /FPi87 /G3 /Gs /Gy /Ob1 /Oc /Oe /Og /Oi /Ol /On /Oo /Ot \
-#          /OV4 /W3
-# except for jquant1.c, which must be compiled with /Oo- to avoid a compiler
-# crash.
-
-# Ingar Steinsland suggests the following switches when building
-# a 16-bit Windows DLL:
-# CFLAGS = -ALw -Gsw -Zpe -W3 -O2 -Zi -Zd
+# Link-time cc options:
+LDFLAGS=
+# -lc case-significant link
 
 # Put here the object file name for the correct system-dependent memory
-# manager file.  For DOS, we recommend jmemdos.c and jmemdosa.asm.
-# (But not for Windows; see install.txt if you use this makefile for Windows.)
-SYSDEPMEM= jmemdos.obj jmemdosa.obj
+# manager file.
 # SYSDEPMEMLIB must list the same files with "+" signs for the librarian.
-SYSDEPMEMLIB= +jmemdos.obj +jmemdosa.obj
+SYSDEPMEM= jmemnobs.obj
+SYSDEPMEMLIB= +jmemnobs.obj
 
 # End of configurable options.
 
@@ -101,86 +99,75 @@ DOBJECTS= djpeg.obj wrppm.obj wrgif.obj wrtarga.obj wrrle.obj wrbmp.obj \
         rdcolmap.obj cdjpeg.obj
 TROBJECTS= jpegtran.obj rdswitch.obj cdjpeg.obj transupp.obj
 
-# need linker response file because file list > 128 chars
-RFILE = libjpeg.ans
-
 
 all: libjpeg.lib cjpeg.exe djpeg.exe jpegtran.exe rdjpgcom.exe wrjpgcom.exe
 
-libjpeg.lib: $(LIBOBJECTS) $(RFILE)
-	del libjpeg.lib
-	lib @$(RFILE)
-
-# linker response file for building libjpeg.lib
-$(RFILE) : makefile
-	del $(RFILE)
-	echo libjpeg.lib >$(RFILE)
-# silly want-to-create-it prompt:
-	echo y >>$(RFILE)
-	echo +jcapimin.obj +jcapistd.obj +jcarith.obj +jctrans.obj & >>$(RFILE)
-	echo +jcparam.obj +jdatadst.obj +jcinit.obj +jcmaster.obj & >>$(RFILE)
-	echo +jcmarker.obj +jcmainct.obj +jcprepct.obj & >>$(RFILE)
-	echo +jccoefct.obj +jccolor.obj +jcsample.obj +jchuff.obj & >>$(RFILE)
-	echo +jcdctmgr.obj +jfdctfst.obj +jfdctflt.obj & >>$(RFILE)
-	echo +jfdctint.obj +jdapimin.obj +jdapistd.obj & >>$(RFILE)
-	echo +jdarith.obj +jdtrans.obj +jdatasrc.obj +jdmaster.obj & >>$(RFILE)
-	echo +jdinput.obj +jdmarker.obj +jdhuff.obj +jdmainct.obj & >>$(RFILE)
-	echo +jdcoefct.obj +jdpostct.obj +jddctmgr.obj & >>$(RFILE)
-	echo +jidctfst.obj +jidctflt.obj +jidctint.obj & >>$(RFILE)
-	echo +jdsample.obj +jdcolor.obj +jquant1.obj & >>$(RFILE)
-	echo +jquant2.obj +jdmerge.obj +jaricom.obj +jcomapi.obj & >>$(RFILE)
-	echo +jutils.obj +jerror.obj +jmemmgr.obj & >>$(RFILE)
-	echo $(SYSDEPMEMLIB) ; >>$(RFILE)
+libjpeg.lib: $(LIBOBJECTS)
+        - del libjpeg.lib
+        tlib libjpeg.lib /E /C @&&|
++jcapimin.obj +jcapistd.obj +jcarith.obj +jctrans.obj +jcparam.obj &
++jdatadst.obj +jcinit.obj +jcmaster.obj +jcmarker.obj +jcmainct.obj &
++jcprepct.obj +jccoefct.obj +jccolor.obj +jcsample.obj +jchuff.obj &
++jcdctmgr.obj +jfdctfst.obj +jfdctflt.obj +jfdctint.obj +jdapimin.obj &
++jdapistd.obj +jdarith.obj +jdtrans.obj +jdatasrc.obj +jdmaster.obj &
++jdinput.obj +jdmarker.obj +jdhuff.obj +jdmainct.obj +jdcoefct.obj &
++jdpostct.obj +jddctmgr.obj +jidctfst.obj +jidctflt.obj +jidctint.obj &
++jdsample.obj +jdcolor.obj +jquant1.obj +jquant2.obj +jdmerge.obj &
++jaricom.obj +jcomapi.obj +jutils.obj +jerror.obj +jmemmgr.obj &
+$(SYSDEPMEMLIB)
+|
 
 cjpeg.exe: $(COBJECTS) libjpeg.lib
-	echo $(COBJECTS) >cjpeg.lst
-	link /STACK:4096 /EXEPACK @cjpeg.lst, cjpeg.exe, , libjpeg.lib, ;
-	del cjpeg.lst
+        $(CC) $(LDFLAGS) -ecjpeg.exe $(COBJECTS) libjpeg.lib
 
 djpeg.exe: $(DOBJECTS) libjpeg.lib
-	echo $(DOBJECTS) >djpeg.lst
-	link /STACK:4096 /EXEPACK @djpeg.lst, djpeg.exe, , libjpeg.lib, ;
-	del djpeg.lst
+        $(CC) $(LDFLAGS) -edjpeg.exe $(DOBJECTS) libjpeg.lib
 
 jpegtran.exe: $(TROBJECTS) libjpeg.lib
-	link /STACK:4096 /EXEPACK $(TROBJECTS), jpegtran.exe, , libjpeg.lib, ;
+        $(CC) $(LDFLAGS) -ejpegtran.exe $(TROBJECTS) libjpeg.lib
 
 rdjpgcom.exe: rdjpgcom.c
-	$(CC) -AS -O -W3 rdjpgcom.c
+        $(CC) $(CFLAGS) rdjpgcom.c
 
-# wrjpgcom needs large model so it can malloc a 64K chunk
 wrjpgcom.exe: wrjpgcom.c
-	$(CC) -AL -O -W3 wrjpgcom.c
+        $(CC) $(CFLAGS) wrjpgcom.c
+
+# This "{}" syntax allows Borland Make to "batch" source files.
+# In this way, each run of the compiler can build many modules.
+.c.obj:
+        $(CC) $(CFLAGS) -c{ $<}
 
 jconfig.h: jconfig.txt
-	echo You must prepare a system-dependent jconfig.h file.
-	echo Please read the installation directions in install.txt.
-	exit 1
+        echo You must prepare a system-dependent jconfig.h file.
+        echo Please read the installation directions in install.txt.
+        exit 1
 
 clean:
-	del *.obj
-	del libjpeg.lib
-	del cjpeg.exe
-	del djpeg.exe
-	del jpegtran.exe
-	del rdjpgcom.exe
-	del wrjpgcom.exe
-	del testout*.*
+        - del *.obj
+        - del libjpeg.lib
+        - del cjpeg.exe
+        - del djpeg.exe
+        - del jpegtran.exe
+        - del rdjpgcom.exe
+        - del wrjpgcom.exe
+        - del testout*.*
 
 test: cjpeg.exe djpeg.exe jpegtran.exe
-	del testout*.*
-	djpeg -dct int -ppm -outfile testout.ppm  testorig.jpg
-	djpeg -dct int -bmp -colors 256 -outfile testout.bmp  testorig.jpg
-	cjpeg -dct int -outfile testout.jpg  testimg.ppm
-	djpeg -dct int -ppm -outfile testoutp.ppm testprog.jpg
-	cjpeg -dct int -progressive -opt -outfile testoutp.jpg testimg.ppm
-	jpegtran -outfile testoutt.jpg testprog.jpg
-	fc /b testimg.ppm testout.ppm
-	fc /b testimg.bmp testout.bmp
-	fc /b testimg.jpg testout.jpg
-	fc /b testimg.ppm testoutp.ppm
-	fc /b testimgp.jpg testoutp.jpg
-	fc /b testorig.jpg testoutt.jpg
+        - del testout*.*
+        djpeg -dct int -ppm -outfile testout.ppm  testorig.jpg
+        djpeg -dct int -bmp -colors 256 -outfile testout.bmp  testorig.jpg
+        cjpeg -dct int -outfile testout.jpg  testimg.ppm
+        djpeg -dct int -ppm -outfile testoutp.ppm testprog.jpg
+        cjpeg -dct int -progressive -opt -outfile testoutp.jpg testimg.ppm
+        jpegtran -outfile testoutt.jpg testprog.jpg
+        echo n > n.tmp
+        comp testimg.ppm testout.ppm < n.tmp
+        comp testimg.bmp testout.bmp < n.tmp
+        comp testimg.jpg testout.jpg < n.tmp
+        comp testimg.ppm testoutp.ppm < n.tmp
+        comp testimgp.jpg testoutp.jpg < n.tmp
+        comp testorig.jpg testoutt.jpg < n.tmp
+        del n.tmp
 
 
 jaricom.obj: jaricom.c jinclude.h jconfig.h jpeglib.h jmorecfg.h jpegint.h jerror.h
@@ -252,5 +239,5 @@ rdbmp.obj: rdbmp.c cdjpeg.h jinclude.h jconfig.h jpeglib.h jmorecfg.h jerror.h c
 wrbmp.obj: wrbmp.c cdjpeg.h jinclude.h jconfig.h jpeglib.h jmorecfg.h jerror.h cderror.h
 rdrle.obj: rdrle.c cdjpeg.h jinclude.h jconfig.h jpeglib.h jmorecfg.h jerror.h cderror.h
 wrrle.obj: wrrle.c cdjpeg.h jinclude.h jconfig.h jpeglib.h jmorecfg.h jerror.h cderror.h
-jmemdosa.obj : jmemdosa.asm
-	masm /mx $*;
+jmemdosa.obj: jmemdosa.asm
+        tasm /mx jmemdosa.asm
