@@ -12226,7 +12226,7 @@ fb01                            // 1986 FB-01
 fc100                           //
 
 @source:fccpu20.cpp
-fccpu20
+fccpu20sbc
 
 @source:fccpu30.cpp
 fccpu30
@@ -14782,7 +14782,7 @@ hector1                         //
 interact                        //
 
 @source:interpro.cpp
-//ip2800                          // Intergraph InterPro 28xx workstation
+ip2800                          // Intergraph InterPro 28xx workstation
 
 @source:intrscti.cpp
 intrscti                        // ????
