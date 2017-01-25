@@ -14782,7 +14782,7 @@ hector1                         //
 interact                        //
 
 @source:interpro.cpp
-//ip2800                          // Intergraph InterPro 28xx workstation
+ip2800                          // Intergraph InterPro 28xx workstation
 
 @source:intrscti.cpp
 intrscti                        // ????
