@@ -221,7 +221,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		case 0: m_noise[ch].freq = m_master_clock/256.0 * 2; break;
 		case 1: m_noise[ch].freq = m_master_clock/512.0 * 2; break;
 		case 2: m_noise[ch].freq = m_master_clock/1024.0 * 2; break;
-		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break;
+		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break; // todo: this case will be m_master_clock/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
 		}
 	}
 
@@ -280,12 +280,14 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		for (ch = 0; ch < 2; ch++)
 		{
-			/* check the actual position in noise generator */
+			/* update the state of the noise generator 
+			 * polynomial is x^18 + x^11 + x (i.e. 0x20400) and is a plain XOR, initial state is probably all 1s
+			 * see http://www.vogons.org/viewtopic.php?f=9&t=51695 */
 			m_noise[ch].counter -= m_noise[ch].freq;
 			while (m_noise[ch].counter < 0)
 			{
 				m_noise[ch].counter += m_sample_rate;
-				if( ((m_noise[ch].level & 0x4000) == 0) == ((m_noise[ch].level & 0x0040) == 0) )
+				if( ((m_noise[ch].level & 0x20000) == 0) != ((m_noise[ch].level & 0x0400) == 0) )
 					m_noise[ch].level = (m_noise[ch].level << 1) | 1;
 				else
 					m_noise[ch].level <<= 1;
