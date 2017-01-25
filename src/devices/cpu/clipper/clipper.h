@@ -5,6 +5,10 @@
 #ifndef __CLIPPER_H__
 #define __CLIPPER_H__
 
+#if defined __LIBRETRO__
+#include <climits>
+#endif
+
 enum clipper_registers
 {
 	CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
