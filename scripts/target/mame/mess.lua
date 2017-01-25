@@ -134,6 +134,7 @@ CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
 CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
+CPUS["CLIPPER"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -945,6 +946,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"imp",
 		"intel",
+		"interpro",
 		"interton",
 		"intv",
 		"isc",
