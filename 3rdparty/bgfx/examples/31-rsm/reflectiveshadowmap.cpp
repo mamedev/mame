@@ -127,7 +127,7 @@ bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
 // Utility function to draw a screen space quad for deferred rendering
 void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
+	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
@@ -515,12 +515,12 @@ public:
 				for (uint32_t j = 0; j < MAX_SPHERE; j++)
 				{
 					// These are used in the fragment shader
-					bgfx::setTexture(0, s_normal, m_gbuffer, GBUFFER_RT_NORMAL);  // Normal for lighting calculations
-					bgfx::setTexture(1, s_depth,  m_gbuffer, GBUFFER_RT_DEPTH);   // Depth to reconstruct world position
+					bgfx::setTexture(0, s_normal, bgfx::getTexture(m_gbuffer, GBUFFER_RT_NORMAL) );  // Normal for lighting calculations
+					bgfx::setTexture(1, s_depth,  bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );   // Depth to reconstruct world position
 
 					// Thse are used in the vert shader
-					bgfx::setTexture(2, s_shadowMap, m_shadowBuffer, SHADOW_RT_DEPTH);  // Used to place sphere
-					bgfx::setTexture(3, s_rsm,       m_shadowBuffer, SHADOW_RT_RSM);    // Used to scale/color sphere
+					bgfx::setTexture(2, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH) );  // Used to place sphere
+					bgfx::setTexture(3, s_rsm,       bgfx::getTexture(m_shadowBuffer, SHADOW_RT_RSM) );    // Used to scale/color sphere
 
 					bgfx::setUniform(u_invMvp, invMvp);
 					bgfx::setUniform(u_invMvpShadow, invMvpShadow);
@@ -551,11 +551,13 @@ public:
 			// Draw combine pass
 
 			// Texture inputs for combine pass
-			bgfx::setTexture(0, s_normal, m_gbuffer, GBUFFER_RT_NORMAL);
-			bgfx::setTexture(1, s_color, m_gbuffer, GBUFFER_RT_COLOR);
-			bgfx::setTexture(2, s_light, m_lightBuffer, 0);
-			bgfx::setTexture(3, s_depth, m_gbuffer, GBUFFER_RT_DEPTH);
-			bgfx::setTexture(4, s_shadowMap, m_shadowBuffer, SHADOW_RT_DEPTH, BGFX_TEXTURE_COMPARE_LEQUAL);
+			bgfx::setTexture(0, s_normal,    bgfx::getTexture(m_gbuffer, GBUFFER_RT_NORMAL) );
+			bgfx::setTexture(1, s_color,     bgfx::getTexture(m_gbuffer, GBUFFER_RT_COLOR) );
+			bgfx::setTexture(2, s_light,     bgfx::getTexture(m_lightBuffer, 0) );
+			bgfx::setTexture(3, s_depth,     bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );
+			bgfx::setTexture(4, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH)
+				, BGFX_TEXTURE_COMPARE_LEQUAL
+				);
 
 			// Uniforms for combine pass
 
@@ -666,10 +668,10 @@ public:
 	void updateLightDir()
 	{
 		float el = m_lightElevation * (bx::pi/180.0f);
-		float az = m_lightAzimuth * (bx::pi/180.0f);
-		m_lightDir[0] = cos(el)*cos(az);
-		m_lightDir[2] = cos(el)*sin(az);
-		m_lightDir[1] = sin(el);
+		float az = m_lightAzimuth   * (bx::pi/180.0f);
+		m_lightDir[0] = bx::fcos(el)*bx::fcos(az);
+		m_lightDir[2] = bx::fcos(el)*bx::fsin(az);
+		m_lightDir[1] = bx::fsin(el);
 		m_lightDir[3] = 0.0f;
 	}
 

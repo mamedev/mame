@@ -461,7 +461,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_sound_int_state(0),
 			m_video_int_state(0),
 			m_palette(*this, "palette"),
-			m_slapstic_device(*this, "slapstic")
+			m_slapstic_device(*this, "slapstic"),
+			m_rs232(*this, "rs232")
 {
 	int i;
 
@@ -1445,6 +1446,10 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 
 	MCFG_MC68681_ADD("duartn68681", XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(harddriv_state, harddriv_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("duartn68681", mc68681_device, rx_a_w))
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)

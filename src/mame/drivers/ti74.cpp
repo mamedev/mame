@@ -97,10 +97,10 @@ public:
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
 
-	uint8_t m_key_select;
-	uint8_t m_power;
+	u8 m_key_select;
+	u8 m_power;
 
-	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
+	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -126,7 +126,7 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	// max size is 32KB
 	if (size > 0x8000)
@@ -156,7 +156,7 @@ PALETTE_INIT_MEMBER(ti74_state, ti74)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void ti74_state::update_lcd_indicator(uint8_t y, uint8_t x, int state)
+void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 {
 	// TI-74 ref._________________...
 	// output#  |10     11     12     13     14      2      3      4
@@ -229,7 +229,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 READ8_MEMBER(ti74_state::keyboard_r)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")
-	//AM_RANGE(0x4000, 0xbfff)      // mapped by the cartslot
+	//AM_RANGE(0x4000, 0xbfff) // mapped by the cartslot
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("sysbank")
 ADDRESS_MAP_END
 

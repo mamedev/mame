@@ -184,7 +184,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)typeCharacterAndScrollToCursor:(char)ch {
 	debug_view_xy const oldPos = view->cursor_position();
 	view->process_char(ch);
-	if (view->cursor_supported() && view->cursor_visible())
+	if (view->cursor_supported())
 	{
 		debug_view_xy const newPos = view->cursor_position();
 		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))

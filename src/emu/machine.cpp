@@ -84,6 +84,9 @@
 #include "network.h"
 #include "ui/uimain.h"
 #include <time.h>
+#include "server_http.hpp"
+#include "rapidjson/include/rapidjson/writer.h"
+#include "rapidjson/include/rapidjson/stringbuffer.h"
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
@@ -331,6 +334,8 @@ int running_machine::run(bool quiet)
 		// handle initial load
 		if (m_saveload_schedule != SLS_NONE)
 			handle_saveload();
+
+		export_http_api();
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
@@ -1176,7 +1181,32 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 {
 }
 
+void running_machine::export_http_api()
+{
+	if (!options().http()) return;
 
+	m_manager.http_server()->on_get("/api/machine", [this](auto response, auto request)
+	{
+		rapidjson::StringBuffer s;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+		writer.StartObject();
+		writer.Key("name");
+		writer.String(m_basename.c_str());
+
+		writer.Key("devices");
+		writer.StartArray();
+
+		device_iterator iter(this->root_device());
+		for (device_t &device : iter)
+			writer.String(device.tag());
+
+		writer.EndArray();
+		writer.EndObject();
+
+		response->type("application/json");
+		response->status(200).send(s.GetString());
+	});
+}
 
 //**************************************************************************
 //  SYSTEM TIME

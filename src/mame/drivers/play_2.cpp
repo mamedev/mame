@@ -3,12 +3,17 @@
 /**********************************************************************************
 
 PINBALL
-Playmatic MPU 2
+Playmatic MPU-C
 
-4 different sound boards were used.
-- Those without sound roms use a CDP1863
-- Zira uses a COP402 and a AY-3-8910
-- Cerberus uses a 90435 (appears to be a CDP1802) and a 90503 (unknown)
+The IOS board common to all games provides sound effects through the CDP1863.
+4 different add-on sound boards were also used:
+- Black Fever has the Speaking System board, which produces analog signals for
+  controlling an 8-track tape player.
+- Zira uses the Sound-2 board with a COP402 and AY-3-8910. The latter device is
+  also supposedly used to control lights through a separate connector.
+- Cerberus uses the Sound-3 board with a 90435 processor, which is most likely a
+  CDP1802 by another name. The 90503 "synthesizer" is the only sound IC on this
+  board; it has a TI logo and seems at least pin-compatible with TMS52xx.
 - Mad Race uses a Sound Board IV (same as MPU-3 and later), but I/O ports
   that talk to it are unknown.
 

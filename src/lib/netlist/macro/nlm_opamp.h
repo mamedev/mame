@@ -11,6 +11,8 @@
  *  Netlist Macros
  * ---------------------------------------------------------------------------*/
 
+#ifndef NL_AUTO_DEVICES
+
 #define MB3614_DIP(name)                                                      \
 		NET_REGISTER_DEV(MB3614_DIP, name)
 
@@ -19,6 +21,11 @@
 
 #define LM358_DIP(name)                                                       \
 		NET_REGISTER_DEV(LM358_DIP, name)
+
+#define LM3900(name)                                                           \
+		NET_REGISTER_DEV(LM3900, name)
+
+#endif
 
 /* ----------------------------------------------------------------------------
  *  External declarations

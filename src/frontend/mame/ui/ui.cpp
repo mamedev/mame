@@ -256,6 +256,16 @@ void mame_ui_manager::initialize(running_machine &machine)
 	{
 		slider_current = nullptr;
 	}
+
+	// if no test switch found, assign its input sequence to a service mode DIP
+	if (!m_machine_info->has_test_switch() && m_machine_info->has_dips())
+	{
+		const char *const service_mode_dipname = ioport_configurer::string_from_token(DEF_STR(Service_Mode));
+		for (auto &port : machine.ioport().ports())
+			for (ioport_field &field : port.second->fields())
+				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
+					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
+	}
 }
 
 

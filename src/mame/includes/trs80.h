@@ -40,7 +40,7 @@ public:
 		m_floppy3(*this, "fdc:3"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_region_maincpu(*this, "maincpu"),
 		m_io_config(*this, "CONFIG"),
 		m_io_line0(*this, "LINE0"),

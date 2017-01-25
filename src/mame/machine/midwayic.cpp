@@ -1222,7 +1222,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* bit  6 = sound input buffer full */
 			/* bit  7 = sound output buffer empty */
 			/* bit 14 = LED? */
-			if ((oldreg ^ newreg) & 0x3ff6)
+			if (LOG_IOASIC && ((oldreg ^ newreg) & 0x3ff6))
 				logerror("IOASIC int control = %04X\n", data);
 			update_ioasic_irq();
 			break;

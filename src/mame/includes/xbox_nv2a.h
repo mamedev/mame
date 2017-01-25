@@ -102,13 +102,22 @@ public:
 	// input vertex
 	vertex_nv *input;
 	// input parameters
-	union constant {
+	struct constant {
 		float fv[4];
-		unsigned int iv[4];
+		void iv(int idx, uint32_t value)
+		{
+			union
+			{
+				uint32_t i;
+				float f;
+			} cnv;
+
+			cnv.i = value;
+			fv[idx] = cnv.f;
+		}
 	} c_constant[192];
 	union temp {
 		float fv[4];
-		unsigned int iv[4];
 	} r_temp[32];
 	// output vertex
 	vertex_nv *output;
@@ -224,11 +233,11 @@ public:
 		TEX3 = 12
 	};
 	enum class NV2A_VTXBUF_TYPE {
-		UBYTE2 = 0, // what is the difference with UBYTE ?
+		UBYTE_D3D = 0, // what is the difference with opengl UBYTE ?
 		FLOAT = 2,
-		UBYTE = 4,
+		UBYTE_OGL = 4,
 		USHORT = 5,
-		UNKNOWN_6 = 6 // used for vertex color
+		FLOAT_PACKED = 6 // used for vertex color
 	};
 	enum class NV2A_TEX_FORMAT {
 		L8 = 0x0,
@@ -428,7 +437,8 @@ public:
 		puller_waiting = 0;
 		debug_grab_texttype = -1;
 		debug_grab_textfile = nullptr;
-		waitvblank_used = 1;
+		enable_waitvblank = true;
+		enable_clipping_w = false;
 		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
 		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));
 		memset(&persistvertexattr, 0, sizeof(persistvertexattr));
@@ -479,8 +489,9 @@ public:
 	uint32_t dilate0(uint32_t value, int bits);
 	uint32_t dilate1(uint32_t value, int bits);
 	void computedilated(void);
-	int toggle_register_combiners_usage();
-	int toggle_wait_vblank_support();
+	bool toggle_register_combiners_usage();
+	bool toggle_wait_vblank_support();
+	bool toggle_clipping_w_support();
 	void debug_grab_texture(int type, const char *filename);
 	void debug_grab_vertex_program_slot(int slot, uint32_t *instruction);
 	void start(address_space *cpu_space);
@@ -488,9 +499,9 @@ public:
 	void compute_supersample_factors(float &horizontal, float &vertical);
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
+	void extract_packed_float(uint32_t data, float &first, float &second, float &third);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
+	int read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
@@ -577,7 +588,7 @@ public:
 	uint32_t primitives_total_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	uint32_t vertex_indexes[1024]; // vertex indices sent by the software to the 3d accelerator
 	int vertex_count;
 	unsigned int vertex_first;
 	int vertex_accumulated;
@@ -743,5 +754,6 @@ public:
 	nvidia_object_data *objectdata;
 	int debug_grab_texttype;
 	char *debug_grab_textfile;
-	int waitvblank_used;
+	bool enable_waitvblank;
+	bool enable_clipping_w;
 };

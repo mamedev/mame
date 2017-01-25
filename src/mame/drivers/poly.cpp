@@ -41,8 +41,6 @@
 #include "machine/keyboard.h"
 #include "sound/speaker.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class poly_state : public driver_device
 {
 public:
@@ -198,7 +196,7 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(poly_state, kbd_put))
 MACHINE_CONFIG_END
 

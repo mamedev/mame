@@ -2,8 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 #include "teleprinter.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 static const uint8_t teleprinter_font[128*8] =
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -215,7 +213,7 @@ MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, teleprinter_device, tp_update)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(generic_terminal_device, kbd_put))
 
 	MCFG_SPEAKER_STANDARD_MONO("bell")

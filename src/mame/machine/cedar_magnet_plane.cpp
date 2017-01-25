@@ -10,7 +10,8 @@ extern const device_type CEDAR_MAGNET_PLANE = &device_creator<cedar_magnet_plane
 
 
 cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cedar_magnet_board_device(mconfig, CEDAR_MAGNET_PLANE, "Cedar Plane", tag, owner, clock, "cedmag_plane", __FILE__)
+	: device_t(mconfig, CEDAR_MAGNET_PLANE, "Cedar Plane", tag, owner, clock, "cedmag_plane", __FILE__),
+	cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
 {
 }
 
@@ -72,7 +73,6 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_plane )
 	MCFG_CPU_ADD("planecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_plane_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_plane_io)
-	MCFG_CPU_VBLANK_INT_DRIVER(":screen", cedar_magnet_board_device,  irq)
 
 	MCFG_DEVICE_ADD("z80pio0", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -133,8 +133,6 @@ machine_config_constructor cedar_magnet_plane_device::device_mconfig_additions()
 
 void cedar_magnet_plane_device::device_start()
 {
-	m_cpu = subdevice<z80_device>("planecpu");
-	m_ram = (uint8_t*)memshare("ram")->ptr();
 	save_item(NAME(m_framebuffer));
 }
 

@@ -768,6 +768,13 @@ namespace bgfx { namespace mtl
 
 	struct TextureMtl
 	{
+		enum Enum
+		{
+			Texture2D,
+			Texture3D,
+			TextureCube,
+		};
+
 		TextureMtl()
 			: m_ptr(NULL)
 			, m_ptrMSAA(NULL)
@@ -795,11 +802,12 @@ namespace bgfx { namespace mtl
 		Texture m_ptrStencil; // for emulating packed depth/stencil formats - only for iOS8...
 		SamplerState m_sampler;
 		uint32_t m_flags;
-		uint8_t m_requestedFormat;
-		uint8_t m_textureFormat;
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
+		uint8_t m_type;
+		uint8_t m_requestedFormat;
+		uint8_t m_textureFormat;
 		uint8_t m_numMips;
 	};
 
@@ -830,6 +838,31 @@ namespace bgfx { namespace mtl
 		uint8_t m_num; // number of color handles
 	};
 
+	struct CommandQueueMtl
+	{
+		CommandQueueMtl() : m_releaseWriteIndex(0), m_releaseReadIndex(0)
+		{
+		}
+		
+		void init(Device _device);
+		void shutdown();
+		CommandBuffer alloc();
+		void kick(bool _endFrame, bool _waitForFinish = false);
+		void finish(bool _finishAll = false);
+		void release(NSObject* _ptr);
+		void consume();
+
+		bx::Semaphore m_framesSemaphore;
+
+		CommandQueue  m_commandQueue;
+		CommandBuffer m_activeCommandBuffer;
+		
+		int m_releaseWriteIndex;
+		int m_releaseReadIndex;
+		typedef stl::vector<NSObject*> ResourceArray;
+		ResourceArray m_release[MTL_MAX_FRAMES_IN_FLIGHT];
+	};
+	
 	struct TimerQueryMtl
 	{
 		TimerQueryMtl()

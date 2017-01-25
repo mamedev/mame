@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Moore, Nicola Salmoria
 
+#include "cpu/m6805/m68705.h"
+
 #include "machine/gen_latch.h"
+#include "machine/taito68705interface.h"
 
 class bublbobl_state : public driver_device
 {
@@ -17,13 +20,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_objectram(*this, "objectram"),
 		m_mcu_sharedram(*this, "mcu_sharedram"),
-		m_mcu_sent(false),
-		m_main_sent(false),
-		m_from_main(0),
-		m_from_mcu(0),
-		m_from_mcu_latch(0),
-		m_to_mcu_latch(0),
-		m_old_portB(0),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -61,26 +57,9 @@ public:
 	uint8_t    m_port2_out;
 	uint8_t    m_port3_out;
 	uint8_t    m_port4_out;
-	/* Bubble Bobble 68705 */
-	uint8_t    m_port_a_in;
-	uint8_t    m_port_a_out;
-	uint8_t    m_ddr_a;
-	uint8_t    m_port_b_in;
-	uint8_t    m_port_b_out;
-	uint8_t    m_ddr_b;
-	int      m_address;
-	int      m_latch;
 	/* Bobble Bobble */
 	int      m_ic43_a;
 	int      m_ic43_b;
-	/* Tokio */
-	bool m_mcu_sent;
-	bool m_main_sent;
-	uint8_t m_from_main;
-	uint8_t m_from_mcu;
-	uint8_t m_from_mcu_latch;
-	uint8_t m_to_mcu_latch;
-	uint8_t m_old_portB;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -95,8 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-	DECLARE_READ8_MEMBER(tokio_mcu_r);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_w);
 
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_sound_command_w);
@@ -125,27 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(boblbobl_ic43_a_w);
 	DECLARE_WRITE8_MEMBER(boblbobl_ic43_b_w);
 	DECLARE_READ8_MEMBER(boblbobl_ic43_b_r);
-	DECLARE_READ8_MEMBER(bublbobl_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(bublbobl_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_b_w);
 
-
-
-
-	DECLARE_CUSTOM_INPUT_MEMBER(tokio_mcu_sent_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tokio_main_sent_r);
-
-
-	DECLARE_READ8_MEMBER(tokio_mcu_porta_r);
-	DECLARE_READ8_MEMBER(tokio_mcu_portc_r);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_porta_w);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_portb_w);
-
-
-	DECLARE_DRIVER_INIT(tokiob);
 	DECLARE_DRIVER_INIT(tokio);
 	DECLARE_DRIVER_INIT(dland);
 	DECLARE_DRIVER_INIT(bublbobl);
@@ -155,14 +112,44 @@ public:
 	DECLARE_MACHINE_RESET(bublbobl);
 	DECLARE_MACHINE_START(boblbobl);
 	DECLARE_MACHINE_RESET(boblbobl);
-	DECLARE_MACHINE_START(bub68705);
-	DECLARE_MACHINE_RESET(bub68705);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
-	void configure_banks(  );
+	void configure_banks();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+
+class bub68705_state : public bublbobl_state
+{
+public:
+	bub68705_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bublbobl_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+		, m_mux_ports(*this, { "DSW0", "DSW1", "IN1", "IN2" })
+		, m_port_a_out(0xff)
+		, m_port_b_out(0xff)
+		, m_address(0)
+		, m_latch(0)
+	{
+	}
+
+	DECLARE_WRITE8_MEMBER(port_a_w);
+	DECLARE_WRITE8_MEMBER(port_b_w);
+
+	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
+
+	DECLARE_MACHINE_START(bub68705);
+	DECLARE_MACHINE_RESET(bub68705);
+
+protected:
+	required_device<m68705p_device> m_mcu;
+	required_ioport_array<4>        m_mux_ports;
+
+	uint8_t     m_port_a_out;
+	uint8_t     m_port_b_out;
+	uint16_t    m_address;
+	uint8_t     m_latch;
 };

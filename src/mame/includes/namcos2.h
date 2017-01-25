@@ -11,6 +11,8 @@
 #include "namcoic.h"
 #include "cpu/m6502/m3745x.h"
 #include "video/c45.h"
+#include "machine/namco_c148.h"
+#include "machine/namco_c139.h"
 
 /* CPU reference numbers */
 
@@ -101,6 +103,9 @@ public:
 			m_dspmaster(*this, "dspmaster"),
 			m_dspslave(*this, "dspslave"),
 			m_c68(*this, "c68"),
+			m_master_intc(*this, "master_intc"),
+			m_slave_intc(*this, "slave_intc"),
+			m_sci(*this, "sci"),
 			m_gpu(*this, "gpu"),
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
@@ -119,20 +124,25 @@ public:
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
 	optional_device<m37450_device> m_c68;
+	optional_device<namco_c148_device> m_master_intc;
+	optional_device<namco_c148_device> m_slave_intc;
+	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 
 	// game type helpers
 	bool is_system21();
 	int m_gametype;
 
-	emu_timer *m_posirq_timer;
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;
 	int m_mcu_analog_complete;
 	std::unique_ptr<uint8_t[]> m_eeprom;
-	uint16_t  m_68k_master_C148[0x20];
-	uint16_t  m_68k_slave_C148[0x20];
-	uint16_t  m_68k_gpu_C148[0x20];
+
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void reset_all_subcpus(int state);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
@@ -218,23 +228,9 @@ public:
 	// general
 	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
-	TIMER_CALLBACK_MEMBER(namcos2_posirq_tick);
-	void adjust_posirq_timer( int scanline );
-	void init_c148();
-	void reset_all_subcpus(int state);
-	uint16_t readwrite_c148( address_space &space, offs_t offset, uint16_t data, int bWrite );
-	int get_posirq_scanline();
 
 	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
 	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_master_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_master_C148_r );
-
-	DECLARE_WRITE16_MEMBER( namcos2_68k_slave_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_slave_C148_r );
 
 	DECLARE_WRITE8_MEMBER( namcos2_mcu_port_d_w );
 	DECLARE_READ8_MEMBER( namcos2_mcu_port_d_r );
@@ -244,9 +240,6 @@ public:
 	DECLARE_READ8_MEMBER( namcos2_mcu_analog_port_r );
 	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
 
-	/* TODO: this should belong to namcos21_state */
-	DECLARE_WRITE16_MEMBER( namcos21_68k_gpu_C148_w );
-	DECLARE_READ16_MEMBER( namcos21_68k_gpu_C148_r );
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
@@ -264,7 +257,6 @@ public:
 			m_dpram(*this, "dpram"),
 			m_paletteram(*this, "paletteram"),
 			m_spriteram(*this, "spriteram"),
-			m_serial_comms_ram(*this, "serialram"),
 			m_rozram(*this, "rozram"),
 			m_roz_ctrl(*this, "rozctrl"),
 			m_c45_road(*this, "c45_road")
@@ -331,10 +323,6 @@ public:
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-	DECLARE_READ16_MEMBER( serial_comms_ram_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ram_w );
-	DECLARE_READ16_MEMBER( serial_comms_ctrl_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ctrl_w );
 
 	void draw_sprite_init();
 	void update_palette();
@@ -345,11 +333,11 @@ public:
 	uint16_t get_palette_register( int which );
 
 	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_serial_comms_ram;
 	optional_shared_ptr<uint16_t> m_rozram;
 	optional_shared_ptr<uint16_t> m_roz_ctrl;
 	tilemap_t *m_tilemap_roz;

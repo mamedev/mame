@@ -33,39 +33,30 @@ Year   Game                PCB            NOTES
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
+WRITE8_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+}
+
+WRITE8_MEMBER(gaelco_state::bigkarnk_coin_w)
+{
+	switch ((offset >> 3))
 	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		case 0x00:  /* Coin Lockouts */
+		case 0x01:
+			machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
+			break;
+		case 0x02:  /* Coin Counters */
+		case 0x03:
+			machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
+			break;
 	}
 }
 
-WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
+WRITE8_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		switch ((offset >> 3))
-		{
-			case 0x00:  /* Coin Lockouts */
-			case 0x01:
-				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-				break;
-			case 0x02:  /* Coin Counters */
-			case 0x03:
-				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-				break;
-		}
-	}
-}
-
-WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	membank("okibank")->set_entry(data & 0x0f);
 }
 
 /*********** Squash Encryption Related Code ******************/
@@ -124,8 +115,8 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(bigkarnk_sound_command_w)                                     /* Triggers a FIRQ on the sound CPU */
-	AM_RANGE(0x70000a, 0x70003b) AM_WRITE(bigkarnk_coin_w)                                          /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000e, 0x70000f) AM_WRITE8(bigkarnk_sound_command_w, 0x00ff)                                     /* Triggers a FIRQ on the sound CPU */
+	AM_RANGE(0x70000a, 0x70003b) AM_WRITE8(bigkarnk_coin_w, 0x00ff)                                          /* Coin Counters + Coin Lockout */
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
 
@@ -150,7 +141,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
@@ -167,7 +158,7 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END
@@ -184,7 +175,7 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                      /* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                         /* Work RAM */
 ADDRESS_MAP_END

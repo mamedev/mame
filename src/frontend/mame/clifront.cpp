@@ -309,9 +309,13 @@ int cli_frontend::execute(int argc, char **argv)
 
 		load_translation(m_options);
 
+		manager->start_http_server();
+
 		manager->start_luaengine();
 
-			start_execution(manager, argc, argv, option_errors);
+		manager->start_context();
+
+		start_execution(manager, argc, argv, option_errors);
 	}
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)

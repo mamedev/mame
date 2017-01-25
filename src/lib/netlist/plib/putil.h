@@ -18,7 +18,7 @@ namespace plib
 	namespace util
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
-		const pstring environment(const pstring &var, const pstring &default_val = "");
+		const pstring environment(const pstring &var, const pstring &default_val);
 	}
 
 	namespace container
@@ -45,6 +45,11 @@ namespace plib
 			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
 		}
 
+		template <class C>
+		void remove(C &con, const typename C::value_type &elem)
+		{
+			con.erase(std::remove(con.begin(), con.end(), elem), con.end());
+		}
 	}
 
 	template <class C>

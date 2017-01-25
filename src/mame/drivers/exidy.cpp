@@ -1118,6 +1118,31 @@ ROM_START( mtrap )
 ROM_END
 
 
+ROM_START( mtrap2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mtl-2.11a",   0xa000, 0x1000, CRC(a8cc3a18) SHA1(09fa9eff5ae5cb923d6e9137ba9a4b6944acffb2) )
+	ROM_LOAD( "mtl-2.10a",   0xb000, 0x1000, CRC(e26b074c) SHA1(e8882edc818860d887c08e8083a40c4717412b2f) )
+	ROM_LOAD( "mtl-2.9a",    0xc000, 0x1000, CRC(845394f6) SHA1(a150a6f00465abb787d8d46a2e32d8985364554e) )
+	ROM_LOAD( "mtl-2.8a",    0xd000, 0x1000, CRC(854d2d50) SHA1(4213999acbc03ee8300b2fcf86349cd7450adae5) )
+	ROM_LOAD( "mtl-2.7a",    0xe000, 0x1000, CRC(3d235f95) SHA1(57031d9784c55853dcf6e396ee685d8dd0d3ef87) )
+	ROM_LOAD( "mtl-2.6a",    0xf000, 0x1000, CRC(7ed7632a) SHA1(6800d3c1b901808373d3edd2a3fcf699f93d7daf) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "mta5a.bin",   0x6800, 0x0800, CRC(dbe4ec02) SHA1(34e965428dbb4b9c558927bb80d19cb550b53228) )
+	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
+	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
+
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
+	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
+	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
+	ROM_LOAD( "mta1a.bin",   0x3000, 0x1000, CRC(658482a6) SHA1(c0d770fbeaa7cb3e0eef47d8caa0f8a78841692e) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+ROM_END
+
+
 ROM_START( mtrap3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mtl-3.11a",   0xa000, 0x1000, CRC(4091be6e) SHA1(a4432f4588915276583f4b2e8db527fd24eb4291) )
@@ -1566,6 +1591,7 @@ GAME( 1980, phantoma, spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, 
 GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap2,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )

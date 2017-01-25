@@ -326,18 +326,17 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 class apollo_sio: public mc68681_device
 {
 public:
-	apollo_sio(const machine_config &mconfig, const char *tag,
-			device_t *owner, uint32_t clock);
+	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	virtual void device_reset() override;
 
 private:
-		uint8_t m_csrb;
-		uint8_t m_ip6;
+	uint8_t m_csrb;
+	uint8_t m_ip6;
 };
 
 extern const device_type APOLLO_SIO;

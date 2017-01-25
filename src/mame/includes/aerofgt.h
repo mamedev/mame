@@ -78,27 +78,26 @@ public:
 	int       m_pending_command;
 
 	/* handlers */
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE16_MEMBER(turbofrc_sound_command_w);
-	DECLARE_WRITE16_MEMBER(aerfboot_soundlatch_w);
-	DECLARE_READ16_MEMBER(pending_command_r);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
+	DECLARE_READ8_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1videoram_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2videoram_w);
-	DECLARE_WRITE16_MEMBER(pspikes_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(pspikes_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(spikes91_lookup_w);
-	DECLARE_WRITE16_MEMBER(karatblz_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(spinlbrk_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(karatblz_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(spinlbrk_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrollx_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1scrolly_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrollx_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrolly_w);
-	DECLARE_WRITE16_MEMBER(pspikes_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(pspikes_palette_bank_w);
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);

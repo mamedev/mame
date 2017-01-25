@@ -87,6 +87,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 
 	ANALOG_INPUT(V5, 5)
 #define VCC "V5", Q
+#undef GND
 #define GND "GND", Q
 
 	CHIP("F9",  7493)

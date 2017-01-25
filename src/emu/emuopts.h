@@ -190,6 +190,10 @@
 
 #define OPTION_LANGUAGE             "language"
 
+#define OPTION_HTTP                 "http"
+#define OPTION_HTTP_PORT            "http_port"
+#define OPTION_HTTP_ROOT            "http_root"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -380,6 +384,11 @@ public:
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
+
+	// Web server specific optopns
+	bool  http() const { return bool_value(OPTION_HTTP); }
+	short http_port() const { return int_value(OPTION_HTTP_PORT); }
+	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
 	// cache frequently used options in members
 	void update_cached_options();

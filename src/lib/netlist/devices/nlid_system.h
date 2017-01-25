@@ -11,12 +11,18 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
+#include <cstddef>
+#include <memory>
 #include <vector>
 
-#include "nl_setup.h"
-#include "nl_base.h"
-#include "nl_factory.h"
 #include "analog/nld_twoterm.h"
+#include "nl_base.h"
+#include "nl_time.h"
+#include "plib/palloc.h"
+#include "plib/pfmtlog.h"
+#include "plib/pfunction.h"
+#include "plib/pstring.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -92,7 +98,7 @@ namespace netlist
 		{
 			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 		}
 		NETLIB_UPDATEI();
 		//NETLIB_RESETI();
@@ -123,7 +129,7 @@ namespace netlist
 		{
 			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
-			connect_late(m_feedback, m_Q);
+			connect(m_feedback, m_Q);
 			{
 				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
 				plib::pstring_vector_t pat(m_pattern(),",");
@@ -175,7 +181,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().setup().family_from_model(m_FAMILY()));
+			set_logic_family(setup().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
@@ -267,11 +273,11 @@ namespace netlist
 		{
 			register_subalias("I", m_RIN.m_P);
 			register_subalias("G", m_RIN.m_N);
-			connect_late(m_I, m_RIN.m_P);
+			connect(m_I, m_RIN.m_P);
 
 			register_subalias("_OP", m_ROUT.m_P);
 			register_subalias("Q", m_ROUT.m_N);
-			connect_late(m_Q, m_ROUT.m_P);
+			connect(m_Q, m_ROUT.m_P);
 		}
 
 		NETLIB_RESETI()
@@ -286,9 +292,9 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_NAME(twoterm) m_RIN;
+		analog::NETLIB_NAME(twoterm) m_RIN;
 		/* Fixme: only works if the device is time-stepped - need to rework */
-		NETLIB_NAME(twoterm) m_ROUT;
+		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
@@ -309,41 +315,15 @@ namespace netlist
 		, m_func(*this, "FUNC", "")
 		, m_Q(*this, "Q")
 		{
+			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
-				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
-
-			plib::pstring_vector_t cmds(m_func(), " ");
-			m_precompiled.clear();
-
-			for (std::size_t i=0; i < cmds.size(); i++)
 			{
-				pstring cmd = cmds[i];
-				rpn_inst rc;
-				if (cmd == "+")
-					rc.m_cmd = ADD;
-				else if (cmd == "-")
-					rc.m_cmd = SUB;
-				else if (cmd == "*")
-					rc.m_cmd = MULT;
-				else if (cmd == "/")
-					rc.m_cmd = DIV;
-				else if (cmd.startsWith("A"))
-				{
-					rc.m_cmd = PUSH_INPUT;
-					rc.m_param = cmd.substr(1).as_long();
-				}
-				else
-				{
-					bool err = false;
-					rc.m_cmd = PUSH_CONST;
-					rc.m_param = cmd.as_double(&err);
-					if (err)
-						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
-				}
-				m_precompiled.push_back(rc);
+				pstring n = plib::pfmt("A{1}")(i);
+				m_I.push_back(plib::make_unique<analog_input_t>(*this, n));
+				inps.push_back(n);
+				m_vals.push_back(0.0);
 			}
-
-
+			m_precompiled.compile_postfix(inps, m_func());
 		}
 
 	protected:
@@ -353,29 +333,13 @@ namespace netlist
 
 	private:
 
-		enum rpn_cmd
-		{
-			ADD,
-			MULT,
-			SUB,
-			DIV,
-			PUSH_CONST,
-			PUSH_INPUT
-		};
-
-		struct rpn_inst
-		{
-			rpn_inst() : m_cmd(ADD), m_param(0.0) { }
-			rpn_cmd m_cmd;
-			nl_double m_param;
-		};
-
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
 		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
-		std::vector<rpn_inst> m_precompiled;
+		std::vector<double> m_vals;
+		plib::pfunction m_precompiled;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -386,7 +350,7 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
-		, m_R(*this, "R")
+		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
@@ -396,188 +360,18 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_SUB(R) m_R;
+		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI()
-		{
-			m_last_state = 0;
-			m_R.set_R(m_ROFF());
-		}
+		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
 	};
-
-	// -----------------------------------------------------------------------------
-	// nld_base_proxy
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(base_proxy)
-	{
-	public:
-		nld_base_proxy(netlist_t &anetlist, const pstring &name,
-				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
-				: device_t(anetlist, name)
-		{
-			m_logic_family = inout_proxied->logic_family();
-			m_term_proxied = inout_proxied;
-			m_proxy_term = proxy_inout;
-		}
-
-		virtual ~nld_base_proxy() {}
-
-		logic_t &term_proxied() const { return *m_term_proxied; }
-		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
-
-	protected:
-		const logic_family_desc_t *m_logic_family;
-
-		virtual const logic_family_desc_t &logic_family() const
-		{
-			return *m_logic_family;
-		}
-
-	private:
-		logic_t *m_term_proxied;
-		detail::core_terminal_t *m_proxy_term;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_a_to_d_proxy
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_proxy)
-	{
-	public:
-		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
-				: nld_base_proxy(anetlist, name, in_proxied, &m_I)
-		, m_I(*this, "I")
-		, m_Q(*this, "Q")
-		{
-		}
-
-		virtual ~nld_a_to_d_proxy() {}
-
-		analog_input_t m_I;
-		logic_output_t m_Q;
-
-	protected:
-
-		NETLIB_RESETI() { }
-
-		NETLIB_UPDATEI()
-		{
-			nl_assert(m_logic_family != nullptr);
-			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
-				m_Q.push(1, NLTIME_FROM_NS(1));
-			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
-				m_Q.push(0, NLTIME_FROM_NS(1));
-			else
-			{
-				// do nothing
-			}
-		}
-	private:
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_base_d_to_a_proxy
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
-	{
-	public:
-		virtual ~nld_base_d_to_a_proxy() {}
-
-		virtual logic_input_t &in() { return m_I; }
-
-	protected:
-		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
-				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
-		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
-		, m_I(*this, "I")
-		{
-		}
-
-		logic_input_t m_I;
-
-	private:
-	};
-
-	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
-	{
-	public:
-		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
-		: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
-		, m_GNDHack(*this, "_Q")
-		, m_RV(*this, "RV")
-		, m_last_state(*this, "m_last_var", -1)
-		, m_is_timestep(false)
-		{
-			//register_sub(m_RV);
-			//register_term("1", m_RV.m_P);
-			//register_term("2", m_RV.m_N);
-
-			register_subalias("Q", m_RV.m_P);
-
-			connect_late(m_RV.m_N, m_GNDHack);
-		}
-
-		virtual ~nld_d_to_a_proxy() {}
-
-	protected:
-
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-
-	private:
-		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		NETLIB_SUB(twoterm) m_RV;
-		state_var<int> m_last_state;
-		bool m_is_timestep;
-	};
-
-
-	class factory_lib_entry_t : public base_factory_t
-	{
-		P_PREVENT_COPYING(factory_lib_entry_t)
-	public:
-
-		factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: base_factory_t(name, classname, def_param), m_setup(setup) {  }
-
-		class wrapper : public device_t
-		{
-		public:
-			wrapper(const pstring &devname, netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name), m_devname(devname)
-			{
-				anetlist.setup().namespace_push(name);
-				anetlist.setup().include(m_devname);
-				anetlist.setup().namespace_pop();
-			}
-		protected:
-			NETLIB_RESETI() { }
-			NETLIB_UPDATEI() { }
-
-			pstring m_devname;
-		};
-
-		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
-		{
-			return plib::owned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
-		}
-
-	private:
-		setup_t &m_setup;
-	};
-
 
 	} //namespace devices
 } // namespace netlist

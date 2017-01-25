@@ -11,6 +11,16 @@
         - 8-voice mono (custom 15XX: Mappy, Dig Dug 2, etc)
         - 8-voice stereo (System 1)
 
+    The 15XX custom does not have a DAC of its own; instead, it streams
+    the 4-bit PROM data directly into the 99XX custom DAC. Most pre-99XX
+    (and pre-15XX) Namco games use a LS273 latch (cleared when sound is
+    disabled), a 4.7K/2.2K/1K/470 resistor-weighted DAC, and a 4066 and
+    second group of resistors (10K/22K/47K/100K) for volume control.
+    Pole Position does more complicated sound mixing: a 4051 multiplexes
+    wavetable sound with four signals derived from the 52XX and 54XX, the
+    selected signal is distributed to four volume control sections, and
+    finally the engine noise is mixed into all four channels.
+
 ***************************************************************************/
 
 #include "emu.h"

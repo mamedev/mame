@@ -60,6 +60,9 @@ const int acia6850_device::transmitter_control[4][3] =
 // device type definition
 const device_type ACIA6850 = &device_creator<acia6850_device>;
 
+template class device_finder<acia6850_device, false>;
+template class device_finder<acia6850_device, true>;
+
 //-------------------------------------------------
 //  acia6850_device - constructor
 //-------------------------------------------------

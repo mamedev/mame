@@ -29,6 +29,9 @@ static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", 
 const device_type IEEE488 = &device_creator<ieee488_device>;
 const device_type IEEE488_SLOT = &device_creator<ieee488_slot_device>;
 
+template class device_finder<ieee488_device, false>;
+template class device_finder<ieee488_device, true>;
+
 
 
 //**************************************************************************
@@ -396,4 +399,15 @@ SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("hardbox", HARDBOX)
 	SLOT_INTERFACE("shark", SHARK)
 	SLOT_INTERFACE("c4023", C4023)
+SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( hp_ieee488_devices )
+//-------------------------------------------------
+
+// slot devices
+#include "hp9895.h"
+
+SLOT_INTERFACE_START(hp_ieee488_devices)
+	SLOT_INTERFACE("hp9895", HP9895)
 SLOT_INTERFACE_END

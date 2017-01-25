@@ -51,7 +51,6 @@ public:
 
 	/* sound-related */
 	uint8_t       m_adpcm_byte;
-	int         m_soundlatch_status;
 	int         m_msm5205_vclk_toggle;
 
 	/* devices */
@@ -62,9 +61,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ16_MEMBER(fake_4a00a_r);
-	DECLARE_WRITE16_MEMBER(ashnojoe_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_READ8_MEMBER(sound_latch_status_r);
 	DECLARE_WRITE16_MEMBER(ashnojoe_tileram_w);
 	DECLARE_WRITE16_MEMBER(ashnojoe_tileram2_w);

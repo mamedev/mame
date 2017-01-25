@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -46,6 +46,23 @@ namespace bx
 		const char* ptr;
 		for (ptr = _str; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
 		return ptr - _str;
+	}
+
+	/// Copy _num characters from string _src to _dst buffer of maximum _dstSize capacity
+	/// including zero terminator. Copy will be terminated with '\0'.
+	inline size_t strlncpy(char* _dst, size_t _dstSize, const char* _src, size_t _num = -1)
+	{
+		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
+		BX_CHECK(NULL != _src, "_src can't be NULL!");
+		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+
+		const size_t len = strnlen(_src, _num);
+		const size_t max = _dstSize-1;
+		const size_t num = (len < max ? len : max);
+		strncpy(_dst, _src, num);
+		_dst[num] = '\0';
+
+		return num;
 	}
 
 	/// Find substring in string. Limit search to _size.
@@ -550,12 +567,12 @@ namespace bx
 			return *this;
 		}
 
-		StringView(const char* _ptr, uint32_t _len = UINT32_MAX)
+		StringView(const char* _ptr, uint32_t _len = UINT16_MAX)
 		{
 			set(_ptr, _len);
 		}
 
-		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
+		void set(const char* _ptr, uint32_t _len = UINT16_MAX)
 		{
 			clear();
 
@@ -619,11 +636,12 @@ namespace bx
 	{
 	public:
 		StringT()
-			: StringView("", 0)
+			: StringView()
 		{
 		}
 
 		StringT(const StringT<AllocatorT>& _rhs)
+			: StringView()
 		{
 			set(_rhs.m_ptr, _rhs.m_len);
 		}
@@ -652,15 +670,18 @@ namespace bx
 		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
 		{
 			clear();
+			append(_ptr, _len);
+		}
 
+		void append(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
 			if (0 != _len)
 			{
-				uint32_t len = uint32_t(strnlen(_ptr, _len) );
+				uint32_t old = m_len;
+				uint32_t len = m_len + uint32_t(strnlen(_ptr, _len) );
+				char* ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_len ? const_cast<char*>(m_ptr) : NULL, len+1);
 				m_len = len;
-				char* ptr = (char*)BX_ALLOC(*AllocatorT, len+1);
-
-				memcpy(ptr, _ptr, len);
-				ptr[len] = '\0';
+				strlncpy(ptr + old, len-old+1, _ptr, _len);
 
 				*const_cast<char**>(&m_ptr) = ptr;
 			}

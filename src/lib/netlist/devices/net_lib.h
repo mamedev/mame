@@ -12,6 +12,27 @@
 #define NET_LIB_H
 
 #include "nl_base.h"
+
+//#define NL_AUTO_DEVICES 1
+
+#ifdef NL_AUTO_DEVICES
+#include "nld_devinc.h"
+
+#include "analog/nld_bjt.h"
+#include "analog/nld_fourterm.h"
+#include "analog/nld_switches.h"
+#include "analog/nld_twoterm.h"
+#include "analog/nld_opamps.h"
+#include "solver/nld_solver.h"
+
+#include "macro/nlm_cd4xxx.h"
+#include "macro/nlm_ttl74xx.h"
+#include "macro/nlm_opamp.h"
+#include "macro/nlm_other.h"
+
+#include "nld_7448.h"
+
+#else
 #include "nld_system.h"
 
 #include "nld_2102A.h"
@@ -75,13 +96,10 @@
 #include "solver/nld_solver.h"
 
 #include "nld_legacy.h"
-
-NETLIST_EXTERNAL(diode_models)
-NETLIST_EXTERNAL(bjt_models)
-NETLIST_EXTERNAL(family_models)
+#endif
 
 namespace netlist {
-	void initialize_factory(netlist::factory_list_t &factory);
+	void initialize_factory(factory::list_t &factory);
 }
 
 #endif

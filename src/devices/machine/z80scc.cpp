@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     Z80-SCC Serial Communications Controller emulation
@@ -72,27 +73,41 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #include "z80scc.h"
 
+
+//**************************************************************************
+//  CONFIGURABLE LOGGING
+//**************************************************************************
+
+#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_PRINTF  (1U <<  2)
+#define LOG_READ    (1U <<  3)
+#define LOG_INT     (1U <<  4)
+#define LOG_CMD     (1U <<  5)
+#define LOG_TX      (1U <<  6)
+#define LOG_RCV     (1U <<  7)
+#define LOG_CTS     (1U <<  8)
+#define LOG_DCD     (1U <<  9)
+#define LOG_SYNC    (1U << 10)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-/* Useful temporary debug printout format */
-// printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
-
-#define VERBOSE 0
-#define LOGPRINT(...)   do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
-#define LOG(...)        {} LOGPRINT(__VA_ARGS__)
-#define LOGR(...)       {}
-#define LOGSETUP(...)   {} LOGPRINT(__VA_ARGS__)
-#define LOGINT(...)     {}
-#define LOGCMD(...)     {}
-#define LOGTX(...)      {}
-#define LOGRCV(...)     {}
-#define LOGCTS(...)     {}
-#define LOGDCD(...)     {}
-#define LOGSYNC(...)    {}
-#if VERBOSE == 2
-#define logerror printf
-#endif
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__

@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "machine/taito68705interface.h"
 
 class flstory_state : public driver_device
 {
@@ -15,7 +16,7 @@ public:
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -46,26 +47,14 @@ public:
 	uint8_t    m_snd_ctrl2;
 	uint8_t    m_snd_ctrl3;
 
-	/* protection */
-	uint8_t    m_from_main;
-	uint8_t    m_from_mcu;
-	int      m_mcu_sent;
-	int      m_main_sent;
-	uint8_t    m_port_a_in;
-	uint8_t    m_port_a_out;
-	uint8_t    m_ddr_a;
-	uint8_t    m_port_b_in;
-	uint8_t    m_port_b_out;
-	uint8_t    m_ddr_b;
-	uint8_t    m_port_c_in;
-	uint8_t    m_port_c_out;
-	uint8_t    m_ddr_c;
+	/* protection sims */
+	uint8_t m_from_mcu;
 	int      m_mcu_select;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -87,20 +76,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
 	DECLARE_READ8_MEMBER(rumba_mcu_r);
 	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
-	DECLARE_READ8_MEMBER(flstory_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(flstory_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(flstory_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(flstory_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(flstory_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(flstory_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(flstory_mcu_w);
-	DECLARE_READ8_MEMBER(flstory_mcu_r);
-	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);
 	DECLARE_READ8_MEMBER(onna34ro_mcu_r);
 	DECLARE_READ8_MEMBER(onna34ro_mcu_status_r);

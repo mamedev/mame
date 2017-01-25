@@ -15,6 +15,7 @@
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/input_merger.h"
 #include "softlist.h"
 
 #define MAIN_CLOCK  23961600
@@ -64,11 +65,9 @@ public:
 	/* PIA 0 (UD12) */
 	uint8_t   m_pia0_porta;
 	uint8_t   m_pia0_portb;
-	int     m_pia0_irq_state;
 	int     m_pia0_cb2;         /* 60/50 */
 
 	/* PIA 1 (UD8) */
-	int     m_pia1_irq_state;
 
 	/* Vblank counter ("RTC") */
 	uint8_t   m_rtc;
@@ -99,13 +98,6 @@ public:
 			m_ram_c000 = m_vram_region->base();
 	}
 
-	void update_irq_state()
-	{
-		if ( m_pia0_irq_state || m_pia1_irq_state )
-			m_maincpu->set_input_line(0, ASSERT_LINE );
-		else
-			m_maincpu->set_input_line(0, CLEAR_LINE );
-	}
 	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
 	DECLARE_READ8_MEMBER(osbexec_c000_r);
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
@@ -408,20 +400,6 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_irq)
-{
-	m_pia0_irq_state = state;
-	update_irq_state();
-}
-
-
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
-{
-	m_pia1_irq_state = state;
-	update_irq_state();
-}
-
-
 /*
  * The Osborne Executive supports the following disc formats: (TODO: Verify)
  * - Osborne single density: 40 tracks, 10 sectors per track, 256-byte sectors (100 KByte)
@@ -514,6 +492,9 @@ void osbexec_state::machine_reset()
 	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
 
 	m_rtc = 0;
+
+	// D0 cleared on interrupt acknowledge cycle by a few TTL gates
+	m_maincpu->set_input_line_vector(0, 0xfe);
 }
 
 
@@ -549,12 +530,15 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osbexec_state, osbexec_pia0_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_irq))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in0_w))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in0_w))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in1_w))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in1_w))
+
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 

@@ -65,6 +65,18 @@
 		</part>
 	</software>
 
+	<software name="galxians">
+		<description>Galaxians (12K)</description>
+		<year>1982</year>
+		<publisher>Aardvark</publisher>
+		<info name="usage" value="Load with *RUN&quot;GALAXI&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Galaxians(Aardvark).dsk" size="102400" crc="142fff89" sha1="5edca5333d5584ed64f980f15c67698873db93ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hardhath">
 		<description>Hard Hat Harry (32K)</description>
 		<year>2011</year>

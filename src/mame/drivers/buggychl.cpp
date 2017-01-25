@@ -126,6 +126,14 @@ WRITE8_MEMBER(buggychl_state::sound_enable_w)
 	machine().sound().system_enable(data & 1);
 }
 
+READ8_MEMBER(buggychl_state::mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
 
 
 static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
@@ -140,8 +148,8 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(mcu_status_r)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
@@ -347,8 +355,6 @@ void buggychl_state::machine_start()
 
 void buggychl_state::machine_reset()
 {
-	m_mcu->set_input_line(0, CLEAR_LINE);
-
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_sl_bank = 0;
@@ -370,9 +376,8 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60) /* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
-	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,8000000/2)  /* 4 MHz */
+
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -438,7 +443,7 @@ ROM_START( buggychl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */
@@ -468,7 +473,7 @@ ROM_START( buggychlt )
 	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */

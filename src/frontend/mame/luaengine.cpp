@@ -769,6 +769,12 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
+	emu["wait"] = lua_CFunction([](lua_State *L) {
+			lua_engine *engine = mame_machine_manager::instance()->lua();
+			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			return lua_yield(L, 0);
+		});
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
@@ -1707,6 +1713,17 @@ void lua_engine::close()
 {
 	lua_settop(m_lua_state, 0);  /* clear stack */
 	lua_close(m_lua_state);
+}
+
+void lua_engine::resume(void *ptr, int nparam)
+{
+	lua_State *L = static_cast<lua_State *>(ptr);
+	int stat = lua_resume(L, nullptr, 0);
+	if((stat != LUA_OK) && (stat != LUA_YIELD))
+	{
+		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
 }
 
 void lua_engine::run(sol::load_result res)

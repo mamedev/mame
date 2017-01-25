@@ -4,6 +4,7 @@
 
     TODO:
 
+    - keyboard
     - LDV1000 mode
     - PR7820 INT/_EXT line
     - coin counter
@@ -19,6 +20,7 @@
 #include "cpu/cop400/cop400.h"
 #include "thayers.lh"
 
+#define LOG 0
 
 struct ssi263_t
 {
@@ -56,6 +58,8 @@ public:
 	uint8_t m_laserdisc_data;
 	int m_rx_bit;
 	int m_keylatch;
+	uint8_t m_keydata;
+	bool m_kbclk;
 	uint8_t m_cop_data_latch;
 	int m_cop_data_latch_enable;
 	uint8_t m_cop_l;
@@ -78,8 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(cop_g_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(cop_g_w);
-	DECLARE_READ_LINE_MEMBER(cop_si_r);
-	DECLARE_WRITE_LINE_MEMBER(cop_so_w);
+	DECLARE_READ_LINE_MEMBER(kbdata_r);
+	DECLARE_WRITE_LINE_MEMBER(kbclk_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
 	DECLARE_READ8_MEMBER(dsw_b_r);
 	DECLARE_READ8_MEMBER(laserdsc_data_r);
@@ -125,7 +129,7 @@ void thayers_state::check_interrupt()
 {
 	if (!m_timer_int || !m_data_rdy_int || !m_ssi_data_request)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
@@ -137,7 +141,7 @@ WRITE8_MEMBER(thayers_state::intrq_w)
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	timer_set(attotime::from_usec(8250), TIMER_INTRQ_TICK);
 }
@@ -164,6 +168,8 @@ READ8_MEMBER(thayers_state::irqstate_r)
 
 WRITE8_MEMBER(thayers_state::timer_int_ack_w)
 {
+	if (LOG) logerror("%s %s TIMER INT ACK\n", machine().time().as_string(), machine().describe_context());
+
 	m_timer_int = 1;
 
 	check_interrupt();
@@ -171,6 +177,8 @@ WRITE8_MEMBER(thayers_state::timer_int_ack_w)
 
 WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 {
+	if (LOG) logerror("%s %s DATA RDY INT ACK\n", machine().time().as_string(), machine().describe_context());
+
 	m_data_rdy_int = 1;
 
 	check_interrupt();
@@ -191,11 +199,13 @@ WRITE8_MEMBER(thayers_state::cop_d_w)
 
 	if (!BIT(data, 0))
 	{
+		if (LOG) logerror("%s %s TIMER INT\n", machine().time().as_string(), machine().describe_context());
 		m_timer_int = 0;
 	}
 
 	if (!BIT(data, 1))
 	{
+		if (LOG) logerror("%s %s DATA RDY INT\n", machine().time().as_string(), machine().describe_context());
 		m_data_rdy_int = 0;
 	}
 
@@ -219,6 +229,7 @@ READ8_MEMBER(thayers_state::cop_data_r)
 WRITE8_MEMBER(thayers_state::cop_data_w)
 {
 	m_cop_data_latch = data;
+	if (LOG) logerror("COP DATA %02x\n", m_cop_data_latch);
 }
 
 READ8_MEMBER(thayers_state::cop_l_r)
@@ -236,6 +247,7 @@ READ8_MEMBER(thayers_state::cop_l_r)
 WRITE8_MEMBER(thayers_state::cop_l_w)
 {
 	m_cop_l = data;
+	if (LOG) logerror("COP L %02x\n", m_cop_l);
 }
 
 READ8_MEMBER(thayers_state::cop_g_r)
@@ -272,6 +284,7 @@ WRITE8_MEMBER(thayers_state::control_w)
 	*/
 
 	m_cop_cmd_latch = (data >> 5) & 0x07;
+	if (LOG) logerror("COP G0..2 %u\n", m_cop_cmd_latch);
 }
 
 WRITE8_MEMBER(thayers_state::cop_g_w)
@@ -288,63 +301,52 @@ WRITE8_MEMBER(thayers_state::cop_g_w)
 	*/
 
 	m_cop_data_latch_enable = BIT(data, 3);
+	if (LOG) logerror("U17 enable %u\n", m_cop_data_latch_enable);
 }
 
 /* Keyboard */
 
-READ_LINE_MEMBER(thayers_state::cop_si_r)
+READ_LINE_MEMBER(thayers_state::kbdata_r)
 {
-	/* keyboard data */
-
-	/*
-
-	    Serial communications format
-
-	    1, 1, 0, 1, Q8, P0, P1, P2, P3, 0
-
-	*/
-
-	switch (m_rx_bit)
-	{
-	case 0:
-	case 1:
-	case 3:
-		return 1;
-
-	case 4:
-		return (m_keylatch == 9);
-
-	case 5:
-	case 6:
-	case 7:
-	case 8:
-		return BIT(m_row[m_keylatch]->read(), m_rx_bit - 5);
-
-	default:
-		return 0;
-	}
+	if (LOG) logerror("%s KBDATA %u BIT %u\n",machine().time().as_string(),BIT(m_keydata,7),m_rx_bit);
+	return BIT(m_keydata, 7);
 }
 
-WRITE_LINE_MEMBER(thayers_state::cop_so_w)
+WRITE_LINE_MEMBER(thayers_state::kbclk_w)
 {
-	/* keyboard clock */
+	if (m_kbclk != state) {
+		if (LOG) logerror("%s %s KBCLK %u\n", machine().time().as_string(), machine().describe_context(),state);
+	}
 
-	if (state)
-	{
+	if (!m_kbclk && state) {
 		m_rx_bit++;
 
-		if (m_rx_bit == 10)
-		{
+		if (m_rx_bit == 10) {
 			m_rx_bit = 0;
 
 			m_keylatch++;
 
-			if (m_keylatch == 10)
-			{
+			if (m_keylatch == 10) {
 				m_keylatch = 0;
 			}
+
+			if (LOG) logerror("keylatch %u\n",m_keylatch);
+		}
+
+		if (LOG) logerror("rx bit %u\n",m_rx_bit);
+
+		if (BIT(m_rx_bit, 3)) {
+			// 1, 0, 1, Q9, P3, P2, P1, P0, 1, 1
+			bool q9 = (m_keylatch == 9);
+			m_keydata = 0xa0 | q9 << 4 | m_row[m_keylatch]->read();
+			if (LOG) logerror("keydata %02x keylatch %u\n",m_keydata,m_keylatch);
+		} else if (m_rx_bit) {
+			m_keydata <<= 1;
+			if (LOG) logerror("keydata %02x shift\n",m_keydata);
 		}
 	}
+
+	m_kbclk = state;
 }
 
 /* I/O Board */
@@ -677,64 +679,64 @@ static INPUT_PORTS_START( thayers )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
 
 	PORT_START("ROW.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "1 - Clear" ) PORT_CODE( KEYCODE_BACKSPACE )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Q" ) PORT_CODE( KEYCODE_Q )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE( KEYCODE_0_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "1 - Clear" ) PORT_CODE( KEYCODE_BACKSPACE )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Q" ) PORT_CODE( KEYCODE_Q )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE( KEYCODE_0_PAD )
 
 	PORT_START("ROW.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Z - Spell of Release" ) PORT_CODE( KEYCODE_Z )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "A" ) PORT_CODE( KEYCODE_A )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "W - Amulet" ) PORT_CODE( KEYCODE_W )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Items" ) PORT_CODE( KEYCODE_1_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Z - Spell of Release" ) PORT_CODE( KEYCODE_Z )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "A" ) PORT_CODE( KEYCODE_A )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "W - Amulet" ) PORT_CODE( KEYCODE_W )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Items" ) PORT_CODE( KEYCODE_1_PAD )
 
 	PORT_START("ROW.2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "X - Scepter" ) PORT_CODE( KEYCODE_X )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "S - Dagger" ) PORT_CODE( KEYCODE_S )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "E - Black Mace" ) PORT_CODE( KEYCODE_E )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Drop Item" ) PORT_CODE( KEYCODE_2_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "X - Scepter" ) PORT_CODE( KEYCODE_X )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "S - Dagger" ) PORT_CODE( KEYCODE_S )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "E - Black Mace" ) PORT_CODE( KEYCODE_E )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Drop Item" ) PORT_CODE( KEYCODE_2_PAD )
 
 	PORT_START("ROW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "C - Spell of Seeing" ) PORT_CODE( KEYCODE_C )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "D - Great Circlet" ) PORT_CODE( KEYCODE_D )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "R - Blood Sword" ) PORT_CODE( KEYCODE_R )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Give Score" ) PORT_CODE( KEYCODE_3_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "C - Spell of Seeing" ) PORT_CODE( KEYCODE_C )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "D - Great Circlet" ) PORT_CODE( KEYCODE_D )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "R - Blood Sword" ) PORT_CODE( KEYCODE_R )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Give Score" ) PORT_CODE( KEYCODE_3_PAD )
 
 	PORT_START("ROW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "V - Shield" ) PORT_CODE( KEYCODE_V )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "F - Hunting Horn" ) PORT_CODE( KEYCODE_F )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "T - Chalice" ) PORT_CODE( KEYCODE_T )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Replay" ) PORT_CODE( KEYCODE_4_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "V - Shield" ) PORT_CODE( KEYCODE_V )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "F - Hunting Horn" ) PORT_CODE( KEYCODE_F )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "T - Chalice" ) PORT_CODE( KEYCODE_T )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Replay" ) PORT_CODE( KEYCODE_4_PAD )
 
 	PORT_START("ROW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "B - Silver Wheat" ) PORT_CODE( KEYCODE_B )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "G - Long Bow" ) PORT_CODE( KEYCODE_G )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Y - Coins" ) PORT_CODE( KEYCODE_Y )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Combine Action" ) PORT_CODE( KEYCODE_6_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "B - Silver Wheat" ) PORT_CODE( KEYCODE_B )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "G - Long Bow" ) PORT_CODE( KEYCODE_G )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Y - Coins" ) PORT_CODE( KEYCODE_Y )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Combine Action" ) PORT_CODE( KEYCODE_6_PAD )
 
 	PORT_START("ROW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "N - Staff" ) PORT_CODE( KEYCODE_N )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "H - Medallion" ) PORT_CODE( KEYCODE_H )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "U - Cold Fire" ) PORT_CODE( KEYCODE_U )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Save Game" ) PORT_CODE( KEYCODE_7_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "N - Staff" ) PORT_CODE( KEYCODE_N )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "H - Medallion" ) PORT_CODE( KEYCODE_H )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "U - Cold Fire" ) PORT_CODE( KEYCODE_U )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Save Game" ) PORT_CODE( KEYCODE_7_PAD )
 
 	PORT_START("ROW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "M - Spell of Understanding" ) PORT_CODE( KEYCODE_M )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "J - Onyx Seal" ) PORT_CODE( KEYCODE_J )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "I - Crown" ) PORT_CODE( KEYCODE_I )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Update" ) PORT_CODE( KEYCODE_8_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "M - Spell of Understanding" ) PORT_CODE( KEYCODE_M )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "J - Onyx Seal" ) PORT_CODE( KEYCODE_J )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "I - Crown" ) PORT_CODE( KEYCODE_I )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Update" ) PORT_CODE( KEYCODE_8_PAD )
 
 	PORT_START("ROW.8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "3 - Enter" ) PORT_CODE( KEYCODE_ENTER )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "K - Orb of Quoid" ) PORT_CODE( KEYCODE_K )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "O - Crystal" ) PORT_CODE( KEYCODE_O )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "Hint" ) PORT_CODE( KEYCODE_9_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "3 - Enter" ) PORT_CODE( KEYCODE_ENTER )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "K - Orb of Quoid" ) PORT_CODE( KEYCODE_K )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "O - Crystal" ) PORT_CODE( KEYCODE_O )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Hint" ) PORT_CODE( KEYCODE_9_PAD )
 
 	PORT_START("ROW.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "4 - Space" ) PORT_CODE( KEYCODE_SPACE )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "L" ) PORT_CODE( KEYCODE_L )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "P" ) PORT_CODE( KEYCODE_P )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( DEF_STR( No ) ) PORT_CODE( KEYCODE_0_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "4 - Space" ) PORT_CODE( KEYCODE_SPACE )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "L" ) PORT_CODE( KEYCODE_L )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "P" ) PORT_CODE( KEYCODE_P )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( DEF_STR( No ) ) PORT_CODE( KEYCODE_0_PAD )
 INPUT_PORTS_END
 
 /* Machine Initialization */
@@ -750,6 +752,7 @@ void thayers_state::machine_reset()
 
 	m_rx_bit = 0;
 	m_keylatch = 0;
+	m_keydata = 0xb0;
 
 	m_cop_data_latch = 0;
 	m_cop_data_latch_enable = 0;
@@ -777,14 +780,14 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_CPU_IO_MAP(thayers_io_map)
 
 	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
 	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))
 	MCFG_COP400_WRITE_G_CB(WRITE8(thayers_state, cop_g_w))
 	MCFG_COP400_WRITE_D_CB(WRITE8(thayers_state, cop_d_w))
-	MCFG_COP400_READ_SI_CB(READLINE(thayers_state, cop_si_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(thayers_state, cop_so_w))
+	MCFG_COP400_READ_SI_CB(READLINE(thayers_state, kbdata_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(thayers_state, kbclk_w))
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 

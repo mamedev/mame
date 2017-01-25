@@ -143,4 +143,7 @@ private:
 // device type definition
 extern const device_type ACIA6850;
 
+extern template class device_finder<acia6850_device, false>;
+extern template class device_finder<acia6850_device, true>;
+
 #endif /* __ACIA6850_H__ */

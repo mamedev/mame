@@ -16,6 +16,7 @@
 #include "machine/mc68681.h"
 #include "machine/asic65.h"
 #include "machine/timekpr.h"
+#include "bus/rs232/rs232.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
@@ -393,6 +394,12 @@ protected:
 	uint8_t                   m_st68k_sloop_bank;
 	offs_t                  m_st68k_last_alt_sloop_offset;
 
+	uint8_t                   m_sel_select;
+	uint8_t                   m_sel1_data;
+	uint8_t                   m_sel2_data;
+	uint8_t                   m_sel3_data;
+	uint8_t                   m_sel4_data;
+
 	#define MAX_MSP_SYNC    16
 	uint32_t *                m_dataptr[MAX_MSP_SYNC];
 	uint32_t                  m_dataval[MAX_MSP_SYNC];
@@ -446,6 +453,8 @@ protected:
 	optional_device<palette_device> m_palette;
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	optional_device<atari_slapstic_device> m_slapstic_device;
+
+	optional_device<rs232_port_device> m_rs232;
 
 protected:
 	//virtual machine_config_constructor device_mconfig_additions() const;

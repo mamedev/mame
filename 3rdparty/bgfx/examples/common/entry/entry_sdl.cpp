@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -20,7 +20,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wextern-c-compat")
 #include <SDL2/SDL_syswm.h>
 BX_PRAGMA_DIAGNOSTIC_POP()
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 #if defined(None) // X11 defines this...
 #	undef None
 #endif // defined(None)
@@ -486,7 +486,7 @@ namespace entry
 			WindowHandle defaultWindow = { 0 };
 			setWindowSize(defaultWindow, m_width, m_height, true);
 
-			bx::CrtFileReader reader;
+			bx::FileReaderI* reader = getFileReader();
 			if (bx::open(&reader, "gamecontrollerdb.txt") )
 			{
 				bx::AllocatorI* allocator = getAllocator();
@@ -605,7 +605,6 @@ namespace entry
 									modifiers = translateKeyModifierPress(kev.keysym.scancode);
 								}
 
-								/// TODO: These keys are not captured by SDL_TEXTINPUT. Should be probably handled by SDL_TEXTEDITING. This is a workaround for now.
 								if (Key::Esc == key)
 								{
 									uint8_t pressedChar[4];

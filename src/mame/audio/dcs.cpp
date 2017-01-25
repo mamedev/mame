@@ -463,7 +463,7 @@ MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac", DMADAC, 0)
+	MCFG_SOUND_ADD("dac", DMADAC, 0) // AD-1851 16bit mono
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1510,14 +1510,13 @@ void dcs_audio_device::dmovlay_remap_memory()
 {
 	// Switch banks
 	// Internal ram is bank 0
-	int bankSel;
 	if (m_dmovlay_val == 0) {
 		m_ram_map->set_bank(0);
 	} else {
 		m_ram_map->set_bank(1);
 	}
 	if (LOG_DCS_IO)
-		logerror("%s dmovlay_remap_memory: Switching data ram location bankSel = %i\n", machine().describe_context(), bankSel);
+		logerror("%s dmovlay_remap_memory: Switching data ram location dmovlay=%i\n", machine().describe_context(), m_dmovlay_val);
 }
 
 WRITE32_MEMBER(dcs_audio_device::dmovlay_callback)

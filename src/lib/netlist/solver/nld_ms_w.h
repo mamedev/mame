@@ -131,9 +131,6 @@ matrix_solver_w_t<m_N, storage_N>::~matrix_solver_w_t()
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_w_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	if (m_dim < nets.size())
-		log().fatal("Dimension {1} less than {2}", m_dim, nets.size());
-
 	matrix_solver_t::setup_base(nets);
 
 	netlist().save(*this, m_last_RHS, "m_last_RHS");
@@ -300,7 +297,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				if (H[i][i] == 0.0)
-					printf("%s H singular\n", this->name().cstr());
+					printf("%s H singular\n", this->name().c_str());
 				const nl_double f = 1.0 / H[i][i];
 				for (unsigned j = i+1; j < rowcount; j++)
 				{
@@ -355,7 +352,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 				tmp += A(i,j) * new_V[j];
 			}
 			if (std::abs(tmp-RHS(i)) > 1e-6)
-				printf("%s failed on row %d: %f RHS: %f\n", this->name().cstr(), i, std::abs(tmp-RHS(i)), RHS(i));
+				printf("%s failed on row %d: %f RHS: %f\n", this->name().c_str(), i, std::abs(tmp-RHS(i)), RHS(i));
 		}
 	if (newton_raphson)
 	{

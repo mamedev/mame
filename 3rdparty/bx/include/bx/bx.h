@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -80,8 +80,5 @@ namespace bx
 	}
 
 } // namespace bx
-
-// Annoying C++0x stuff..
-//namespace std { namespace tr1 {}; using namespace tr1; }
 
 #endif // BX_H_HEADER_GUARD

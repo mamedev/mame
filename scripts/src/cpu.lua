@@ -425,7 +425,8 @@ end
 if (CPUS["COP400"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop410ds.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop420ds.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop440ds.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop444ds.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cop400/cop424ds.cpp")
 end
 
 --------------------------------------------------
@@ -611,7 +612,6 @@ if (CPUS["HCD62121"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.cpp",
 		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121.h",
-		MAME_DIR .. "src/devices/cpu/hcd62121/hcd62121_ops.h",
 	}
 end
 
@@ -1335,7 +1335,10 @@ if (CPUS["M6805"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
+		MAME_DIR .. "src/devices/cpu/m6805/6805defs.h",
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
+		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 	}
 end
 
@@ -2411,4 +2414,20 @@ end
 
 if (CPUS["MB86901"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sparc/sparcdasm.cpp")
+end
+
+--------------------------------------------------
+-- Intergraph CLIPPER (C100/C300/C400) series
+--@src/devices/cpu/clipper/clipper.h,CPUS["CLIPPER"] = true
+--------------------------------------------------
+
+if (CPUS["CLIPPER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/clipper/clipper.cpp",
+		MAME_DIR .. "src/devices/cpu/clipper/clipper.h",
+	}
+end
+
+if (CPUS["CLIPPER"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/clipper/clipperd.cpp")
 end
