@@ -1,12 +1,12 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// license: BSD-3-Clause
+// copyright-holders: Aaron Giles
 /***************************************************************************
 
-    Amiga audio hardware
+    Commodore 8364 "Paula"
 
 ***************************************************************************/
 
-#include "amiga.h"
+#include "8364_paula.h"
 #include "includes/amiga.h"
 
 
@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AMIGA = &device_creator<amiga_sound_device>;
+const device_type PAULA_8364 = &device_creator<paula_8364_device>;
 
 
 //*************************************************************************
@@ -30,11 +30,11 @@ const device_type AMIGA = &device_creator<amiga_sound_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  amiga_sound_device - constructor
+//  paula_8364_device - constructor
 //-------------------------------------------------
 
-amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock, "amiga_paula", __FILE__),
+paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PAULA_8364, "8364 Paula", tag, owner, clock, "paula_8364", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr)
 {
@@ -44,7 +44,7 @@ amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void amiga_sound_device::device_start()
+void paula_8364_device::device_start()
 {
 	// initialize channels
 	for (int i = 0; i < 4; i++)
@@ -53,7 +53,7 @@ void amiga_sound_device::device_start()
 		m_channel[i].curticks = 0;
 		m_channel[i].manualmode = false;
 		m_channel[i].curlocation = 0;
-		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_sound_device::signal_irq), this));
+		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(paula_8364_device::signal_irq), this));
 	}
 
 	// create the stream
@@ -69,7 +69,7 @@ void amiga_sound_device::device_start()
 //  signal_irq - irq signaling
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER( amiga_sound_device::signal_irq )
+TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 
@@ -80,7 +80,7 @@ TIMER_CALLBACK_MEMBER( amiga_sound_device::signal_irq )
 //  dma_reload
 //-------------------------------------------------
 
-void amiga_sound_device::dma_reload(audio_channel *chan)
+void paula_8364_device::dma_reload(audio_channel *chan)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 
@@ -95,7 +95,7 @@ void amiga_sound_device::dma_reload(audio_channel *chan)
 //  data_w - manual mode data writer
 //-------------------------------------------------
 
-void amiga_sound_device::data_w(int which, uint16_t data)
+void paula_8364_device::data_w(int which, uint16_t data)
 {
 	m_channel[which].manualmode = true;
 }
@@ -104,7 +104,7 @@ void amiga_sound_device::data_w(int which, uint16_t data)
 //  update - stream updater
 //-------------------------------------------------
 
-void amiga_sound_device::update()
+void paula_8364_device::update()
 {
 	m_stream->update();
 }
@@ -113,7 +113,7 @@ void amiga_sound_device::update()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void amiga_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 	int channum, sampoffs = 0;

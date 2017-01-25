@@ -21,7 +21,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/msm6242.h"
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
-#include "sound/amiga.h"
+#include "machine/8364_paula.h"
 #include "video/amigaaga.h"
 
 
@@ -563,7 +563,7 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
-	required_device<amiga_sound_device> m_sound;
+	required_device<paula_8364_device> m_sound;
 	optional_device<amiga_fdc> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
