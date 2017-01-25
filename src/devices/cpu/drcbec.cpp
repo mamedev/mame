@@ -1747,7 +1747,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 0):       // DROL    dst,src,count[,f]
-				shift = DPARAM2 & 31;
+				shift = DPARAM2 & 63;
 				DPARAM0 = (DPARAM1 << shift) | (DPARAM1 >> ((64 - shift) & 63));
 				break;
 

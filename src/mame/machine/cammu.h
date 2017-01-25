@@ -40,15 +40,13 @@ protected:
 	virtual const address_space_config *memory_space_config (address_spacenum spacenum) const override;
 
 private:
-	devcb_read32 m_ssw_func;
-
 	address_space_config m_main_space_config;
 	address_space_config m_io_space_config;
 	address_space_config m_boot_space_config;
-
 	address_space *m_main_space;
 	address_space *m_io_space;
 	address_space *m_boot_space;
+	devcb_read32 m_ssw_func;
 
 	u32 m_cammu[1024];
 

@@ -43,14 +43,39 @@ clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const ch
 
 clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_pc(0),
+	m_r(m_rs),
 	m_insn_config("insn", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_insn(nullptr),
 	m_data(nullptr),
-	m_pc(0),
-	m_r(m_rs),
 	m_icount(0)
 {
+}
+
+// rotate helpers to replace MSVC intrinsics
+inline u32 rotl32(u32 x, u8 shift)
+{
+  shift &= 31;
+  return (x << shift) | (x >> ((32 - shift) & 31));
+}
+
+inline u32 rotr32(u32 x, u8 shift)
+{
+  shift &= 31;
+  return (x >> shift) | (x << ((32 - shift) & 31));
+}
+
+inline u64 rotl64(u64 x, u8 shift)
+{
+  shift &= 63;
+  return (x << shift) | (x >> ((64 - shift) & 63));
+}
+
+inline u64 rotr64(u64 x, u8 shift)
+{
+  shift &= 63;
+  return (x >> shift) | (x << ((64 - shift) & 63));
 }
 
 void clipper_device::device_start()
@@ -126,7 +151,7 @@ void clipper_device::device_reset()
 	m_r = SSW(U) ? m_ru : m_rs;
 
 	// we'll opt to clear the integer and floating point registers too
-	memset(m_r, 0, sizeof(m_r));
+	memset(m_r, 0, sizeof(s32)*16);
 	memset(m_f, 0, sizeof(m_f));
 
 	// FIXME: figure out how to branch to the boot code properly
@@ -221,6 +246,7 @@ const address_space_config *clipper_device::memory_space_config(address_spacenum
 	{
 	case AS_PROGRAM: return &m_insn_config;
 	case AS_DATA: return &m_data_config;
+	default: break;
 	}
 
 	return nullptr;
@@ -544,18 +570,18 @@ int clipper_device::execute_instruction ()
 	case 0x34: 
 		// rotw: rotate word
 		if (m_r[R1] > 0)
-			m_r[R2] = _rotl(m_r[R2], m_r[R1]);
+			m_r[R2] = rotl32(m_r[R2], m_r[R1]);
 		else
-			m_r[R2] = _rotr(m_r[R2], -m_r[R1]);
+			m_r[R2] = rotr32(m_r[R2], -m_r[R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
 		break;
 	case 0x35: 
 		// rotl: rotate longword
 		if (m_r[R1] > 0)
-			((u64 *)m_r)[R2 >> 1] = _rotl64(((u64 *)m_r)[R2 >> 1], m_r[R1]);
+			((u64 *)m_r)[R2 >> 1] = rotl64(((u64 *)m_r)[R2 >> 1], m_r[R1]);
 		else
-			((u64 *)m_r)[R2 >> 1] = _rotr64(((u64 *)m_r)[R2 >> 1], -m_r[R1]);
+			((u64 *)m_r)[R2 >> 1] = rotr64(((u64 *)m_r)[R2 >> 1], -m_r[R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		break;
@@ -623,9 +649,9 @@ int clipper_device::execute_instruction ()
 	case 0x3c: 
 		// roti: rotate immediate
 		if (m_info.imm > 0)
-			m_r[R2] = _rotl(m_r[R2], m_info.imm);
+			m_r[R2] = rotl32(m_r[R2], m_info.imm);
 		else
-			m_r[R2] = _rotr(m_r[R2], -m_info.imm);
+			m_r[R2] = rotr32(m_r[R2], -m_info.imm);
 		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
@@ -633,9 +659,9 @@ int clipper_device::execute_instruction ()
 	case 0x3d: 
 		// rotli: rotate longword immediate
 		if (m_info.imm > 0)
-			((u64 *)m_r)[R2 >> 1] = _rotl64(((u64 *)m_r)[R2 >> 1], m_info.imm);
+			((u64 *)m_r)[R2 >> 1] = rotl64(((u64 *)m_r)[R2 >> 1], m_info.imm);
 		else
-			((u64 *)m_r)[R2 >> 1] = _rotr64(((u64 *)m_r)[R2 >> 1], -m_info.imm);
+			((u64 *)m_r)[R2 >> 1] = rotr64(((u64 *)m_r)[R2 >> 1], -m_info.imm);
 		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
@@ -1053,7 +1079,7 @@ int clipper_device::execute_instruction ()
 
 				m_r[0]--;
 				m_r[1]++;
-				m_r[2] = _rotr(m_r[2], 8);
+				m_r[2] = rotr32(m_r[2], 8);
 			}
 			// TRAPS: P,W
 			break;
