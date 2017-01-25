@@ -83,16 +83,18 @@ class naomi2_state : public naomi_state
 public:
 	naomi2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: naomi_state(mconfig, type, tag),
-		pvr2_texture_ram(*this, "textureram2"),
-		pvr2_framebuffer_ram(*this, "frameram2"),
-		elan_ram(*this, "elan_ram")  { }
+		m_pvr2_texture_ram(*this, "textureram2"),
+		m_pvr2_framebuffer_ram(*this, "frameram2"),
+		m_elan_ram(*this, "elan_ram"),
+		m_powervr2_slave(*this, "powervr2_slave") { }
 
-	/* Naomi 2 specific (To be moved) */
-	required_shared_ptr<uint64_t> pvr2_texture_ram;
-	required_shared_ptr<uint64_t> pvr2_framebuffer_ram;
-	required_shared_ptr<uint64_t> elan_ram;
+	required_shared_ptr<uint64_t> m_pvr2_texture_ram;
+	required_shared_ptr<uint64_t> m_pvr2_framebuffer_ram;
+	required_shared_ptr<uint64_t> m_elan_ram;
+	required_device<powervr2_device> m_powervr2_slave;
 
 	DECLARE_DRIVER_INIT(naomi2);
+	DECLARE_WRITE32_MEMBER(both_pvr2_ta_w);
 };
 
 class atomiswave_state : public dc_state
