@@ -220,6 +220,8 @@ void tms1k_base_device::device_reset()
 	m_eac = 0;
 	m_bl = 0;
 	m_add = 0;
+	m_status = 0;
+	m_clatch = 0;
 
 	m_opcode = 0;
 	m_micro = 0;

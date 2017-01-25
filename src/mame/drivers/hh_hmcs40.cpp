@@ -698,7 +698,6 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
 
 	/* basic machine hardware */
@@ -944,7 +943,6 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( msthawk, msthawk_state )
 
 	/* basic machine hardware */
@@ -1066,7 +1064,6 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
 
 	/* basic machine hardware */
@@ -1182,7 +1179,6 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 {
 	update_int0();
 }
-
 
 static MACHINE_CONFIG_START( zackman, zackman_state )
 
@@ -1311,7 +1307,6 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( bpengo, bpengo_state )
 
 	/* basic machine hardware */
@@ -1436,7 +1431,6 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 {
 	update_int0();
 }
-
 
 static MACHINE_CONFIG_START( bbtime, bbtime_state )
 
@@ -2248,7 +2242,6 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-
 static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
 
 	/* basic machine hardware */
@@ -2988,7 +2981,6 @@ INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
 	update_int();
 }
 
-
 void eturtles_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
@@ -3360,7 +3352,6 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( gckong, gckong_state )
 
 	/* basic machine hardware */
@@ -3479,7 +3470,6 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 {
 	update_int1();
 }
-
 
 static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
 
@@ -3856,7 +3846,6 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( kingman, kingman_state )
 
 	/* basic machine hardware */
@@ -3977,7 +3966,6 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 {
 	update_int1();
 }
-
 
 static MACHINE_CONFIG_START( tmtron, tmtron_state )
 
