@@ -375,7 +375,7 @@ static void create_header(tool_options_t &opts)
 			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
 			pout("{1}\n", pstring("// ").rpad("-", 72));
 		}
-		auto v = plib::pstring_vector_t(e->param_desc(), ",");
+		auto v = plib::psplit(e->param_desc(), ",");
 		pstring vs;
 		for (auto s : v)
 			vs += ", p" + s.replace("+","").replace(".","_");
@@ -464,7 +464,7 @@ static void listdevices(tool_options_t &opts)
 		}
 
 		out += "," + f->param_desc();
-		for (auto p : plib::pstring_vector_t(f->param_desc(),",") )
+		for (auto p : plib::psplit(f->param_desc(),",") )
 		{
 			if (p.startsWith("+"))
 			{

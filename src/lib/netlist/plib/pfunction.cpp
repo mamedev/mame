@@ -24,7 +24,7 @@ void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
 
 void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring expr)
 {
-	plib::pstring_vector_t cmds(expr, " ");
+	std::vector<pstring> cmds(plib::psplit(expr, " "));
 	compile_postfix(inputs, cmds, expr);
 }
 
@@ -110,9 +110,9 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	plib::pstring_vector_t sexpr(expr.replace(" ",""), sep);
+	std::vector<pstring> sexpr(plib::psplit(expr.replace(" ",""), sep));
 	std::stack<pstring> opstk;
-	plib::pstring_vector_t postfix;
+	std::vector<pstring> postfix;
 
 	//printf("dbg: %s\n", expr.c_str());
 	for (unsigned i = 0; i < sexpr.size(); i++)

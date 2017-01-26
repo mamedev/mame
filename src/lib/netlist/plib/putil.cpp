@@ -40,9 +40,10 @@ namespace plib
 		}
 	}
 
-	pstring_vector_t::pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty)
-	: std::vector<pstring>()
+	std::vector<pstring> psplit(const pstring &str, const pstring &onstr, bool ignore_empty)
 	{
+		std::vector<pstring> ret;
+
 		pstring::iterator p = str.begin();
 		pstring::iterator pn = str.find(onstr, p);
 
@@ -50,7 +51,7 @@ namespace plib
 		{
 			pstring t = str.substr(p, pn);
 			if (!ignore_empty || t.len() != 0)
-				this->push_back(t);
+				ret.push_back(t);
 			p = pn + onstr.len();
 			pn = str.find(onstr, p);
 		}
@@ -58,14 +59,15 @@ namespace plib
 		{
 			pstring t = str.substr(p, str.end());
 			if (!ignore_empty || t.len() != 0)
-				this->push_back(t);
+				ret.push_back(t);
 		}
+		return ret;
 	}
 
-	pstring_vector_t::pstring_vector_t(const pstring &str, const std::vector<pstring> &onstrl)
-	: std::vector<pstring>()
+	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl)
 	{
 		pstring col = "";
+		std::vector<pstring> ret;
 
 		unsigned i = 0;
 		while (i<str.blen())
@@ -82,10 +84,10 @@ namespace plib
 			if (p != static_cast<std::size_t>(-1))
 			{
 				if (col != "")
-					this->push_back(col);
+					ret.push_back(col);
 
 				col = "";
-				this->push_back(onstrl[p]);
+				ret.push_back(onstrl[p]);
 				i += onstrl[p].blen();
 			}
 			else
@@ -96,7 +98,9 @@ namespace plib
 			}
 		}
 		if (col != "")
-			this->push_back(col);
+			ret.push_back(col);
+
+		return ret;
 	}
 
 

@@ -186,14 +186,14 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 
 	while (!ttline.equals(""))
 	{
-		plib::pstring_vector_t io(ttline,"|");
+		std::vector<pstring> io(plib::psplit(ttline,"|"));
 		// checks
 		nl_assert_always(io.size() == 3, "io.count mismatch");
-		plib::pstring_vector_t inout(io[0], ",");
+		std::vector<pstring> inout(plib::psplit(io[0], ","));
 		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		plib::pstring_vector_t out(io[1], ",");
+		std::vector<pstring> out(plib::psplit(io[1], ","));
 		nl_assert_always(out.size() == m_NO, "output count not matching");
-		plib::pstring_vector_t times(io[2], ",");
+		std::vector<pstring> times(plib::psplit(io[2], ","));
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		uint_least64_t val = 0;

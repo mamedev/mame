@@ -121,7 +121,7 @@ void setup_t::register_alias(const pstring &alias, const pstring &out)
 
 void setup_t::register_dippins_arr(const pstring &terms)
 {
-	plib::pstring_vector_t list(terms,", ");
+	std::vector<pstring> list(plib::psplit(terms,", "));
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal(MF_1_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1,
 				build_fqn(""));
@@ -202,7 +202,7 @@ void setup_t::register_term(detail::core_terminal_t &term)
 
 void setup_t::register_link_arr(const pstring &terms)
 {
-	plib::pstring_vector_t list(terms,", ");
+	std::vector<pstring> list(plib::psplit(terms,", "));
 	if (list.size() < 2)
 		log().fatal(MF_2_NET_C_NEEDS_AT_LEAST_2_TERMINAL);
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -769,7 +769,7 @@ void setup_t::start_devices()
 	if (env != "")
 	{
 		log().debug("Creating dynamic logs ...");
-		plib::pstring_vector_t loglist(env, ":");
+		std::vector<pstring> loglist(plib::psplit(env, ":"));
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
@@ -840,7 +840,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	// FIMXE: Not optimal
 	remainder = remainder.left(remainder.begin() + (remainder.len() - 1));
 
-	plib::pstring_vector_t pairs(remainder," ", true);
+	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
 	{
 		auto pose = pe.find("=");

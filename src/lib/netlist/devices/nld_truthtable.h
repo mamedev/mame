@@ -11,8 +11,6 @@
 #define NLD_TRUTHTABLE_H_
 
 #include "nl_setup.h"
-#include "nl_factory.h"
-#include "plib/plists.h"
 #include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                     \
@@ -191,12 +189,12 @@ namespace netlist
 
 			pstring header = m_desc[0];
 
-			plib::pstring_vector_t io(header,"|");
+			std::vector<pstring> io(plib::psplit(header,"|"));
 			// checks
 			nl_assert_always(io.size() == 2, "too many '|'");
-			plib::pstring_vector_t inout(io[0], ",");
+			std::vector<pstring> inout(plib::psplit(io[0], ","));
 			nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-			plib::pstring_vector_t out(io[1], ",");
+			std::vector<pstring> out(plib::psplit(io[1], ","));
 			nl_assert_always(out.size() == m_NO, "output count wrong");
 
 			for (std::size_t i=0; i < m_NI; i++)
