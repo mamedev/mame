@@ -2556,21 +2556,7 @@ inline void sh34_base_device::PREFM(const uint16_t opcode)
  *  OPCODE DISPATCHERS
  *****************************************************************************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// TODO: current SZ=1(64bit) FMOVs correct for SH4 in LE mode only
 
 /*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
@@ -2580,34 +2566,35 @@ inline void sh34_base_device::FMOVMRIFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		n = n & 14;
-		m_ea = m_r[m];
-		m_r[m] += 8;
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (n & 1) {
-				n = n & 14;
+				n &= 14;
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[m];
 				m_xf[n] = RL(m_ea );
 				m_r[m] += 4;
-				m_xf[n+1] = RL(m_ea+4 );
+				m_xf[n^1] = RL(m_ea+4 );
 				m_r[m] += 4;
 			} else {
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[m];
 				m_fr[n] = RL(m_ea );
 				m_r[m] += 4;
-				m_fr[n+1] = RL(m_ea+4 );
+				m_fr[n^1] = RL(m_ea+4 );
 				m_r[m] += 4;
 			}
 		} else {              /* SZ = 0 */
 			m_ea = m_r[m];
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_fr[n] = RL(m_ea );
 			m_r[m] += 4;
 		}
-	}
 }
 
 /*  FMOV.S  FRm,@Rn PR=0 SZ=0 1111nnnnmmmm1010 */
@@ -2618,28 +2605,30 @@ inline void sh34_base_device::FMOVFRMR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_ea = m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
-				m= m & 14;
+				m &= 14;
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_ea = m_r[n];
 				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
+				WL(m_ea+4,m_xf[m^1] );
 			} else {
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_ea = m_r[n];
 				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
+				WL(m_ea+4,m_fr[m^1] );
 			}
 		} else {              /* SZ = 0 */
 			m_ea = m_r[n];
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
 			WL(m_ea,m_fr[m] );
 		}
-	}
 }
 
 /*  FMOV.S  FRm,@-Rn PR=0 SZ=0 1111nnnnmmmm1011 */
@@ -2650,32 +2639,33 @@ inline void sh34_base_device::FMOVFRMDR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_r[n] -= 8;
-		m_ea = m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
-				m= m & 14;
+				m &= 14;
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_r[n] -= 8;
 				m_ea = m_r[n];
 				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
+				WL(m_ea+4,m_xf[m^1] );
 			} else {
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_r[n] -= 8;
 				m_ea = m_r[n];
 				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
+				WL(m_ea+4,m_fr[m^1] );
 			}
 		} else {              /* SZ = 0 */
 			m_r[n] -= 4;
 			m_ea = m_r[n];
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
 			WL(m_ea,m_fr[m] );
 		}
-	}
 }
 
 /*  FMOV.S  FRm,@(R0,Rn) PR=0 SZ=0 1111nnnnmmmm0111 */
@@ -2686,28 +2676,30 @@ inline void sh34_base_device::FMOVFRS0(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_ea = m_r[0] + m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (m & 1) {
-				m= m & 14;
+				m &= 14;
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_ea = m_r[0] + m_r[n];
 				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
+				WL(m_ea+4,m_xf[m^1] );
 			} else {
+#ifdef LSB_FIRST
+				m ^= m_fpu_pr;
+#endif
 				m_ea = m_r[0] + m_r[n];
 				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
+				WL(m_ea+4,m_fr[m^1] );
 			}
 		} else {              /* SZ = 0 */
 			m_ea = m_r[0] + m_r[n];
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
 			WL(m_ea,m_fr[m] );
 		}
-	}
 }
 
 /*  FMOV.S  @(R0,Rm),FRn PR=0 SZ=0 1111nnnnmmmm0110 */
@@ -2718,28 +2710,30 @@ inline void sh34_base_device::FMOVS0FR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		n= n & 14;
-		m_ea = m_r[0] + m_r[m];
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (n & 1) {
-				n= n & 14;
+				n &= 14;
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[0] + m_r[m];
 				m_xf[n] = RL(m_ea );
-				m_xf[n+1] = RL(m_ea+4 );
+				m_xf[n^1] = RL(m_ea+4 );
 			} else {
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[0] + m_r[m];
 				m_fr[n] = RL(m_ea );
-				m_fr[n+1] = RL(m_ea+4 );
+				m_fr[n^1] = RL(m_ea+4 );
 			}
 		} else {              /* SZ = 0 */
 			m_ea = m_r[0] + m_r[m];
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_fr[n] = RL(m_ea );
 		}
-	}
 }
 
 /*  FMOV.S  @Rm,FRn PR=0 SZ=0 1111nnnnmmmm1000 */
@@ -2751,36 +2745,30 @@ inline void sh34_base_device::FMOVMRFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		if (n & 1) {
-			n= n & 14;
-			m_ea = m_r[m];
-			m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-			m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-		} else {
-			n= n & 14;
-			m_ea = m_r[m];
-			m_fr[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-			m_fr[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-		}
-	} else {              /* PR = 0 */
 		if (m_fpu_sz) { /* SZ = 1 */
 			if (n & 1) {
-				n= n & 14;
+				n &= 14;
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[m];
 				m_xf[n] = RL(m_ea );
-				m_xf[n+1] = RL(m_ea+4 );
+				m_xf[n^1] = RL(m_ea+4 );
 			} else {
-				n= n & 14;
+#ifdef LSB_FIRST
+				n ^= m_fpu_pr;
+#endif
 				m_ea = m_r[m];
 				m_fr[n] = RL(m_ea );
-				m_fr[n+1] = RL(m_ea+4 );
+				m_fr[n^1] = RL(m_ea+4 );
 			}
 		} else {              /* SZ = 0 */
 			m_ea = m_r[m];
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_fr[n] = RL(m_ea );
 		}
-	}
 }
 
 /*  FMOV    FRm,FRn PR=0 SZ=0 FRm -> FRn 1111nnnnmmmm1100 */
@@ -2792,9 +2780,14 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if ((m_fpu_sz == 0) && (m_fpu_pr == 0)) /* SZ = 0 */
+	if (m_fpu_sz == 0)	{  /* SZ = 0 */
+#ifdef LSB_FIRST
+		n ^= m_fpu_pr;
+		m ^= m_fpu_pr;
+#endif
 		m_fr[n] = m_fr[m];
-	else { /* SZ = 1 or PR = 1 */
+	}
+	else { /* SZ = 1 */
 		if (m & 1) {
 			if (n & 1) {
 				m_xf[n & 14] = m_xf[m & 14];
@@ -2818,25 +2811,41 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 /*  FLDI1  FRn 1111nnnn10011101 */
 inline void sh34_base_device::FLDI1(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = 0x3F800000;
+#else
 	m_fr[Rn] = 0x3F800000;
+#endif
 }
 
 /*  FLDI0  FRn 1111nnnn10001101 */
 inline void sh34_base_device::FLDI0(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = 0;
+#else
 	m_fr[Rn] = 0;
+#endif
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
 inline void sh34_base_device:: FLDS(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fpul = m_fr[Rn ^ m_fpu_pr];
+#else
 	m_fpul = m_fr[Rn];
+#endif
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
 inline void sh34_base_device:: FSTS(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = m_fpul;
+#else
 	m_fr[Rn] = m_fpul;
+#endif
 }
 
 /* FRCHG 1111101111111101 */
