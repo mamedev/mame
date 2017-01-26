@@ -8,6 +8,7 @@
 #include <cstring>
 #include <algorithm>
 #include <stack>
+#include <cstdlib>
 
 #include "pstring.h"
 #include "palloc.h"
@@ -238,7 +239,7 @@ double pstring_t<F>::as_double(bool *error) const
 
 	if (error != nullptr)
 		*error = false;
-	ret = strtod(c_str(), &e);
+	ret = std::strtod(c_str(), &e);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -254,9 +255,9 @@ long pstring_t<F>::as_long(bool *error) const
 	if (error != nullptr)
 		*error = false;
 	if (startsWith("0x"))
-		ret = strtol(substr(2).c_str(), &e, 16);
+		ret = std::strtol(substr(2).c_str(), &e, 16);
 	else
-		ret = strtol(c_str(), &e, 10);
+		ret = std::strtol(c_str(), &e, 10);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
