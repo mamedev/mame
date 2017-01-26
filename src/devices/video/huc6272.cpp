@@ -40,7 +40,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, huc6272, "HuC6272 \"King\"", tag, owner, clock, "huc6272", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
-		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
+		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
 		m_microprg_ram(*this, "microprg_ram")
 {
 }
@@ -160,9 +160,9 @@ READ32_MEMBER( huc6272_device::read )
 				res = (m_kram_addr_w & 0x3ffff) | ((m_kram_inc_w & 0x1ff) << 18) | ((m_kram_page_w & 1) << 31);
 				break;
 
-			case 0x0e:
+			case 0x0e: // KRAM read data
 				res = read_dword((m_kram_addr_r)|(m_kram_page_r<<18));
-				m_kram_addr_r += (m_kram_inc_r & 0x100) ? ((m_kram_inc_r & 0xff) - 0x100) : (m_kram_inc_r & 0xff);
+				m_kram_addr_r += (m_kram_inc_r & 0x200) ? ((m_kram_inc_r & 0x1ff) - 0x200) : (m_kram_inc_r & 0x1ff);
 				break;
 
 			case 0x0f:
@@ -200,19 +200,20 @@ WRITE32_MEMBER( huc6272_device::write )
 			*/
 			case 0x0c: // KRAM load address
 				m_kram_addr_r = (data & 0x0003ffff);
-				m_kram_inc_r =  (data & 0x07fc0000) >> 18;
+				m_kram_inc_r =  (data & 0x0ffc0000) >> 18;
 				m_kram_page_r = (data & 0x80000000) >> 31;
 				break;
 
 			case 0x0d: // KRAM write address
 				m_kram_addr_w = (data & 0x0003ffff);
-				m_kram_inc_w =  (data & 0x07fc0000) >> 18;
+				m_kram_inc_w =  (data & 0x0ffc0000) >> 18;
 				m_kram_page_w = (data & 0x80000000) >> 31;
 				break;
 
-			case 0x0e: // KRAM write VRAM
-				write_dword((m_kram_addr_w)|(m_kram_page_w<<18),data); /* TODO: there are some 32-bits accesses during BIOS? */
-				m_kram_addr_w += (m_kram_inc_w & 0x100) ? ((m_kram_inc_w & 0xff) - 0x100) : (m_kram_inc_w & 0xff);
+			case 0x0e: // KRAM write data
+				// TODO: handle non-dword cases?
+				write_dword((m_kram_addr_w)|(m_kram_page_w<<18),data); 
+				m_kram_addr_w += (m_kram_inc_w & 0x200) ? ((m_kram_inc_w & 0x1ff) - 0x200) : (m_kram_inc_w & 0x1ff);
 				break;
 
 			/*
@@ -241,12 +242,25 @@ WRITE32_MEMBER( huc6272_device::write )
 			// 1011 - 256 color palette block mode
 			// others - unused/invalid
 			case 0x10:
-				m_bgmode[0] = data & 0x0f;
-				m_bgmode[1] = ( data >> 4 ) & 0x0f;
-				m_bgmode[2] = ( data >> 8 ) & 0x0f;
-				m_bgmode[3] = ( data >> 12 ) & 0x0f;
+				for(int i=0;i<4;i++)
+					m_bg[i].mode = (data >> i*4) & 0x0f;
+
 				break;
 
+			/*
+			---x ---- ---- ---- BG0 rotation enable
+			---- xxx- ---- ---- BG3 priority
+			---- ---x xx-- ---- BG2 priority
+			---- ---- --xx x--- BG1 priority
+			---- ---- ---- -xxx BG0 priority
+			*/
+			case 0x12:
+				for(int i=0;i<4;i++)
+					m_bg[i].priority = (data >> i*3) & 0x07;
+
+				// TODO: rotation enable
+				break;
+				
 			case 0x13:
 				m_micro_prg.index = data & 0xf;
 				break;
@@ -260,7 +274,56 @@ WRITE32_MEMBER( huc6272_device::write )
 			case 0x15:
 				m_micro_prg.ctrl = data & 1;
 				break;
+			
+			// case 0x16: wrap-around enable
+			
+			// BAT and CG address setters
+			case 0x20: m_bg[0].bat_address = data * 1024;  break;
+			case 0x21: m_bg[0].cg_address = data * 1024;   break;
+			case 0x22: m_bg0sub.bat_address = data * 1024; break;
+			case 0x23: m_bg0sub.cg_address = data * 1024;  break;
+			case 0x24: m_bg[1].bat_address = data * 1024;  break;
+			case 0x25: m_bg[1].cg_address = data * 1024;   break;
+			case 0x26: m_bg[2].bat_address = data * 1024;  break;
+			case 0x27: m_bg[2].cg_address = data * 1024;   break;
+			case 0x28: m_bg[3].bat_address = data * 1024;  break;
+			case 0x29: m_bg[3].cg_address = data * 1024;   break;
 
+			// Height & Width setters
+			case 0x2c: 
+			case 0x2d: 
+			case 0x2e:
+			case 0x2f:
+			{
+				uint8_t reg_offs = m_register & 3;
+				m_bg[reg_offs].height = 1 << (data & 0x000f);
+				m_bg[reg_offs].width = 1 << ((data & 0x00f0) >> 4);
+				if(reg_offs == 0)
+				{
+					m_bg0sub.height = 1 << ((data & 0x0f00) >> 8);
+					m_bg0sub.width = 1 << ((data & 0xf000) >> 12);
+				}
+				break;
+			}
+			
+			// X & Y scroll values
+			case 0x30:
+			case 0x31:
+			case 0x32:
+			case 0x33:
+			case 0x34:
+			case 0x35:
+			case 0x36:
+			case 0x37:
+			{
+				uint8_t reg_offs = (m_register & 6) >> 1;
+
+				if(m_register & 1)
+					m_bg[reg_offs].yscroll = data & 0xffff;
+				else
+					m_bg[reg_offs].xscroll = data & 0xffff;
+				break;
+			}
 			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}

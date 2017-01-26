@@ -52,8 +52,26 @@ private:
 	uint16_t m_kram_inc_r,m_kram_inc_w;
 	uint8_t m_kram_page_r,m_kram_page_w;
 	uint32_t m_page_setting;
-	uint8_t m_bgmode[4];
-
+	
+	struct{
+		uint32_t bat_address;
+		uint32_t cg_address;
+		uint8_t mode;
+		uint16_t height;
+		uint16_t width;
+		uint16_t xscroll;
+		uint16_t yscroll;
+		uint8_t priority;
+	}m_bg[4];
+	
+	struct{
+		uint32_t bat_address;
+		uint32_t cg_address;
+		uint16_t height;
+		uint16_t width;
+	}m_bg0sub;
+	
+	
 	struct{
 		uint8_t index;
 		uint8_t ctrl;
@@ -67,7 +85,6 @@ private:
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
 };
-
 
 // device type definition
 extern const device_type huc6272;

@@ -289,21 +289,21 @@ WRITE16_MEMBER( huc6261_device::write )
 			switch( m_register )
 			{
 				/* Control register */
-				// -x-------------- Enable HuC6271: 0 - disabled, 1 - enabled
-				// --x------------- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
-				// ---x------------ Enable HuC6272 BG2: 0 - disabled, 1 - enabled
-				// ----x----------- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
-				// -----x---------- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
-				// ------x--------- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
-				// -------x-------- Enable HuC6270 BG: 0 - disabled, 1 - enabled
-				// --------x------- Number of SPR colors?: 0 - 16, 1 - 256
-				// ---------x------ Number of BG colors?: 0 - 16, 1 - 256
-				// ------------x--- Dot clock: 0 - 5MHz, 1 - 7MHz
-				// -------------x-- Synchronization: 0 - internal, 1 - external
-				// --------------xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
+				// -x-- ---- ---- ---- Enable HuC6271: 0 - disabled, 1 - enabled
+				// --x- ---- ---- ---- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
+				// ---x ---- ---- ---- Enable HuC6272 BG2: 0 - disabled, 1 - enabled
+				// ---- x--- ---- ---- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
+				// ---- -x-- ---- ---- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
+				// ---- --x- ---- ---- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
+				// ---- ---x ---- ---- Enable HuC6270 BG: 0 - disabled, 1 - enabled
+				// ---- ---- x--- ---- Number of SPR colors?: 0 - 16, 1 - 256
+				// ---- ---- -x-- ---- Number of BG colors?: 0 - 16, 1 - 256
+				// ---- ---- ---- x--- Dot clock: 0 - 5MHz, 1 - 7MHz
+				// ---- ---- ---- -x-- Synchronization: 0 - internal, 1 - external
+				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
 				case 0x00:
 					m_control = data;
-					m_pixels_per_clock = ( data & 0x04 ) ? 3 : 4;
+					m_pixels_per_clock = ( data & 0x08 ) ? 3 : 4;
 					break;
 
 				// Palette address
