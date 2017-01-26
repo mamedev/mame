@@ -183,14 +183,17 @@ WRITE32_MEMBER( huc6272_device::write )
 	{
 		switch(m_register)
 		{
-			case 0x09: // DMA addr
-				//printf("%08x DMA ADDR\n",data);
-				break;
-			case 0x0a: // DMA size
-				//printf("%08x DMA SIZE\n",data);
-				break;
-			case 0x0b: // DMA status
-				//printf("%08x DMA STATUS\n",data);
+			case 0x00: // SCSI data
+			case 0x01: // SCSI command
+			case 0x02: // SCSI mode
+			case 0x03: // SCSI target command
+			case 0x05: // SCSI bus status
+			case 0x06: // SCSI input data
+			case 0x07: // SCSI DMA trigger
+			case 0x08: // SCSI subcode
+			case 0x09: // SCSI DMA start address
+			case 0x0a: // SCSI DMA size
+			case 0x0b: // SCSI DMA control
 				break;
 			/*
 			---- ---- ---- ---- ----
