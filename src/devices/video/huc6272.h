@@ -44,11 +44,9 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_PROGRAM) const override;
 
 private:
-	inline uint32_t read_dword(offs_t address);
-	inline void write_dword(offs_t address, uint32_t data);
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
 	uint16_t m_kram_inc_r,m_kram_inc_w;
@@ -57,12 +55,17 @@ private:
 	uint8_t m_bgmode[4];
 
 	struct{
-		uint8_t addr;
+		uint8_t index;
 		uint8_t ctrl;
-		uint16_t data[16];
 	}m_micro_prg;
 
-	const address_space_config      m_space_config;
+	const address_space_config      m_program_space_config;
+	const address_space_config      m_data_space_config;
+	required_shared_ptr<uint16_t> 	m_microprg_ram;
+
+	uint32_t read_dword(offs_t address);
+	void write_dword(offs_t address, uint32_t data);
+	void write_microprg_data(offs_t address, uint16_t data);
 };
 
 

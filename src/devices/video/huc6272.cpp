@@ -18,44 +18,15 @@
 // device type definition
 const device_type huc6272 = &device_creator<huc6272_device>;
 
-static ADDRESS_MAP_START( huc6272_vram, AS_0, 32, huc6272_device )
+static ADDRESS_MAP_START( microprg_map, AS_PROGRAM, 16, huc6272_device )
+	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kram_map, AS_DATA, 32, huc6272_device )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *huc6272_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
-}
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_dword - read a dword at the given address
-//-------------------------------------------------
-
-inline uint32_t huc6272_device::read_dword(offs_t address)
-{
-	return space().read_dword(address << 2);
-}
-
-
-//-------------------------------------------------
-//  write_dword - write a dword at the given address
-//-------------------------------------------------
-
-inline void huc6272_device::write_dword(offs_t address, uint32_t data)
-{
-	space().write_dword(address << 2, data);
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -68,7 +39,9 @@ inline void huc6272_device::write_dword(offs_t address, uint32_t data)
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock, "huc6272", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(huc6272_vram))
+		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
+		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
+		m_microprg_ram(*this, "microprg_ram")
 {
 }
 
@@ -100,6 +73,48 @@ void huc6272_device::device_reset()
 {
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *huc6272_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+		case AS_PROGRAM: 	return &m_program_space_config;
+		case AS_DATA: 		return &m_data_space_config;
+		default: 			return nullptr;
+	}
+}
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_dword - read a dword at the given address
+//-------------------------------------------------
+
+inline uint32_t huc6272_device::read_dword(offs_t address)
+{
+	return space(AS_DATA).read_dword(address << 2);
+}
+
+
+//-------------------------------------------------
+//  write_dword - write a dword at the given address
+//-------------------------------------------------
+
+inline void huc6272_device::write_dword(offs_t address, uint32_t data)
+{
+	space(AS_DATA).write_dword(address << 2, data);
+}
+
+void huc6272_device::write_microprg_data(offs_t address, uint16_t data)
+{
+	space(AS_PROGRAM).write_word(address << 1, data);
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -230,13 +245,13 @@ WRITE32_MEMBER( huc6272_device::write )
 				break;
 
 			case 0x13:
-				m_micro_prg.addr = data & 0xf;
+				m_micro_prg.index = data & 0xf;
 				break;
 
 			case 0x14:
-				m_micro_prg.data[m_micro_prg.addr] = data & 0xffff;
-				m_micro_prg.addr++;
-				m_micro_prg.addr &= 0xf;
+				write_microprg_data(m_micro_prg.index,data & 0xffff);
+				m_micro_prg.index ++;
+				m_micro_prg.index &= 0xf;
 				break;
 
 			case 0x15:
