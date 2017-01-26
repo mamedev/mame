@@ -10,23 +10,24 @@
  */
 
 #if 0
-#pragma GCC optimize "-ffast-math"
-#pragma GCC optimize "-fstrict-aliasing"
-#pragma GCC optimize "-ftree-vectorizer-verbose=2"
-#pragma GCC optimize "-fopt-info-vec"
-#pragma GCC optimize "-fopt-info-vec-missed"
-//#pragma GCC optimize "-ftree-parallelize-loops=4"
-#pragma GCC optimize "-funroll-loops"
-#pragma GCC optimize "-funswitch-loops"
-#pragma GCC optimize "-fvariable-expansion-in-unroller"
-#pragma GCC optimize "-funsafe-loop-optimizations"
-#pragma GCC optimize "-fvect-cost-model"
-#pragma GCC optimize "-fvariable-expansion-in-unroller"
-#pragma GCC optimize "-ftree-loop-if-convert-stores"
-#pragma GCC optimize "-ftree-loop-distribution"
-#pragma GCC optimize "-ftree-loop-im"
-#pragma GCC optimize "-ftree-loop-ivcanon"
-#pragma GCC optimize "-fivopts"
+#pragma GCC optimize "fast-math"
+#pragma GCC optimize "strict-aliasing"
+#pragma GCC optimize "tree-vectorize"
+#pragma GCC optimize "tree-vectorizer-verbose=7"
+#pragma GCC optimize "opt-info-vec"
+#pragma GCC optimize "opt-info-vec-missed"
+//#pragma GCC optimize "tree-parallelize-loops=4"
+#pragma GCC optimize "unroll-loops"
+#pragma GCC optimize "unswitch-loops"
+#pragma GCC optimize "variable-expansion-in-unroller"
+#pragma GCC optimize "unsafe-loop-optimizations"
+#pragma GCC optimize "vect-cost-model"
+#pragma GCC optimize "variable-expansion-in-unroller"
+#pragma GCC optimize "tree-loop-if-convert-stores"
+#pragma GCC optimize "tree-loop-distribution"
+#pragma GCC optimize "tree-loop-im"
+#pragma GCC optimize "tree-loop-ivcanon"
+#pragma GCC optimize "ivopts"
 #endif
 
 #include <iostream>
@@ -399,11 +400,13 @@ void NETLIB_NAME(solver)::post_start()
 	}
 }
 
-void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
+void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
 {
-	plib::putf8_fmt_writer w(strm);
 	for (auto & s : m_mat_solvers)
-		s->create_solver_code(w);
+	{
+		auto r = s->create_solver_code();
+		mp[r.first] = r.second; // automatically overwrites identical names
+	}
 }
 
 	NETLIB_DEVICE_IMPL(solver)

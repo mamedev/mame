@@ -320,7 +320,15 @@ static void static_compile(tool_options_t &opts)
 			opts.opt_logs(),
 			opts.opt_defines(), opts.opt_rfolders());
 
-	nt.solver()->create_solver_code(pout_strm);
+	plib::putf8_writer w(pout_strm);
+	std::map<pstring, pstring> mp;
+
+	nt.solver()->create_solver_code(mp);
+
+	for (auto &e : mp)
+	{
+		w.write(e.second);
+	}
 
 	nt.stop();
 
