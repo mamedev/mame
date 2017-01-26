@@ -83,13 +83,13 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 
 static int get_prio(pstring v)
 {
-	if (v == "(" or v == ")")
+	if (v == "(" || v == ")")
 		return 1;
 	else if (v.left(v.begin()+1) >= "a" && v.left(v.begin()+1) <= "z")
 		return 0;
-	else if (v == "*" or v == "/")
+	else if (v == "*" || v == "/")
 		return 20;
-	else if (v == "+" or v == "-")
+	else if (v == "+" || v == "-")
 		return 10;
 	else if (v == "^")
 		return 30;
