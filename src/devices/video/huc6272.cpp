@@ -37,7 +37,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock, "huc6272", __FILE__),
+	: device_t(mconfig, huc6272, "HuC6272 \"King\"", tag, owner, clock, "huc6272", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
 		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
