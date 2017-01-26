@@ -302,6 +302,7 @@ VIDEOS["HUC6202"] = true
 VIDEOS["HUC6260"] = true
 VIDEOS["HUC6261"] = true
 VIDEOS["HUC6270"] = true
+VIDEOS["HUC6271"] = true
 VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
