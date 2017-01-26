@@ -3499,6 +3499,7 @@ WRITE32_MEMBER( powervr2_device::pvr2_ta_w )
 	//printf("PVR2 %08x %08x\n",reg,dat);
 }
 
+// TODO: move to specific device
 READ32_MEMBER( powervr2_device::elan_regs_r )
 {
 	switch(offset)

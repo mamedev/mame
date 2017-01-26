@@ -29,8 +29,8 @@ namespace netlist
 		logic_input_t m_I;
 		logic_output_t m_Q;
 
-		state_var_u8 m_reset;
-		state_var_u8 m_state;
+		state_var<netlist_sig_t> m_reset;
+		state_var<netlist_sig_t> m_state;
 	};
 
 	NETLIB_OBJECT(7493)
@@ -99,7 +99,7 @@ namespace netlist
 
 	NETLIB_UPDATE(7493ff)
 	{
-		constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
+		static constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
 		if (m_reset)
 		{
 			m_state ^= 1;

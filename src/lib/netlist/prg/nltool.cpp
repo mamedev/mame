@@ -320,7 +320,15 @@ static void static_compile(tool_options_t &opts)
 			opts.opt_logs(),
 			opts.opt_defines(), opts.opt_rfolders());
 
-	nt.solver()->create_solver_code(pout_strm);
+	plib::putf8_writer w(pout_strm);
+	std::map<pstring, pstring> mp;
+
+	nt.solver()->create_solver_code(mp);
+
+	for (auto &e : mp)
+	{
+		w.write(e.second);
+	}
 
 	nt.stop();
 
@@ -531,7 +539,7 @@ int main(int argc, char *argv[])
 	{
 		pout(
 			"nltool (netlist) 0.1\n"
-			"Copyright (C) 2016 Couriersud\n"
+			"Copyright (C) 2017 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"

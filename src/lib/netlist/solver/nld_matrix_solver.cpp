@@ -91,11 +91,6 @@ matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
 
 matrix_solver_t::~matrix_solver_t()
 {
-	for (unsigned k = 0; k < m_terms.size(); k++)
-	{
-		plib::pfree(m_terms[k]);
-	}
-
 }
 
 void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
@@ -109,7 +104,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	for (auto & net : nets)
 	{
 		m_nets.push_back(net);
-		m_terms.push_back(plib::palloc<terms_for_net_t>());
+		m_terms.push_back(plib::make_unique<terms_for_net_t>());
 		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
 	}
 
@@ -164,7 +159,6 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					}
 					break;
 				case terminal_t::OUTPUT:
-				case terminal_t::PARAM:
 					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
 							p->name());
 					break;
@@ -242,7 +236,7 @@ void matrix_solver_t::setup_matrix()
 	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
@@ -264,7 +258,7 @@ void matrix_solver_t::setup_matrix()
 	 */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
@@ -294,9 +288,9 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	bool **touched = new bool*[iN];
+	bool **touched = plib::palloc_array<bool *>(iN);
 	for (unsigned k=0; k<iN; k++)
-		touched[k] = new bool[iN];
+		touched[k] = plib::palloc_array<bool>(iN);
 
 	for (unsigned k = 0; k < iN; k++)
 	{
@@ -354,8 +348,8 @@ void matrix_solver_t::setup_matrix()
 	}
 
 	for (unsigned k=0; k<iN; k++)
-		delete [] touched[k];
-	delete [] touched;
+		plib::pfree_array(touched[k]);
+	plib::pfree_array(touched);
 }
 
 void matrix_solver_t::update_inputs()
@@ -499,7 +493,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
-			terms_for_net_t *t = m_terms[k];
+			terms_for_net_t *t = m_terms[k].get();
 
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;
@@ -548,12 +542,12 @@ void matrix_solver_t::log_stats()
 		log().verbose("       {1:6.3} average newton raphson loops",
 					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
 		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
-				this->m_stat_calculations(),
-				static_cast<double>(this->m_stat_calculations()) / this->netlist().time().as_double(),
-				this->m_iterative_fail(),
-				100.0 * static_cast<double>(this->m_iterative_fail())
-					/ static_cast<double>(this->m_stat_calculations()),
-				static_cast<double>(this->m_iterative_total()) / static_cast<double>(this->m_stat_calculations()));
+				this->m_stat_calculations,
+				static_cast<double>(this->m_stat_calculations) / this->netlist().time().as_double(),
+				this->m_iterative_fail,
+				100.0 * static_cast<double>(this->m_iterative_fail)
+					/ static_cast<double>(this->m_stat_calculations),
+				static_cast<double>(this->m_iterative_total) / static_cast<double>(this->m_stat_calculations));
 	}
 }
 

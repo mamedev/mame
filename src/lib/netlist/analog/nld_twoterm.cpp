@@ -5,8 +5,9 @@
  *
  */
 
-#include <solver/nld_solver.h>
 #include <algorithm>
+
+#include "solver/nld_solver.h"
 
 #include "nld_twoterm.h"
 
@@ -23,6 +24,7 @@ generic_diode::generic_diode(device_t &dev, pstring name)
 	, m_Id(dev, name + ".m_Id", 0.0)
 	, m_G(dev,  name + ".m_G", 1e-15)
 	, m_Vt(0.0)
+	, m_Vmin(0.0)
 	, m_Is(0.0)
 	, m_n(0.0)
 	, m_gmin(1e-15)
@@ -40,6 +42,7 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 	m_gmin = gmin;
 
 	m_Vt = 0.0258 * m_n;
+	m_Vmin = -5.0 * m_Vt;
 
 	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
@@ -47,8 +50,7 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 
 void generic_diode::update_diode(const nl_double nVd)
 {
-#if 1
-	if (nVd < NL_FCONST(-5.0) * m_Vt)
+	if (nVd < m_Vmin)
 	{
 		m_Vd = nVd;
 		m_G = m_gmin;
@@ -58,29 +60,19 @@ void generic_diode::update_diode(const nl_double nVd)
 	{
 		m_Vd = nVd;
 		//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		m_Id = IseVDVt - m_Is;
+		m_G = IseVDVt * m_VtInv + m_gmin;
 	}
 	else
 	{
-#if 1
-		const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
+		const double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
-#else
-		m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-#endif
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		m_Id = IseVDVt - m_Is;
+		m_G = IseVDVt * m_VtInv + m_gmin;
 	}
-#else
-	m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-	const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-	m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-	m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-#endif
 }
 
 // ----------------------------------------------------------------------------------------

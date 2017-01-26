@@ -17,12 +17,11 @@
 #include "plib/putil.h"
 #include "nl_base.h"
 
-#if 1
 #define NETLIB_DEVICE_IMPL(chip) \
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
 			const pstring &name, const pstring &classname, const pstring &def_param) \
 	{ \
-		return std::unique_ptr<factory::element_t>(new factory::device_element_t<NETLIB_NAME(chip)>(name, classname, def_param, pstring(__FILE__))); \
+		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
@@ -30,15 +29,9 @@
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
 			const pstring &name, const pstring &classname, const pstring &def_param) \
 	{ \
-		return std::unique_ptr<factory::element_t>(new factory::device_element_t<ns :: NETLIB_NAME(chip)>(name, classname, def_param, pstring(__FILE__))); \
+		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
-
-#else
-#define NETLIB_DEVICE_IMPL(chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< NETLIB_NAME(chip) >;
-#define NETLIB_DEVICE_IMPL_NS(ns, chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< ns :: NETLIB_NAME(chip) >;
-#endif
-
 
 namespace netlist { namespace factory
 {
@@ -99,7 +92,7 @@ namespace netlist { namespace factory
 		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			register_device(std::unique_ptr<element_t>(new device_element_t<device_class>(name, classname, def_param)));
+			register_device(std::unique_ptr<element_t>(plib::palloc<device_element_t<device_class>>(name, classname, def_param)));
 		}
 
 		void register_device(std::unique_ptr<element_t> factory);
@@ -127,7 +120,7 @@ namespace netlist { namespace factory
 	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		return std::unique_ptr<element_t>(new device_element_t<T>(name, classname, def_param));
+		return std::unique_ptr<element_t>(plib::palloc<device_element_t<T>>(name, classname, def_param));
 	}
 
 	// -----------------------------------------------------------------------------

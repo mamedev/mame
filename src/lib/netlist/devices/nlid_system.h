@@ -323,7 +323,7 @@ namespace netlist
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
-			m_precompiled.compile_postfix(inps, m_func());
+			m_precompiled.compile(inps, m_func());
 		}
 
 	protected:

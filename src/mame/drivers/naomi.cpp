@@ -61,9 +61,9 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - marstv: locks up during anchor talking (does same in Demul);
+    - marstv: temporary lock ups during anchor talking (does same in Demul);
     - marstv: missing graphics at stage select, renderer fault or something else?
-    - Monkey Ball: asserts when attempts to load a stage;
+    - monkeyba: CPU jumps to la la land when attempts to load a stage (bp c09e950, uses FPU opcodes for calculating the return address?);
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
     - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
@@ -1731,6 +1731,13 @@ ADDRESS_MAP_END
  * Naomi 2 address map
  */
 
+// example hookup for accessing both PVRs, to be extended to everything else.
+WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
+{
+	space.write_dword(0x005f8000|offset*4,data,mem_mask);
+	space.write_dword(0x025f8000|offset*4,data,mem_mask);
+}
+ 
 static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
@@ -1741,8 +1748,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
@@ -1752,9 +1759,11 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
+	AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVICE32("powervr2_slave", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
+	AM_RANGE(0x025f8000, 0x025f9fff) AM_DEVICE32("powervr2_slave", powervr2_device, ta_map, 0xffffffffffffffffU)
 //  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
 //  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, 0xffffffffffffffffU)
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
+//	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -1763,8 +1772,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_SHARE("frameram2")// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE(dc_sysctrl_w ) // writes to BOTH PVRs
-	AM_RANGE(0x085f8000, 0x805f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
+	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE(dc_sysctrl_w ) // TODO: writes to BOTH PVRs
+	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE32(both_pvr2_ta_w, 0xffffffffffffffffU)
 	AM_RANGE(0x08800000, 0x088000ff) AM_DEVREADWRITE32("powervr2", powervr2_device, elan_regs_r, elan_regs_w, 0xffffffffffffffffU) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
 	AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
@@ -2571,6 +2580,7 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+
 	PORT_START("P1.1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
@@ -2590,6 +2600,7 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+
 	PORT_START("P2.1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2767,9 +2778,16 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
+static MACHINE_CONFIG_START( naomi2_base, naomi2_state )
+	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(dc_state, pvr_irq))
+
+	// TODO: ELAN device
+MACHINE_CONFIG_END
+ 
 static MACHINE_CONFIG_START( naomi2gd, naomi2_state )
 	MCFG_FRAGMENT_ADD( naomigd )
-
+	MCFG_FRAGMENT_ADD( naomi2_base )
+	
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
@@ -2780,6 +2798,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( naomi2m1, naomi2_state )
 	MCFG_FRAGMENT_ADD( naomim1 )
+	MCFG_FRAGMENT_ADD( naomi2_base )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2791,6 +2810,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( naomi2m2, naomi2_state )
 	MCFG_FRAGMENT_ADD( naomim2 )
+	MCFG_FRAGMENT_ADD( naomi2_base )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)

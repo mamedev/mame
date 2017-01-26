@@ -200,7 +200,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	/* add RHS element */
 	for (unsigned k = 0; k < N(); k++)
 	{
-		terms_for_net_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 
 		if (!plib::container::contains(t->m_nzrd, N()))
 			t->m_nzrd.push_back(N());

@@ -127,8 +127,7 @@ void hlcd0515_device::set_control()
 	}
 
 	// clock 4: read/write mode
-	if (m_control & 1)
-		m_buffer = m_ram[m_rowsel];
+	m_buffer = (m_control & 1) ? m_ram[m_rowsel] : 0;
 }
 
 void hlcd0569_device::set_control()
@@ -198,7 +197,6 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 		
 		m_count = 0;
 		m_control = 0;
-		m_buffer = 0;
 	}
 
 	m_cs = state;

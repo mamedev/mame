@@ -45,82 +45,83 @@ namespace netlist
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (resolution / den)) { }
 
-		ptime &operator=(const ptime rhs) { m_time = rhs.m_time; return *this; }
+		ptime &operator=(const ptime rhs) noexcept { m_time = rhs.m_time; return *this; }
 
-		ptime &operator+=(const ptime &rhs) { m_time += rhs.m_time; return *this; }
-		ptime &operator-=(const ptime &rhs) { m_time -= rhs.m_time; return *this; }
+		ptime &operator+=(const ptime &rhs) noexcept { m_time += rhs.m_time; return *this; }
+		ptime &operator-=(const ptime &rhs) noexcept { m_time -= rhs.m_time; return *this; }
 
-		friend ptime operator-(ptime lhs, const ptime &rhs)
+		friend constexpr ptime operator-(const ptime &lhs, const ptime &rhs) noexcept
 		{
-			lhs -= rhs;
-			return lhs;
+			return ptime(lhs.m_time - rhs.m_time);
 		}
 
-		friend ptime operator+(ptime lhs, const ptime &rhs)
+		friend constexpr ptime operator+(const ptime &lhs, const ptime &rhs) noexcept
 		{
-			lhs += rhs;
-			return lhs;
+			return ptime(lhs.m_time + rhs.m_time);
 		}
 
-		friend ptime operator*(ptime lhs, const mult_type factor)
+		friend constexpr ptime operator*(const ptime &lhs, const mult_type factor) noexcept
 		{
-			lhs.m_time *= static_cast<internal_type>(factor);
-			return lhs;
+			return ptime(lhs.m_time * static_cast<internal_type>(factor));
 		}
 
-		friend mult_type operator/(const ptime &lhs, const ptime &rhs)
+		friend constexpr mult_type operator/(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return static_cast<mult_type>(lhs.m_time / rhs.m_time);
 		}
 
-		friend bool operator<(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator<(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return (lhs.m_time < rhs.m_time);
 		}
 
-		friend bool operator>(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator>(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return (rhs < lhs);
 		}
 
-		friend bool operator<=(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator<=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs > rhs);
 		}
 
-		friend bool operator>=(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator>=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs < rhs);
 		}
 
-		friend bool operator==(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator==(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return lhs.m_time == rhs.m_time;
 		}
 
-		friend bool operator!=(const ptime &lhs, const ptime &rhs)
+		friend constexpr bool operator!=(const ptime &lhs, const ptime &rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}
 
-		constexpr internal_type as_raw() const { return m_time; }
-		constexpr double as_double() const { return static_cast<double>(m_time)
-				/ static_cast<double>(resolution); }
+		constexpr internal_type as_raw() const noexcept { return m_time; }
+		constexpr double as_double() const noexcept
+		{
+			return static_cast<double>(m_time)
+				/ static_cast<double>(resolution);
+		}
 
 		// for save states ....
-		internal_type *get_internaltype_ptr() { return &m_time; }
+		internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 
-		static constexpr ptime from_nsec(const internal_type ns) { return ptime(ns, UINT64_C(1000000000)); }
-		static constexpr ptime from_usec(const internal_type us) { return ptime(us, UINT64_C(1000000)); }
-		static constexpr ptime from_msec(const internal_type ms) { return ptime(ms, UINT64_C(1000)); }
-		static constexpr ptime from_hz(const internal_type hz) { return ptime(1 , hz); }
-		static constexpr ptime from_raw(const internal_type raw) { return ptime(raw, resolution); }
-		static constexpr ptime from_double(const double t) { return ptime(static_cast<internal_type>( t * static_cast<double>(resolution)), resolution); }
+		static constexpr ptime from_nsec(const internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
+		static constexpr ptime from_usec(const internal_type us) noexcept { return ptime(us, UINT64_C(1000000)); }
+		static constexpr ptime from_msec(const internal_type ms) noexcept { return ptime(ms, UINT64_C(1000)); }
+		static constexpr ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
+		static constexpr ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
+		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>( t * static_cast<double>(resolution)), resolution); }
 
-		static constexpr ptime zero() { return ptime(0, resolution); }
-		static constexpr ptime quantum() { return ptime(1, resolution); }
-		static constexpr ptime never() { return ptime(plib::numeric_limits<internal_type>::max(), resolution); }
+		static constexpr ptime zero() noexcept { return ptime(0, resolution); }
+		static constexpr ptime quantum() noexcept { return ptime(1, resolution); }
+		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), resolution); }
 	private:
+		constexpr explicit ptime(const internal_type time) : m_time(time) {}
 		internal_type m_time;
 	};
 

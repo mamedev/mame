@@ -11,6 +11,8 @@
 #define NLLISTS_H_
 
 #include <atomic>
+#include <thread>
+#include <mutex>
 
 #include "nl_config.h"
 #include "plib/plists.h"
@@ -26,29 +28,23 @@ namespace netlist
 
 	//FIXME: move to an appropriate place
 	template<bool enabled_ = true>
-	class pspin_lock
+	class pspin_mutex
 	{
 	public:
-		pspin_lock() { }
-		void acquire() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
-		void release() noexcept { m_lock.clear(std::memory_order_release); }
+		pspin_mutex() noexcept { }
+		void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
+		void unlock() noexcept { m_lock.clear(std::memory_order_release); }
 	private:
 		std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
 	};
 
 	template<>
-	class pspin_lock<false>
+	class pspin_mutex<false>
 	{
 	public:
-		void acquire() const noexcept { }
-		void release() const noexcept { }
+		void lock() const noexcept { }
+		void unlock() const noexcept { }
 	};
-
-	#if HAS_OPENMP && USE_OPENMP
-		using tqlock = pspin_lock<true>;
-	#else
-		using tqlock = pspin_lock<false>;
-	#endif
 
 	template <class Element, class Time>
 	class timed_queue
@@ -58,6 +54,18 @@ namespace netlist
 
 		struct entry_t
 		{
+			entry_t() { }
+			entry_t(const Time &t, const Element &o) : m_exec_time(t), m_object(o) { }
+			entry_t(const entry_t &e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
+			entry_t(entry_t &&e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
+
+			entry_t& operator=(entry_t && other)
+			{
+				m_exec_time = other.m_exec_time;
+				m_object = other.m_object;
+				return *this;
+			}
+
 			Time m_exec_time;
 			Element m_object;
 		};
@@ -65,37 +73,35 @@ namespace netlist
 		timed_queue(unsigned list_size)
 		: m_list(list_size)
 		{
-			m_lock.acquire();
 			clear();
-			m_lock.release();
 		}
 
 		std::size_t capacity() const { return m_list.size(); }
 		bool empty() const { return (m_end == &m_list[1]); }
 
-		void push(Element o, const Time t) noexcept
+		void push(entry_t &&e) noexcept
 		{
 			/* Lock */
-			m_lock.acquire();
+			tqlock lck(m_lock);
 			entry_t * i = m_end;
-			for (; t > (i - 1)->m_exec_time; --i)
+			while (e.m_exec_time > (i - 1)->m_exec_time)
 			{
-				*(i) = *(i-1);
+				*(i) = std::move(*(i-1));
+				--i;
 				m_prof_sortmove.inc();
 			}
-			*i = { t, o };
+			*i = std::move(e);
 			++m_end;
 			m_prof_call.inc();
-			m_lock.release();
 		}
 
-		entry_t pop() noexcept              { return *(--m_end); }
-		const entry_t &top() const noexcept { return *(m_end-1); }
+		entry_t pop() noexcept              { return std::move(*(--m_end)); }
+		const entry_t &top() const noexcept { return std::move(*(m_end-1)); }
 
 		void remove(const Element &elem) noexcept
 		{
 			/* Lock */
-			m_lock.acquire();
+			tqlock lck(m_lock);
 			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
 			{
 				if (i->m_object == elem)
@@ -103,24 +109,23 @@ namespace netlist
 					m_end--;
 					while (i < m_end)
 					{
-						*i = *(i+1);
+						*i = std::move(*(i+1));
 						++i;
 					}
-					m_lock.release();
 					return;
 				}
 			}
-			m_lock.release();
 		}
 
 		void retime(const Element &elem, const Time t) noexcept
 		{
 			remove(elem);
-			push(elem, t);
+			push(entry_t(t, elem));
 		}
 
 		void clear()
 		{
+			tqlock lck(m_lock);
 			m_end = &m_list[0];
 			/* put an empty element with maximum time into the queue.
 			 * the insert algo above will run into this element and doesn't
@@ -137,8 +142,14 @@ namespace netlist
 		const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
 
 	private:
+	#if HAS_OPENMP && USE_OPENMP
+		using tqmutex = pspin_mutex<true>;
+	#else
+		using tqmutex = pspin_mutex<false>;
+	#endif
+		using tqlock = std::lock_guard<tqmutex>;
 
-		tqlock m_lock;
+		tqmutex m_lock;
 		entry_t * m_end;
 		std::vector<entry_t> m_list;
 

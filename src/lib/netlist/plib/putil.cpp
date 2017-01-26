@@ -62,7 +62,7 @@ namespace plib
 		}
 	}
 
-	pstring_vector_t::pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl)
+	pstring_vector_t::pstring_vector_t(const pstring &str, const std::vector<pstring> &onstrl)
 	: std::vector<pstring>()
 	{
 		pstring col = "";

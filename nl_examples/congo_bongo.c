@@ -374,7 +374,7 @@ NETLIST_START(G501534_DIP)
 	//AFUNC(f, 2, "A0 A1 A1 A1 * * 0.01 * *")
 	//AFUNC(f, 2, "A0")
 	//AFUNC(f, 2, "A0 6 - A1 3 pow * 0.02 * 6 +")
-	AFUNC(f, 2, "A0 A1 3 pow * 0.02 *")
+	AFUNC(f, 2, "A0 * pow(A1,3.0) * 0.02")
 
 	/*
 	 * 12:   VCC

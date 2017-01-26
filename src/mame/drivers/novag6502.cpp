@@ -13,7 +13,6 @@
     TODO:
     - cforteb emulation (was initially sforteba romset)
     - verify supercon IRQ and beeper frequency
-    - why is sforte H and 1 leds always on?
     - printer port
 
 ******************************************************************************
@@ -413,8 +412,9 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
 	// if lcd is disabled, misc control
 	if (~m_lcd_control & 4)
 	{
-		// d5,d6: led data
-		display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
+		// d5,d6: led data, but not both at same time?
+		if ((data & 0x60) != 0x60)
+			display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
 
 		// d7: enable beeper
 		m_beeper->set_state(data >> 7 & 1);

@@ -1,6 +1,6 @@
 IJG JPEG LIBRARY:  SYSTEM ARCHITECTURE
 
-Copyright (C) 1991-2009, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1991-2013, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -20,7 +20,7 @@ In this document, JPEG-specific terminology follows the JPEG standard:
   A "component" means a color channel, e.g., Red or Luminance.
   A "sample" is a single component value (i.e., one number in the image data).
   A "coefficient" is a frequency coefficient (a DCT transform output number).
-  A "block" is an 8x8 group of samples or coefficients.
+  A "block" is an array of samples or coefficients.
   An "MCU" (minimum coded unit) is an interleaved set of blocks of size
 	determined by the sampling factors, or a single block in a
 	noninterleaved scan.
@@ -43,13 +43,8 @@ command-line user interface and I/O routines for several uncompressed image
 formats.  This document concentrates on the library itself.
 
 We desire the library to be capable of supporting all JPEG baseline, extended
-sequential, and progressive DCT processes.  Hierarchical processes are not
-supported.
-
-The library does not support the lossless (spatial) JPEG process.  Lossless
-JPEG shares little or no code with lossy JPEG, and would normally be used
-without the extensive pre- and post-processing provided by this library.
-We feel that lossless JPEG is better handled by a separate library.
+sequential, and progressive DCT processes.  The library does not support the
+hierarchical or lossless processes defined in the standard.
 
 Within these limits, any set of compression parameters allowed by the JPEG
 spec should be readable for decompression.  (We can be more restrictive about
@@ -175,16 +170,16 @@ can be simplified a little if they work on padded data: it's not necessary to
 have special cases at the right and bottom edges.  Therefore the interface
 buffer is always an integral number of blocks wide and high, and we expect
 compression preprocessing to pad the source data properly.  Padding will occur
-only to the next block (8-sample) boundary.  In an interleaved-scan situation,
-additional dummy blocks may be used to fill out MCUs, but the MCU assembly and
-disassembly logic will create or discard these blocks internally.  (This is
-advantageous for speed reasons, since we avoid DCTing the dummy blocks.
-It also permits a small reduction in file size, because the compressor can
-choose dummy block contents so as to minimize their size in compressed form.
-Finally, it makes the interface buffer specification independent of whether
-the file is actually interleaved or not.)  Applications that wish to deal
-directly with the downsampled data must provide similar buffering and padding
-for odd-sized images.
+only to the next block (block_size-sample) boundary.  In an interleaved-scan
+situation, additional dummy blocks may be used to fill out MCUs, but the MCU
+assembly and disassembly logic will create or discard these blocks internally.
+(This is advantageous for speed reasons, since we avoid DCTing the dummy
+blocks.  It also permits a small reduction in file size, because the
+compressor can choose dummy block contents so as to minimize their size
+in compressed form.  Finally, it makes the interface buffer specification
+independent of whether the file is actually interleaved or not.)
+Applications that wish to deal directly with the downsampled data must
+provide similar buffering and padding for odd-sized images.
 
 
 *** Poor man's object-oriented programming ***
@@ -350,9 +345,10 @@ The objects shown above are:
   require context rows above and below the current row group; the
   preprocessing controller is responsible for supplying these rows via proper
   buffering.  The downsampler is responsible for edge expansion at the right
-  edge (i.e., extending each sample row to a multiple of 8 samples); but the
-  preprocessing controller is responsible for vertical edge expansion (i.e.,
-  duplicating the bottom sample row as needed to make a multiple of 8 rows).
+  edge (i.e., extending each sample row to a multiple of block_size samples);
+  but the preprocessing controller is responsible for vertical edge expansion
+  (i.e., duplicating the bottom sample row as needed to make a multiple of
+  block_size rows).
 
 * Coefficient controller: buffer controller for the DCT-coefficient data.
   This controller handles MCU assembly, including insertion of dummy DCT
@@ -385,8 +381,9 @@ objects:
 
 * Data destination manager: writes the output JPEG datastream to its final
   destination (e.g., a file).  The destination manager supplied with the
-  library knows how to write to a stdio stream; for other behaviors, the
-  surrounding application may provide its own destination manager.
+  library knows how to write to a stdio stream or to a memory buffer;
+  for other behaviors, the surrounding application may provide its own
+  destination manager.
 
 * Memory manager: allocates and releases memory, controls virtual arrays
   (with backing store management, where required).
@@ -504,9 +501,9 @@ objects:
 * Marker reading: decodes JPEG markers (except for RSTn).
 
 * Data source manager: supplies the input JPEG datastream.  The source
-  manager supplied with the library knows how to read from a stdio stream;
-  for other behaviors, the surrounding application may provide its own source
-  manager.
+  manager supplied with the library knows how to read from a stdio stream
+  or from a memory buffer;  for other behaviors, the surrounding application
+  may provide its own source manager.
 
 * Memory manager: same as for compression library.
 
@@ -654,9 +651,9 @@ contain quantized coefficients everywhere outside the DCT/IDCT subsystems.
 (This latter decision may need to be revisited to support variable
 quantization a la JPEG Part 3.)
 
-Notice that the allocation unit is now a row of 8x8 blocks, corresponding to
-eight rows of samples.  Otherwise the structure is much the same as for
-samples, and for the same reasons.
+Notice that the allocation unit is now a row of 8x8 coefficient blocks,
+corresponding to block_size rows of samples.  Otherwise the structure
+is much the same as for samples, and for the same reasons.
 
 On machines where malloc() can't handle a request bigger than 64Kb, this data
 structure limits us to rows of less than 512 JBLOCKs, or a picture width of

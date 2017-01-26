@@ -917,14 +917,14 @@ project "portaudio"
 			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
 			"/wd4127", -- warning C4127: conditional expression is constant
 		}
- if _OPTIONS["vs"]=="intel-15" then
+	if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
 			"/Qwd2544",             -- message #2544: empty dependent statement in if-statement
 			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
- end
+	end
 	configuration { "vs2015*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration

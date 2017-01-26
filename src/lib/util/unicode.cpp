@@ -15,7 +15,7 @@
 #define UTF8PROC_DLLEXPORT
 #endif
 
-#include "utf8proc/utf8proc.h"
+#include <utf8proc.h>
 
 #include <codecvt>
 #include <locale>
