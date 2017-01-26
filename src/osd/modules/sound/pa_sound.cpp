@@ -13,7 +13,7 @@
 
 #ifndef NO_USE_PORTAUDIO
 
-#include "portaudio/include/portaudio.h"
+#include <portaudio.h>
 #include "modules/lib/osdobj_common.h"
 
 #include <iostream>
