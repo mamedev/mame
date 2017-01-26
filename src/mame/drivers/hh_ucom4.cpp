@@ -2167,7 +2167,6 @@ INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
 	set_clock();
 }
 
-
 void tmtennis_state::set_clock()
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,

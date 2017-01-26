@@ -61,9 +61,9 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - marstv: locks up during anchor talking (does same in Demul);
+    - marstv: temporary lock ups during anchor talking (does same in Demul);
     - marstv: missing graphics at stage select, renderer fault or something else?
-    - Monkey Ball: asserts when attempts to load a stage;
+    - monkeyba: CPU jumps to la la land when attempts to load a stage (bp c09e950, uses FPU opcodes for calculating the return address?);
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
     - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
