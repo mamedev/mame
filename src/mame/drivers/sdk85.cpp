@@ -29,8 +29,8 @@ Game instructions (from Stefano):
 Start up, press 0 to begin. Game shows ----. You need to guess a number between 0000 and 9999.
 Enter your guess, "computer" will answer showing on left with the number of found digits.
 On the right you'll get a "clue", slightly different than on the standard game (making it a bit more tricky and more intriguing).
-Once you find the number, you'll see it flashing.   Press the 'PT' key (sorry I don't remember how I remapped it)
-and you'll get your score (number of attempts before guessing). Press 'ST' (try around the keyboard again, sorry!) to restart.
+Once you find the number, you'll see it flashing.   Press the 2 key and you'll get your score (number of attempts before guessing).
+Press 0 to restart.
 
 *************************************************************************************************************************************/
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER( sdk85_state::digit_w )
 
 READ8_MEMBER( sdk85_state::kbd_r )
 {
-	uint8_t data = (m_digit < 3) ? m_keyboard[m_digit]->read() : 0xff;
+	u8 data = (m_digit < 3) ? m_keyboard[m_digit]->read() : 0xff;
 	return data;
 }
 
