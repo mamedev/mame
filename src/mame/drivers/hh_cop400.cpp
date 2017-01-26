@@ -770,7 +770,6 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */

@@ -25,7 +25,7 @@ namespace netlist
 namespace detail
 {
 #if (USE_MEMPOOL)
-static plib::mempool pool(65536, 8);
+static plib::mempool pool(6553600, 64);
 
 void * object_t::operator new (size_t size)
 {
@@ -184,7 +184,7 @@ void detail::queue_t::on_post_load()
 		detail::net_t *n = netlist().find_net(pstring(m_names[i].m_buf, pstring::UTF8));
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
 		//log().debug("schedule time {1} ({2})\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
-		this->push(n, netlist_time::from_raw(m_times[i]));
+		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
 	}
 }
 
@@ -216,20 +216,18 @@ detail::device_object_t::device_object_t(core_device_t &dev, const pstring &anam
 {
 }
 
-detail::device_object_t::type_t detail::device_object_t::type() const
+detail::core_terminal_t::type_t detail::core_terminal_t::type() const
 {
 	if (dynamic_cast<const terminal_t *>(this) != nullptr)
 		return type_t::TERMINAL;
-	else if (dynamic_cast<const param_t *>(this) != nullptr)
-		return param_t::PARAM;
 	else if (dynamic_cast<const logic_input_t *>(this) != nullptr)
-		return param_t::INPUT;
+		return type_t::INPUT;
 	else if (dynamic_cast<const logic_output_t *>(this) != nullptr)
-		return param_t::OUTPUT;
+		return type_t::OUTPUT;
 	else if (dynamic_cast<const analog_input_t *>(this) != nullptr)
-		return param_t::INPUT;
+		return type_t::INPUT;
 	else if (dynamic_cast<const analog_output_t *>(this) != nullptr)
-		return param_t::OUTPUT;
+		return type_t::OUTPUT;
 	else
 	{
 		netlist().log().fatal(MF_1_UNKNOWN_TYPE_FOR_OBJECT, name());
@@ -254,19 +252,16 @@ netlist_t::netlist_t(const pstring &aname)
 {
 	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
 	state().save_item(this, m_time, "m_time");
-	m_setup = new setup_t(*this);
+	m_setup = plib::make_unique<setup_t>(*this);
 	/* FIXME: doesn't really belong here */
 	NETLIST_NAME(base)(*m_setup);
 }
 
 netlist_t::~netlist_t()
 {
-	if (m_setup != nullptr)
-		delete m_setup;
 	m_nets.clear();
 	m_devices.clear();
 
-	pfree(m_lib);
 	pstring::resetmem();
 }
 
@@ -356,7 +351,7 @@ void netlist_t::start()
 	}
 
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-	m_lib = plib::palloc<plib::dynlib>(libpath);
+	m_lib = plib::make_unique<plib::dynlib>(libpath);
 
 	/* resolve inputs */
 	setup().resolve_inputs();
@@ -448,7 +443,7 @@ void netlist_t::process_queue(const netlist_time &delta)
 {
 	netlist_time stop(m_time + delta);
 
-	m_queue.push(nullptr, stop);
+	m_queue.push(detail::queue_t::entry_t(stop, nullptr));
 
 	m_stat_mainloop.start();
 
@@ -475,17 +470,20 @@ void netlist_t::process_queue(const netlist_time &delta)
 			while (m_queue.top().m_exec_time > mc_time)
 			{
 				m_time = mc_time;
-				mc_time += inc;
 				mc_net.toggle_new_Q();
 				mc_net.update_devs();
+				mc_time += inc;
 			}
 
 			const detail::queue_t::entry_t e(m_queue.pop());
 			m_time = e.m_exec_time;
-			if (e.m_object == nullptr)
+			if (e.m_object != nullptr)
+			{
+				e.m_object->update_devs();
+				m_perf_out_processed.inc();
+			}
+			else
 				break;
-			e.m_object->update_devs();
-			m_perf_out_processed.inc();
 		}
 		mc_net.set_time(mc_time);
 	}
@@ -578,7 +576,7 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner)
 	, m_hint_deactivate(false)
-#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+#if (!NL_USE_PMF_VIRTUAL)
 	, m_static_update()
 #endif
 {
@@ -591,7 +589,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
 	, m_hint_deactivate(false)
-#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+#if (!NL_USE_PMF_VIRTUAL)
 	, m_static_update()
 #endif
 {
@@ -607,14 +605,8 @@ core_device_t::~core_device_t()
 
 void core_device_t::set_delegate_pointer()
 {
-#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = pFunc;
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
-	void (core_device_t::* pFunc)() = &core_device_t::update;
-	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
-#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
-	m_static_update = plib::mfp::get_mfp<net_update_delegate>(&core_device_t::update, this);
+#if (!NL_USE_PMF_VIRTUAL)
+	m_static_update.set_base(&core_device_t::update, this);
 #endif
 }
 
@@ -692,13 +684,6 @@ detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_
 // net_t
 // ----------------------------------------------------------------------------------------
 
-// FIXME: move somewhere central
-
-struct do_nothing_deleter{
-	template<typename T> void operator()(T*){}
-};
-
-
 detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	: object_t(aname)
 	, netlist_ref(nl)
@@ -731,7 +716,7 @@ void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 			if (m_time > netlist().time())
 			{
 				m_in_queue = 1;     /* pending */
-				netlist().queue().push(this, m_time);
+				netlist().queue().push(queue_t::entry_t(m_time, this));
 			}
 			else
 			{
@@ -1106,11 +1091,11 @@ param_double_t::param_double_t(device_t &device, const pstring name, const doubl
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
 }
-
+#if 0
 param_double_t::~param_double_t()
 {
 }
-
+#endif
 param_int_t::param_int_t(device_t &device, const pstring name, const int val)
 : param_t(device, name)
 {
@@ -1118,9 +1103,11 @@ param_int_t::param_int_t(device_t &device, const pstring name, const int val)
 	netlist().save(*this, m_param, "m_param");
 }
 
+#if 0
 param_int_t::~param_int_t()
 {
 }
+#endif
 
 param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
 : param_t(device, name)
@@ -1129,9 +1116,11 @@ param_logic_t::param_logic_t(device_t &device, const pstring name, const bool va
 	netlist().save(*this, m_param, "m_param");
 }
 
+#if 0
 param_logic_t::~param_logic_t()
 {
 }
+#endif
 
 param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
 : param_t(device, name)
@@ -1140,9 +1129,11 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
 	//netlist().save(*this, m_param, "m_param");
 }
 
+#if 0
 param_ptr_t::~param_ptr_t()
 {
 }
+#endif
 
 void param_model_t::changed()
 {

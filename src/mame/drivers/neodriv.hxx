@@ -5893,7 +5893,41 @@ ROM_START( kof99e ) /* Original Version - Encrypted Code & GFX */
 	ROM_LOAD16_BYTE( "251-c8.c8", 0x3000001, 0x800000, CRC(8d921c68) SHA1(42acf1d27d52a8e3b6262eb7df50693c0b135565) ) /* Plane 2,3 */ /* TC5364205 */
 ROM_END
 
-ROM_START( kof99k ) /* Original Version - Encrypted GFX */ /* KOREAN VERSION */
+ROM_START( kof99k ) /* Original Version - Encrypted Code & GFX */ /* KOREAN VERSION */
+	ROM_REGION( 0x900000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "kb.neo-sma", 0x0c0000, 0x040000, CRC(9fccc688) SHA1(1a24d0fe7cabe7b346f538e099f1357bbf77bc89) ) /* stored in the custom chip */
+	ROM_LOAD16_WORD_SWAP( "151-pg1k.p1",  0x100000, 0x400000, CRC(ef259292) SHA1(e02f2d0c71eac74424507e4845991fbc12821045) ) /* mask rom TC5332205 */
+	ROM_LOAD16_WORD_SWAP( "151-pg2k.p2",  0x500000, 0x400000, CRC(f3898ec2) SHA1(c7fd230fbb97a9b171aeae8ff1a5cd39ba7fa9eb) ) /* mask rom TC5332205 */
+
+	ROM_Y_ZOOM
+
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
+	ROM_REGION( 0x20000, "cslot1:fixed", 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
+	ROM_REGION( 0x20000, "fixedbios", 0 )
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
+
+	NEO_BIOS_AUDIO_128K( "251-m1.m1", CRC(5e74539c) SHA1(6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da) ) /* TC531001 */
+
+	ROM_REGION( 0x0e00000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "251-v1.v1", 0x000000, 0x400000, CRC(ef2eecc8) SHA1(8ed13b9db92dba3124bc5ba66e3e275885ece24a) ) /* TC5332204 */
+	ROM_LOAD( "251-v2.v2", 0x400000, 0x400000, CRC(73e211ca) SHA1(0e60fa64cab6255d9721e2b4bc22e3de64c874c5) ) /* TC5332204 */
+	ROM_LOAD( "251-v3.v3", 0x800000, 0x400000, CRC(821901da) SHA1(c6d4975bfaa19a62ed59126cadf2578c0a5c257f) ) /* TC5332204 */
+	ROM_LOAD( "251-v4.v4", 0xc00000, 0x200000, CRC(b49e6178) SHA1(dde6f76e958841e8c99b693e13ced9aa9ef316dc) ) /* TC5316200 */
+
+	ROM_REGION( 0x4000000, "cslot1:sprites", 0 )
+	/* Encrypted */
+	ROM_LOAD16_BYTE( "251-c1.c1", 0x0000000, 0x800000, CRC(0f9e93fe) SHA1(c7d77f0833c6f526f632e4f2dce59e302f6b9a15) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c2.c2", 0x0000001, 0x800000, CRC(e71e2ea3) SHA1(39c7a326fddbcca3b29c68cdc96aad4d62295c0f) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c3.c3", 0x1000000, 0x800000, CRC(238755d2) SHA1(01125b5c7a28e350f091280b041954fd1ac7c98f) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c4.c4", 0x1000001, 0x800000, CRC(438c8b22) SHA1(ffbc643f5b27dd00f2f95d4ef4c5f29ee814722b) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c5.c5", 0x2000000, 0x800000, CRC(0b0abd0a) SHA1(d5ad324fe523bdc6f09209d236cc4932524a48f1) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c6.c6", 0x2000001, 0x800000, CRC(65bbf281) SHA1(79ae174667a23dabcfe865b6cd6133c86098452e) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c7.c7", 0x3000000, 0x800000, CRC(ff65f62e) SHA1(7cd335fede05b56e15db90ce407c1183a78da4e9) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "251-c8.c8", 0x3000001, 0x800000, CRC(8d921c68) SHA1(42acf1d27d52a8e3b6262eb7df50693c0b135565) ) /* Plane 2,3 */ /* TC5364205 */
+ROM_END
+
+ROM_START( kof99ka ) /* Original Version - Encrypted GFX */ /* KOREAN VERSION */
 	ROM_REGION( 0x500000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "152-p1.p1",  0x000000, 0x100000, CRC(f2c7ddfa) SHA1(d592eecc53d442c55c2f26a6a721fdf2924d2a5b) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "152-p2.sp2", 0x100000, 0x400000, CRC(274ef47a) SHA1(98654b68cc85c19d4a90b46f3110f551fa2e5357) ) /* TC5332205 */
@@ -8832,8 +8866,8 @@ GAME( 1998, mslug2,     neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 2015, mslug2t,    mslug2,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "hack (trap15)", "Metal Slug 2 Turbo (NGM-9410) (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98,      neogeo,   kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98a,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420, alt board)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, kof98k,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, kof98ka,    kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, kof98k,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, kof98ka,    kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98h,     kof98,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGH-2420)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, lastbld2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, neocup98,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", MACHINE_SUPPORTS_SAVE )
@@ -8841,7 +8875,8 @@ GAME( 1999, mslugx,     neogeo,   mslugx,    neogeo, neogeo_state,   neogeo,   R
 GAME( 1999, kof99,      neogeo,   kof99,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, kof99h,     kof99,    kof99,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
 GAME( 1999, kof99e,     kof99,    kof99,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99k,     kof99,    kof99k,    neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
+GAME( 1999, kof99k,     kof99,    kof99,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99ka,    kof99,    kof99k,    neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release, non-encrypted program)" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 GAME( 1999, kof99p,     kof99,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, garou,      neogeo,   garou,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, garouh,     garou,    garouh,    neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530 ~ NGH-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */

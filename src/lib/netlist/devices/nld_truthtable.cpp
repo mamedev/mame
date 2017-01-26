@@ -8,6 +8,7 @@
 #include "nld_truthtable.h"
 #include "plib/plists.h"
 #include "nl_setup.h"
+#include "plib/palloc.h"
 
 namespace netlist
 {
@@ -272,7 +273,7 @@ netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
 
 #define ENTRYY(n, m, s)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \
-		ret = new xtype(desc.name, desc.classname, desc.def_param, s); } break
+		ret = plib::palloc<xtype>(desc.name, desc.classname, desc.def_param, s); } break
 
 #define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s)

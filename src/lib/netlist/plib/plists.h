@@ -56,6 +56,7 @@ public:
 	template<typename... Args>
 	void emplace(const std::size_t index, Args&&... args)
 	{
+		// allocate on buffer
 		new (&m_buf[index]) C(std::forward<Args>(args)...);
 	}
 

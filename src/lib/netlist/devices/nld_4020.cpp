@@ -5,7 +5,7 @@
  *
  */
 
-#include <devices/nlid_cmos.h>
+#include "devices/nlid_cmos.h"
 #include "nld_4020.h"
 
 namespace netlist

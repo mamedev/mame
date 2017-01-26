@@ -6,7 +6,7 @@
  */
 
 #include "nld_mm5837.h"
-#include <solver/nld_matrix_solver.h>
+#include "solver/nld_matrix_solver.h"
 #include "analog/nld_twoterm.h"
 
 #define R_LOW (1000.0)

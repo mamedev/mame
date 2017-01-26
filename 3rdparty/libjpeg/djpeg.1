@@ -1,4 +1,4 @@
-.TH DJPEG 1 "3 October 2009"
+.TH DJPEG 1 "26 July 2015"
 .SH NAME
 djpeg \- decompress a JPEG file to an image file
 .SH SYNOPSIS
@@ -55,10 +55,15 @@ default options are chosen for highest quality output.)  Currently, this is
 equivalent to \fB\-dct fast \-nosmooth \-onepass \-dither ordered\fR.
 .TP
 .B \-grayscale
-Force gray-scale output even if JPEG file is color.  Useful for viewing on
-monochrome displays; also,
+Force grayscale output even if JPEG file is color.
+Useful for viewing on monochrome displays; also,
 .B djpeg
 runs noticeably faster in this mode.
+.TP
+.B \-rgb
+Force RGB output even if JPEG file is grayscale.
+This is provided to support applications that don't
+want to cope with grayscale as a separate case.
 .TP
 .BI \-scale " M/N"
 Scale the output image by a factor M/N.  Currently supported scale factors are
@@ -76,7 +81,7 @@ emitted if
 .B \-colors
 or
 .B \-grayscale
-is specified, or if the JPEG file is gray-scale; otherwise, 24-bit full-color
+is specified, or if the JPEG file is grayscale; otherwise, 24-bit full-color
 format is emitted.
 .TP
 .B \-gif
@@ -90,12 +95,12 @@ emitted if
 .B \-colors
 or
 .B \-grayscale
-is specified, or if the JPEG file is gray-scale; otherwise, 24-bit full-color
+is specified, or if the JPEG file is grayscale; otherwise, 24-bit full-color
 format is emitted.
 .TP
 .B \-pnm
 Select PBMPLUS (PPM/PGM) output format (this is the default format).
-PGM is emitted if the JPEG file is gray-scale or if
+PGM is emitted if the JPEG file is grayscale or if
 .B \-grayscale
 is specified; otherwise PPM is emitted.
 .TP
@@ -103,8 +108,8 @@ is specified; otherwise PPM is emitted.
 Select RLE output format.  (Requires URT library.)
 .TP
 .B \-targa
-Select Targa output format.  Gray-scale format is emitted if the JPEG file is
-gray-scale or if
+Select Targa output format.  Grayscale format is emitted if the JPEG file is
+grayscale or if
 .B \-grayscale
 is specified; otherwise, colormapped format is emitted if
 .B \-colors
@@ -162,7 +167,7 @@ faster and needs less memory, but it produces a lower-quality image.
 is ignored unless you also say
 .B \-colors
 .IR N .
-Also, the one-pass method is always used for gray-scale output (the two-pass
+Also, the one-pass method is always used for grayscale output (the two-pass
 method is no improvement then).
 .TP
 .BI \-maxmemory " N"
@@ -246,7 +251,7 @@ Communications of the ACM, April 1991 (vol. 34, no. 4), pp. 30-44.
 .SH AUTHOR
 Independent JPEG Group
 .SH BUGS
-To avoid the Unisys LZW patent,
+To avoid the Unisys LZW patent (now expired),
 .B djpeg
 produces uncompressed GIF files.  These are larger than they should be, but
 are readable by standard GIF decoders.

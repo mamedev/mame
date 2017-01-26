@@ -8,6 +8,8 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
+#include <map>
+
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "plib/pstream.h"
@@ -79,7 +81,7 @@ NETLIB_OBJECT(solver)
 
 	inline nl_double gmin() { return m_gmin(); }
 
-	void create_solver_code(plib::postream &strm);
+	void create_solver_code(std::map<pstring, pstring> &mp);
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();

@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <stack>
 #include "pfunction.h"
 #include "pfmtlog.h"
 #include "putil.h"
@@ -13,13 +14,27 @@
 
 namespace plib {
 
+void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
+{
+	if (expr.startsWith("rpn:"))
+		compile_postfix(inputs, expr.substr(4));
+	else
+		compile_infix(inputs, expr);
+}
+
 void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring expr)
 {
 	plib::pstring_vector_t cmds(expr, " ");
+	compile_postfix(inputs, cmds, expr);
+}
+
+void pfunction::compile_postfix(const std::vector<pstring> &inputs,
+		const std::vector<pstring> &cmds, const pstring expr)
+{
 	m_precompiled.clear();
 	int stk = 0;
 
-	for (pstring &cmd : cmds)
+	for (const pstring &cmd : cmds)
 	{
 		rpn_inst rc;
 		if (cmd == "+")
@@ -65,6 +80,99 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstrin
 	if (stk != 1)
 		throw plib::pexception(plib::pfmt("nld_function: stack count different to one on <{2}>")(expr));
 }
+
+static int get_prio(pstring v)
+{
+	if (v == "(" || v == ")")
+		return 1;
+	else if (v.left(v.begin()+1) >= "a" && v.left(v.begin()+1) <= "z")
+		return 0;
+	else if (v == "*" || v == "/")
+		return 20;
+	else if (v == "+" || v == "-")
+		return 10;
+	else if (v == "^")
+		return 30;
+	else
+		return -1;
+}
+
+static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
+{
+	if (stk.size() == 0)
+		throw plib::pexception(plib::pfmt("nld_function: stack underflow during infix parsing of: <{1}>")(expr));
+	pstring res = stk.top();
+	stk.pop();
+	return res;
+}
+
+void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring expr)
+{
+	// Shunting-yard infix parsing
+	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
+	plib::pstring_vector_t sexpr(expr.replace(" ",""), sep);
+	std::stack<pstring> opstk;
+	plib::pstring_vector_t postfix;
+
+	//printf("dbg: %s\n", expr.c_str());
+	for (unsigned i = 0; i < sexpr.size(); i++)
+	{
+		pstring &s = sexpr[i];
+		if (s=="(")
+			opstk.push(s);
+		else if (s==")")
+		{
+			pstring x = pop_check(opstk, expr);
+			while (x != "(")
+			{
+				postfix.push_back(x);
+				x = pop_check(opstk, expr);
+			}
+			if (opstk.size() > 0 && get_prio(opstk.top()) == 0)
+				postfix.push_back(pop_check(opstk, expr));
+		}
+		else if (s==",")
+		{
+			pstring x = pop_check(opstk, expr);
+			while (x != "(")
+			{
+				postfix.push_back(x);
+				x = pop_check(opstk, expr);
+			}
+			opstk.push(x);
+		}
+		else {
+			int p = get_prio(s);
+			if (p>0)
+			{
+				if (opstk.size() == 0)
+					opstk.push(s);
+				else
+				{
+					if (get_prio(opstk.top()) >= get_prio(s))
+						postfix.push_back(pop_check(opstk, expr));
+					opstk.push(s);
+				}
+			}
+			else if (p == 0) // Function or variable
+			{
+				if (sexpr[i+1] == "(")
+					opstk.push(s);
+				else
+					postfix.push_back(s);
+			}
+			else
+				postfix.push_back(s);
+		}
+	}
+	while (opstk.size() > 0)
+	{
+		postfix.push_back(opstk.top());
+		opstk.pop();
+	}
+	compile_postfix(inputs, postfix, expr);
+}
+
 
 #define ST1 stack[ptr]
 #define ST2 stack[ptr-1]

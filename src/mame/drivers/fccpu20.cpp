@@ -86,9 +86,9 @@ MACHINE_CONFIG_START (cpu20, cpu20_state)
 MACHINE_CONFIG_END
 
 /* ROM configuration */
-ROM_START(fccpu20)
+ROM_START(fccpu20sbc)
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1986, fccpu20,      0,       0,      cpu20,          cpu20,    driver_device,      0,      "Force Computers Gmbh",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1986, fccpu20sbc,   0,       0,      cpu20,          cpu20,    driver_device,      0,      "Force Computers Gmbh",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

@@ -13,6 +13,7 @@
 #include "cpu/v810/v810.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
+#include "video/huc6271.h"
 #include "video/huc6272.h"
 
 struct pcfx_pad_t
@@ -181,7 +182,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff) /* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP   /* HuC6230 */
-	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP   /* HuC6271 */
+	AM_RANGE( 0x00000200, 0x000002FF ) AM_DEVICE16( "huc6271", huc6271_device, regs, 0xffff )   /* HuC6271 */
 	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )  /* HuC6261 */
 	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff ) /* HuC6270-A */
 	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff ) /* HuC6270-B */
@@ -497,6 +498,8 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_HUC6261_VDC2("huc6270_b")
 
 	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
+
+	MCFG_HUC6271_ADD( "huc6271", XTAL_21_4772MHz )	
 MACHINE_CONFIG_END
 
 

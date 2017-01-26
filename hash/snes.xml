@@ -33287,7 +33287,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-  <software name="lostvik">
+	<software name="lostvik">
 		<description>The Lost Vikings (Euro)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>

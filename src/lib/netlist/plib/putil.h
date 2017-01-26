@@ -71,7 +71,7 @@ namespace plib
 	public:
 		pstring_vector_t() : std::vector<pstring>() { }
 		pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty = false);
-		pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl);
+		pstring_vector_t(const pstring &str, const std::vector<pstring> &onstrl);
 	};
 
 }

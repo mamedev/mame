@@ -134,6 +134,7 @@ CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
 CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
+CPUS["CLIPPER"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -945,6 +946,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"imp",
 		"intel",
+		"interpro",
 		"interton",
 		"intv",
 		"isc",
@@ -2071,6 +2073,22 @@ createMESSProjects(_target, _subtarget, "imp")
 files {
 	MAME_DIR .. "src/mame/drivers/tim011.cpp",
 	MAME_DIR .. "src/mame/drivers/tim100.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "interpro")
+files {
+	MAME_DIR .. "src/mame/drivers/interpro.cpp",
+	MAME_DIR .. "src/mame/includes/interpro.h",
+	MAME_DIR .. "src/mame/machine/cammu.h",
+	MAME_DIR .. "src/mame/machine/cammu.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_mcga.h",
+	MAME_DIR .. "src/mame/machine/interpro_mcga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_sga.h",
+	MAME_DIR .. "src/mame/machine/interpro_sga.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "interton")

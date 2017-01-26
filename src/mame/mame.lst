@@ -1414,6 +1414,8 @@ dolphntr                        // (c) 1996
 dolphntra                       // (c) 1996
 dolphntrb
 dolphntru                       // (c) 1996
+dolphntrce
+drgneye
 dynajack
 eldorda5
 eforsta5                        // (c) 1995
@@ -1425,6 +1427,7 @@ genmagi
 gnomeatw
 goldpyr                         // (c) 1997
 goldpyra                        // (c) 1997
+goldpyrb
 goldenra
 incasun
 incasunsp
@@ -1444,6 +1447,7 @@ magimaska                       // (c) 2000
 magtcha5
 marmagic                        // (c) 2000
 marmagicu                       // (c) 2000
+marmagicua
 minemine                        // (c) 1996
 monmouse
 montree
@@ -1460,7 +1464,10 @@ pengpay
 pengpaya
 pengpayb
 pengpayu                        // (c) 1997
+penpir2
 petshop
+petshopa
+phantpay
 przfight
 qcash
 qnile
@@ -1469,6 +1476,7 @@ qnileb                            // (c) 1997
 qnilec
 qnileu                           // (c) 1997
 qnilemax
+qtbird
 rainwrce
 reelrock                        // (c) 1998
 retrsam
@@ -1493,6 +1501,8 @@ wamazonv
 wildbill
 wcougar
 wcougaru                        // (c) 1997
+wizways
+wnpost
 wthing
 wtiger                          // (c) 1999
 
@@ -12216,7 +12226,7 @@ fb01                            // 1986 FB-01
 fc100                           //
 
 @source:fccpu20.cpp
-fccpu20
+fccpu20sbc
 
 @source:fccpu30.cpp
 fccpu30
@@ -14288,6 +14298,7 @@ elecbowl                        // Marx
 elecdet                         // Ideal
 esbattle                        // Entex
 esoccer                         // Entex
+f2pbball                        // Fonas
 fxmcr165                        // Gakken
 ginv1000                        // Gakken
 gjackpot                        // Gakken
@@ -14770,6 +14781,9 @@ instruct                        //
 @source:interact.cpp
 hector1                         //
 interact                        //
+
+@source:interpro.cpp
+ip2800                          // Intergraph InterPro 28xx workstation
 
 @source:intrscti.cpp
 intrscti                        // ????
@@ -28806,6 +28820,7 @@ kof99                           // 0251 (c) 1999 SNK
 kof99e                          // 0251 (c) 1999 SNK
 kof99h                          // 0251 (c) 1999 SNK
 kof99k                          // 0152 (c) 1999 SNK
+kof99ka                         // 0152 (c) 1999 SNK
 kof99p                          // 0251 (c) 1999 SNK
 kog                             // bootleg of kof97
 kotm                            // 0016 (c) 1991 SNK
@@ -34662,9 +34677,11 @@ sarukani                        // 1997.01 (c) 1997 Kaneko / Mediaworks (Japan)
 sengekis                        // 1997.?? (c) 1997 Kaneko / Warashi (Asia)
 sengekisj                       // 1997.07 (c) 1997 Kaneko / Warashi (Japan)
 senknow                         // 1999.04 (c) 1999 Kaneko / Kouyousha (Japan)
-skns                            //
+skns                            // - BIOS - various regions
 teljan                          // 1999.11 (c) 1999 Electro Design Co. (Japan)
-vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+vblokbrk                        // 1997.?? (c) 1997 Kaneko / Mediaworks (Europe)
+vblokbrka                       // 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
+
 
 @source:suprridr.cpp
 suprridr                        // (c) 1983 Venture Line + Taito license

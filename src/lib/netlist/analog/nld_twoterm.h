@@ -338,29 +338,30 @@ class generic_diode
 public:
 	generic_diode(device_t &dev, pstring name);
 
-	void update_diode(const nl_double nVd);
+	void update_diode(const double nVd);
 
-	void set_param(const nl_double Is, const nl_double n, nl_double gmin);
+	void set_param(const double Is, const double n, double gmin);
 
-	inline nl_double I() const { return m_Id; }
-	inline nl_double G() const { return m_G; }
-	inline nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
-	inline nl_double Vd() const { return m_Vd; }
+	inline double I() const { return m_Id; }
+	inline double G() const { return m_G; }
+	inline double Ieq() const { return (m_Id - m_Vd * m_G); }
+	inline double Vd() const { return m_Vd; }
 
 	/* owning object must save those ... */
 
 private:
-	state_var<nl_double> m_Vd;
-	state_var<nl_double> m_Id;
-	state_var<nl_double> m_G;
+	state_var<double> m_Vd;
+	state_var<double> m_Id;
+	state_var<double> m_G;
 
-	nl_double m_Vt;
-	nl_double m_Is;
-	nl_double m_n;
-	nl_double m_gmin;
+	double m_Vt;
+	double m_Vmin;
+	double m_Is;
+	double m_n;
+	double m_gmin;
 
-	nl_double m_VtInv;
-	nl_double m_Vcrit;
+	double m_VtInv;
+	double m_Vcrit;
 };
 
 /*! Class representing the diode model paramers.
