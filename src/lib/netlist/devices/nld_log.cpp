@@ -5,7 +5,6 @@
  *
  */
 
-#include <memory>
 #include "nl_base.h"
 #include "plib/pstream.h"
 #include "plib/pfmtlog.h"

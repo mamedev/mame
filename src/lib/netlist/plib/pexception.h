@@ -10,7 +10,6 @@
 
 #include <exception>
 
-#include "pconfig.h"
 #include "pstring.h"
 
 namespace plib {

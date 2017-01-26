@@ -4,7 +4,7 @@
  * nld_ms_direct.h
  *
  */
-
+#if 0
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
@@ -634,3 +634,4 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */
+#endif

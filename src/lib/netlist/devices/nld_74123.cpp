@@ -10,6 +10,8 @@
 #include "nlid_system.h"
 #include "analog/nld_twoterm.h"
 
+#include <cmath>
+
 namespace netlist
 {
 	namespace devices

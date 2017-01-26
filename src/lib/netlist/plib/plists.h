@@ -10,10 +10,7 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include <algorithm>
 #include <vector>
-#include <type_traits>
-#include <cmath>
 
 #include "pstring.h"
 

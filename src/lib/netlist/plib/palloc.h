@@ -10,9 +10,6 @@
 
 #include <vector>
 #include <memory>
-#include <utility>
-
-#include "pconfig.h"
 #include "pstring.h"
 
 namespace plib {

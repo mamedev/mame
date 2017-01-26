@@ -9,6 +9,8 @@
 #include "nld_fourterm.h"
 #include "nl_setup.h"
 
+#include <cmath>
+
 namespace netlist
 {
 	namespace analog

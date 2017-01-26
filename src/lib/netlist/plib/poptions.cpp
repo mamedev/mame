@@ -56,7 +56,7 @@ namespace plib {
 			return 1;
 	}
 
-	int option_bool::parse(ATTR_UNUSED pstring argument)
+	int option_bool::parse(pstring argument)
 	{
 		m_val = true;
 		return 0;

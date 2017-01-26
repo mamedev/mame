@@ -9,6 +9,7 @@
 #define PTYPES_H_
 
 #include <type_traits>
+#include <limits>
 
 #include "pconfig.h"
 #include "pstring.h"

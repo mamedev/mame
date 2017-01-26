@@ -38,7 +38,6 @@
 #include "omp.h"
 #endif
 
-#include "plib/putil.h"
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
 

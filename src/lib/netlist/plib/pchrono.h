@@ -9,7 +9,6 @@
 #define PCHRONO_H_
 
 #include <cstdint>
-#include <thread>
 #include <chrono>
 
 #include "pconfig.h"

@@ -8,10 +8,10 @@
 #ifndef P_UTIL_H_
 #define P_UTIL_H_
 
-#include <initializer_list>
-
 #include "plib/pstring.h"
-#include "plib/plists.h"
+
+#include <initializer_list>
+#include <algorithm>
 
 namespace plib
 {

@@ -5,8 +5,6 @@
  *
  */
 
-#include <cstdio>
-
 #include "plib/palloc.h"
 #include "plib/putil.h"
 #include "nl_base.h"

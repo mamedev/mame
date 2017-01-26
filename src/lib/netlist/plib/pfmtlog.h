@@ -9,7 +9,6 @@
 
 #include <limits>
 
-#include "pconfig.h"
 #include "pstring.h"
 #include "ptypes.h"
 

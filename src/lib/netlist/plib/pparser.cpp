@@ -8,7 +8,8 @@
 #include <cstdarg>
 
 #include "pparser.h"
-#include "plib/palloc.h"
+#include "palloc.h"
+#include "putil.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
@@ -302,7 +303,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];

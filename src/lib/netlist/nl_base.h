@@ -9,20 +9,16 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
-#include <vector>
-#include <unordered_map>
-#include <memory>
-//#include <cmath>
-#include <cstdint>
-
 #include "nl_lists.h"
 #include "nl_time.h"
-#include "plib/palloc.h"
+#include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
-#include "plib/pexception.h"
+#include "plib/ppmf.h"
+
+#include <unordered_map>
 
 // ----------------------------------------------------------------------------------------
 // Type definitions

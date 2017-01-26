@@ -8,19 +8,11 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include <memory>
-#include <stack>
-#include <unordered_map>
-#include <vector>
-
-#include "plib/pstring.h"
-#include "plib/pfmtlog.h"
-#include "plib/pstream.h"
-#include "plib/putil.h"
-#include "plib/pparser.h"
-#include "nl_config.h"
 #include "nl_base.h"
 #include "nl_factory.h"
+#include "plib/pparser.h"
+
+#include <stack>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -125,7 +117,7 @@ namespace netlist
 		unsigned long ni;
 		unsigned long no;
 		pstring def_param;
-		plib::pstring_vector_t desc;
+		std::vector<pstring> desc;
 		pstring family;
 	};
 

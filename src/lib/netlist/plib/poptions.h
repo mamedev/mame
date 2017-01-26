@@ -10,8 +10,6 @@
 #ifndef POPTIONS_H_
 #define POPTIONS_H_
 
-#include <cstddef>
-
 #include "pstring.h"
 #include "plists.h"
 #include "putil.h"
@@ -67,7 +65,7 @@ public:
 
 	/* no_argument options will be called with "" argument */
 
-	virtual int parse(ATTR_UNUSED pstring argument) = 0;
+	virtual int parse(pstring argument) = 0;
 
 	pstring short_opt() { return m_short; }
 	pstring long_opt() { return m_long; }
@@ -116,7 +114,7 @@ public:
 	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
-	virtual int parse(ATTR_UNUSED pstring argument) override;
+	virtual int parse(pstring argument) override;
 
 	bool operator ()() { return m_val; }
 private:

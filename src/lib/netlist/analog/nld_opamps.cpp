@@ -10,6 +10,8 @@
 #include "nld_opamps.h"
 #include "nl_errstr.h"
 
+#include <cmath>
+
 namespace netlist
 {
 	namespace analog

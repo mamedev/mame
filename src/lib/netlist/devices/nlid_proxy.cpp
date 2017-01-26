@@ -5,7 +5,6 @@
  *
  */
 
-//#include <memory>
 #include "nlid_proxy.h"
 #include "solver/nld_solver.h"
 //#include "plib/pstream.h"

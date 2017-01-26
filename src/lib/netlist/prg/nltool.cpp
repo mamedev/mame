@@ -8,21 +8,11 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstdlib>
-
 #include "plib/poptions.h"
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/ptypes.h"
-#include "plib/pexception.h"
 #include "nl_setup.h"
-#include "nl_factory.h"
 #include "nl_parser.h"
 #include "devices/net_lib.h"
 #include "tools/nl_convert.h"
-
-#include <cfenv>
 
 class tool_options_t : public plib::options
 {

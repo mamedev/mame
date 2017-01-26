@@ -7,9 +7,6 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
-#include <cstdarg>
-#include <cstddef>
-
 #include "pconfig.h"
 #include "pstring.h"
 #include "pfmtlog.h"

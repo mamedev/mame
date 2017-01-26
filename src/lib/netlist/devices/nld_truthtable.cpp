@@ -121,7 +121,7 @@ uint_least64_t truthtable_desc_t::get_ignored_extended(uint_least64_t state)
 // desc
 // ----------------------------------------------------------------------------------------
 
-void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
+void truthtable_desc_t::help(unsigned cur, std::vector<pstring> list,
 		uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 {
 	pstring elem = list[cur].trim();
@@ -166,7 +166,7 @@ void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
 	}
 }
 
-void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_least64_t disabled_ignore)
+void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least64_t disabled_ignore)
 {
 	unsigned line = 0;
 

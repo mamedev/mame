@@ -59,6 +59,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.h",
+    MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",

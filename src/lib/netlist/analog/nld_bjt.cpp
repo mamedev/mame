@@ -9,6 +9,8 @@
 #include "analog/nld_bjt.h"
 #include "nl_setup.h"
 
+#include <cmath>
+
 namespace netlist
 {
 	namespace analog

@@ -6,7 +6,6 @@
  */
 
 #include <algorithm>
-#include <cstdio>
 #include <cmath>
 #include <unordered_map>
 #include "nl_convert.h"

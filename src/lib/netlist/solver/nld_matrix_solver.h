@@ -10,6 +10,7 @@
 
 #include "nl_base.h"
 #include "nl_errstr.h"
+#include "plib/putil.h"
 
 namespace netlist
 {

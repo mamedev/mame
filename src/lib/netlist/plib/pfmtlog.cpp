@@ -6,11 +6,8 @@
  */
 
 #include <cstring>
-//FIXME:: pstring should be locale free
-#include <cctype>
 #include <cstdlib>
-#include <cstdio>
-
+#include <cstdarg>
 #include <algorithm>
 
 #include "pfmtlog.h"

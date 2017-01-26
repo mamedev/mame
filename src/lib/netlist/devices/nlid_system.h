@@ -11,13 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include <cstddef>
-#include <memory>
-#include <vector>
-
 #include "analog/nld_twoterm.h"
 #include "nl_base.h"
 #include "nl_time.h"
+#include "nl_setup.h"
 #include "plib/palloc.h"
 #include "plib/pfmtlog.h"
 #include "plib/pfunction.h"

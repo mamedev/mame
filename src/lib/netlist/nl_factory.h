@@ -9,12 +9,6 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
-#include <type_traits>
-
-#include "nl_config.h"
-#include "plib/palloc.h"
-#include "plib/plists.h"
-#include "plib/putil.h"
 #include "nl_base.h"
 
 #define NETLIB_DEVICE_IMPL(chip) \
