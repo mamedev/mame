@@ -6,8 +6,20 @@
 
     HP9895 floppy disk drive
 
-    Reference manual:
-    HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
+	Phew, this one was tough!
+
+	Reference manual:
+	HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
+
+	Reference manual for the floppy drives:
+	Magnetic Peripherals, inc., feb 83, 9406-4 Flexible Disk Drive
+	Hardware Maintenance Manual
+
+	TODO/Issues:
+	* floppy_image_device sometimes reports the wrong state for ready &
+	  wpt signals
+	* IBM mode hasn't been tested yet
+	* Synchronizer/AM detector could be optimized
 
 *********************************************************************/
 
@@ -101,16 +113,38 @@ hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, dev
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_phi(*this , "phi"),
-	  m_drives{{*this , "floppy0"} , {*this , "floppy1"}}
+	  m_drives{{*this , "floppy0"} , {*this , "floppy1"}},
+	  m_switches{*this , "switches"}
 {
 }
 
-#if 0
+static INPUT_PORTS_START(hp9895_port)
+	PORT_START("switches")
+	PORT_CONFNAME(REG_SWITCHES_HPIB_ADDR_MASK << REG_SWITCHES_HPIB_ADDR_SHIFT , 0x00 , "HPIB address")
+	PORT_CONFSETTING(0 << REG_SWITCHES_HPIB_ADDR_SHIFT , "0")
+	PORT_CONFSETTING(1 << REG_SWITCHES_HPIB_ADDR_SHIFT , "1")
+	PORT_CONFSETTING(2 << REG_SWITCHES_HPIB_ADDR_SHIFT , "2")
+	PORT_CONFSETTING(3 << REG_SWITCHES_HPIB_ADDR_SHIFT , "3")
+	PORT_CONFSETTING(4 << REG_SWITCHES_HPIB_ADDR_SHIFT , "4")
+	PORT_CONFSETTING(5 << REG_SWITCHES_HPIB_ADDR_SHIFT , "5")
+	PORT_CONFSETTING(6 << REG_SWITCHES_HPIB_ADDR_SHIFT , "6")
+	PORT_CONFSETTING(7 << REG_SWITCHES_HPIB_ADDR_SHIFT , "7")
+	PORT_CONFNAME(BIT_MASK(REG_SWITCHES_W_TEST_BIT) , 0x00 , "W Test")
+	PORT_CONFSETTING(0x00 , DEF_STR(Off))
+	PORT_CONFSETTING(BIT_MASK(REG_SWITCHES_W_TEST_BIT) , DEF_STR(On))
+	PORT_CONFNAME(BIT_MASK(REG_SWITCHES_S_TEST_BIT) , 0x00 , "S Test")
+	PORT_CONFSETTING(0x00 , DEF_STR(Off))
+	PORT_CONFSETTING(BIT_MASK(REG_SWITCHES_S_TEST_BIT) , DEF_STR(On))
+	PORT_CONFNAME(BIT_MASK(REG_SWITCHES_LOOP_BIT) , 0x00 , "Loop")
+	PORT_CONFSETTING(0x00 , DEF_STR(Off))
+	PORT_CONFSETTING(BIT_MASK(REG_SWITCHES_LOOP_BIT) , DEF_STR(On))
+INPUT_PORTS_END
+
 ioport_constructor hp9895_device::device_input_ports() const
 {
-	// TODO: inputs=HPIB address, "S" & "W" switches, "loop" pin
+	return INPUT_PORTS_NAME(hp9895_port);
 }
-#endif
+
 void hp9895_device::device_start()
 {
 	save_item(NAME(m_cpu_irq));
@@ -170,6 +204,10 @@ void hp9895_device::device_reset()
 	m_timeout_timer->reset();
 	m_byte_timer->reset();
 	m_half_bit_timer->reset();
+#if 0
+	// DEBUG DEBUG DEBUG DEBUG
+	for (auto& r : m_ready) r = 2;
+#endif
 }
 
 void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -626,7 +664,7 @@ READ8_MEMBER(hp9895_device::drivstat_r)
 READ8_MEMBER(hp9895_device::switches_r)
 {
 	uint8_t res = get_switches2();
-	// TODO:
+	res |= m_switches->read();
 	return res;
 }
 
@@ -637,6 +675,19 @@ READ8_MEMBER(hp9895_device::switches2_r)
 
 void hp9895_device::floppy_ready_cb(floppy_image_device *floppy , int state)
 {
+#if 0
+	// DEBUG DEBUG DEBUG DEBUG
+	for (unsigned i = 0; i < 2; i++) {
+		if (floppy == m_drives[ i ]->get_device()) {
+			if (m_ready[ i ] != state) {
+				LOG(("Ready %u=%d\n" , i , state));
+				m_ready[ i ] = state;
+			}
+			break;
+		}
+	}
+#endif
+
 	if (state) {
 		// Set Disk Changed flag when a drive is not ready
 		for (unsigned i = 0; i < 2; i++) {
