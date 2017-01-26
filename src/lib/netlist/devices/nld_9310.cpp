@@ -158,21 +158,22 @@ namespace netlist
 	{
 		if (m_loadq)
 		{
-			switch (m_cnt())
+			if (m_cnt < MAXCNT - 1)
 			{
-				case MAXCNT - 1:
-					m_cnt = MAXCNT;
-					m_RC.push(m_ent, NLTIME_FROM_NS(20));
-					m_QA.push(1, NLTIME_FROM_NS(20));
-					break;
-				case MAXCNT:
-					m_RC.push(0, NLTIME_FROM_NS(20));
-					m_cnt = 0;
-					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
-					break;
-				default:
-					m_cnt++;
-					update_outputs(m_cnt);
+				m_cnt++;
+				update_outputs(m_cnt);
+			}
+			else if (m_cnt == MAXCNT - 1)
+			{
+				m_cnt = MAXCNT;
+				m_RC.push(m_ent, NLTIME_FROM_NS(20));
+				m_QA.push(1, NLTIME_FROM_NS(20));
+			}
+			else // MAXCNT
+			{
+				m_RC.push(0, NLTIME_FROM_NS(20));
+				m_cnt = 0;
+				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 			}
 		}
 		else

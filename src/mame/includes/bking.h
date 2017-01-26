@@ -15,7 +15,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
@@ -63,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bking3_addr_h_w);
 	DECLARE_READ8_MEMBER(bking3_extrarom_r);
 	DECLARE_READ8_MEMBER(bking3_ext_check_r);
+	DECLARE_READ8_MEMBER(bking3_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(bking_xld1_w);
 	DECLARE_WRITE8_MEMBER(bking_yld1_w);
 	DECLARE_WRITE8_MEMBER(bking_xld2_w);

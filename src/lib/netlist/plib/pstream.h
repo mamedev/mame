@@ -81,15 +81,6 @@ public:
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
 
-	/* this digests linux & dos/windows text files */
-
-	bool readline(pstring &line);
-
-	bool readbyte(char &b)
-	{
-		return (read(&b, 1) == 1);
-	}
-
 	pos_type read(void *buf, const unsigned n)
 	{
 		return vread(buf, n);
@@ -99,8 +90,6 @@ protected:
 	/* read up to n bytes from stream */
 	virtual pos_type vread(void *buf, const pos_type n) = 0;
 
-private:
-	pstringbuffer m_linebuf;
 };
 
 // -----------------------------------------------------------------------------
@@ -114,24 +103,6 @@ public:
 
 	explicit postream(unsigned flags) : pstream(flags) {}
 	virtual ~postream();
-
-	/* this digests linux & dos/windows text files */
-
-	void writeline(const pstring &line)
-	{
-		write(line);
-		write(10);
-	}
-
-	void write(const pstring &text)
-	{
-		write(text.c_str(), text.blen());
-	}
-
-	void write(const char c)
-	{
-		write(&c, 1);
-	}
 
 	void write(const void *buf, const pos_type n)
 	{
@@ -306,6 +277,7 @@ public:
 	explicit pimemstream(const pomemstream &ostrm);
 	virtual ~pimemstream();
 
+	pos_type size() const { return m_len; }
 protected:
 	/* read up to n bytes from stream */
 	virtual pos_type vread(void *buf, const pos_type n) override;
@@ -335,25 +307,87 @@ private:
 };
 
 // -----------------------------------------------------------------------------
-// pstream_fmt_writer_t: writer on top of ostream
+// putf8reader_t: reader on top of istream
 // -----------------------------------------------------------------------------
 
-class pstream_fmt_writer_t : public plib::pfmt_writer_t<>
+/* this digests linux & dos/windows text files */
+
+class putf8_reader
 {
-	P_PREVENT_COPYING(pstream_fmt_writer_t)
+	P_PREVENT_COPYING(putf8_reader)
 public:
+	explicit putf8_reader(pistream &strm) : m_strm(strm) {}
+	virtual ~putf8_reader() {}
 
-	explicit pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}
-	virtual ~pstream_fmt_writer_t();
+	bool eof() const { return m_strm.eof(); }
+	bool readline(pstring &line);
 
-protected:
-	virtual void vdowrite(const pstring &ls) const override
+	bool readbyte1(char &b)
 	{
-		m_strm.write(ls);
+		return (m_strm.read(&b, 1) == 1);
+	}
+
+	bool readcode(pstring::code_t &c)
+	{
+		char b[4];
+		if (m_strm.read(&b[0], 1) != 1)
+			return false;
+		const unsigned l = pstring::traits::codelen(b);
+		for (unsigned i = 1; i < l; i++)
+			if (m_strm.read(&b[i], 1) != 1)
+				return false;
+		c = pstring::traits::code(b);
+		return true;
+	}
+
+private:
+	pistream &m_strm;
+	pstringbuffer m_linebuf;
+};
+
+// -----------------------------------------------------------------------------
+// putf8writer_t: writer on top of ostream
+// -----------------------------------------------------------------------------
+
+class putf8_writer
+{
+	P_PREVENT_COPYING(putf8_writer)
+public:
+	explicit putf8_writer(postream &strm) : m_strm(strm) {}
+	virtual ~putf8_writer() {}
+
+	void writeline(const pstring &line) const
+	{
+		write(line);
+		write(10);
+	}
+
+	void write(const pstring &text) const
+	{
+		m_strm.write(text.c_str(), text.blen());
+	}
+
+	void write(const pstring::code_t c) const
+	{
+		write(pstring(c));
 	}
 
 private:
 	postream &m_strm;
+};
+
+class putf8_fmt_writer : public pfmt_writer_t<>, public putf8_writer
+{
+	P_PREVENT_COPYING(putf8_fmt_writer)
+public:
+
+	explicit putf8_fmt_writer(postream &strm);
+	virtual ~putf8_fmt_writer();
+
+protected:
+	virtual void vdowrite(const pstring &ls) const override;
+
+private:
 };
 
 }

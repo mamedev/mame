@@ -81,7 +81,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	for (unsigned k=0; k<iN; k++)
 	{
-		terms_for_net_t * RESTRICT row = this->m_terms[k];
+		terms_for_net_t * RESTRICT row = this->m_terms[k].get();
 		mat.ia[k] = nz;
 
 		for (unsigned j=0; j<row->m_nz.size(); j++)

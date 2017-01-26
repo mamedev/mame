@@ -22,7 +22,7 @@
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
-#define PRINT_TEX_INFO		0
+#define PRINT_TEX_INFO      0
 
 #define WAVERAM0_WIDTH      1024
 #define WAVERAM0_HEIGHT     2048

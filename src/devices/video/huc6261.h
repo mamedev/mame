@@ -40,8 +40,6 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
-	inline uint32_t yuv2rgb(uint32_t yuv);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,12 +64,16 @@ private:
 	uint8_t   m_priority[7];
 
 	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
-	uint16_t  m_pixel_data;
+	uint16_t  m_pixel_data_a;
+	uint16_t  m_pixel_data_b;
+	uint16_t  m_palette_offset[4];
 	uint8_t   m_pixel_clock;
 
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_rgb32>  m_bmp;
 	int32_t   m_uv_lookup[65536][3];
+	inline uint32_t yuv2rgb(uint32_t yuv);
+	inline void apply_pal_offs(uint16_t *pix_data);
 };
 
 

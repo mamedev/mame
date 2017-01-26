@@ -332,7 +332,11 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 
 	*/
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
+	return
+		(ioport("PORT04")->read() & 0x03) |
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x08 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x10 : 0x00) |
+		m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
@@ -346,8 +350,8 @@ static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x07, 0x07) AM_READNOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(beg_port08_w) /* muxed port select + other unknown stuff */
-	AM_RANGE(0x0b, 0x0b) AM_DEVREAD("bmcu", taito68705_mcu_device, mcu_r)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("bmcu", taito68705_mcu_device, mcu_w)
+	AM_RANGE(0x0b, 0x0b) AM_DEVREAD("bmcu", taito68705_mcu_device, data_r)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("bmcu", taito68705_mcu_device, data_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	AM_RANGE(0x10, 0x17) AM_WRITE(beg13_a_clr_w)
 	AM_RANGE(0x18, 0x1f) AM_WRITE(beg13_b_set_w)
@@ -456,7 +460,7 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	    2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
 	    4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_BEG, 2000000) /* ??? */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 2000000) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - interleaving is forced on the fly */
 

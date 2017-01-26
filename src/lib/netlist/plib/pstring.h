@@ -10,6 +10,7 @@
 #include <cstdarg>
 #include <cstddef>
 #include <iterator>
+#include <exception>
 
 #include "pconfig.h"
 
@@ -22,26 +23,23 @@
 
 struct pstr_t
 {
-	//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-	pstr_t(const std::size_t alen)
-	{
-		init(alen);
-	}
+	pstr_t(const std::size_t alen) { init(alen); }
 	void init(const std::size_t alen)
 	{
-			m_ref_count = 1;
-			m_len = alen;
-			m_str[0] = 0;
+		m_ref_count = 1;
+		m_len = alen;
+		m_str[0] = 0;
 	}
 	char *str() { return &m_str[0]; }
 	unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
 	std::size_t len() const  { return m_len; }
-	int m_ref_count;
+	void inc() { m_ref_count++; }
+	bool dec_and_check() { --m_ref_count; return m_ref_count == 0; }
 private:
+	int m_ref_count;
 	std::size_t m_len;
 	char m_str[1];
 };
-
 
 template <typename F>
 struct pstring_t
@@ -53,20 +51,38 @@ public:
 	typedef typename F::code_t code_t;
 	typedef std::size_t size_type;
 
-	// simple construction/destruction
-	pstring_t()
+	enum enc_t
 	{
-		init();
+		UTF8
+	};
+
+	// simple construction/destruction
+	pstring_t() : m_ptr(&m_zero)
+	{
+		init(nullptr);
 	}
 	~pstring_t();
 
-	// construction with copy
-	pstring_t(const mem_t *string) { init(); if (string != nullptr && *string != 0) pcopy(string); }
-	pstring_t(const pstring_t &string) { init(); pcopy(string); }
+	// FIXME: Do something with encoding
+	pstring_t(const mem_t *string, const enc_t enc) : m_ptr(&m_zero)
+	{
+		init(string);
+	}
+
+	template<typename C, std::size_t N>
+	pstring_t(C (&string)[N]) : m_ptr(&m_zero) {
+		static_assert(std::is_same<C, const mem_t>::value, "pstring constructor only accepts const mem_t");
+		static_assert(N>0,"pstring from array of length 0");
+		if (string[N-1] != 0)
+			throw std::exception();
+		init(string);
+	}
+
+	pstring_t(const pstring_t &string) : m_ptr(&m_zero) { init(string); }
 	pstring_t(pstring_t &&string) : m_ptr(string.m_ptr) { string.m_ptr = nullptr; }
+	explicit pstring_t(code_t code) : m_ptr(&m_zero) { pstring_t t; t+= code;  init(t); }
 
 	// assignment operators
-	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
 	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }
 
 	struct iterator final : public std::iterator<std::forward_iterator_tag, mem_t>
@@ -94,41 +110,24 @@ public:
 
 	// concatenation operators
 	pstring_t& operator+=(const pstring_t &string) { pcat(string); return *this; }
-	pstring_t& operator+=(const mem_t *string) { pcat(string); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const pstring_t &lhs, const mem_t *rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const mem_t *lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
 
 	// comparison operators
-	bool operator==(const mem_t *string) const { return (pcmp(string) == 0); }
 	bool operator==(const pstring_t &string) const { return (pcmp(string) == 0); }
-	bool operator!=(const mem_t *string) const { return (pcmp(string) != 0); }
 	bool operator!=(const pstring_t &string) const { return (pcmp(string) != 0); }
 
-	bool operator<(const mem_t *string) const { return (pcmp(string) < 0); }
 	bool operator<(const pstring_t &string) const { return (pcmp(string) < 0); }
-	bool operator<=(const mem_t *string) const { return (pcmp(string) <= 0); }
 	bool operator<=(const pstring_t &string) const { return (pcmp(string) <= 0); }
-	bool operator>(const mem_t *string) const { return (pcmp(string) > 0); }
 	bool operator>(const pstring_t &string) const { return (pcmp(string) > 0); }
-	bool operator>=(const mem_t *string) const { return (pcmp(string) >= 0); }
 	bool operator>=(const pstring_t &string) const { return (pcmp(string) >= 0); }
 
 	bool equals(const pstring_t &string) const { return (pcmp(string) == 0); }
-
-	//int cmp(const pstring_t &string) const { return pcmp(string); }
-	//int cmp(const mem_t *string) const { return pcmp(string); }
-
 	bool startsWith(const pstring_t &arg) const;
-	bool startsWith(const mem_t *arg) const;
-
 	bool endsWith(const pstring_t &arg) const;
-	bool endsWith(const mem_t *arg) const { return endsWith(pstring_t(arg)); }
 
 	pstring_t replace(const pstring_t &search, const pstring_t &replace) const;
-
 	const pstring_t cat(const pstring_t &s) const { return *this + s; }
-	const pstring_t cat(const mem_t *s) const { return *this + s; }
+	const pstring_t cat(const code_t c) const { return *this + c; }
 
 	size_type blen() const { return m_ptr->len(); }
 
@@ -145,11 +144,9 @@ public:
 	pstring_t& operator+=(const code_t c) { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(c, buf); pcat(buf); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
-	iterator find(const pstring_t &search, iterator start) const;
-	iterator find(const pstring_t &search) const { return find(search, begin()); }
-	iterator find(const mem_t *search, iterator start) const;
-	iterator find(const mem_t *search) const { return find(search, begin()); }
-	iterator find(const code_t search, iterator start) const { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(search, buf); return find(buf, start); }
+	iterator find(const pstring_t search, iterator start) const;
+	iterator find(const pstring_t search) const { return find(search, begin()); }
+	iterator find(const code_t search, iterator start) const;
 	iterator find(const code_t search) const { return find(search, begin()); }
 
 	const pstring_t substr(const iterator start, const iterator end) const ;
@@ -162,9 +159,9 @@ public:
 	iterator find_first_not_of(const pstring_t &no) const;
 	iterator find_last_not_of(const pstring_t &no) const;
 
-	const pstring_t ltrim(const pstring_t &ws = " \t\n\r") const;
-	const pstring_t rtrim(const pstring_t &ws = " \t\n\r") const;
-	const pstring_t trim(const pstring_t &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
+	const pstring_t ltrim(const pstring_t ws = pstring_t(" \t\n\r")) const;
+	const pstring_t rtrim(const pstring_t ws = pstring_t(" \t\n\r")) const;
+	const pstring_t trim(const pstring_t ws = pstring_t(" \t\n\r")) const { return this->ltrim(ws).rtrim(ws); }
 
 	const pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
 
@@ -178,10 +175,16 @@ protected:
 	pstr_t *m_ptr;
 
 private:
-	void init()
+	void init(const mem_t *string)
 	{
-		m_ptr = &m_zero;
-		m_ptr->m_ref_count++;
+		m_ptr->inc();
+		if (string != nullptr && *string != 0)
+			pcopy(string);
+	}
+	void init(const pstring_t &string)
+	{
+		m_ptr->inc();
+		pcopy(string);
 	}
 
 	int pcmp(const pstring_t &right) const;
@@ -191,14 +194,12 @@ private:
 	void pcopy(const mem_t *from, std::size_t size);
 
 	void pcopy(const mem_t *from);
-
 	void pcopy(const pstring_t &from)
 	{
 		sfree(m_ptr);
 		m_ptr = from.m_ptr;
-		m_ptr->m_ref_count++;
+		m_ptr->inc();
 	}
-
 	void pcat(const mem_t *s);
 	void pcat(const pstring_t &s);
 
@@ -207,8 +208,6 @@ private:
 
 	static pstr_t m_zero;
 };
-
-template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 struct pu8_traits
 {
@@ -358,7 +357,8 @@ public:
 	// C string conversion helpers
 	const char *c_str() const { return m_ptr; }
 
-	operator pstring() const { return pstring(m_ptr); }
+	// FIXME: encoding should be parameter
+	operator pstring() const { return pstring(m_ptr, pstring::UTF8); }
 
 	// concatenation operators
 	pstringbuffer& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }

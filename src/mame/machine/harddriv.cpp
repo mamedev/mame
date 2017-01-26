@@ -388,7 +388,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr1_write )
 				machine().output().set_value("SEL3", m_sel3_data);
 			break;
 
-			case 4: /* SEL4 */		
+			case 4: /* SEL4 */
 				m_sel4_data = data;
 				machine().output().set_value("SEL4", m_sel4_data);
 			break;

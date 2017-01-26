@@ -94,7 +94,7 @@
  *
  * VME side A24 address map - Dual ported RAM
  * ----------------------------------------------------------
- * Offset Range     Description 
+ * Offset Range     Description
  * ----------------------------------------------------------
  * 000000 - 0007FF  BIM
  * 000800 - 000FFF  Status registers
@@ -130,6 +130,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
+#include "machine/68153bim.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "vme_fcisio.h"
@@ -157,7 +158,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_FCISIO1 = &device_creator<vme_fcisio1_card_device>;
@@ -194,7 +195,7 @@ static MACHINE_CONFIG_FRAGMENT (fcisio1)
 	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
-//	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", fcisio_terminal)
+//  MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", fcisio_terminal)
 
 	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
@@ -202,6 +203,8 @@ static MACHINE_CONFIG_FRAGMENT (fcisio1)
 
 	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
 	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
+
+	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -328,6 +331,7 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 	,m_duscc2(*this, "duscc2")
 	,m_duscc3(*this, "duscc3")
 	,m_pit (*this, "pit")
+	,m_bim (*this, "bim")
 {
 	LOG("%s\n", FUNCNAME);
 }
@@ -341,6 +345,7 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 	,m_duscc2(*this, "duscc2")
 	,m_duscc3(*this, "duscc3")
 	,m_pit (*this, "pit")
+	,m_bim (*this, "bim")
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }

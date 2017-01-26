@@ -244,6 +244,18 @@ WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
+{
+	/* bit 1 = when 1, mcu has sent data to the main cpu */
+	return (CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 2 : 0;
+}
+
+READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
+{
+	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
+	return (CLEAR_LINE != m_bmcu->host_semaphore_r()) ? 0 : 1;
+}
+
 
 MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
 {
@@ -311,7 +323,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nycaptor_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)   /* bit 3 - memory bank at 0x8000-0xbfff */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)

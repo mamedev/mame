@@ -22,6 +22,9 @@
 #include "plib/pstream.h"
 
 #define NL_USE_SSE 0
+#if NL_USE_SSE
+#include <mmintrin.h>
+#endif
 
 namespace netlist
 {
@@ -49,22 +52,15 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
-	virtual void create_solver_code(plib::postream &strm) override;
+	virtual std::pair<pstring, pstring> create_solver_code() override;
 
 private:
 
-	void csc_private(plib::postream &strm);
+	void csc_private(plib::putf8_fmt_writer &strm);
 
 	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
 
-	pstring static_compile_name()
-	{
-		plib::postringstream t;
-		csc_private(t);
-		std::hash<pstring> h;
-
-		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
-	}
+	pstring static_compile_name();
 
 	unsigned m_dim;
 	std::vector<unsigned> m_term_cr[storage_N];
@@ -92,7 +88,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	bool touched[storage_N][storage_N] = { { false } };
 	for (unsigned k = 0; k < iN; k++)
 	{
-		for (auto & j : this->m_terms[k]->m_nz)
+		for (auto &j : this->m_terms[k]->m_nz)
 			touched[k][j] = true;
 	}
 
@@ -100,32 +96,21 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	unsigned ops = 0;
 
-	const bool static_compile = false;
 	for (unsigned k = 0; k < iN; k++)
 	{
 		ops++; // 1/A(k,k)
-		if (static_compile) printf("const double fd%d = 1.0 / A(%d,%d); \n", k, k, k);
 		for (unsigned row = k + 1; row < iN; row++)
 		{
 			if (touched[row][k])
 			{
 				ops++;
 				fc++;
-				if (static_compile) printf("  const double f%d = -fd%d * A(%d,%d); \n", fc, k, row, k);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
 					{
-						if (touched[row][col])
-						{
-							if (static_compile) printf("    A(%d,%d) += f%d * A(%d,%d); \n", row, col, fc, k, col);
-						} else
-						{
-							if (static_compile) printf("    A(%d,%d) = f%d * A(%d,%d); \n", row, col, fc, k, col);
-						}
 						touched[row][col] = true;
 						ops += 2;
 					}
-				if (static_compile) printf("    RHS(%d) += f%d * RHS(%d); \n", row, fc, k);
 			}
 		}
 	}
@@ -176,13 +161,13 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		if (m_proc != nullptr)
 			this->log().verbose("External static solver {1} found ...", symname);
 		else
-			this->log().verbose("External static solver {1} not found ...", symname);
+			this->log().warning("External static solver {1} not found ...", symname);
 	}
 
 }
 
 template <unsigned m_N, unsigned storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
+void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
 {
 	const unsigned iN = N();
 	for (unsigned i = 0; i < iN - 1; i++)
@@ -194,7 +179,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 			unsigned pi = mat.diag[i];
 
 			//const nl_double f = 1.0 / m_A[pi++];
-			strm.writeline(plib::pfmt("const double f{1} = 1.0 / m_A[{2}];")(i)(pi));
+			strm("const double f{1} = 1.0 / m_A[{2}];\n", i, pi);
 			pi++;
 			const unsigned piie = mat.ia[i+1];
 
@@ -207,7 +192,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 					pj++;
 
 				//const nl_double f1 = - m_A[pj++] * f;
-				strm.writeline(plib::pfmt("\tconst double f{1}_{2} = -f{3} * m_A[{4}];")(i)(j)(i)(pj));
+				strm("\tconst double f{1}_{2} = -f{3} * m_A[{4}];\n", i, j, i, pj);
 				pj++;
 
 				// subtract row i from j */
@@ -216,25 +201,40 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::postream &strm)
 					while (mat.ja[pj] < mat.ja[pii])
 						pj++;
 					//m_A[pj++] += m_A[pii++] * f1;
-					strm.writeline(plib::pfmt("\tm_A[{1}] += m_A[{2}] * f{3}_{4};")(pj)(pii)(i)(j));
+					strm("\tm_A[{1}] += m_A[{2}] * f{3}_{4};\n", pj, pii, i, j);
 					pj++; pii++;
 				}
 				//RHS[j] += f1 * RHS[i];
-				strm.writeline(plib::pfmt("\tRHS[{1}] += f{2}_{3} * RHS[{4}];")(j)(i)(j)(i));
+				strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
 			}
 		}
 	}
 }
 
-template <unsigned m_N, unsigned storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::create_solver_code(plib::postream &strm)
-{
-	//const unsigned iN = N();
 
-	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * _restrict m_A, double * _restrict RHS)")(static_compile_name()));
-	strm.writeline("{");
+template <unsigned m_N, unsigned storage_N>
+pstring matrix_solver_GCR_t<m_N, storage_N>::static_compile_name()
+{
+	plib::postringstream t;
+	plib::putf8_fmt_writer w(t);
+	csc_private(w);
+	std::hash<pstring> h;
+
+	return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
+}
+
+template <unsigned m_N, unsigned storage_N>
+std::pair<pstring, pstring> matrix_solver_GCR_t<m_N, storage_N>::create_solver_code()
+{
+	plib::postringstream t;
+	plib::putf8_fmt_writer strm(t);
+	pstring name = static_compile_name();
+
+	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS)\n")(name));
+	strm.writeline("{\n");
 	csc_private(strm);
-	strm.writeline("}");
+	strm.writeline("}\n");
+	return std::pair<pstring, pstring>(name, t.str());
 }
 
 
@@ -251,7 +251,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t *t = this->m_terms[k];
+		terms_for_net_t *t = this->m_terms[k].get();
 		nl_double gtot_t = 0.0;
 		nl_double RHS_t = 0.0;
 
@@ -261,18 +261,20 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const RESTRICT go = t->go();
 		const nl_double * const RESTRICT Idr = t->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = t->connected_net_V();
+		const unsigned * const RESTRICT tcr = m_term_cr[k].data();
 
+#if 1
 #if (0 ||NL_USE_SSE)
-		__m128d mg = mm_set_pd(0.0, 0.0);
-		__m128d mr = mm_set_pd(0.0, 0.0);
+		__m128d mg = _mm_set_pd(0.0, 0.0);
+		__m128d mr = _mm_set_pd(0.0, 0.0);
 		unsigned i = 0;
 		for (; i < term_count - 1; i+=2)
 		{
-			mg = mm_add_pd(mg, mm_loadu_pd(&gt[i]));
-			mr = mm_add_pd(mr, mm_loadu_pd(&Idr[i]));
+			mg = _mm_add_pd(mg, _mm_loadu_pd(&gt[i]));
+			mr = _mm_add_pd(mr, _mm_loadu_pd(&Idr[i]));
 		}
-		gtot_t = mm_cvtsd_f64(mg) + mm_cvtsd_f64(mm_unpackhi_pd(mg,mg));
-		RHS_t = mm_cvtsd_f64(mr) + mm_cvtsd_f64(mm_unpackhi_pd(mr,mr));
+		gtot_t = _mm_cvtsd_f64(mg) + _mm_cvtsd_f64(_mm_unpackhi_pd(mg,mg));
+		RHS_t = _mm_cvtsd_f64(mr) + _mm_cvtsd_f64(_mm_unpackhi_pd(mr,mr));
 		for (; i < term_count; i++)
 		{
 			gtot_t += gt[i];
@@ -294,11 +296,26 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		m_A[mat.diag[k]] = gtot_t;
 
 		for (unsigned i = 0; i < railstart; i++)
-		{
-			const unsigned pi = m_term_cr[k][i];
-			m_A[pi] -= go[i];
-		}
+			m_A[tcr[i]] -= go[i];
 	}
+#else
+		for (std::size_t i = 0; i < railstart; i++)
+		{
+			m_A[tcr[i]] -= go[i];
+			gtot_t = gtot_t + gt[i];
+			RHS_t = RHS_t + Idr[i];
+		}
+
+		for (std::size_t i = railstart; i < term_count; i++)
+		{
+			RHS_t += (Idr[i] + go[i] * *other_cur_analog[i]);
+			gtot_t += gt[i];
+		}
+
+		RHS[k] = RHS_t;
+		m_A[mat.diag[k]] += gtot_t;
+	}
+#endif
 	mat.ia[iN] = mat.nz_num;
 
 	/* now solve it */
@@ -356,16 +373,16 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		//__builtin_prefetch(&new_V[j-1], 1);
 		//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
 #if (NL_USE_SSE)
-		__m128d tmp = mm_set_pd1(0.0);
+		__m128d tmp = _mm_set_pd1(0.0);
 		const unsigned e = mat.ia[j+1];
 		unsigned pk = mat.diag[j] + 1;
 		for (; pk < e - 1; pk+=2)
 		{
 			//tmp += m_A[pk] * new_V[mat.ja[pk]];
-			tmp = mm_add_pd(tmp, mm_mul_pd(mm_set_pd(m_A[pk], m_A[pk+1]),
+			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(m_A[pk], m_A[pk+1]),
 					_mm_set_pd(new_V[mat.ja[pk]], new_V[mat.ja[pk+1]])));
 		}
-		double tmpx = mm_cvtsd_f64(tmp) + mm_cvtsd_f64(mm_unpackhi_pd(tmp,tmp));
+		double tmpx = _mm_cvtsd_f64(tmp) + _mm_cvtsd_f64(_mm_unpackhi_pd(tmp,tmp));
 		for (; pk < e; pk++)
 		{
 			tmpx += m_A[pk] * new_V[mat.ja[pk]];

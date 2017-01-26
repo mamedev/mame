@@ -35,7 +35,7 @@ static void writeusage(std::wostream &output, bool write_word_usage, const struc
 		L"%s %s %s %s\n",
 		(write_word_usage ? L"Usage:" : L"      "),
 		wstring_from_utf8(cmdname),
-		c->name,
+		wstring_from_utf8(c->name),
 		c->usage ? wstring_from_utf8(c->usage) : std::wstring());
 }
 
@@ -245,7 +245,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 			L"%*s %*s %*s %*s\n",
 			-columnwidth_filename, wstring_from_utf8(ent.filename),
 			columnwidth_filesize, wstring_from_utf8(filesize_string),
-			columnwidth_attributes, ent.attr,
+			columnwidth_attributes, wstring_from_utf8(ent.attr),
 			columnwidth_lastmodified, wstring_from_utf8(last_modified));
 
 		if (ent.softlink && ent.softlink[0] != '\0')

@@ -279,9 +279,9 @@ ROM_START( ms3 )
 
 	ROM_REGION( 0x200000, "snd", 0 )
 	ROM_LOAD( "1h5053xx.u6",  0x000000, 0x080000, CRC(6735c65a) SHA1(198cacec5441aa615c0de63a0b4e47265636bcee) )
-	
+
 	ROM_REGION( 0x20000, "nvram", 0 )
-	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(acbbc6d9) SHA1(6e86d24ad3793b41f1f23f80f9bdb22767abc3bf) ) 
+	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(acbbc6d9) SHA1(6e86d24ad3793b41f1f23f80f9bdb22767abc3bf) )
 ROM_END
 
 ROM_START( ms72c )
@@ -302,9 +302,9 @@ ROM_START( ms72c )
 
 	ROM_REGION( 0x200000, "snd", 0 )
 	ROM_LOAD( "1H5008FA Multistar 7.u6", 0x000000, 0x100000, CRC(69656637) SHA1(28c2cf48856ee4f820146fdbd0f3c7e307892dc6) )
-	
+
 	ROM_REGION( 0x20000, "nvram", 0 )
-	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(b5e42dbc) SHA1(f6afadb6877bca2cef40725b001c7918f9c99359) ) 
+	ROM_LOAD( "nvram",        0x000000, 0x020000, CRC(b5e42dbc) SHA1(f6afadb6877bca2cef40725b001c7918f9c99359) )
 ROM_END
 
 

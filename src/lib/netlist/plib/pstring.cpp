@@ -6,16 +6,15 @@
  */
 
 #include <cstring>
-//FIXME:: pstring should be locale free
-#include <cctype>
-#include <cstdlib>
-#include <cstdio>
 #include <algorithm>
 #include <stack>
+#include <cstdlib>
 
 #include "pstring.h"
 #include "palloc.h"
 #include "plists.h"
+
+template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 template<typename F>
 pstring_t<F>::~pstring_t()
@@ -97,14 +96,15 @@ const pstring_t<F> pstring_t<F>::substr(const iterator start, const iterator end
 	return ret;
 }
 
-
 template<typename F>
 const pstring_t<F> pstring_t<F>::ucase() const
 {
-	pstring_t ret = *this;
-	ret.pcopy(c_str(), blen());
-	for (std::size_t  i=0; i<ret.len(); i++)
-		ret.m_ptr->str()[i] = static_cast<char>(toupper(static_cast<int>(ret.m_ptr->str()[i])));
+	pstring_t ret = "";
+	for (auto c : *this)
+		if (c >= 'a' && c <= 'z')
+			ret += (c - 'a' + 'A');
+		else
+			ret += c;
 	return ret;
 }
 
@@ -151,7 +151,7 @@ typename pstring_t<F>::iterator pstring_t<F>::find_last_not_of(const pstring_t &
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iterator start) const
+typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t search, iterator start) const
 {
 	for (; start != end(); ++start)
 	{
@@ -167,6 +167,15 @@ typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iter
 	}
 	return end();
 }
+
+template<typename F>
+typename pstring_t<F>::iterator pstring_t<F>::find(const code_t search, iterator start) const
+{
+	mem_t buf[traits::MAXCODELEN+1] = { 0 };
+	traits::encode(search, buf);
+	return find(pstring_t(&buf[0], UTF8), start);
+}
+
 
 template<typename F>
 pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &replace) const
@@ -188,13 +197,13 @@ pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &rep
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::ltrim(const pstring_t &ws) const
+const pstring_t<F> pstring_t<F>::ltrim(const pstring_t ws) const
 {
 	return substr(find_first_not_of(ws), end());
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::rtrim(const pstring_t &ws) const
+const pstring_t<F> pstring_t<F>::rtrim(const pstring_t ws) const
 {
 	auto f = find_last_not_of(ws);
 	if (f==end())
@@ -230,7 +239,7 @@ double pstring_t<F>::as_double(bool *error) const
 
 	if (error != nullptr)
 		*error = false;
-	ret = strtod(c_str(), &e);
+	ret = std::strtod(c_str(), &e);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -246,31 +255,13 @@ long pstring_t<F>::as_long(bool *error) const
 	if (error != nullptr)
 		*error = false;
 	if (startsWith("0x"))
-		ret = strtol(substr(2).c_str(), &e, 16);
+		ret = std::strtol(substr(2).c_str(), &e, 16);
 	else
-		ret = strtol(c_str(), &e, 10);
+		ret = std::strtol(c_str(), &e, 10);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
 	return ret;
-}
-
-template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find(const mem_t *search, iterator start) const
-{
-	for (; start != end(); ++start)
-	{
-		iterator itc(start);
-		iterator cmp(search);
-		while (itc != end() && *cmp != 0 && *itc == *cmp)
-		{
-			++itc;
-			++cmp;
-		}
-		if (*cmp == 0)
-			return start;
-	}
-	return end();
 }
 
 template<typename F>
@@ -289,17 +280,6 @@ bool pstring_t<F>::endsWith(const pstring_t &arg) const
 		return false;
 	else
 		return (memcmp(c_str()+this->blen()-arg.blen(), arg.c_str(), arg.blen()) == 0);
-}
-
-
-template<typename F>
-bool pstring_t<F>::startsWith(const mem_t *arg) const
-{
-	std::size_t alen = strlen(arg);
-	if (alen > blen())
-		return false;
-	else
-		return (memcmp(arg, c_str(), alen) == 0);
 }
 
 template<typename F>
@@ -435,8 +415,8 @@ static inline std::size_t countleadbits(std::size_t x)
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	bool b = s->dec_and_check();
+	if ( b && s != &m_zero)
 	{
 		if (stk != nullptr)
 		{
@@ -445,7 +425,6 @@ void pstring_t<F>::sfree(pstr_t *s)
 		}
 		else
 			plib::pfree_array(reinterpret_cast<char *>(s));
-		//_mm_free(((char *)s));
 	}
 }
 
@@ -492,16 +471,15 @@ void pstring_t<F>::resetmem()
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	bool b = s->dec_and_check();
+	if ( b && s != &m_zero)
 	{
 		plib::pfree_array(((char *)s));
-		//_mm_free(((char *)s));
 	}
 }
 
 template<typename F>
-pstr_t *pstring_t<F>::salloc(int n)
+pstr_t *pstring_t<F>::salloc(std::size_t n)
 {
 	int size = sizeof(pstr_t) + n + 1;
 	pstr_t *p = (pstr_t *) plib::palloc_array<char>(size);

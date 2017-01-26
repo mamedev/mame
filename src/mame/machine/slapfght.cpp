@@ -16,26 +16,18 @@
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 {
-	// d0 is vblank
-	uint8_t res = m_screen->vblank() ? 1 : 0;
-
-	if (m_bmcu)
-	{
-		if (!m_bmcu->get_main_sent())
-			res |= 0x02;
-		if (!m_bmcu->get_mcu_sent())
-			res |= 0x04;
-	}
-
-	return res;
+	return
+			(m_screen->vblank() ? 0x01 : 0x00) |
+			((m_bmcu && (CLEAR_LINE == m_bmcu->host_semaphore_r())) ? 0x02 : 0x00) |
+			((m_bmcu && (CLEAR_LINE == m_bmcu->mcu_semaphore_r())) ? 0x04 : 0x00);
 }
 
 WRITE8_MEMBER(slapfght_state::scroll_from_mcu_w)
 {
 	switch (offset)
 	{
-	case 0x00: m_scrollx_lo = data; break;
-	case 0x01: m_scrollx_hi = data; break;
+	case 0x01: m_scrollx_lo = data; break;  // PB3
+	case 0x02: m_scrollx_hi = data; break;  // PB4
 	}
 }
 

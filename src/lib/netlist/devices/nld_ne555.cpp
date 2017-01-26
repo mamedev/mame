@@ -7,7 +7,7 @@
 
 #include "nld_ne555.h"
 #include "analog/nld_twoterm.h"
-#include <solver/nld_solver.h>
+#include "solver/nld_solver.h"
 
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
@@ -35,19 +35,19 @@ namespace netlist
 			register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 			register_subalias("VCC",  m_R1.m_P);    // Pin 8
 
-			connect_late(m_R1.m_N, m_R2.m_P);
-			connect_late(m_R2.m_N, m_R3.m_P);
-			connect_late(m_RDIS.m_N, m_R3.m_N);
+			connect(m_R1.m_N, m_R2.m_P);
+			connect(m_R2.m_N, m_R3.m_P);
+			connect(m_RDIS.m_N, m_R3.m_N);
 		}
 
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
 	protected:
-		NETLIB_SUB(R) m_R1;
-		NETLIB_SUB(R) m_R2;
-		NETLIB_SUB(R) m_R3;
-		NETLIB_SUB(R) m_RDIS;
+		analog::NETLIB_SUB(R_base) m_R1;
+		analog::NETLIB_SUB(R_base) m_R2;
+		analog::NETLIB_SUB(R_base) m_R3;
+		analog::NETLIB_SUB(R_base) m_RDIS;
 
 		logic_input_t m_RESET;
 		analog_input_t m_THRES;

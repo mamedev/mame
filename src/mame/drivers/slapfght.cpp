@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfigh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
@@ -785,7 +785,7 @@ void slapfght_state::machine_reset()
 MACHINE_RESET_MEMBER(slapfght_state,getstar)
 {
 	// don't boot the mcu since we don't have a dump yet
-//	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+//  m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	machine_reset();
 }
@@ -1044,8 +1044,8 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_SLAP, XTAL_36MHz/12) // 3MHz
-	MCFG_TAITO_M68705_EXTENSION_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_36MHz/12) // 3MHz
+	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

@@ -39,7 +39,7 @@ Supported games:
     batsugun    TP-030        Toaplan       Batsugun
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
-	enmadaio    TP-031        Toaplan       Enma Daio
+    enmadaio    TP-031        Toaplan       Enma Daio
     pwrkick     SW931201      Sunwise       Power Kick
     othldrby    ??????        Sunwise       Othello Derby
     snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
@@ -1559,7 +1559,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( enmadaio_oki, AS_0, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
- 
+
 
 
 WRITE16_MEMBER(toaplan2_state::tekipaki_mcu_w)
@@ -2661,7 +2661,7 @@ static INPUT_PORTS_START( enmadaio )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("yes")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("no") 
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("no")
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

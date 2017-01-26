@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_ds.c 1945 2015-01-21 06:24:32Z rbencina $
+ * $Id$
  * Portable Audio I/O Library DirectSound implementation
  *
  * Authors: Phil Burk, Robert Marsanyi & Ross Bencina
@@ -48,6 +48,7 @@
 //#define PA_WIN_DS_USE_WMME_TIMER
 
 #define _WIN32_WINNT 0x0400 /* required to get waitable timer APIs */
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h> /* strlen() */

@@ -67,7 +67,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	 * omega = 2.0 / (1.0 + std::sqrt(1-rho))
 	 */
 
-	const nl_double ws = this->m_params.m_sor;
+	const nl_double ws = this->m_params.m_gs_sor;
 
 	nl_double w[storage_N];
 	nl_double one_m_w[storage_N];

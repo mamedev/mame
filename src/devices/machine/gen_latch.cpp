@@ -9,12 +9,24 @@
 #include "emu.h"
 #include "gen_latch.h"
 
+
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
 const device_type GENERIC_LATCH_8 = &device_creator<generic_latch_8_device>;
 const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
+
+
+//**************************************************************************
+//  TEMPALTE INSTANTIATIONS
+//**************************************************************************
+
+template class device_finder<generic_latch_8_device, false>;
+template class device_finder<generic_latch_8_device, true>;
+template class device_finder<generic_latch_16_device, false>;
+template class device_finder<generic_latch_16_device, true>;
+
 
 //**************************************************************************
 //  LIVE DEVICE

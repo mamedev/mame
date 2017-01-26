@@ -161,5 +161,4 @@ equation solver.
 
 The formal representation of the circuit will stay the same, thus scales.
 
-
 */

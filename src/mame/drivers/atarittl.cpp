@@ -57,9 +57,9 @@
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
- 	566    Voltage-Controlled Oscillator
- 	1N751A Zener Diode
- 	1N752A Zener Diode
+    566    Voltage-Controlled Oscillator
+    1N751A Zener Diode
+    1N752A Zener Diode
 
  TM-055 (Indy 4)
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
@@ -94,13 +94,13 @@
 #define HRES_MULT                   (1)
 // end
 
-#define SC_VIDCLOCK		(14318181/2)
-#define SC_HTOTAL		(0x1C8+1)		// 456
-#define SC_VTOTAL		(0x103+1)		// 259
-#define SC_HBSTART		(SC_HTOTAL)
-#define SC_HBEND		(32)
-#define SC_VBSTART		(SC_VTOTAL)
-#define SC_VBEND		(8)
+#define SC_VIDCLOCK     (14318181/2)
+#define SC_HTOTAL       (0x1C8+1)       // 456
+#define SC_VTOTAL       (0x103+1)       // 259
+#define SC_HBSTART      (SC_HTOTAL)
+#define SC_HBEND        (32)
+#define SC_VBSTART      (SC_VTOTAL)
+#define SC_VBEND        (8)
 
 class atarikee_state : public driver_device
 {
@@ -184,7 +184,7 @@ private:
 	int m_probe_bit4;
 	int m_probe_bit5;
 	int m_probe_bit6;
-	
+
 	std::unique_ptr<int[]> m_probe_data;
 
 	int m_last_beam;

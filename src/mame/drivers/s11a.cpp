@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( s11a, s11a_state )
 	MCFG_CPU_PROGRAM_MAP(s11a_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( s11a, s11a_state )
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11a_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac1", dac_byte_interface, write))
@@ -451,10 +451,10 @@ ROM_START(pb_p4)
 	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
-GAME(1987, f14_l1,   0,      s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p3,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p4,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p5,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_l1,   0,      s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p3,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p4,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p5,   f14_l1, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l3,  0,      s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l2,  fire_l3,s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-2)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, milln_l3, 0,      s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)

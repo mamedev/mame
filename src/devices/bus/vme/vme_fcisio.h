@@ -6,11 +6,12 @@
 
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
+#include "machine/68153bim.h"
 #include "bus/vme/vme.h"
 
 extern const device_type VME_FCISIO1;
 
-class vme_fcisio1_card_device : 
+class vme_fcisio1_card_device :
 	public device_t
 	,public device_vme_card_interface
 {
@@ -41,6 +42,7 @@ private:
 	required_device<duscc68562_device> m_duscc3;
 
 	required_device<pit68230_device> m_pit;
+	required_device<bim68153_device> m_bim;
 
 	// Pointer to System ROMs needed by bootvect_r
 	uint16_t  *m_sysrom;

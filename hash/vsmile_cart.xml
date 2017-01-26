@@ -516,1408 +516,1408 @@ Game cartridges
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-    <software name="aladdin" supported="no">
-        <description>Disneys Aladdin - Aladdins Welt der Wunder (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092204(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="redhood" supported="no">
-        <description>Entdecke die Welt von Rotkäppchen (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092024(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="alphaprk" supported="no">
-        <description>Alphabet Park Adventure (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092000(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-A" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="ariel" supported="no">
-        <description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Ger, Rev. 3?)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092124(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="ariel1" cloneof="ariel" supported="no">
-        <description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092124(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-A" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="arielf" cloneof="ariel" supported="no">
-        <description>Disney La Petite Sirene - Ariel devient une princesse (Fra)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092125(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="arieldk" cloneof="ariel" supported="no">
-        <description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Den)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092133(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="arielsw" cloneof="ariel" supported="no">
-        <description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092134(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-E" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="barney" supported="no">
-        <description>Barney - Erlebnis-Reise (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092384(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="7061238A" />
-            <feature name="pcb_model" value="7061238A-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <!-- loads if mapped as Batman TV -->
-    <software name="bobbday" supported="no">
-        <description>Bob the Builder - Bob's Busy Day (USA)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092300(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="7061238A" />
-            <feature name="pcb_model" value="7061238A-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="bobbdayg" cloneof="bobbday" supported="no">
-        <description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092304(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="bobbdaydk" cloneof="bobbday" supported="no">
-        <description>Byggemand Bob - Bobs travle dag (Den)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092313(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="bobbdaysw" cloneof="bobbday" supported="no">
-        <description>Byggare Bob - Bobs stressiga dag (Swe)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092314(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <!-- loads if mapped as Batman TV -->
-    <software name="cars" supported="no">
-        <description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092660(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="carsg" cloneof="cars" supported="no">
-        <description>Disney/Pixar Cars - Vollgas in Radiator Springs (Ger)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092664(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="carsf" cloneof="cars" supported="no">
-        <description>Disney/Pixar Cars - Quatre Roues (Fra)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092665(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="carsdk" cloneof="cars" supported="no">
-        <description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Den)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092673(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="carssw" cloneof="cars" supported="no">
-        <description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Swe)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092674(SE)" />
-        <info name="alt_title" value="Biler - Kör ikapp i Kylarköping (Misprinted cart)"/>
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-7" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092240(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderlaa" cloneof="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA, Alt)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092240(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <dataarea name="rom" size="8388608">
-                <rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderlaf" cloneof="cinderla" supported="no">
-        <description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (Fra)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092245(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderladk" cloneof="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Askepots magiske ønsker (Den)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092253(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderlag" cloneof="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092244-104(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderlag1" cloneof="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092244(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="cinderlasw" cloneof="cinderla" supported="no">
-        <description>Disney Princess Cinderella - Askungens magiska önskningar (Swe)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092254(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mickymag" supported="no">
-        <description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092080(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <dataarea name="rom" size="8388608">
-                <rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <!-- loads if mapped as Batman TV -->
-    <software name="dora" supported="no">
-        <description>Nick Jr Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092280(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="doraf" cloneof="dora" supported="no">
-        <description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (Fra)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092285(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="7061238A" />
-            <feature name="pcb_model" value="7061238A-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="dorag" cloneof="dora" supported="no">
-        <description>Nick Jr Dora - Doras Reparatur-Abenteuer (Ger, Rev. 1)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092284-104(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="elmo" supported="no">
-        <description>Elmos großes Abenteuer (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092264(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="footschl" supported="no">
-        <description>V.Smile Fußball Schule (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092824(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="findnemo" supported="no">
-        <description>Disney/Pixar Finding Nemo - Nemo's Ocean Discoveries (USA)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092420(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="fred" supported="no">
-        <description>Freds Zahlen Rallye (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092044(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-A" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="appilote" cloneof="fred" supported="no">
-        <description>Apprenti' pilote (Fra)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092045(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-A" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="kleinstn" supported="no">
-        <description>Kleine Einsteins (Ger, Rev. 3?)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092984(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-6" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="lionking" supported="no">
-        <description>Disney's The Lion King - Simba's Big Adventure (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092100(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="lionkingdk" cloneof="lionking" supported="no">
-        <description>Disney Løvernes Konge - Simbas store eventyr (Den)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092113(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-E" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="lionkingsw" cloneof="lionking" supported="no">
-        <description>Disney Lejonkungen - Simbas stora äventyr (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092114(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-E" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="manny" supported="no">
-        <description>Meister Manny's Werkzeugkiste (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090024(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="melodil">
-        <description>Nickelodeon Les Mélodilous - Les explorateurs vikings (Fra)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092585(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mickymagg" cloneof="mickymag" supported="no">
-        <description>Disneys Micky - Mickys magisches Abenteuer (Ger)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092084(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mickymagsw" cloneof="mickymag" supported="no">
-        <description>Disneys Musse Pigg - Musses magiska äventyr (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092094(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mickeywh" supported="no">
-        <description>Micky Maus Wunderhaus (Ger, Rev. 3?)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092944(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mickeychsw" cloneof="mickeywh" supported="no">
-        <description>Mickey Mouse Clubhouse (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092954(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-7" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="monstaln" supported="no">
-        <description>DreamWorks Monsters vs Aliens (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090164(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mypuppy" supported="no">
-        <description>Mein erster Hund (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090144(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="mypuppysw" cloneof="mypuppy" supported="no">
-        <description>Min hundvalp (Swe)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090154(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-6" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="noddy" supported="no">
-        <description>Noddy - Detektiv für einen Tag (Ger, Rev. 3?)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092544-104(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="oben" supported="no">
-        <description>Disney/Pixar Oben (Ger)</description>
-        <year>2009?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090004-004(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="partyprk" supported="no">
-        <description>Cranium Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092920(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="ratat" supported="no">
-        <description>Disney/Pixar Ratatouille - Remys neue Rezepte (Ger)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092884(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="scoobydo" supported="no">
-        <description>Scooby-Doo! - Funland Frenzy (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092160(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="scoobydof" cloneof="scoobydo" supported="no">
-        <description>Scooby-Doo - Panique à Funland (Fra)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092165(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="scoobydog" cloneof="scoobydo" supported="no">
-        <description>Scooby-Doo! - Im Lernpark (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092164(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-E" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="scoobydodk" cloneof="scoobydo" supported="no">
-        <description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092173(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="scoobydosw" cloneof="scoobydo" supported="no">
-        <description>Scooby-Doo! - Tivoli-tokerier (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092174(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="erniebrt" supported="no">
-        <description>Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092464(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="shrek3" supported="no">
-        <description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092860(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="shrek" supported="no">
-        <description>DreamWorks Shrek - Die Geschichte des Drachen (Ger)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092604(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="shrekf" cloneof="shrek" supported="no">
-        <description>DreamWorks Shrek - Le rhume de Dragonne (Fra)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092605(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="spidermn" supported="no">
-        <description>Spider-Man &amp; ses amis - Missions secrètes (Fra)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092145(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="spiderm2" supported="no">
-        <description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Ger)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092524(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="spongeb" supported="no">
-        <description>Nickelodeon Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092440(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="spongebg" cloneof="spongeb" supported="no">
-        <description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092444(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="spongebg1" cloneof="spongeb" supported="no">
-        <description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092444(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="superman" supported="no">
-        <description>Superman - Der Superheld (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092644(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="supermanf" cloneof="superman" supported="no">
-        <description>Superman - À la rescousse ! (Fra)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092645(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="thomas" supported="no">
-        <description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger, Rev. 1)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092344-104(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="thomas1" cloneof="thomas" supported="no">
-        <description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092344(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="thomassw" cloneof="thomas" supported="no">
-        <description>Thomas &amp; Friends - Tågen hjälps åt (Swe)</description>
-        <year>2007?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092354(SE)" /> <!-- 494096(SE) on cart -->
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="tingelng" supported="no">
-        <description>Tingeling (Swe)</description>
-        <year>2010?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-090274(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-7" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="toystor2" supported="no">
-        <description>Disney/Pixar Toy Story 2 - Operation: Rescue Woody! (USA)</description>
-        <year>2005</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092220(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <dataarea name="rom" size="8388608">
-                <rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="toystor2g" cloneof="toystor2" supported="no">
-        <description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
-        <year>2006?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092224(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="toystor2sw" cloneof="toystor2" supported="no">
-        <description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
-        <year>2005?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092234(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="walle" supported="no">
-        <description>Disney/Pixar Wall-E (Ger)</description>
-        <year>2008?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092844(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="wallesw" cloneof="walle" supported="no">
-        <description>Disney/Pixar Wall-E (Swe)</description>
-        <year>2008?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092854(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708106" />
-            <feature name="pcb_model" value="708106-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="pooh" supported="no">
-        <description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092064(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="pooh1" cloneof="pooh" supported="no">
-        <description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger)</description>
-        <year>2008?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092064-104(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-3" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="poohf" cloneof="pooh" supported="no">
-        <description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
-        <year>2004?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092065(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708894" />
-            <feature name="pcb_model" value="708894-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="poohdk" cloneof="pooh" supported="no">
-        <description>Disney Peter Plys - Honningjagten (Den)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092073(DK)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="poohsw" cloneof="pooh" supported="no">
-        <description>Disney Nalle Puh - Honungsjakten (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092074(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="lerntanz" supported="no">
-        <description>V.Smile - Lern- und Tanzmatte (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-091324(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="707180" />
-            <feature name="pcb_model" value="707180-2" />
-            <feature name="cart_type" value="yellow" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="techart" supported="no">
-        <description>V.Smile Zeichenatelier (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-067004(GER)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="67000C" />
-            <feature name="pcb_model" value="67000C-5" />
-            <feature name="cart_type" value="yellow" />
-            <feature name="u2" value="U2" /> <!-- SRAM -->
-            <feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="4194304">
-                <rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
-            </dataarea>
-            <dataarea name="vram" size="131072">
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="techartsw" cloneof="techart" supported="no">
-        <description>V.Smile Tecknarstudio (Swe)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-067021(SE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="67000C" />
-            <feature name="pcb_model" value="67000C-2" />
-            <feature name="cart_type" value="yellow" />
-            <feature name="u2" value="U2" /> <!-- SRAM -->
-            <feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="4194304">
-                <rom name="52-67021.u3" size="4194304" crc="27449e15" sha1="5c13865dffb04c98c69f3422c965d76a9aa36c33" offset="0" />
-            </dataarea>
-            <dataarea name="vram" size="131072">
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="zayzmac" cloneof="zayzaea" supported="no">
-        <description>Zayzoo - My Alien Classmate (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092360(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <dataarea name="rom" size="8388608">
-                <rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="zayzaea" supported="no">
-        <description>Zayzoo: An Earth Adventure (USA)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092360-101(US)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="708201" />
-            <feature name="pcb_model" value="708201-4" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="zayzmacg" cloneof="zayzaea" supported="no">
-        <description>Zayzoos Lernall (Ger)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092364(GE)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="zezou" cloneof="zayzaea" supported="no">
-        <description>Zézou - Notre Ami Venu d'Ailleurs (Fra)</description>
-        <year>200?</year>
-        <publisher>VTech</publisher>
-        <info name="serial" value="80-092365(FR)" />
-        <part name="cart" interface="vsmile_cart">
-            <feature name="pcb" value="706714" />
-            <feature name="pcb_model" value="706714-1" />
-            <feature name="cart_type" value="lilac" />
-            <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-            <dataarea name="rom" size="8388608">
-                <rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="aladdin" supported="no">
+		<description>Disneys Aladdin - Aladdins Welt der Wunder (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092204(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redhood" supported="no">
+		<description>Entdecke die Welt von Rotkäppchen (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092024(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprk" supported="no">
+		<description>Alphabet Park Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-A" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariel" supported="no">
+		<description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Ger, Rev. 3?)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092124(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariel1" cloneof="ariel" supported="no">
+		<description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092124(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-A" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arielf" cloneof="ariel" supported="no">
+		<description>Disney La Petite Sirene - Ariel devient une princesse (Fra)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092125(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arieldk" cloneof="ariel" supported="no">
+		<description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092133(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arielsw" cloneof="ariel" supported="no">
+		<description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092134(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-E" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barney" supported="no">
+		<description>Barney - Erlebnis-Reise (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092384(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="7061238A" />
+			<feature name="pcb_model" value="7061238A-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- loads if mapped as Batman TV -->
+	<software name="bobbday" supported="no">
+		<description>Bob the Builder - Bob's Busy Day (USA)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092300(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="7061238A" />
+			<feature name="pcb_model" value="7061238A-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdayg" cloneof="bobbday" supported="no">
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092304(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdaydk" cloneof="bobbday" supported="no">
+		<description>Byggemand Bob - Bobs travle dag (Den)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092313(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdaysw" cloneof="bobbday" supported="no">
+		<description>Byggare Bob - Bobs stressiga dag (Swe)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092314(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- loads if mapped as Batman TV -->
+	<software name="cars" supported="no">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092660(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsg" cloneof="cars" supported="no">
+		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092664(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsf" cloneof="cars" supported="no">
+		<description>Disney/Pixar Cars - Quatre Roues (Fra)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092665(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsdk" cloneof="cars" supported="no">
+		<description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Den)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092673(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carssw" cloneof="cars" supported="no">
+		<description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Swe)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092674(SE)" />
+		<info name="alt_title" value="Biler - Kör ikapp i Kylarköping (Misprinted cart)"/>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092240(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlaa" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA, Alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092240(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlaf" cloneof="cinderla" supported="no">
+		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (Fra)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092245(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderladk" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Askepots magiske ønsker (Den)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092253(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlag" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092244-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlag1" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092244(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlasw" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Askungens magiska önskningar (Swe)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092254(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymag" supported="no">
+		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092080(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- loads if mapped as Batman TV -->
+	<software name="dora" supported="no">
+		<description>Nick Jr Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092280(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraf" cloneof="dora" supported="no">
+		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (Fra)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092285(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="7061238A" />
+			<feature name="pcb_model" value="7061238A-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorag" cloneof="dora" supported="no">
+		<description>Nick Jr Dora - Doras Reparatur-Abenteuer (Ger, Rev. 1)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092284-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmo" supported="no">
+		<description>Elmos großes Abenteuer (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092264(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footschl" supported="no">
+		<description>V.Smile Fußball Schule (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092824(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="findnemo" supported="no">
+		<description>Disney/Pixar Finding Nemo - Nemo's Ocean Discoveries (USA)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092420(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fred" supported="no">
+		<description>Freds Zahlen Rallye (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092044(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-A" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="appilote" cloneof="fred" supported="no">
+		<description>Apprenti' pilote (Fra)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092045(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-A" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kleinstn" supported="no">
+		<description>Kleine Einsteins (Ger, Rev. 3?)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092984(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking" supported="no">
+		<description>Disney's The Lion King - Simba's Big Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092100(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingdk" cloneof="lionking" supported="no">
+		<description>Disney Løvernes Konge - Simbas store eventyr (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092113(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-E" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingsw" cloneof="lionking" supported="no">
+		<description>Disney Lejonkungen - Simbas stora äventyr (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092114(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-E" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manny" supported="no">
+		<description>Meister Manny's Werkzeugkiste (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090024(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melodil">
+		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (Fra)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092585(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymagg" cloneof="mickymag" supported="no">
+		<description>Disneys Micky - Mickys magisches Abenteuer (Ger)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092084(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymagsw" cloneof="mickymag" supported="no">
+		<description>Disneys Musse Pigg - Musses magiska äventyr (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092094(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeywh" supported="no">
+		<description>Micky Maus Wunderhaus (Ger, Rev. 3?)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092944(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeychsw" cloneof="mickeywh" supported="no">
+		<description>Mickey Mouse Clubhouse (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092954(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstaln" supported="no">
+		<description>DreamWorks Monsters vs Aliens (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090164(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppy" supported="no">
+		<description>Mein erster Hund (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090144(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppysw" cloneof="mypuppy" supported="no">
+		<description>Min hundvalp (Swe)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090154(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noddy" supported="no">
+		<description>Noddy - Detektiv für einen Tag (Ger, Rev. 3?)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092544-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oben" supported="no">
+		<description>Disney/Pixar Oben (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090004-004(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="partyprk" supported="no">
+		<description>Cranium Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092920(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratat" supported="no">
+		<description>Disney/Pixar Ratatouille - Remys neue Rezepte (Ger)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092884(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydo" supported="no">
+		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092160(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydof" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo - Panique à Funland (Fra)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092165(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydog" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Im Lernpark (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092164(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-E" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydodk" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092173(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydosw" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Tivoli-tokerier (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092174(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erniebrt" supported="no">
+		<description>Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092464(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek3" supported="no">
+		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092860(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek" supported="no">
+		<description>DreamWorks Shrek - Die Geschichte des Drachen (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092604(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekf" cloneof="shrek" supported="no">
+		<description>DreamWorks Shrek - Le rhume de Dragonne (Fra)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092605(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermn" supported="no">
+		<description>Spider-Man &amp; ses amis - Missions secrètes (Fra)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092145(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiderm2" supported="no">
+		<description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092524(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb" supported="no">
+		<description>Nickelodeon Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092440(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebg" cloneof="spongeb" supported="no">
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092444(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebg1" cloneof="spongeb" supported="no">
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092444(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />  <!-- sldh -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superman" supported="no">
+		<description>Superman - Der Superheld (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092644(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermanf" cloneof="superman" supported="no">
+		<description>Superman - À la rescousse ! (Fra)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092645(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas" supported="no">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger, Rev. 1)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092344-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas1" cloneof="thomas" supported="no">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092344(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomassw" cloneof="thomas" supported="no">
+		<description>Thomas &amp; Friends - Tågen hjälps åt (Swe)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092354(SE)" /> <!-- 494096(SE) on cart -->
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tingelng" supported="no">
+		<description>Tingeling (Swe)</description>
+		<year>2010?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090274(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2" supported="no">
+		<description>Disney/Pixar Toy Story 2 - Operation: Rescue Woody! (USA)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092220(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2g" cloneof="toystor2" supported="no">
+		<description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092224(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2sw" cloneof="toystor2" supported="no">
+		<description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
+		<year>2005?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092234(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walle" supported="no">
+		<description>Disney/Pixar Wall-E (Ger)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092844(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallesw" cloneof="walle" supported="no">
+		<description>Disney/Pixar Wall-E (Swe)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092854(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh" supported="no">
+		<description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092064(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh1" cloneof="pooh" supported="no">
+		<description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger)</description>
+		<year>2008?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092064-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohf" cloneof="pooh" supported="no">
+		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092065(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohdk" cloneof="pooh" supported="no">
+		<description>Disney Peter Plys - Honningjagten (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092073(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohsw" cloneof="pooh" supported="no">
+		<description>Disney Nalle Puh - Honungsjakten (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092074(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lerntanz" supported="no">
+		<description>V.Smile - Lern- und Tanzmatte (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091324(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techart" supported="no">
+		<description>V.Smile Zeichenatelier (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067004(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="67000C" />
+			<feature name="pcb_model" value="67000C-5" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" /> <!-- SRAM -->
+			<feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="4194304">
+				<rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
+			</dataarea>
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techartsw" cloneof="techart" supported="no">
+		<description>V.Smile Tecknarstudio (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067021(SE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="67000C" />
+			<feature name="pcb_model" value="67000C-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" /> <!-- SRAM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="4194304">
+				<rom name="52-67021.u3" size="4194304" crc="27449e15" sha1="5c13865dffb04c98c69f3422c965d76a9aa36c33" offset="0" />
+			</dataarea>
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzmac" cloneof="zayzaea" supported="no">
+		<description>Zayzoo - My Alien Classmate (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092360(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzaea" supported="no">
+		<description>Zayzoo: An Earth Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092360-101(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzmacg" cloneof="zayzaea" supported="no">
+		<description>Zayzoos Lernall (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092364(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zezou" cloneof="zayzaea" supported="no">
+		<description>Zézou - Notre Ami Venu d'Ailleurs (Fra)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092365(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
 

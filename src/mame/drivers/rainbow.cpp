@@ -44,7 +44,7 @@ NB.: a single hard disk (5 - 67 MB, 512 byte sectors) may be attached before sta
 until shutdown. "Hot swapping" wasn't possible on the original system (our GUI just doesn't forbid it).
 
 To create a DEC RD50/ST506 compatible image (153 cylinders, 4 heads, 16 sectors, standard 512 byte sectors) enter
->chdman64 createhd - c none - chs 153, 4, 16 - ss 512 - o RD50_ST506.chd
+>chdman createhd -c none -chs 153,4,16 -ss 512 -o RD50_ST506.chd
 NOTE: use -c none parameter for no compression. No more than 8 heads or 1024 cylinders.
 
 Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot from a properly formatted
@@ -56,34 +56,32 @@ handled wrongly, so shared mem. just below $8000 is tainted by Z80 stack data. A
 Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
 
 
-CORVUS HARD DISK (CP/M 1.x only)
---------------------------------
-In theory, it should be possible to use up to 4 Corvus Disks with up to 20 MB each. 
-MS DOS 2.x and CP/M 2.0 were once supported, but are untested (in part because no drivers have survived).
+CORVUS HARD DISK
+----------------
+Up to 4 Corvus Disks with up to 20 MB each can be emulated (to be mounted as hard disks 2 - 5).
+MS DOS 2.x and CP/M v2.x were once supported, but are untested (in part because no binary drivers have survived).
 
 To get a Corvus 11 drive up and running under CP/M 1.x, you'll need drcdutil.td0 from Donald Maslin's Archive.
 
 First, create a 11 MB hard disk:
 >Chdman createhd -c none -chs 306,4,20 -ss 512 -o CORVUS11.chd
-(worked for me, definitive CHS parameters for Corvus B/H drives are hard to come by)
+[ -chs 306,2,20 for the 6 MB model and  -chs 306,6,20 for the 20 MB type ]
 
-HINT: hard disk 1 is linked to DEC's controller. So it is vital that CORVUS11.chd is mounted as hard disk 2 in emulation!
-
-Then make a copy of your CP/M 86-80 V1.x boot disk. This copy will be patched to make the Corvus hard drive usable!
-
+Then make a copy of your CP/M 86-80 V1.x boot disk. This copy must be patched to make the Corvus hard drive usable!
 With 'drcdutil.td0' mounted in A: and a write enabled (non TeleDisk) image of CPM 1.x in B: type:
 b:>SUBMIT A:hinstall
 
-This should replace the following CP/M files on B:
+This replaces the following CP/M files on B:
    B:Z80CCP.SYS  <- A:HZ80CCP.SYS
    B:Z80.SYS     <- A:HZ80.SYS
    B:PRMTVPV.SYS <- A:HPRMTVPV.SYS
 
-Due to a typo in HINSTALL.SUB, the last PIP must be executed manually:
+Due to a missing drive specification in HINSTALL.SUB, the last PIP must be invoked manually:
 b:>PIP B:PRMTVPVT.SYS=A:HPRMTVPV.SYS[V]
 
-Finally, boot from the newly patched CP/M disk and invoke CLINK2TN (command must be invoked after each cold boot).
-CLINK2TN has hard coded params valid for a Corvus 11 MB hard disk only. It needs a patched CP/M 1.x and will not run on CP/M 2.
+Finally, boot from the newly patched CP/M disk and type CLINK2TN (a step necessary after each cold boot).
+CLINK2TN can only be used together with a Corvus 11 MB hard disk. It needs a patched CP/M 1.x disk and won't run on CP/M 2.x.
+[ use CLINK2FV for the 6 MB model and CLINK2TW for the 20 MB type ]
 
 Two steps are needed to initialize the new disk:
 Step 1: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Starting disc address?  2320", "Number of Sectors? 64"
@@ -91,7 +89,7 @@ Step 2: invoke PUTGET, then press "f". Enter "Drive no: 1", "HEX BYTE? e5", "Sta
 Done.
 
 Required steps vary with 5 and 20 MB models (look into the *.DOC files in DRCDUTIL.TD0 / CLINK86.A86 / DRIVEL.COM).
-Parameters for initialization can be taken from Chapter 2 of the Disk System Installion Guide for TRS-80 II (uses same type H drives).
+Parameters for initialization can be taken from Chapter 2 of the Disk System Installion Guide for TRS-80 II (same type H drives).
 
 
 COLOR EMULATION (NEC 7220 + extra hardware)
@@ -112,7 +110,7 @@ COLOR EMULATION (NEC 7220 + extra hardware)
 THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
    The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
    (DIP setting COLOR_MONITOR).
-   
+
    An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
    As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
    A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
@@ -457,7 +455,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"
-#include "machine/corvushd.h" 
+#include "machine/corvushd.h"
 
 #include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
@@ -490,8 +488,8 @@ public:
 		m_inp2(*this, "W14"),
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
-		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER 
-		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER 
+		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER
+		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER
 		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
 		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER
 		m_inp9(*this, "MONO MONITOR TYPE"),
@@ -507,7 +505,7 @@ public:
 
 		m_fdc(*this, FD1793_TAG),
 		m_hdc(*this, "hdc"),
-		m_corvus_hdc(*this, "corvus"), 
+		m_corvus_hdc(*this, "corvus"),
 
 		m_mpsc(*this, "upd7201"),
 		m_dbrg_A(*this, "com8116_a"),
@@ -662,7 +660,7 @@ private:
 	required_device<fd1793_t> m_fdc;
 	optional_device<wd2010_device> m_hdc;
 
-	required_device<corvus_hdc_t> m_corvus_hdc; 
+	required_device<corvus_hdc_t> m_corvus_hdc;
 
 	required_device<upd7201_device> m_mpsc;
 	required_device<com8116_device> m_dbrg_A;
@@ -956,7 +954,7 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 
 // Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
-AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_t, read, write) 
+AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_t, read, write)
 AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
 
 // ===========================================================
@@ -1076,7 +1074,7 @@ PORT_DIPNAME(0x01, 0x00, "DEC HARD DISK") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
 
-PORT_START("CORVUS HARD DISKS") 
+PORT_START("CORVUS HARD DISKS")
 PORT_DIPNAME(0x01, 0x00, "CORVUS HARD DISKS") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1231,7 +1229,7 @@ void rainbow_state::machine_reset()
 	}
 
 	if (m_inp6->read() == 0x00) // Unmap port if Corvus not present
-			io.unmap_readwrite(0x20, 0x20);  
+			io.unmap_readwrite(0x20, 0x20);
 
 	// *********** FLOPPY DISK CONTROLLER [ NOT OPTIONAL ]
 	m_unit = INVALID_DRIVE;
@@ -2150,7 +2148,7 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return  (((m_inp5->read() == 1) ? 0 : 1) |
-		     ((m_inp7->read() == 1) ? 0 : 4) | // Floppy is always present (bit 1 zero)
+			 ((m_inp7->read() == 1) ? 0 : 4) | // Floppy is always present (bit 1 zero)
 #ifdef      OLD_RAM_BOARD_PRESENT
 		((m_inp8->read() > MOTHERBOARD_RAM) ? 0 : 8) |
 #else
@@ -3290,7 +3288,7 @@ MCFG_WD2010_IN_INDEX_CB(VCC) //    "
 MCFG_HARDDISK_ADD("decharddisk1")
 /// ******************************** / HARD DISK CONTROLLER ****************************************
 
-MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0) 
+MCFG_DEVICE_ADD("corvus", CORVUS_HDC, 0)
 MCFG_HARDDISK_ADD("harddisk1")
 MCFG_HARDDISK_INTERFACE("corvus_hdd")
 MCFG_HARDDISK_ADD("harddisk2")

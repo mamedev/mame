@@ -47,7 +47,7 @@
  *
  * Misc links about Force Computes and this board:
  *------------------------------------------------
- * http://bitsavers.trailing-edge.com/pdf/forceComputers/
+ * http://bitsavers.org/pdf/forceComputers/
  *
  * Description, from datasheets etc
  * --------------------------------
@@ -66,9 +66,38 @@
  * - One 5 1/4" full height space for the winchester drive
  * - Up to 6 free slots for system expansion
  *
+ * Features per version
+ * --------------------------------------------------------------------------
+ *  Description             miniFORCE 2P21A  miniFORCE 2P21   miniFORCE 2P21S
+ * --------------------------------------------------------------------------
+ *  CPU 68020                20 MHz           16.7 MHz         12.5 MHz
+ *  FPU 68881                20 MHz           16.7 MHz         12.5 MHz
+ *  Memory SRAM              512KB            512KB            512KB
+ *  Serial 68561 MPSC        2 RS232 ports    2 RS232 ports    2 RS232 ports
+ *  Winchester HDD           51 MB            51 MB            20 MB
+ *  Floppy                   1 MB             1 MB             1 MB
+ *  Timer 68230 PIT          1                1                1
+ *  RTOS                     PDOS             PDOS             PDOS
+ * --------------------------------------------------------------------------
+ *
+ * Address Map from CPU-21 board perspective
+ * --------------------------------------------------------------------------
+ *  Range                   Decscription
+ * --------------------------------------------------------------------------
+ * 00000000-0007FFFF        Local 512KB SRAM CPU-21 CPU board
+ * 00080000-000FFFFF        VME A32 512KB SRAM CPU-22 SRAM board (optional)
+ * 00080000-FAFFFFFF        VME A32 Memory if no CPU-22 installed
+ * 00100000-FAFFFFFF        VME A32 Memory if CPU-22 installed
+ * FCB00000-FCB001FF        VME A24 First SIO-1 card (optional)
+ * FCB01000-FCB0100F        VME A24 WFC-l card
+ * FCB02000-FCB022FF        VME A24 ASCU-l/2 card (optional)
+ * FF000000-FF07FFFF        EPROM Area 1
+ * FF080000-FFFFFFFF        Local I/O devices
+ * --------------------------------------------------------------------------
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
+#include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 #include "machine/clock.h"
@@ -110,11 +139,11 @@ miniforce_state(const machine_config &mconfig, device_type type, const char *tag
 static ADDRESS_MAP_START (miniforce_mem, AS_PROGRAM, 32, miniforce_state)
 	ADDRESS_MAP_UNMAP_HIGH
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
-//	AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
-//	AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
-//	AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
-//	AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//	AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
+//  AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
+//  AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
+//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
+//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 #endif
 
@@ -135,17 +164,18 @@ static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(miniforce_vme_cards)
+	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END	
+SLOT_INTERFACE_END
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START (miniforce, miniforce_state)
-//	MCFG_CPU_PROGRAM_MAP (miniforce_mem)
+//  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, "fccpu20")
 	MCFG_VME_SLOT_ADD ("vme", "slot2", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot3", miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", "slot4", miniforce_vme_cards, nullptr)

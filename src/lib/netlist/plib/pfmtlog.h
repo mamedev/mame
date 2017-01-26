@@ -157,13 +157,12 @@ protected:
 class pfmt : public pformat_base<pfmt>
 {
 public:
-	explicit pfmt(const pstring &fmt);
-	explicit pfmt(const char *fmt);
+	explicit pfmt(const pstring fmt);
 	virtual ~pfmt();
 
-	operator pstring() const { return m_str; }
+	operator pstring() const { return pstring(m_str, pstring::UTF8); }
 
-	const char *cstr() { return m_str; }
+	const char *c_str() { return m_str; }
 
 
 protected:
@@ -190,41 +189,42 @@ class plog_dispatch_intf;
 template <bool build_enabled = true>
 class pfmt_writer_t
 {
+	P_PREVENT_COPYING(pfmt_writer_t)
 public:
-	pfmt_writer_t() : m_enabled(true)  { }
+	explicit pfmt_writer_t() : m_enabled(true)  { }
 	virtual ~pfmt_writer_t() { }
 
-	void operator ()(const char *fmt) const
+	void operator ()(const pstring fmt) const
 	{
 		if (build_enabled && m_enabled) vdowrite(fmt);
 	}
 
 	template<typename T1>
-	void operator ()(const char *fmt, const T1 &v1) const
+	void operator ()(const pstring fmt, const T1 &v1) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1));
 	}
 
 	template<typename T1, typename T2>
-	void operator ()(const char *fmt, const T1 &v1, const T2 &v2) const
+	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2));
 	}
 
 	template<typename T1, typename T2, typename T3>
-	void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
+	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4>
-	void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
+	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	void operator ()(const char *fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
+	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
 	}
@@ -237,7 +237,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
-	virtual void vdowrite(const pstring &ls) const {}
+	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:
 	bool m_enabled;
@@ -248,7 +248,7 @@ template <plog_level::e L, bool build_enabled = true>
 class plog_channel : public pfmt_writer_t<build_enabled>
 {
 public:
-	explicit plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(),  m_base(b) { }
+	explicit plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(), m_base(b) { }
 	virtual ~plog_channel() { }
 
 protected:

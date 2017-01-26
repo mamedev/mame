@@ -63,6 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(yamato_p1_r);
 	DECLARE_WRITE8_MEMBER(toprollr_rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_READ8_MEMBER(bagmanf_a000_r);
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
 

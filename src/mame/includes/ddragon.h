@@ -6,31 +6,34 @@
 
 *************************************************************************/
 
+#include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+
 
 class ddragon_state : public driver_device
 {
 public:
 	ddragon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_rambase(*this, "rambase"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_comram(*this, "comram"),
-		m_spriteram(*this, "spriteram"),
-		m_scrollx_lo(*this, "scrollx_lo"),
-		m_scrolly_lo(*this, "scrolly_lo"),
-		m_darktowr_mcu_ports(*this, "darktowr_mcu"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_subcpu(*this, "sub"),
-		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_rambase(*this, "rambase")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_comram(*this, "comram")
+		, m_spriteram(*this, "spriteram")
+		, m_scrollx_lo(*this, "scrollx_lo")
+		, m_scrolly_lo(*this, "scrolly_lo")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_subcpu(*this, "sub")
+		, m_adpcm1(*this, "adpcm1")
+		, m_adpcm2(*this, "adpcm2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+	{
+	}
 
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_rambase;
@@ -40,7 +43,6 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scrollx_lo;
 	required_shared_ptr<uint8_t> m_scrolly_lo;
-	optional_shared_ptr<uint8_t> m_darktowr_mcu_ports;
 
 	/* video-related */
 	tilemap_t      *m_fg_tilemap;
@@ -105,15 +107,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
 	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
-	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
-	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
-	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
 	DECLARE_READ8_MEMBER(ddragon_interrupt_r);
 	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
-	DECLARE_WRITE8_MEMBER(darktowr_mcu_w);
 	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
 	DECLARE_READ8_MEMBER(ddragon_comram_r);
@@ -124,9 +121,45 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
-	DECLARE_DRIVER_INIT(toffy);
-	DECLARE_DRIVER_INIT(darktowr);
 	DECLARE_DRIVER_INIT(ddragon2);
 	DECLARE_DRIVER_INIT(ddragon);
 	DECLARE_DRIVER_INIT(ddragon6809);
+};
+
+
+class darktowr_state : public ddragon_state
+{
+public:
+	darktowr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ddragon_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+		, m_mcu_port_a_out(0xff)
+	{
+	}
+
+	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
+	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
+	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
+
+	DECLARE_DRIVER_INIT(darktowr);
+
+protected:
+	required_device<m68705p_device> m_mcu;
+
+	uint8_t m_mcu_port_a_out;;
+};
+
+
+class toffy_state : public ddragon_state
+{
+public:
+	toffy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ddragon_state(mconfig, type, tag)
+	{
+	}
+
+	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
+
+	DECLARE_DRIVER_INIT(toffy);
 };

@@ -36,7 +36,7 @@ namespace plib
 			if (getenv(var.c_str()) == nullptr)
 				return default_val;
 			else
-				return pstring(getenv(var.c_str()));
+				return pstring(getenv(var.c_str()), pstring::UTF8);
 		}
 	}
 
@@ -62,7 +62,7 @@ namespace plib
 		}
 	}
 
-	pstring_vector_t::pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl)
+	pstring_vector_t::pstring_vector_t(const pstring &str, const std::vector<pstring> &onstrl)
 	: std::vector<pstring>()
 	{
 		pstring col = "";
@@ -139,7 +139,7 @@ namespace plib
 				if (*str == ',')
 				{
 					*bufp = 0;
-					return pstring(buf);
+					return pstring(buf, pstring::UTF8);
 				}
 				else if (*str != ' ')
 					*bufp++ = *str;
@@ -152,6 +152,6 @@ namespace plib
 			str++;
 		}
 		*bufp = 0;
-		return pstring(buf);
+		return pstring(buf, pstring::UTF8);
 	}
 } // namespace plib

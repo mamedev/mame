@@ -6,15 +6,15 @@
  *
  *  23/09/2015
  *
- * This device was drycoded based on OS9 boot strap code on a Mizar mz8105 board 
+ * This device was drycoded based on OS9 boot strap code on a Mizar mz8105 board
  * which expects to find a SIO on the VME bus + photos of a Mizar 8300 board on Ebay
  * I have found no formal documents for this board so far, so needs verification.
- *                                                                                   
- *         ||                                                                          
- *         ||                                                                          
- *         ||                                                                          
- *         ||                                                                          
- *         ||____________________________________________________________   ___ 
+ *
+ *         ||
+ *         ||
+ *         ||
+ *         ||
+ *         ||____________________________________________________________   ___
  * \+++====|| U2|AM26LS32|   |  NEC               | |74LS04N||74LS645   ||_|   |
  *  \=/-  o||   +--------+   |  D7201C            | ++-----+++----------+| |   |
  *   |  |  ||      +-------+ +--------------------+  |     | |SN74LS374N|| |   |
@@ -32,14 +32,14 @@
  *  /=\-  o||J1    K1 U4| xxx   |  xxx   | 74LS164|   K6     |AM25LS2521|| |   |
  * /+++====||  J2       +-------+--------+--------+--------+ +----------+|_|   |
  *         ||Rev G    U3| MC1488| MC1488 | 74LS161|  74F85 |      K8     | |___|
- *         ||-----------+-------+-----------------------------------------            
- *         ||                                                            
- *         ||                                                            
+ *         ||-----------+-------+-----------------------------------------
+ *         ||
+ *         ||
  *
  *
- * Misc links about this board: 
+ * Misc links about this board:
  * http://www.ebay.com/itm/MIZAR-INC-8300-0-01-REV-J-INTERFACE-CONTROL-BOARD-W-RIBBON-AND-PLATE-/231508658429?hash=item35e6fdc8fd
- * 
+ *
  * Description
  * ------------
  * The Mizar mz8300 is a Quad Serial board.
@@ -52,8 +52,8 @@
  * --------------------------------------------------------------------------
  * Local          VME                  Decscription
  * -------------------------------------------------------------------------
- *  n/a           0xff0000 0xff0003   mzr8105.c Bootstrap expects to find a 
- *                                    UPD7201 serial device here - configurable! 
+ *  n/a           0xff0000 0xff0003   mzr8105.c Bootstrap expects to find a
+ *                                    UPD7201 serial device here - configurable!
  * --------------------------------------------------------------------------
  *
  * Interrupt sources MVME
@@ -61,15 +61,15 @@
  * Description                  Device  Lvl  IRQ    VME board
  *                           /Board      Vector  Address
  * ----------------------------------------------------------
- * On board Sources                     
- *  
+ * On board Sources
+ *
  * Off board Sources (other VME boards)
  *
  * ----------------------------------------------------------
  *
  * DMAC Channel Assignments
  * ----------------------------------------------------------
- * Channel                               
+ * Channel
  * ----------------------------------------------------------
  *
  *  TODO:
@@ -110,7 +110,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_MZR8300 = &device_creator<vme_mzr8300_card_device>;
@@ -135,8 +135,8 @@ MACHINE_CONFIG_FRAGMENT( mzr8300 )
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
-//	machine_config_additions - device-specific
-//	machine configurations
+//  machine_config_additions - device-specific
+//  machine configurations
 //-------------------------------------------------
 
 

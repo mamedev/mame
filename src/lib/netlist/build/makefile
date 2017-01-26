@@ -50,6 +50,7 @@ POBJS := \
 	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
+	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \

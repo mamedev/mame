@@ -91,15 +91,11 @@ matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
 
 matrix_solver_t::~matrix_solver_t()
 {
-	for (unsigned k = 0; k < m_terms.size(); k++)
-	{
-		plib::pfree(m_terms[k]);
-	}
-
 }
 
 void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 {
+
 	log().debug("New solver setup\n");
 
 	m_nets.clear();
@@ -108,7 +104,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 	for (auto & net : nets)
 	{
 		m_nets.push_back(net);
-		m_terms.push_back(plib::palloc<terms_for_net_t>());
+		m_terms.push_back(plib::make_unique<terms_for_net_t>());
 		m_rails_temp.push_back(plib::palloc<terms_for_net_t>());
 	}
 
@@ -163,8 +159,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					}
 					break;
 				case terminal_t::OUTPUT:
-				case terminal_t::PARAM:
-					log().fatal("unhandled element found\n");
+					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
+							p->name());
 					break;
 			}
 		}
@@ -240,7 +236,7 @@ void matrix_solver_t::setup_matrix()
 	/* create a list of non zero elements. */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
@@ -262,7 +258,7 @@ void matrix_solver_t::setup_matrix()
 	 */
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_for_net_t * t = m_terms[k];
+		terms_for_net_t * t = m_terms[k].get();
 		/* pretty brutal */
 		int *other = t->connected_net_idx();
 
@@ -292,9 +288,9 @@ void matrix_solver_t::setup_matrix()
 	 * This should reduce cache misses ...
 	 */
 
-	bool **touched = new bool*[iN];
+	bool **touched = plib::palloc_array<bool *>(iN);
 	for (unsigned k=0; k<iN; k++)
-		touched[k] = new bool[iN];
+		touched[k] = plib::palloc_array<bool>(iN);
 
 	for (unsigned k = 0; k < iN; k++)
 	{
@@ -352,8 +348,8 @@ void matrix_solver_t::setup_matrix()
 	}
 
 	for (unsigned k=0; k<iN; k++)
-		delete [] touched[k];
-	delete [] touched;
+		plib::pfree_array(touched[k]);
+	plib::pfree_array(touched);
 }
 
 void matrix_solver_t::update_inputs()
@@ -379,7 +375,7 @@ void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices() && new_timestep > netlist_time::zero())
+	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
 		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(new_timestep);
@@ -390,7 +386,7 @@ void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
 
-	if (m_params.m_dynamic && has_timestep_devices())
+	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
 		m_Q_sync.net().force_queue_execution();
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
@@ -423,7 +419,7 @@ void matrix_solver_t::solve_base()
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
+			log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
 			m_Q_sync.net().toggle_new_Q();
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
 		}
@@ -479,7 +475,7 @@ void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 		else // if (ot<0)
 		{
 			m_rails_temp[k]->add(term, ot, true);
-			log().fatal("found term with missing othernet {1}\n", term->name());
+			log().fatal(MF_1_FOUND_TERM_WITH_MISSING_OTHERNET, term->name());
 		}
 	}
 }
@@ -488,7 +484,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
 		/*
 		 * FIXME: We should extend the logic to use either all nets or
@@ -497,7 +493,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
-			terms_for_net_t *t = m_terms[k];
+			terms_for_net_t *t = m_terms[k].get();
 
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;
@@ -509,7 +505,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			t->m_h_n_m_1 = hn;
 			t->m_DD_n_m_1 = DD_n;
 			if (std::fabs(DD2) > NL_FCONST(1e-60)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_lte / std::fabs(NL_FCONST(0.5)*DD2));
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -546,12 +542,12 @@ void matrix_solver_t::log_stats()
 		log().verbose("       {1:6.3} average newton raphson loops",
 					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
 		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
-				this->m_stat_calculations(),
-				static_cast<double>(this->m_stat_calculations()) / this->netlist().time().as_double(),
-				this->m_iterative_fail(),
-				100.0 * static_cast<double>(this->m_iterative_fail())
-					/ static_cast<double>(this->m_stat_calculations()),
-				static_cast<double>(this->m_iterative_total()) / static_cast<double>(this->m_stat_calculations()));
+				this->m_stat_calculations,
+				static_cast<double>(this->m_stat_calculations) / this->netlist().time().as_double(),
+				this->m_iterative_fail,
+				100.0 * static_cast<double>(this->m_iterative_fail)
+					/ static_cast<double>(this->m_stat_calculations),
+				static_cast<double>(this->m_iterative_total) / static_cast<double>(this->m_stat_calculations));
 	}
 }
 

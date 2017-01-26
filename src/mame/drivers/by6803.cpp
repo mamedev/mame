@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( by6803, by6803_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
 
 	//MCFG_SPEAKER_STANDARD_MONO("speaker")
-	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0) // Cheap Squeak Turbo
+	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0) // Cheap Squeak Turbo
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -615,6 +615,14 @@ ROM_START(motrdome)
 	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
 ROM_END
 
+ROM_START(motrdomeg) // German version claims to be game #E69
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "u2_11_de.bin", 0x8000, 0x4000, CRC(8a4bafd3) SHA1(d764d2e38be2df27ab982cfbedddb79f89ca2359))
+	ROM_LOAD( "u3_11_de.bin", 0xc000, 0x4000, CRC(9cb10037) SHA1(7847a71a0295e8de51a8f2f8d406350eca4555bf))
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("modm_u7.snd", 0x8000, 0x8000, CRC(29ce4679) SHA1(f17998198b542dd99a34abd678db7e031bde074b))
+ROM_END
+
 /*--------------------------------
 / Party Animal #OH01
 /-------------------------------*/
@@ -708,6 +716,7 @@ ROM_END
 GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Eight Ball Champ", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Beat the Clock", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, by6803, ROT0, "Bally","MotorDome (German)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Lady Luck", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1986, strngscg,  strngsci, by6803, by6803, by6803_state, by6803, ROT0, "Bally","Strange Science (German)", MACHINE_IS_SKELETON_MECHANICAL)

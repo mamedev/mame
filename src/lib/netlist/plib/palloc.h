@@ -61,6 +61,7 @@ public:
 	owned_ptr(SC *p, bool owned) noexcept
 	: m_ptr(p), m_is_owned(owned)
 	{ }
+
 	owned_ptr(const owned_ptr &r) = delete;
 	owned_ptr & operator =(owned_ptr &r) = delete;
 

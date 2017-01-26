@@ -2,13 +2,13 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Namco C139 - Serial I/F Controller
+    Namco C139 - Serial I/F Controller
 
-	
-	TODO:
-	- Make this to actually work! 
-	- Is RAM shared with a specific CPU other than master/slave?
-	
+
+    TODO:
+    - Make this to actually work!
+    - Is RAM shared with a specific CPU other than master/slave?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -35,9 +35,9 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START( regs_map, 16, namco_c139_device )
 	AM_RANGE(0x00, 0x00) AM_READ(status_r) // WRITE clears flags
 	AM_RANGE(0x02, 0x02) AM_NOP // settings?
-//	AM_RANGE(0x0a, 0x0a) // WRITE tx_w
-//	AM_RANGE(0x0c, 0x0c) // READ rx_r
-// 	AM_RANGE(0x0e, 0x0e) // 
+//  AM_RANGE(0x0a, 0x0a) // WRITE tx_w
+//  AM_RANGE(0x0c, 0x0c) // READ rx_r
+//  AM_RANGE(0x0e, 0x0e) //
 ADDRESS_MAP_END
 
 //-------------------------------------------------

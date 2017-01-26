@@ -27,14 +27,14 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_MZR8105 = &device_creator<vme_mzr8105_card_device>;
 
 //-------------------------------------------------
-//	machine_config_additions - device-specific
-//	machine configurations
+//  machine_config_additions - device-specific
+//  machine configurations
 //-------------------------------------------------
 
 MACHINE_CONFIG_EXTERN( mzr8105 );

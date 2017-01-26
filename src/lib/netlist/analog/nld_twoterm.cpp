@@ -5,14 +5,15 @@
  *
  */
 
-#include <solver/nld_solver.h>
 #include <algorithm>
+
+#include "solver/nld_solver.h"
 
 #include "nld_twoterm.h"
 
 namespace netlist
 {
-	namespace devices
+	namespace analog
 	{
 // ----------------------------------------------------------------------------------------
 // generic_diode
@@ -23,6 +24,7 @@ generic_diode::generic_diode(device_t &dev, pstring name)
 	, m_Id(dev, name + ".m_Id", 0.0)
 	, m_G(dev,  name + ".m_G", 1e-15)
 	, m_Vt(0.0)
+	, m_Vmin(0.0)
 	, m_Is(0.0)
 	, m_n(0.0)
 	, m_gmin(1e-15)
@@ -40,6 +42,7 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 	m_gmin = gmin;
 
 	m_Vt = 0.0258 * m_n;
+	m_Vmin = -5.0 * m_Vt;
 
 	m_Vcrit = m_Vt * std::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
@@ -47,8 +50,7 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 
 void generic_diode::update_diode(const nl_double nVd)
 {
-#if 1
-	if (nVd < NL_FCONST(-5.0) * m_Vt)
+	if (nVd < m_Vmin)
 	{
 		m_Vd = nVd;
 		m_G = m_gmin;
@@ -58,29 +60,19 @@ void generic_diode::update_diode(const nl_double nVd)
 	{
 		m_Vd = nVd;
 		//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		m_Id = IseVDVt - m_Is;
+		m_G = IseVDVt * m_VtInv + m_gmin;
 	}
 	else
 	{
-#if 1
-		const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
+		const double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
-#else
-		m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-#endif
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		m_Id = IseVDVt - m_Is;
+		m_G = IseVDVt * m_VtInv + m_gmin;
 	}
-#else
-	m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-	const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-	m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-	m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -255,8 +247,8 @@ NETLIB_TIMESTEP(L)
 
 NETLIB_RESET(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 	set(m_D.G(), 0.0, m_D.Ieq());
@@ -264,8 +256,8 @@ NETLIB_RESET(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	nl_double Is = m_model.model_value("IS");
-	nl_double n = m_model.model_value("N");
+	nl_double Is = m_model.m_IS;
+	nl_double n = m_model.m_N;
 
 	m_D.set_param(Is, n, netlist().gmin());
 }
@@ -300,6 +292,13 @@ NETLIB_UPDATE(VS)
 	NETLIB_NAME(twoterm)::update();
 }
 
+NETLIB_TIMESTEP(VS)
+{
+	this->set(1.0 / m_R(),
+			m_compiled.evaluate(std::vector<double>({netlist().time().as_double()})),
+			0.0);
+}
+
 // ----------------------------------------------------------------------------------------
 // nld_CS
 // ----------------------------------------------------------------------------------------
@@ -319,5 +318,24 @@ NETLIB_UPDATE(CS)
 	NETLIB_NAME(twoterm)::update();
 }
 
-	} //namespace devices
+NETLIB_TIMESTEP(CS)
+{
+	const double I = m_compiled.evaluate(std::vector<double>({netlist().time().as_double()}));
+	set_mat(0.0, 0.0, -I,
+			0.0, 0.0,  I);
+}
+
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, R)
+		NETLIB_DEVICE_IMPL_NS(analog, POT)
+		NETLIB_DEVICE_IMPL_NS(analog, POT2)
+		NETLIB_DEVICE_IMPL_NS(analog, C)
+		NETLIB_DEVICE_IMPL_NS(analog, L)
+		NETLIB_DEVICE_IMPL_NS(analog, D)
+		NETLIB_DEVICE_IMPL_NS(analog, VS)
+		NETLIB_DEVICE_IMPL_NS(analog, CS)
+	}
+
 } // namespace netlist

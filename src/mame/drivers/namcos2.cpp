@@ -1701,7 +1701,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
 	}
-	
+
 	if(scanline == cur_posirq)
 	{
 		m_master_intc->pos_irq_trigger();
@@ -1736,7 +1736,7 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
 	MCFG_NAMCO_C139_ADD("sci")
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)

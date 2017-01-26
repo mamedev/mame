@@ -8,11 +8,8 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
-#include <type_traits>
-
-//#include "solver/nld_solver.h"
 #include "nl_base.h"
-#include "plib/pstream.h"
+#include "nl_errstr.h"
 
 namespace netlist
 {
@@ -24,11 +21,11 @@ namespace netlist
 	{
 		int m_pivot;
 		nl_double m_accuracy;
-		nl_double m_lte;
+		nl_double m_dynamic_lte;
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
-		nl_double m_sor;
-		bool m_dynamic;
+		nl_double m_gs_sor;
+		bool m_dynamic_ts;
 		unsigned m_gs_loops;
 		unsigned m_nr_loops;
 		netlist_time m_nr_recalc_delay;
@@ -47,14 +44,14 @@ public:
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() { return m_terms.size(); }
+	inline std::size_t count() const { return m_terms.size(); }
 
 	inline terminal_t **terms() { return m_terms.data(); }
 	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
 	inline nl_double *gt() { return m_gt.data(); }
 	inline nl_double *go() { return m_go.data(); }
 	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double **connected_net_V() { return m_connected_net_V.data(); }
+	inline nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
 
 	void set_pointers();
 
@@ -110,7 +107,10 @@ public:
 
 	virtual ~matrix_solver_t();
 
-	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
+	void setup(analog_net_t::list_t &nets)
+	{
+		vsetup(nets);
+	}
 
 	void solve_base();
 
@@ -133,13 +133,11 @@ public:
 public:
 	int get_net_idx(detail::net_t *net);
 
-	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
-
 	virtual void log_stats();
 
-	virtual void create_solver_code(plib::postream &strm)
+	virtual std::pair<pstring, pstring> create_solver_code()
 	{
-		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
+		return std::pair<pstring, pstring>("", plib::pfmt("/* {1} doesn't support static compile */"));
 	}
 
 protected:
@@ -163,7 +161,7 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	std::vector<terms_for_net_t *> m_terms;
+	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
@@ -228,12 +226,14 @@ void matrix_solver_t::build_LE_A()
 	const unsigned iN = child.N();
 	for (unsigned k = 0; k < iN; k++)
 	{
+		terms_for_net_t *terms = m_terms[k].get();
+
 		for (unsigned i=0; i < iN; i++)
 			child.A(k,i) = 0.0;
 
-		const std::size_t terms_count = m_terms[k]->count();
-		const std::size_t railstart =  m_terms[k]->m_railstart;
-		const nl_double * RESTRICT gt = m_terms[k]->gt();
+		const std::size_t terms_count = terms->count();
+		const std::size_t railstart =  terms->m_railstart;
+		const nl_double * const RESTRICT gt = terms->gt();
 
 		{
 			nl_double akk  = 0.0;
@@ -243,8 +243,8 @@ void matrix_solver_t::build_LE_A()
 			child.A(k,k) = akk;
 		}
 
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
+		const nl_double * const RESTRICT go = terms->go();
+		int * RESTRICT net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			child.A(k,net_other[i]) -= go[i];
@@ -264,8 +264,8 @@ void matrix_solver_t::build_LE_RHS()
 		nl_double rhsk_b = 0.0;
 
 		const std::size_t terms_count = m_terms[k]->count();
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
+		const nl_double * const RESTRICT go = m_terms[k]->go();
+		const nl_double * const RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)

@@ -32,7 +32,7 @@ public:
 	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
 		, m_Vdelta(*this, "m_Vdelta", 0.0)
-		, m_omega(*this, "m_omega", params->m_sor)
+		, m_omega(*this, "m_omega", params->m_gs_sor)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, m_gs_fail(*this, "m_gs_fail", 0)
 		, m_gs_total(*this, "m_gs_total", 0)

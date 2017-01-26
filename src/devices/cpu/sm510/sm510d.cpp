@@ -69,7 +69,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
-static const uint8_t s_bits[] =
+static const u8 s_bits[] =
 {
 	0, 8,
 	4, 8, 0, 0, 0, 0,
@@ -99,7 +99,7 @@ static const uint8_t s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const uint32_t s_flags[] =
+static const u32 s_flags[] =
 {
 	0, 0,
 	0, 0, 0, 0, 0, 0,
@@ -127,7 +127,7 @@ static const uint32_t s_flags[] =
 };
 
 // next program counter in sequence (relative)
-static const int8_t s_next_pc[0x40] =
+static const s8 s_next_pc[0x40] =
 {
 	32, -1 /* rollback */, -1, 30, 30, -3, -3, 28, 28, -5, -5, 26, 26, -7, -7, 24,
 	24, -9, -9, 22, 22, -11, -11, 20, 20, -13, -13, 18, 18, -15, -15, 16,
@@ -139,16 +139,16 @@ static const int8_t s_next_pc[0x40] =
 
 // common disasm
 
-static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram)
 {
 	// get raw opcode
-	uint8_t op = oprom[0];
-	uint8_t instr = lut_mnemonic[op];
+	u8 op = oprom[0];
+	u8 instr = lut_mnemonic[op];
 	int len = 1;
 
 	int bits = s_bits[instr];
-	uint8_t mask = op & ((1 << (bits & 7)) - 1);
-	uint16_t param = mask;
+	u8 mask = op & ((1 << (bits & 7)) - 1);
+	u16 param = mask;
 	if (bits >= 8)
 	{
 		// note: disasm view shows correct parameter, but raw view does not
@@ -180,7 +180,7 @@ static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lu
 		}
 		else
 		{
-			uint16_t address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
+			u16 address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
 			util::stream_format(stream, "$%03X", address);
 		}
 
@@ -195,7 +195,7 @@ static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lu
 
 // SM510 disasm
 
-static const uint8_t sm510_mnemonic[0x100] =
+static const u8 sm510_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	mSKIP, mATBP, mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
@@ -227,7 +227,7 @@ CPU_DISASSEMBLE(sm510)
 
 // SM511 disasm
 
-static const uint8_t sm511_mnemonic[0x100] =
+static const u8 sm511_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	mROT,  mDTA,  mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
@@ -251,7 +251,7 @@ static const uint8_t sm511_mnemonic[0x100] =
 	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM    // F
 };
 
-static const uint8_t sm511_extended[0x10] =
+static const u8 sm511_extended[0x10] =
 {
 	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 60 3
 };
@@ -259,7 +259,7 @@ static const uint8_t sm511_extended[0x10] =
 CPU_DISASSEMBLE(sm511)
 {
 	// create extended opcode table
-	uint8_t ext[0x100];
+	u8 ext[0x100];
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
@@ -269,7 +269,7 @@ CPU_DISASSEMBLE(sm511)
 
 // SM500 disasm
 
-static const uint8_t sm500_mnemonic[0x100] =
+static const u8 sm500_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	mSKIP, mATR,  mEXKSA,mATBP, mRM,   mRM,   mRM,   mRM,   mADD,  mADDC, mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
@@ -293,7 +293,7 @@ static const uint8_t sm500_mnemonic[0x100] =
 	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS   // F
 };
 
-static const uint8_t sm500_extended[0x10] =
+static const u8 sm500_extended[0x10] =
 {
 	mCEND, 0,     0,     0,     mDTA,  0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 5E 0
 };
@@ -301,7 +301,7 @@ static const uint8_t sm500_extended[0x10] =
 CPU_DISASSEMBLE(sm500)
 {
 	// create extended opcode table
-	uint8_t ext[0x100];
+	u8 ext[0x100];
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm500_extended, 0x10);
 
@@ -311,7 +311,7 @@ CPU_DISASSEMBLE(sm500)
 
 // KB1013VK1-2 disasm
 
-static const uint8_t kb1013vk12_mnemonic[0x100] =
+static const u8 kb1013vk12_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	mNOP,  mOAR,  mBS1,  mEN,   mBM0,  mBM0,  mBM0,  mBM0,  mAM,   mAC,   mCOM,  mXL,   mBM1,  mBM1,  mBM1,  mBM1,  // 0
@@ -335,7 +335,7 @@ static const uint8_t kb1013vk12_mnemonic[0x100] =
 	mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR,  mCBR   // F
 };
 
-static const uint8_t kb1013vk12_extended[0x10] =
+static const u8 kb1013vk12_extended[0x10] =
 {
 	mHLT,  0,     0,     0,     mLDF,  0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 5E 0
 };
@@ -343,7 +343,7 @@ static const uint8_t kb1013vk12_extended[0x10] =
 CPU_DISASSEMBLE(kb1013vk12)
 {
 	// create extended opcode table
-	uint8_t ext[0x100];
+	u8 ext[0x100];
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, kb1013vk12_extended, 0x10);
 

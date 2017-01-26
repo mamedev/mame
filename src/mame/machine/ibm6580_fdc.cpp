@@ -30,24 +30,24 @@ const tiny_rom_entry *dw_fdc_device::device_rom_region() const
 }
 
 static ADDRESS_MAP_START( dw_fdc_io, AS_IO, 8, dw_fdc_device )
-//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
+//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
+//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( dw_fdc )
-	MCFG_CPU_ADD("mcu", I8048, XTAL_24MHz/4)	// divisor is unverified
+	MCFG_CPU_ADD("mcu", I8048, XTAL_24MHz/4)    // divisor is unverified
 	MCFG_CPU_IO_MAP(dw_fdc_io)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
 	MCFG_UPD765A_ADD("upd765", false, false)
-//	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
-//	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", dma8257_device, XXX))
-//	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
-//	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
+//  MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
+//  MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", dma8257_device, XXX))
+//  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
+//  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 MACHINE_CONFIG_END
 
 machine_config_constructor dw_fdc_device::device_mconfig_additions() const

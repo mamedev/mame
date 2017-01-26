@@ -32,7 +32,7 @@
 // SC28C94 specific callbacks
 #define MCFG_SC28C94_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, SC28C94, _clock)
-	
+
 #define MCFG_SC28C94_C_TX_CALLBACK(_cb) \
 	devcb = &sc28c94_device::set_c_tx_cb(*device, DEVCB_##_cb);
 
@@ -182,9 +182,9 @@ private:
 	void set_ISR_bits(int mask);
 	void update_interrupts();
 
-	int get_ch(mc68681_channel *ch) 
-	{ 
-		if (ch == m_chanA) 
+	int get_ch(mc68681_channel *ch)
+	{
+		if (ch == m_chanA)
 		{
 			return 0;
 		}
@@ -196,10 +196,10 @@ private:
 		{
 			return 2;
 		}
-				
+
 		return 3;
 	}
-	
+
 	mc68681_channel *get_channel(int chan);
 };
 
@@ -213,7 +213,7 @@ class sc28c94_device : public mc68681_base_device
 {
 public:
 	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	template<class _Object> static devcb_base &set_c_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_c_tx.set_callback(object); }
 	template<class _Object> static devcb_base &set_d_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_d_tx.set_callback(object); }
 
@@ -222,10 +222,10 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
-	
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	
+
 private:
 };
 

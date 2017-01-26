@@ -25,19 +25,19 @@ CPU_DISASSEMBLE(cop410)
 		if (page == 2 || page == 3) //JP pages 2,3
 		{
 			address = (uint16_t)((pc & 0x180) | (opcode & 0x7F));
-			util::stream_format(stream, "JP %03x", address);
+			util::stream_format(stream, "JP %03X", address);
 		}
 		else
 		{
 			if ((opcode & 0xC0) == 0xC0) //JP other pages
 			{
 				address = (uint16_t)((pc & 0x1C0) | (opcode & 0x3F));
-				util::stream_format(stream, "JP %03x", address);
+				util::stream_format(stream, "JP %03X", address);
 			}
 			else                    //JSRP
 			{
 				address = (uint16_t)(0x80 | (opcode & 0x3F));
-				util::stream_format(stream, "JSRP %03x", address);
+				util::stream_format(stream, "JSRP %03X", address);
 				flags = DASMFLAG_STEP_OVER;
 			}
 		}
@@ -65,13 +65,13 @@ CPU_DISASSEMBLE(cop410)
 	else if (opcode >= 0x60 && opcode <= 0x61)
 	{
 		address = ((opcode & 0x01) << 8) | next_opcode;
-		util::stream_format(stream, "JMP %03x", address);
+		util::stream_format(stream, "JMP %03X", address);
 		bytes = 2;
 	}
 	else if (opcode >= 0x68 && opcode <= 0x69)
 	{
 		address = ((opcode & 0x01) << 8) | next_opcode;
-		util::stream_format(stream, "JSR %03x", address);
+		util::stream_format(stream, "JSR %03X", address);
 		flags = DASMFLAG_STEP_OVER;
 		bytes = 2;
 	}

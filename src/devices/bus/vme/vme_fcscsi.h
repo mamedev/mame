@@ -11,7 +11,7 @@
 
 extern const device_type VME_FCSCSI1;
 
-class vme_fcscsi1_card_device : 
+class vme_fcscsi1_card_device :
 	public device_t
 	,public device_vme_card_interface
 {

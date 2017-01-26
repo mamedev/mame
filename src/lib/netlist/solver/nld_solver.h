@@ -8,6 +8,8 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
+#include <map>
+
 #include "nl_setup.h"
 #include "nl_base.h"
 #include "plib/pstream.h"
@@ -20,10 +22,13 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
+#ifndef NL_AUTO_DEVICES
+
 #define SOLVER(name, freq)                                                 \
 		NET_REGISTER_DEV(SOLVER, name)                                      \
 		PARAM(name.FREQ, freq)
 
+#endif
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
@@ -59,14 +64,14 @@ NETLIB_OBJECT(solver)
 
 	/* automatic time step */
 	, m_dynamic_ts(*this, "DYNAMIC_TS", 0)
-	, m_dynamic_lte(*this, "DYNAMIC_LTE", 5e-5)                     // diff/timestep
+	, m_dynamic_lte(*this, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution
 	{
 		// internal staff
 
-		connect_late(m_fb_step, m_Q_step);
+		connect(m_fb_step, m_Q_step);
 	}
 
 	virtual ~NETLIB_NAME(solver)();
@@ -76,7 +81,7 @@ NETLIB_OBJECT(solver)
 
 	inline nl_double gmin() { return m_gmin(); }
 
-	void create_solver_code(plib::postream &strm);
+	void create_solver_code(std::map<pstring, pstring> &mp);
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();
