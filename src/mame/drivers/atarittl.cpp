@@ -136,8 +136,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		//, m_video(*this, "fixfreq")
 		, m_probe_screen(*this, "screen")
-		, m_hf1(*this, "maincpu:hf1")
-		, m_d7(*this, "maincpu:d7")
 		, m_probe_bit0(0.0)
 		, m_probe_bit1(0.0)
 		, m_probe_bit2(0.0)
@@ -174,8 +172,6 @@ private:
 	required_device<netlist_mame_device_t> m_maincpu;
 	//required_device<fixedfreq_device> m_video;
 	required_device<screen_device> m_probe_screen;
-	required_device<netlist_mame_rom_t> m_hf1;
-	required_device<netlist_mame_rom_t> m_d7;
 
 	int m_probe_bit0;
 	int m_probe_bit1;
@@ -330,9 +326,6 @@ static MACHINE_CONFIG_START( stuntcyc, stuntcyc_state )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)
-
-	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "004275.f1", 0x0000, 0x0200)
-	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "004811.d7", 0x0000, 0x0020)
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
@@ -495,10 +488,10 @@ ROM_END
 ROM_START( stuntcyc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "hf1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "maincpu:004275.f1", ROMREGION_ERASE00 )
 	ROM_LOAD( "004275.f1",  0x0000, 0x0200, CRC(4ed5a99d) SHA1(1e5f439bce72e78dfff76fd8f61187c6ef484a64) ) // Motorcycle & Bus
 
-	ROM_REGION( 0x0020, "d7", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0020, "maincpu:004811.d7", ROMREGION_ERASE00 )
 	ROM_LOAD( "004811.d7",  0x0000, 0x0020, CRC(31a09efb) SHA1(fd5d538c9ec1234acf7c74ca0704113d220abbf6) ) // Score Translator
 ROM_END
 

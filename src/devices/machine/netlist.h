@@ -49,10 +49,6 @@
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                \
 	netlist_mame_int_input_t::static_set_params(*device, _name, _mask, _shift);
 
-#define MCFG_NETLIST_ROM_REGION(_basetag, _tag, _region, _name, _offset, _size) \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ROM_REGION, 0) \
-	netlist_mame_rom_t::static_set_params(*device, _name, ":" _region, _offset, _size);
-
 #define MCFG_NETLIST_RAM_POINTER(_basetag, _tag, _name) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_RAM_POINTER, 0) \
 	netlist_ram_pointer_t::static_set_params(*device, _name ".m_RAM");
@@ -102,23 +98,12 @@ private:
 	pstring m_name;
 };
 
-class netlist_data_memregion_t : public netlist::source_t
+class netlist_data_memregions_t : public netlist::source_t
 {
 public:
-	netlist_data_memregion_t(netlist::setup_t &setup,
-			pstring name, uint8_t *ptr, std::size_t size)
-	: netlist::source_t(setup, netlist::source_t::DATA)
-	, m_name(name)
-	, m_ptr(ptr)
-	, m_size(size)
-	{
-	}
+	netlist_data_memregions_t(netlist::setup_t &setup);
 
 	virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
-private:
-	pstring m_name;
-	uint8_t *m_ptr;
-	std::size_t m_size;
 };
 
 class netlist_mame_device_t;
@@ -564,33 +549,6 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_mame_rom_t
-// ----------------------------------------------------------------------------------------
-
-class netlist_mame_rom_t : public device_t,
-						   public netlist_mame_sub_interface
-{
-public:
-
-	// construction/destruction
-	netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~netlist_mame_rom_t() { }
-
-	static void static_set_params(device_t &device, const char *name, const char* region_tag, std::size_t offset, std::size_t size);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
-
-private:
-	pstring m_name;
-	const char* m_region_tag;
-	std::size_t m_offset;
-	std::size_t m_size;
-};
-
-// ----------------------------------------------------------------------------------------
 // netlist_ram_pointer_t
 // ----------------------------------------------------------------------------------------
 
@@ -929,7 +887,6 @@ extern const device_type NETLIST_SOUND;
 extern const device_type NETLIST_ANALOG_INPUT;
 extern const device_type NETLIST_LOGIC_INPUT;
 extern const device_type NETLIST_INT_INPUT;
-extern const device_type NETLIST_ROM_REGION;
 extern const device_type NETLIST_RAM_POINTER;
 
 extern const device_type NETLIST_LOGIC_OUTPUT;

@@ -29,7 +29,6 @@ const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
 
 const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
 const device_type NETLIST_INT_INPUT = &device_creator<netlist_mame_int_input_t>;
-const device_type NETLIST_ROM_REGION = &device_creator<netlist_mame_rom_t>;
 const device_type NETLIST_RAM_POINTER = &device_creator<netlist_ram_pointer_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
@@ -219,41 +218,6 @@ void netlist_mame_logic_input_t::device_start()
 	}
 }
 
-// ----------------------------------------------------------------------------------------
-// netlist_mame_rom_t
-// ----------------------------------------------------------------------------------------
-
-netlist_mame_rom_t::netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_ROM_REGION, "Netlist ROM Region", tag, owner, clock, "netlist_rom_region", __FILE__)
-		, netlist_mame_sub_interface(*owner)
-		, m_name("")
-		, m_region_tag(nullptr)
-		, m_offset(0)
-		, m_size(0)
-{
-}
-
-void netlist_mame_rom_t::static_set_params(device_t &device, const char *name, const char* region_tag, std::size_t offset, std::size_t size)
-{
-	netlist_mame_rom_t &r = downcast<netlist_mame_rom_t&>(device);
-	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
-	r.m_name = pstring(name, pstring::UTF8);
-	r.m_region_tag = region_tag;
-	r.m_offset = offset;
-	r.m_size = size;
-}
-
-void netlist_mame_rom_t::custom_netlist_additions(netlist::setup_t &setup)
-{
-	if (memregion(m_region_tag) == nullptr)
-		fatalerror("device %s region %s not found\n", basetag(), m_region_tag);
-	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_data_memregion_t>(setup,
-			m_name, memregion(m_region_tag)->base() + m_offset, m_size));
-}
-
-void netlist_mame_rom_t::device_start()
-{
-}
 
 // ----------------------------------------------------------------------------------------
 // netlist_ram_pointer_t
@@ -451,6 +415,9 @@ void netlist_mame_device_t::device_start()
 			sdev->pre_parse_action(setup());
 		}
 	}
+
+	/* add default data provider for roms */
+	setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_memregions_t>(setup()));
 
 	m_setup_func(setup());
 
@@ -787,11 +754,24 @@ std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring
 	return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
 }
 
-std::unique_ptr<plib::pistream> netlist_data_memregion_t::stream(const pstring &name)
+netlist_data_memregions_t::netlist_data_memregions_t(netlist::setup_t &setup)
+: netlist::source_t(setup, netlist::source_t::DATA)
 {
-	if (name == m_name)
-		return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_ptr, m_size);
+}
+
+std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
+{
+	memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).parent().memregion(name.c_str());
+	//memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(name.c_str());
+	if (mem != nullptr)
+	{
+		return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
+	}
 	else
+	{
+		// This should be the last data provider being called - last resort
+		fatalerror("data named %s not found in device rom regions\n", name.c_str());
 		return std::unique_ptr<plib::pistream>(nullptr);
+	}
 }
 
