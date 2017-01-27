@@ -72,6 +72,10 @@ void huc6272_device::device_start()
 {
 	m_irq_changed_cb.resolve_safe();
 
+	assert( m_huc6271_tag != nullptr );
+
+	m_huc6271 = machine().device<huc6271_device>(m_huc6271_tag);
+
 }
 
 
@@ -212,6 +216,7 @@ WRITE32_MEMBER( huc6272_device::write )
 				m_scsibus->write_sel(BIT(data, 2));
 				m_scsibus->write_ack(BIT(data, 4));
 				m_scsibus->write_rst(BIT(data, 7));
+				
 				break;
 			
 			case 0x02: // SCSI mode
@@ -365,6 +370,7 @@ WRITE32_MEMBER( huc6272_device::write )
 					m_bg[reg_offs].xscroll = data & 0xffff;
 				break;
 			}
+			
 			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}

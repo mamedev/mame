@@ -13,6 +13,7 @@
 
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
+#include "video/huc6271.h"
 
 
 //**************************************************************************
@@ -24,6 +25,9 @@
 
 #define MCFG_HUC6272_IRQ_CHANGED_CB(_devcb) \
 	devcb = &huc6272_device::set_irq_changed_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_HUC6272_RAINBOW(_tag) \
+	huc6272_device::set_rainbow_tag(*device, _tag);
 
 
 //**************************************************************************
@@ -40,6 +44,7 @@ public:
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(object); }
+	static void set_rainbow_tag(device_t &device, const char *tag) { downcast<huc6272_device &>(device).m_huc6271_tag = tag; }
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
@@ -54,6 +59,10 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_PROGRAM) const override;
 
 private:
+	const char *m_huc6271_tag;
+
+	huc6271_device *m_huc6271;
+
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
 	uint16_t m_kram_inc_r,m_kram_inc_w;
@@ -78,12 +87,11 @@ private:
 		uint16_t width;
 	}m_bg0sub;
 	
-	
 	struct{
 		uint8_t index;
 		uint8_t ctrl;
 	}m_micro_prg;
-
+	
 	const address_space_config      m_program_space_config;
 	const address_space_config      m_data_space_config;
 	required_shared_ptr<uint16_t> 	m_microprg_ram;
