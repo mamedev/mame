@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Angelo Salese
 /***************************************************************************
 
     Hudson/NEC HuC6272 "King" device
@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "video/huc6272.h"
 
 
@@ -23,8 +24,8 @@ static ADDRESS_MAP_START( microprg_map, AS_PROGRAM, 16, huc6272_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kram_map, AS_DATA, 32, huc6272_device )
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("kram_page0")
+	AM_RANGE(0x100000, 0x1fffff) AM_RAM AM_SHARE("kram_page1")
 ADDRESS_MAP_END
 
 
@@ -41,7 +42,14 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
 		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
-		m_microprg_ram(*this, "microprg_ram")
+		m_microprg_ram(*this, "microprg_ram"),
+		m_kram_page0(*this, "kram_page0"),
+		m_kram_page1(*this, "kram_page1"),
+		m_scsibus(*this, "scsi"),
+		m_scsi_data_in(*this, "scsi_data_in"),
+		m_scsi_data_out(*this, "scsi_data_out"),
+		m_scsi_ctrl_in(*this, "scsi_ctrl_in"),
+		m_irq_changed_cb(*this)
 {
 }
 
@@ -62,6 +70,8 @@ void huc6272_device::device_validity_check(validity_checker &valid) const
 
 void huc6272_device::device_start()
 {
+	m_irq_changed_cb.resolve_safe();
+
 }
 
 
@@ -143,12 +153,22 @@ READ32_MEMBER( huc6272_device::read )
 		---- ---- ---- ---- ---- ---- -xxx xxxx register read-back
 		*/
 		res = m_register & 0x7f;
-		res |= (0) << 16;
+		res |= (m_scsi_ctrl_in->read() & 0xff) << 16;
 	}
 	else
 	{
 		switch(m_register)
 		{
+			case 0x00: // SCSI data in
+				res = m_scsi_data_in->read() & 0xff;
+				break;
+			
+			case 0x05: // SCSI bus status
+				res = m_scsi_ctrl_in->read() & 0xff;
+				res|= (m_scsi_data_in->read() << 8);
+				break;
+			
+			
 			/*
 			x--- ---- ---- ---- ----
 			*/
@@ -180,14 +200,34 @@ WRITE32_MEMBER( huc6272_device::write )
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;
 	else
-	{
+	{		
 		switch(m_register)
 		{
-			case 0x00: // SCSI data
+			case 0x00: // SCSI data out
+				m_scsi_data_out->write(data & 0xff);
+				break;
 			case 0x01: // SCSI command
+				//m_scsibus->write_bsy(BIT(data, 0)); // bus?
+				m_scsibus->write_atn(BIT(data, 1));
+				m_scsibus->write_sel(BIT(data, 2));
+				m_scsibus->write_ack(BIT(data, 4));
+				m_scsibus->write_rst(BIT(data, 7));
+				break;
+			
 			case 0x02: // SCSI mode
+				break;
+
 			case 0x03: // SCSI target command
+				m_scsibus->write_io(BIT(data, 0));
+				m_scsibus->write_cd(BIT(data, 1));
+				m_scsibus->write_msg(BIT(data, 2));
+				break;
+				
 			case 0x05: // SCSI bus status
+				// bits 7-0: SCSI DMA trigger?
+				m_scsi_data_out->write((data >> 8) & 0xff);
+				break;
+			
 			case 0x06: // SCSI input data
 			case 0x07: // SCSI DMA trigger
 			case 0x08: // SCSI subcode
@@ -273,6 +313,7 @@ WRITE32_MEMBER( huc6272_device::write )
 
 			case 0x15:
 				m_micro_prg.ctrl = data & 1;
+
 				break;
 			
 			// case 0x16: wrap-around enable
@@ -327,4 +368,33 @@ WRITE32_MEMBER( huc6272_device::write )
 			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}
+}
+
+static MACHINE_CONFIG_FRAGMENT( king_scsi_intf )
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSI_RST_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
+	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
+	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
+	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
+	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
+	MCFG_SCSI_SEL_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+
+	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
+	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)	
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor huc6272_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( king_scsi_intf );
 }

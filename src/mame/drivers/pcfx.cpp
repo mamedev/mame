@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP   /* BackUp RAM */
 	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP   /* Extended BackUp RAM */
 	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP   /* PIO */
-	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")  /* ROM */
+	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROM AM_REGION("ipl", 0)  /* ROM */
 ADDRESS_MAP_END
 
 READ16_MEMBER( pcfx_state::pad_r )
@@ -395,8 +395,6 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 
 void pcfx_state::machine_reset()
 {
-	membank( "bank1" )->set_base( memregion("user1")->base() );
-
 	m_irq_mask = 0xFF;
 	m_irq_pending = 0;
 }
@@ -431,13 +429,14 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_HUC6261_VDC2("huc6270_b")
 
 	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
-
+	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq13_w))
+	
 	MCFG_HUC6271_ADD( "huc6271", XTAL_21_4772MHz )	
 MACHINE_CONFIG_END
 
 
 ROM_START( pcfx )
-	ROM_REGION( 0x100000, "user1", 0 )
+	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
 	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
@@ -449,7 +448,7 @@ ROM_END
 
 
 ROM_START( pcfxga )
-	ROM_REGION( 0x100000, "user1", 0 )
+	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
 
 	ROM_REGION( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
