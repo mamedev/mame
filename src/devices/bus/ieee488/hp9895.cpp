@@ -2,11 +2,43 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-    hp9895.cpp
+	hp9895.cpp
 
-    HP9895 floppy disk drive
+	HP9895 floppy disk drive
 
 	Phew, this one was tough!
+
+	This is a dual 8" floppy disk drive that interfaces through
+	HPIB/IEEE-488 bus. It implements the so-called "Amigo" command
+	set.
+
+	Its main components are:
+	* A Z80A CPU @ 4 MHz with 8 kB of firmware ROM and 1 kB of
+	  static RAM
+	* A HP PHI chip that interfaces CPU to HPIB bus
+	* A disk controller implemented with a lot of discrete TTLs
+	* 2 MPI 8" disk drives
+
+	Data I/O with the disk is carried out through 2 shift registers,
+	one for data bits (@ 0x60 address) and one for clock bits (@ 0x61
+	address). CPU is stalled by setting WAIT/ to 0 whenever it accesses
+	the data register and the hw is not ready for the byte. Once
+	the next byte boundary is reached (the SDOK signal activates) the
+	CPU is released and either the data byte is read from shift register
+	or written into it. At the same time clock shift register is
+	copied into clock register when reading or viceversa when writing.
+
+	The 9895 drive can operate in 2 modes: HP/High density or IBM/low
+	density. This table summarizes the differences between the modes.
+	See also page 2-12 of service manual.
+
+	| Characteristic | HP mode  | IBM mode  |
+	|----------------+----------+-----------|
+	| Bit cell size  | 2 µs     | 4 µs      |
+	| Modulation     | MMFM     | FM        |
+	| Bit order      | LS first | MS first  |
+	| Sync bytes     | 4x FF    | 6x 00     |
+	| Formatted size | 1155 kB  | 250.25 kB |
 
 	Reference manual:
 	HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
