@@ -17,7 +17,6 @@ namespace netlist
 	template<unsigned m_NI, unsigned m_NO>
 	class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 	{
-		P_PREVENT_COPYING(netlist_factory_truthtable_t)
 	public:
 		netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring  &sourcefile)

@@ -47,9 +47,8 @@ namespace netlist
 	};
 
 	template <class Element, class Time>
-	class timed_queue
+	class timed_queue : plib::nocopyassignmove
 	{
-		P_PREVENT_COPYING(timed_queue)
 	public:
 
 		struct entry_t

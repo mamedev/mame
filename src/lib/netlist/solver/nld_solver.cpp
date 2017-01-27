@@ -30,8 +30,9 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include <iostream>
 #include <algorithm>
+#include <cmath>  // <<= needed by windows build
+
 #include "nl_lists.h"
 
 #if HAS_OPENMP

@@ -8,6 +8,8 @@
 #include "nld_matrix_solver.h"
 #include "plib/putil.h"
 
+#include <cmath>  // <<= needed by windows build
+
 namespace netlist
 {
 	namespace devices

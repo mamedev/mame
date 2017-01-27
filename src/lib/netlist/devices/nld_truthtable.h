@@ -364,7 +364,6 @@ namespace netlist
 
 	class netlist_base_factory_truthtable_t : public factory::element_t
 	{
-		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 	public:
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);

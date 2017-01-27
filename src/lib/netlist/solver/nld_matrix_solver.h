@@ -34,10 +34,8 @@ namespace netlist
 	};
 
 
-class terms_for_net_t
+class terms_for_net_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(terms_for_net_t)
-
 public:
 	terms_for_net_t();
 

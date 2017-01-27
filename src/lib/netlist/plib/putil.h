@@ -8,10 +8,11 @@
 #ifndef P_UTIL_H_
 #define P_UTIL_H_
 
-#include "plib/pstring.h"
+#include "pstring.h"
 
 #include <initializer_list>
 #include <algorithm>
+#include <vector> // <<= needed by windows build
 
 namespace plib
 {

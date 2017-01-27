@@ -33,9 +33,8 @@ namespace netlist { namespace factory
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
 
-	class element_t
+	class element_t : plib::nocopyassignmove
 	{
-		P_PREVENT_COPYING(element_t)
 	public:
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param);
@@ -61,7 +60,6 @@ namespace netlist { namespace factory
 	template <class C>
 	class device_element_t : public element_t
 	{
-		P_PREVENT_COPYING(device_element_t)
 	public:
 		device_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
@@ -135,19 +133,17 @@ namespace netlist { namespace factory
 
 	class library_element_t : public element_t
 	{
-		P_PREVENT_COPYING(library_element_t)
 	public:
 
 		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source), m_setup(setup) {  }
+		: element_t(name, classname, def_param, source) {  }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
 
 		void macro_actions(netlist_t &anetlist, const pstring &name) override;
 
 	private:
-		setup_t &m_setup;
 	};
 
 } }

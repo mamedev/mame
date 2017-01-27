@@ -173,9 +173,8 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 
-	class setup_t
+	class setup_t : plib::nocopyassignmove
 	{
-		P_PREVENT_COPYING(setup_t)
 	public:
 
 		using link_t = std::pair<pstring, pstring>;

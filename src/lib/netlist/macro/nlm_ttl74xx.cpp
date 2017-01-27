@@ -413,7 +413,7 @@ static NETLIST_START(TTL_7430_DIP)
 		s1.A,  /*     A |1     ++    14| VCC  */ VCC.I,
 		s1.B,  /*     B |2           13| NC   */ NC.I,
 		s1.C,  /*     C |3           12| H    */ s1.H,
-		s1.D,  /*     D |4    7420   11| G    */ s1.G,
+		s1.D,  /*     D |4    7430   11| G    */ s1.G,
 		s1.E,  /*     E |5           10| NC   */ NC.I,
 		s1.F,  /*     F |6            9| NC   */ NC.I,
 		GND.I, /*   GND |7            8| Y    */ s1.Q

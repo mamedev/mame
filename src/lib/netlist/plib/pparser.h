@@ -17,9 +17,8 @@
 #include "pstream.h"
 
 namespace plib {
-class ptokenizer
+class ptokenizer : nocopyassignmove
 {
-	P_PREVENT_COPYING(ptokenizer)
 public:
 	explicit ptokenizer(plib::putf8_reader &strm);
 
@@ -147,9 +146,8 @@ private:
 };
 
 
-class ppreprocessor
+class ppreprocessor : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(ppreprocessor)
 public:
 
 	struct define_t

@@ -186,9 +186,8 @@ P_ENUM(plog_level,
 class plog_dispatch_intf;
 
 template <bool build_enabled = true>
-class pfmt_writer_t
+class pfmt_writer_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(pfmt_writer_t)
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
 	virtual ~pfmt_writer_t() { }

@@ -65,7 +65,7 @@
 #define MF_2_ADDING_1_2_TO_TERMINAL_LIST        "Error adding {1} {2} to terminal list"
 #define MF_2_NET_C_NEEDS_AT_LEAST_2_TERMINAL    "You must pass at least 2 terminals to NET_C"
 #define MF_1_FOUND_NO_OCCURRENCE_OF_1           "Found no occurrence of {1}"
-#define MF_2_TERMINAL_1_2_NOT_FOUND             "terminal {1}({2}) not found!"
+#define MF_2_TERMINAL_1_2_NOT_FOUND             "Alias {1} was resolved to be terminal {2}. Terminal {2} was not found."
 #define MF_2_OBJECT_1_2_WRONG_TYPE              "object {1}({2}) found but wrong type"
 #define MF_2_PARAMETER_1_2_NOT_FOUND            "parameter {1}({2}) not found!"
 #define MF_2_CONNECTING_1_TO_2                  "Error connecting {1} to {2}"
