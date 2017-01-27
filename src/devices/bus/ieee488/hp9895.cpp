@@ -216,11 +216,18 @@ void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	case TIMEOUT_TMR_ID:
 		LOG(("Timeout!\n"));
 		m_timeout = true;
+		if (m_mgnena) {
+			// CPU is resumed by timeout if MGNENA=1
+			m_cpu->trigger(1);
+		}
 		break;
 
 	case BYTE_TMR_ID:
 		{
-			if (!m_accdata) {
+			if (m_accdata) {
+				// Resume CPU when it's waiting for SDOK
+				m_cpu->trigger(1);
+			} else {
 				// No access to data register by CPU
 				LOG(("Data overrun!\n"));
 				m_overrun = true;
@@ -483,10 +490,9 @@ WRITE16_MEMBER(hp9895_device::z80_m1_w)
 
 WRITE8_MEMBER(hp9895_device::data_w)
 {
-	attotime next_sdok{get_time_next_sdok()};
-	LOG_0(("W DATA=%02x next SDOK @ %.6f\n" , data , next_sdok.as_double()));
+	LOG_0(("W DATA=%02x\n" , data));
 	// CPU stalls until next SDOK
-	m_cpu->spin_until_time(next_sdok - m_cpu->local_time());
+	m_cpu->suspend_until_trigger(1 , true);
 	m_data_sr = data;
 	m_clock_sr = m_clock_reg;
 	m_accdata = true;
@@ -519,61 +525,63 @@ WRITE8_MEMBER(hp9895_device::leds_w)
 
 WRITE8_MEMBER(hp9895_device::cntl_w)
 {
-	LOG_0(("W CNTL=%02x -> %02x\n" , m_cntl_reg , data));
-	uint8_t old_cntl_reg = m_cntl_reg;
-	m_cntl_reg = data;
+	if (data != m_cntl_reg) {
+		LOG_0(("W CNTL=%02x -> %02x\n" , m_cntl_reg , data));
+		uint8_t old_cntl_reg = m_cntl_reg;
+		m_cntl_reg = data;
 
-	bool old_writon = BIT(old_cntl_reg , REG_CNTL_WRITON_BIT);
-	bool new_writon = BIT(m_cntl_reg , REG_CNTL_WRITON_BIT);
-	bool old_readon = BIT(old_cntl_reg , REG_CNTL_READON_BIT);
-	bool new_readon = BIT(m_cntl_reg , REG_CNTL_READON_BIT);
+		bool old_writon = BIT(old_cntl_reg , REG_CNTL_WRITON_BIT);
+		bool new_writon = BIT(m_cntl_reg , REG_CNTL_WRITON_BIT);
+		bool old_readon = BIT(old_cntl_reg , REG_CNTL_READON_BIT);
+		bool new_readon = BIT(m_cntl_reg , REG_CNTL_READON_BIT);
 
-	bool byte_timer_running = old_writon || m_amdt;
-	bool byte_timer_needed = new_writon || (new_readon && m_amdt);
+		bool byte_timer_running = old_writon || m_amdt;
+		bool byte_timer_needed = new_writon || (new_readon && m_amdt);
 
-	if (!byte_timer_running && byte_timer_needed) {
-		LOG_0(("Enable byte tmr\n"));
-		attotime byte_period = get_half_bit_cell_period() * 16;
-		m_byte_timer->adjust(byte_period);
-	} else if (byte_timer_running && !byte_timer_needed) {
-		LOG_0(("Disable byte tmr\n"));
-		m_byte_timer->reset();
-	}
+		if (!byte_timer_running && byte_timer_needed) {
+			LOG_0(("Enable byte tmr\n"));
+			attotime byte_period = get_half_bit_cell_period() * 16;
+			m_byte_timer->adjust(byte_period);
+		} else if (byte_timer_running && !byte_timer_needed) {
+			LOG_0(("Disable byte tmr\n"));
+			m_byte_timer->reset();
+		}
 
-	if (!old_writon && !old_readon && (new_writon || new_readon)) {
-		m_pll.set_clock(get_half_bit_cell_period());
-	}
+		if (!old_writon && !old_readon && (new_writon || new_readon)) {
+			m_pll.set_clock(get_half_bit_cell_period());
+		}
 
-	if (!old_writon && new_writon) {
-		// Writing enabled
-		LOG_0(("Start writing..\n"));
-		m_pll.start_writing(machine().time());
-		m_wr_context = 0;
-		m_had_transition = false;
-	} else if (old_writon && !new_writon) {
-		// Writing disabled
-		LOG_0(("Stop writing..\n"));
-		m_pll.stop_writing(get_write_device() , machine().time());
-	}
-	if (!old_readon && new_readon) {
-		// Reading enabled
-		LOG_0(("Start reading..\n"));
-		m_pll.read_reset(machine().time());
-		m_sync_cnt = 0;
-		m_prev_transition = attotime::never;
-		m_half_bit_timer->adjust(get_half_bit_cell_period());
-	} else if (old_readon && !new_readon) {
-		// Reading disabled
-		LOG_0(("Stop reading..\n"));
-		m_half_bit_timer->reset();
-		m_lckup = true;
-		m_amdt = false;
-	}
-	if (!new_readon && !new_writon) {
-		m_crcerr_syn = false;
-		BIT_CLR(m_cntl_reg, REG_CNTL_CRCON_BIT);
-		BIT_CLR(m_cntl_reg, REG_CNTL_CRCOUT_BIT);
-		preset_crc();
+		if (!old_writon && new_writon) {
+			// Writing enabled
+			LOG_0(("Start writing..\n"));
+			m_pll.start_writing(machine().time());
+			m_wr_context = 0;
+			m_had_transition = false;
+		} else if (old_writon && !new_writon) {
+			// Writing disabled
+			LOG_0(("Stop writing..\n"));
+			m_pll.stop_writing(get_write_device() , machine().time());
+		}
+		if (!old_readon && new_readon) {
+			// Reading enabled
+			LOG_0(("Start reading..\n"));
+			m_pll.read_reset(machine().time());
+			m_sync_cnt = 0;
+			m_prev_transition = attotime::never;
+			m_half_bit_timer->adjust(get_half_bit_cell_period());
+		} else if (old_readon && !new_readon) {
+			// Reading disabled
+			LOG_0(("Stop reading..\n"));
+			m_half_bit_timer->reset();
+			m_lckup = true;
+			m_amdt = false;
+		}
+		if (!new_readon && !new_writon) {
+			m_crcerr_syn = false;
+			BIT_CLR(m_cntl_reg, REG_CNTL_CRCON_BIT);
+			BIT_CLR(m_cntl_reg, REG_CNTL_CRCOUT_BIT);
+			preset_crc();
+		}
 	}
 }
 
@@ -594,7 +602,9 @@ WRITE8_MEMBER(hp9895_device::xv_w)
 	LOG_0(("W XV=%02x\n" , data));
 	// Disk Changed flag is cleared when drive is ready and it is deselected
 	if (m_current_drive_idx < 2 && (data & xv_drive_masks[ m_current_drive_idx ]) == 0 && !m_current_drive->ready_r()) {
-		LOG(("Dskchg %u cleared\n" , m_current_drive_idx));
+		if (m_dskchg[ m_current_drive_idx ]) {
+			LOG(("Dskchg %u cleared\n" , m_current_drive_idx));
+		}
 		m_dskchg[ m_current_drive_idx ] = false;
 	}
 
@@ -615,10 +625,9 @@ READ8_MEMBER(hp9895_device::data_r)
 {
 	m_clock_reg = m_clock_sr;
 	m_accdata = true;
-	attotime next_sdok{get_time_next_sdok()};
-	LOG_0(("R DATA=%02x next SDOK @ %.6f\n" , m_data_sr , next_sdok.as_double()));
+	LOG_0(("R DATA=%02x\n" , m_data_sr));
 	// CPU stalls until next SDOK
-	m_cpu->spin_until_time(next_sdok - m_cpu->local_time());
+	m_cpu->suspend_until_trigger(1 , true);
 	return m_data_sr;
 }
 
@@ -725,17 +734,6 @@ floppy_image_device *hp9895_device::get_write_device(void) const
 		return nullptr;
 	} else {
 		return m_current_drive;
-	}
-}
-
-attotime hp9895_device::get_time_next_sdok(void) const
-{
-	if (m_byte_timer->enabled()) {
-		return m_byte_timer->expire();
-	} else if (m_mgnena && m_timeout_timer->enabled()) {
-		return m_timeout_timer->expire();
-	} else {
-		return attotime::never;
 	}
 }
 

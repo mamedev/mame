@@ -126,7 +126,6 @@ private:
 	uint8_t get_switches2(void) const;
 	attotime get_half_bit_cell_period(void) const;
 	floppy_image_device *get_write_device(void) const;
-	attotime get_time_next_sdok(void) const;
 	void preset_crc(void);
 	void update_crc(bool bit);
 	bool shift_sr(uint8_t& sr , bool input_bit);
