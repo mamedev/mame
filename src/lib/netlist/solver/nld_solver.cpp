@@ -108,6 +108,10 @@ NETLIB_UPDATE(solver)
 					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
 				}
 		}
+
+		for (auto & solver : m_mat_solvers)
+			if (solver->has_timestep_devices() || force_solve)
+				solver->update_inputs();
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
@@ -115,12 +119,16 @@ NETLIB_UPDATE(solver)
 			{
 				// Ignore return value
 				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
+				solver->update_inputs();
 			}
 #else
 	for (auto & solver : m_mat_solvers)
 		if (solver->has_timestep_devices() || force_solve)
+		{
 			// Ignore return value
 			ATTR_UNUSED const netlist_time ts = solver->solve();
+			solver->update_inputs();
+		}
 #endif
 
 	/* step circuit */
@@ -132,14 +140,14 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_parameters_t &params, unsigned size)
+std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
 	typedef C solver;
 	return plib::make_unique<solver>(nl, name, &params, size);
 }
 
-template <int m_N, int storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned size, const bool use_specific)
+template <std::size_t m_N, std::size_t storage_N>
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const bool use_specific)
 {
 	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
@@ -294,11 +302,11 @@ void NETLIB_NAME(solver)::post_start()
 	for (auto & grp : splitter.groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
-		unsigned net_count = static_cast<unsigned>(grp.size());
+		std::size_t net_count = grp.size();
 
 		switch (net_count)
 		{
-#if 0
+#if 1
 			case 1:
 				ms = create_solver<1,1>(1, false);
 				break;
@@ -341,6 +349,9 @@ void NETLIB_NAME(solver)::post_start()
 			case 31:
 				ms = create_solver<31,31>(31, use_specific);
 				break;
+			case 35:
+				ms = create_solver<31,31>(31, use_specific);
+				break;
 			case 49:
 				ms = create_solver<49,49>(49, use_specific);
 				break;
@@ -352,7 +363,11 @@ void NETLIB_NAME(solver)::post_start()
 #endif
 			default:
 				log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
-				if (net_count <= 16)
+				if (net_count <= 8)
+				{
+					ms = create_solver<0, 8>(net_count, use_specific);
+				}
+				else if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);
 				}

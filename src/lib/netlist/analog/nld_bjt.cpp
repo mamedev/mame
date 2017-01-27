@@ -124,8 +124,6 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 
 		m_RB.set(gb, v,   0.0);
 		m_RC.set(gc, 0.0, 0.0);
-		//m_RB.update_dev();
-		//m_RC.update_dev();
 		m_state_on = new_state;
 	}
 }

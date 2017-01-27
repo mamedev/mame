@@ -13,13 +13,16 @@
 #include <algorithm>
 #include "plib/pconfig.h"
 
-template<int storage_N>
+//template<std::size_t storage_N, typename C = std::size_t>
+template<std::size_t storage_N, typename C = uint16_t>
 struct mat_cr_t
 {
-	unsigned nz_num;
-	unsigned ia[storage_N + 1];
-	unsigned ja[storage_N * storage_N];
-	unsigned diag[storage_N];       /* n */
+	typedef C type;
+
+	C nz_num;
+	C ia[storage_N + 1];
+	C ja[storage_N * storage_N];
+	C diag[storage_N];       /* n */
 
 	template<typename T>
 	void mult_vec(const T * RESTRICT A, const T * RESTRICT x, T * RESTRICT res)
@@ -28,14 +31,14 @@ struct mat_cr_t
 		 * res = A * x
 		 */
 
-		unsigned i = 0;
-		unsigned k = 0;
-		const unsigned oe = nz_num;
+		std::size_t i = 0;
+		std::size_t k = 0;
+		const std::size_t oe = nz_num;
 
 		while (k < oe)
 		{
 			T tmp = 0.0;
-			const unsigned e = ia[i+1];
+			const std::size_t e = ia[i+1];
 			for (; k < e; k++)
 				tmp += A[k] * x[ja[k]];
 			res[i++] = tmp;
@@ -52,28 +55,28 @@ struct mat_cr_t
 		 *
 		 */
 
-		const unsigned lnz = nz_num;
+		const std::size_t lnz = nz_num;
 
-		for (unsigned k = 0; k < lnz; k++)
+		for (std::size_t k = 0; k < lnz; k++)
 			LU[k] = A[k];
 
-		for (unsigned i = 1; ia[i] < lnz; i++) // row i
+		for (std::size_t i = 1; ia[i] < lnz; i++) // row i
 		{
-			const unsigned iai1 = ia[i + 1];
-			const unsigned pke = diag[i];
-			for (unsigned pk = ia[i]; pk < pke; pk++) // all columns left of diag in row i
+			const std::size_t iai1 = ia[i + 1];
+			const std::size_t pke = diag[i];
+			for (std::size_t pk = ia[i]; pk < pke; pk++) // all columns left of diag in row i
 			{
 				// pk == (i, k)
-				const unsigned k = ja[pk];
-				const unsigned iak1 = ia[k + 1];
+				const std::size_t k = ja[pk];
+				const std::size_t iak1 = ia[k + 1];
 				const T LUpk = LU[pk] = LU[pk] / LU[diag[k]];
 
-				unsigned pt = ia[k];
+				std::size_t pt = ia[k];
 
-				for (unsigned pj = pk + 1; pj < iai1; pj++)  // pj = (i, j)
+				for (std::size_t pj = pk + 1; pj < iai1; pj++)  // pj = (i, j)
 				{
 					// we can assume that within a row ja increases continuously */
-					const unsigned ej = ja[pj];
+					const std::size_t ej = ja[pj];
 					while (ja[pt] < ej && pt < iak1)
 						pt++;
 					if (pt < iak1 && ja[pt] == ej)
@@ -108,15 +111,15 @@ struct mat_cr_t
 		 *
 		 */
 
-		unsigned i;
+		std::size_t i;
 
 		for (i = 1; ia[i] < nz_num; i++ )
 		{
 			T tmp = 0.0;
-			const unsigned j1 = ia[i];
-			const unsigned j2 = diag[i];
+			const std::size_t j1 = ia[i];
+			const std::size_t j2 = diag[i];
 
-			for (unsigned j = j1; j < j2; j++ )
+			for (std::size_t j = j1; j < j2; j++ )
 				tmp +=  LU[j] * r[ja[j]];
 
 			r[i] -= tmp;
@@ -124,11 +127,11 @@ struct mat_cr_t
 		// i now is equal to n;
 		for (; 0 < i; i-- )
 		{
-			const unsigned im1 = i - 1;
+			const std::size_t im1 = i - 1;
 			T tmp = 0.0;
-			const unsigned j1 = diag[im1] + 1;
-			const unsigned j2 = ia[im1+1];
-			for (unsigned j = j1; j < j2; j++ )
+			const std::size_t j1 = diag[im1] + 1;
+			const std::size_t j2 = ia[im1+1];
+			for (std::size_t j = j1; j < j2; j++ )
 				tmp += LU[j] * r[ja[j]];
 			r[im1] = (r[im1] - tmp) / LU[diag[im1]];
 		}

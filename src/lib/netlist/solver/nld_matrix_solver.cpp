@@ -376,6 +376,7 @@ void matrix_solver_t::reset()
 void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
+	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
@@ -387,6 +388,7 @@ void matrix_solver_t::update() NL_NOEXCEPT
 void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
+	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
@@ -447,7 +449,6 @@ const netlist_time matrix_solver_t::solve()
 	step(delta);
 	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
-	update_inputs();
 
 	return next_time_step;
 }

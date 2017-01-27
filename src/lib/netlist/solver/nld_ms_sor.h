@@ -21,12 +21,12 @@ namespace netlist
 {
 	namespace devices
 	{
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
+	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		{
@@ -46,16 +46,16 @@ private:
 // ----------------------------------------------------------------------------------------
 
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_SOR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
 }
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	const unsigned iN = this->N();
+	const std::size_t iN = this->N();
 	bool resched = false;
 	unsigned resched_cnt = 0;
 
