@@ -4,6 +4,9 @@
 
     Hudson/NEC HuC6272 "King" device
 
+	TODO:
+	- Use NSCSI instead of legacy one!
+	
 ***************************************************************************/
 
 #include "emu.h"
