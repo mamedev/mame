@@ -3665,7 +3665,7 @@ ROM_START( sbuk2 )
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0400501v.u7",  0x0000000, 0x0080000, CRC(f025775d) SHA1(71a94f6f17fa7cdcd997b0117b8f4afe21606a69) )
 	ROM_LOAD32_WORD("0400501v.u11", 0x0000002, 0x0080000, CRC(f1b51a61) SHA1(8e9fcb071f704122e13333094828a41974646792) )
-	ROM_LOAD32_WORD("0400501v.u8",  0x0100000, 0x0080000, CRC(03912f4e) SHA1(48bdcd2160e05261b7d834c53e1d483acaad098f) )
+	ROM_LOAD32_WORD("0400501v.u8",  0x0100000, 0x0080000, BAD_DUMP CRC(03912f4e) SHA1(48bdcd2160e05261b7d834c53e1d483acaad098f) ) // bit 0x20 is stuck on for most of the ROM
 	ROM_LOAD32_WORD("0400501v.u12", 0x0100002, 0x0080000, CRC(f9b65d2b) SHA1(f519fc284aaa08d3619e4d88e92e690320cf5432) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
@@ -4222,7 +4222,7 @@ GAMEL( 1997, sumospin,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1998, sbuk3,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 626, A - 22/04/98
 GAMEL( 1995, swhr2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200004V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 577/1, C - 07/09/95
 GAMEL( 1995, swhr2v,    swhr2,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",        MACHINE_FLAGS, layout_aristmk5 )  // 577/1,    C - 07/09/95
-GAMEL( 199?, topbana,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  //
+GAMEL( 1997, topbana,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Top Banana (0100550V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 594/3, A - 18/08/97
 GAMEL( 2000, trstrove,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Treasure Trove (01J00161, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // JB001/3, A - 5/10/00
 GAMEL( 2002, tritreat,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 692, A - 17/05/02
 GAMEL( 2001, trojhors,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // JB001/5, A - 30/10/01
@@ -4239,14 +4239,14 @@ GAMEL( 1999, wthing,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1999, wtiger,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS, layout_aristmk5 )  // 638/1,    B - 08/07/99
 
 // the following might be bad dumps or need different hardware (unconfirmed)
-GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS, layout_aristmk5 )  // 594/1, A - 30/07/96 - doesn't boot, 'needs VLC comms instead of QCOM' (or bad?)
-GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )  // 578, G - 26/07/99 - doesn't boot (maybe bad?)
+GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Black Panther (0200818V, Victoria)",           MACHINE_FLAGS, layout_aristmk5 )  // 594/1, A - 30/07/96 - doesn't boot, 'needs VLC (Video Lottery Consultants) comms instead of QCOM' (or bad?)
 
 // the following parent sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4084/1, A - 30/10/98
 GAMEL( 2001, koalamnt,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Koala Mint (CHG1573, US)",                 MACHINE_FLAGS, layout_aristmk5_us )  // MV4137,   A - 12/09/01
 GAMEL( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // MV4033,   B - 10/02/97
 GAMEL( 1997, trpdlght,  aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 577/3,    D - 24/09/97
+GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",       MACHINE_FLAGS, layout_aristmk5 )  // 578, G - 26/07/99
 // the following clone sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4124/1, B - 31/07/01
 GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098,   A - 25/08/99
