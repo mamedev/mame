@@ -104,7 +104,7 @@ namespace plib
 	}
 
 
-	int enum_base::from_string_int(const char *str, const char *x)
+	int penum_base::from_string_int(const char *str, const char *x)
 	{
 		int cnt = 0;
 		const char *cur = str;
@@ -131,7 +131,7 @@ namespace plib
 				return cnt;
 		return -1;
 	}
-	pstring enum_base::nthstr(int n, const char *str)
+	pstring penum_base::nthstr(int n, const char *str)
 	{
 		char buf[64];
 		char *bufp = buf;

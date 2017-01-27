@@ -17,6 +17,7 @@
 #include "nl_config.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
+#include "plib/ptypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue

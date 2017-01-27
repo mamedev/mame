@@ -51,30 +51,6 @@ typedef __int128_t INT128;
 //  Standard defines
 //============================================================
 
-// prevent implicit copying
-#if 0
-#define P_PREVENT_COPYING(name)               \
-	private:                                  \
-		name(const name &);                   \
-		name(const name &&);                  \
-		name &operator=(const name &);
-#else
-
-namespace plib
-{
-	struct nocopyassignmove
-	{
-	protected:
-		nocopyassignmove() = default;
-		~nocopyassignmove() = default;
-	private:
-		nocopyassignmove(const nocopyassignmove &) = delete;
-		nocopyassignmove(nocopyassignmove &&) = delete;
-		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
-	};
-}
-#endif
-
 //============================================================
 //  Pointer to Member Function
 //============================================================
