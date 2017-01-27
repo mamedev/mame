@@ -19,7 +19,6 @@
 	* floppy_image_device sometimes reports the wrong state for ready &
 	  wpt signals
 	* IBM mode hasn't been tested yet
-	* Synchronizer/AM detector could be optimized
 
 *********************************************************************/
 
@@ -94,8 +93,6 @@ enum {
 #define TIMEOUT_MSEC		450		// Timeout duration (ms)
 #define HPMODE_BIT_FREQ		500000	// HP-mode bit frequency (Hz)
 #define IBMMODE_BIT_FREQ	250000	// IBM-mode bit frequency (Hz)
-#define HPMODE_SYNC_MAX		2400	// Maximum distance of transitions to synchronize in HP mode (nsec)
-#define IBMMODE_SYNC_MIN	3400	// Minimum distance of transitions to synchronize in IBM mode (nsec)
 
 #define MIN_SYNC_BITS		29		// Number of bits to synchronize
 
@@ -164,7 +161,6 @@ void hp9895_device::device_start()
 	save_item(NAME(m_lckup));
 	save_item(NAME(m_amdt));
 	save_item(NAME(m_sync_cnt));
-	save_item(NAME(m_prev_transition));
 	save_item(NAME(m_hiden));
 	save_item(NAME(m_mgnena));
 
@@ -301,46 +297,40 @@ void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				attotime edge;
 				attotime tm;
 				get_next_transition(m_pll.ctime, edge);
-				bool half_bit = m_pll.feed_read_data(tm , edge , attotime::never);
-				if (half_bit) {
-					if (!m_prev_transition.is_never()) {
-						attotime delta{ edge - m_prev_transition };
-						LOG_0(("Time=%.7f, Prev @ %.7f, Edge @ %.7f, Delta=%.7f\n" , machine().time().as_double() , m_prev_transition.as_double() , edge.as_double() , delta.as_double()));
-						if ((m_hiden && delta > attotime::from_nsec(HPMODE_SYNC_MAX)) ||
-							(!m_hiden && delta < attotime::from_nsec(IBMMODE_SYNC_MIN))) {
-							LOG_0(("Reset sync_cnt\n"));
-							m_sync_cnt = 0;
-						} else if (++m_sync_cnt >= MIN_SYNC_BITS) {
-							// Synchronized, now wait for AM
-							LOG_0(("Synchronized @ %.6f\n" , machine().time().as_double()));
-							m_lckup = false;
-							if (BIT(m_cntl_reg , REG_CNTL_WRITON_BIT)) {
-								// When loopback is active, leave AM detection to byte timer as
-								// byte boundary is already synchronized
-								timer.reset();
-								return;
-							} else {
-								// half_bit is 0 in the clock part of bit cell when in HP mode,
-								// whereas it's 1 in IBM mode
-								// Synchronization bits in HP mode: 32x 1s -> C/D bits = 01010101...
-								// Synchronization bits in IBM mode: 32x 0s -> C/D bits = 10101010...
-								if (!m_hiden) {
-									// Discard 1/2 bit cell if synchronization achieved in the clock part
-									get_next_transition(m_pll.ctime, edge);
-									m_pll.feed_read_data(tm , edge , attotime::never);
-								}
-								// Load CSR & DSR as they are after synchronization bits
-								if (m_hiden) {
-									m_clock_sr = 0;
-									m_data_sr = ~0;
-								} else {
-									m_clock_sr = ~0;
-									m_data_sr = 0;
-								}
-							}
+				bool half_bit0 = m_pll.feed_read_data(tm , edge , attotime::never);
+				get_next_transition(m_pll.ctime, edge);
+				bool half_bit1 = m_pll.feed_read_data(tm , edge , attotime::never);
+				if (half_bit0 == half_bit1) {
+					// If half bits are equal, no synch
+					LOG_0(("Reset sync_cnt\n"));
+					m_sync_cnt = 0;
+				} else if (++m_sync_cnt >= MIN_SYNC_BITS) {
+					// Synchronized, now wait for AM
+					LOG_0(("Synchronized @ %.6f\n" , machine().time().as_double()));
+					m_lckup = false;
+					if (BIT(m_cntl_reg , REG_CNTL_WRITON_BIT)) {
+						// When loopback is active, leave AM detection to byte timer as
+						// byte boundary is already synchronized
+						timer.reset();
+						return;
+					} else {
+						// Align with bit cell
+						// Synchronization bits in HP mode: 32x 1s -> C/D bits = 01010101...
+						// Synchronization bits in IBM mode: 32x 0s -> C/D bits = 10101010...
+						if (m_hiden != half_bit1) {
+							// Discard 1/2 bit cell if synchronization achieved in the clock part
+							get_next_transition(m_pll.ctime, edge);
+							m_pll.feed_read_data(tm , edge , attotime::never);
+						}
+						// Load CSR & DSR as they are after synchronization bits
+						if (m_hiden) {
+							m_clock_sr = 0;
+							m_data_sr = ~0;
+						} else {
+							m_clock_sr = ~0;
+							m_data_sr = 0;
 						}
 					}
-					m_prev_transition = edge;
 				}
 			} else {
 				// Looking for AM
@@ -567,7 +557,6 @@ WRITE8_MEMBER(hp9895_device::cntl_w)
 			LOG_0(("Start reading..\n"));
 			m_pll.read_reset(machine().time());
 			m_sync_cnt = 0;
-			m_prev_transition = attotime::never;
 			m_half_bit_timer->adjust(get_half_bit_cell_period());
 		} else if (old_readon && !new_readon) {
 			// Reading disabled

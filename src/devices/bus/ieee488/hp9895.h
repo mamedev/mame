@@ -107,7 +107,6 @@ private:
 	bool m_lckup;
 	bool m_amdt;
 	uint8_t m_sync_cnt;	// U28 & U73
-	attotime m_prev_transition;
 	bool m_hiden;
 	bool m_mgnena;
 #if 0
