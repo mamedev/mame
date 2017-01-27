@@ -747,19 +747,6 @@ void setup_t::resolve_inputs()
 	if (errstr != "")
 		log().fatal("{1}", errstr);
 
-
-	log().verbose("looking for two terms connected to rail nets ...");
-	for (auto & t : netlist().get_device_list<analog::NETLIB_NAME(twoterm)>())
-	{
-		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
-		{
-			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
-				t->name(), t->m_N.net().name(), t->m_P.net().name());
-			t->m_N.net().remove_terminal(t->m_N);
-			t->m_P.net().remove_terminal(t->m_P);
-			netlist().remove_dev(t);
-		}
-	}
 }
 
 void setup_t::start_devices()

@@ -152,6 +152,7 @@ namespace plib {
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
+		bool is_set() { return m_func != nullptr; }
 	private:
 		generic_function m_func;
 	};

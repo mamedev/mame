@@ -319,6 +319,7 @@ void netlist_t::start()
 
 	/* create devices */
 
+	log().debug("Creating devices ...\n");
 	for (auto & e : setup().m_device_factory)
 	{
 		if ( !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
@@ -356,6 +357,25 @@ void netlist_t::start()
 	/* resolve inputs */
 	setup().resolve_inputs();
 
+	/* Make sure devices are fully created - now done in register_dev */
+
+	log().debug("Setting delegate pointers ...\n");
+	for (auto &dev : m_devices)
+		dev->set_delegate_pointer();
+
+	log().verbose("looking for two terms connected to rail nets ...");
+	for (auto & t : get_device_list<analog::NETLIB_NAME(twoterm)>())
+	{
+		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		{
+			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
+				t->name(), t->m_N.net().name(), t->m_P.net().name());
+			t->m_N.net().remove_terminal(t->m_N);
+			t->m_P.net().remove_terminal(t->m_P);
+			remove_dev(t);
+		}
+	}
+
 	log().verbose("initialize solver ...\n");
 
 	if (m_solver == nullptr)
@@ -366,12 +386,6 @@ void netlist_t::start()
 	}
 	else
 		m_solver->post_start();
-
-	/* finally, set the pointers */
-
-	log().debug("Setting delegate pointers ...\n");
-	for (auto &dev : m_devices)
-		dev->set_delegate_pointer();
 
 }
 
