@@ -125,8 +125,6 @@
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
   - 7in1ss: in 2-player mode, game select and skill select can be configured
     after selecting a game?
-  - when f2pbball randomly picks a result, it is much rarer for it to pick one from
-    the right side? (the 6 leds at the upper-right, and the right foul)
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
