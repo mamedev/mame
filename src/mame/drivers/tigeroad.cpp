@@ -708,7 +708,7 @@ static MACHINE_CONFIG_DERIVED_CLASS(bballs, f1dream_comad, pushman_state)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
 
-	MCFG_CPU_ADD("mcu", M68705U3, 4000000)    /* No idea */
+	MCFG_CPU_ADD("mcu", M68705R3, 4000000)    /* No idea */
 	MCFG_M68705_PORTA_W_CB(WRITE8(pushman_state, mcu_pa_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(pushman_state, mcu_pb_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(pushman_state, mcu_pc_w))
@@ -1115,7 +1115,7 @@ ROM_START( bballs )
 	ROM_LOAD( "bb13.n4", 0x00000, 0x08000, CRC(1ef78175) SHA1(2e7dcbab3a572c2a6bb67a36ba283a5faeb14a88) )
 
 	ROM_REGION( 0x01000, "mcu", 0 ) /* using dump from bballsa set */
-	ROM_LOAD( "mc68705u3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) BAD_DUMP )
+	ROM_LOAD( "mc68705r3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "bb1.g20",  0x00000, 0x08000, CRC(b62dbcb8) SHA1(121613f6d2bcd226e71d4ae71830b9b0d15c2331) )
@@ -1148,7 +1148,7 @@ ROM_START( bballsa )
 	ROM_LOAD( "13.ic216", 0x00000, 0x08000, CRC(1ef78175) SHA1(2e7dcbab3a572c2a6bb67a36ba283a5faeb14a88) )
 
 	ROM_REGION( 0x01000, "mcu", 0 )
-	ROM_LOAD( "mc68705u3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) )
+	ROM_LOAD( "mc68705r3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) )
 
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(67672444) SHA1(f1d4681999d44e8d3cbf26b8a9c05f50573e0df6) )
