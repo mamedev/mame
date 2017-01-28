@@ -252,7 +252,7 @@ public:
 	DECLARE_READ64_MEMBER(unk30000_r);
 	DECLARE_READ64_MEMBER(unk30030_r);
 	DECLARE_WRITE64_MEMBER(video_w);
-	DECLARE_WRITE64_MEMBER(video_irq_ack_w);
+	DECLARE_WRITE32_MEMBER(video_irq_ack_w);
 	DECLARE_READ64_MEMBER(unk4000280_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 	DECLARE_WRITE64_MEMBER(unk4000418_w);
@@ -264,6 +264,7 @@ public:
 
 	DECLARE_DRIVER_INIT(m2);
 	virtual void video_start() override;
+	virtual void machine_reset() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
 	void cde_init();
@@ -282,18 +283,22 @@ void konamim2_state::video_start()
 uint32_t konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
-	
 	uint32_t fb_start = 0xffffffff;
-	uint32_t config;
+	uint32_t fb_size;
+	//uint32_t config;
 	int height = 384,width = 512;
-	
+
 	if (m_vdl0_address != 0)
 	{
-		fb_start = *(uint32_t*)&m_main_ram[(m_vdl1_address - 0x40000000) / 8] - 0x40000000;
-		config = m_main_ram[(m_vdl0_address - 0x40000000) / 8] >> 32;
-		// config bits are a guess, and yes, pitch is doubled in low-res
-		height = config & 2 ? 384 : 240; 
-		width = config & 4 ? 640*2 : 512;
+		uint32_t cur_vdl_address = screen.frame_number() & 1 ? m_vdl0_address : m_vdl1_address;
+		// TODO: this looks more likely to be a framebuffer copy, with parameters!
+		fb_start = *(uint32_t*)&m_main_ram[(cur_vdl_address - 0x40000000) / 8] - 0x40000000;
+		fb_size = m_main_ram[((cur_vdl_address - 0x40000000) / 8) + 2] >> 32;
+		//config = m_main_ram[(cur_vdl_address - 0x40000000) / 8] >> 32;
+		//popmessage("%08x",config);
+		
+		height = fb_size & 0x1ff;
+		width = (fb_size >> 24) * 16;
 	}
 	
 	if (fb_start <= 0x800000)
@@ -400,7 +405,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 		if (data & 0x800000)
 		{
 //          osd_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
-			m_subcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_subcpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 		}
 
 		m_unk20004 = (uint32_t)(data);
@@ -435,14 +440,12 @@ WRITE64_MEMBER(konamim2_state::video_w)
 	}
 }
 
-WRITE64_MEMBER(konamim2_state::video_irq_ack_w)
+WRITE32_MEMBER(konamim2_state::video_irq_ack_w)
 {
-	if (ACCESSING_BITS_32_63)
+	if (data & 0x8000)
 	{
-		if ((data >> 32) & 0x8000)
-		{
-			m_irq_active &= ~0x800000;
-		}
+		m_irq_active &= ~0x800000;
+		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 	}
 }
 
@@ -454,9 +457,9 @@ READ64_MEMBER(konamim2_state::unk4000280_r)
 
 	uint32_t sys_config = 0x03600000;
 
-	sys_config |= 0 << 0;           // Bit 0:       PAL/NTSC switch (default is selected by encoder)
-	sys_config |= 0 << 2;           // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
-	sys_config |= m_in_country->read() << 11;          // Bit 11-12:   Country
+	sys_config |= 0 << 0;  // Bit 0:       PAL/NTSC switch (default is selected by encoder)
+	sys_config |= 0 << 2;           			  // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
+	sys_config |= m_in_country->read() << 11;     // Bit 11-12:   Country
 									//              0 = ???
 									//              1 = UK
 									//              2 = Japan
@@ -1137,10 +1140,12 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(unk4_r, unk4_w)
+	AM_RANGE(0x00020400, 0x000207ff) AM_RAM // ???
+	AM_RANGE(0x00020800, 0x00020807) AM_RAM // ???
 	AM_RANGE(0x00030000, 0x00030007) AM_READ(unk30000_r)
 	AM_RANGE(0x00030010, 0x00030017) AM_WRITE(video_w)
 	AM_RANGE(0x00030030, 0x00030037) AM_READ(unk30030_r)
-	AM_RANGE(0x00030400, 0x00030407) AM_WRITE(video_irq_ack_w)
+	AM_RANGE(0x00030400, 0x00030407) AM_WRITE32(video_irq_ack_w,0x00000000ffffffffU)
 	AM_RANGE(0x01000000, 0x01000fff) AM_READWRITE(cde_r, cde_w)
 	AM_RANGE(0x02000000, 0x02000fff) AM_READ(device2_r)
 	AM_RANGE(0x04000010, 0x04000017) AM_WRITE8(serial_w,0x00000000000000ffU)
@@ -1157,9 +1162,10 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM( m2_main )
 
-//	AM_RANGE(0x00000000, 0x000cffff) AM_RAM devices?
+//	AM_RANGE(0x00000000, 0x000cffff) devices?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( m2 )
@@ -1188,19 +1194,33 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(konamim2_state::m2)
 {
+	/*
+	 0x000001
+	 0x000008
+	 0x200000
+	 0x800000 VBlank irq
+	 */
+	
 	if (m_irq_enable & 0x800000)
 	{
+		//m_irq_enable |= 0x800000;
 		m_irq_active |= 0x800000;
-		
-		device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		device.execute().set_input_line(PPC_IRQ, ASSERT_LINE);
 	}
-
+	
 	/*if (m_irq_enable & 0x8)
 	{
 	    m_irq_active |= 0x8;
 	}*/
 
+	
+}
 
+void konamim2_state::machine_reset()
+{
+	m_unk3 = 0xffffffffffffffffU;
+	m_unk20004 = 0;
+	cde_init();
 }
 
 static MACHINE_CONFIG_START( m2, konamim2_state )
@@ -1378,9 +1398,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(konamim2_state,m2)
 {
-	m_unk3 = 0xffffffffffffffffU;
-	m_unk20004 = 0;
-	cde_init();
+
 }
 
 GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
