@@ -10,6 +10,12 @@
 class dec0_state : public driver_device
 {
 public:
+	enum class mcu_type {
+		EMULATED,
+		BADDUDES_SIM,
+		BIRDTRY_SIM
+	};
+
 	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -47,7 +53,7 @@ public:
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
-	int m_game;
+	mcu_type m_game;
 	int m_i8751_return;
 	int m_i8751_command;
 	int m_slyspy_state;
@@ -85,7 +91,7 @@ public:
 	DECLARE_DRIVER_INIT(hbarrel);
 	DECLARE_DRIVER_INIT(slyspy);
 	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(baddudes);
+	DECLARE_DRIVER_INIT(drgninja);
 	DECLARE_DRIVER_INIT(midresb);
 	DECLARE_DRIVER_INIT(ffantasybl);
 

@@ -303,9 +303,9 @@ void dec0_state::dec0_i8751_write(int data)
 	m_i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (m_game == 1) m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-	if (m_game == 2) baddudes_i8751_write(data);
-	if (m_game == 3) birdtry_i8751_write(data);
+	if (m_game == mcu_type::EMULATED)     m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	if (m_game == mcu_type::BADDUDES_SIM) baddudes_i8751_write(data);
+	if (m_game == mcu_type::BIRDTRY_SIM)  birdtry_i8751_write(data);
 
 	//logerror("%s: warning - write %02x to i8751\n",machine().describe_context(),data);
 }
@@ -388,17 +388,17 @@ DRIVER_INIT_MEMBER(dec0_state,robocop)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,baddudes)
+DRIVER_INIT_MEMBER(dec0_state,drgninja)
 {
-	m_game = 2;
+	m_game = mcu_type::BADDUDES_SIM;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,hbarrel)
 {
-	m_game = 1;
+	m_game = mcu_type::EMULATED;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,birdtry)
 {
-	m_game=3;
+	m_game = mcu_type::BIRDTRY_SIM;
 }
