@@ -146,8 +146,7 @@ WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 	switch (offset & 0x01)
 	{
 	case 0:
-		data = flipendian_int16(data);
-		COMBINE_DATA(&m_host_latch);
+		m_host_latch = flipendian_int16(data);
 		break;
 	case 1:
 		m_mcu->pd_w(space, 0, data & 0x00ff);
@@ -159,7 +158,7 @@ WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 
 WRITE16_MEMBER(pushman_state::bballs_mcu_comm_w)
 {
-	COMBINE_DATA(&m_host_latch);
+	m_host_latch = data;
 	m_host_semaphore = true;
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
