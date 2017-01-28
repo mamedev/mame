@@ -192,6 +192,13 @@ public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
 	virtual ~pfmt_writer_t() { }
 
+	/* runtime enable */
+	template<bool enabled, typename... Args>
+	void log(const pstring fmt, Args&&... args) const
+	{
+		if (build_enabled && enabled && m_enabled) (*this)(fmt, std::forward<Args>(args)...);
+	}
+
 	void operator ()(const pstring fmt) const
 	{
 		if (build_enabled && m_enabled) vdowrite(fmt);
