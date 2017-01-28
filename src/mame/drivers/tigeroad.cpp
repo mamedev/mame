@@ -704,14 +704,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(pushman, f1dream_comad, pushman_state)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS(bballs, f1dream_comad, pushman_state)
+static MACHINE_CONFIG_DERIVED(bballs, pushman)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
-
-	MCFG_CPU_ADD("mcu", M68705R3, 4000000)    /* No idea */
-	MCFG_M68705_PORTA_W_CB(WRITE8(pushman_state, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(pushman_state, mcu_pb_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(pushman_state, mcu_pc_w))
 MACHINE_CONFIG_END
 
 
