@@ -39,6 +39,7 @@ public:
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
 		, m_dim(size)
+		, mat(size)
 		, m_proc(nullptr)
 		{
 		}
@@ -56,7 +57,8 @@ public:
 
 private:
 
-	typedef typename mat_cr_t<storage_N>::type mattype;
+	//typedef typename mat_cr_t<storage_N>::type mattype;
+	typedef typename mat_cr_t<storage_N>::index_type mattype;
 
 	void csc_private(plib::putf8_fmt_writer &strm);
 
@@ -67,7 +69,6 @@ private:
 	const std::size_t m_dim;
 	std::vector<unsigned> m_term_cr[storage_N];
 	mat_cr_t<storage_N> mat;
-	nl_double m_A[storage_N * storage_N];
 
 	extsolver m_proc;
 
@@ -185,7 +186,8 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &st
 			pi++;
 			const std::size_t piie = mat.ia[i+1];
 
-			for (auto & j : nzbd)
+			//for (auto & j : nzbd)
+			for (std::size_t j : nzbd)
 			{
 				// proceed to column i
 				std::size_t pj = mat.ia[j];
@@ -248,8 +250,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	nl_double RHS[storage_N];
 	nl_double new_V[storage_N];
 
-	for (std::size_t i=0, e=mat.nz_num; i<e; i++)
-		m_A[i] = 0.0;
+	mat.set_scalar(0.0);
 
 	for (std::size_t k = 0; k < iN; k++)
 	{
@@ -283,7 +284,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 			RHS_t += Idr[i];
 		}
 #else
-		for (unsigned i = 0; i < term_count; i++)
+		for (std::size_t i = 0; i < term_count; i++)
 		{
 			gtot_t += gt[i];
 			RHS_t += Idr[i];
@@ -295,10 +296,10 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		RHS[k] = RHS_t;
 
 		// add diagonal element
-		m_A[mat.diag[k]] = gtot_t;
+		mat.A[mat.diag[k]] = gtot_t;
 
 		for (std::size_t i = 0; i < railstart; i++)
-			m_A[tcr[i]] -= go[i];
+			mat.A[tcr[i]] -= go[i];
 	}
 #else
 		for (std::size_t i = 0; i < railstart; i++)
@@ -325,7 +326,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	if (m_proc != nullptr)
 	{
 		//static_solver(m_A, RHS);
-		m_proc(m_A, RHS);
+		m_proc(mat.A, RHS);
 	}
 	else
 	{
@@ -336,10 +337,10 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 			if (nzbd.size() > 0)
 			{
 				std::size_t pi = mat.diag[i];
-				const nl_double f = 1.0 / m_A[pi++];
+				const nl_double f = 1.0 / mat.A[pi++];
 				const std::size_t piie = mat.ia[i+1];
 
-				for (auto & j : nzbd)
+				for (std::size_t j : nzbd) // for (std::size_t j = i + 1; j < iN; j++)
 				{
 					// proceed to column i
 					//__builtin_prefetch(&m_A[mat.diag[j+1]], 1);
@@ -348,14 +349,14 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 					while (mat.ja[pj] < i)
 						pj++;
 
-					const nl_double f1 = - m_A[pj++] * f;
+					const nl_double f1 = - mat.A[pj++] * f;
 
 					// subtract row i from j */
 					for (std::size_t pii = pi; pii<piie; )
 					{
 						while (mat.ja[pj] < mat.ja[pii])
 							pj++;
-						m_A[pj++] += m_A[pii++] * f1;
+						mat.A[pj++] += mat.A[pii++] * f1;
 					}
 					RHS[j] += f1 * RHS[i];
 				}
@@ -368,7 +369,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	 */
 
 	/* row n-1 */
-	new_V[iN - 1] = RHS[iN - 1] / m_A[mat.diag[iN - 1]];
+	new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
 
 	for (std::size_t j = iN - 1; j-- > 0;)
 	{
@@ -381,23 +382,23 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		for (; pk < e - 1; pk+=2)
 		{
 			//tmp += m_A[pk] * new_V[mat.ja[pk]];
-			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(m_A[pk], m_A[pk+1]),
+			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(mat.A[pk], mat.A[pk+1]),
 					_mm_set_pd(new_V[mat.ja[pk]], new_V[mat.ja[pk+1]])));
 		}
 		double tmpx = _mm_cvtsd_f64(tmp) + _mm_cvtsd_f64(_mm_unpackhi_pd(tmp,tmp));
 		for (; pk < e; pk++)
 		{
-			tmpx += m_A[pk] * new_V[mat.ja[pk]];
+			tmpx += mat.A[pk] * new_V[mat.ja[pk]];
 		}
-		new_V[j] = (RHS[j] - tmpx) / m_A[mat.diag[j]];
+		new_V[j] = (RHS[j] - tmpx) / mat.A[mat.diag[j]];
 #else
 		double tmp = 0;
 		const std::size_t e = mat.ia[j+1];
 		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
 		{
-			tmp += m_A[pk] * new_V[mat.ja[pk]];
+			tmp += mat.A[pk] * new_V[mat.ja[pk]];
 		}
-		new_V[j] = (RHS[j] - tmp) / m_A[mat.diag[j]];
+		new_V[j] = (RHS[j] - tmp) / mat.A[mat.diag[j]];
 #endif
 	}
 	this->m_stat_calculations++;

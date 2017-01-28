@@ -12,20 +12,59 @@
 
 #include <algorithm>
 #include "plib/pconfig.h"
+#include "plib/palloc.h"
 
-//template<std::size_t storage_N, typename C = std::size_t>
-template<std::size_t storage_N, typename C = uint16_t>
+template<std::size_t N, typename C = uint16_t, typename T = double>
 struct mat_cr_t
 {
-	typedef C type;
+	typedef C index_type;
+	typedef T value_type;
 
-	C nz_num;
-	C ia[storage_N + 1];
-	C ja[storage_N * storage_N];
-	C diag[storage_N];       /* n */
+	C RESTRICT diag[N];      // diagonal index pointer n
+	C RESTRICT ia[N+1];      // row index pointer n + 1
+	C RESTRICT ja[N*N];		 // column index array nz_num, initially (n * n)
+	T RESTRICT A[N*N];  	 // Matrix elements nz_num, initially (n * n)
 
-	template<typename T>
-	void mult_vec(const T * RESTRICT A, const T * RESTRICT x, T * RESTRICT res)
+	std::size_t size;
+	std::size_t nz_num;
+
+	mat_cr_t(const std::size_t n)
+	: size(n)
+	, nz_num(0)
+	{
+#if 0
+#if 0
+		ia = plib::palloc_array<C>(n + 1);
+		ja = plib::palloc_array<C>(n * n);
+		diag = plib::palloc_array<C>(n);
+#else
+		diag = plib::palloc_array<C>(n + (n + 1) + n * n);
+		ia = diag + n;
+		ja = ia + (n+1);
+		A = plib::palloc_array<T>(n * n);
+#endif
+#endif
+	}
+
+	~mat_cr_t()
+	{
+#if 0
+		plib::pfree_array(diag);
+#if 0
+		plib::pfree_array(ia);
+		plib::pfree_array(ja);
+#endif
+		plib::pfree_array(A);
+#endif
+	}
+
+	void set_scalar(const T scalar)
+	{
+		for (std::size_t i=0, e=nz_num; i<e; i++)
+			A[i] = scalar;
+	}
+
+	void mult_vec(const T * RESTRICT x, T * RESTRICT res)
 	{
 		/*
 		 * res = A * x
@@ -45,8 +84,7 @@ struct mat_cr_t
 		}
 	}
 
-	template<typename T>
-	void incomplete_LU_factorization(const T * RESTRICT A, T * RESTRICT LU)
+	void incomplete_LU_factorization(T * RESTRICT LU)
 	{
 		/*
 		 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
@@ -86,7 +124,6 @@ struct mat_cr_t
 		}
 	}
 
-	template<typename T>
 	void solveLUx (const T * RESTRICT LU, T * RESTRICT r)
 	{
 		/*
@@ -99,7 +136,7 @@ struct mat_cr_t
 		 *
 		 * ==> LUx = r
 		 *
-		 * ==> Ux = L?????r = w
+		 * ==> Ux = L⁻¹ r = w
 		 *
 		 * ==> r = Lw
 		 *
@@ -111,32 +148,28 @@ struct mat_cr_t
 		 *
 		 */
 
-		std::size_t i;
-
-		for (i = 1; ia[i] < nz_num; i++ )
+		for (std::size_t i = 1; ia[i] < nz_num; ++i )
 		{
 			T tmp = 0.0;
 			const std::size_t j1 = ia[i];
 			const std::size_t j2 = diag[i];
 
-			for (std::size_t j = j1; j < j2; j++ )
+			for (std::size_t j = j1; j < j2; ++j )
 				tmp +=  LU[j] * r[ja[j]];
 
 			r[i] -= tmp;
 		}
 		// i now is equal to n;
-		for (; 0 < i; i-- )
+		for (std::size_t i = size; i-- > 0; )
 		{
-			const std::size_t im1 = i - 1;
 			T tmp = 0.0;
-			const std::size_t j1 = diag[im1] + 1;
-			const std::size_t j2 = ia[im1+1];
-			for (std::size_t j = j1; j < j2; j++ )
+			const std::size_t di = diag[i];
+			const std::size_t j2 = ia[i+1];
+			for (std::size_t j = di + 1; j < j2; j++ )
 				tmp += LU[j] * r[ja[j]];
-			r[im1] = (r[im1] - tmp) / LU[diag[im1]];
+			r[i] = (r[i] - tmp) / LU[di];
 		}
 	}
-
 };
 
 #endif /* MAT_CR_H_ */

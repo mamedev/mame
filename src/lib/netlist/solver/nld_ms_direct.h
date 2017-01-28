@@ -19,7 +19,7 @@
  * going forward in case we implement cuda solvers in the future.
  */
 #define NL_USE_DYNAMIC_ALLOCATION (0)
-#define TEST_PARALLEL (0)
+#define TEST_PARALLEL (0	)
 
 #if TEST_PARALLEL
 #include <thread>
@@ -36,16 +36,17 @@ namespace netlist
 
 #if TEST_PARALLEL
 #define MAXTHR 10
-static const int num_thr = 1;
+static const int num_thr = 3;
 
 struct thr_intf
 {
+	virtual ~thr_intf() = default;
 	virtual void do_work(const int id, void *param) = 0;
 };
 
 struct ti_t
 {
-	volatile std::atomic<int> lo;
+	/*volatile */std::atomic<int> lo;
 	thr_intf *intf;
 	void *params;
 //  int block[29]; /* make it 256 bytes */
@@ -163,6 +164,7 @@ protected:
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
+	//static const std::size_t m_pitch = (((storage_N + 1) + 0) / 1) * 1;
 	static const std::size_t m_pitch = (((storage_N + 1) + 7) / 8) * 8;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 15) / 16) * 16;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 31) / 32) * 32;
@@ -185,7 +187,7 @@ template <std::size_t m_N, std::size_t storage_N>
 matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	pfree_array(m_A);
+	plib::pfree_array(m_A);
 #endif
 #if TEST_PARALLEL
 	thr_dispose();
@@ -215,7 +217,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 
 #if TEST_PARALLEL
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::do_work(const int id, void *param)
 {
 	const int i = x_i[id];
@@ -323,14 +325,14 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 			const auto &nzrd = m_terms[i]->m_nzrd;
 			const auto &nzbd = m_terms[i]->m_nzbd;
 
-			for (auto & j : nzbd)
+			for (std::size_t j : nzbd)
 			{
 				const nl_double f1 = -f * A(j,i);
-				for (auto & k : nzrd)
+				for (std::size_t k : nzrd)
 					A(j,k) += A(i,k) * f1;
 				//RHS(j) += RHS(i) * f1;
-#endif
 			}
+#endif
 		}
 	}
 }
@@ -416,7 +418,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
+	m_A = plib::palloc_array<nl_ext_double>(N() * m_pitch);
 #endif
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -434,7 +436,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 , m_dim(size)
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
+	m_A = plib::palloc_array<nl_ext_double>(N() * m_pitch);
 #endif
 	for (unsigned k = 0; k < N(); k++)
 	{

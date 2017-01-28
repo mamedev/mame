@@ -113,7 +113,7 @@ private:
 	solver_parameters_t m_params;
 
 	template <std::size_t m_N, std::size_t storage_N>
-	std::unique_ptr<matrix_solver_t> create_solver(std::size_t size, bool use_specific);
+	std::unique_ptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

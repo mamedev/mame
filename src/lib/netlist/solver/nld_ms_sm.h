@@ -115,7 +115,7 @@ template <std::size_t m_N, std::size_t storage_N>
 matrix_solver_sm_t<m_N, storage_N>::~matrix_solver_sm_t()
 {
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	pfree_array(m_A);
+	plib::pfree_array(m_A);
 #endif
 }
 
@@ -324,9 +324,6 @@ matrix_solver_sm_t<m_N, storage_N>::matrix_solver_sm_t(netlist_t &anetlist, cons
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	m_A = palloc_array(nl_ext_double, N() * m_pitch);
-#endif
 	for (std::size_t k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;

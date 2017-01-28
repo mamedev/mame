@@ -147,58 +147,50 @@ std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_p
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const bool use_specific)
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
-	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
-	if (use_specific && m_N == 1)
-		return plib::make_unique<matrix_solver_direct1_t>(netlist(), solvername, &m_params);
-	else if (use_specific && m_N == 2)
-		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
+	if (pstring("SOR_MAT").equals(m_method()))
+	{
+		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
+		//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("MAT_CR").equals(m_method()))
+	{
+		typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("MAT").equals(m_method()))
+	{
+		typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("SM").equals(m_method()))
+	{
+		/* Sherman-Morrison Formula */
+		typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("W").equals(m_method()))
+	{
+		/* Woodbury Formula */
+		typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("SOR").equals(m_method()))
+	{
+		typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
+		return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("GMRES").equals(m_method()))
+	{
+		typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
+		return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
+	}
 	else
 	{
-		if (pstring("SOR_MAT").equals(m_method()))
-		{
-			return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
-			//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
-			//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("MAT_CR").equals(m_method()))
-		{
-			typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("MAT").equals(m_method()))
-		{
-			typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("SM").equals(m_method()))
-		{
-			/* Sherman-Morrison Formula */
-			typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("W").equals(m_method()))
-		{
-			/* Woodbury Formula */
-			typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("SOR").equals(m_method()))
-		{
-			typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
-			return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("GMRES").equals(m_method()))
-		{
-			typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
-			return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
-		}
-		else
-		{
-			log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-			return nullptr;
-		}
+		log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
+		return nullptr;
 	}
 }
 
@@ -303,61 +295,68 @@ void NETLIB_NAME(solver)::post_start()
 	{
 		std::unique_ptr<matrix_solver_t> ms;
 		std::size_t net_count = grp.size();
+		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
 		switch (net_count)
 		{
 #if 1
 			case 1:
-				ms = create_solver<1,1>(1, false);
+				if (use_specific)
+					ms = plib::make_unique<matrix_solver_direct1_t>(netlist(), sname, &m_params);
+				else
+					ms = create_solver<1,1>(1, sname);
 				break;
 			case 2:
-				ms = create_solver<2,2>(2, false);
+				if (use_specific)
+					ms =  plib::make_unique<matrix_solver_direct2_t>(netlist(), sname, &m_params);
+				else
+					ms = create_solver<2,2>(2, sname);
 				break;
 			case 3:
-				ms = create_solver<3,3>(3, use_specific);
+				ms = create_solver<3,3>(3, sname);
 				break;
 			case 4:
-				ms = create_solver<4,4>(4, use_specific);
+				ms = create_solver<4,4>(4, sname);
 				break;
 			case 5:
-				ms = create_solver<5,5>(5, use_specific);
+				ms = create_solver<5,5>(5, sname);
 				break;
 			case 6:
-				ms = create_solver<6,6>(6, use_specific);
+				ms = create_solver<6,6>(6, sname);
 				break;
 			case 7:
-				ms = create_solver<7,7>(7, use_specific);
+				ms = create_solver<7,7>(7, sname);
 				break;
 			case 8:
-				ms = create_solver<8,8>(8, use_specific);
+				ms = create_solver<8,8>(8, sname);
 				break;
 			case 9:
-				ms = create_solver<9,9>(9, use_specific);
+				ms = create_solver<9,9>(9, sname);
 				break;
 			case 10:
-				ms = create_solver<10,10>(10, use_specific);
+				ms = create_solver<10,10>(10, sname);
 				break;
 			case 11:
-				ms = create_solver<11,11>(11, use_specific);
+				ms = create_solver<11,11>(11, sname);
 				break;
 			case 12:
-				ms = create_solver<12,12>(12, use_specific);
+				ms = create_solver<12,12>(12, sname);
 				break;
 			case 15:
-				ms = create_solver<15,15>(15, use_specific);
+				ms = create_solver<15,15>(15, sname);
 				break;
 			case 31:
-				ms = create_solver<31,31>(31, use_specific);
+				ms = create_solver<31,31>(31, sname);
 				break;
 			case 35:
-				ms = create_solver<31,31>(31, use_specific);
+				ms = create_solver<31,31>(31, sname);
 				break;
 			case 49:
-				ms = create_solver<49,49>(49, use_specific);
+				ms = create_solver<49,49>(49, sname);
 				break;
 #if 0
 			case 87:
-				ms = create_solver<87,87>(87, use_specific);
+				ms = create_solver<87,87>(87, sname);
 				break;
 #endif
 #endif
@@ -365,25 +364,25 @@ void NETLIB_NAME(solver)::post_start()
 				log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
 				if (net_count <= 8)
 				{
-					ms = create_solver<0, 8>(net_count, use_specific);
+					ms = create_solver<0, 8>(net_count, sname);
 				}
 				else if (net_count <= 16)
 				{
-					ms = create_solver<0,16>(net_count, use_specific);
+					ms = create_solver<0,16>(net_count, sname);
 				}
 				else if (net_count <= 32)
 				{
-					ms = create_solver<0,32>(net_count, use_specific);
+					ms = create_solver<0,32>(net_count, sname);
 				}
 				else
 					if (net_count <= 64)
 				{
-					ms = create_solver<0,64>(net_count, use_specific);
+					ms = create_solver<0,64>(net_count, sname);
 				}
 				else
 					if (net_count <= 128)
 				{
-					ms = create_solver<0,128>(net_count, use_specific);
+					ms = create_solver<0,128>(net_count, sname);
 				}
 				else
 				{

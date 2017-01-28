@@ -33,6 +33,7 @@ public:
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
 		, m_accuracy_mult(1.0)
+		, mat(size)
 		{
 		}
 
@@ -45,7 +46,8 @@ public:
 
 private:
 
-	typedef typename mat_cr_t<storage_N>::type mattype;
+	//typedef typename mat_cr_t<storage_N>::type mattype;
+	typedef typename mat_cr_t<storage_N>::index_type mattype;
 
 	unsigned solve_ilu_gmres(nl_double (& RESTRICT x)[storage_N], const nl_double * RESTRICT rhs, const unsigned restart_max, const std::size_t mr, nl_double accuracy);
 
@@ -57,7 +59,6 @@ private:
 
 	mat_cr_t<storage_N> mat;
 
-	nl_double m_A[storage_N * storage_N];
 	nl_double m_LU[storage_N * storage_N];
 
 	nl_double m_c[storage_N + 1];  /* mr + 1 */
@@ -129,8 +130,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 	nl_double RHS[storage_N];
 	nl_double new_V[storage_N];
 
-	for (unsigned i=0, e=mat.nz_num; i<e; i++)
-		m_A[i] = 0.0;
+	mat.set_scalar(0.0);
 
 	for (std::size_t k = 0; k < iN; k++)
 	{
@@ -158,12 +158,12 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		RHS[k] = RHS_t;
 
 		// add diagonal element
-		m_A[mat.diag[k]] = gtot_t;
+		mat.A[mat.diag[k]] = gtot_t;
 
 		for (std::size_t i = 0; i < railstart; i++)
 		{
-			const unsigned pi = m_term_cr[k][i];
-			m_A[pi] -= go[i];
+			const std::size_t pi = m_term_cr[k][i];
+			mat.A[pi] -= go[i];
 		}
 	}
 	mat.ia[iN] = mat.nz_num;
@@ -242,7 +242,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 	const	 std::size_t n = this->N();
 
 	if (m_use_iLU_preconditioning)
-		mat.incomplete_LU_factorization(m_A, m_LU);
+		mat.incomplete_LU_factorization(m_LU);
 
 	if (m_use_more_precise_stop_condition)
 	{
@@ -260,7 +260,8 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		nl_double t[storage_N];
 		nl_double Ax[storage_N];
 		vec_set(n, accuracy, t);
-		mat.mult_vec(m_A, t, Ax);
+		mat.mult_vec(t, Ax);
+
 		mat.solveLUx(m_LU, Ax);
 
 		const nl_double rho_to_accuracy = std::sqrt(vecmult2(n, Ax)) / accuracy;
@@ -278,7 +279,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		nl_double Ax[storage_N];
 		nl_double residual[storage_N];
 
-		mat.mult_vec(m_A, x, Ax);
+		mat.mult_vec(x, Ax);
 
 		vec_sub(n, rhs, Ax, residual);
 
@@ -304,7 +305,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		{
 			const std::size_t k1 = k + 1;
 
-			mat.mult_vec(m_A, m_v[k], m_v[k1]);
+			mat.mult_vec(m_v[k], m_v[k1]);
 
 			if (m_use_iLU_preconditioning)
 				mat.solveLUx(m_LU, m_v[k1]);
