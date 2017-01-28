@@ -13,6 +13,8 @@
     TODO:
     - cforteb emulation (was initially sforteba romset)
     - verify supercon IRQ and beeper frequency
+    - sforte irq active time (21.5us is too long)
+    - sforte/sexpert led handling is correct?
     - printer port
 
 ******************************************************************************
@@ -838,6 +840,8 @@ static MACHINE_CONFIG_DERIVED( sforte, sexpert )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
+	MCFG_TIMER_MODIFY("irq_on")
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(15)) // active for ?us
 
 	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END
