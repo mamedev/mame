@@ -1,5 +1,5 @@
-// license: GPL-2.0+
-// copyright-holders: Dirk Best
+// license: BSD-3-Clause
+// copyright-holders: Aaron Giles, Dirk Best
 /***************************************************************************
 
     Commodore 8364 "Paula"
@@ -33,7 +33,7 @@
       RGA6  21 |         | 28  CCK
       RGA5  22 |         | 27  VCC
       RGA4  23 |         | 26  RGA1
-	  RGA3  24 |_________| 25  RGA2
+      RGA3  24 |_________| 25  RGA2
 
 ***************************************************************************/
 
