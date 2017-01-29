@@ -54,8 +54,8 @@ public:
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
 	mcu_type m_game;
-	int m_i8751_return;
-	int m_i8751_command;
+	uint16_t m_i8751_return;
+	uint16_t m_i8751_command;
 	int m_slyspy_state;
 	int m_hippodrm_msb;
 	int m_hippodrm_lsb;
