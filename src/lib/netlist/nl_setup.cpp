@@ -11,12 +11,11 @@
 #include "nl_setup.h"
 #include "nl_parser.h"
 #include "nl_factory.h"
-#include "devices/net_lib.h"
-#include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
 #include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
+#include "devices/nlid_truthtable.h"
 
 // ----------------------------------------------------------------------------------------
 // setup_t
@@ -30,7 +29,7 @@ setup_t::setup_t(netlist_t &netlist)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	initialize_factory(m_factory);
+	devices::initialize_factory(m_factory);
 }
 
 setup_t::~setup_t()
@@ -137,11 +136,11 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 {
 	switch (in.type())
 	{
-		case terminal_t::TERMINAL:
+		case detail::terminal_type::TERMINAL:
 			return pstring("TERMINAL");
-		case terminal_t::INPUT:
+		case detail::terminal_type::INPUT:
 			return pstring("INPUT");
-		case terminal_t::OUTPUT:
+		case detail::terminal_type::OUTPUT:
 			return pstring("OUTPUT");
 	}
 	// FIXME: noreturn
@@ -336,12 +335,12 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 }
 
 detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		detail::core_terminal_t::type_t atype, bool required)
+		detail::terminal_type atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret == m_terminals.end() && atype == detail::core_terminal_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == detail::terminal_type::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		ret = m_terminals.find(tname + ".Q");
@@ -603,7 +602,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 		{
 			for (auto & t : t1.net().m_core_terms)
 			{
-				if (t->is_type(detail::core_terminal_t::TERMINAL))
+				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -618,7 +617,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 		{
 			for (auto & t : t2.net().m_core_terms)
 			{
-				if (t->is_type(detail::core_terminal_t::TERMINAL))
+				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -637,39 +636,39 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	detail::core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::INPUT))
+	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			log().fatal(MF_1_INPUT_1_ALREADY_CONNECTED, t2.name());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			log().fatal(MF_1_INPUT_1_ALREADY_CONNECTED, t1.name());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::INPUT))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::INPUT))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -782,7 +781,7 @@ const plib::plog_base<NL_DEBUG> &setup_t::log() const
 // Model
 // ----------------------------------------------------------------------------------------
 
-static pstring model_string(model_map_t &map)
+static pstring model_string(detail::model_map_t &map)
 {
 	pstring ret = map["COREMODEL"] + "(";
 	for (auto & i : map)
@@ -791,7 +790,7 @@ static pstring model_string(model_map_t &map)
 	return ret + ")";
 }
 
-void setup_t::model_parse(const pstring &model_in, model_map_t &map)
+void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 {
 	pstring model = model_in;
 	pstring::iterator pos(nullptr);
@@ -837,7 +836,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	}
 }
 
-const pstring setup_t::model_value_str(model_map_t &map, const pstring &entity)
+const pstring setup_t::model_value_str(detail::model_map_t &map, const pstring &entity)
 {
 	pstring ret;
 
@@ -852,7 +851,7 @@ const pstring setup_t::model_value_str(model_map_t &map, const pstring &entity)
 	return ret;
 }
 
-nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
+nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 {
 	pstring tmp = model_value_str(map, entity);
 
@@ -899,7 +898,7 @@ plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
-	model_map_t map;
+	detail::model_map_t map;
 	model_parse(model, map);
 
 	if (model_value_str(map, "TYPE") == "TTL")

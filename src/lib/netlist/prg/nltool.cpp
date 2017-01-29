@@ -13,6 +13,7 @@
 #include "nl_parser.h"
 #include "devices/net_lib.h"
 #include "tools/nl_convert.h"
+#include "solver/nld_solver.h"
 
 class tool_options_t : public plib::options
 {

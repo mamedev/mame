@@ -86,7 +86,7 @@ inline static void vec_add_mult_scalar (const std::size_t n, const T (& RESTRICT
 }
 
 template<typename T>
-inline static void vec_add_mult_scalar (const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
+inline static void vec_add_mult_scalar_p(const std::size_t & n, const T * RESTRICT v, const T scalar, T * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] += scalar * v[i];

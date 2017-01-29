@@ -7,12 +7,12 @@
 
 ***************************************************************************/
 
-#include "netlist/devices/net_lib.h"
+#ifndef __PLIB_PREPROCESSOR__
+	#define NL_PROHIBIT_BASEH_INCLUDE	1
+	#include "netlist/devices/net_lib.h"
+#endif
 
 #define FAST_CLOCK  (1)
-
-#ifndef __PLIB_PREPROCESSOR__
-#endif
 
 NETLIST_START(pong_fast)
 

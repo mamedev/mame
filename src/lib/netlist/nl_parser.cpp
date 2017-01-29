@@ -8,7 +8,6 @@
 #include "nl_parser.h"
 #include "nl_factory.h"
 #include "nl_errstr.h"
-#include "devices/nld_truthtable.h"
 
 namespace netlist
 {
@@ -187,7 +186,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			netlist::devices::tt_factory_create(m_setup, desc, nlname);
+			m_setup.tt_factory_create(desc, nlname);
 			return;
 		}
 	}

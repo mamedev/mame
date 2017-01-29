@@ -15,6 +15,7 @@
 #include <mutex>
 
 #include "nl_config.h"
+#include "nl_types.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
 #include "plib/ptypes.h"
@@ -26,7 +27,6 @@
 
 namespace netlist
 {
-
 	//FIXME: move to an appropriate place
 	template<bool enabled_ = true>
 	class pspin_mutex

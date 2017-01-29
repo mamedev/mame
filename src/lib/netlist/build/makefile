@@ -64,9 +64,9 @@ NLOBJS := \
 	$(NLOBJ)/nl_setup.o \
 	$(NLOBJ)/nl_factory.o \
 	$(NLOBJ)/analog/nld_bjt.o \
-	$(NLOBJ)/analog/nld_fourterm.o \
+	$(NLOBJ)/analog/nlid_fourterm.o \
 	$(NLOBJ)/analog/nld_switches.o \
-	$(NLOBJ)/analog/nld_twoterm.o \
+	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
@@ -115,7 +115,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_log.o \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
-	$(NLOBJ)/devices/nld_truthtable.o \
+	$(NLOBJ)/devices/nlid_truthtable.o \
 	$(NLOBJ)/macro/nlm_base.o \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \
 	$(NLOBJ)/macro/nlm_opamp.o \

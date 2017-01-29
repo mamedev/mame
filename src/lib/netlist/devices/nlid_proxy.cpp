@@ -112,9 +112,9 @@ namespace netlist
 		{
 			pstring devname = out_proxied->device().name();
 			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
-					detail::core_terminal_t::type_t::INPUT, false);
+					detail::terminal_type::INPUT, false);
 			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
-					detail::core_terminal_t::type_t::INPUT, false);
+					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
 				/* alternative logic */
@@ -127,7 +127,7 @@ namespace netlist
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 #if (0)
 		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
-		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::type_t::OUTPUT, false);
+		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::terminal_type::OUTPUT, false);
 		if (x) printf("==> %s\n", x->name().c_str());
 #endif
 	}

@@ -1,9 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 #include "nlm_opamp.h"
-
-#include "analog/nld_opamps.h"
-#include "devices/nld_system.h"
+#include "devices/net_lib.h"
 
 /*
  *   Generic layout with 4 opamps, VCC on pin 4 and GND on pin 11

@@ -5,10 +5,8 @@
  *
  */
 
-#include "nld_74123.h"
-
 #include "nlid_system.h"
-#include "analog/nld_twoterm.h"
+#include "analog/nlid_twoterm.h"
 
 #include <cmath>
 

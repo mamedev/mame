@@ -10,6 +10,7 @@
 #include <cstdint>
 
 #include "nl_config.h"
+#include "plib/ptypes.h"
 #include "plib/pstate.h"
 
 //============================================================

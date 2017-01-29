@@ -216,22 +216,22 @@ detail::device_object_t::device_object_t(core_device_t &dev, const pstring &anam
 {
 }
 
-detail::core_terminal_t::type_t detail::core_terminal_t::type() const
+detail::terminal_type detail::core_terminal_t::type() const
 {
 	if (dynamic_cast<const terminal_t *>(this) != nullptr)
-		return type_t::TERMINAL;
+		return terminal_type::TERMINAL;
 	else if (dynamic_cast<const logic_input_t *>(this) != nullptr)
-		return type_t::INPUT;
+		return terminal_type::INPUT;
 	else if (dynamic_cast<const logic_output_t *>(this) != nullptr)
-		return type_t::OUTPUT;
+		return terminal_type::OUTPUT;
 	else if (dynamic_cast<const analog_input_t *>(this) != nullptr)
-		return type_t::INPUT;
+		return terminal_type::INPUT;
 	else if (dynamic_cast<const analog_output_t *>(this) != nullptr)
-		return type_t::OUTPUT;
+		return terminal_type::OUTPUT;
 	else
 	{
 		netlist().log().fatal(MF_1_UNKNOWN_TYPE_FOR_OBJECT, name());
-		return type_t::TERMINAL; // please compiler
+		return terminal_type::TERMINAL; // please compiler
 	}
 }
 

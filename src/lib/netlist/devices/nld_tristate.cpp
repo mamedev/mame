@@ -6,6 +6,7 @@
  */
 
 #include "nld_tristate.h"
+#include "nl_base.h"
 
 namespace netlist
 {

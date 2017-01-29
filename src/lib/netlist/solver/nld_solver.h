@@ -10,7 +10,6 @@
 
 #include <map>
 
-#include "nl_setup.h"
 #include "nl_base.h"
 #include "plib/pstream.h"
 #include "solver/nld_matrix_solver.h"
@@ -18,17 +17,6 @@
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
 
-// ----------------------------------------------------------------------------------------
-// Macros
-// ----------------------------------------------------------------------------------------
-
-#ifndef NL_AUTO_DEVICES
-
-#define SOLVER(name, freq)                                                 \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
-
-#endif
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------

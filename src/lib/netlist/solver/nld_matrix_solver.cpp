@@ -123,7 +123,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
 			{
-				case terminal_t::TERMINAL:
+				case detail::terminal_type::TERMINAL:
 					if (p->device().is_timestep())
 						if (!plib::container::contains(m_step_devices, &p->device()))
 							m_step_devices.push_back(&p->device());
@@ -136,7 +136,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					}
 					log().debug("Added terminal {1}\n", p->name());
 					break;
-				case terminal_t::INPUT:
+				case detail::terminal_type::INPUT:
 					{
 						proxied_analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
@@ -160,7 +160,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						log().debug("Added input\n");
 					}
 					break;
-				case terminal_t::OUTPUT:
+				case detail::terminal_type::OUTPUT:
 					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
 							p->name());
 					break;

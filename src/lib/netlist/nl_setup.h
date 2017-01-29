@@ -8,11 +8,18 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include "nl_base.h"
-#include "nl_factory.h"
+#include "plib/pstring.h"
+#include "plib/putil.h"
+#include "plib/pstream.h"
 #include "plib/pparser.h"
 
+#include "nl_factory.h"
+#include "nl_config.h"
+#include "nl_types.h"
+
 #include <stack>
+#include <vector>
+#include <memory>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -100,12 +107,29 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		netlist::devices::tt_factory_create(setup, desc, __FILE__);       \
+		setup.tt_factory_create(desc, __FILE__);       \
 	}
 
 
 namespace netlist
 {
+
+	namespace detail {
+		class core_terminal_t;
+		class net_t;
+	}
+
+	namespace devices {
+		class nld_base_proxy;
+	}
+
+	class core_device_t;
+	class param_t;
+	class setup_t;
+	class netlist_t;
+	class logic_family_desc_t;
+	class terminal_t;
+
 	// -----------------------------------------------------------------------------
 	// truthtable desc
 	// -----------------------------------------------------------------------------
@@ -252,10 +276,10 @@ namespace netlist
 
 		/* model / family related */
 
-		const pstring model_value_str(model_map_t &map, const pstring &entity);
-		nl_double model_value(model_map_t &map, const pstring &entity);
+		const pstring model_value_str(detail::model_map_t &map, const pstring &entity);
+		double model_value(detail::model_map_t &map, const pstring &entity);
 
-		void model_parse(const pstring &model, model_map_t &map);
+		void model_parse(const pstring &model, detail::model_map_t &map);
 
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
@@ -276,7 +300,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		/* needed by proxy */
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::core_terminal_t::type_t atype, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
 
 	private:
 

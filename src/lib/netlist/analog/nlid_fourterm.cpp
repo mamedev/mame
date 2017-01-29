@@ -6,7 +6,7 @@
  */
 
 #include "solver/nld_solver.h"
-#include "nld_fourterm.h"
+#include "nlid_fourterm.h"
 #include "nl_setup.h"
 
 #include <cmath>
@@ -15,6 +15,8 @@ namespace netlist
 {
 	namespace analog
 	{
+
+
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
 // ----------------------------------------------------------------------------------------

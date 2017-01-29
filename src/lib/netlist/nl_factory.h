@@ -9,7 +9,8 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
-#include "nl_base.h"
+#include "plib/palloc.h"
+#include "plib/ptypes.h"
 
 #define NETLIB_DEVICE_IMPL(chip) \
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
@@ -27,8 +28,12 @@
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
-namespace netlist { namespace factory
-{
+namespace netlist {
+	class netlist_t;
+	class device_t;
+	class setup_t;
+
+namespace factory {
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
@@ -99,7 +104,7 @@ namespace netlist { namespace factory
 
 	private:
 		setup_t &m_setup;
-};
+	};
 
 	// -----------------------------------------------------------------------------
 	// factory_creator_ptr_t
@@ -119,18 +124,6 @@ namespace netlist { namespace factory
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	class NETLIB_NAME(wrapper) : public device_t
-	{
-	public:
-		NETLIB_NAME(wrapper)(netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
-		{
-		}
-	protected:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-	};
-
 	class library_element_t : public element_t
 	{
 	public:
@@ -146,6 +139,11 @@ namespace netlist { namespace factory
 	private:
 	};
 
-} }
+	}
+
+	namespace devices {
+		void initialize_factory(factory::list_t &factory);
+	}
+}
 
 #endif /* NLFACTORY_H_ */

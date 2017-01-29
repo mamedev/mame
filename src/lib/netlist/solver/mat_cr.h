@@ -20,10 +20,10 @@ struct mat_cr_t
 	typedef C index_type;
 	typedef T value_type;
 
-	C RESTRICT diag[N];      // diagonal index pointer n
-	C RESTRICT ia[N+1];      // row index pointer n + 1
-	C RESTRICT ja[N*N];		 // column index array nz_num, initially (n * n)
-	T RESTRICT A[N*N];  	 // Matrix elements nz_num, initially (n * n)
+	C diag[N];      // diagonal index pointer n
+	C ia[N+1];      // row index pointer n + 1
+	C ja[N*N];		 // column index array nz_num, initially (n * n)
+	T A[N*N];  	 // Matrix elements nz_num, initially (n * n)
 
 	std::size_t size;
 	std::size_t nz_num;

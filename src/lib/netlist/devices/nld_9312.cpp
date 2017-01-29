@@ -20,8 +20,8 @@
  *          | 1 | 1 | 1 | 0 || D7|D7Q|
  *          +---+---+---+---++---+---+
 */
+#include  "nlid_truthtable.h"
 #include "nld_9312.h"
-#include "nld_truthtable.h"
 
 namespace netlist
 {

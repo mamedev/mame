@@ -166,7 +166,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 			mat.A[pi] -= go[i];
 		}
 	}
-	mat.ia[iN] = mat.nz_num;
+	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 

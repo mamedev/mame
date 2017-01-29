@@ -7,10 +7,11 @@
  *      Author: andre
  */
 
-#ifndef NLD_TRUTHTABLE_H_
-#define NLD_TRUTHTABLE_H_
+#ifndef NLID_TRUTHTABLE_H_
+#define NLID_TRUTHTABLE_H_
 
 #include "nl_setup.h"
+#include "nl_base.h"
 #include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                     \
@@ -381,4 +382,4 @@ namespace netlist
 
 
 
-#endif /* NLD_TRUTHTABLE_H_ */
+#endif /* NLID_TRUTHTABLE_H_ */

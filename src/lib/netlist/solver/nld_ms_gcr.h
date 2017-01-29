@@ -319,7 +319,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		m_A[mat.diag[k]] += gtot_t;
 	}
 #endif
-	mat.ia[iN] = mat.nz_num;
+	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 
 	/* now solve it */
 

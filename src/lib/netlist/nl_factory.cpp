@@ -9,12 +9,27 @@
 ****************************************************************************/
 
 #include "nl_factory.h"
+#include "nl_base.h"
 #include "nl_setup.h"
 #include "plib/putil.h"
 #include "nl_errstr.h"
 
 namespace netlist { namespace factory
 {
+
+class NETLIB_NAME(wrapper) : public device_t
+{
+public:
+	NETLIB_NAME(wrapper)(netlist_t &anetlist, const pstring &name)
+	: device_t(anetlist, name)
+	{
+	}
+protected:
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+};
+
+
 
 element_t::element_t(const pstring &name, const pstring &classname,
 		const pstring &def_param, const pstring &sourcefile)

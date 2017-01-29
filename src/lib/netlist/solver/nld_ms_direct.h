@@ -280,9 +280,9 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 					const nl_double * RESTRICT pi = &A(i,i+1);
 					nl_double * RESTRICT pj = &A(j,i+1);
 #if 1
-					vec_add_mult_scalar(kN-i,pi,f1,pj);
+					vec_add_mult_scalar_p(kN-i,pi,f1,pj);
 #else
-					vec_add_mult_scalar(kN-i-1,pj,f1,pi);
+					vec_add_mult_scalar_p(kN-i-1,pj,f1,pi);
 					//for (unsigned k = i+1; k < kN; k++)
 					//  pj[k] = pj[k] + pi[k] * f1;
 					//for (unsigned k = i+1; k < kN; k++)

@@ -39,6 +39,8 @@
 #include "omp.h"
 #endif
 
+#include "nl_factory.h"
+
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
 
@@ -215,7 +217,7 @@ struct net_splitter
 		groups.back().push_back(n);
 		for (auto &p : n->m_core_terms)
 		{
-			if (p->is_type(terminal_t::TERMINAL))
+			if (p->is_type(detail::terminal_type::TERMINAL))
 			{
 				terminal_t *pt = static_cast<terminal_t *>(p);
 				analog_net_t *other_net = &pt->m_otherterm->net();

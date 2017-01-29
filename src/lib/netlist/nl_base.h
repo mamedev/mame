@@ -20,6 +20,10 @@
 
 #include <unordered_map>
 
+#ifdef NL_PROHIBIT_BASEH_INCLUDE
+#error "nl_base.h included. Please correct."
+#endif
+
 // ----------------------------------------------------------------------------------------
 // Type definitions
 // ----------------------------------------------------------------------------------------
@@ -223,11 +227,6 @@ namespace netlist
 	class netlist_t;
 	class core_device_t;
 	class device_t;
-
-	/*! Type of the model map used.
-	 *  This is used to hold all #Models in an unordered map
-	 */
-	using model_map_t = std::unordered_map<pstring, pstring>;
 
 	/*! Logic families descriptors are used to create proxy devices.
 	 *  The logic family describes the analog capabilities of logic devices,
@@ -481,25 +480,18 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		/*! Enum specifying the type of object */
-		enum type_t {
-			TERMINAL = 0, /*!< object is an analog terminal */
-			INPUT    = 1, /*!< object is an input */
-			OUTPUT   = 2, /*!< object is an output */
-		};
-
 		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~core_terminal_t();
 
 		/*! The object type.
 		 * \returns type of the object
 		 */
-		type_t type() const;
+		terminal_type type() const;
 		/*! Checks if object is of specified type.
 		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const type_t atype) const { return (type() == atype); }
+		bool is_type(const terminal_type atype) const { return (type() == atype); }
 
 		void set_net(net_t *anet);
 		void clear_net();
@@ -980,7 +972,7 @@ namespace netlist
 	private:
 		/* hide this */
 		void setTo(const pstring &param) = delete;
-		model_map_t m_map;
+		detail::model_map_t m_map;
 };
 
 
