@@ -81,7 +81,9 @@ has to be supplied by the host.
 
 The current Dragonninja MCU program was made by hacking the expected startup
 synchronisation command in the Bad Dudes MCU program (location $09A4 changed
-from $0B to $07).  There may be other differences in a real Dragonninja MCU.
+from $0B to $03).  There may be other differences in a real Dragonninja MCU.
+The table of expected values for command 7 is the same for Dragonninja (from
+debugging main CPU program).
 
 
 PCB Layouts
@@ -1887,7 +1889,7 @@ ROM_START( drgninja )
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - using hacked baddudes program */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, CRC(b74e40a1) SHA1(dc50895efdf24c0fb73f1483478890b04e7b972c) BAD_DUMP )
+	ROM_LOAD( "i8751",     0x0000, 0x1000, CRC(c3f6bc70) SHA1(3c80197dc70c6cb283df5d11d29a9d9baabcd99b) BAD_DUMP )
 
 	/* various graphic and sound roms also differ when compared to baddudes */
 
