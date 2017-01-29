@@ -7,6 +7,7 @@
 
   TODO:
   - why does h2hbaskb need a workaround on writing L pins?
+  - plus1 is not playable, problem with sensor?
 
 ***************************************************************************/
 
@@ -939,7 +940,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley Plus One
   * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
-  * 4 sensors(1 on each die side), 1-bit sound
+  * orientation sensor(4 directions), 1-bit sound
 
 ***************************************************************************/
 
@@ -960,7 +961,7 @@ public:
 
 WRITE8_MEMBER(plus1_state::write_d)
 {
-	// D?: speaker out
+	// D0?: speaker out
 	m_dac->write(BIT(data, 0));
 }
 
@@ -1465,7 +1466,7 @@ ROM_END
 
 ROM_START( plus1 )
 	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, BAD_DUMP CRC(8626fdb8) SHA1(fd241b6dde0e4e86b439cb2c5bb3a82fb257d7e1) ) // still need to verify
+	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, CRC(d861b80c) SHA1(4652f8ee0dd4c3c48b625285bb4f094d96434071) )
 ROM_END
 
 
