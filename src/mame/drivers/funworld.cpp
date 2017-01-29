@@ -5485,12 +5485,27 @@ ROM_END
   |                                                                                                                      |
   '----------------------------------------------------------------------------------------------------------------------'
 
+
+  The encrypted CPU:
+  
+  It's a DIP40 custom IC. It has inside a PLCC28 IC and 3 dies:
+
+  The PLCC28 chip is a CY7C291A (prom replacement)
+  DIE#1 is a TI74F245A, a 3-state octal latch from Texas Instruments.
+  DIE#2 is the CPU, a 65SC02.
+  DIE#3 is a 7400, a quad 2-input NAND gate.
+
+  Is unknown how they are connected.
+
 */
 
 ROM_START( megamc3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
 	ROM_LOAD( "mega_mc3_210-f-1.ic37",  0x8000, 0x8000, CRC(747f5ed1) SHA1(06757bb6a792dca93978b17b54c28e413e3720b1) )  /* just the 2nd half */
 	ROM_LOAD( "mega_mc3_210-f-2.ic41",  0x4000, 0x8000, CRC(373094d2) SHA1(8aed2502e89b0e7522e88f351ac256f1afad7ee8) )  /* just the 2nd half */
+
+	ROM_REGION( 0x0300, "decode", 0 )  /* from the 65SC02 die inside of the custom CPU */
+	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
