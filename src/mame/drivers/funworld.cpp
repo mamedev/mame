@@ -5507,6 +5507,10 @@ ROM_START( megamc3 )
 	ROM_REGION( 0x0300, "decode", 0 )  /* from the 65SC02 die inside of the custom CPU */
 	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
 
+	ROM_REGION( 0x1000, "decode2", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_LOAD( "cy7291a.bin",    0x0000, 0x0800, CRC(34d256b3) SHA1(4f1da3d445dcb349def999720d05258f1d1a1ec3) )  /* dumped with programmer #1 */
+	ROM_LOAD( "cy7291a_.bin",   0x0800, 0x0800, CRC(d79a7842) SHA1(6fb17db38113a28750f6af7bf1cb9fdd46fa6dec) )  /* dumped with programmer #2. three bytes different */
+
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
 	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
