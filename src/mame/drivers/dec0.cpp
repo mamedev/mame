@@ -85,6 +85,12 @@ from $0B to $03).  There may be other differences in a real Dragonninja MCU.
 The table of expected values for command 7 is the same for Dragonninja (from
 debugging main CPU program).
 
+Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
+$3B), $07 (return table index if parameter matches table otherwise reset) and
+$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
+startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
+Dudes).  Most of the MCU program isn't utilised.
+
 
 PCB Layouts
 -----------
