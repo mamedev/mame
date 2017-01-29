@@ -46,6 +46,17 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_PAULA_MEM_READ_CB(_devcb) \
+	devcb = &paula_8364_device::set_mem_r_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_PAULA_INT_CB(_devcb) \
+	devcb = &paula_8364_device::set_int_w_callback(*device, DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -57,8 +68,17 @@ public:
 	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~paula_8364_device() {}
 
+	// configuration
+	template<class _Object> static devcb_base &set_mem_r_callback(device_t &device, _Object object)
+		{ return downcast<paula_8364_device &>(device).m_mem_r.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_int_w_callback(device_t &device, _Object object)
+		{ return downcast<paula_8364_device &>(device).m_int_w.set_callback(object); }
+
+	DECLARE_READ16_MEMBER(reg_r);
+	DECLARE_WRITE16_MEMBER(reg_w);
+
 	void update();
-	void data_w(int which, uint16_t data);
 
 protected:
 	// device-level overrides
@@ -68,6 +88,47 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	enum
+	{
+		CHAN_0 = 0,
+		CHAN_1 = 1,
+		CHAN_2 = 2,
+		CHAN_3 = 3
+	};
+
+	enum
+	{
+		REG_DMACONR = 0x02/2,
+		REG_ADKCONR = 0x10/2,
+		REG_DMACON  = 0x96/2,
+		REG_INTREQ  = 0x9c/2,
+		REG_ADKCON  = 0x9e/2,
+		REG_AUD0LCH = 0xa0/2,  // to be moved, not part of paula
+		REG_AUD0LCL = 0xa2/2,  // to be moved, not part of paula
+		REG_AUD0LEN = 0xa4/2,
+		REG_AUD0PER = 0xa6/2,
+		REG_AUD0VOL = 0xa8/2,
+		REG_AUD0DAT = 0xaa/2,
+		REG_AUD1LCH = 0xb0/2,  // to be moved, not part of paula
+		REG_AUD1LCL = 0xb2/2,  // to be moved, not part of paula
+		REG_AUD1LEN = 0xb4/2,
+		REG_AUD1PER = 0xb6/2,
+		REG_AUD1VOL = 0xb8/2,
+		REG_AUD1DAT = 0xba/2,
+		REG_AUD2LCH = 0xc0/2,  // to be moved, not part of paula
+		REG_AUD2LCL = 0xc2/2,  // to be moved, not part of paula
+		REG_AUD2LEN = 0xc4/2,
+		REG_AUD2PER = 0xc6/2,
+		REG_AUD2VOL = 0xc8/2,
+		REG_AUD2DAT = 0xca/2,
+		REG_AUD3LCH = 0xd0/2,  // to be moved, not part of paula
+		REG_AUD3LCL = 0xd2/2,  // to be moved, not part of paula
+		REG_AUD3LEN = 0xd4/2,
+		REG_AUD3PER = 0xd6/2,
+		REG_AUD3VOL = 0xd8/2,
+		REG_AUD3DAT = 0xda/2
+	};
+
 	static const int CLOCK_DIVIDER = 16;
 
 	struct audio_channel
@@ -80,11 +141,25 @@ private:
 		bool dma_enabled;
 		bool manualmode;
 		int8_t latched;
+
+		// custom chip registers
+		uint32_t loc;  // to be moved, not part of paula
+		uint16_t len;
+		uint16_t per;
+		uint16_t vol;
+		uint16_t dat;
 	};
 
 	void dma_reload(audio_channel *chan);
 
+	// callbacks
+	devcb_read16 m_mem_r;
+	devcb_write_line m_int_w;
+
 	// internal state
+	uint16_t m_dmacon;
+	uint16_t m_adkcon;
+
 	audio_channel m_channel[4];
 	sound_stream *m_stream;
 
