@@ -832,26 +832,22 @@ static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 
 inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap)
 {
-	int xc, yc;
-	double r, alpha, sin_theta, cos_theta;
-	const rectangle &visarea = screen.visible_area();
-
+	//int xc, yc;
+	//double r, alpha, sin_theta, cos_theta;
+	//const rectangle &visarea = screen.visible_area();
+	
 	if( m_regs.s.r7 & r7_zron )
 	{
-		/*
-		 *    fudge - translate ax,ay to startx, starty each time
-		 */
-
-		xc = m_ax >> 16;
-		yc = m_ay >> 16;
-		r = sqrt( (double)( xc * xc + yc * yc ) );
-		alpha = atan( (double)xc / (double)yc );
-		sin_theta = (double)m_dyx / (double)0x10000;
-		cos_theta = (double)m_dx / (double)0x10000;
+		// old code, for reference.
+		//xc = m_ax >> 16;
+		//yc = m_ay >> 16;
+		//r = sqrt( (double)( xc * xc + yc * yc ) );
+		//alpha = atan( (double)xc / (double)yc );
+		//sin_theta = (double)m_dyx / (double)0x10000;
+		//cos_theta = (double)m_dx / (double)0x10000;
 		
 		source_tilemap->draw_roz(screen, bitmap, cliprect, 
-				( visarea.min_x << 16 ) + m_ax + 0x10000 * r * ( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
-				( visarea.min_y << 16 ) + m_ay + 0x10000 * r * ( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
+				m_ax, m_ay,
 				m_dx, m_dxy, m_dyx, m_dy, true, 0, 0 );
 	}
 	else
