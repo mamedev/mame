@@ -31,7 +31,15 @@
     PARAMETERS
 ***************************************************************************/
 
-#define TRACE_VIA       0
+#define LOG_SETUP   (1U <<  1)
+#define LOG_SHIFT   (1U <<  2)
+
+#define VERBOSE 0 // (LOG_SETUP|LOG_SHIFT)
+#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGSHIFT(...) LOGMASKED(LOG_SHIFT,   __VA_ARGS__)
 
 
 /***************************************************************************
@@ -310,10 +318,7 @@ void via6522_device::set_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
 	}
 }
 
@@ -330,10 +335,7 @@ void via6522_device::clear_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
 	}
 }
 
@@ -344,8 +346,10 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift_out()
 {
+	LOGSHIFT("Shift Out SR: %02x->", m_sr);
 	m_out_cb2 = (m_sr >> 7) & 1;
 	m_sr =  (m_sr << 1) | m_out_cb2;
+	LOGSHIFT("%02x\n", m_sr);
 
 	m_cb2_handler(m_out_cb2);
 
@@ -362,7 +366,9 @@ void via6522_device::shift_out()
 
 void via6522_device::shift_in()
 {
+	LOGSHIFT("Shift In SR: %02x->", m_sr);
 	m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
+	LOGSHIFT("%02x\n", m_sr);
 
 	m_shift_counter = (m_shift_counter + 1) % 8;
 
@@ -378,6 +384,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case TIMER_SHIFT:
+			LOGSHIFT("SHIFT timer event\n");
 			m_out_cb1 = 0;
 			m_cb1_handler(m_out_cb1);
 
@@ -615,6 +622,7 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_SR:
+		LOGSHIFT("Read SR: %02x\n", m_sr);
 		val = m_sr;
 		m_shift_counter=0;
 		clear_int(INT_SR);
@@ -655,6 +663,8 @@ READ8_MEMBER( via6522_device::read )
 WRITE8_MEMBER( via6522_device::write )
 {
 	offset &=0x0f;
+
+	LOGSETUP(" * %s Reg %02x <- %02x  \n", m_owner->tag(), offset, data);
 
 	switch (offset)
 	{
@@ -776,6 +786,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_SR:
 		m_sr = data;
+		LOGSHIFT("Write SR: %02x\n", m_sr);
 		m_shift_counter=0;
 		clear_int(INT_SR);
 		if (SO_O2_CONTROL(m_acr))
@@ -791,10 +802,7 @@ WRITE8_MEMBER( via6522_device::write )
 	case VIA_PCR:
 		m_pcr = data;
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
-		}
+		LOG("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
 
 		if (CA2_FIX_OUTPUT(data) && m_out_ca2 != CA2_OUTPUT_LEVEL(data))
 		{
@@ -815,6 +823,16 @@ WRITE8_MEMBER( via6522_device::write )
 			m_acr = data;
 
 			output_pb();
+
+			LOGSHIFT("VIA_ACR Shift mode [%02x]: ", (m_acr >> 2) & 7);
+			if (SR_DISABLED(m_acr))    LOGSHIFT("Disabled\n");
+			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2\n");
+			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2\n");
+			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT\n");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2\n");
+			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2\n");
+			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2\n");
+			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT\n");
 
 			if (T1_CONTINUOUS(data))
 			{
@@ -870,8 +888,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 	{
 		m_in_ca1 = state;
 
-		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
+		LOG("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
 
 		if ((m_in_ca1 && CA1_LOW_TO_HIGH(m_pcr)) || (!m_in_ca1 && CA1_HIGH_TO_LOW(m_pcr)))
 		{
