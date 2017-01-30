@@ -146,7 +146,7 @@ WRITE16_MEMBER( paula_8364_device::reg_w )
 
 TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 {
-	m_int_w(0x8000 | (0x80 << param));
+	m_int_w(param);
 }
 
 //-------------------------------------------------
