@@ -25,7 +25,7 @@
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
-//#include "lchicken.lh"
+#include "lchicken.lh"
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
 #include "qkracer.lh"
@@ -727,8 +727,7 @@ static MACHINE_CONFIG_START( lchicken, lchicken_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("chicken_motor", lchicken_state, motor_sim_tick, attotime::from_msec(6000/0x100)) // ~6sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_lchicken)
-	MCFG_DEFAULT_LAYOUT(layout_hh_cop400_test)
+	MCFG_DEFAULT_LAYOUT(layout_lchicken)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
