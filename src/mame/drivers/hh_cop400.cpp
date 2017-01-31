@@ -7,7 +7,8 @@
 
   TODO:
   - why does h2hbaskb need a workaround on writing L pins?
-  - plus1 is not playable, problem with sensor?
+  - lchicken high pitch beeping, aliasing in MAME sound core
+  - plus1: which sensor position is which colour?
 
 ***************************************************************************/
 
@@ -281,7 +282,7 @@ WRITE8_MEMBER(ctstein_state::write_g)
 
 WRITE8_MEMBER(ctstein_state::write_l)
 {
-	// L0-L3: button lamps (strobed)
+	// L0-L3: button lamps
 	display_matrix(4, 1, data & 0xf, 1);
 }
 
@@ -1104,6 +1105,9 @@ MACHINE_CONFIG_END
   Milton Bradley Plus One
   * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
   * orientation sensor(4 directions), 1-bit sound
+  
+  This is a board game, each player needs to rotate a triangular pyramid
+  shaped piece the same as the previous player, plus 1.
 
 ***************************************************************************/
 
@@ -1118,6 +1122,8 @@ public:
 	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_READ8_MEMBER(read_l);
 };
 
 // handlers
@@ -1128,21 +1134,32 @@ WRITE8_MEMBER(plus1_state::write_d)
 	m_dac->write(BIT(data, 0));
 }
 
+WRITE8_MEMBER(plus1_state::write_l)
+{
+	m_l = data;
+}
+
+READ8_MEMBER(plus1_state::read_l)
+{
+	// L: IN.1, mask with output
+	return m_inp_matrix[1]->read() & m_l;
+}
+
 
 // config
 
 static INPUT_PORTS_START( plus1 )
 	PORT_START("IN.0") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Sensor Position 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sensor Position 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.1") // port L
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Sensor Position 4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Sensor Position 2")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1153,7 +1170,8 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
-	MCFG_COP400_READ_L_CB(IOPORT("IN.1"))
+	MCFG_COP400_WRITE_L_CB(WRITE8(plus1_state, write_l))
+	MCFG_COP400_READ_L_CB(READ8(plus1_state, read_l))
 
 	/* no visual feedback! */
 
@@ -1671,7 +1689,7 @@ CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mat
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, mdallas,   0,        0, mdallas,   mdallas,   driver_device, 0, "Mattel", "Dalla$ (J.R. handheld)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   driver_device, 0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
