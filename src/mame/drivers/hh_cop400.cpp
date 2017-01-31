@@ -25,7 +25,7 @@
 #include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
-#include "lchicken.lh"
+#include "lchicken.lh" // clickable
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
 #include "qkracer.lh"
@@ -701,7 +701,7 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER(lchicken_state::motor_switch)
 {
-	return m_motor_pos > 0xeb; // approximation
+	return m_motor_pos > 0xe8; // approximation
 }
 
 void lchicken_state::machine_start()
@@ -1657,7 +1657,7 @@ CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Col
 
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, lchicken,  0,        0, lchicken,  lchicken,  driver_device, 0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+CONS( 1980, lchicken,  0,        0, lchicken,  lchicken,  driver_device, 0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
