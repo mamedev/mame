@@ -143,7 +143,6 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 		case detail::terminal_type::OUTPUT:
 			return pstring("OUTPUT");
 	}
-	// FIXME: noreturn
 	log().fatal(MF_1_UNKNOWN_OBJECT_TYPE_1, static_cast<unsigned>(in.type()));
 	return pstring("Error");
 }
@@ -376,12 +375,11 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
 }
 
-// FIXME avoid dynamic cast here
 devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
-	logic_output_t &out_cast = dynamic_cast<logic_output_t &>(out);
+	logic_output_t &out_cast = static_cast<logic_output_t &>(out);
 	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
 	if (proxy == nullptr)
@@ -686,8 +684,8 @@ void setup_t::resolve_inputs()
 	 * We therefore first park connecting inputs and retry
 	 * after all other terminals were connected.
 	 */
-	int tries = 100;
-	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
+	int tries = NL_MAX_LINK_RESOLVE_LOOPS;
+	while (m_links.size() > 0 && tries >  0)
 	{
 
 		for (auto li = m_links.begin(); li != m_links.end(); )

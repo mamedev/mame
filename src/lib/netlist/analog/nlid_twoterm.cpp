@@ -27,6 +27,7 @@ generic_diode::generic_diode(device_t &dev, pstring name)
 	, m_Vt(0.0)
 	, m_Vmin(0.0)
 	, m_Is(0.0)
+	, m_logIs(0.0)
 	, m_n(0.0)
 	, m_gmin(1e-15)
 	, m_VtInv(0.0)
@@ -39,6 +40,7 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 {
 	static const double csqrt2 = std::sqrt(2.0);
 	m_Is = Is;
+	m_logIs = std::log(Is);
 	m_n = n;
 	m_gmin = gmin;
 
@@ -62,7 +64,7 @@ void generic_diode::update_diode(const nl_double nVd)
 		m_Vd = nVd;
 		//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
 		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
-		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
 		m_Id = IseVDVt - m_Is;
 		m_G = IseVDVt * m_VtInv + m_gmin;
 	}
@@ -70,7 +72,8 @@ void generic_diode::update_diode(const nl_double nVd)
 	{
 		const double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
 		m_Vd = m_Vd + std::log1p(a) * m_Vt;
-		const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		//const double IseVDVt = m_Is * std::exp(m_Vd * m_VtInv);
+		const double IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
 		m_Id = IseVDVt - m_Is;
 		m_G = IseVDVt * m_VtInv + m_gmin;
 	}

@@ -5,8 +5,6 @@
  *
  * Gaussian elimination using compressed row format.
  *
- * Fow w==1 we will do the classic Gauss-Seidel approach
- *
  */
 
 #ifndef NLD_MS_GCR_H_
@@ -20,11 +18,6 @@
 #include "solver/nld_solver.h"
 #include "solver/vector_base.h"
 #include "plib/pstream.h"
-
-#define NL_USE_SSE 0
-#if NL_USE_SSE
-#include <mmintrin.h>
-#endif
 
 namespace netlist
 {
@@ -62,7 +55,7 @@ private:
 
 	void csc_private(plib::putf8_fmt_writer &strm);
 
-	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS);
+	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS, double * RESTRICT V);
 
 	pstring static_compile_name();
 
@@ -75,7 +68,7 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// matrix_solver - GMRES
+// matrix_solver - GCR
 // ----------------------------------------------------------------------------------------
 
 template <std::size_t m_N, std::size_t storage_N>
@@ -168,7 +161,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	}
 
 }
-
+#if 0
 template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
 {
@@ -213,8 +206,84 @@ void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &st
 			}
 		}
 	}
-}
 
+	//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
+	strm("\tV[{1}] = RHS[{2}] / m_A[{3}];\n", iN - 1, iN - 1, mat.diag[iN - 1]);
+	for (std::size_t j = iN - 1; j-- > 0;)
+	{
+		strm("\tdouble tmp{1} = 0.0;\n", j);
+		const std::size_t e = mat.ia[j+1];
+		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
+		{
+			strm("\ttmp{1} += m_A[{2}] * V[{3}];\n", j, pk, mat.ja[pk]);
+		}
+		strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A[{4}];\n", j, j, j, mat.diag[j]);
+	}
+}
+#else
+template <std::size_t m_N, std::size_t storage_N>
+void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
+{
+	const std::size_t iN = N();
+
+	for (std::size_t i = 0; i < mat.nz_num; i++)
+		strm("double m_A{1} = m_A[{2}];\n", i, i);
+
+	for (std::size_t i = 0; i < iN - 1; i++)
+	{
+		const auto &nzbd = this->m_terms[i]->m_nzbd;
+
+		if (nzbd.size() > 0)
+		{
+			std::size_t pi = mat.diag[i];
+
+			//const nl_double f = 1.0 / m_A[pi++];
+			strm("const double f{1} = 1.0 / m_A{2};\n", i, pi);
+			pi++;
+			const std::size_t piie = mat.ia[i+1];
+
+			//for (auto & j : nzbd)
+			for (std::size_t j : nzbd)
+			{
+				// proceed to column i
+				std::size_t pj = mat.ia[j];
+
+				while (mat.ja[pj] < i)
+					pj++;
+
+				//const nl_double f1 = - m_A[pj++] * f;
+				strm("\tconst double f{1}_{2} = -f{3} * m_A{4};\n", i, j, i, pj);
+				pj++;
+
+				// subtract row i from j */
+				for (std::size_t pii = pi; pii<piie; )
+				{
+					while (mat.ja[pj] < mat.ja[pii])
+						pj++;
+					//m_A[pj++] += m_A[pii++] * f1;
+					strm("\tm_A{1} += m_A{2} * f{3}_{4};\n", pj, pii, i, j);
+					pj++; pii++;
+				}
+				//RHS[j] += f1 * RHS[i];
+				strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
+			}
+		}
+	}
+
+	//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
+	strm("\tV[{1}] = RHS[{2}] / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
+	for (std::size_t j = iN - 1; j-- > 0;)
+	{
+		strm("\tdouble tmp{1} = 0.0;\n", j);
+		const std::size_t e = mat.ia[j+1];
+		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
+		{
+			strm("\ttmp{1} += m_A{2} * V[{3}];\n", j, pk, mat.ja[pk]);
+		}
+		strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A{4};\n", j, j, j, mat.diag[j]);
+	}
+}
+#endif
 
 template <std::size_t m_N, std::size_t storage_N>
 pstring matrix_solver_GCR_t<m_N, storage_N>::static_compile_name()
@@ -234,7 +303,7 @@ std::pair<pstring, pstring> matrix_solver_GCR_t<m_N, storage_N>::create_solver_c
 	plib::putf8_fmt_writer strm(t);
 	pstring name = static_compile_name();
 
-	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS)\n")(name));
+	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));
 	strm.writeline("{\n");
 	csc_private(strm);
 	strm.writeline("}\n");
@@ -266,30 +335,13 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const * RESTRICT other_cur_analog = t->connected_net_V();
 		const unsigned * const RESTRICT tcr = m_term_cr[k].data();
 
-#if 1
-#if (0 ||NL_USE_SSE)
-		__m128d mg = _mm_set_pd(0.0, 0.0);
-		__m128d mr = _mm_set_pd(0.0, 0.0);
-		unsigned i = 0;
-		for (; i < term_count - 1; i+=2)
-		{
-			mg = _mm_add_pd(mg, _mm_loadu_pd(&gt[i]));
-			mr = _mm_add_pd(mr, _mm_loadu_pd(&Idr[i]));
-		}
-		gtot_t = _mm_cvtsd_f64(mg) + _mm_cvtsd_f64(_mm_unpackhi_pd(mg,mg));
-		RHS_t = _mm_cvtsd_f64(mr) + _mm_cvtsd_f64(_mm_unpackhi_pd(mr,mr));
-		for (; i < term_count; i++)
-		{
-			gtot_t += gt[i];
-			RHS_t += Idr[i];
-		}
-#else
+#if 0
 		for (std::size_t i = 0; i < term_count; i++)
 		{
 			gtot_t += gt[i];
 			RHS_t += Idr[i];
 		}
-#endif
+		
 		for (std::size_t i = railstart; i < term_count; i++)
 			RHS_t += go[i] * *other_cur_analog[i];
 
@@ -304,7 +356,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 #else
 		for (std::size_t i = 0; i < railstart; i++)
 		{
-			m_A[tcr[i]] -= go[i];
+			mat.A[tcr[i]] -= go[i];
 			gtot_t = gtot_t + gt[i];
 			RHS_t = RHS_t + Idr[i];
 		}
@@ -316,7 +368,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		}
 
 		RHS[k] = RHS_t;
-		m_A[mat.diag[k]] += gtot_t;
+		mat.A[mat.diag[k]] += gtot_t;
 	}
 #endif
 	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
@@ -326,7 +378,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	if (m_proc != nullptr)
 	{
 		//static_solver(m_A, RHS);
-		m_proc(mat.A, RHS);
+		m_proc(mat.A, RHS, new_V);
 	}
 	else
 	{
@@ -362,45 +414,28 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 				}
 			}
 		}
+		/* backward substitution
+		 *
+		 */
+
+		/* row n-1 */
+		new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
+
+		for (std::size_t j = iN - 1; j-- > 0;)
+		{
+			//__builtin_prefetch(&new_V[j-1], 1);
+			//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
+			double tmp = 0;
+			auto jdiag = mat.diag[j];
+			const std::size_t e = mat.ia[j+1];
+			for (std::size_t pk = jdiag + 1; pk < e; pk++)
+			{
+				tmp += mat.A[pk] * new_V[mat.ja[pk]];
+			}
+			new_V[j] = (RHS[j] - tmp) / mat.A[jdiag];
+		}
 	}
 
-	/* backward substitution
-	 *
-	 */
-
-	/* row n-1 */
-	new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
-
-	for (std::size_t j = iN - 1; j-- > 0;)
-	{
-		//__builtin_prefetch(&new_V[j-1], 1);
-		//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
-#if (NL_USE_SSE)
-		__m128d tmp = _mm_set_pd1(0.0);
-		const unsigned e = mat.ia[j+1];
-		unsigned pk = mat.diag[j] + 1;
-		for (; pk < e - 1; pk+=2)
-		{
-			//tmp += m_A[pk] * new_V[mat.ja[pk]];
-			tmp = _mm_add_pd(tmp, _mm_mul_pd(_mm_set_pd(mat.A[pk], mat.A[pk+1]),
-					_mm_set_pd(new_V[mat.ja[pk]], new_V[mat.ja[pk+1]])));
-		}
-		double tmpx = _mm_cvtsd_f64(tmp) + _mm_cvtsd_f64(_mm_unpackhi_pd(tmp,tmp));
-		for (; pk < e; pk++)
-		{
-			tmpx += mat.A[pk] * new_V[mat.ja[pk]];
-		}
-		new_V[j] = (RHS[j] - tmpx) / mat.A[mat.diag[j]];
-#else
-		double tmp = 0;
-		const std::size_t e = mat.ia[j+1];
-		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
-		{
-			tmp += mat.A[pk] * new_V[mat.ja[pk]];
-		}
-		new_V[j] = (RHS[j] - tmp) / mat.A[mat.diag[j]];
-#endif
-	}
 	this->m_stat_calculations++;
 
 	if (newton_raphson)

@@ -159,8 +159,16 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t 
 	}
 	else if (pstring("MAT_CR").equals(m_method()))
 	{
-		typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
-		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		if (size > 0) // GCR always outperforms MAT solver
+		{
+			typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
+			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		}
+		else
+		{
+			typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
+			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		}
 	}
 	else if (pstring("MAT").equals(m_method()))
 	{

@@ -547,16 +547,12 @@ namespace netlist
 
 		void set(const nl_double G)
 		{
-			set_ptr(m_Idr1, 0);
-			set_ptr(m_go1, G);
-			set_ptr(m_gt1, G);
+			set(G,G, 0.0);
 		}
 
 		void set(const nl_double GO, const nl_double GT)
 		{
-			set_ptr(m_Idr1, 0);
-			set_ptr(m_go1, GO);
-			set_ptr(m_gt1, GT);
+			set(GO, GT, 0.0);
 		}
 
 		void set(const nl_double GO, const nl_double GT, const nl_double I)
@@ -735,13 +731,13 @@ namespace netlist
 		state_var_s32            m_active;
 		state_var_u8             m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
+		state_var<nl_double>     m_cur_Analog;
+
 	private:
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
 	public:
-		// FIXME: Have to fix the public at some time
-		state_var<nl_double>     m_cur_Analog;
 
 	};
 
@@ -796,6 +792,7 @@ namespace netlist
 		virtual ~analog_net_t();
 
 		nl_double Q_Analog() const { return m_cur_Analog; }
+		void set_Q_Analog(const nl_double &v) { m_cur_Analog = v; }
 		nl_double *Q_Analog_state_ptr() { return m_cur_Analog.ptr(); }
 
 		//FIXME: needed by current solver code
@@ -1450,7 +1447,7 @@ namespace netlist
 	{
 		if (newQ != m_my_net.Q_Analog())
 		{
-			m_my_net.m_cur_Analog = newQ;
+			m_my_net.set_Q_Analog(newQ);
 			m_my_net.toggle_new_Q();
 			m_my_net.push_to_queue(NLTIME_FROM_NS(1));
 		}

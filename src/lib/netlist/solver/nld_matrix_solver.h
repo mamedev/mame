@@ -198,7 +198,7 @@ private:
 template <typename T>
 T matrix_solver_t::delta(const T * RESTRICT V)
 {
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
 	 * and thus belong into a different calculation. This applies to all solvers.
 	 */
@@ -206,7 +206,7 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	const std::size_t iN = this->m_terms.size();
 	T cerr = 0;
 	for (std::size_t i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->m_cur_Analog)));
+		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->Q_Analog())));
 	return cerr;
 }
 
@@ -215,7 +215,7 @@ void matrix_solver_t::store(const T * RESTRICT V)
 {
 	const std::size_t iN = this->m_terms.size();
 	for (std::size_t i = 0; i < iN; i++)
-		this->m_nets[i]->m_cur_Analog = V[i];
+		this->m_nets[i]->set_Q_Analog(V[i]);
 }
 
 template <typename T>

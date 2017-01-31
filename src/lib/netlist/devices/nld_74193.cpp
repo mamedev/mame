@@ -137,8 +137,8 @@ namespace netlist
 		for (std::size_t i=0; i<4; i++)
 			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 
-		m_BORROWQ.push(tBorrow, NLTIME_FROM_NS(20)); //FIXME
-		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME
+		m_BORROWQ.push(tBorrow, NLTIME_FROM_NS(20)); //FIXME timing
+		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME timing
 	}
 
 	NETLIB_DEVICE_IMPL(74193)

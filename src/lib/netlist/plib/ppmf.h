@@ -105,21 +105,27 @@ namespace plib {
 	{
 	public:
 		class generic_class;
+#if defined (__INTEL_COMPILER) && defined (_M_X64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
+		using generic_function = int [((sizeof(void *) + 4 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
+#elif defined(_MSC_VER)// all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
+		using generic_function = int [((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
+#else
 		using generic_function = R (generic_class::*)(Targs...);
-		pmfp_base() : m_func(nullptr) {}
+#endif
+		pmfp_base() {}
 
 		template<typename MemberFunctionType, typename O>
 		void set_base(MemberFunctionType mftp, O *object)
 		{
 			using function_ptr = R (O::*)(Targs...);
 			function_ptr t = mftp;
-			m_func = reinterpret_cast<generic_function>(t);
+			*reinterpret_cast<function_ptr *>(&m_func) = t;
 		}
 		template<typename O>
-		inline R call(O *obj, Targs... args) const
+		inline R call(O *obj, Targs... args)
 		{
 			using function_ptr = R (O::*)(Targs...);
-			function_ptr t = reinterpret_cast<function_ptr>(m_func);
+			function_ptr t = *reinterpret_cast<function_ptr *>(&m_func);
 			return (obj->*t)(std::forward<Targs>(args)...);
 		}
 	private:
@@ -166,13 +172,19 @@ namespace plib {
 		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
 
 		template<typename MemberFunctionType, typename O>
+		pmfp(MemberFunctionType mftp, O *object)
+		{
+			this->set(mftp, object);
+		}
+
+		template<typename MemberFunctionType, typename O>
 		void set(MemberFunctionType mftp, O *object)
 		{
 			this->set_base(mftp, object);
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs... args) const
+		inline R operator()(Targs... args)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}

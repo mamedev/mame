@@ -137,6 +137,20 @@ private:
 	double m_val;
 };
 
+class option_long : public option
+{
+public:
+	option_long(options &parent, pstring ashort, pstring along, long defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
+	{}
+
+	virtual int parse(const pstring &argument) override;
+
+	long operator ()() { return m_val; }
+private:
+	long m_val;
+};
+
 class option_vec : public option
 {
 public:

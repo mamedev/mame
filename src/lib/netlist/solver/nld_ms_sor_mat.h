@@ -170,7 +170,7 @@ unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool 
 #endif
 
 	for (std::size_t k = 0; k < iN; k++)
-		new_v[k] = this->m_nets[k]->m_cur_Analog;
+		new_v[k] = this->m_nets[k]->Q_Analog();
 
 	do {
 		resched = false;
@@ -199,10 +199,12 @@ unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool 
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
 	this->m_stat_calculations++;
+	this->m_iterative_total += resched_cnt;
 	this->m_gs_total += resched_cnt;
 
 	if (resched)
 	{
+		this->m_iterative_fail++;
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 		this->m_gs_fail++;
 

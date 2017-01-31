@@ -66,7 +66,7 @@ void terms_for_net_t::set_pointers()
 	for (unsigned i = 0; i < count(); i++)
 	{
 		m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().m_cur_Analog.ptr();
+		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().Q_Analog_state_ptr();
 	}
 }
 
@@ -155,7 +155,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
 						net_proxy_output->net().add_terminal(*p);
-						// FIXME: repeated
+						// FIXME: repeated calling - kind of brute force
 						net_proxy_output->net().rebuild_list();
 						log().debug("Added input\n");
 					}
@@ -208,7 +208,7 @@ void matrix_solver_t::setup_matrix()
 	 * literature but I have found no articles about Gauss Seidel.
 	 *
 	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	 * NOTE: Even better would be to sort on elements right of the matrix diagonal.
 	 *
 	 */
 
@@ -489,10 +489,6 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 
 	if (m_params.m_dynamic_ts)
 	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];

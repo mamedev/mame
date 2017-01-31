@@ -157,9 +157,9 @@ protected:
 	inline nl_ext_double &RHS(const T1 &r) { return m_A[r * m_pitch + N()]; }
 #else
 	template <typename T1, typename T2>
-	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1>
-	inline nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
+	nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
 #endif
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
@@ -245,10 +245,54 @@ template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 {
 	const std::size_t kN = N();
+	if (!(!TEST_PARALLEL && m_params.m_pivot))
+	{
+		for (std::size_t i = 0; i < kN; i++)
+		{
+#if TEST_PARALLEL
+			const unsigned eb = m_terms[i]->m_nzbd.size();
+			if (eb > 0)
+			{
+				//printf("here %d\n", eb);
+				unsigned chunks = (eb + num_thr) / (num_thr + 1);
+				for (int p=0; p < num_thr + 1; p++)
+				{
+					x_i[p] = i;
+					x_start[p] = chunks * p;
+					x_stop[p] = std::min(chunks*(p+1), eb);
+					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, nullptr);
+				}
+				if (x_start[num_thr] < x_stop[num_thr])
+					do_work(num_thr, nullptr);
+				thr_wait();
+			}
+			else if (eb > 0)
+			{
+				x_i[0] = i;
+				x_start[0] = 0;
+				x_stop[0] = eb;
+				do_work(0, nullptr);
+			}
+#else
 
-	for (std::size_t i = 0; i < kN; i++) {
-		// FIXME: use a parameter to enable pivoting? m_pivot
-		if (!TEST_PARALLEL && m_params.m_pivot)
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / A(i,i);
+			const auto &nzrd = m_terms[i]->m_nzrd;
+			const auto &nzbd = m_terms[i]->m_nzbd;
+
+			for (std::size_t j : nzbd)
+			{
+				const nl_double f1 = -f * A(j,i);
+				for (std::size_t k : nzrd)
+					A(j,k) += A(i,k) * f1;
+				//RHS(j) += RHS(i) * f1;
+			}
+#endif
+		}
+	}
+	else
+	{
+		for (std::size_t i = 0; i < kN; i++)
 		{
 			/* Find the row with the largest first value */
 			std::size_t maxrow = i;
@@ -291,48 +335,6 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 #endif
 				}
 			}
-		}
-		else
-		{
-#if TEST_PARALLEL
-			const unsigned eb = m_terms[i]->m_nzbd.size();
-			if (eb > 0)
-			{
-				//printf("here %d\n", eb);
-				unsigned chunks = (eb + num_thr) / (num_thr + 1);
-				for (int p=0; p < num_thr + 1; p++)
-				{
-					x_i[p] = i;
-					x_start[p] = chunks * p;
-					x_stop[p] = std::min(chunks*(p+1), eb);
-					if (p<num_thr && x_start[p] < x_stop[p]) thr_process(p, this, nullptr);
-				}
-				if (x_start[num_thr] < x_stop[num_thr])
-					do_work(num_thr, nullptr);
-				thr_wait();
-			}
-			else if (eb > 0)
-			{
-				x_i[0] = i;
-				x_start[0] = 0;
-				x_stop[0] = eb;
-				do_work(0, nullptr);
-			}
-#else
-
-			/* FIXME: Singular matrix? */
-			const nl_double f = 1.0 / A(i,i);
-			const auto &nzrd = m_terms[i]->m_nzrd;
-			const auto &nzbd = m_terms[i]->m_nzbd;
-
-			for (std::size_t j : nzbd)
-			{
-				const nl_double f1 = -f * A(j,i);
-				for (std::size_t k : nzrd)
-					A(j,k) += A(i,k) * f1;
-				//RHS(j) += RHS(i) * f1;
-			}
-#endif
 		}
 	}
 }

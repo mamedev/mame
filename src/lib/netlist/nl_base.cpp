@@ -342,9 +342,12 @@ void netlist_t::start()
 			auto p = setup().m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
 			if (p != setup().m_param_values.end())
 			{
-				//FIXME: Error checking
-				auto v = p->second.as_long();
-				d->set_hint_deactivate(!v);
+				//FIXME: turn this into a proper function
+				bool error;
+				auto v = p->second.as_double(&error);
+				if (error || std::abs(v - std::floor(v)) > 1e-6 )
+					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
+				d->set_hint_deactivate(v == 0.0);
 			}
 		}
 		else
@@ -436,16 +439,16 @@ void netlist_t::reset()
 		dev->update_param();
 
 	// Step all devices once !
+	/*
+	 * INFO: The order here affects power up of e.g. breakout. However, such
+	 * variations are explicitly stated in the breakout manual.
+	 */
 #if 0
 	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_dev();
 	}
 #else
-	/* FIXME: this makes breakout attract mode working again.
-	 * It is however not acceptable that this depends on the startup order.
-	 * Best would be, if reset would call update_dev for devices which need it.
-	 */
 	std::size_t i = m_devices.size();
 	while (i>0)
 		m_devices[--i]->update_dev();
@@ -706,10 +709,9 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_active(*this, "m_active", 0)
 	, m_in_queue(*this, "m_in_queue", 2)
-	, m_railterminal(nullptr)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
+	, m_railterminal(mr)
 {
-	m_railterminal = mr;
 }
 
 detail::net_t::~net_t()
@@ -940,16 +942,20 @@ terminal_t::~terminal_t()
 
 void terminal_t::schedule_solve()
 {
-	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != nullptr)
-		net().solver()->update_forced();
+	// Nets may belong to railnets which do not have a solver attached
+	// FIXME: Enforce that all terminals get connected?
+	if (this->has_net())
+		if (net().solver() != nullptr)
+			net().solver()->update_forced();
 }
 
 void terminal_t::schedule_after(const netlist_time &after)
 {
-	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != nullptr)
-		net().solver()->update_after(after);
+	// Nets may belong to railnets which do not have a solver attached
+	// FIXME: Enforce that all terminals get connected?
+	if (this->has_net())
+		if (net().solver() != nullptr)
+			net().solver()->update_after(after);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1009,7 +1015,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
-	net().m_cur_Analog = NL_FCONST(0.0);
+	//net().m_cur_Analog = NL_FCONST(0.0);
 	netlist().setup().register_term(*this);
 }
 
@@ -1019,7 +1025,7 @@ analog_output_t::~analog_output_t()
 
 void analog_output_t::initial(const nl_double val)
 {
-	net().m_cur_Analog = val;
+	net().set_Q_Analog(val);
 }
 
 // -----------------------------------------------------------------------------

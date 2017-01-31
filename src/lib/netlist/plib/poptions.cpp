@@ -69,6 +69,13 @@ namespace plib {
 		return (err ? 1 : 0);
 	}
 
+	int option_long::parse(const pstring &argument)
+	{
+		bool err = false;
+		m_val = argument.as_long(&err);
+		return (err ? 1 : 0);
+	}
+
 	int option_vec::parse(const pstring &argument)
 	{
 		bool err = false;

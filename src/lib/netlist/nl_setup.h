@@ -283,8 +283,6 @@ namespace netlist
 
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
-		/* FIXME: truth table trampoline */
-
 		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
 		/* helper - also used by nltool */

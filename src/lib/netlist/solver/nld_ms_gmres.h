@@ -144,7 +144,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = this->m_terms[k]->connected_net_V();
 
-		new_V[k] = this->m_nets[k]->m_cur_Analog;
+		new_V[k] = this->m_nets[k]->Q_Analog();
 
 		for (std::size_t i = 0; i < term_count; i++)
 		{

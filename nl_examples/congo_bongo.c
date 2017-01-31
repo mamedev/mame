@@ -11,6 +11,7 @@
 /* set to 1 to use optimizations increasing performance significantly */
 
 #define USE_OPTMIZATIONS	1
+#define USE_FRONTIERS		1
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -44,12 +45,18 @@ NETLIST_START(dummy)
 
 	PARAM(Solver.ACCURACY, 1e-8)
 	PARAM(Solver.NR_LOOPS, 90)
-	PARAM(Solver.SOR_FACTOR, 0.001)
-	PARAM(Solver.GS_LOOPS, 1)
+	PARAM(Solver.SOR_FACTOR, 1.01)
+	PARAM(Solver.GS_LOOPS, 4)
+	//PARAM(Solver.METHOD, "GMRES")
 	PARAM(Solver.METHOD, "MAT_CR")
+	//PARAM(Solver.METHOD, "SOR")
 
 #if USE_OPTMIZATIONS
+#if USE_FRONTIERS
 	SOLVER(Solver, 24000)
+#else
+	SOLVER(Solver, 48000)
+#endif
 	PARAM(Solver.DYNAMIC_TS, 0	)
 	PARAM(Solver.PARALLEL, 1)
 #else
@@ -121,7 +128,7 @@ NETLIST_START(dummy)
 	PARAM(XU13.D.MODEL, "MB3614(TYPE=1)")
 #endif
 
-#if 1
+#if USE_FRONTIERS
 	OPTIMIZE_FRONTIER(C51.1, RES_K(20), 50)
 	OPTIMIZE_FRONTIER(R77.2, RES_K(20), 50)
 

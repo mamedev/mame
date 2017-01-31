@@ -376,7 +376,7 @@ static NETLIST_START(TTL_7427_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -416,7 +416,7 @@ static NETLIST_START(TTL_7430_DIP)
 		s1.E,  /*     E |5           10| NC   */ NC.I,
 		s1.F,  /*     F |6            9| NC   */ NC.I,
 		GND.I, /*   GND |7            8| Y    */ s1.Q
-				/*       +--------------+      */
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 

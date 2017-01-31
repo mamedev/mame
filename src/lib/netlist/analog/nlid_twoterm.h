@@ -278,10 +278,10 @@ public:
 
 	void set_param(const double Is, const double n, double gmin);
 
-	inline double I() const { return m_Id; }
-	inline double G() const { return m_G; }
-	inline double Ieq() const { return (m_Id - m_Vd * m_G); }
-	inline double Vd() const { return m_Vd; }
+	double I() const { return m_Id; }
+	double G() const { return m_G; }
+	double Ieq() const { return (m_Id - m_Vd * m_G); }
+	double Vd() const { return m_Vd; }
 
 	/* owning object must save those ... */
 
@@ -293,6 +293,7 @@ private:
 	double m_Vt;
 	double m_Vmin;
 	double m_Is;
+	double m_logIs;
 	double m_n;
 	double m_gmin;
 

@@ -30,7 +30,11 @@
  *
  */
 #define USE_MEMPOOL                 (0)
+
 #define USE_TRUTHTABLE              (1)
+
+// How many times do we try to resolve links (connections)
+#define NL_MAX_LINK_RESOLVE_LOOPS	(100)
 
 //============================================================
 //  Solver defines
