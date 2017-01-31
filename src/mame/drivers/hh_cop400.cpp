@@ -7,13 +7,13 @@
 
   TODO:
   - why does h2hbaskb need a workaround on writing L pins?
-  - lchicken high pitch beeping, aliasing in MAME sound core
   - plus1: which sensor position is which colour?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/cop400/cop400.h"
+#include "sound/speaker.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 //#include "rendlay.h"
@@ -40,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
 		m_display_maxx(0)
@@ -48,6 +49,7 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<6> m_inp_matrix; // max 6
+	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	u8 m_l;                         // MCU port L write data
@@ -322,17 +324,16 @@ static MACHINE_CONFIG_START( ctstein, ctstein_state )
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_G_CB(WRITE8(ctstein_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(ctstein_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_COP400_READ_L_CB(READ8(ctstein_state, read_l))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ctstein)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -442,22 +443,21 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hbaskb, h2hbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 1600000) // approximation - RC osc. R=43K, C=101pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(h2hbaskb_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(h2hbaskb_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(h2hbaskb_state, write_l))
 	MCFG_COP400_READ_IN_CB(READ8(h2hbaskb_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_h2hbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -479,11 +479,8 @@ class einvaderc_state : public hh_cop400_state
 {
 public:
 	einvaderc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -523,7 +520,7 @@ WRITE8_MEMBER(einvaderc_state::write_g)
 WRITE_LINE_MEMBER(einvaderc_state::write_sk)
 {
 	// SK: speaker out + led grid 8
-	m_dac->write(state);
+	m_speaker->level_w(state);
 	m_sk = state;
 	prepare_display();
 }
@@ -576,10 +573,9 @@ static MACHINE_CONFIG_START( einvaderc, einvaderc_state )
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -605,11 +601,8 @@ class lchicken_state : public hh_cop400_state
 {
 public:
 	lchicken_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	u8 m_motor_pos;
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
@@ -667,7 +660,7 @@ READ8_MEMBER(lchicken_state::read_g)
 WRITE_LINE_MEMBER(lchicken_state::write_so)
 {
 	// SO: speaker out
-	m_dac->write(state);
+	m_speaker->level_w(state);
 	m_so = state;
 }
 
@@ -738,10 +731,9 @@ static MACHINE_CONFIG_START( lchicken, lchicken_state )
 	MCFG_DEFAULT_LAYOUT(layout_hh_cop400_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -760,11 +752,8 @@ class funjacks_state : public hh_cop400_state
 {
 public:
 	funjacks_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
@@ -793,7 +782,7 @@ WRITE8_MEMBER(funjacks_state::write_l)
 WRITE8_MEMBER(funjacks_state::write_g)
 {
 	// G1: speaker out
-	m_dac->write(BIT(data, 1));
+	m_speaker->level_w(data >> 1 & 1);
 	m_g = data;
 }
 
@@ -850,10 +839,9 @@ static MACHINE_CONFIG_START( funjacks, funjacks_state )
 	MCFG_DEFAULT_LAYOUT(layout_funjacks)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -876,11 +864,8 @@ class funrlgl_state : public hh_cop400_state
 {
 public:
 	funrlgl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
@@ -910,7 +895,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 WRITE8_MEMBER(funrlgl_state::write_g)
 {
 	// G3: speaker out
-	m_dac->write(BIT(data, 3));
+	m_speaker->level_w(data >> 3 & 1);
 }
 
 
@@ -950,10 +935,9 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -974,11 +958,8 @@ class mdallas_state : public hh_cop400_state
 {
 public:
 	mdallas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_l);
@@ -1084,16 +1065,15 @@ static MACHINE_CONFIG_START( mdallas, mdallas_state )
 	MCFG_COP400_WRITE_D_CB(WRITE8(mdallas_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(mdallas_state, write_g))
 	MCFG_COP400_READ_IN_CB(READ8(mdallas_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mdallas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1115,11 +1095,8 @@ class plus1_state : public hh_cop400_state
 {
 public:
 	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_cop400_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		: hh_cop400_state(mconfig, type, tag)
 	{ }
-
-	required_device<dac_bit_interface> m_dac;
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
@@ -1131,7 +1108,7 @@ public:
 WRITE8_MEMBER(plus1_state::write_d)
 {
 	// D0?: speaker out
-	m_dac->write(BIT(data, 0));
+	m_speaker->level_w(data & 1);
 }
 
 WRITE8_MEMBER(plus1_state::write_l)
@@ -1176,10 +1153,9 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	/* no visual feedback! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1300,17 +1276,16 @@ static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_D_CB(WRITE8(lightfgt_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(lightfgt_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	MCFG_COP400_WRITE_SK_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_COP400_READ_G_CB(READ8(lightfgt_state, read_g))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_lightfgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1450,8 +1425,8 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 static MACHINE_CONFIG_START( bship82, bship82_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, 3000000) // approximation - RC osc. R=14K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
 	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write)) // G: 4-bit signed DAC
 	MCFG_COP400_READ_L_CB(READ8(bship82_state, read_l))
@@ -1463,8 +1438,8 @@ static MACHINE_CONFIG_START( bship82, bship82_state )
 	MCFG_DEFAULT_LAYOUT(layout_bship82)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
