@@ -12,6 +12,12 @@
 #include "bus/vme/vme.h"
 
 extern const device_type VME_FCCPU20;
+extern const device_type VME_FCCPU21S;
+extern const device_type VME_FCCPU21;
+extern const device_type VME_FCCPU21A;
+extern const device_type VME_FCCPU21YA;
+extern const device_type VME_FCCPU21B;
+extern const device_type VME_FCCPU21YB;
 
 class vme_fccpu20_card_device :
 	public device_t
@@ -57,5 +63,60 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
+
+class vme_fccpu21s_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vme_fccpu21_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vme_fccpu21a_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vme_fccpu21ya_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vme_fccpu21b_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class vme_fccpu21yb_card_device : public vme_fccpu20_card_device 
+{
+public :
+	vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
 
 #endif // VME_FCCPU20_H
