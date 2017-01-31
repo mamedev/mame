@@ -624,19 +624,28 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_SR:
-		LOGSHIFT("Read SR: %02x\n", m_sr);
+		LOGSHIFT("Read SR: %02x ", m_sr);
 		val = m_sr;
 		m_out_cb1 = 1;
 		m_shift_counter = 8;
 		clear_int(INT_SR);
+		LOGSHIFT("ACR: %02x ", m_acr);
 		if (SI_O2_CONTROL(m_acr))
 		{
 			m_shift_timer->adjust(clocks_to_attotime(1));
+			LOGSHIFT("SI_O2 starts timer ");
 		}
-		if (SI_T2_CONTROL(m_acr))
+		else if (SI_T2_CONTROL(m_acr))
 		{
 			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			LOGSHIFT("SI_T2 starts timer ");
 		}
+		else if (! (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr) || SO_T2_RATE(m_acr)))
+		{
+			m_shift_timer->adjust(attotime::never);
+			LOGSHIFT("Timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
@@ -667,7 +676,7 @@ WRITE8_MEMBER( via6522_device::write )
 {
 	offset &=0x0f;
 
-	LOGSETUP(" * %s Reg %02x <- %02x  \n", m_owner->tag(), offset, data);
+	LOGSETUP(" * %s Reg %02x <- %02x  \n", tag(), offset, data);
 
 	switch (offset)
 	{
@@ -793,14 +802,23 @@ WRITE8_MEMBER( via6522_device::write )
 		m_out_cb1 = 1;
 		m_shift_counter = 8;
 		clear_int(INT_SR);
+		LOGSHIFT("ACR: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr))
 		{
 			m_shift_timer->adjust(clocks_to_attotime(1));
+			LOGSHIFT("SO_O2 starts timer");
 		}
-		if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
+		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
 		{
 			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			LOGSHIFT("SO_T2 starts timer");
 		}
+		else if (! (SI_O2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr)))
+		{
+			m_shift_timer->adjust(attotime::never); // In case we change mode before counter expire
+			LOGSHIFT("Timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
@@ -825,24 +843,32 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			uint16_t counter1 = get_counter1_value();
 			m_acr = data;
+			LOGSHIFT("Write ACR: %02x ", m_acr);
 
 			output_pb();
 
-			LOGSHIFT("VIA_ACR Shift mode [%02x]: ", (m_acr >> 2) & 7);
-			if (SR_DISABLED(m_acr))    LOGSHIFT("Disabled\n");
-			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2\n");
-			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2\n");
-			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT\n");
-			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2\n");
-			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2\n");
-			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2\n");
-			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT\n");
+			LOGSHIFT("Shift mode [%02x]: ", (m_acr >> 2) & 7);
+			if (SR_DISABLED(m_acr))    LOGSHIFT("Disabled");
+			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2");
+			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2");
+			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2");
+			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2");
+			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2");
+			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT");
 
-			if (T1_CONTINUOUS(data))
+			if (SR_DISABLED(m_acr) || SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))
+			{
+				m_shift_timer->adjust(attotime::never);
+				LOGSHIFT(" Timer stops");
+			}
+
+			if (T1_CONTINUOUS(m_acr))
 			{
 				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
+			LOGSHIFT("\n");
 		}
 		break;
 
