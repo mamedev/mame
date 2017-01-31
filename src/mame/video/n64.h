@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/poly.h"
+#include "pin64.h"
 
 /*****************************************************************************/
 
@@ -366,6 +367,8 @@ private:
 	// Texture perspective division
 	int32_t m_norm_point_rom[64];
 	int32_t m_norm_slope_rom[64];
+
+	pin64_t m_capture;
 
 	static uint32_t s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];
