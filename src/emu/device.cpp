@@ -551,6 +551,23 @@ machine_config_constructor device_t::device_mconfig_additions() const
 
 
 //-------------------------------------------------
+//  append_ports - append the given device's input
+//  ports to the current list
+//-------------------------------------------------
+
+void device_t::device_append_ports(ioport_list &portlist)
+{
+	// no constructor, no list
+	ioport_constructor constructor = device_input_ports();
+	if (constructor == nullptr)
+		return;
+
+	// detokenize into the list
+	(*constructor)(*this, portlist);
+}
+
+
+//-------------------------------------------------
 //  input_ports - return a pointer to the implicit
 //  input ports description for this device
 //-------------------------------------------------

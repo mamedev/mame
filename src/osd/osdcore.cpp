@@ -194,3 +194,19 @@ void osd_sleep(osd_ticks_t duration)
 {
 	std::this_thread::sleep_for(std::chrono::high_resolution_clock::duration(duration));
 }
+
+//-------------------------------------------------
+//  output_via_delegate - helper to output a
+//  message via a varargs string, so the argptr
+//  can be forwarded onto the given delegate
+//-------------------------------------------------
+
+void osd_output::output_via_delegate(osd_output_channel channel, const char *format, ...)
+{
+	va_list argptr;
+
+	// call through to the delegate with the proper parameters
+	va_start(argptr, format);
+	chain_output(channel, format, argptr);
+	va_end(argptr);
+}

@@ -1691,26 +1691,20 @@ void validity_checker::validate_inputs()
 	// iterate over devices
 	for (device_t &device : device_iterator(m_current_config->root_device()))
 	{
-		// see if this device has ports; if not continue
-		if (device.input_ports() == nullptr)
-			continue;
-
 		// track the current device
 		m_current_device = &device;
 
-		// allocate the input ports
+		// allocate the input ports (if any)
 		ioport_list portlist;
-		std::string errorbuf;
-		portlist.append(device, errorbuf);
-
-		// report any errors during construction
-		if (!errorbuf.empty())
-			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
+		device.append_ports(portlist);
 
 		// do a first pass over ports to add their names and find duplicates
 		for (auto &port : portlist)
+		{
+			port.second->collapse_fields();
 			if (!port_map.insert(port.second->tag()).second)
 				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.second->tag());
+		}
 
 		// iterate over ports
 		for (auto &port : portlist)
@@ -1923,22 +1917,6 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		chain_output(channel, msg, args);
 		break;
 	}
-}
-
-//-------------------------------------------------
-//  output_via_delegate - helper to output a
-//  message via a varargs string, so the argptr
-//  can be forwarded onto the given delegate
-//-------------------------------------------------
-
-void validity_checker::output_via_delegate(osd_output_channel channel, const char *format, ...)
-{
-	va_list argptr;
-
-	// call through to the delegate with the proper parameters
-	va_start(argptr, format);
-	chain_output(channel, format, argptr);
-	va_end(argptr);
 }
 
 //-------------------------------------------------

@@ -663,9 +663,10 @@ struct ioport_field_live;
 class ioport_manager;
 class natural_keyboard;
 class analog_field;
+class device_iterator;
 
 // constructor function pointer
-typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
+typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist);
 
 // I/O port callback function delegates
 typedef device_delegate<ioport_value (ioport_field &, void *)> ioport_field_read_delegate;
@@ -1117,7 +1118,7 @@ public:
 	void set_user_settings(const user_settings &settings);
 
 private:
-	void expand_diplocation(const char *location, std::string &errorbuf);
+	void expand_diplocation(const char *location);
 
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
@@ -1199,7 +1200,7 @@ class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
 public:
 	ioport_list() { }
 
-	void append(device_t &device, std::string &errorbuf);
+	void append(const device_iterator &iter);
 };
 
 
@@ -1234,13 +1235,13 @@ public:
 
 	// other operations
 	ioport_field *field(ioport_value mask) const;
-	void collapse_fields(std::string &errorbuf);
+	void collapse_fields();
 	void frame_update();
 	void init_live_state();
 	void update_defvalue(bool flush_defaults);
 
 private:
-	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
+	void insert_field(ioport_field &newfield, ioport_value &disallowedbits);
 
 	// internal state
 	ioport_port *               m_next;         // pointer to next port
@@ -1504,7 +1505,7 @@ class ioport_configurer
 {
 public:
 	// construction/destruction
-	ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf);
+	ioport_configurer(device_t &owner, ioport_list &portlist);
 
 	// static helpers
 	static const char *string_from_token(const char *string);
@@ -1539,7 +1540,7 @@ public:
 	ioport_configurer& field_set_analog_invert() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; return *this; }
 	ioport_configurer& field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) { m_curfield->m_read = delegate; m_curfield->m_read_param = param; return *this; }
 	ioport_configurer& field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) { m_curfield->m_write = delegate; m_curfield->m_write_param = param; return *this; }
-	ioport_configurer& field_set_diplocation(const char *location) { m_curfield->expand_diplocation(location, m_errorbuf); return *this; }
+	ioport_configurer& field_set_diplocation(const char *location) { m_curfield->expand_diplocation(location); return *this; }
 
 	// setting helpers
 	ioport_configurer& setting_alloc(ioport_value value, const char *name);
@@ -1552,7 +1553,6 @@ private:
 	// internal state
 	device_t &          m_owner;
 	ioport_list &       m_portlist;
-	std::string &       m_errorbuf;
 
 	ioport_port *       m_curport;
 	ioport_field *      m_curfield;
@@ -1596,20 +1596,20 @@ private:
 
 // start of table
 #define INPUT_PORTS_START(_name) \
-ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf) \
+ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist) \
 { \
-	ioport_configurer configurer(owner, portlist, errorbuf);
+	ioport_configurer configurer(owner, portlist);
 // end of table
 #define INPUT_PORTS_END \
 }
 
 // aliasing
 #define INPUT_PORTS_EXTERN(_name) \
-	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist)
 
 // including
 #define PORT_INCLUDE(_name) \
-	INPUT_PORTS_NAME(_name)(owner, portlist, errorbuf);
+	INPUT_PORTS_NAME(_name)(owner, portlist);
 // start of a new input port (with included tag)
 #define PORT_START(_tag) \
 	configurer.port_alloc(_tag);
