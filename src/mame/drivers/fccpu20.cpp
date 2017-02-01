@@ -174,12 +174,6 @@ MACHINE_CONFIG_END
 
 /* ROM configurations */
 ROM_START(fccpu20sbc)   ROM_END
-ROM_START(fccpu21ssbc)  ROM_END
-ROM_START(fccpu21sbc)   ROM_END
-ROM_START(fccpu21asbc)  ROM_END
-ROM_START(fccpu21yasbc) ROM_END
-ROM_START(fccpu21bsbc)  ROM_END
-ROM_START(fccpu21ybsbc) ROM_END
 
 /* Boards supported by same rom set, need to do like this to avoid need for multi named rom sets */
 #define rom_fccpu21ssbc		rom_fccpu20sbc
