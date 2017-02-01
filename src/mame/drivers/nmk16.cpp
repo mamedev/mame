@@ -7066,7 +7066,7 @@ ROM_START( redhawkg ) // original Afega PCB with Delta Coin sticker
 	// Unused
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
-	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
 ROM_START( redhawkb )
