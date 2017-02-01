@@ -231,7 +231,7 @@ const device_type VME_FCCPU21YB = &device_creator<vme_fccpu21yb_card_device>;
 #define CLOCK40 XTAL_40MHz /* HCJ */
 #define CLOCK32 XTAL_32MHz /* HCJ */
 
-static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_card_device)
+static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ (bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
@@ -257,14 +257,14 @@ static MACHINE_CONFIG_FRAGMENT (fccpu20)
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit", PIT68230, CLOCK32 / 4) /* Crystal not verified */
-	MCFG_PIT68230_PA_INPUT_CB(READ8(vme_fccpu20_card_device, pita_r))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fccpu20_card_device, pitb_r))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(vme_fccpu20_card_device, pitc_r))
+	MCFG_PIT68230_PA_INPUT_CB(READ8(vme_fccpu20_device, pita_r))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fccpu20_device, pitb_r))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(vme_fccpu20_device, pitc_r))
 	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("bim", bim68153_device, int2_w))
 
 	/* BIM */
 	MCFG_MC68153_ADD("bim", CLOCK32 / 8)
-	MCFG_BIM68153_OUT_INT_CB(WRITELINE(vme_fccpu20_card_device, bim_irq_callback))
+	MCFG_BIM68153_OUT_INT_CB(WRITELINE(vme_fccpu20_device, bim_irq_callback))
 		/*INT0 - Abort switch */
 		/*INT1 - MPCC@8.064 MHz aswell */
 		/*INT2 - PI/T timer */
@@ -348,83 +348,92 @@ static MACHINE_CONFIG_DERIVED( fccpu21yb, fccpu20 )
 	MCFG_DEVICE_CLOCK( CLOCK50 / 2)
 MACHINE_CONFIG_END
 
-machine_config_constructor vme_fccpu20_card_device::device_mconfig_additions()   const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu20   ); }
-machine_config_constructor vme_fccpu21s_card_device::device_mconfig_additions()  const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21s  ); }
-machine_config_constructor vme_fccpu21_card_device::device_mconfig_additions()   const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21   ); }
-machine_config_constructor vme_fccpu21a_card_device::device_mconfig_additions()  const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21a  ); }
-machine_config_constructor vme_fccpu21ya_card_device::device_mconfig_additions() const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21ya ); }
-machine_config_constructor vme_fccpu21b_card_device::device_mconfig_additions()  const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21b  ); }
-machine_config_constructor vme_fccpu21yb_card_device::device_mconfig_additions() const {	LOG("%s %s\n", tag(), FUNCNAME); return MACHINE_CONFIG_NAME( fccpu21yb ); }
+machine_config_constructor vme_fccpu20_device::device_mconfig_additions() const 
+{
+	LOG("%s %s\n", tag(), FUNCNAME);
+
+	switch (m_board_id)
+	{
+	case cpu20:	  return MACHINE_CONFIG_NAME( fccpu20   ); break;
+	case cpu21a:  return MACHINE_CONFIG_NAME( fccpu21a  ); break;
+	case cpu21ya: return MACHINE_CONFIG_NAME( fccpu21ya ); break;
+	case cpu21b:  return MACHINE_CONFIG_NAME( fccpu21b  ); break;
+	case cpu21yb: return MACHINE_CONFIG_NAME( fccpu21yb ); break;
+	case cpu21s:  return MACHINE_CONFIG_NAME( fccpu21s  ); break;
+	case cpu21:   return MACHINE_CONFIG_NAME( fccpu21   ); break;
+	default: logerror("Attempt to get config for unknown board type %02x, defaulting to CPU20\n", m_board_id);
+		return MACHINE_CONFIG_NAME( fccpu20 );
+	}
+	return MACHINE_CONFIG_NAME( fccpu20 );
+}
 
 //**************************************************************************
-//  LIVE DEVICE
+//  Base Device
 //**************************************************************************
-vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
+vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, fc_board_t board_id) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_vme_card_interface(mconfig, *this)
+	, device_vme_card_interface(mconfig, *this) 
 	, m_maincpu (*this, "maincpu")
 	, m_pit (*this, "pit")
 	, m_bim  (*this, "bim")
 	, m_mpcc  (*this, "mpcc")
 	, m_mpcc2  (*this, "mpcc2")
 	, m_mpcc3  (*this, "mpcc3")
+	, m_board_id(board_id)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_FCCPU20, "Force Computer SYS68K/CPU-20 CPU Board", tag, owner, clock, "fccpu20", __FILE__)
-	,device_vme_card_interface(mconfig, *this)
-	, m_maincpu (*this, "maincpu")
-	, m_pit (*this, "pit")
-	, m_bim  (*this, "bim")
-	, m_mpcc  (*this, "mpcc")
-	, m_mpcc2  (*this, "mpcc2")
-	, m_mpcc3  (*this, "mpcc3")
+//**************************************************************************
+//  Card Devices
+//**************************************************************************
+vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: vme_fccpu20_card_device( mconfig, VME_FCCPU20, "Force Computer SYS68K/CPU-20 CPU Board", tag, owner, clock, "fccpu20", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
+
 vme_fccpu21s_card_device::vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21S, "Force Computer SYS68K/CPU-21S CPU Board", tag, owner, clock, "fccpu21s", __FILE__)
+	: vme_fccpu21s_card_device( mconfig, VME_FCCPU21S, "Force Computer SYS68K/CPU-21S CPU Board", tag, owner, clock, "fccpu21s", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_fccpu21_card_device::vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21, "Force Computer SYS68K/CPU-21 CPU Board", tag, owner, clock, "fccpu21", __FILE__)
+	: vme_fccpu21_card_device( mconfig, VME_FCCPU21, "Force Computer SYS68K/CPU-21 CPU Board", tag, owner, clock, "fccpu21", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_fccpu21a_card_device::vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21A, "Force Computer SYS68K/CPU-21A CPU Board", tag, owner, clock, "fccpu21a", __FILE__)
+	: vme_fccpu21a_card_device( mconfig, VME_FCCPU21A, "Force Computer SYS68K/CPU-21A CPU Board", tag, owner, clock, "fccpu21a", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
 vme_fccpu21ya_card_device::vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21YA, "Force Computer SYS68K/CPU-21YA CPU Board", tag, owner, clock, "fccpu21ya", __FILE__)
+	: vme_fccpu21ya_card_device( mconfig, VME_FCCPU21YA, "Force Computer SYS68K/CPU-21YA CPU Board", tag, owner, clock, "fccpu21ya", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21B CPU Board", tag, owner, clock, "fccpu21b", __FILE__)
+	: vme_fccpu21b_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21B CPU Board", tag, owner, clock, "fccpu21b", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
 vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu20_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21YB CPU Board", tag, owner, clock, "fccpu21yb", __FILE__)
+	: vme_fccpu21yb_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21YB CPU Board", tag, owner, clock, "fccpu21yb", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 /* Start it up */
-void vme_fccpu20_card_device::device_start()
+void vme_fccpu20_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 
@@ -432,6 +441,7 @@ void vme_fccpu20_card_device::device_start()
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
+	//	save_item(NAME(m_board_id)); // TODO: Save this "non base type" item
 
 	/* TODO: setup this RAM from (not yet) optional SRAM-2x board and also support 2MB versions */
 	//m_maincpu->space(AS_PROGRAM).install_ram(0x80000, m_ram->size() + 0x7ffff, m_ram->pointer());
@@ -449,25 +459,27 @@ void vme_fccpu20_card_device::device_start()
 
 }
 
-void vme_fccpu20_card_device::device_reset()
+void vme_fccpu20_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (vme_fccpu20_card_device::bootvect_r){
+READ32_MEMBER (vme_fccpu20_device::bootvect_r)
+{
 	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (vme_fccpu20_card_device::bootvect_w){
+WRITE32_MEMBER (vme_fccpu20_device::bootvect_w)
+{
 	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
 }
 
-WRITE_LINE_MEMBER(vme_fccpu20_card_device::bim_irq_callback)
+WRITE_LINE_MEMBER(vme_fccpu20_device::bim_irq_callback)
 {
 	LOGINT("%s(%02x)\n", FUNCNAME, state);
 
@@ -477,7 +489,7 @@ WRITE_LINE_MEMBER(vme_fccpu20_card_device::bim_irq_callback)
 	update_irq_to_maincpu();
 }
 
-void vme_fccpu20_card_device::update_irq_to_maincpu()
+void vme_fccpu20_device::update_irq_to_maincpu()
 {
 	LOGINT("%s()\n", FUNCNAME);
 	LOGINT(" - bim_irq_level: %02x\n", bim_irq_level);
@@ -507,34 +519,57 @@ void vme_fccpu20_card_device::update_irq_to_maincpu()
  B6: Auto execute FF00C0000
  B7: memory size?
 */
+/* PIT Port definitions */
 #define BR7N9600   0x01
 #define BR7N28800  0x02
 #define BR7N38400  0x06
 #define BR7N57600  0x03
 #define BR8N38400  0x08
 #define FORCEBUG   0x30
-READ8_MEMBER (vme_fccpu20_card_device::pita_r){
-	LOG("%s\n", FUNCNAME);
 
+READ8_MEMBER (vme_fccpu20_device::pita_r)
+{
+	LOG("%s\n", FUNCNAME);
 	return FORCEBUG | BR7N9600;
 }
 
 /* Enabling/Disabling of VME IRQ 1-7 */
-READ8_MEMBER (vme_fccpu20_card_device::pitb_r){
+READ8_MEMBER (vme_fccpu20_device::pitb_r)
+{
 	LOG("%s\n", FUNCNAME);
 	return 0xff;
 }
 
-/* VME bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
-READ8_MEMBER (vme_fccpu20_card_device::pitc_r){
-	LOG("%s\n", FUNCNAME);
-	return 0xff;
+/* VME board ID bit and bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
+READ8_MEMBER (vme_fccpu20_device::pitc_r)
+{
+	uint8_t board_id = 0;
+
+	LOG("%s Board id:%02x\n", FUNCNAME, m_board_id);
+
+	switch (m_board_id)
+	{
+	case cpu20: 
+		board_id = CPU20; 
+		break;
+	case cpu21a:
+	case cpu21ya:
+	case cpu21b:
+	case cpu21yb:
+	case cpu21s:
+	case cpu21: 
+		board_id = CPU21;
+		break;
+	default: logerror("Attempt to set unknown board type %02x, defaulting to CPU20\n", board_id);
+		board_id = CPU20;
+	}
+
+	return board_id | 0xbf;
 }
 
 /* ROM definitions */
 ROM_START (fccpu20) /* This is an original rom dump */
 	ROM_REGION32_BE(0x10000, "roms", 0)
-// Boots with Board ID set to: 0x36 (FGA002 BOOT on terminal P4, "Wait until harddisk is up to speed " on terminal P1)
 	ROM_LOAD32_BYTE("L.BIN",  0x000002, 0x4000, CRC (174ab801) SHA1 (0d7b8ed29d5fdd4bd2073005008120c5f20128dd))
 	ROM_LOAD32_BYTE("LL.BIN", 0x000003, 0x4000, CRC (9fd9e3e4) SHA1 (e5a7c87021e6be412dd5a8166d9f62b681169eda))
 	ROM_LOAD32_BYTE("U.BIN",  0x000001, 0x4000, CRC (d1afe4c0) SHA1 (b5baf9798d73632f7bb843cbc4b306c8c03f4296))
@@ -554,13 +589,23 @@ ROM_END
 #define rom_fccpu21b       rom_fccpu20
 #define rom_fccpu21yb      rom_fccpu20
 
-const tiny_rom_entry *vme_fccpu20_card_device::device_rom_region()   const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu20   ); }
-const tiny_rom_entry *vme_fccpu21s_card_device::device_rom_region()  const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21s  ); }
-const tiny_rom_entry *vme_fccpu21_card_device::device_rom_region()   const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21   ); }
-const tiny_rom_entry *vme_fccpu21a_card_device::device_rom_region()  const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21a  ); }
-const tiny_rom_entry *vme_fccpu21ya_card_device::device_rom_region() const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21ya ); }
-const tiny_rom_entry *vme_fccpu21b_card_device::device_rom_region()  const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21b  ); }
-const tiny_rom_entry *vme_fccpu21yb_card_device::device_rom_region() const { LOG("%s\n", FUNCNAME); return ROM_NAME( fccpu21yb ); }
+const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const 
+{
+	LOG("%s\n", FUNCNAME); 
+
+	switch (m_board_id)
+	{
+	case cpu20:	  return ROM_NAME( fccpu20   ); break;
+	case cpu21a:  return ROM_NAME( fccpu21a  ); break;
+	case cpu21ya: return ROM_NAME( fccpu21ya ); break;
+	case cpu21b:  return ROM_NAME( fccpu21b  ); break;
+	case cpu21yb: return ROM_NAME( fccpu21yb ); break;
+	case cpu21s:  return ROM_NAME( fccpu21s  ); break;
+	case cpu21:   return ROM_NAME( fccpu21   ); break;
+	default: logerror("Attempt to get rom set for unknown board type %02x, defaulting to CPU20\n", m_board_id);
+		return ROM_NAME( fccpu20 ); 
+	}
+}
 
 /*
  * System ROM information
