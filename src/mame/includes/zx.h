@@ -15,6 +15,7 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "formats/zx81_p.h"
+#include "formats/tzx_cas.h"
 #include "machine/ram.h"
 
 
