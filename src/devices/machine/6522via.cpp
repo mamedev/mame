@@ -989,12 +989,12 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				m_latch_b = input_pb();
 			}
 
-			if (SO_EXT_CONTROL(m_acr))
+			if (!state && SO_EXT_CONTROL(m_acr))
 			{
 				shift_out();
 			}
 
-			if (SI_EXT_CONTROL(m_acr))
+			if (state && SI_EXT_CONTROL(m_acr))
 			{
 				shift_in();
 			}
@@ -1005,6 +1005,18 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			{
 				m_out_cb2 = 1;
 				m_cb2_handler(1);
+			}
+		}
+		else // shift is not controlled by m_pcr
+		{
+			if (!state && SO_EXT_CONTROL(m_acr)) 
+			{
+				shift_out();
+			}
+
+			if (state && SI_EXT_CONTROL(m_acr))
+			{
+				shift_in();
 			}
 		}
 	}
