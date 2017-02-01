@@ -127,7 +127,7 @@ public:
 	};
 
 	NETLIB_CONSTRUCTOR(Q)
-	, m_model(*this, "MODEL", "")
+	, m_model(*this, "MODEL", "NPN")
 	, m_qtype(BJT_NPN)
 	{
 	}

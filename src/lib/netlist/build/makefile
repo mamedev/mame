@@ -195,11 +195,15 @@ doc:
 #-------------------------------------------------
 
 .depend: $(SOURCES)
+ifeq ($(OS),windows)
+	@echo using existing .depend
+else
 	@echo creating .depend
 	@rm -f ./.depend
 	@for i in $(SOURCES); do \
 		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
 	done
+endif
 
 depend: .depend
 

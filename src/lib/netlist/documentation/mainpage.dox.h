@@ -1,5 +1,208 @@
+/*
+ * Documentation settings
+ */
 
-/*! \mainpage notitle
+/*!
+ * \defgroup devices Devices
+ *
+ */
+
+/*!
+ * \page devices Devices
+ *
+ * Below is a list of all the devices currently supported ...
+ *
+ *         - \subpage AFUNC
+ *         - \subpage ANALOG_INPUT
+ *         - \subpage CAP
+ *         - \subpage CCCS
+ *         - \subpage CD4001_DIP
+ *         - \subpage CD4001_NOR
+ *         - \subpage CD4016_DIP
+ *         - \subpage CD4020_DIP
+ *         - \subpage CD4020
+ *         - \subpage CD4020_WI
+ *         - \subpage CD4066_DIP
+ *         - \subpage CD4066_GATE
+ *         - \subpage CD4316_DIP
+ *         - \subpage CD4316_GATE
+ *         - \subpage CD4538_DIP
+ *         - \subpage CLOCK
+ *         - \subpage CS
+ *         - \subpage DIODE
+ *         - \subpage DUMMY_INPUT
+ *         - \subpage EPROM_2716_DIP
+ *         - \subpage EPROM_2716
+ *         - \subpage EXTCLOCK
+ *         - \subpage FRONTIER_DEV
+ *         - \subpage GND
+ *         - \subpage IND
+ *         - \subpage LM324_DIP
+ *         - \subpage LM358_DIP
+ *         - \subpage LM3900
+ *         - \subpage LM747A_DIP
+ *         - \subpage LM747_DIP
+ *         - \subpage LOGD
+ *         - \subpage LOGIC_INPUT
+ *         - \subpage LOG
+ *         - \subpage LVCCS
+ *         - \subpage MAINCLOCK
+ *         - \subpage MB3614_DIP
+ *         - \subpage MC14584B_DIP
+ *         - \subpage MC14584B_GATE
+ *         - \subpage MM5837_DIP
+ *         - \subpage NE555_DIP
+ *         - \subpage NE555
+ *         - \subpage NETDEV_DELAY
+ *         - \subpage NETDEV_RSFF
+ *         - \subpage OPAMP
+ *         - \subpage opamp_layout_1_11_6
+ *         - \subpage opamp_layout_1_7_4
+ *         - \subpage opamp_layout_1_8_5
+ *         - \subpage opamp_layout_2_13_9_4
+ *         - \subpage opamp_layout_2_8_4
+ *         - \subpage opamp_layout_4_4_11
+ *         - \subpage PARAMETER
+ *         - \subpage POT2
+ *         - \subpage POT
+ *         - \subpage PROM_82S115_DIP
+ *         - \subpage PROM_82S115
+ *         - \subpage PROM_82S123_DIP
+ *         - \subpage PROM_82S123
+ *         - \subpage PROM_82S126_DIP
+ *         - \subpage PROM_82S126
+ *         - \subpage QBJT_EB
+ *         - \subpage QBJT_SW
+ *         - \subpage R2R_DAC
+ *         - \subpage RAM_2102A_DIP
+ *         - \subpage RAM_2102A
+ *         - \subpage RES
+ *         - \subpage RES_SWITCH
+ *         - \subpage SN74LS629_DIP
+ *         - \subpage SN74LS629
+ *         - \subpage SOLVER
+ *         - \subpage SWITCH2
+ *         - \subpage SWITCH
+ *         - \subpage TTL_7400_DIP
+ *         - \subpage TTL_7400_GATE
+ *         - \subpage TTL_7400_NAND
+ *         - \subpage TTL_7402_DIP
+ *         - \subpage TTL_7402_GATE
+ *         - \subpage TTL_7402_NOR
+ *         - \subpage TTL_7404_DIP
+ *         - \subpage TTL_7404_GATE
+ *         - \subpage TTL_7404_INVERT
+ *         - \subpage TTL_7408_AND
+ *         - \subpage TTL_7408_DIP
+ *         - \subpage TTL_7408_GATE
+ *         - \subpage TTL_74107A
+ *         - \subpage TTL_74107_DIP
+ *         - \subpage TTL_74107
+ *         - \subpage TTL_7410_DIP
+ *         - \subpage TTL_7410_GATE
+ *         - \subpage TTL_7410_NAND
+ *         - \subpage TTL_7411_AND
+ *         - \subpage TTL_7411_DIP
+ *         - \subpage TTL_7411_GATE
+ *         - \subpage TTL_74123_DIP
+ *         - \subpage TTL_74123
+ *         - \subpage TTL_74153_DIP
+ *         - \subpage TTL_74153
+ *         - \subpage TTL_74161_DIP
+ *         - \subpage TTL_74161
+ *         - \subpage TTL_74165_DIP
+ *         - \subpage TTL_74165
+ *         - \subpage TTL_74166_DIP
+ *         - \subpage TTL_74166
+ *         - \subpage TTL_7416_DIP
+ *         - \subpage TTL_7416_GATE
+ *         - \subpage TTL_74174_DIP
+ *         - \subpage TTL_74174
+ *         - \subpage TTL_74175_DIP
+ *         - \subpage TTL_74175
+ *         - \subpage TTL_74192_DIP
+ *         - \subpage TTL_74192
+ *         - \subpage TTL_74193_DIP
+ *         - \subpage TTL_74193
+ *         - \subpage TTL_74194_DIP
+ *         - \subpage TTL_74194
+ *         - \subpage TTL_7420_DIP
+ *         - \subpage TTL_7420_GATE
+ *         - \subpage TTL_7420_NAND
+ *         - \subpage TTL_7425_DIP
+ *         - \subpage TTL_7425_GATE
+ *         - \subpage TTL_7425_NOR
+ *         - \subpage TTL_74260_DIP
+ *         - \subpage TTL_74260_GATE
+ *         - \subpage TTL_74260_NOR
+ *         - \subpage TTL_74279_DIP
+ *         - \subpage TTL_7427_DIP
+ *         - \subpage TTL_7427_GATE
+ *         - \subpage TTL_7427_NOR
+ *         - \subpage TTL_7430_DIP
+ *         - \subpage TTL_7430_GATE
+ *         - \subpage TTL_7430_NAND
+ *         - \subpage TTL_7432_DIP
+ *         - \subpage TTL_7432_GATE
+ *         - \subpage TTL_7432_OR
+ *         - \subpage TTL_74365_DIP
+ *         - \subpage TTL_74365
+ *         - \subpage TTL_7437_DIP
+ *         - \subpage TTL_7437_GATE
+ *         - \subpage TTL_7437_NAND
+ *         - \subpage TTL_7448_DIP
+ *         - \subpage TTL_7448
+ *         - \subpage TTL_7450_ANDORINVERT
+ *         - \subpage TTL_7450_DIP
+ *         - \subpage TTL_7473A_DIP
+ *         - \subpage TTL_7473A
+ *         - \subpage TTL_7473_DIP
+ *         - \subpage TTL_7473
+ *         - \subpage TTL_7474_DIP
+ *         - \subpage TTL_7474
+ *         - \subpage TTL_7475_DIP
+ *         - \subpage TTL_7475
+ *         - \subpage TTL_7477_DIP
+ *         - \subpage TTL_7477
+ *         - \subpage TTL_7483_DIP
+ *         - \subpage TTL_7483
+ *         - \subpage TTL_7485_DIP
+ *         - \subpage TTL_7485
+ *         - \subpage TTL_7486_DIP
+ *         - \subpage TTL_7486_GATE
+ *         - \subpage TTL_7486_XOR
+ *         - \subpage TTL_7490_DIP
+ *         - \subpage TTL_7490
+ *         - \subpage TTL_7493_DIP
+ *         - \subpage TTL_7493
+ *         - \subpage TTL_82S16_DIP
+ *         - \subpage TTL_82S16
+ *         - \subpage TTL_9310_DIP
+ *         - \subpage TTL_9310
+ *         - \subpage TTL_9312_DIP
+ *         - \subpage TTL_9312
+ *         - \subpage TTL_9316_DIP
+ *         - \subpage TTL_9316
+ *         - \subpage TTL_9322_DIP
+ *         - \subpage TTL_9322
+ *         - \subpage TTL_9334_DIP
+ *         - \subpage TTL_9334
+ *         - \subpage TTL_9602_DIP
+ *         - \subpage TTL_AM2847_DIP
+ *         - \subpage TTL_AM2847
+ *         - \subpage TTL_INPUT
+ *         - \subpage TTL_TRISTATE3
+ *         - \subpage TTL_TRISTATE
+ *         - \subpage UA741_DIP10
+ *         - \subpage UA741_DIP14
+ *         - \subpage UA741_DIP8
+ *         - \subpage VCCS
+ *         - \subpage VCVS
+ *         - \subpage VS
+ *
+ * \mainpage Netlist
+
+
 
 ##Netlist
 
