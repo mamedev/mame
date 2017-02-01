@@ -1339,6 +1339,8 @@ if (CPUS["M6805"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 	}
 end
 

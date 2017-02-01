@@ -291,7 +291,14 @@ OP_HANDLER( nega )
 
 // $41 ILLEGAL
 
-// $42 ILLEGAL
+// $42 MUL inherent 0--0
+OP_HANDLER( mul )
+{
+	u16 const r = u16(A) * X;
+	clr_hc();
+	X = u8(r >> 8);
+	A = u8(r);
+}
 
 // $43 COMA inherent -**1
 OP_HANDLER( coma )
@@ -519,17 +526,7 @@ OP_HANDLER( swi )
 	pushbyte(m_a);
 	pushbyte(m_cc);
 	SEI;
-	rm16(0xfffc, m_pc);
-}
-
-DERIVED_OP_HANDLER( hd63705, swi )
-{
-	pushword(m_pc);
-	pushbyte(m_x);
-	pushbyte(m_a);
-	pushbyte(m_cc);
-	SEI;
-	rm16(0x1ffa, m_pc);
+	rm16(m_params.m_swi_vector, m_pc);
 }
 
 // $84 ILLEGAL
@@ -552,9 +549,18 @@ DERIVED_OP_HANDLER( hd63705, swi )
 
 // $8D ILLEGAL
 
-// $8E ILLEGAL
+// $8E STOP inherent    ----
+OP_HANDLER( stop )
+{
+	fatalerror("m6805: unimplemented STOP");
+}
 
-// $8F ILLEGAL
+// $8F WAIT inherent    ----
+OP_HANDLER( wait )
+{
+	fatalerror("m6805: unimplemented WAIT");
+}
+
 
 // $90 ILLEGAL
 

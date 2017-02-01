@@ -6,6 +6,7 @@
  */
 
 #include "nld_82S126.h"
+#include "nl_base.h"
 
 namespace netlist
 {

@@ -67,9 +67,9 @@ enum
 
 
 #define MCFG_M6801_SC2(_devcb) \
-	m6800_cpu_device::set_out_sc2_func(*device, DEVCB_##_devcb);
+	devcb = &m6800_cpu_device::set_out_sc2_func(*device, DEVCB_##_devcb);
 #define MCFG_M6801_SER_TX(_devcb) \
-	m6800_cpu_device::set_out_sertx_func(*device, DEVCB_##_devcb);
+	devcb = &m6800_cpu_device::set_out_sertx_func(*device, DEVCB_##_devcb);
 
 class m6800_cpu_device :  public cpu_device
 {

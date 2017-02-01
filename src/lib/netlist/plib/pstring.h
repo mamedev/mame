@@ -7,12 +7,8 @@
 #ifndef PSTRING_H_
 #define PSTRING_H_
 
-#include <cstdarg>
-#include <cstddef>
 #include <iterator>
 #include <exception>
-
-#include "pconfig.h"
 
 // ----------------------------------------------------------------------------------------
 // pstring: immutable strings ...

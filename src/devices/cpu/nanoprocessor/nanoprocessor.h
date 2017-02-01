@@ -63,12 +63,12 @@
 // DC0 is in bit 0, DC1 in bit 1 and so on.
 // Keep in mind that DC7 usually masks the interrupt signal.
 #define MCFG_HP_NANO_DC_CHANGED(_devcb)                                 \
-	hp_nanoprocessor_device::set_dc_changed_func(*device , DEVCB_##_devcb);
+	devcb = &hp_nanoprocessor_device::set_dc_changed_func(*device , DEVCB_##_devcb);
 
 // Callback to read the input state of DC lines
 // All lines that are not in input are to be reported at "1"
 #define MCFG_HP_NANO_READ_DC_CB(_devcb)                                 \
-	hp_nanoprocessor_device::set_read_dc_func(*device , DEVCB_##_devcb);
+	devcb = &hp_nanoprocessor_device::set_read_dc_func(*device , DEVCB_##_devcb);
 
 class hp_nanoprocessor_device : public cpu_device
 {

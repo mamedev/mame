@@ -5,8 +5,6 @@
  *
  */
 
-#include <cstdio>
-
 #include "pconfig.h"
 #include "palloc.h"
 #include "pfmtlog.h"

@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 #include "nlm_cd4xxx.h"
 
-#include "devices/nld_truthtable.h"
 #include "devices/nld_system.h"
 #include "devices/nld_4020.h"
 #include "devices/nld_4066.h"

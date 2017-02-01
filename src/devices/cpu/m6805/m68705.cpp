@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 #include "emu.h"
 #include "m68705.h"
 #include "m6805defs.h"
@@ -61,7 +63,7 @@ ROM_END
 
 ROM_START( m68705r3 )
 	ROM_REGION(0x0078, "bootstrap", 0)
-	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37) BAD_DUMP)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0078, CRC(5946479b) SHA1(834ea00aef5de12dbcd6421a6e21d5ea96cfbf37))
 ROM_END
 
 ROM_START( m68705u3 )
@@ -90,7 +92,7 @@ device_type const M68705U3 = &device_creator<m68705u3_device>;
 
 
 /****************************************************************************
- * MC68705 base device
+ * M68705 base device
  ****************************************************************************/
 
 /*
@@ -192,7 +194,17 @@ m68705_device::m68705_device(
 		address_map_delegate internal_map,
 		char const *shortname,
 		char const *source)
-	: m6805_base_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source)
+	: m6805_base_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			type,
+			name,
+			{ s_hmos_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, 0xfffc },
+			internal_map,
+			shortname,
+			source)
 	, device_nvram_interface(mconfig, *this)
 	, m_user_rom(*this, DEVICE_SELF, u32(1) << addr_width)
 	, m_port_open_drain{ false, false, false, false }

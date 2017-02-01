@@ -1329,11 +1329,13 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 
 	// audio
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_PAL)
+	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
+	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
 
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)

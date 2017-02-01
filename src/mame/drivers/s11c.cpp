@@ -478,6 +478,36 @@ ROM_START(rollr_g3)
 	ROM_LOAD("rolr_u20.l3", 0x30000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
 ROM_END
 
+ROM_START(rollr_f2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rolr-u26.lf2", 0x4000, 0x4000, CRC(a33a3a39) SHA1(fa67cede5fe9f86ce8772e49dba8d929d2b53ecb))
+	ROM_LOAD("rolr_u27.l2", 0x8000, 0x8000, CRC(f3bac2b8) SHA1(9f0ff32ea83e43097de42065909137a362b29d49))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("rolr_u4.l3", 0x10000, 0x10000, CRC(d366c705) SHA1(76018305b5040b2e5d8c45cc81a18f13e1a8f8da))
+	ROM_LOAD("rolr_u19.l3", 0x20000, 0x10000, CRC(45a89e55) SHA1(3aff897514d242c83a8e7575d430d594a873736e))
+	ROM_LOAD("rolr_u20.l3", 0x30000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
+ROM_END
+
+ROM_START(rollr_f3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rolr-u26.lf3", 0x4000, 0x4000, CRC(0c54de2a) SHA1(764a0986bb1966ddfd547ee6380debaaa1ea3769))
+	ROM_LOAD("rolr_u27.l2", 0x8000, 0x8000, CRC(f3bac2b8) SHA1(9f0ff32ea83e43097de42065909137a362b29d49))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("rolr_u4.l3", 0x10000, 0x10000, CRC(d366c705) SHA1(76018305b5040b2e5d8c45cc81a18f13e1a8f8da))
+	ROM_LOAD("rolr_u19.l3", 0x20000, 0x10000, CRC(45a89e55) SHA1(3aff897514d242c83a8e7575d430d594a873736e))
+	ROM_LOAD("rolr_u20.l3", 0x30000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
+ROM_END
+
+ROM_START(rollr_d2) // American Drops 2 - sample/prototype with 8 drop targets
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rolr-u26.ad2", 0x4000, 0x4000, CRC(913574ac) SHA1(52e2b398d087e998ba5c16a623c7d1a02b99ca55))
+	ROM_LOAD("rolr_u27.ad2", 0x8000, 0x8000, CRC(92d2172f) SHA1(73f15d338f2680ee2dd961e9e4d4ea97e9328b6e))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("rolr_u4.l3", 0x10000, 0x10000, CRC(d366c705) SHA1(76018305b5040b2e5d8c45cc81a18f13e1a8f8da))
+	ROM_LOAD("rolr_u19.l3", 0x20000, 0x10000, CRC(45a89e55) SHA1(3aff897514d242c83a8e7575d430d594a873736e))
+	ROM_LOAD("rolr_u20.l3", 0x30000, 0x10000, CRC(77f89aff) SHA1(dcd9fe233f33ef8f97cdeaaa365532e485a28944))
+ROM_END
+
 /*--------------------
 / The Bally Game Show 4/90
 /--------------------*/
@@ -544,6 +574,9 @@ GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   
 GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  gs_l3,      gs_l4,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  gs_l4,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)

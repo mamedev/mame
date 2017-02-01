@@ -41,10 +41,14 @@ enum
 };
 
 
-#define MCFG_MB86233_FIFO_READ_CB(_devcb) mb86233_cpu_device::set_fifo_read_cb(*device, DEVCB_##_devcb);
-#define MCFG_MB86233_FIFO_READ_OK_CB(_devcb) mb86233_cpu_device::set_fifo_read_ok_cb(*device, DEVCB_##_devcb);
-#define MCFG_MB86233_FIFO_WRITE_CB(_devcb) mb86233_cpu_device::set_fifo_write_cb(*device, DEVCB_##_devcb);
-#define MCFG_MB86233_TABLE_REGION(_region) mb86233_cpu_device::set_tablergn(*device, _region);
+#define MCFG_MB86233_FIFO_READ_CB(_devcb) \
+	devcb = &mb86233_cpu_device::set_fifo_read_cb(*device, DEVCB_##_devcb);
+#define MCFG_MB86233_FIFO_READ_OK_CB(_devcb) \
+	devcb = &mb86233_cpu_device::set_fifo_read_ok_cb(*device, DEVCB_##_devcb);
+#define MCFG_MB86233_FIFO_WRITE_CB(_devcb) \
+	devcb = &mb86233_cpu_device::set_fifo_write_cb(*device, DEVCB_##_devcb);
+#define MCFG_MB86233_TABLE_REGION(_region) \
+	mb86233_cpu_device::set_tablergn(*device, _region);
 
 
 class mb86233_cpu_device : public cpu_device

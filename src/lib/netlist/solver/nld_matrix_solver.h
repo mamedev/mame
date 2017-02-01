@@ -10,6 +10,7 @@
 
 #include "nl_base.h"
 #include "nl_errstr.h"
+#include "plib/putil.h"
 
 namespace netlist
 {
@@ -33,10 +34,8 @@ namespace netlist
 	};
 
 
-class terms_for_net_t
+class terms_for_net_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(terms_for_net_t)
-
 public:
 	terms_for_net_t();
 
@@ -114,7 +113,11 @@ public:
 
 	void solve_base();
 
+	/* after every call to solve, update inputs must be called.
+	 * this can be done as well as a batch to ease parallel processing.
+	 */
 	const netlist_time solve();
+	void update_inputs();
 
 	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
 	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
@@ -189,31 +192,30 @@ private:
 
 	void step(const netlist_time &delta);
 
-	void update_inputs();
-
 	const eSortType m_sort;
 };
 
 template <typename T>
 T matrix_solver_t::delta(const T * RESTRICT V)
 {
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
 	 * and thus belong into a different calculation. This applies to all solvers.
 	 */
 
-	std::size_t iN = this->m_terms.size();
+	const std::size_t iN = this->m_terms.size();
 	T cerr = 0;
-	for (unsigned i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->m_cur_Analog)));
+	for (std::size_t i = 0; i < iN; i++)
+		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->Q_Analog())));
 	return cerr;
 }
 
 template <typename T>
 void matrix_solver_t::store(const T * RESTRICT V)
 {
-	for (std::size_t i = 0, iN=m_terms.size(); i < iN; i++)
-		this->m_nets[i]->m_cur_Analog = V[i];
+	const std::size_t iN = this->m_terms.size();
+	for (std::size_t i = 0; i < iN; i++)
+		this->m_nets[i]->set_Q_Analog(V[i]);
 }
 
 template <typename T>
@@ -223,12 +225,12 @@ void matrix_solver_t::build_LE_A()
 
 	T &child = static_cast<T &>(*this);
 
-	const unsigned iN = child.N();
-	for (unsigned k = 0; k < iN; k++)
+	const std::size_t iN = child.N();
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
 
-		for (unsigned i=0; i < iN; i++)
+		for (std::size_t i=0; i < iN; i++)
 			child.A(k,i) = 0.0;
 
 		const std::size_t terms_count = terms->count();
@@ -237,7 +239,7 @@ void matrix_solver_t::build_LE_A()
 
 		{
 			nl_double akk  = 0.0;
-			for (unsigned i = 0; i < terms_count; i++)
+			for (std::size_t i = 0; i < terms_count; i++)
 				akk += gt[i];
 
 			child.A(k,k) = akk;
@@ -257,8 +259,8 @@ void matrix_solver_t::build_LE_RHS()
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 	T &child = static_cast<T &>(*this);
 
-	const unsigned iN = child.N();
-	for (unsigned k = 0; k < iN; k++)
+	const std::size_t iN = child.N();
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;

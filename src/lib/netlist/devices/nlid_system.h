@@ -11,17 +11,9 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include <cstddef>
-#include <memory>
-#include <vector>
-
-#include "analog/nld_twoterm.h"
 #include "nl_base.h"
-#include "nl_time.h"
-#include "plib/palloc.h"
-#include "plib/pfmtlog.h"
-#include "plib/pfunction.h"
-#include "plib/pstring.h"
+#include "nl_setup.h"
+#include "analog/nlid_twoterm.h"
 #include "plib/putil.h"
 
 namespace netlist
@@ -132,7 +124,7 @@ namespace netlist
 			connect(m_feedback, m_Q);
 			{
 				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
-				plib::pstring_vector_t pat(m_pattern(),",");
+				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
 				unsigned long pati[256];

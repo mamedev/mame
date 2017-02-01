@@ -15,8 +15,10 @@
 #include <mutex>
 
 #include "nl_config.h"
+#include "nl_types.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
+#include "plib/ptypes.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue
@@ -25,7 +27,6 @@
 
 namespace netlist
 {
-
 	//FIXME: move to an appropriate place
 	template<bool enabled_ = true>
 	class pspin_mutex
@@ -47,9 +48,8 @@ namespace netlist
 	};
 
 	template <class Element, class Time>
-	class timed_queue
+	class timed_queue : plib::nocopyassignmove
 	{
-		P_PREVENT_COPYING(timed_queue)
 	public:
 
 		struct entry_t

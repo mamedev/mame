@@ -8,21 +8,12 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstdlib>
-
 #include "plib/poptions.h"
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/ptypes.h"
-#include "plib/pexception.h"
 #include "nl_setup.h"
-#include "nl_factory.h"
 #include "nl_parser.h"
 #include "devices/net_lib.h"
 #include "tools/nl_convert.h"
-
-#include <cfenv>
+#include "solver/nld_solver.h"
 
 class tool_options_t : public plib::options
 {
@@ -385,7 +376,7 @@ static void create_header(tool_options_t &opts)
 			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
 			pout("{1}\n", pstring("// ").rpad("-", 72));
 		}
-		auto v = plib::pstring_vector_t(e->param_desc(), ",");
+		auto v = plib::psplit(e->param_desc(), ",");
 		pstring vs;
 		for (auto s : v)
 			vs += ", p" + s.replace("+","").replace(".","_");
@@ -474,7 +465,7 @@ static void listdevices(tool_options_t &opts)
 		}
 
 		out += "," + f->param_desc();
-		for (auto p : plib::pstring_vector_t(f->param_desc(),",") )
+		for (auto p : plib::psplit(f->param_desc(),",") )
 		{
 			if (p.startsWith("+"))
 			{

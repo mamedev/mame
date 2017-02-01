@@ -59,14 +59,14 @@ private:
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		plib::pstring_vector_t &terminals() { return m_terminals; }
+		std::vector<pstring> &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		plib::pstring_vector_t m_terminals;
+		std::vector<pstring> m_terminals;
 	};
 
 	struct dev_t

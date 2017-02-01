@@ -51,43 +51,43 @@ enum
 
 
 #define MCFG_UPD7810_TO(_devcb) \
-	upd7810_device::set_to_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_to_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_CO0(_devcb) \
-	upd7810_device::set_co0_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_co0_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_CO1(_devcb) \
-	upd7810_device::set_co1_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_co1_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_TXD(_devcb) \
-	upd7810_device::set_txd_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_txd_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_RXD(_devcb) \
-	upd7810_device::set_rxd_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_rxd_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN0(_devcb) \
-	upd7810_device::set_an0_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an0_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN1(_devcb) \
-	upd7810_device::set_an1_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an1_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN2(_devcb) \
-	upd7810_device::set_an2_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an2_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN3(_devcb) \
-	upd7810_device::set_an3_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an3_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN4(_devcb) \
-	upd7810_device::set_an4_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an4_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN5(_devcb) \
-	upd7810_device::set_an5_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an5_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN6(_devcb) \
-	upd7810_device::set_an6_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an6_func(*device, DEVCB_##_devcb);
 
 #define MCFG_UPD7810_AN7(_devcb) \
-	upd7810_device::set_an7_func(*device, DEVCB_##_devcb);
+	devcb = &upd7810_device::set_an7_func(*device, DEVCB_##_devcb);
 
 
 class upd7810_device : public cpu_device

@@ -33,28 +33,28 @@
 
 
 #define MCFG_IEEE488_EOI_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_DAV_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NRFD_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_NDAC_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_IFC_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_SRQ_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_ATN_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_IEEE488_REN_CALLBACK(_write) \
-	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
+	devcb = &downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
 
 
 #define MCFG_IEEE488_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
@@ -92,14 +92,14 @@ public:
 	// construction/destruction
 	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> void set_eoi_callback(_write wr) { m_write_eoi.set_callback(wr); }
-	template<class _write> void set_dav_callback(_write wr) { m_write_dav.set_callback(wr); }
-	template<class _write> void set_nrfd_callback(_write wr) { m_write_nrfd.set_callback(wr); }
-	template<class _write> void set_ndac_callback(_write wr) { m_write_ndac.set_callback(wr); }
-	template<class _write> void set_ifc_callback(_write wr) { m_write_ifc.set_callback(wr); }
-	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
-	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
-	template<class _write> void set_ren_callback(_write wr) { m_write_ren.set_callback(wr); }
+	template<class _write> devcb_base &set_eoi_callback(_write wr) { return m_write_eoi.set_callback(wr); }
+	template<class _write> devcb_base &set_dav_callback(_write wr) { return m_write_dav.set_callback(wr); }
+	template<class _write> devcb_base &set_nrfd_callback(_write wr) { return m_write_nrfd.set_callback(wr); }
+	template<class _write> devcb_base &set_ndac_callback(_write wr) { return m_write_ndac.set_callback(wr); }
+	template<class _write> devcb_base &set_ifc_callback(_write wr) { return m_write_ifc.set_callback(wr); }
+	template<class _write> devcb_base &set_srq_callback(_write wr) { return m_write_srq.set_callback(wr); }
+	template<class _write> devcb_base &set_atn_callback(_write wr) { return m_write_atn.set_callback(wr); }
+	template<class _write> devcb_base &set_ren_callback(_write wr) { return m_write_ren.set_callback(wr); }
 
 	void add_device(ieee488_slot_device *slot, device_t *target);
 

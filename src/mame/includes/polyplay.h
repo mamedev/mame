@@ -42,6 +42,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	INTERRUPT_GEN_MEMBER(nmi_handler);
+
 	/* devices */
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_w);

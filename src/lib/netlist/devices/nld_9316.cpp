@@ -6,6 +6,7 @@
  */
 
 #include "nld_9316.h"
+#include "nl_base.h"
 
 #define MAXCNT 15
 

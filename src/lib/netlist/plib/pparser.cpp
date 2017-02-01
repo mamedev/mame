@@ -8,7 +8,8 @@
 #include <cstdarg>
 
 #include "pparser.h"
-#include "plib/palloc.h"
+#include "palloc.h"
+#include "putil.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
@@ -302,7 +303,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -383,7 +384,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	pstring_vector_t elems(line, m_expr_sep);
+	std::vector<pstring> elems(psplit(line, m_expr_sep));
 	pstringbuffer ret = "";
 	for (auto & elem : elems)
 	{
@@ -396,7 +397,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return ret;
 }
 
-static pstring catremainder(const pstring_vector_t &elems, std::size_t start, pstring sep)
+static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
 	pstringbuffer ret = "";
 	for (auto & elem : elems)
@@ -415,13 +416,13 @@ pstring  ppreprocessor::process_line(const pstring &line)
 	// FIXME ... revise and extend macro handling
 	if (lt.startsWith("#"))
 	{
-		pstring_vector_t lti(lt, " ", true);
+		std::vector<pstring> lti(psplit(lt, " ", true));
 		if (lti[0].equals("#if"))
 		{
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			pstring_vector_t t(lt.substr(3).replace(" ",""), m_expr_sep);
+			std::vector<pstring> t(psplit(lt.substr(3).replace(" ",""), m_expr_sep));
 			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);

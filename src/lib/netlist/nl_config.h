@@ -9,10 +9,7 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-#include <cstdint>
-
 #include "plib/pconfig.h"
-#include "plib/pchrono.h"
 
 //============================================================
 //  SETUP
@@ -33,7 +30,11 @@
  *
  */
 #define USE_MEMPOOL                 (0)
+
 #define USE_TRUTHTABLE              (1)
+
+// How many times do we try to resolve links (connections)
+#define NL_MAX_LINK_RESOLVE_LOOPS	(100)
 
 //============================================================
 //  Solver defines
@@ -66,20 +67,6 @@
 #define HAS_OPENMP (0)
 #endif
 
-//============================================================
-//  Performance tracking
-//============================================================
-
-namespace netlist
-{
-#if NL_KEEP_STATISTICS
-using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, true>;
-using nperfcount_t = plib::chrono::counter<true>;
-#else
-using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
-using nperfcount_t = plib::chrono::counter<false>;
-#endif
-}
 //============================================================
 //  General
 //============================================================

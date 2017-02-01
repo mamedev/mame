@@ -10,9 +10,6 @@
 
 #include <vector>
 #include <memory>
-#include <utility>
-
-#include "pconfig.h"
 #include "pstring.h"
 
 namespace plib {
@@ -31,7 +28,7 @@ template<typename T>
 void pfree(T *ptr) { delete ptr; }
 
 template<typename T>
-inline T* palloc_array(std::size_t num)
+inline T* palloc_array(const std::size_t num)
 {
 	return new T[num]();
 }

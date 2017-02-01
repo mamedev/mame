@@ -28,11 +28,9 @@
 
 namespace netlist
 {
-	using namespace netlist::analog;
-
 	namespace devices
 	{
-static void initialize_factory(factory::list_t &factory)
+	void initialize_factory(factory::list_t &factory)
 {
 	ENTRYX(R,                   RES,                    "R")
 	ENTRYX(POT,                 POT,                    "R")
@@ -162,10 +160,3 @@ static void initialize_factory(factory::list_t &factory)
 	} //namespace devices
 } // namespace netlist
 
-namespace netlist
-{
-	void initialize_factory(factory::list_t &factory)
-	{
-		devices::initialize_factory(factory);
-	}
-}

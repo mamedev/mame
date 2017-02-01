@@ -14,35 +14,35 @@
 
 // I/O ports setup
 #define MCFG_UCOM4_READ_A_CB(_devcb) \
-	ucom4_cpu_device::set_read_a_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_a_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_B_CB(_devcb) \
-	ucom4_cpu_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_b_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_C_CB(_devcb) \
-	ucom4_cpu_device::set_read_c_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_c_callback(*device, DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_C_CB(_devcb) \
-	ucom4_cpu_device::set_write_c_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_READ_D_CB(_devcb) \
-	ucom4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
 #define MCFG_UCOM4_WRITE_D_CB(_devcb) \
-	ucom4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_E_CB(_devcb) \
-	ucom4_cpu_device::set_write_e_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_e_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_F_CB(_devcb) \
-	ucom4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_G_CB(_devcb) \
-	ucom4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_H_CB(_devcb) \
-	ucom4_cpu_device::set_write_h_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_h_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_UCOM4_WRITE_I_CB(_devcb) \
-	ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
+	devcb = &ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
 
 enum
 {

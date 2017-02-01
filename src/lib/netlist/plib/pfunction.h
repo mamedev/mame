@@ -10,7 +10,6 @@
 
 #include <vector>
 
-#include "pconfig.h"
 #include "pstring.h"
 
 namespace plib {

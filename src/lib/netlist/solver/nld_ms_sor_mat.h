@@ -22,14 +22,14 @@ namespace netlist
 {
 	namespace devices
 	{
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 	friend class matrix_solver_t;
 
 public:
 
-	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
+	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
 		, m_Vdelta(*this, "m_Vdelta", 0.0)
 		, m_omega(*this, "m_omega", params->m_gs_sor)
@@ -58,7 +58,7 @@ private:
 // matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_SOR_mat_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
@@ -113,7 +113,7 @@ nl_double matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 }
 #endif
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
@@ -123,7 +123,7 @@ unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool 
 
 
 	nl_double new_v[storage_N] = { 0.0 };
-	const unsigned iN = this->N();
+	const std::size_t iN = this->N();
 
 	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();
 	matrix_solver_t::build_LE_RHS<matrix_solver_SOR_mat_t>();
@@ -169,14 +169,14 @@ unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool 
 	}
 #endif
 
-	for (unsigned k = 0; k < iN; k++)
-		new_v[k] = this->m_nets[k]->m_cur_Analog;
+	for (std::size_t k = 0; k < iN; k++)
+		new_v[k] = this->m_nets[k]->Q_Analog();
 
 	do {
 		resched = false;
 		nl_double cerr = 0.0;
 
-		for (unsigned k = 0; k < iN; k++)
+		for (std::size_t k = 0; k < iN; k++)
 		{
 			nl_double Idrive = 0;
 
@@ -199,10 +199,12 @@ unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool 
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
 	this->m_stat_calculations++;
+	this->m_iterative_total += resched_cnt;
 	this->m_gs_total += resched_cnt;
 
 	if (resched)
 	{
+		this->m_iterative_fail++;
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 		this->m_gs_fail++;
 

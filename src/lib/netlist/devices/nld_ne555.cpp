@@ -6,7 +6,7 @@
  */
 
 #include "nld_ne555.h"
-#include "analog/nld_twoterm.h"
+#include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 
 #define R_OFF (1E20)

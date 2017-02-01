@@ -414,7 +414,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0xc3:  // lanes 0, 1
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -425,7 +425,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0xa5:  // lanes 0, 2
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -436,7 +436,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 		case 0x3c:  // lanes 2,3
 			m_declaration_rom.resize(romlen*2);
-			memset(&m_declaration_rom[0], 0, romlen*4);
+			memset(&m_declaration_rom[0], 0, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];

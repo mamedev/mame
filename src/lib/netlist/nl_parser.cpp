@@ -8,7 +8,6 @@
 #include "nl_parser.h"
 #include "nl_factory.h"
 #include "nl_errstr.h"
-#include "devices/nld_truthtable.h"
 
 namespace netlist
 {
@@ -187,7 +186,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			netlist::devices::tt_factory_create(m_setup, desc, nlname);
+			m_setup.tt_factory_create(desc, nlname);
 			return;
 		}
 	}
@@ -293,7 +292,7 @@ void parser_t::net_c()
 
 void parser_t::dippins()
 {
-	plib::pstring_vector_t pins;
+	std::vector<pstring> pins;
 
 	pins.push_back(get_identifier());
 	require_token(m_tok_comma);
@@ -350,7 +349,7 @@ void parser_t::netdev_hint()
 void parser_t::device(const pstring &dev_type)
 {
 	factory::element_t *f = m_setup.factory().factory_by_name(dev_type);
-	auto paramlist = plib::pstring_vector_t(f->param_desc(), ",");
+	auto paramlist = plib::psplit(f->param_desc(), ",");
 
 	pstring devname = get_identifier();
 

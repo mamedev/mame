@@ -7,15 +7,12 @@
  *      Author: andre
  */
 
-#ifndef NLD_TRUTHTABLE_H_
-#define NLD_TRUTHTABLE_H_
-
-#include <new>
-#include <cstdint>
+#ifndef NLID_TRUTHTABLE_H_
+#define NLID_TRUTHTABLE_H_
 
 #include "nl_setup.h"
-#include "nl_factory.h"
-#include "plib/plists.h"
+#include "nl_base.h"
+#include "plib/putil.h"
 
 #define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                     \
 	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>               \
@@ -112,10 +109,10 @@ namespace netlist
 		{
 		}
 
-		void setup(const plib::pstring_vector_t &desc, uint_least64_t disabled_ignore);
+		void setup(const std::vector<pstring> &desc, uint_least64_t disabled_ignore);
 
 	private:
-		void help(unsigned cur, plib::pstring_vector_t list,
+		void help(unsigned cur, std::vector<pstring> list,
 				uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
 		static unsigned count_bits(uint_least64_t v);
 		static uint_least64_t set_bits(uint_least64_t v, uint_least64_t b);
@@ -176,7 +173,7 @@ namespace netlist
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-				truthtable_t *ttp, const plib::pstring_vector_t &desc)
+				truthtable_t *ttp, const std::vector<pstring> &desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
@@ -193,12 +190,12 @@ namespace netlist
 
 			pstring header = m_desc[0];
 
-			plib::pstring_vector_t io(header,"|");
+			std::vector<pstring> io(plib::psplit(header,"|"));
 			// checks
 			nl_assert_always(io.size() == 2, "too many '|'");
-			plib::pstring_vector_t inout(io[0], ",");
+			std::vector<pstring> inout(plib::psplit(io[0], ","));
 			nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-			plib::pstring_vector_t out(io[1], ",");
+			std::vector<pstring> out(plib::psplit(io[1], ","));
 			nl_assert_always(out.size() == m_NO, "output count wrong");
 
 			for (std::size_t i=0; i < m_NI; i++)
@@ -363,19 +360,18 @@ namespace netlist
 		state_var_u32       m_ign;
 		state_var_s32       m_active;
 		truthtable_t *      m_ttp;
-		plib::pstring_vector_t m_desc;
+		std::vector<pstring> m_desc;
 	};
 
 	class netlist_base_factory_truthtable_t : public factory::element_t
 	{
-		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 	public:
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
 
 		virtual ~netlist_base_factory_truthtable_t();
 
-		plib::pstring_vector_t m_desc;
+		std::vector<pstring> m_desc;
 		const logic_family_desc_t *m_family;
 	};
 
@@ -386,4 +382,4 @@ namespace netlist
 
 
 
-#endif /* NLD_TRUTHTABLE_H_ */
+#endif /* NLID_TRUTHTABLE_H_ */

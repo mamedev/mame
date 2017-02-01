@@ -9,13 +9,8 @@
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
 
-#include <type_traits>
-
-#include "nl_config.h"
 #include "plib/palloc.h"
-#include "plib/plists.h"
-#include "plib/putil.h"
-#include "nl_base.h"
+#include "plib/ptypes.h"
 
 #define NETLIB_DEVICE_IMPL(chip) \
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
@@ -33,15 +28,18 @@
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
-namespace netlist { namespace factory
-{
+namespace netlist {
+	class netlist_t;
+	class device_t;
+	class setup_t;
+
+namespace factory {
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
 
-	class element_t
+	class element_t : plib::nocopyassignmove
 	{
-		P_PREVENT_COPYING(element_t)
 	public:
 		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param);
@@ -67,7 +65,6 @@ namespace netlist { namespace factory
 	template <class C>
 	class device_element_t : public element_t
 	{
-		P_PREVENT_COPYING(device_element_t)
 	public:
 		device_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
@@ -107,7 +104,7 @@ namespace netlist { namespace factory
 
 	private:
 		setup_t &m_setup;
-};
+	};
 
 	// -----------------------------------------------------------------------------
 	// factory_creator_ptr_t
@@ -127,35 +124,26 @@ namespace netlist { namespace factory
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
-	class NETLIB_NAME(wrapper) : public device_t
-	{
-	public:
-		NETLIB_NAME(wrapper)(netlist_t &anetlist, const pstring &name)
-		: device_t(anetlist, name)
-		{
-		}
-	protected:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-	};
-
 	class library_element_t : public element_t
 	{
-		P_PREVENT_COPYING(library_element_t)
 	public:
 
 		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &source)
-		: element_t(name, classname, def_param, source), m_setup(setup) {  }
+		: element_t(name, classname, def_param, source) {  }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
 
 		void macro_actions(netlist_t &anetlist, const pstring &name) override;
 
 	private:
-		setup_t &m_setup;
 	};
 
-} }
+	}
+
+	namespace devices {
+		void initialize_factory(factory::list_t &factory);
+	}
+}
 
 #endif /* NLFACTORY_H_ */

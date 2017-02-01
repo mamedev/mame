@@ -9,11 +9,18 @@
 
 #include <limits>
 
-#include "pconfig.h"
 #include "pstring.h"
 #include "ptypes.h"
 
 namespace plib {
+
+P_ENUM(plog_level,
+	DEBUG,
+	INFO,
+	VERBOSE,
+	WARNING,
+	ERROR,
+	FATAL)
 
 template <typename T>
 struct ptype_traits_base
@@ -176,23 +183,21 @@ private:
 	unsigned m_arg;
 };
 
-P_ENUM(plog_level,
-	DEBUG,
-	INFO,
-	VERBOSE,
-	WARNING,
-	ERROR,
-	FATAL)
-
 class plog_dispatch_intf;
 
 template <bool build_enabled = true>
-class pfmt_writer_t
+class pfmt_writer_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(pfmt_writer_t)
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
 	virtual ~pfmt_writer_t() { }
+
+	/* runtime enable */
+	template<bool enabled, typename... Args>
+	void log(const pstring fmt, Args&&... args) const
+	{
+		if (build_enabled && enabled && m_enabled) (*this)(fmt, std::forward<Args>(args)...);
+	}
 
 	void operator ()(const pstring fmt) const
 	{
@@ -244,7 +249,7 @@ private:
 
 };
 
-template <plog_level::e L, bool build_enabled = true>
+template <plog_level::E L, bool build_enabled = true>
 class plog_channel : public pfmt_writer_t<build_enabled>
 {
 public:
@@ -260,7 +265,7 @@ private:
 
 class plog_dispatch_intf
 {
-	template<plog_level::e, bool> friend class plog_channel;
+	template<plog_level::E, bool> friend class plog_channel;
 
 public:
 	virtual ~plog_dispatch_intf();
@@ -292,7 +297,7 @@ public:
 };
 
 
-template <plog_level::e L, bool build_enabled>
+template <plog_level::E L, bool build_enabled>
 void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
 {
 	m_base->vlog(L, ls);

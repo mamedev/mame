@@ -5,7 +5,7 @@
  *
  */
 
-#include "nld_truthtable.h"
+#include  "nlid_truthtable.h"
 #include "plib/plists.h"
 #include "nl_setup.h"
 #include "plib/palloc.h"
@@ -17,7 +17,6 @@ namespace netlist
 	template<unsigned m_NI, unsigned m_NO>
 	class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 	{
-		P_PREVENT_COPYING(netlist_factory_truthtable_t)
 	public:
 		netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring  &sourcefile)
@@ -121,7 +120,7 @@ uint_least64_t truthtable_desc_t::get_ignored_extended(uint_least64_t state)
 // desc
 // ----------------------------------------------------------------------------------------
 
-void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
+void truthtable_desc_t::help(unsigned cur, std::vector<pstring> list,
 		uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 {
 	pstring elem = list[cur].trim();
@@ -166,7 +165,7 @@ void truthtable_desc_t::help(unsigned cur, plib::pstring_vector_t list,
 	}
 }
 
-void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_least64_t disabled_ignore)
+void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least64_t disabled_ignore)
 {
 	unsigned line = 0;
 
@@ -186,14 +185,14 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 
 	while (!ttline.equals(""))
 	{
-		plib::pstring_vector_t io(ttline,"|");
+		std::vector<pstring> io(plib::psplit(ttline,"|"));
 		// checks
 		nl_assert_always(io.size() == 3, "io.count mismatch");
-		plib::pstring_vector_t inout(io[0], ",");
+		std::vector<pstring> inout(plib::psplit(io[0], ","));
 		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		plib::pstring_vector_t out(io[1], ",");
+		std::vector<pstring> out(plib::psplit(io[1], ","));
 		nl_assert_always(out.size() == m_NO, "output count not matching");
-		plib::pstring_vector_t times(io[2], ",");
+		std::vector<pstring> times(plib::psplit(io[2], ","));
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		uint_least64_t val = 0;

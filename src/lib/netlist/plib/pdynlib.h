@@ -7,10 +7,6 @@
 #ifndef PDYNLIB_H_
 #define PDYNLIB_H_
 
-#include <cstdarg>
-#include <cstddef>
-
-#include "pconfig.h"
 #include "pstring.h"
 
 namespace plib {

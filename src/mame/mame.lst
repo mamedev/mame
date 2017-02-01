@@ -1457,6 +1457,7 @@ mystgard
 orchidms
 oscara5
 pantmag
+pantmaga
 partygrs                        // (c) 2001
 partygrsa                        // (c) 2001
 peaflut
@@ -12568,6 +12569,7 @@ magicrd2                        // (c) 1996 Impera
 magicrd2a                       // (c) 1996 Impera
 magicrd2b                       // (c) 1996 Impera
 magicrd2c                       // (c) 1996 Impera
+megacard                        // (c) 1993 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
 novoplay                        // (c) 1986 Novomatic
@@ -13969,6 +13971,7 @@ jamesb                          //
 jamesb2                         //
 marsp                           //
 marspf                          //
+marspp                          //
 panthera                        //
 pnkpnthr                        //
 s80tst                          //
@@ -14008,37 +14011,71 @@ touchdn                         //
 @source:gts80b.cpp
 amazonh2                        //
 amazonh3                        //
+amazonh3a                       //
 arena                           //
 arenaa                          //
+arenaf                          //
+arenag                          //
 badgirls                        //
+badgirlsf                       //
+badgirlsg                       //
 bighouse                        //
+bighousef                       //
+bighouseg                       //
 bonebstr                        //
 bonebstrf                       //
+bonebstrg                       //
 bountyh                         //
+bountyhg                        //
 diamondp                        //
+diamondpf                       //
+diamondpg                       //
 excalibr                        //
+excalibrf                       //
 genesisp                        //
+genesispf                       //
+genesispg                       //
 goldwing                        //
+goldwingf                       //
+goldwingg                       //
 hlywoodh                        //
+hlywoodhf                       //
+hlywoodhg                       //
 hotshots                        //
+hotshotsf                       //
+hotshotsg                       //
 mntecrlo                        //
+mntecrlo2                       //
 mntecrloa                       //
+mntecrlof                       //
+mntecrlog                       //
 nmoves                          //
 raven                           //
 ravena                          //
+raveng                          //
 robowars                        //
+robowarsf                       //
 rock                            //
+rockg                           //
 rock_enc                        //
+rock_encg                       //
 s80btest                        //
 sprbreak                        //
 sprbreaka                       //
+sprbreakf                       //
+sprbreakg                       //
 sprbreaks                       //
 tagteamp                        //
 tagteamp2                       //
+tagteampg                       //
 triplay                         //
 triplaya                        //
 txsector                        //
+txsectorf                       //
+txsectorg                       //
 victoryp                        //
+victorypf                       //
+victorypg                       //
 
 @source:guab.cpp
 crisscrs                        // (c) 1986
@@ -14211,6 +14248,7 @@ einvaderc                       // Entex
 funjacks                        // Mattel
 funrlgl                         // Mattel
 h2hbaskb                        // Coleco
+lchicken                        // LJN
 lightfgt                        // Milton Bradley
 mdallas                         // Mattel
 plus1                           // Milton Bradley
@@ -29142,6 +29180,7 @@ redfoxwp2a                      // (c) 1998 (China)
 redhawk                         // (c) 1997 New Vision Ent. license
 redhawkb                        // (c) 1997
 redhawke                        // (c) 1997 Excellent Co., Ltd license
+redhawkg                        // (c) 1997
 redhawki                        // (c) 1997 Haedong Corp. license
 redhawkk                        // (c) 1997
 sabotenb                        // (c) 1992 NMK / Tecmo
@@ -32008,8 +32047,11 @@ pool_p7                         //
 radcl_g1                        //
 radcl_l1                        //
 radcl_p3                        //
+rollr_d2                        //
 rollr_e1                        //
 rollr_ex                        //
+rollr_f2                        //
+rollr_f3                        //
 rollr_g3                        //
 rollr_l2                        //
 rollr_l3                        //
@@ -34657,8 +34699,9 @@ galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk                       // 1997.04 (c) 1997 Kaneko (Korea)
-galpans2                        // 1999.02 (c) 1999 Kaneko (Japan)
+galpans2                        // 1999.?? (c) 1999 Kaneko (Europe)
 galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
+galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
 galpans3                        // 2002.07 (c) 2002 Kaneko (Japan)
 galpansu                        // 1999.?? (c) 1999 Kaneko (Korea)
 gutsn                           // 2000.06 (c) 2000 Kaneko / Kouyousha (Japan)
@@ -38007,6 +38050,7 @@ sfex2p                          // Street Fighter EX 2 Plus (USA 990611)
 sfex2pa                         // Street Fighter EX 2 Plus (ASIA 990611)
 sfex2ph                         // Street Fighter EX 2 Plus (HISPANIC 990611)
 sfex2pj                         // Street Fighter EX 2 Plus (JAPAN 990611)
+sfex2u1                         // Street Fighter EX 2 (USA 980312)
 sfexa                           // Street Fighter EX (ASIA 961219)
 sfexj                           // Street Fighter EX (JAPAN 961130)
 sfexp                           // Street Fighter EX Plus (USA 970407)

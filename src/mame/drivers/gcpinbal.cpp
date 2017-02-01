@@ -254,6 +254,8 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 /* Controlled through ioc? */
 WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
+	if (!state)
+		return;
 	if (m_adpcm_idle)
 		m_msm->reset_w(1);
 	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
@@ -266,8 +268,8 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 	{
 		uint8_t *ROM = memregion("msm")->base();
 
-		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
-		m_msm->data_w(m_adpcm_data & 0xf);
+		m_adpcm_select->ab_w(ROM[m_adpcm_start]);
+		m_adpcm_select->select_w(m_adpcm_trigger);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 			m_adpcm_start++;
@@ -496,6 +498,9 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
 	MCFG_MSM6585_VCLK_CB(WRITELINE(gcpinbal_state, gcp_adpcm_int))      /* VCK function */

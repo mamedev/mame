@@ -6,6 +6,7 @@
  */
 
 #include <cstring>
+#include <cmath>
 
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
@@ -216,22 +217,22 @@ detail::device_object_t::device_object_t(core_device_t &dev, const pstring &anam
 {
 }
 
-detail::core_terminal_t::type_t detail::core_terminal_t::type() const
+detail::terminal_type detail::core_terminal_t::type() const
 {
 	if (dynamic_cast<const terminal_t *>(this) != nullptr)
-		return type_t::TERMINAL;
+		return terminal_type::TERMINAL;
 	else if (dynamic_cast<const logic_input_t *>(this) != nullptr)
-		return type_t::INPUT;
+		return terminal_type::INPUT;
 	else if (dynamic_cast<const logic_output_t *>(this) != nullptr)
-		return type_t::OUTPUT;
+		return terminal_type::OUTPUT;
 	else if (dynamic_cast<const analog_input_t *>(this) != nullptr)
-		return type_t::INPUT;
+		return terminal_type::INPUT;
 	else if (dynamic_cast<const analog_output_t *>(this) != nullptr)
-		return type_t::OUTPUT;
+		return terminal_type::OUTPUT;
 	else
 	{
 		netlist().log().fatal(MF_1_UNKNOWN_TYPE_FOR_OBJECT, name());
-		return type_t::TERMINAL; // please compiler
+		return terminal_type::TERMINAL; // please compiler
 	}
 }
 
@@ -319,6 +320,7 @@ void netlist_t::start()
 
 	/* create devices */
 
+	log().debug("Creating devices ...\n");
 	for (auto & e : setup().m_device_factory)
 	{
 		if ( !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
@@ -341,9 +343,12 @@ void netlist_t::start()
 			auto p = setup().m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
 			if (p != setup().m_param_values.end())
 			{
-				//FIXME: Error checking
-				auto v = p->second.as_long();
-				d->set_hint_deactivate(!v);
+				//FIXME: turn this into a proper function
+				bool error;
+				auto v = p->second.as_double(&error);
+				if (error || std::abs(v - std::floor(v)) > 1e-6 )
+					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
+				d->set_hint_deactivate(v == 0.0);
 			}
 		}
 		else
@@ -356,6 +361,25 @@ void netlist_t::start()
 	/* resolve inputs */
 	setup().resolve_inputs();
 
+	/* Make sure devices are fully created - now done in register_dev */
+
+	log().debug("Setting delegate pointers ...\n");
+	for (auto &dev : m_devices)
+		dev->set_delegate_pointer();
+
+	log().verbose("looking for two terms connected to rail nets ...");
+	for (auto & t : get_device_list<analog::NETLIB_NAME(twoterm)>())
+	{
+		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		{
+			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
+				t->name(), t->m_N.net().name(), t->m_P.net().name());
+			t->m_N.net().remove_terminal(t->m_N);
+			t->m_P.net().remove_terminal(t->m_P);
+			remove_dev(t);
+		}
+	}
+
 	log().verbose("initialize solver ...\n");
 
 	if (m_solver == nullptr)
@@ -366,12 +390,6 @@ void netlist_t::start()
 	}
 	else
 		m_solver->post_start();
-
-	/* finally, set the pointers */
-
-	log().debug("Setting delegate pointers ...\n");
-	for (auto &dev : m_devices)
-		dev->set_delegate_pointer();
 
 }
 
@@ -422,16 +440,16 @@ void netlist_t::reset()
 		dev->update_param();
 
 	// Step all devices once !
+	/*
+	 * INFO: The order here affects power up of e.g. breakout. However, such
+	 * variations are explicitly stated in the breakout manual.
+	 */
 #if 0
 	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_dev();
 	}
 #else
-	/* FIXME: this makes breakout attract mode working again.
-	 * It is however not acceptable that this depends on the startup order.
-	 * Best would be, if reset would call update_dev for devices which need it.
-	 */
 	std::size_t i = m_devices.size();
 	while (i>0)
 		m_devices[--i]->update_dev();
@@ -692,10 +710,9 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_active(*this, "m_active", 0)
 	, m_in_queue(*this, "m_in_queue", 2)
-	, m_railterminal(nullptr)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
+	, m_railterminal(mr)
 {
-	m_railterminal = mr;
 }
 
 detail::net_t::~net_t()
@@ -926,16 +943,20 @@ terminal_t::~terminal_t()
 
 void terminal_t::schedule_solve()
 {
-	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != nullptr)
-		net().solver()->update_forced();
+	// Nets may belong to railnets which do not have a solver attached
+	// FIXME: Enforce that all terminals get connected?
+	if (this->has_net())
+		if (net().solver() != nullptr)
+			net().solver()->update_forced();
 }
 
 void terminal_t::schedule_after(const netlist_time &after)
 {
-	// FIXME: Remove this after we found a way to remove *ALL* twoterms connected to railnets only.
-	if (net().solver() != nullptr)
-		net().solver()->update_after(after);
+	// Nets may belong to railnets which do not have a solver attached
+	// FIXME: Enforce that all terminals get connected?
+	if (this->has_net())
+		if (net().solver() != nullptr)
+			net().solver()->update_after(after);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -995,7 +1016,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
-	net().m_cur_Analog = NL_FCONST(0.0);
+	//net().m_cur_Analog = NL_FCONST(0.0);
 	netlist().setup().register_term(*this);
 }
 
@@ -1005,7 +1026,7 @@ analog_output_t::~analog_output_t()
 
 void analog_output_t::initial(const nl_double val)
 {
-	net().m_cur_Analog = val;
+	net().set_Q_Analog(val);
 }
 
 // -----------------------------------------------------------------------------

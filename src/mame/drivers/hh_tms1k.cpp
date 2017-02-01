@@ -167,7 +167,7 @@
 #include "elecdet.lh"
 #include "esbattle.lh"
 #include "esoccer.lh"
-//#include "f2pbball.lh"
+#include "f2pbball.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -3395,6 +3395,19 @@ MACHINE_CONFIG_END
   - USA: 2 Player Baseball, distributed by Sears
   - Canada: 2 Player Baseball, distributed by Talbot Electronics
 
+  led translation table: led zz from game PCB = MAME y.x:
+
+    0 = -     10 = 2.2   20 = 4.0   30 = 4.4
+    1 = 2.3   11 = 3.3   21 = 2.7   31 = 3.7
+    2 = 0.4   12 = 1.2   22 = 0.0   32 = 4.3
+    3 = 3.2   13 = 2.4   23 = 4.1   33 = 4.6
+    4 = 0.5   14 = 1.0   24 = 3.1   34 = 3.5
+    5 = 0.3   15 = 2.1   25 = 0.2   35 = 4.5
+    6 = 3.4   16 = 1.1   26 = 0.1
+    7 = 1.3   17 = 4.7   27 = 4.2
+    8 = 1.4   18 = 2.0   28 = 3.0
+    9 = 1.7   19 = 0.7   29 = 1.5
+
 ***************************************************************************/
 
 class f2pbball_state : public hh_tms1k_state
@@ -3417,7 +3430,7 @@ public:
 void f2pbball_state::prepare_display()
 {
 	// R5-R8 are 7segs
-	set_display_segmask(0x1e0, 0xff);
+	set_display_segmask(0x1e0, 0x7f);
 	display_matrix(8, 9, m_o, m_r);
 }
 
@@ -3437,7 +3450,7 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 WRITE16_MEMBER(f2pbball_state::write_o)
 {
 	// O0-O7: led state
-	m_o = BITSWAP8(data,0,7,2,6,5,4,3,1);
+	m_o = BITSWAP8(data,0,7,6,5,4,3,2,1);
 	prepare_display();
 }
 
@@ -3452,7 +3465,7 @@ READ8_MEMBER(f2pbball_state::read_k)
 
 static INPUT_PORTS_START( f2pbball )
 	PORT_START("IN.0") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("Pick Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Pick Off")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x0c, 0x04, "Players" )
 	PORT_CONFSETTING(    0x04, "1" )
@@ -3460,19 +3473,19 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.1") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Score")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Steal")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pitch")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Steal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pitch")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Swing")
 
 	PORT_START("IN.2") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("Curve Left")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("Slow")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("Curve Right")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("Fast")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Curve Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Slow")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Curve Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, f2pbball_state, reset_button, 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
@@ -3490,8 +3503,7 @@ static MACHINE_CONFIG_START( f2pbball, f2pbball_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(f2pbball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
-	//MCFG_DEFAULT_LAYOUT(layout_f2pbball)
+	MCFG_DEFAULT_LAYOUT(layout_f2pbball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

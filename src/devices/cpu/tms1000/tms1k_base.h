@@ -18,11 +18,11 @@
 
 // K input pins
 #define MCFG_TMS1XXX_READ_K_CB(_devcb) \
-	tms1k_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	devcb = &tms1k_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 
 // O/Segment output pins
 #define MCFG_TMS1XXX_WRITE_O_CB(_devcb) \
-	tms1k_base_device::set_write_o_callback(*device, DEVCB_##_devcb);
+	devcb = &tms1k_base_device::set_write_o_callback(*device, DEVCB_##_devcb);
 
 // Use this if the output PLA is unknown:
 // If the microinstructions (or other) PLA is unknown, try using one from another romset.
@@ -31,11 +31,11 @@
 
 // R output pins (also called D on some chips)
 #define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
-	tms1k_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
+	devcb = &tms1k_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
 // OFF request on TMS0980 and up
 #define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
-	tms1k_base_device::set_power_off_callback(*device, DEVCB_##_devcb);
+	devcb = &tms1k_base_device::set_power_off_callback(*device, DEVCB_##_devcb);
 
 
 // pinout reference

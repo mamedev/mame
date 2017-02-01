@@ -51,7 +51,45 @@ ToDo:
 - Get rid of ROM patches in Sly Spy and Hippodrome;
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified;
-- Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
+- Finally, get a proper decap of the MCUs used by Drangonninja and Birdie Try;
+
+
+Bad Dudes MCU dump came from an MCU that had been damaged during a misguided
+attempt at decapping.  Data didn't read consistently, and the final dump was
+built up from multiple dumps by taking the most common value for each location.
+It appears there may be one bit error in the dump.  The MCU implements a
+command to calculate a program ROM checksum and compare the low byte of the
+result to a value supplied by the host CPU, but with the dump as-is, it doesn't
+work.  Here's the code in question:
+
+0AB0: 51 50    acall   $0A50
+0AB2: C3       clr     c
+0AB3: 48       orl     a,r0
+0AB4: 70 02    jnz     $0AB8
+0AB6: 80 89    sjmp    $0A41
+0AB8: 21 F0    ajmp    $09F0
+
+The function at $0A50 reads the expected value from the host, $0A41 is the
+normal command response, and $09F0 is the error response.  The orl instruction
+doesn't make sense here.  However, changing it from 48 to 60 makes it an xrl
+instruction which would work as expected.
+
+Unfortunately the game doesn't issue this command during the attract loop or
+first level, so I haven't been able to test it.  I can't even use the checksum
+function to verify that the program is good because the expected value mod 256
+has to be supplied by the host.
+
+The current Dragonninja MCU program was made by hacking the expected startup
+synchronisation command in the Bad Dudes MCU program (location $09A4 changed
+from $0B to $03).  There may be other differences in a real Dragonninja MCU.
+The table of expected values for command 7 is the same for Dragonninja (from
+debugging main CPU program).
+
+Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
+$3B), $07 (return table index if parameter matches table otherwise reset) and
+$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
+startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
+Dudes).  Most of the MCU program isn't utilised.
 
 
 PCB Layouts
@@ -1561,6 +1599,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
 
+	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( drgninjab, dec0 )
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
@@ -1803,8 +1851,8 @@ ROM_START( baddudes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ei07.8a",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ei31.9a",   0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - see notes */
+	ROM_LOAD( "ei31.9a",   0x0000, 0x1000, CRC(2a8745d2) SHA1(f15ab17b1e7836d603135f5c66ca2e3d72f6e4a2) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "ei25.15j",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
@@ -1846,8 +1894,8 @@ ROM_START( drgninja )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - using hacked baddudes program */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, CRC(c3f6bc70) SHA1(3c80197dc70c6cb283df5d11d29a9d9baabcd99b) BAD_DUMP )
 
 	/* various graphic and sound roms also differ when compared to baddudes */
 
@@ -3389,8 +3437,8 @@ DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE/DEVICE,   INIT, MONITOR,COMPANY,                 FULLNAME,            FLAGS
 GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state,  hbarrel, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state,  hbarrel, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, birdtry,    0,        birdtry,  birdtry,  dec0_state,  birdtry, ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection controls game related data, impossible to emulate without a working PCB
 GAME( 1988, robocop,    0,        robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopw,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
@@ -3416,17 +3464,15 @@ GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-
-
+GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, robocop,    ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj, midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
 GAME( 1988, automat,    robocop,  automat,  robocop,  dec0_state,  robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?

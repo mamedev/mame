@@ -21,12 +21,12 @@ namespace netlist
 {
 	namespace devices
 	{
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const unsigned size)
+	matrix_solver_SOR_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		{
@@ -46,16 +46,16 @@ private:
 // ----------------------------------------------------------------------------------------
 
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_SOR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
 }
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	const unsigned iN = this->N();
+	const std::size_t iN = this->N();
 	bool resched = false;
 	unsigned resched_cnt = 0;
 
@@ -74,7 +74,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	nl_double RHS[storage_N];
 	nl_double new_V[storage_N];
 
-	for (unsigned k = 0; k < iN; k++)
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		nl_double gtot_t = 0.0;
 		nl_double gabs_t = 0.0;
@@ -86,7 +86,7 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
 		const nl_double * const *other_cur_analog = this->m_terms[k]->connected_net_V();
 
-		new_V[k] = this->m_nets[k]->m_cur_Analog;
+		new_V[k] = this->m_nets[k]->Q_Analog();
 
 		for (std::size_t i = 0; i < term_count; i++)
 		{
@@ -125,17 +125,10 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	/* uncommenting the line below will force dynamic updates every X iterations
-	 * althought the system has not converged yet. This is a proof of concept,
-	 *
-	 */
-	const bool interleaved_dynamic_updates = false;
-	//const bool interleaved_dynamic_updates = newton_raphson;
-
 	do {
 		resched = false;
 		nl_double err = 0;
-		for (unsigned k = 0; k < iN; k++)
+		for (std::size_t k = 0; k < iN; k++)
 		{
 			const int * RESTRICT net_other = this->m_terms[k]->connected_net_idx();
 			const std::size_t railstart = this->m_terms[k]->m_railstart;
@@ -156,29 +149,20 @@ unsigned matrix_solver_SOR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 		resched_cnt++;
 	//} while (resched && (resched_cnt < this->m_params.m_gs_loops));
-	} while (resched && ((!interleaved_dynamic_updates && resched_cnt < this->m_params.m_gs_loops) || (interleaved_dynamic_updates && resched_cnt < 5 )));
+	} while (resched && ((resched_cnt < this->m_params.m_gs_loops)));
 
 	this->m_iterative_total += resched_cnt;
+	this->m_stat_calculations++;
 
-	if (resched && !interleaved_dynamic_updates)
+	if (resched)
 	{
 		// Fallback to direct solver ...
 		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
-	this->m_stat_calculations++;
-
-	if (interleaved_dynamic_updates)
-	{
-		for (unsigned k = 0; k < iN; k++)
-			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
-	}
-	else
-	{
-		for (unsigned k = 0; k < iN; k++)
-			this->m_nets[k]->m_cur_Analog = new_V[k];
-	}
+	for (std::size_t k = 0; k < iN; k++)
+		this->m_nets[k]->set_Q_Analog(new_V[k]);
 
 	return resched_cnt;
 }
