@@ -12228,6 +12228,12 @@ fc100                           //
 
 @source:fccpu20.cpp
 fccpu20sbc
+fccpu21ssbc
+fccpu21sbc
+fccpu21asbc
+fccpu21yasbc
+fccpu21bsbc
+fccpu21ybsbc
 
 @source:fccpu30.cpp
 fccpu30
