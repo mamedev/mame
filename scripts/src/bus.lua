@@ -428,6 +428,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/devices/bus/c64/silverrock.h",
 		MAME_DIR .. "src/devices/bus/c64/simons_basic.cpp",
 		MAME_DIR .. "src/devices/bus/c64/simons_basic.h",
+		MAME_DIR .. "src/devices/bus/c64/speakeasy.cpp",
+		MAME_DIR .. "src/devices/bus/c64/speakeasy.h",
 		MAME_DIR .. "src/devices/bus/c64/stardos.cpp",
 		MAME_DIR .. "src/devices/bus/c64/stardos.h",
 		MAME_DIR .. "src/devices/bus/c64/std.cpp",

@@ -2,7 +2,8 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Personal Peripheral Products SpeakEasy cartridge emulation
+    Personal Peripheral Products Speakeasy cartridge emulation
+    (aka Protecto Enterprizes VIC-20 Voice Synthesizer)
 
 **********************************************************************/
 

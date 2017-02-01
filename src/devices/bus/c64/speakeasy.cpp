@@ -2,8 +2,7 @@
 // copyright-holders:smf
 /**********************************************************************
 
-    Personal Peripheral Products Speakeasy cartridge emulation
-    (aka Protecto Enterprizes VIC-20 Voice Synthesizer)
+    Personal Peripheral Products Speakeasy 64 cartridge emulation
 
 **********************************************************************/
 
@@ -23,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_SPEAKEASY = &device_creator<vic20_speakeasy_t>;
+const device_type C64_SPEAKEASY = &device_creator<c64_speakeasy_t>;
 
 
 //-------------------------------------------------
@@ -43,7 +42,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor vic20_speakeasy_t::device_mconfig_additions() const
+machine_config_constructor c64_speakeasy_t::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( speakeasy );
 }
@@ -55,12 +54,12 @@ machine_config_constructor vic20_speakeasy_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  vic20_speakeasy_t - constructor
+//  c64_speakeasy_t - constructor
 //-------------------------------------------------
 
-vic20_speakeasy_t::vic20_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VIC20_SPEAKEASY, "Speakeasy", tag, owner, clock, "speakeasy", __FILE__),
-	device_vic20_expansion_card_interface(mconfig, *this),
+c64_speakeasy_t::c64_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_SPEAKEASY, "Speakeasy 64", tag, owner, clock, "speakeasy64", __FILE__),
+	device_c64_expansion_card_interface(mconfig, *this),
 	m_votrax(*this, SC01A_TAG)
 {
 }
@@ -70,18 +69,18 @@ vic20_speakeasy_t::vic20_speakeasy_t(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void vic20_speakeasy_t::device_start()
+void c64_speakeasy_t::device_start()
 {
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_speakeasy_t::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t c64_speakeasy_t::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io2)
+	if (!io1)
 	{
 		return m_votrax->request() << 7;
 	}
@@ -91,12 +90,12 @@ uint8_t vic20_speakeasy_t::vic20_cd_r(address_space &space, offs_t offset, uint8
 
 
 //-------------------------------------------------
-//  vic20_cd_w - cartridge data write
+//  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_speakeasy_t::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void c64_speakeasy_t::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io2)
+	if (!io1)
 	{
 		m_votrax->write(space, 0, data & 0x3f);
 		m_votrax->inflection_w(space, 0, data >> 6);

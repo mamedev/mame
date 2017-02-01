@@ -339,6 +339,7 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 #include "sfx_sound_expander.h"
 #include "silverrock.h"
 #include "simons_basic.h"
+#include "speakeasy.h"
 #include "stardos.h"
 #include "std.h"
 #include "structured_basic.h"
@@ -375,6 +376,7 @@ SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("reu1750", C64_REU1750)
 	SLOT_INTERFACE("reu1764", C64_REU1764)
 	SLOT_INTERFACE("sfxse", C64_SFX_SOUND_EXPANDER)
+	SLOT_INTERFACE("speakez", C64_SPEAKEASY)
 	SLOT_INTERFACE("supercpu", C64_SUPERCPU)
 	SLOT_INTERFACE("swiftlink", C64_SWIFTLINK)
 	SLOT_INTERFACE("turbo232", C64_TURBO232)
