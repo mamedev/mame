@@ -5500,7 +5500,7 @@ ROM_END
 
 */
 
-ROM_START( megamc3 )
+ROM_START( megacard )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
 	ROM_LOAD( "mega_mc3_210-f-1.ic37",  0x8000, 0x8000, CRC(747f5ed1) SHA1(06757bb6a792dca93978b17b54c28e413e3720b1) )  /* just the 2nd half */
 	ROM_LOAD( "mega_mc3_210-f-2.ic41",  0x4000, 0x8000, CRC(373094d2) SHA1(8aed2502e89b0e7522e88f351ac256f1afad7ee8) )  /* just the 2nd half */
@@ -5508,9 +5508,8 @@ ROM_START( megamc3 )
 	ROM_REGION( 0x0300, "decode", 0 )  /* from the 65SC02 die inside of the custom CPU */
 	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
 
-	ROM_REGION( 0x1000, "decode2", 0 )  /* from the CY7C291A inside of the custom CPU */
-	ROM_LOAD( "cy7291a.bin",    0x0000, 0x0800, CRC(34d256b3) SHA1(4f1da3d445dcb349def999720d05258f1d1a1ec3) )  /* dumped with programmer #1 */
-	ROM_LOAD( "cy7291a_.bin",   0x0800, 0x0800, CRC(d79a7842) SHA1(6fb17db38113a28750f6af7bf1cb9fdd46fa6dec) )  /* dumped with programmer #2. three bytes different */
+	ROM_REGION( 0x0800, "decode2", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_LOAD( "megacard_cy7291a.bin",  0x0000, 0x0800, CRC(596f01ac) SHA1(a8606a1dd385fbb46b1a96f11a759fa6580803d8) )  /* new dump */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
@@ -6965,7 +6964,7 @@ GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  driver_device,  0,       
 // Encrypted games...
 GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
 GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
-GAME(  1993, megamc3,   0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
+GAME(  1993, megacard,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
 GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
 
