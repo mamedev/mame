@@ -5289,12 +5289,15 @@ ROM_END
   Power Card (Fun World)
   Version 0263 / 1993-10-22
 
-  Amatic encrypted CPU
-  based on 65SC02 (bitwise) family
+  Amatic encrypted CPU based on 65SC02 (bitwise) family,
+  with the following components inside:
 
-  Looks like a Bonus Card / Big Deal clone.
-  Inside the program ROM there is a reference to "Mega Card",
-  but the graphics are from Power Card.
+  1x CY7C291A (prom replacement).
+  1x 65SC02 (CPU).
+  1x TI74F245A (3-state octal latch from Texas Instruments).
+  1x 7400 (quad 2-input NAND gate).
+
+  (Same as Mega Card CPU)
 
 
   PCB Layout...
@@ -5368,11 +5371,19 @@ ROM_END
   '---------------'
    1 2 3 4 5 6 7 8
 
+
+  Looks like a Bonus Card / Big Deal clone.
+  Inside the program ROM there is a reference to "Mega Card",
+  but the graphics are from Power Card.
+
 */
 ROM_START( powercrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
 	ROM_LOAD( "263a1.bin",  0x8000, 0x8000, CRC(9e5e477d) SHA1(428464a64bea8cb478bc8033859baa47d7de0297) )  /* just the 2nd half */
 	ROM_LOAD( "263a2.bin",  0x4000, 0x8000, CRC(11b1a13f) SHA1(766c1a45c238467d6a292795f5a159187966ceec) )  /* just the 2nd half */
+
+	ROM_REGION( 0x0800, "decode", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_LOAD( "powercrd_cy7c291a.bin",  0x0000, 0x0800, CRC(f1d8f35d) SHA1(2b5f9222a81a627d43fd8448385f85c71c24b914) )  /* new dump */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "power_c_zg2.ic11",   0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
@@ -5394,7 +5405,7 @@ ROM_END
 
   Encrypted poker game.
 
-  1x custom encrypted Fun World CPU based on 65SC02.
+  1x Custom encrypted Fun World CPU based on 65SC02 (Same as Power Card).
   1x GM68B45S CRTC.
   2x EF6821P PIAs.
   1x AY38910A.
@@ -5505,10 +5516,10 @@ ROM_START( megacard )
 	ROM_LOAD( "mega_mc3_210-f-1.ic37",  0x8000, 0x8000, CRC(747f5ed1) SHA1(06757bb6a792dca93978b17b54c28e413e3720b1) )  /* just the 2nd half */
 	ROM_LOAD( "mega_mc3_210-f-2.ic41",  0x4000, 0x8000, CRC(373094d2) SHA1(8aed2502e89b0e7522e88f351ac256f1afad7ee8) )  /* just the 2nd half */
 
-	ROM_REGION( 0x0300, "decode", 0 )  /* from the 65SC02 die inside of the custom CPU */
+	ROM_REGION( 0x0300, "die_65sc02", 0 )  /* from the 65SC02 die inside of the custom CPU */
 	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
 
-	ROM_REGION( 0x0800, "decode2", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_REGION( 0x0800, "decode", 0 )  /* from the CY7C291A inside of the custom CPU */
 	ROM_LOAD( "megacard_cy7291a.bin",  0x0000, 0x0800, CRC(596f01ac) SHA1(a8606a1dd385fbb46b1a96f11a759fa6580803d8) )  /* new dump */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
