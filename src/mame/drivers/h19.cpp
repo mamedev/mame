@@ -449,8 +449,7 @@ MACHINE_CONFIG_END
 ROM_START( h19 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// Original
-	ROM_SYSTEM_BIOS(0, "orig", "Original")
-	ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(1))
+	ROM_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
@@ -462,28 +461,30 @@ ROM_START( h19 )
 ROM_END
 
 ROM_START( super19 )
-        // Super H19 ROM (
-        ROM_SYSTEM_BIOS(1, "super", "Super 19")
-        ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117), ROM_BIOS(2))
-        ROM_REGION( 0x0800, "chargen", 0 )
-        // Original font dump
-        ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	// Super H19 ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
-        ROM_REGION( 0x1000, "keyboard", 0 )
-        // Original dump
-        ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
 ROM_END
 
 ROM_START( watz19 )
-        // Watzman ROM
-        ROM_SYSTEM_BIOS(2, "watzman", "Watzman")
-        ROMX_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(3))
-        ROM_REGION( 0x0800, "chargen", 0 )
-        // Original font dump
-        ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
-        // Watzman keyboard
-        ROM_LOAD( "keybd.bin", 0x0800, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
+	// Watzman ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
 
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	// Watzman keyboard
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_LOAD( "keybd.bin", 0x0800, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
