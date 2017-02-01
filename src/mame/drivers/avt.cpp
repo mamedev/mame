@@ -661,11 +661,15 @@ ADDRESS_MAP_END
   02D6: CD B2 02      call $02B2
   02D9: C9            ret
 
-  0338: DB 02         in   a,($02)
-  033A: E6 40         and  $40
-  033C: 28 02         jr   z,$0340
+  0338: DB 02         in   a,($02) --> poll IN0
+  033A: E6 40         and  $40 ------> check for IN0-7 if active. 
+  033C: 28 02         jr   z,$0340 --> to continue the program.
   033E: AF            xor  a
   033F: C9            ret
+  ....
+  1ACB: B7            or   a
+  1ACC: 28 03         jr   z,$1AD1 --> to continue the program.
+  1ACE: CD B6 2D      call $2DB6 ----> nothing there!!!
 
 
   poll the port 00h and compare with 0x03
@@ -882,7 +886,7 @@ static INPUT_PORTS_START( avtbingo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Column 5 UP")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Column 4 UP")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")  // Used. Masked 0x40. See code at PC=0338.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
