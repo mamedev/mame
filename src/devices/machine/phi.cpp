@@ -1274,7 +1274,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 							if (m_t_state == PHI_T_TADS) {
 								BIT_SET(word, REG_IFIFO_TALK_BIT);
 							}
-							m_fifo_in.enqueue(word);
+							rx_n_data_freeze(word);
 						}
 					}
 				}
@@ -1320,13 +1320,8 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 			LOG_0(("..stalled\n"));
 			return false;
 		} else {
-			m_fifo_in.enqueue(word);
 			LOG_0(("..OK\n"));
-			if (m_t_state != PHI_T_TACS && m_t_state != PHI_T_ID3 &&
-				m_t_state != PHI_T_ID5 && m_t_state != PHI_T_SPAS) {
-				// If PHI didn't send this byte to itself, set data freeze
-				BIT_SET(m_reg_status, REG_STATUS_DATA_FREEZE_BIT);
-			}
+			rx_n_data_freeze(word);
 		}
 	}
 	if (end_of_transfer) {
@@ -1338,6 +1333,15 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 	}
 
 	return true;
+}
+
+void phi_device::rx_n_data_freeze(uint16_t word)
+{
+	m_fifo_in.enqueue(word);
+	if (m_sh_state != PHI_SH_STRS) {
+		// If PHI didn't send this byte to itself, set data freeze
+		BIT_SET(m_reg_status, REG_STATUS_DATA_FREEZE_BIT);
+	}
 }
 
 bool phi_device::ton_msg(void) const
