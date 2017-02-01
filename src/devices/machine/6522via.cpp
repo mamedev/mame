@@ -31,7 +31,15 @@
     PARAMETERS
 ***************************************************************************/
 
-#define TRACE_VIA       0
+#define LOG_SETUP   (1U <<  1)
+#define LOG_SHIFT   (1U <<  2)
+
+#define VERBOSE 0 // (LOG_SETUP|LOG_SHIFT)
+#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGSHIFT(...) LOGMASKED(LOG_SHIFT,   __VA_ARGS__)
 
 
 /***************************************************************************
@@ -310,10 +318,7 @@ void via6522_device::set_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
 	}
 }
 
@@ -330,10 +335,7 @@ void via6522_device::clear_int(int data)
 
 		output_irq();
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-		}
+		LOG("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
 	}
 }
 
@@ -344,14 +346,16 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift_out()
 {
+	LOGSHIFT("Shift Out SR: %02x->", m_sr);
 	m_out_cb2 = (m_sr >> 7) & 1;
 	m_sr =  (m_sr << 1) | m_out_cb2;
+	LOGSHIFT("%02x\n", m_sr);
 
 	m_cb2_handler(m_out_cb2);
 
 	if (!SO_T2_RATE(m_acr))
 	{
-		m_shift_counter = (m_shift_counter + 1) % 8;
+		m_shift_counter = (m_shift_counter - 1) & 7;
 
 		if (m_shift_counter == 0)
 		{
@@ -362,9 +366,11 @@ void via6522_device::shift_out()
 
 void via6522_device::shift_in()
 {
+	LOGSHIFT("Shift In SR: %02x->", m_sr);
 	m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
+	LOGSHIFT("%02x\n", m_sr);
 
-	m_shift_counter = (m_shift_counter + 1) % 8;
+	m_shift_counter = (m_shift_counter - 1) & 7;
 
 	if (m_shift_counter == 0)
 	{
@@ -378,31 +384,34 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case TIMER_SHIFT:
-			m_out_cb1 = 0;
+			LOGSHIFT("SHIFT timer event\n");
+			m_out_cb1 ^= 1;
 			m_cb1_handler(m_out_cb1);
 
-			if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+			if (m_out_cb1 & 1) // raising flank
 			{
-				shift_out();
+				if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+				{
+					shift_in();
+				}
 			}
-
-			m_out_cb1 = 1;
-			m_cb1_handler(m_out_cb1);
-
-			if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+			else // falling flank
 			{
-				shift_in();
+				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+				{
+					shift_out();
+				}
 			}
 
 			if (SO_T2_RATE(m_acr) || m_shift_counter)
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(2));
+					m_shift_timer->adjust(clocks_to_attotime(1));
 				}
 				else
 				{
-					m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 				}
 			}
 			break;
@@ -615,17 +624,28 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_SR:
+		LOGSHIFT("Read SR: %02x ", m_sr);
 		val = m_sr;
-		m_shift_counter=0;
+		m_out_cb1 = 1;
+		m_shift_counter = 8;
 		clear_int(INT_SR);
+		LOGSHIFT("ACR: %02x ", m_acr);
 		if (SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(1));
+			LOGSHIFT("SI_O2 starts timer ");
 		}
-		if (SI_T2_CONTROL(m_acr))
+		else if (SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			LOGSHIFT("SI_T2 starts timer ");
 		}
+		else if (! (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr) || SO_T2_RATE(m_acr)))
+		{
+			m_shift_timer->adjust(attotime::never);
+			LOGSHIFT("Timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
@@ -655,6 +675,8 @@ READ8_MEMBER( via6522_device::read )
 WRITE8_MEMBER( via6522_device::write )
 {
 	offset &=0x0f;
+
+	LOGSETUP(" * %s Reg %02x <- %02x  \n", tag(), offset, data);
 
 	switch (offset)
 	{
@@ -776,25 +798,33 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_SR:
 		m_sr = data;
-		m_shift_counter=0;
+		LOGSHIFT("Write SR: %02x\n", m_sr);
+		m_out_cb1 = 1;
+		m_shift_counter = 8;
 		clear_int(INT_SR);
+		LOGSHIFT("ACR: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(1));
+			LOGSHIFT("SO_O2 starts timer");
 		}
-		if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
+		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			LOGSHIFT("SO_T2 starts timer");
 		}
+		else if (! (SI_O2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr)))
+		{
+			m_shift_timer->adjust(attotime::never); // In case we change mode before counter expire
+			LOGSHIFT("Timer stops");
+		}
+		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
 		m_pcr = data;
 
-		if (TRACE_VIA)
-		{
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
-		}
+		LOG("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
 
 		if (CA2_FIX_OUTPUT(data) && m_out_ca2 != CA2_OUTPUT_LEVEL(data))
 		{
@@ -813,14 +843,32 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			uint16_t counter1 = get_counter1_value();
 			m_acr = data;
+			LOGSHIFT("Write ACR: %02x ", m_acr);
 
 			output_pb();
 
-			if (T1_CONTINUOUS(data))
+			LOGSHIFT("Shift mode [%02x]: ", (m_acr >> 2) & 7);
+			if (SR_DISABLED(m_acr))    LOGSHIFT("Disabled");
+			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2");
+			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2");
+			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2");
+			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2");
+			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2");
+			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT");
+
+			if (SR_DISABLED(m_acr) || SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))
+			{
+				m_shift_timer->adjust(attotime::never);
+				LOGSHIFT(" Timer stops");
+			}
+
+			if (T1_CONTINUOUS(m_acr))
 			{
 				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
+			LOGSHIFT("\n");
 		}
 		break;
 
@@ -870,8 +918,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 	{
 		m_in_ca1 = state;
 
-		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
+		LOG("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
 
 		if ((m_in_ca1 && CA1_LOW_TO_HIGH(m_pcr)) || (!m_in_ca1 && CA1_HIGH_TO_LOW(m_pcr)))
 		{
@@ -942,12 +989,12 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				m_latch_b = input_pb();
 			}
 
-			if (SO_EXT_CONTROL(m_acr))
+			if (!state && SO_EXT_CONTROL(m_acr))
 			{
 				shift_out();
 			}
 
-			if (SI_EXT_CONTROL(m_acr))
+			if (state && SI_EXT_CONTROL(m_acr))
 			{
 				shift_in();
 			}
@@ -958,6 +1005,18 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			{
 				m_out_cb2 = 1;
 				m_cb2_handler(1);
+			}
+		}
+		else // shift is not controlled by m_pcr
+		{
+			if (!state && SO_EXT_CONTROL(m_acr)) 
+			{
+				shift_out();
+			}
+
+			if (state && SI_EXT_CONTROL(m_acr))
+			{
+				shift_in();
 			}
 		}
 	}
