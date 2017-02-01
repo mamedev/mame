@@ -32,13 +32,13 @@
 ///*************************************************************************
 
 #define MCFG_40105_DATA_IN_READY_CB(_dir) \
-	downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB_##_dir);
+	devcb = &downcast<cmos_40105_device *>(device)->set_dir_callback(DEVCB_##_dir);
 
 #define MCFG_40105_DATA_OUT_READY_CB(_dor) \
-	downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB_##_dor);
+	devcb = &downcast<cmos_40105_device *>(device)->set_dor_callback(DEVCB_##_dor);
 
 #define MCFG_40105_DATA_OUT_CB(_out) \
-	downcast<cmos_40105_device *>(device)->set_data_out_callback(DEVCB_##_out);
+	devcb = &downcast<cmos_40105_device *>(device)->set_data_out_callback(DEVCB_##_out);
 
 
 
@@ -54,9 +54,9 @@ public:
 	// construction/destruction
 	cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template<class _dir> void set_dir_callback(_dir dir) { m_write_dir.set_callback(dir); }
-	template<class _dor> void set_dor_callback(_dor dor) { m_write_dor.set_callback(dor); }
-	template<class _out> void set_data_out_callback(_out out) { m_write_q.set_callback(out); }
+	template<class _dir> devcb_base &set_dir_callback(_dir dir) { return m_write_dir.set_callback(dir); }
+	template<class _dor> devcb_base &set_dor_callback(_dor dor) { return m_write_dor.set_callback(dor); }
+	template<class _out> devcb_base &set_data_out_callback(_out out) { return m_write_q.set_callback(out); }
 
 	u8 read();
 	void write(u8 data);

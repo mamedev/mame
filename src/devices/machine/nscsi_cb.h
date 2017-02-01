@@ -7,22 +7,22 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NSCSICB_RST_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ATN_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ACK_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_REQ_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_MSG_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_IO_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_CD_HANDLER(_line) \
 	downcast<nscsi_callback_device *>(device)->set_cd_callback(DEVCB_##_line);
@@ -38,15 +38,15 @@ class nscsi_callback_device : public nscsi_device
 public:
 	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _line> void set_rst_callback(_line line) { m_write_rst.set_callback(line); }
-	template<class _line> void set_atn_callback(_line line) { m_write_atn.set_callback(line); }
-	template<class _line> void set_ack_callback(_line line) { m_write_ack.set_callback(line); }
-	template<class _line> void set_req_callback(_line line) { m_write_req.set_callback(line); }
-	template<class _line> void set_msg_callback(_line line) { m_write_msg.set_callback(line); }
-	template<class _line> void set_io_callback(_line line)  { m_write_io.set_callback(line); }
-	template<class _line> void set_cd_callback(_line line)  { m_write_cd.set_callback(line); }
-	template<class _line> void set_sel_callback(_line line) { m_write_sel.set_callback(line); }
-	template<class _line> void set_bsy_callback(_line line) { m_write_bsy.set_callback(line); }
+	template<class _line> devcb_base &set_rst_callback(_line line) { return m_write_rst.set_callback(line); }
+	template<class _line> devcb_base &set_atn_callback(_line line) { return m_write_atn.set_callback(line); }
+	template<class _line> devcb_base &set_ack_callback(_line line) { return m_write_ack.set_callback(line); }
+	template<class _line> devcb_base &set_req_callback(_line line) { return m_write_req.set_callback(line); }
+	template<class _line> devcb_base &set_msg_callback(_line line) { return m_write_msg.set_callback(line); }
+	template<class _line> devcb_base &set_io_callback(_line line)  { return m_write_io.set_callback(line); }
+	template<class _line> devcb_base &set_cd_callback(_line line)  { return m_write_cd.set_callback(line); }
+	template<class _line> devcb_base &set_sel_callback(_line line) { return m_write_sel.set_callback(line); }
+	template<class _line> devcb_base &set_bsy_callback(_line line) { return m_write_bsy.set_callback(line); }
 
 	virtual void scsi_ctrl_changed() override;
 

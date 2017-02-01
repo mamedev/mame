@@ -27,25 +27,25 @@ enum
 
 // port a, 4 bits, 2-way
 #define MCFG_PIC16C5x_READ_A_CB(_devcb) \
-	pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
-	pic16c5x_device::set_write_a_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_a_callback(*device, DEVCB_##_devcb);
 
 // port b, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_B_CB(_devcb) \
-	pic16c5x_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_b_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_B_CB(_devcb) \
-	pic16c5x_device::set_write_b_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_b_callback(*device, DEVCB_##_devcb);
 
 // port c, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_C_CB(_devcb) \
-	pic16c5x_device::set_read_c_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_c_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
-	pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
 // T0 pin (readline)
 #define MCFG_PIC16C5x_T0_CB(_devcb) \
-	pic16c5x_device::set_t0_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_t0_callback(*device, DEVCB_##_devcb);
 
 // CONFIG register
 #define MCFG_PIC16C5x_SET_CONFIG(_data) \

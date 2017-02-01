@@ -121,34 +121,34 @@
 
 
 #define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	downcast<abcbus_slot_t *>(device)->set_irq_callback(DEVCB_##_irq);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	downcast<abcbus_slot_t *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	downcast<abcbus_slot_t *>(device)->set_rdy_callback(DEVCB_##_rdy);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_rdy_callback(DEVCB_##_rdy);
 
 #define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	downcast<abcbus_slot_t *>(device)->set_resin_callback(DEVCB_##_resin);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_resin_callback(DEVCB_##_resin);
 
 #define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	downcast<abcbus_slot_t *>(device)->set_pren_callback(DEVCB_##_pren);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_pren_callback(DEVCB_##_pren);
 
 #define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	downcast<abcbus_slot_t *>(device)->set_trrq_callback(DEVCB_##_trrq);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_trrq_callback(DEVCB_##_trrq);
 
 #define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	downcast<abcbus_slot_t *>(device)->set_xint2_callback(DEVCB_##_xint2);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_xint2_callback(DEVCB_##_xint2);
 
 #define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	downcast<abcbus_slot_t *>(device)->set_xint3_callback(DEVCB_##_xint3);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_xint3_callback(DEVCB_##_xint3);
 
 #define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	downcast<abcbus_slot_t *>(device)->set_xint4_callback(DEVCB_##_xint4);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_xint4_callback(DEVCB_##_xint4);
 
 #define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	downcast<abcbus_slot_t *>(device)->set_xint5_callback(DEVCB_##_xint5);
+	devcb = &downcast<abcbus_slot_t *>(device)->set_xint5_callback(DEVCB_##_xint5);
 
 
 
@@ -207,16 +207,16 @@ public:
 	// construction/destruction
 	abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }
-	template<class _rdy> void set_rdy_callback(_rdy rdy) { m_write_rdy.set_callback(rdy); }
-	template<class _resin> void set_resin_callback(_resin resin) { m_write_resin.set_callback(resin); }
-	template<class _pren> void set_pren_callback(_pren pren) { m_write_pren.set_callback(pren); }
-	template<class _trrq> void set_trrq_callback(_trrq trrq) { m_write_trrq.set_callback(trrq); }
-	template<class _xint2> void set_xint2_callback(_xint2 xint2) { m_write_xint2.set_callback(xint2); }
-	template<class _xint3> void set_xint3_callback(_xint3 xint3) { m_write_xint3.set_callback(xint3); }
-	template<class _xint4> void set_xint4_callback(_xint4 xint4) { m_write_xint4.set_callback(xint4); }
-	template<class _xint5> void set_xint5_callback(_xint5 xint5) { m_write_xint5.set_callback(xint5); }
+	template<class _irq> devcb_base &set_irq_callback(_irq irq) { return m_write_irq.set_callback(irq); }
+	template<class _nmi> devcb_base &set_nmi_callback(_nmi nmi) { return m_write_nmi.set_callback(nmi); }
+	template<class _rdy> devcb_base &set_rdy_callback(_rdy rdy) { return m_write_rdy.set_callback(rdy); }
+	template<class _resin> devcb_base &set_resin_callback(_resin resin) { return m_write_resin.set_callback(resin); }
+	template<class _pren> devcb_base &set_pren_callback(_pren pren) { return m_write_pren.set_callback(pren); }
+	template<class _trrq> devcb_base &set_trrq_callback(_trrq trrq) { return m_write_trrq.set_callback(trrq); }
+	template<class _xint2> devcb_base &set_xint2_callback(_xint2 xint2) { return m_write_xint2.set_callback(xint2); }
+	template<class _xint3> devcb_base &set_xint3_callback(_xint3 xint3) { return m_write_xint3.set_callback(xint3); }
+	template<class _xint4> devcb_base &set_xint4_callback(_xint4 xint4) { return m_write_xint4.set_callback(xint4); }
+	template<class _xint5> devcb_base &set_xint5_callback(_xint5 xint5) { return m_write_xint5.set_callback(xint5); }
 
 	// computer interface
 	void cs_w(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }

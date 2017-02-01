@@ -32,7 +32,7 @@ enum
 	t11_device::set_initial_mode(*device, _mode);
 
 #define MCFG_T11_RESET(_devcb) \
-	t11_device::set_out_reset_func(*device, DEVCB_##_devcb);
+	devcb = &t11_device::set_out_reset_func(*device, DEVCB_##_devcb);
 
 class t11_device :  public cpu_device
 {

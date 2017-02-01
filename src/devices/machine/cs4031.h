@@ -45,31 +45,31 @@
 	cs4031_device::static_set_keybctag(*device, _keybctag);
 
 #define MCFG_CS4031_IOR(_ior) \
-	downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
+	devcb = &downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_CS4031_IOW(_iow) \
-	downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
+	devcb = &downcast<cs4031_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_CS4031_TC(_tc) \
-	downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
+	devcb = &downcast<cs4031_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_CS4031_HOLD(_hold) \
-	downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
+	devcb = &downcast<cs4031_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_CS4031_NMI(_nmi) \
-	downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	devcb = &downcast<cs4031_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_CS4031_INTR(_intr) \
-	downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
+	devcb = &downcast<cs4031_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_CS4031_CPURESET(_cpureset) \
-	downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
+	devcb = &downcast<cs4031_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_CS4031_A20M(_a20m) \
-	downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
+	devcb = &downcast<cs4031_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_CS4031_SPKR(_spkr) \
-	downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
+	devcb = &downcast<cs4031_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************
@@ -88,15 +88,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
-	template<class _ior> void set_ior_callback(_ior ior) { m_read_ior.set_callback(ior); }
-	template<class _iow> void set_iow_callback(_iow iow) { m_write_iow.set_callback(iow); }
-	template<class _tc> void set_tc_callback(_tc tc) { m_write_tc.set_callback(tc); }
-	template<class _hold> void set_hold_callback(_hold hold) { m_write_hold.set_callback(hold); }
-	template<class _cpureset> void set_cpureset_callback(_cpureset cpureset) { m_write_cpureset.set_callback(cpureset); }
-	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }
-	template<class _intr> void set_intr_callback(_intr intr) { m_write_intr.set_callback(intr); }
-	template<class _a20m> void set_a20m_callback(_a20m a20m) { m_write_a20m.set_callback(a20m); }
-	template<class _spkr> void set_spkr_callback(_spkr spkr) { m_write_spkr.set_callback(spkr); }
+	template<class _ior> devcb_base &set_ior_callback(_ior ior) { return m_read_ior.set_callback(ior); }
+	template<class _iow> devcb_base &set_iow_callback(_iow iow) { return m_write_iow.set_callback(iow); }
+	template<class _tc> devcb_base &set_tc_callback(_tc tc) { return m_write_tc.set_callback(tc); }
+	template<class _hold> devcb_base &set_hold_callback(_hold hold) { return m_write_hold.set_callback(hold); }
+	template<class _cpureset> devcb_base &set_cpureset_callback(_cpureset cpureset) { return m_write_cpureset.set_callback(cpureset); }
+	template<class _nmi> devcb_base &set_nmi_callback(_nmi nmi) { return m_write_nmi.set_callback(nmi); }
+	template<class _intr> devcb_base &set_intr_callback(_intr intr) { return m_write_intr.set_callback(intr); }
+	template<class _a20m> devcb_base &set_a20m_callback(_a20m a20m) { return m_write_a20m.set_callback(a20m); }
+	template<class _spkr> devcb_base &set_spkr_callback(_spkr spkr) { return m_write_spkr.set_callback(spkr); }
 
 	// not really public
 	DECLARE_READ8_MEMBER( dma_read_byte );
