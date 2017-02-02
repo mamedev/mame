@@ -222,8 +222,11 @@ uint32_t pin64_block_t::size() {
 const uint8_t pin64_t::CAP_ID[8]  = { 'P', 'I', 'N', '6', '4', 'C', 'A', 'P' };
 
 pin64_t::~pin64_t() {
-	if (m_capture_file != nullptr)
+	if (m_capture_file != nullptr) {
+		finalize();
+		print();
 		finish();
+	}
 
 	clear();
 }
@@ -256,19 +259,29 @@ void pin64_t::finish() {
 	clear();
 }
 
-pin64_command_block_t* pin64_t::start_command_block() {
-	if (!m_capture_file)
-		return nullptr;
-
-	if (m_current_cmdblock)
+void pin64_t::finalize() {
+	if (m_current_cmdblock) {
 		m_current_cmdblock->finalize();
+		m_cmdblocks.push_back(m_current_cmdblock);
+	}
 
-	m_cmdblocks.push_back(new pin64_command_block_t());
-	return m_cmdblocks[m_cmdblocks.size() - 1];
+	if (m_current_block)
+		data_end();
 }
 
-void pin64_t::play(int index)
-{
+void pin64_t::start_command_block() {
+	if (!m_capture_file)
+		return;
+
+	if (m_current_cmdblock) {
+		m_current_cmdblock->finalize();
+		m_cmdblocks.push_back(m_current_cmdblock);
+	}
+
+	m_current_cmdblock = new pin64_command_block_t();
+}
+
+void pin64_t::play(int index) {
 }
 
 void pin64_t::mark_frame(running_machine& machine) {
@@ -276,7 +289,7 @@ void pin64_t::mark_frame(running_machine& machine) {
 		if (m_cmdblocks.size() == m_capture_frames && m_capture_frames > 0) {
 			finish();
 		} else {
-			m_current_cmdblock = start_command_block();
+			start_command_block();
 		}
 	}
 
@@ -286,6 +299,8 @@ void pin64_t::mark_frame(running_machine& machine) {
 		machine.popmessage("Capturing PIN64 snapshot to pin64_%d.cap", m_capture_index - 1);
 	} else if (machine.input().code_pressed_once(KEYCODE_M)) {
 		if (m_capture_file) {
+			finalize();
+			print();
 			finish();
 			machine.popmessage("Done recording.");
 		} else {
@@ -301,7 +316,7 @@ void pin64_t::command(uint64_t* cmd_data, uint32_t size) {
 		return;
 
 	if (!m_current_cmdblock)
-		return;
+		start_command_block();
 
 	m_current_cmdblock->data()->put32(size);
 
@@ -316,40 +331,33 @@ void pin64_t::command(uint64_t* cmd_data, uint32_t size) {
 }
 
 void pin64_t::data_begin() {
-	if (!capturing() || !m_current_cmdblock)
+	if (!capturing())
 		return;
 
-	m_blocks.push_back(new pin64_block_t());
-	m_current_block = m_blocks[m_blocks.size() - 1];
+	if (m_current_block)
+		data_end();
+
+	m_current_block = new pin64_block_t();
 }
 
 pin64_data_t* pin64_t::data_block() {
-	if (!capturing() || !m_current_cmdblock)
+	if (!capturing() || !m_current_block)
 		return &m_dummy_data;
 
 	return m_current_block->data();
 }
 
 void pin64_t::data_end() {
-	if (!capturing() || !m_current_cmdblock)
+	if (!capturing() || !m_current_block)
 		return;
 
 	m_current_block->finalize();
-
 	m_current_cmdblock->data()->put32(m_current_block->crc32());
 
-	const uint32_t last_index = m_blocks.size() - 1;
-	if (m_blocks.size() > 1) {
-		int i = 0;
-		for (i = 0; i < last_index; i++) {
-			if (m_blocks[i]->crc32() == block().crc32()) {
-				break;
-			}
-		}
-		if (i != last_index) {
-			m_blocks.erase(m_blocks.begin() + last_index);
-		}
-	}
+	if (m_blocks.find(m_current_block->crc32()) == m_blocks.end())
+		m_blocks[m_current_block->crc32()] = m_current_block;
+
+	m_current_block = nullptr;
 }
 
 uint32_t pin64_t::size() {
@@ -367,8 +375,8 @@ uint32_t pin64_t::header_size() {
 
 uint32_t pin64_t::blocks_size() {
 	uint32_t block_size = 0;
-	for (pin64_block_t* block : m_blocks)
-		block_size += block->size();
+	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks)
+		block_size += (block_pair.second)->size();
 
 	return block_size;
 }
@@ -402,14 +410,16 @@ void pin64_t::print()
 	}
 
 	printf("\nData Block Count: %d\n", (uint32_t)m_blocks.size()); fflush(stdout);
-	for (int i = 0; i < m_blocks.size(); i++) {
+	int i = 0;
+	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks) {
 		printf("    Block %d:\n", i); fflush(stdout);
 
-		m_blocks[i]->print();
+		(block_pair.second)->print();
 		if (i == (m_blocks.size() - 1))
 		{
 			printf("\n"); fflush(stdout);
 		}
+		i++;
 	}
 }
 
@@ -430,8 +440,8 @@ void pin64_t::write(FILE* file) {
 	write_block_directory(file);
 	write_cmdblock_directory(file);
 
-	for (pin64_block_t* block : m_blocks)
-		block->write(file);
+	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks)
+		(block_pair.second)->write(file);
 
 	for (pin64_command_block_t* block : m_cmdblocks)
 		block->write(file);
@@ -440,9 +450,9 @@ void pin64_t::write(FILE* file) {
 void pin64_t::write_block_directory(FILE* file) {
 	pin64_fileutil_t::write(file, m_blocks.size());
 	uint32_t offset(header_size() + (m_blocks.size() + m_cmdblocks.size() + 2));
-	for (pin64_block_t* block : m_blocks) {
+	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks) {
 		pin64_fileutil_t::write(file, offset);
-		offset += block->size();
+		offset += (block_pair.second)->size();
 	}
 }
 
@@ -461,8 +471,8 @@ void pin64_t::clear() {
 		m_capture_file = nullptr;
 	}
 
-	for (pin64_block_t* block : m_blocks)
-		delete block;
+	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks)
+		delete block_pair.second;
 
 	m_blocks.clear();
 	m_current_block = nullptr;

@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <vector>
+#include <map>
 
 #define PIN64_ENABLE_CAPTURE (0)
 
@@ -132,7 +133,7 @@ public:
 
 	void data_begin();
 	pin64_data_t* data_block();
-	pin64_block_t& block() { return *m_blocks[m_blocks.size() - 1]; }
+	pin64_block_t& block() { return *m_current_block; }
 	void data_end();
 
 	bool capturing() const { return m_capture_file != nullptr; }
@@ -141,7 +142,7 @@ public:
 	uint32_t size();
 
 private:
-	pin64_command_block_t* start_command_block();
+	void start_command_block();
 
 	void write(FILE* file);
 
@@ -153,12 +154,14 @@ private:
 	void write_cmdblock_directory(FILE* file);
 	void init_capture_index();
 
+	void finalize();
+
 	FILE *m_capture_file;
 	int32_t m_capture_index;
 	int m_capture_frames;
 
 	pin64_block_t* m_current_block;
-	std::vector<pin64_block_t*> m_blocks;
+	std::unordered_map<util::crc32_t, pin64_block_t*> m_blocks;
 
 	pin64_command_block_t* m_current_cmdblock;
 	std::vector<pin64_command_block_t*> m_cmdblocks;
