@@ -157,7 +157,9 @@ void pin64_block_t::print() {
 		const uint32_t data_remaining = data_size - row_index;
 		const uint32_t col_count = (data_remaining > 32 ? 32 : data_remaining);
 		for (uint32_t col = 0; col < col_count; col++)
+		{
 			printf("%02x ", bytes[row_index + col]); fflush(stdout);
+		}
 
 		if (row == (row_count - 1)) {
 			printf("\n"); fflush(stdout);
@@ -379,7 +381,8 @@ uint32_t pin64_t::cmdblocks_size() {
 	return cmdblock_size;
 }
 
-void pin64_t::print() {
+void pin64_t::print()
+{
 	printf("Total Size:       %9x bytes\n", size()); fflush(stdout);
 	printf("Header Size:      %9x bytes\n", header_size()); fflush(stdout);
 	printf("Cmdlist Dir Size: %9x bytes\n", uint32_t(m_cmdblocks.size() * sizeof(uint32_t))); fflush(stdout);
@@ -393,7 +396,9 @@ void pin64_t::print() {
 
 		m_cmdblocks[i]->print();
 		if (i == (m_cmdblocks.size() - 1))
+		{
 			printf("\n"); fflush(stdout);
+		}
 	}
 
 	printf("\nData Block Count: %d\n", (uint32_t)m_blocks.size()); fflush(stdout);
@@ -402,7 +407,9 @@ void pin64_t::print() {
 
 		m_blocks[i]->print();
 		if (i == (m_blocks.size() - 1))
+		{
 			printf("\n"); fflush(stdout);
+		}
 	}
 }
 
