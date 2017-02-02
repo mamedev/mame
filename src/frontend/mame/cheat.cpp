@@ -84,6 +84,8 @@
 #include "debug/debugcpu.h"
 
 #include <cstring>
+#include <iterator>
+#include <utility>
 
 #include <ctype.h>
 
@@ -264,17 +266,10 @@ bool cheat_parameter::set_prev_state()
 	else
 	{
 		// if not, we're an item cheat
-		item const *previtem(nullptr);
-		for (item const &curitem : m_itemlist)
-		{
-			if (curitem.value() == m_value)
-			{
-				if (previtem)
-					m_value = previtem->value();
-				break;
-			}
-			previtem = &curitem;
-		}
+		std::vector<item>::const_iterator it;
+		for (it = m_itemlist.begin(); (m_itemlist.end() != it) && (it->value() != m_value); ++it) { }
+		if (m_itemlist.begin() != it)
+			m_value = std::prev(it)->value();
 	}
 
 	return m_value != origvalue;
