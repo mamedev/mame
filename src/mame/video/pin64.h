@@ -105,7 +105,7 @@ protected:
 class pin64_printer_t {
 public:
 	static void print_data(pin64_block_t* block);
-	static void print_command(pin64_block_t* block);
+	static void print_command(int cmd_start, int cmd, std::unordered_map<util::crc32_t, pin64_block_t*>& blocks, std::vector<util::crc32_t>& commands);
 };
 
 class pin64_t
@@ -115,8 +115,8 @@ public:
 		: m_capture_file(nullptr)
 		, m_capture_index(~0)
 		, m_capture_frames(0)
-		, m_current_block(nullptr)
-		, m_current_cmdblock(nullptr)
+		, m_current_data(nullptr)
+		, m_current_command(nullptr)
 		, m_playing(false)
 	{ }
 	~pin64_t();
@@ -133,25 +133,29 @@ public:
 
 	void data_begin();
 	pin64_data_t* data_block();
-	pin64_block_t& block() { return *m_current_block; }
+	pin64_block_t& block() { return *m_current_data; }
 	void data_end();
 
 	bool capturing() const { return m_capture_file != nullptr; }
 	bool playing() const { return m_playing; }
 
-	uint32_t size();
+	size_t size();
 
 private:
 	void start_command_block();
 
 	void write(FILE* file);
 
-	uint32_t header_size();
-	uint32_t blocks_size();
-	uint32_t cmdblocks_size();
+	size_t header_size();
+	size_t block_directory_size();
+	size_t cmdlist_directory_size();
+	size_t blocks_size();
+	size_t cmdlist_size();
 
-	void write_block_directory(FILE* file);
-	void write_cmdblock_directory(FILE* file);
+	void finish_command();
+
+	void write_data_directory(FILE* file);
+	void write_cmdlist_directory(FILE* file);
 	void init_capture_index();
 
 	void finalize();
@@ -160,11 +164,12 @@ private:
 	int32_t m_capture_index;
 	int m_capture_frames;
 
-	pin64_block_t* m_current_block;
+	pin64_block_t* m_current_data;
+	pin64_block_t* m_current_command;
 	std::unordered_map<util::crc32_t, pin64_block_t*> m_blocks;
 
-	pin64_block_t* m_current_cmdblock;
-	std::vector<pin64_block_t*> m_cmdblocks;
+	std::vector<util::crc32_t> m_commands;
+	std::vector<uint32_t> m_frames;
 
 	bool m_playing;
 

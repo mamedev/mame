@@ -129,20 +129,7 @@ void pin64_data_t::update_offset(uint32_t offset, bool update_current) {
 
 
 
-// pin64_block_t members
-
-void pin64_block_t::finalize() {
-	if (m_data.size() > 0)
-		m_crc32 = util::crc32_creator::simple(m_data.bytes(), m_data.size());
-	else
-		m_crc32 = ~0;
-	m_data.reset();
-}
-
-void pin64_block_t::clear() {
-	m_crc32 = 0;
-	m_data.clear();
-}
+// pin64_printer_t members
 
 void pin64_printer_t::print_data(pin64_block_t* block) {
 	pin64_data_t* data = block->data();
@@ -173,39 +160,55 @@ void pin64_printer_t::print_data(pin64_block_t* block) {
 	printf("\n"); fflush(stdout);
 }
 
-void pin64_printer_t::print_command(pin64_block_t* block) {
+void pin64_printer_t::print_command(int cmd_start, int cmd, std::unordered_map<util::crc32_t, pin64_block_t*>& blocks, std::vector<util::crc32_t>& commands) {
+	pin64_block_t* block = blocks[commands[cmd]];
 	pin64_data_t* data = block->data();
 
-	printf("        CRC32: %08x\n", (uint32_t)block->crc32()); fflush(stdout);
-	printf("        Data Size: %08x\n", (uint32_t)data->size()); fflush(stdout);
+	printf("        Command %d:\n", cmd - cmd_start); fflush(stdout);
+	const uint32_t cmd_size(data->get32());
+	printf("        CRC32: %08x\n", (uint32_t)commands[cmd]); fflush(stdout);
+	printf("            Packet Data Size: %d words\n", cmd_size); fflush(stdout);
+	printf("            Packet Data: "); fflush(stdout);
 
-	uint32_t cmd_index = 0;
-	while (data->offset() < data->size()) {
-		printf("        Command %d:\n", cmd_index); fflush(stdout);
-		const uint32_t cmd_size(data->get32());
-		printf("            Packet Data Size: %d words\n", cmd_size); fflush(stdout);
-		printf("            Packet Data: "); fflush(stdout);
-		for (int i = 0; i < cmd_size; i++) {
-			const uint64_t cmd_entry(data->get64());
-			printf("%08x%08x\n", uint32_t(cmd_entry >> 32), (uint32_t)cmd_entry); fflush(stdout);
-
-			if (i < (cmd_size - 1))
-				printf("                         ");
+	bool load_command = false;
+	for (int i = 0; i < cmd_size; i++) {
+		const uint64_t cmd_entry(data->get64());
+		if (i == 0) {
+			const uint8_t top_byte = uint8_t(cmd_entry >> 56) & 0x3f;
+			if (top_byte == 0x30 || top_byte == 0x33 || top_byte == 0x34)
+				load_command = true;
 		}
+		printf("%08x%08x\n", uint32_t(cmd_entry >> 32), (uint32_t)cmd_entry); fflush(stdout);
 
-		const uint8_t data_flag(data->get8());
-		bool data_block_present(data_flag != 0);
-		printf("            Data Block Present: %02x (%s)\n", data_flag, data_block_present ? "Yes" : "No"); fflush(stdout);
+		if (i < (cmd_size - 1))
+			printf("                         "); fflush(stdout);
+	}
 
-		if (data_block_present) {
-			printf("            Data Block CRC32: %08x\n", data->get32()); fflush(stdout);
-		}
+	printf("            Data Block Present: %s\n", load_command ? "Yes" : "No"); fflush(stdout);
 
-		cmd_index++;
+	if (load_command) {
+		printf("            Data Block CRC32: %08x\n", data->get32()); fflush(stdout);
 	}
 
 	data->reset();
 };
+
+
+
+// pin64_block_t members
+
+void pin64_block_t::finalize() {
+	if (m_data.size() > 0)
+		m_crc32 = util::crc32_creator::simple(m_data.bytes(), m_data.size());
+	else
+		m_crc32 = ~0;
+	m_data.reset();
+}
+
+void pin64_block_t::clear() {
+	m_crc32 = 0;
+	m_data.clear();
+}
 
 void pin64_block_t::write(FILE* file) {
 	pin64_fileutil_t::write(file, m_crc32);
@@ -227,11 +230,8 @@ uint32_t pin64_block_t::size() {
 const uint8_t pin64_t::CAP_ID[8]  = { 'P', 'I', 'N', '6', '4', 'C', 'A', 'P' };
 
 pin64_t::~pin64_t() {
-	if (m_capture_file != nullptr) {
-		finalize();
-		print();
+	if (m_capture_file)
 		finish();
-	}
 
 	clear();
 }
@@ -251,11 +251,16 @@ void pin64_t::start(int frames)
 	m_capture_file = fopen(name_buf, "wb");
 
 	m_capture_frames = frames;
+
+	m_frames.push_back(0);
 }
 
 void pin64_t::finish() {
 	if (!m_capture_file)
 		return;
+
+	finalize();
+	print();
 
 	write(m_capture_file);
 	fclose(m_capture_file);
@@ -265,25 +270,8 @@ void pin64_t::finish() {
 }
 
 void pin64_t::finalize() {
-	if (m_current_cmdblock) {
-		m_current_cmdblock->finalize();
-		m_cmdblocks.push_back(m_current_cmdblock);
-	}
-
-	if (m_current_block)
-		data_end();
-}
-
-void pin64_t::start_command_block() {
-	if (!m_capture_file)
-		return;
-
-	if (m_current_cmdblock) {
-		m_current_cmdblock->finalize();
-		m_cmdblocks.push_back(m_current_cmdblock);
-	}
-
-	m_current_cmdblock = new pin64_block_t();
+	finish_command();
+	data_end();
 }
 
 void pin64_t::play(int index) {
@@ -291,13 +279,13 @@ void pin64_t::play(int index) {
 
 void pin64_t::mark_frame(running_machine& machine) {
 	if (m_capture_file) {
-		if (m_cmdblocks.size() == m_capture_frames && m_capture_frames > 0) {
-			finalize();
-			print();
+		if (m_frames.size() == m_capture_frames && m_capture_frames > 0) {
+			printf("\n");
 			finish();
 			machine.popmessage("Done recording.");
 		} else {
-			start_command_block();
+			printf("%d ", (uint32_t)m_commands.size());
+			m_frames.push_back((uint32_t)m_commands.size());
 		}
 	}
 
@@ -307,8 +295,6 @@ void pin64_t::mark_frame(running_machine& machine) {
 		machine.popmessage("Capturing PIN64 snapshot to pin64_%d.cap", m_capture_index - 1);
 	} else if (machine.input().code_pressed_once(KEYCODE_M)) {
 		if (m_capture_file) {
-			finalize();
-			print();
 			finish();
 			machine.popmessage("Done recording.");
 		} else {
@@ -323,95 +309,108 @@ void pin64_t::command(uint64_t* cmd_data, uint32_t size) {
 	if (!capturing())
 		return;
 
-	if (!m_current_cmdblock)
-		start_command_block();
+	finish_command();
 
-	m_current_cmdblock->data()->put32(size);
+	m_current_command = new pin64_block_t();
+	m_current_command->data()->put32(size);
 
 	for (uint32_t i = 0 ; i < size; i++)
-		m_current_cmdblock->data()->put64(cmd_data[i]);
+		m_current_command->data()->put64(cmd_data[i]);
+}
 
-	const uint8_t cmd_byte((cmd_data[0] >> 56) & 0x3f);
-	if (cmd_byte == 0x30 || cmd_byte == 0x33 || cmd_byte == 0x34)
-		m_current_cmdblock->data()->put8(0xff);
-	else
-		m_current_cmdblock->data()->put8(0x00);
+void pin64_t::finish_command() {
+	if (!m_current_command)
+		return;
+
+	m_current_command->finalize();
+	if (m_blocks.find(m_current_command->crc32()) == m_blocks.end())
+		m_blocks[m_current_command->crc32()] = m_current_command;
+
+	m_commands.push_back(m_current_command->crc32());
 }
 
 void pin64_t::data_begin() {
 	if (!capturing())
 		return;
 
-	if (m_current_block)
+	if (m_current_data)
 		data_end();
 
-	m_current_block = new pin64_block_t();
+	m_current_data = new pin64_block_t();
 }
 
 pin64_data_t* pin64_t::data_block() {
-	if (!capturing() || !m_current_block)
+	if (!capturing() || !m_current_data)
 		return &m_dummy_data;
 
-	return m_current_block->data();
+	return m_current_data->data();
 }
 
 void pin64_t::data_end() {
-	if (!capturing() || !m_current_block)
+	if (!capturing() || !m_current_data)
 		return;
 
-	m_current_block->finalize();
-	m_current_cmdblock->data()->put32(m_current_block->crc32());
+	m_current_data->finalize();
+	m_current_command->data()->put32(m_current_data->crc32());
+	finish_command();
 
-	if (m_blocks.find(m_current_block->crc32()) == m_blocks.end())
-		m_blocks[m_current_block->crc32()] = m_current_block;
+	if (m_blocks.find(m_current_data->crc32()) == m_blocks.end())
+		m_blocks[m_current_data->crc32()] = m_current_data;
 
-	m_current_block = nullptr;
+	m_current_data = nullptr;
 }
 
-uint32_t pin64_t::size() {
-	return header_size() + sizeof(uint32_t) * (m_blocks.size() + m_cmdblocks.size() + 2) + blocks_size() + cmdblocks_size();
+size_t pin64_t::size() {
+	return header_size() + block_directory_size() + cmdlist_directory_size() + cmdlist_size();
 }
 
-uint32_t pin64_t::header_size() {
+size_t pin64_t::header_size() {
 	return sizeof(uint8_t) * 8  // "PIN64CAP"
 	       + sizeof(uint32_t)   // total file size
-	       + sizeof(uint32_t)   // start of data block directory data
+	       + sizeof(uint32_t)   // start of block directory data
 	       + sizeof(uint32_t)   // start of command-list directory data
-	       + sizeof(uint32_t)   // start of data blocks
-	       + sizeof(uint32_t);  // start of command list
+	       + sizeof(uint32_t)   // start of blocks
+	       + sizeof(uint32_t);  // start of commands
 }
 
-uint32_t pin64_t::blocks_size() {
-	uint32_t block_size = 0;
+size_t pin64_t::block_directory_size() {
+	return (m_blocks.size() + 1) * sizeof(uint32_t);
+}
+
+size_t pin64_t::cmdlist_directory_size() {
+	return (m_frames.size() + 1) * sizeof(uint16_t);
+}
+
+size_t pin64_t::blocks_size() {
+	size_t block_size = 0;
 	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks)
 		block_size += (block_pair.second)->size();
 
 	return block_size;
 }
 
-uint32_t pin64_t::cmdblocks_size() {
-	uint32_t cmdblock_size = 0;
-	for (pin64_block_t* cmdblock : m_cmdblocks)
-		cmdblock_size += cmdblock->size();
-
-	return cmdblock_size;
+size_t pin64_t::cmdlist_size() {
+	return (m_commands.size() + 1) * sizeof(uint32_t);
 }
 
 void pin64_t::print()
 {
-	printf("Total Size:       %9x bytes\n", size()); fflush(stdout);
-	printf("Header Size:      %9x bytes\n", header_size()); fflush(stdout);
-	printf("Cmdlist Dir Size: %9x bytes\n", uint32_t((m_cmdblocks.size() + 1) * sizeof(uint32_t))); fflush(stdout);
-	printf("Datablk Dir Size: %9x bytes\n", uint32_t((m_blocks.size() + 1) * sizeof(uint32_t))); fflush(stdout);
-	printf("Cmdlist Size:     %9x bytes\n", cmdblocks_size()); fflush(stdout);
-	printf("Datablk Size:     %9x bytes\n", blocks_size()); fflush(stdout);
+	printf("Total Size:       %9x bytes\n", (uint32_t)size()); fflush(stdout);
+	printf("Header Size:      %9x bytes\n", (uint32_t)header_size()); fflush(stdout);
+	printf("Block Dir Size:   %9x bytes\n", (uint32_t)block_directory_size()); fflush(stdout);
+	printf("Cmdlist Dir Size: %9x bytes\n", (uint32_t)cmdlist_directory_size()); fflush(stdout);
+	printf("Blocks Size:      %9x bytes\n", (uint32_t)blocks_size()); fflush(stdout);
+	printf("Cmdlist Size:     %9x bytes\n", (uint32_t)cmdlist_size()); fflush(stdout);
 
-	printf("Command-List Count: %d\n", (uint32_t)m_cmdblocks.size()); fflush(stdout);
-	for (int i = 0; i < m_cmdblocks.size(); i++) {
+	printf("Command-List Count: %d\n", (uint32_t)m_frames.size()); fflush(stdout);
+	for (int i = 0; i < m_frames.size(); i++) {
 		printf("    List %d:\n", i); fflush(stdout);
 
-		pin64_printer_t::print_command(m_cmdblocks[i]);
-		if (i == (m_cmdblocks.size() - 1))
+		const int next_start = ((i == (m_frames.size() - 1)) ? m_commands.size() : m_frames[i+1]);
+		for (int cmd = m_frames[i]; cmd < next_start; cmd++) {
+			pin64_printer_t::print_command(m_frames[i], cmd, m_blocks, m_commands);
+		}
+		if (i == (m_frames.size() - 1))
 		{
 			printf("\n"); fflush(stdout);
 		}
@@ -434,43 +433,41 @@ void pin64_t::print()
 void pin64_t::write(FILE* file) {
 	const uint32_t size_total = size();
 	const uint32_t size_header = header_size();
-	const uint32_t size_block_dir = uint32_t((m_blocks.size() + 1) * sizeof(uint32_t));
-	const uint32_t size_cmdblock_dir = uint32_t((m_cmdblocks.size() + 1) * sizeof(uint32_t));
+	const uint32_t size_block_dir = block_directory_size();
+	const uint32_t size_cmdlist_dir = cmdlist_directory_size();
 	const uint32_t size_blocks_dir = blocks_size();
 
 	pin64_fileutil_t::write(file, CAP_ID, 8);
 	pin64_fileutil_t::write(file, size_total);
 	pin64_fileutil_t::write(file, size_header);
 	pin64_fileutil_t::write(file, size_header + size_block_dir);
-	pin64_fileutil_t::write(file, size_header + size_block_dir + size_cmdblock_dir);
-	pin64_fileutil_t::write(file, size_header + size_block_dir + size_cmdblock_dir + size_blocks_dir);
+	pin64_fileutil_t::write(file, size_header + size_block_dir + size_cmdlist_dir);
+	pin64_fileutil_t::write(file, size_header + size_block_dir + size_cmdlist_dir + size_blocks_dir);
 
-	write_block_directory(file);
-	write_cmdblock_directory(file);
+	write_data_directory(file);
+	write_cmdlist_directory(file);
 
 	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks)
 		(block_pair.second)->write(file);
 
-	for (pin64_block_t* block : m_cmdblocks)
-		block->write(file);
+	pin64_fileutil_t::write(file, m_commands.size());
+	for (util::crc32_t crc : m_commands)
+		pin64_fileutil_t::write(file, crc);
 }
 
-void pin64_t::write_block_directory(FILE* file) {
+void pin64_t::write_data_directory(FILE* file) {
 	pin64_fileutil_t::write(file, m_blocks.size());
-	uint32_t offset(header_size() + (m_blocks.size() + m_cmdblocks.size() + 2));
+	size_t offset(header_size());
 	for (std::pair<util::crc32_t, pin64_block_t*> block_pair : m_blocks) {
 		pin64_fileutil_t::write(file, offset);
 		offset += (block_pair.second)->size();
 	}
 }
 
-void pin64_t::write_cmdblock_directory(FILE* file) {
-	pin64_fileutil_t::write(file, m_cmdblocks.size());
-	uint32_t offset(header_size() + (m_blocks.size() + m_cmdblocks.size() + 2) * sizeof(uint32_t) + blocks_size());
-	for (pin64_block_t* block : m_cmdblocks) {
-		pin64_fileutil_t::write(file, offset);
-		offset += block->size();
-	}
+void pin64_t::write_cmdlist_directory(FILE* file) {
+	pin64_fileutil_t::write(file, m_frames.size());
+	for (uint32_t frame : m_frames)
+		pin64_fileutil_t::write(file, frame);
 }
 
 void pin64_t::clear() {
@@ -483,13 +480,11 @@ void pin64_t::clear() {
 		delete block_pair.second;
 
 	m_blocks.clear();
-	m_current_block = nullptr;
+	m_commands.clear();
+	m_frames.clear();
 
-	for (pin64_block_t* block : m_cmdblocks)
-		delete block;
-
-	m_cmdblocks.clear();
-	m_current_cmdblock = nullptr;
+	m_current_data = nullptr;
+	m_current_command = nullptr;
 }
 
 void pin64_t::init_capture_index()
