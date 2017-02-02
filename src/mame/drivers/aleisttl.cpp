@@ -7,7 +7,7 @@
  Chase (aka Chase1) (1976)
  Deluxe Soccer (1973)
  Fire Power (1975)                EG-1020-2
- Fütsball (1975)
+ Fötsball (1975)
  Galaxy Raider (1974)
  Hesitation (1974)                AL-6500?
  Hockey, Soccer, Tennis (1974)

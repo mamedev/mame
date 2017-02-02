@@ -276,6 +276,7 @@ private:
 	void clear_nba(nba_origin_t origin);
 	bool if_cmd_received(uint8_t byte);
 	bool byte_received(uint8_t byte , bool eoi);
+	void rx_n_data_freeze(uint16_t word);
 	bool ton_msg(void) const;
 	bool lon_msg(void) const;
 	bool odd_parity(uint8_t byte) const;

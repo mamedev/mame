@@ -14077,9 +14077,9 @@
 	</software>
 
 	<software name="wayotef2" cloneof="wayotef">
-		<description>The Way of the Exploding Fist (Richochet)</description>
+		<description>The Way of the Exploding Fist (Ricochet)</description>
 		<year>1985</year>
-		<publisher>Richochet</publisher>
+		<publisher>Ricochet</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="17353">
 				<rom name="wayoftheexplodingfistv2(1985)(ricochet).hq.uef" size="17353" crc="d5ef89de" sha1="3186dad75a0099836be20a97956fca2597ceaeb1" offset="0" />

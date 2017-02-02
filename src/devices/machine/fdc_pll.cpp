@@ -80,7 +80,7 @@ int fdc_pll_t::feed_read_data(attotime &tm, const attotime& edge, const attotime
 	ctime = next;
 	tm = next;
 
-	if(edge.is_never() || edge >= next) {
+	if(edge.is_never() || edge > next) {
 		// No transition in the window means 0 and pll in free run mode
 		phase_adjust = attotime::zero;
 		return 0;

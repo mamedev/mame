@@ -75,12 +75,12 @@ Hardware:   PPIA 8255
     The identity number of each station is set up in hardware by links to IC 8. IC 8 is an octal buffer which when enabled feeds the cards station ID to the computer bus.
     Each link codes a bit in an eight bit binary number allowing any station ID in the range 0 to 255 to be set up. if a link is left open then the bit is a one, when a
     link is made the bit is a zero. Hence all links open corresponds to station ID 255, and all links made to station ID 0. Each station must have a unique identity and
-    some indentities are associated with specific functions on the network. Station ID zero is reserved for broadcast signals and should not be used. Station ID 255 is
-    reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a sugested
+    some identities are associated with specific functions on the network. Station ID zero is reserved for broadcast signals and should not be used. Station ID 255 is
+    reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a suggested
     scheme for number allocation is to number normal user stations from one upwards and to number special stations and servers from 255 downwards.
 
     2011 June 04  - Phill Harvey-Smith
-        Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory reigion causing the basic ROM to become
+        Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory region causing the basic ROM to become
         corrupted. Values are now correctly placed in bytes 0x0008 - 0x000B of RAM.
 
 
@@ -90,10 +90,9 @@ Hardware:   PPIA 8255
 
     TODO:
 
-    - connect to softwarelist
     - e000 EPROM switching
     - display should be monochrome -- Should be optional, Acorn produced a Colour Card, and there is
-        at least one aftermarket Colour card.
+        at least one after market Colour card.
     - ram expansion
     - tap files
     - mouse
@@ -287,17 +286,16 @@ static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    ADDRESS_MAP( prophet2_mem )
+    ADDRESS_MAP( prophet_mem )
 -------------------------------------------------*/
 
-//static ADDRESS_MAP_START( prophet2_mem, AS_PROGRAM, 8, atom_state )
+//static ADDRESS_MAP_START( prophet_mem, AS_PROGRAM, 8, atom_state )
 //  AM_RANGE(0x0000, 0x09ff) AM_RAM
 //  AM_RANGE(0x0a00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 //  AM_RANGE(0x9800, 0x9fff) AM_RAM
+//  AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
 //  AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-////  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
-////  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
 //  AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 //  AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 //ADDRESS_MAP_END
@@ -603,7 +601,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 WRITE_LINE_MEMBER( atom_state::motor_w )
 {
 	for (int i=0; i != 2; i++) {
-		char devname[1];
+		char devname[8];
 		sprintf(devname, "%d", i);
 		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
 		if (con) {
@@ -681,7 +679,7 @@ image_init_result atom_state::load_cart(device_image_interface &image, generic_s
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -754,7 +752,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
-	/* cartridge */
+	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(atom_state, cart_load)
@@ -867,14 +865,19 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_DERIVED( prophet2, atom )
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet2_mem)
+//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
 //  MCFG_DEVICE_REMOVE(I8271_TAG)
 //  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
 //  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
 //
+//  /* internal ram */
+//  MCFG_RAM_MODIFY(RAM_TAG)
+//  MCFG_RAM_DEFAULT_SIZE("32K")
+
 //  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
 //  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
 //MACHINE_CONFIG_END
 
@@ -883,7 +886,16 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_DERIVED( prophet3, atom )
+//  /* basic machine hardware */
+//  MCFG_CPU_MODIFY(SY6502_TAG)
+//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
 //
+//  /* internal ram */
+//  MCFG_RAM_MODIFY(RAM_TAG)
+//  MCFG_RAM_DEFAULT_SIZE("32K")
+
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
