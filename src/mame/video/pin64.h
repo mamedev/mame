@@ -90,7 +90,6 @@ public:
 	void finalize();
 	void clear();
 
-	virtual void print();
 	void write(FILE* file);
 
 	// getters
@@ -103,9 +102,10 @@ protected:
 	pin64_data_t m_data;
 };
 
-class pin64_command_block_t : public pin64_block_t {
+class pin64_printer_t {
 public:
-	void print() override;
+	static void print_data(pin64_block_t* block);
+	static void print_command(pin64_block_t* block);
 };
 
 class pin64_t
@@ -163,8 +163,8 @@ private:
 	pin64_block_t* m_current_block;
 	std::unordered_map<util::crc32_t, pin64_block_t*> m_blocks;
 
-	pin64_command_block_t* m_current_cmdblock;
-	std::vector<pin64_command_block_t*> m_cmdblocks;
+	pin64_block_t* m_current_cmdblock;
+	std::vector<pin64_block_t*> m_cmdblocks;
 
 	bool m_playing;
 
