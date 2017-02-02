@@ -51,7 +51,7 @@ ToDo:
 - Get rid of ROM patches in Sly Spy and Hippodrome;
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified;
-- Finally, get a proper decap of the MCUs used by Drangonninja and Birdie Try;
+- Finally, get a proper decap of the MCUs used by Dragonninja and Birdie Try;
 
 
 Bad Dudes MCU dump came from an MCU that had been damaged during a misguided

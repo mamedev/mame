@@ -3390,6 +3390,8 @@ files {
 	MAME_DIR .. "src/mame/video/rdpblend.h",
 	MAME_DIR .. "src/mame/video/rdptpipe.cpp",
 	MAME_DIR .. "src/mame/video/rdptpipe.h",
+	MAME_DIR .. "src/mame/video/pin64.cpp",
+	MAME_DIR .. "src/mame/video/pin64.h",
 	MAME_DIR .. "src/mame/drivers/hanaawas.cpp",
 	MAME_DIR .. "src/mame/includes/hanaawas.h",
 	MAME_DIR .. "src/mame/video/hanaawas.cpp",

@@ -4,13 +4,25 @@
 
     Apple LaserWriter II NT driver
 
+        0x000000 - 0x1fffff     ???/ROM (switches based on overlay)
+        0x200000 - 0x3fffff     ROM
+        0x400000 - 0x5fffff     RAM
+        0x600000 - 0x7fffff     ??? more RAM?
+        0x800000 - 0x9fffff     LED/Printer Controls
+        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Read
+        0xc00000 - 0xdfffff     Zilog 8530 SCC (Serial Control Chip) Write
+        0xe00000 - 0xefffff     Rockwell 6522 VIA
+        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
+        0xfffff0 - 0xffffff     ???Auto Vector??
+
     TODO:
     - Get the board to pass its self test, it fails long before it even bothers reading the dipswitches
-    - Hook up SCC and VIA interrupt pins to the 68k
     - Hook up the rest of the VIA pins to a canon printer HLE stub
     - Hook up ADB bitbang device to the VIA CB1, CB2 and PortA pins
     - Hook up VIA Port A, bits 5 and 6 to the SW1 and SW2 panel switches
     - Everything else
+    DONE:
+    - Hook up SCC and VIA interrupt pins to the 68k
     Future:
     - Let the board identify itself to a emulated mac driver so it displays the printer icon on the desktop
 
@@ -100,7 +112,7 @@ public:
 	{ }
 	DECLARE_READ16_MEMBER(bankedarea_r);
 	DECLARE_WRITE16_MEMBER(bankedarea_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(led_out_w);
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pa_w);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
@@ -109,6 +121,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
+	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 private:
@@ -122,7 +135,7 @@ private:
 	required_device<via6522_device> m_via;
 #endif
 
-	//
+	uint16_t *m_ram_ptr, *m_rom_ptr;
 	bool m_overlay;
 };
 
@@ -138,7 +151,8 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   A   0   1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROMEN3
 0   0   A   0   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROMEN4
 0   0   A   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       OPEN BUS
-0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  DRAM
+0   1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  DRAM
+0   1   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW ???? DRAM mirror?
 1   0   0   ?   ?   ?   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   1       W   Status LEDs and mech
 1   0   1   ?   ?   ?   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *   *   1       R   8530 SCC Read
 1   1   0   ?   ?   ?   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *   *   0       W   8530 SCC Write
@@ -153,7 +167,7 @@ map when overlay is set, i.e. A above is considered 'x':
 000000-1fffff ROM (second half is open bus)
 200000-3fffff ROM (second half is open bus)
 400000-5fffff DRAM?
-600000-7fffff unknown
+600000-7fffff unknown, DRAM mirror?
 800000-83ffff LEDs and status bits to printer mechanism
 840000-9fffff unknown
 a00000-a3ffff SCC read
@@ -169,7 +183,7 @@ map when overlay is clear, i.e. A above is considered '1':
 000000-1fffff unknown, maybe RAM???? maybe eeprom goes here too? eeprom is specifically disabled when overlay is set
 200000-3fffff ROM (second half is open bus)
 400000-5fffff DRAM?
-600000-7fffff unknown
+600000-7fffff unknown, DRAM mirror?
 800000-83ffff LEDs and status bits to printer mechanism
 840000-9fffff unknown
 a00000-a3ffff SCC read
@@ -189,8 +203,9 @@ static ADDRESS_MAP_START (maincpu_map, AS_PROGRAM, 16, lwriter_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(bankedarea_r, bankedarea_w)
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("rom", 0) // 1MB ROM
 	//AM_RANGE(0x300000, 0x3fffff) // open bus?
-	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_REGION("mainram", 0) AM_MIRROR(0x200000) // 2MB DRAM; the AM_MIRROR is probably wrong, but it gets the selftest to failing on test 08 instead of 0A
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(led_w, 0xff00) AM_MIRROR(0x1ffffe) // mirror is a guess given that the pals can only decode A18-A23
+	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_REGION("mainram", 0) AM_MIRROR(0x200000) // 2MB DRAM
+	//AM_RANGE(0x600000, 0x600fff) AM_RAM AM_MIRROR(0x1ff000) // 4096 bytes SRAM????
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(led_out_w, 0xff00) AM_MIRROR(0x1ffffe) // mirror is a guess given that the pals can only decode A18-A23
 	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("scc", scc8530_device, ca_w, 0x00ff) AM_MIRROR(0x1ffff8)
 	AM_RANGE(0xc00004, 0xc00005) AM_DEVWRITE8("scc", scc8530_device, da_w, 0x00ff) AM_MIRROR(0x1ffff8)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREAD8 ("scc", scc8530_device, ca_r, 0xff00) AM_MIRROR(0x1ffff8)
@@ -214,6 +229,8 @@ INPUT_PORTS_END
 /* Start it up */
 void lwriter_state::machine_start()
 {
+	m_rom_ptr = (uint16_t*)memregion("rom")->base();
+	m_ram_ptr = (uint16_t*)memregion("mainram")->base();
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
 }
 
@@ -223,8 +240,29 @@ void lwriter_state::machine_reset()
 	m_via->reset();
 }
 
+/* Overlay area */
+READ16_MEMBER(lwriter_state::bankedarea_r)
+{
+	if (m_overlay)
+	{
+		return m_rom_ptr[offset];
+	}
+	// what actually maps here? dram? the sram and eeprom?
+	return 0xFFFF;//m_ram_ptr[offset];
+}
+
+WRITE16_MEMBER (lwriter_state::bankedarea_w)
+{
+	if (!m_overlay)
+	{
+		COMBINE_DATA(&m_ram_ptr[offset]);
+	}
+	else
+		fprintf(stderr, "Attempt to write data %04X to offset %08X IGNORED!\n", data, offset);
+}
+
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
-WRITE8_MEMBER(lwriter_state::led_w)
+WRITE8_MEMBER(lwriter_state::led_out_w)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
@@ -232,7 +270,6 @@ WRITE8_MEMBER(lwriter_state::led_w)
 }
 
 /* via stuff */
-// second via
 READ8_MEMBER(lwriter_state::via_pa_r)
 {
 	logerror(" VIA: Port A read!\n");
@@ -258,6 +295,8 @@ READ8_MEMBER(lwriter_state::via_pb_r)
 WRITE8_MEMBER(lwriter_state::via_pb_w)
 {
 	logerror(" VIA: Port B written with data of 0x%02x!\n", data);
+	/* Like early Mac models which had VIA A4 control overlaying, the
+	 * LaserWriter II NT overlay is controlled by VIA B3 */
 	m_overlay = BIT(data,3);
 }
 
@@ -274,31 +313,18 @@ WRITE_LINE_MEMBER(lwriter_state::via_cb2_w)
 WRITE_LINE_MEMBER(lwriter_state::via_int_w)
 {
 	logerror(" VIA: INT output set to %d!\n", state);
+	//TODO: this is likely wrong, the VPA pin which controls whether autovector is enabled or not is controlled by PAL U8D, which is not dumped.
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, (state ? ASSERT_LINE : CLEAR_LINE), M68K_INT_ACK_AUTOVECTOR);
 }
 
-READ16_MEMBER(lwriter_state::bankedarea_r)
+/* scc stuff */
+/*
+WRITE_LINE_MEMBER(lwriter_state::scc_int)
 {
-	uint16_t *rom = (uint16_t *)(memregion("rom")->base());
-	//uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
-	if (m_overlay == 1)
-	{
-		rom += (offset&0x1fffff);
-		return *rom;
-	}
-	else
-	{
-		// what actually maps here? the sram and eeprom?
-		//ram += (offset&0x1fffff);
-		//return *ram;
-		return 0xFFFF; /** TODO: fix me */
-	}
-}
-
-WRITE16_MEMBER (lwriter_state::bankedarea_w)
-{
-	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
-	COMBINE_DATA(&ram[offset]);
-}
+	logerror(" SCC: INT output set to %d!\n", state);
+	//m_via->set_input_line(VIA_CA1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_via->write_ca1(state);
+}*/
 
 #define CPU_CLK (XTAL_22_3210MHz / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
@@ -315,6 +341,9 @@ static MACHINE_CONFIG_START( lwriter, lwriter_state )
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	/* Interrupt */
+	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE("via", via6522_device, write_ca1))
+	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(lwriter_state, scc_int))
 
 	MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
@@ -373,14 +402,14 @@ MACHINE_CONFIG_END
 
 ROM_START(lwriter)
 	ROM_REGION16_BE (0x1000000, "rom", 0)
-	ROM_LOAD16_BYTE ("342-0545.l0", 0x000001, 0x20000, CRC (6431742d) SHA1 (040bd5b84b49b86f2b0fe9ece378bbc7a10a94ec))
-	ROM_LOAD16_BYTE ("342-0546.h0", 0x000000, 0x20000, CRC (c592bfb7) SHA1 (b595ae225238f7fabd1566a3133ea6154e082e2d))
-	ROM_LOAD16_BYTE ("342-0547.l1", 0x040001, 0x20000, CRC (205a5ea8) SHA1 (205fefbb5c67a07d57cb6184c69648321a34a8fe))
-	ROM_LOAD16_BYTE ("342-0548.h1", 0x040000, 0x20000, CRC (f616e1c3) SHA1 (b9e2cd4d07990b2d1936be97b6e89ef21f06b462))
-	ROM_LOAD16_BYTE ("342-0549.l2", 0x080001, 0x20000, CRC (0b0b051a) SHA1 (64a80085001570c3f99d9865031715bf49bd7698))
-	ROM_LOAD16_BYTE ("342-0550.h2", 0x080000, 0x20000, CRC (82adcf85) SHA1 (e2ab728afdae802c0c67fc25c9ba278b9cb04e31))
-	ROM_LOAD16_BYTE ("342-0551.l3", 0x0c0001, 0x20000, CRC (176b3346) SHA1 (eb8dfc7e44f2bc884097e51a47e2f10ee091c9e9))
-	ROM_LOAD16_BYTE ("342-0552.h3", 0x0c0000, 0x20000, CRC (69b175c6) SHA1 (a84c82be1ec7e373bb097ee74b941920a3b091aa))
+	ROM_LOAD16_BYTE ("342-0545.l0", 0x000001, 0x20000, CRC (6431742d) SHA1 (040bd5b84b49b86f2b0fe9ece378bbc7a10a94ec)) // Label: "342-0545-A JAPAN // TC531000CP-F700 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L0
+	ROM_LOAD16_BYTE ("342-0546.h0", 0x000000, 0x20000, CRC (c592bfb7) SHA1 (b595ae225238f7fabd1566a3133ea6154e082e2d)) // Label: "342-0546-A JAPAN // TC531000CP-F701 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H0
+	ROM_LOAD16_BYTE ("342-0547.l1", 0x040001, 0x20000, CRC (205a5ea8) SHA1 (205fefbb5c67a07d57cb6184c69648321a34a8fe)) // Label: "342-0547-A JAPAN // TC531000CP-F702 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L1
+	ROM_LOAD16_BYTE ("342-0548.h1", 0x040000, 0x20000, CRC (f616e1c3) SHA1 (b9e2cd4d07990b2d1936be97b6e89ef21f06b462)) // Label: "342-0548-A JAPAN // TC531000CP-F703 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H1
+	ROM_LOAD16_BYTE ("342-0549.l2", 0x080001, 0x20000, CRC (0b0b051a) SHA1 (64a80085001570c3f99d9865031715bf49bd7698)) // Label: "342-0549-A JAPAN // TC531000CP-F704 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L2
+	ROM_LOAD16_BYTE ("342-0550.h2", 0x080000, 0x20000, CRC (82adcf85) SHA1 (e2ab728afdae802c0c67fc25c9ba278b9cb04e31)) // Label: "342-0550-A JAPAN // TC531000CP-F705 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H2
+	ROM_LOAD16_BYTE ("342-0551.l3", 0x0c0001, 0x20000, CRC (176b3346) SHA1 (eb8dfc7e44f2bc884097e51a47e2f10ee091c9e9)) // Label: "342-0551-A JAPAN // TC531000CP-F706 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L3
+	ROM_LOAD16_BYTE ("342-0552.h3", 0x0c0000, 0x20000, CRC (69b175c6) SHA1 (a84c82be1ec7e373bb097ee74b941920a3b091aa)) // Label: "342-0552-A JAPAN // TC531000CP-F707 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H3
 	ROM_REGION( 0x200000, "mainram", ROMREGION_ERASEFF )
 
 ROM_END
