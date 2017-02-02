@@ -15,9 +15,11 @@
 
 #include "osdcore.h"
 #include "corestr.h"
-#include <string>
 #include "md5.h"
 #include "sha1.h"
+
+#include <functional>
+#include <string>
 
 
 namespace util {
@@ -132,13 +134,23 @@ protected:
 // final digest
 struct crc32_t
 {
-	bool operator==(const crc32_t &rhs) const { return m_raw == rhs.m_raw; }
-	bool operator!=(const crc32_t &rhs) const { return m_raw != rhs.m_raw; }
+	crc32_t() { }
+	constexpr crc32_t(const crc32_t &rhs) = default;
+	constexpr crc32_t(const uint32_t crc) : m_raw(crc) { }
+
+	constexpr bool operator==(const crc32_t &rhs) const { return m_raw == rhs.m_raw; }
+	constexpr bool operator!=(const crc32_t &rhs) const { return m_raw != rhs.m_raw; }
+
+	crc32_t &operator=(const crc32_t &rhs) = default;
 	crc32_t &operator=(const uint32_t crc) { m_raw = crc; return *this; }
-	operator uint32_t() const { return m_raw; }
+
+	constexpr operator uint32_t() const { return m_raw; }
+
 	bool from_string(const char *string, int length = -1);
 	std::string as_string() const;
+
 	uint32_t m_raw;
+
 	static const crc32_t null;
 };
 
@@ -178,13 +190,23 @@ protected:
 // final digest
 struct crc16_t
 {
-	bool operator==(const crc16_t &rhs) const { return m_raw == rhs.m_raw; }
-	bool operator!=(const crc16_t &rhs) const { return m_raw != rhs.m_raw; }
+	crc16_t() { }
+	constexpr crc16_t(const crc16_t &rhs) = default;
+	constexpr crc16_t(const uint16_t crc) : m_raw(crc) { }
+
+	constexpr bool operator==(const crc16_t &rhs) const { return m_raw == rhs.m_raw; }
+	constexpr bool operator!=(const crc16_t &rhs) const { return m_raw != rhs.m_raw; }
+
+	crc16_t &operator=(const crc16_t &rhs) = default;
 	crc16_t &operator=(const uint16_t crc) { m_raw = crc; return *this; }
-	operator uint16_t() const { return m_raw; }
+
+	constexpr operator uint16_t() const { return m_raw; }
+
 	bool from_string(const char *string, int length = -1);
 	std::string as_string() const;
+
 	uint16_t m_raw;
+
 	static const crc16_t null;
 };
 
@@ -219,5 +241,23 @@ protected:
 
 
 } // namespace util
+
+namespace std {
+
+template <> struct hash<::util::crc32_t>
+{
+	typedef ::util::crc32_t argument_type;
+	typedef std::size_t result_type;
+	result_type operator()(argument_type const & s) const { return std::hash<std::uint32_t>()(s); }
+};
+
+template <> struct hash<::util::crc16_t>
+{
+	typedef ::util::crc16_t argument_type;
+	typedef std::size_t result_type;
+	result_type operator()(argument_type const & s) const { return std::hash<std::uint16_t>()(s); }
+};
+
+} // namespace std
 
 #endif // __HASHING_H__
