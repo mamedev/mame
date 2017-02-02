@@ -1197,7 +1197,7 @@ void n64_rdp::disassemble(char* buffer)
 
 	uint64_t cmd[32];
 
-	const uint32_t length = m_cmd_ptr * 4;
+	const uint32_t length = m_cmd_ptr * 8;
 	if (length < 8)
 	{
 		sprintf(buffer, "ERROR: length = %d\n", length);
@@ -2469,6 +2469,8 @@ void n64_rdp::cmd_load_tlut(uint64_t w1)
 		fatalerror("Load tlut: tl=%d, th=%d\n",tl,th);
 	}
 
+	m_capture.data_begin();
+
 	const int32_t count = ((sh >> 2) - (sl >> 2) + 1) << 2;
 
 	switch (m_misc_state.m_ti_size)
@@ -2488,6 +2490,7 @@ void n64_rdp::cmd_load_tlut(uint64_t w1)
 				if (dststart < 2048)
 				{
 					dst[dststart] = U_RREADIDX16(srcstart);
+					m_capture.data_block()->put16(dst[dststart]);
 					dst[dststart + 1] = dst[dststart];
 					dst[dststart + 2] = dst[dststart];
 					dst[dststart + 3] = dst[dststart];
@@ -2499,6 +2502,8 @@ void n64_rdp::cmd_load_tlut(uint64_t w1)
 		}
 		default:    fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
 	}
+
+	m_capture.data_end();
 
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
@@ -2553,6 +2558,8 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 
 	const uint32_t src = (m_misc_state.m_ti_address >> 1) + (tl * tiwinwords) + slinwords;
 
+	m_capture.data_begin();
+
 	if (dxt != 0)
 	{
 		int32_t j = 0;
@@ -2577,6 +2584,12 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				tc[((ptr + 1) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 1);
 				tc[((ptr + 2) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 2);
 				tc[((ptr + 3) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
+
 				j += dxt;
 			}
 		}
@@ -2605,6 +2618,10 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 				j += dxt;
 			}
 		}
@@ -2626,6 +2643,11 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				tc[ptr] = U_RREADIDX16(srcptr + 2);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
 
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
+
 				j += dxt;
 			}
 		}
@@ -2643,6 +2665,11 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				tc[((ptr + 1) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 1);
 				tc[((ptr + 2) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 2);
 				tc[((ptr + 3) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		else if (tile[tilenum].format == FORMAT_YUV)
@@ -2661,6 +2688,11 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				sec = U_RREADIDX16(srcptr + 3);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		else
@@ -2675,10 +2707,17 @@ void n64_rdp::cmd_load_block(uint64_t w1)
 				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
 				tc[ptr] = U_RREADIDX16(srcptr + 2);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		tile[tilenum].th = tl;
 	}
+
+	m_capture.data_end();
 
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
@@ -2715,6 +2754,8 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
     topad = 0; // ????
 */
 
+	m_capture.data_begin();
+
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_8BIT:
@@ -2731,7 +2772,9 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
 
 				for (int32_t i = 0; i < width; i++)
 				{
-					tc[((tline + i) ^ xorval8) & 0xfff] = U_RREADADDR8(src + s + i);
+					const uint8_t data = U_RREADADDR8(src + s + i);
+					m_capture.data_block()->put8(data);
+					tc[((tline + i) ^ xorval8) & 0xfff] = data;
 				}
 			}
 			break;
@@ -2752,8 +2795,10 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
 
 					for (int32_t i = 0; i < width; i++)
 					{
-						uint32_t taddr = (tline + i) ^ xorval16;
-						tc[taddr & 0x7ff] = U_RREADIDX16(src + s + i);
+						const uint32_t taddr = (tline + i) ^ xorval16;
+						const uint16_t data = U_RREADIDX16(src + s + i);
+						m_capture.data_block()->put16(data);
+						tc[taddr & 0x7ff] = data;
 					}
 				}
 			}
@@ -2770,6 +2815,7 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
 					{
 						uint32_t taddr = ((tline + i) ^ xorval8) & 0x7ff;
 						uint16_t yuvword = U_RREADIDX16(src + s + i);
+						m_capture.data_block()->put16(yuvword);
 						get_tmem8()[taddr] = yuvword >> 8;
 						get_tmem8()[taddr | 0x800] = yuvword & 0xff;
 					}
@@ -2792,6 +2838,7 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
 				for (int32_t i = 0; i < width; i++)
 				{
 					uint32_t c = U_RREADIDX32(src + s + i);
+					m_capture.data_block()->put32(c);
 					uint32_t ptr = ((tline + i) ^ xorval32cur) & 0x3ff;
 					tc16[ptr] = c >> 16;
 					tc16[ptr | 0x400] = c & 0xffff;
@@ -2802,6 +2849,8 @@ void n64_rdp::cmd_load_tile(uint64_t w1)
 
 		default:    fatalerror("RDP: load_tile: size = %d\n", m_misc_state.m_ti_size);
 	}
+
+	m_capture.data_end();
 
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
@@ -3017,6 +3066,8 @@ void n64_rdp::process_command_list()
 			return;
 			//fatalerror("rdp_process_list: not enough rdp command data: cur = %d, ptr = %d, expected = %d\n", m_cmd_cur, m_cmd_ptr, s_rdp_command_length[cmd]);
 		}
+
+		m_capture.command(&m_cmd_data[m_cmd_cur], s_rdp_command_length[cmd] / 8);
 
 		if (LOG_RDP_EXECUTION)
 		{
