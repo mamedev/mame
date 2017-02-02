@@ -145,8 +145,7 @@ void pin64_printer_t::print_data(pin64_block_t* block) {
 		const uint32_t row_index = row * 32;
 		const uint32_t data_remaining = data_size - row_index;
 		const uint32_t col_count = (data_remaining > 32 ? 32 : data_remaining);
-		for (uint32_t col = 0; col < col_count; col++)
-		{
+		for (uint32_t col = 0; col < col_count; col++) {
 			printf("%02x ", bytes[row_index + col]); fflush(stdout);
 		}
 
@@ -180,8 +179,9 @@ void pin64_printer_t::print_command(int cmd_start, int cmd, std::unordered_map<u
 		}
 		printf("%08x%08x\n", uint32_t(cmd_entry >> 32), (uint32_t)cmd_entry); fflush(stdout);
 
-		if (i < (cmd_size - 1))
+		if (i < (cmd_size - 1)) {
 			printf("                         "); fflush(stdout);
+		}
 	}
 
 	printf("            Data Block Present: %s\n", load_command ? "Yes" : "No"); fflush(stdout);
@@ -410,8 +410,7 @@ void pin64_t::print()
 		for (int cmd = m_frames[i]; cmd < next_start; cmd++) {
 			pin64_printer_t::print_command(m_frames[i], cmd, m_blocks, m_commands);
 		}
-		if (i == (m_frames.size() - 1))
-		{
+		if (i == (m_frames.size() - 1)) {
 			printf("\n"); fflush(stdout);
 		}
 	}
@@ -422,8 +421,7 @@ void pin64_t::print()
 		printf("    Block %d:\n", i); fflush(stdout);
 
 		pin64_printer_t::print_data((block_pair.second));
-		if (i == (m_blocks.size() - 1))
-		{
+		if (i == (m_blocks.size() - 1)) {
 			printf("\n"); fflush(stdout);
 		}
 		i++;
