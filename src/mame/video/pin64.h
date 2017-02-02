@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <vector>
 
+#define PIN64_ENABLE_CAPTURE (0)
+
 #include "emu.h"
 
 class pin64_fileutil_t {

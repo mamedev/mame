@@ -278,6 +278,7 @@ void pin64_t::mark_frame(running_machine& machine) {
 		}
 	}
 
+#if PIN64_ENABLE_CAPTURE
 	if (machine.input().code_pressed_once(KEYCODE_N) && !m_capture_file) {
 		start(1);
 		machine.popmessage("Capturing PIN64 snapshot to pin64_%d.cap", m_capture_index - 1);
@@ -290,6 +291,7 @@ void pin64_t::mark_frame(running_machine& machine) {
 			machine.popmessage("Recording PIN64 movie to pin64_%d.cap", m_capture_index - 1);
 		}
 	}
+#endif
 }
 
 void pin64_t::command(uint64_t* cmd_data, uint32_t size) {
