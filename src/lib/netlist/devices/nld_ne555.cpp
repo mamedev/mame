@@ -9,10 +9,13 @@
  *
  *  \section ne555_1 Synopsis
  *
- *  \code
- *  NE555(name)
- *  NE555_DIP(name)
- *  \endcode
+ *  \snippet devsyn.dox.h NE555 synopsis
+ *  \snippet devsyn.dox.h NE555_DIP synopsis
+
+ *  \section ne555_11 "C" Synopsis
+ *
+ *  \snippet devsyn.dox.h NE555 csynopsis
+ *  \snippet devsyn.dox.h NE555_DIP csynopsis
  *
  *  For the \c NE555 use verbose pin assignments like \c name.TRIG or \c name.OUT.
  *  For the \c NE555_DIP use pin numbers like \c name.1.
@@ -32,12 +35,7 @@
  *
  *  \section ne555_3 Function Table
  *
- *  | CLR | CLK | D | Q | QQ  |
- *  |-----|-----|---|:-:|:---:|
- *  |  0  |  X  | X | 0 |  1  |
- *  |  1  |  R  | 1 | 1 |  0  |
- *  |  1  |  R  | 0 | 0 |  1  |
- *  |  1  |  0  | X | Q0| Q0Q |
+ *  Please refer to the datasheet.
  *
  *  \section ne555_4 Limitations
  *

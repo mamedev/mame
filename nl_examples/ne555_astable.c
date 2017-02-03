@@ -16,6 +16,14 @@ NETLIST_START(ne555_astable)
      *
      */
 
+	/*!
+	 *
+	 * abc | def
+	 * ghj | ddd
+	 * iop | xyz
+	 *
+	 *
+	 */
     /* Standard stuff */
 
     SOLVER(Solver, 48000)

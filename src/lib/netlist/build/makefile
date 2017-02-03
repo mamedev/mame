@@ -9,8 +9,13 @@
 #
 ###########################################################################
 
-OBJ = obj
 SRC = ..
+
+ifeq ($(subst Windows_NT,windows,$(OS)),windows)
+OBJ = obj/mingw
+else
+OBJ = obj/nix
+endif
 
 #-fuse-ld=gold -Wpedantic -march=native -march=native
 
@@ -187,7 +192,8 @@ mingw:
 #
 
 
-doc:
+doc: nltool
+	./nltool -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
 #-------------------------------------------------
@@ -195,15 +201,11 @@ doc:
 #-------------------------------------------------
 
 .depend: $(SOURCES)
-ifeq ($(OS),windows)
-	@echo using existing .depend
-else
 	@echo creating .depend
 	@rm -f ./.depend
 	@for i in $(SOURCES); do \
-		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's/$(SRC)/$(OBJ)/' -e 's/.cpp/.o/' ` >>./.depend; \
+		$(CC) $(CFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >>./.depend; \
 	done
-endif
 
 depend: .depend
 
@@ -232,3 +234,4 @@ $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
+
