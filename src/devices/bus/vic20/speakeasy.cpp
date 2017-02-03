@@ -59,7 +59,7 @@ machine_config_constructor vic20_speakeasy_t::device_mconfig_additions() const
 //-------------------------------------------------
 
 vic20_speakeasy_t::vic20_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VIC20_SPEAKEASY, "Speakeasy", tag, owner, clock, "speakeasy", __FILE__),
+	device_t(mconfig, VIC20_SPEAKEASY, "Speakeasy VIC20", tag, owner, clock, "speakeasyvic20", __FILE__),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_votrax(*this, SC01A_TAG)
 {
