@@ -531,10 +531,10 @@ MACHINE_CONFIG_END
 
 ROM_START( 4enlinea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-2.ic6",  0x0000, 0x8000, CRC(f8f14bf8) SHA1(e48fbedbd1b9be6fb56a0f65db80eddbedb487c7) )
+	ROM_LOAD( "cicplay-2.ic6",  0x0000, EPROM_27C256, CRC(f8f14bf8) SHA1(e48fbedbd1b9be6fb56a0f65db80eddbedb487c7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-1.ic19", 0x0000, 0x8000, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
+	ROM_LOAD( "cicplay-1.ic19", 0x0000, EPROM_27C256, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 )   /* default serial EEPROM */
 	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x000, 0x800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )

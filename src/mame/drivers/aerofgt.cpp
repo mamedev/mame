@@ -2556,12 +2556,12 @@ ROM_END
 
 ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "4v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
-	ROM_LOAD16_WORD_SWAP( "4v1.subpcb.u1", 0x40000, 0x40000, CRC(6cd5312b) SHA1(57b109fe268fb963e981c91b6d288667a3c9a665) ) // 27c2048 - located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
-	ROM_LOAD16_WORD_SWAP( "4v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 4 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "4v2.subpcb.u2", 0x00000, EPROM_27C2048, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "4v1.subpcb.u1", 0x40000, EPROM_27C2048, CRC(6cd5312b) SHA1(57b109fe268fb963e981c91b6d288667a3c9a665) ) // located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "4v3.u14",       0x80000, EPROM_27C2048, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 4 stamped on chip with VideoSystem logo V
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
-	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+	ROM_LOAD( "6.u166", 0x00000, EPROM_27C1001, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) )
 	ROM_RELOAD(         0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
@@ -2573,10 +2573,10 @@ ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
 
 	ROM_REGION( 0x200000, "spritegfx", 0 )
-	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
-	ROM_LOAD( "5.u118",        0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
-	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
-	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
+	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000,       CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
+	ROM_LOAD( "5.u118",        0x080000, EPROM_27C2048, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) )
+	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000,       CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
+	ROM_LOAD( "4.u119",        0x180000, EPROM_27C2048, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
 	ROM_LOAD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
@@ -2591,27 +2591,27 @@ ROM_END
 
 ROM_START( turbofrcu ) // US version: most notable thing in there is the points value of the rocks in level 6 (5,000 versus 500).
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "8v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
-	ROM_LOAD16_WORD_SWAP( "8v1.subpcb.u1", 0x40000, 0x40000, CRC(cc324da6) SHA1(ed2eaff7351914e3ebaf925ddc01be9d44d89fa6) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
-	ROM_LOAD16_WORD_SWAP( "8v3.u14",       0x80000, 0x40000, CRC(c0a15480) SHA1(1ec99382e0a00a8167773b1d454a63cc5cd6199c) ) // 27c2048 - 8 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "8v2.subpcb.u2", 0x00000, EPROM_27C2048, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "8v1.subpcb.u1", 0x40000, EPROM_27C2048, CRC(cc324da6) SHA1(ed2eaff7351914e3ebaf925ddc01be9d44d89fa6) ) // located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "8v3.u14",       0x80000, EPROM_27C2048, CRC(c0a15480) SHA1(1ec99382e0a00a8167773b1d454a63cc5cd6199c) ) // 8 stamped on chip with VideoSystem logo V
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
-	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+	ROM_LOAD( "6.u166", 0x00000, EPROM_27C1001, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) )
 	ROM_RELOAD(         0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
 	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
-	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
+	ROM_LOAD( "7.u95",        0x080000, EPROM_27C1001, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
 
 	ROM_REGION( 0x0a0000, "gfx2", 0 )
 	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom
-	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
+	ROM_LOAD( "8.u106",        0x080000, EPROM_27C1001, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
 
 	ROM_REGION( 0x200000, "spritegfx", 0 )
-	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
-	ROM_LOAD( "5.u118",        0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
-	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
-	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
+	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000,       CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
+	ROM_LOAD( "5.u118",        0x080000, EPROM_27C2048, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) )
+	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000,       CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
+	ROM_LOAD( "4.u119",        0x180000, EPROM_27C2048, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
 	ROM_LOAD( "lh532a52.u134", 0x000000, 0x40000, CRC(3c725a48) SHA1(120e62b2ef911bfa0f8a1468966ff70fab2d7582) ) // mask rom
