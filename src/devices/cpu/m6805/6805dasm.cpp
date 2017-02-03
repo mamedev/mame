@@ -36,10 +36,10 @@ enum class lvl {
 	HC
 };
 
-enum op_names {
+enum class op_names {
 	adca,   adda,   anda,   asl,    asla,   aslx,   asr,    asra,
 	asrx,   bcc,    bclr,   bcs,    beq,    bhcc,   bhcs,   bhi,
-	bih,    bil,    bita,   bls,    bmc,    bmi,    bms,    bne,
+	bih,    bil,    bit,    bls,    bmc,    bmi,    bms,    bne,
 	bpl,    bra,    brclr,  brn,    brset,  bset,   bsr,    clc,
 	cli,    clr,    clra,   clrx,   cmpa,   com,    coma,   comx,
 	cpx,    dec,    deca,   decx,   eora,   ill,    inc,    inca,
@@ -50,10 +50,10 @@ enum op_names {
 	tst,    tsta,   tstx,   txa,    wait
 };
 
-#define OP(name, mode)   { name, #name,   md::mode, lvl::HMOS }
-#define OPC(name, mode)  { name, #name,   md::mode, lvl::CMOS }
-#define OPHC(name, mode) { name, #name,   md::mode, lvl::HC   }
-#define ILLEGAL          { ill,  nullptr, md::INH,  lvl::HMOS }
+#define OP(name, mode)   { op_names::name, #name,   md::mode, lvl::HMOS }
+#define OPC(name, mode)  { op_names::name, #name,   md::mode, lvl::CMOS }
+#define OPHC(name, mode) { op_names::name, #name,   md::mode, lvl::HC   }
+#define ILLEGAL          { op_names::ill,  nullptr, md::INH,  lvl::HMOS }
 struct { op_names op; char const *name; md mode; lvl level; } const disasm[0x100] = {
 	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR), // 00
 	OP  (brset,BTR), OP  (brclr,BTR), OP  (brset,BTR), OP  (brclr,BTR),
@@ -96,27 +96,27 @@ struct { op_names op; char const *name; md mode; lvl level; } const disasm[0x100
 	OP  (clc,  INH), OP  (sec,  INH), OP  (cli,  INH), OP  (sei,  INH),
 	OP  (rsp,  INH), OP  (nop,  INH), ILLEGAL        , OP  (txa,  INH),
 	OP  (suba, IMM), OP  (cmpa, IMM), OP  (sbca, IMM), OP  (cpx,  IMM), // a0
-	OP  (anda, IMM), OP  (bita, IMM), OP  (lda,  IMM), ILLEGAL        ,
+	OP  (anda, IMM), OP  (bit,  IMM), OP  (lda,  IMM), ILLEGAL        ,
 	OP  (eora, IMM), OP  (adca, IMM), OP  (ora,  IMM), OP  (adda, IMM),
 	ILLEGAL        , OP  (bsr,  REL), OP  (ldx,  IMM), ILLEGAL        ,
 	OP  (suba, DIR), OP  (cmpa, DIR), OP  (sbca, DIR), OP  (cpx,  DIR), // b0
-	OP  (anda, DIR), OP  (bita, DIR), OP  (lda,  DIR), OP  (sta,  DIR),
+	OP  (anda, DIR), OP  (bit,  DIR), OP  (lda,  DIR), OP  (sta,  DIR),
 	OP  (eora, DIR), OP  (adca, DIR), OP  (ora,  DIR), OP  (adda, DIR),
 	OP  (jmp,  DIR), OP  (jsr,  DIR), OP  (ldx,  DIR), OP  (stx,  DIR),
 	OP  (suba, EXT), OP  (cmpa, EXT), OP  (sbca, EXT), OP  (cpx,  EXT), // c0
-	OP  (anda, EXT), OP  (bita, EXT), OP  (lda,  EXT), OP  (sta,  EXT),
+	OP  (anda, EXT), OP  (bit,  EXT), OP  (lda,  EXT), OP  (sta,  EXT),
 	OP  (eora, EXT), OP  (adca, EXT), OP  (ora,  EXT), OP  (adda, EXT),
 	OP  (jmp,  EXT), OP  (jsr,  EXT), OP  (ldx,  EXT), OP  (stx,  EXT),
 	OP  (suba, IX2), OP  (cmpa, IX2), OP  (sbca, IX2), OP  (cpx,  IX2), // d0
-	OP  (anda, IX2), OP  (bita, IX2), OP  (lda,  IX2), OP  (sta,  IX2),
+	OP  (anda, IX2), OP  (bit,  IX2), OP  (lda,  IX2), OP  (sta,  IX2),
 	OP  (eora, IX2), OP  (adca, IX2), OP  (ora,  IX2), OP  (adda, IX2),
 	OP  (jmp,  IX2), OP  (jsr,  IX2), OP  (ldx,  IX2), OP  (stx,  IX2),
 	OP  (suba, IX1), OP  (cmpa, IX1), OP  (sbca, IX1), OP  (cpx,  IX1), // e0
-	OP  (anda, IX1), OP  (bita, IX1), OP  (lda,  IX1), OP  (sta,  IX1),
+	OP  (anda, IX1), OP  (bit,  IX1), OP  (lda,  IX1), OP  (sta,  IX1),
 	OP  (eora, IX1), OP  (adca, IX1), OP  (ora,  IX1), OP  (adda, IX1),
 	OP  (jmp,  IX1), OP  (jsr,  IX1), OP  (ldx,  IX1), OP  (stx,  IX1),
 	OP  (suba, IDX), OP  (cmpa, IDX), OP  (sbca, IDX), OP  (cpx,  IDX), // f0
-	OP  (anda, IDX), OP  (bita, IDX), OP  (lda,  IDX), OP  (sta,  IDX),
+	OP  (anda, IDX), OP  (bit,  IDX), OP  (lda,  IDX), OP  (sta,  IDX),
 	OP  (eora, IDX), OP  (adca, IDX), OP  (ora,  IDX), OP  (adda, IDX),
 	OP  (jmp,  IDX), OP  (jsr,  IDX), OP  (ldx,  IDX), OP  (stx,  IDX)
 };
@@ -164,12 +164,12 @@ offs_t disassemble(
 		u32 flags;
 		switch (disasm[code].op)
 		{
-		case bsr:
-		case jsr:
+		case op_names::bsr:
+		case op_names::jsr:
 			flags = DASMFLAG_STEP_OVER;
 			break;
-		case rts:
-		case rti:
+		case op_names::rts:
+		case op_names::rti:
 			flags = DASMFLAG_STEP_OUT;
 			break;
 		default:

@@ -952,7 +952,18 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		// if we have an 0b prefix, we must be a binary value
 		case 'b':
 		case 'B':
-			return parse_number(token, buffer.c_str() + 2, 2, expression_error::INVALID_NUMBER);
+			try
+			{
+				return parse_number(token, buffer.c_str() + 2, 2, expression_error::INVALID_NUMBER);
+			}
+			catch (expression_error const &err)
+			{
+				// this is really a hack, but 0B1234 could also hex depending on default base
+				if (expression_error::INVALID_NUMBER == err)
+					return parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::INVALID_NUMBER);
+				else
+					throw;
+			}
 
 		// TODO: for octal address spaces, treat 0123 as octal
 		default:

@@ -75,7 +75,7 @@ constexpr u16 M68705_VECTOR_BOOTSTRAP   = 0xfff6;
 constexpr u16 M68705_VECTOR_TIMER       = 0xfff8;
 //constexpr u16 M68705_VECTOR_INT2        = 0xfff8;
 constexpr u16 M68705_VECTOR_INT         = 0xfffa;
-//constexpr u16 M68705_VECTOR_SWI         = 0xfffc;
+constexpr u16 M68705_VECTOR_SWI         = 0xfffc;
 constexpr u16 M68705_VECTOR_RESET       = 0xfffe;
 
 } // anonymous namespace
@@ -201,7 +201,7 @@ m68705_device::m68705_device(
 			clock,
 			type,
 			name,
-			{ s_hmos_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, 0xfffc },
+			{ s_hmos_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M68705_VECTOR_SWI },
 			internal_map,
 			shortname,
 			source)
@@ -249,7 +249,7 @@ template <offs_t B> WRITE8_MEMBER(m68705_device::eprom_w)
 		else
 		{
 			// this causes undefined behaviour, which is bad when EPROM programming is involved
-			logerror("warning: write to EPROM when /PGE = 0 (%x = %x)\n", B + offset, data);
+			logerror("warning: write to EPROM when /PGE = 0 (%04X = %02X)\n", B + offset, data);
 		}
 	}
 }
@@ -273,7 +273,7 @@ template <std::size_t N> READ8_MEMBER(m68705_device::port_r)
 		u8 const newval(m_port_cb_r[N](space, 0, ~m_port_ddr[N] & ~m_port_mask[N]) & ~m_port_mask[N]);
 		if (newval != m_port_input[N])
 		{
-			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02x)\n",
+			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02X)\n",
 					char('A' + N), newval, ~m_port_ddr[N] & ~m_port_mask[N], m_port_input[N]);
 		}
 		m_port_input[N] = newval;
@@ -286,7 +286,7 @@ template <std::size_t N> WRITE8_MEMBER(m68705_device::port_latch_w)
 	data &= ~m_port_mask[N];
 	u8 const diff = m_port_latch[N] ^ data;
 	if (diff)
-		LOGIOPORT("write PORT%c latch: %02X & %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N], m_port_latch[N]);
+		LOGIOPORT("write PORT%c latch: %02X & %02X (was %02X)\n", char('A' + N), data, m_port_ddr[N], m_port_latch[N]);
 	m_port_latch[N] = data;
 	if (diff & m_port_ddr[N])
 		port_cb_w<N>();
@@ -297,7 +297,7 @@ template <std::size_t N> WRITE8_MEMBER(m68705_device::port_ddr_w)
 	data &= ~m_port_mask[N];
 	if (data != m_port_ddr[N])
 	{
-		LOGIOPORT("write DDR%c: %02X (was %02x)\n", char('A' + N), data, m_port_ddr[N]);
+		LOGIOPORT("write DDR%c: %02X (was %02X)\n", char('A' + N), data, m_port_ddr[N]);
 		m_port_ddr[N] = data;
 		port_cb_w<N>();
 	}
@@ -594,9 +594,9 @@ void m68705_device::interrupt()
 			{
 				throw emu_fatalerror("Unknown pending interrupt");
 			}
+			m_icount -= 11;
+			burn_cycles(11);
 		}
-		m_icount -= 11;
-		burn_cycles(11);
 	}
 }
 

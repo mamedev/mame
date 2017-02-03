@@ -386,7 +386,7 @@ void m6805_base_device::interrupt()
 		m_icount -= 11;
 		burn_cycles(11);
 	}
-	else if((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0)
+	else if ((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0)
 	{
 		if ((CC & IFLAG) == 0)
 		{
@@ -402,9 +402,10 @@ void m6805_base_device::interrupt()
 			interrupt_vector();
 
 			m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
+
+			m_icount -= 11;
+			burn_cycles(11);
 		}
-		m_icount -= 11;
-		burn_cycles(11);
 	}
 }
 

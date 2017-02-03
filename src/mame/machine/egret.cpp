@@ -162,7 +162,7 @@ void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 					printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
-					write_via_clock(via_clock^1);
+					write_via_clock(via_clock);
 				}
 			}
 			break;
