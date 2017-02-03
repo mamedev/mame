@@ -12,43 +12,36 @@ namespace netlist
 {
 	namespace devices
 	{
+	class NETLIB_NAME(9322);
+
 	NETLIB_OBJECT(9322_selector)
 	{
 		NETLIB_CONSTRUCTOR(9322_selector)
+		, m_parent(owner)
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		, m_Y(*this, "Y")
 		{
 		}
 
-		void update_outputs(const netlist_sig_t strobe, const netlist_sig_t select);
+		NETLIB_UPDATEI();
 
 	public:
+		NETLIB_NAME(9322) &m_parent;
 		logic_input_t m_A;
 		logic_input_t m_B;
 		logic_output_t m_Y;
 	};
 
-	// FIXME: Timing
-	void NETLIB_NAME(9322_selector)::update_outputs(const netlist_sig_t strobe, const netlist_sig_t select)
-	{
-		if (strobe)
-			m_Y.push(0, NLTIME_FROM_NS(21));
-		else if (select)
-			m_Y.push(m_B(), NLTIME_FROM_NS(14));
-		else
-			m_Y.push(m_A(), NLTIME_FROM_NS(14));
-	}
-
 	NETLIB_OBJECT(9322)
 	{
 		NETLIB_CONSTRUCTOR(9322)
+		, m_SELECT(*this, "SELECT")
+		, m_STROBE(*this, "STROBE")
 		, m_1(*this, "1")
 		, m_2(*this, "2")
 		, m_3(*this, "3")
 		, m_4(*this, "4")
-		, m_SELECT(*this, "SELECT")
-		, m_STROBE(*this, "STROBE")
 		{
 			register_subalias("A1", m_1.m_A);
 			register_subalias("B1", m_1.m_B);
@@ -66,14 +59,15 @@ namespace netlist
 
 		NETLIB_UPDATEI();
 
+	public:
+		logic_input_t m_SELECT;
+		logic_input_t m_STROBE;
 	protected:
 		NETLIB_SUB(9322_selector) m_1;
 		NETLIB_SUB(9322_selector) m_2;
 		NETLIB_SUB(9322_selector) m_3;
 		NETLIB_SUB(9322_selector) m_4;
 
-		logic_input_t m_SELECT;
-		logic_input_t m_STROBE;
 	};
 
 	NETLIB_OBJECT_DERIVED(9322_dip, 9322)
@@ -98,14 +92,23 @@ namespace netlist
 		}
 	};
 
+	// FIXME: Timing
+	NETLIB_UPDATE(9322_selector)
+	{
+		if (m_parent.m_STROBE())
+			m_Y.push(0, NLTIME_FROM_NS(21));
+		else if (m_parent.m_SELECT())
+			m_Y.push(m_B(), NLTIME_FROM_NS(14));
+		else
+			m_Y.push(m_A(), NLTIME_FROM_NS(14));
+	}
+
 	NETLIB_UPDATE(9322)
 	{
-		const netlist_sig_t strobe = m_STROBE();
-		const netlist_sig_t select = m_SELECT();
-		m_1.update_outputs(strobe, select);
-		m_2.update_outputs(strobe, select);
-		m_3.update_outputs(strobe, select);
-		m_4.update_outputs(strobe, select);
+		m_1.update_dev();
+		m_2.update_dev();
+		m_3.update_dev();
+		m_4.update_dev();
 	}
 
 	NETLIB_DEVICE_IMPL(9322)
