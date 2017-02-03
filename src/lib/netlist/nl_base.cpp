@@ -568,7 +568,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-core_device_t *netlist_t::pget_single_device(const pstring classname, bool (*cc)(core_device_t *))
+core_device_t *netlist_t::get_single_device(const pstring classname, bool (*cc)(core_device_t *))
 {
 	core_device_t *ret = nullptr;
 	for (auto &d : m_devices)
@@ -772,7 +772,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	static const unsigned masks[4] =
+	const unsigned masks[4] =
 	{
 		0,
 		core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE,
@@ -780,10 +780,10 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 		0
 	};
 
-	const unsigned mask = masks[ m_cur_Q  * 2 + m_new_Q ];
+	const unsigned mask = masks[ (m_cur_Q << 1) | m_new_Q ];
 
-	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+	m_in_queue = 2; /* mark as taken ... */
 
 	for (auto & p : m_list_active)
 	{
@@ -1199,4 +1199,26 @@ std::unique_ptr<plib::pistream> param_data_t::stream()
 
 
 	} //namespace devices
+
+	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_t *>(this) != nullptr;
+	}
+
+	bool detail::net_t::is_logic() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_net_t *>(this) != nullptr;
+	}
+
+	bool detail::net_t::is_analog() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_net_t *>(this) != nullptr;
+	}
+
+
 } // namespace netlist

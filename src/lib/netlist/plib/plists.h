@@ -81,32 +81,40 @@ public:
 
 		friend class linkedlist_t<LC>;
 
-		element_t() : m_next(nullptr) {}
-		virtual ~element_t() = default;
+		constexpr element_t() : m_next(nullptr) {}
+		constexpr element_t(const element_t &rhs) = delete;
+		constexpr element_t(element_t &&rhs) = delete;
 
-		LC *next() const noexcept { return m_next; }
+		constexpr LC *next() const noexcept { return m_next; }
+
+	protected:
+		~element_t() = default;
 	private:
 		LC * m_next;
 	};
 
 	struct iter_t final : public std::iterator<std::forward_iterator_tag, LC>
 	{
+	private:
 		LC* p;
 	public:
 		explicit constexpr iter_t(LC* x) noexcept : p(x) {}
-		explicit iter_t(const iter_t &rhs) noexcept = default;
-		iter_t(iter_t &&rhs) noexcept = default;
+		explicit constexpr iter_t(const iter_t &rhs) noexcept = default;
+		constexpr iter_t(iter_t &&rhs) noexcept = default;
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
-		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
-		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
-		LC& operator*() noexcept {return *p;}
-		LC* operator->() noexcept {return p;}
+		constexpr bool operator==(const iter_t& rhs) const noexcept {return p == rhs.p;}
+		constexpr bool operator!=(const iter_t& rhs) const noexcept {return p != rhs.p;}
+		/* constexpr */ LC& operator*() noexcept {return *p;}
+		/* constexpr */ LC* operator->() noexcept {return p;}
+
+		constexpr LC& operator*() const noexcept {return *p;}
+		constexpr LC* operator->() const noexcept {return p;}
 	};
 
-	linkedlist_t() : m_head(nullptr) {}
+	constexpr linkedlist_t() : m_head(nullptr) {}
 
-	iter_t begin() const noexcept { return iter_t(m_head); }
+	constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 	constexpr iter_t end() const noexcept { return iter_t(nullptr); }
 
 	void push_front(LC *elem)
@@ -138,7 +146,7 @@ public:
 
 	LC *front() const { return m_head; }
 	void clear() { m_head = nullptr; }
-	bool empty() const { return (m_head == nullptr); }
+	constexpr bool empty() const { return (m_head == nullptr); }
 
 private:
 	LC *m_head;
