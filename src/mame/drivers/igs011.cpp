@@ -4788,6 +4788,25 @@ ROM_START( vbowlj )
 	ROM_COPY( "ics", 0x000000, 0x300000,0x100000)
 ROM_END
 
+ROM_START( vbowlhk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "bowlingv101hjs.bin", 0x00000, 0x80000, CRC(92fbfa72) SHA1(824b666ea2247ef5a974675925bcef94dbd1a992) ) // second half all 00
+
+	ROM_REGION( 0x400000 * 2, "blitter", 0)
+	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
+	// extra space to expand every 4 bits to 8
+
+	ROM_REGION( 0x100000, "blitter_hi", ROMREGION_INVERT )
+	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
+
+	ROM_REGION( 0x400000, "ics", 0 )
+	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
+	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
+	ROM_COPY( "ics", 0x000000, 0x100000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x200000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x300000,0x100000)
+ROM_END
+
 /***************************************************************************
 
     Xing Yen Man Guan
@@ -4821,21 +4840,22 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",        "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta",              "Zhong Guo Long (Japan, V021J)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta",              "Zhong Guo Long (Japan, V020J)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",                     "Zhong Guo Long (China, V010C)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",                     "Dong Fang Zhi Zhu (Hong Kong, V011H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xymg,         ROT0, "IGS",                     "Xing Yun Man Guan (China, V651C)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",                     "Wan Li Chang Cheng (China, V638C)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,      vbowl,    vbowl,           vbowl,     igs011_state, vbowlj,       ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Honk Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING |MACHINE_IMPERFECT_SOUND ) // different encryption?
+GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )
