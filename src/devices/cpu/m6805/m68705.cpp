@@ -584,7 +584,6 @@ void m68705_device::interrupt()
 			if (BIT(m_pending_interrupts, M68705_IRQ_LINE))
 			{
 				LOGINT("servicing /INT interrupt\n");
-				m_irq_latch = 0;
 				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
 				rm16(M68705_VECTOR_INT, m_pc);
 			}

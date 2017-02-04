@@ -218,7 +218,21 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 	{
 		LOGIOPORT("write DDR%c: %02X (was %02X)\n", char('A' + offset), data, m_port_ddr[offset]);
 		m_port_ddr[offset] = data;
-		if (diff & m_port_interrupt[offset]) update_port_irq();
+		if (diff & m_port_interrupt[offset])
+		{
+			if (!m_port_cb_r[offset].isnull())
+			{
+				u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
+				u8 const diff(newval ^ m_port_input[offset]);
+				if (diff)
+				{
+					LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02X)\n",
+							char('A' + offset), newval, ~m_port_ddr[offset] & m_port_bits[offset], m_port_input[offset]);
+				}
+				m_port_input[offset] = newval;
+			}
+			update_port_irq();
+		}
 		m_port_cb_w[offset](space, 0, port_value(offset), m_port_ddr[offset]);
 	}
 }
@@ -559,6 +573,7 @@ void m68hc05_device::interrupt()
 		if (m_pending_interrupts & M68HC05_INT_IRQ)
 		{
 			LOGINT("servicing external interrupt\n");
+			m_irq_latch = 0;
 			m_pending_interrupts &= ~M68HC05_INT_IRQ;
 			rm16(M68HC05_VECTOR_IRQ, m_pc);
 		}
