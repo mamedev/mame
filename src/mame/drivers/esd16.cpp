@@ -23,6 +23,7 @@ Year + Game            PCB             Notes
 98  Multi Champ        ESD 11-09-98   (also a year 1999 revision)
 99  Multi Champ Deluxe ESD 08-26-1999 (also a year 2000 revision)
 99  Head Panic         ESD 05-28-99   (All English version, copyright 1999)
+99  Head Panic         ESD 06-10-1999 (All English version, copyright 1999)
 00  Head Panic         ESD 08-26-1999 (All English version, copyright 2000)
 00  Head Panic         ESD 08-26-1999 (with Fuuki, Story in Japanese)
 00  Deluxe 5           ESD            (no date is marked on PCB)
@@ -1026,7 +1027,7 @@ Notes:
 2x pushbutton
 
 
-ESD 08-26-1999
+ESD 08-26-1999 (ESD 06-10-1999 nearly identical)
 |-----------------------------------------|
 |  3014  3812 6116   6295   ESD4          |
 |VOL        ESD3    Z80                 * |
@@ -1115,6 +1116,33 @@ ROM_START( hedpanicf ) /* Story line in Japanese, game instructions in English *
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
+ROM_END
+
+
+ROM_START( hedpanica ) /* Story line & game instructions in English, copyright year is 1999 - ESD 06-10-1999 PCB */
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "esd12.cu03", 0x000000, 0x040000, CRC(deb7e0a0) SHA1(ef3a00e9bfdffd7c89326ad97a261f9a7b9863ae) ) /* CU03 */
+	ROM_LOAD16_BYTE( "esd11.cu02", 0x000001, 0x040000, CRC(e1418f23) SHA1(39f14172d9b1a0d47edfe2456362fddc22f60066) ) /* CU02 */
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
+
+	ROM_REGION( 0x600000, "spr", 0 )    /* Sprites, 16x16x5 */
+	ROM_LOAD( "ju04", 0x200000, 0x200000, CRC(4f3503d7) SHA1(4bed795c7328e0ebfa97688918eb8a908c29deb8) )
+	ROM_LOAD( "ju06", 0x000000, 0x200000, CRC(9f6f6193) SHA1(c7c7ae6898ab7177eefb0e525d827666e2af9f7e) )
+	/* expand this to take up 0x200000 bytes too so we can decode it */
+	ROM_LOAD16_BYTE( "esd5.bin", 0x400000, 0x080000, CRC(6968265a) SHA1(84b4f2d8b3bf6ea4117fa8281c76b58df778261d) ) /* JU07 */
+	ROM_FILL(                    0x500000, 0x100000, 0x00 )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(9b5a45c5) SHA1(fbd8bc6ccc068d2cc7fe4f575fa0847f53e786ab) )
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(8f2099cc) SHA1(40795ae5fb8de613c2d5b6147992c153695bf698) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "esd4.bin", 0x000000, 0x080000, CRC(5692fe92) SHA1(4423039cb437ab36d198b212ef394bf1704be404) ) /* SU10 */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
@@ -1599,6 +1627,9 @@ GAME( 2001, jumppope, jumppop,  jumppop,  jumppop, driver_device,  0, ROT0, "Ema
 
 /* ESD 05-28-99 */
 GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, driver_device, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", MACHINE_SUPPORTS_SAVE )
+
+/* ESD 06-10-1999 */
+GAME( 1999, hedpanica,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
 GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, driver_device, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
