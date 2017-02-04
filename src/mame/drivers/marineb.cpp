@@ -94,8 +94,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wanted_io_map, AS_IO, 8, marineb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -605,11 +605,11 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
 
-	/* sound hardware */
-	MCFG_SOUND_REPLACE("ay1", AY8910, 1500000)
+	// sound hardware (PSG type verified only for bcruzm12)
+	MCFG_SOUND_REPLACE("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -806,6 +806,9 @@ DIPS: 2 x 8 position
 All roms type 2764
 Both proms type MB7052 (compatible to 82s129)
 RAM: 1 x 8416, 1 x AM9122, 2 x D2125, 4 x M5L2114
+
+The topmost row is entirely unpopulated. This includes a space (at 19D) for
+a MC68705P3.
 
 PCB Layout:
 
