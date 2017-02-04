@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "sound/es8712.h"
+#include "sound/okim6295.h"
 #include "machine/tc009xlvc.h"
 
 #define MASTER_CLOCK XTAL_14_31818MHz
@@ -26,11 +28,13 @@ public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vdp(*this, "tc0091lvc")
+		m_vdp(*this, "tc0091lvc"),
+		m_oki(*this, "oki")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
+	required_device<okim6295_device> m_oki;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -41,6 +45,8 @@ public:
 	uint8_t m_irq_vector[3];
 	uint8_t m_irq_enable;
 	uint8_t m_mux_data;
+	uint8_t m_soundlatch[2];
+	uint8_t m_sound_flags;
 
 	DECLARE_READ8_MEMBER(lastbank_rom_r);
 
@@ -53,8 +59,16 @@ public:
 	DECLARE_WRITE8_MEMBER(lastbank_ram_2_w);
 	DECLARE_WRITE8_MEMBER(lastbank_ram_3_w);
 
+	DECLARE_WRITE8_MEMBER(output_w);
+
 	DECLARE_READ8_MEMBER(mux_0_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(soundlatch_w);
+
+	DECLARE_READ8_MEMBER(soundlatch1_r);
+	DECLARE_READ8_MEMBER(soundlatch2_r);
+	DECLARE_WRITE8_MEMBER(sound_flags_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
 	DECLARE_READ8_MEMBER(lastbank_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(lastbank_rom_bank_w);
@@ -180,9 +194,39 @@ READ8_MEMBER(lastbank_state::mux_0_r)
 	return res;
 }
 
+WRITE8_MEMBER(lastbank_state::output_w)
+{
+	//logerror("%s: Writing %02x to A80%x\n", machine().describe_context(), data, offset);
+}
+
 WRITE8_MEMBER(lastbank_state::mux_w)
 {
 	m_mux_data = data;
+}
+
+WRITE8_MEMBER(lastbank_state::soundlatch_w)
+{
+	m_soundlatch[offset] = data;
+}
+
+READ8_MEMBER(lastbank_state::soundlatch1_r)
+{
+	return m_soundlatch[0];
+}
+
+READ8_MEMBER(lastbank_state::soundlatch2_r)
+{
+	return m_soundlatch[1];
+}
+
+WRITE8_MEMBER(lastbank_state::sound_flags_w)
+{
+	m_sound_flags = data;
+}
+
+CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
+{
+	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }
 
 static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, lastbank_state )
@@ -205,15 +249,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_IMPORT_FROM( tc0091lvc_map )
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS") AM_WRITENOP
-	AM_RANGE(0xa801, 0xa801) AM_WRITENOP
-	AM_RANGE(0xa802, 0xa802) AM_WRITENOP
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS")
+	AM_RANGE(0xa800, 0xa802) AM_WRITE(output_w)
 	AM_RANGE(0xa803, 0xa803) AM_WRITE(mux_w) // mux for $a808 / $a80c
-	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("VBLANK")
-	AM_RANGE(0xa805, 0xa805) AM_WRITENOP
-	AM_RANGE(0xa806, 0xa806) AM_WRITENOP
-	AM_RANGE(0xa807, 0xa807) AM_WRITENOP
+	AM_RANGE(0xa804, 0xa804) AM_READ_PORT("SPECIAL")
+	AM_RANGE(0xa805, 0xa806) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa807, 0xa807) AM_WRITENOP // hopper?
 	AM_RANGE(0xa808, 0xa808) AM_READ(mux_0_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(mux_0_r)
 	AM_RANGE(0xa81c, 0xa81c) AM_READ_PORT("DSW0")
@@ -225,11 +267,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lastbank_audio_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastbank_audio_io, AS_IO, 8, lastbank_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x06) AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch1_r) AM_WRITE(sound_flags_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch2_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lastbank )
@@ -243,7 +289,7 @@ static INPUT_PORTS_START( lastbank )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("VBLANK")
+	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service")
 	PORT_DIPNAME( 0x04, 0x04, "Hopper Count" )
@@ -252,8 +298,8 @@ static INPUT_PORTS_START( lastbank )
 	PORT_DIPNAME( 0x08, 0x08, "Hopper Empty" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN ) // bit 6 is a status of some sort
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lastbank_state, sound_status_r, nullptr)
 
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
@@ -461,7 +507,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(lastbank_audio_map)
 	MCFG_CPU_IO_MAP(lastbank_audio_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lastbank_state, nmi_line_pulse, 60)
+	// yes, we have no interrupts
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -488,7 +534,12 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	// es8712
+
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MCFG_ES8712_ADD("essnd", 12000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -508,9 +559,11 @@ ROM_START( lastbank )
 	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
 	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 
-	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
-	ROM_LOAD( "7.u60", 0x40000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
+
+	ROM_REGION( 0x80000, "essnd", 0 ) /* Samples */
+	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, driver_device,  0, ROT0, "Excellent System", "Last Bank (v1.16)", MACHINE_NO_SOUND )
+GAME( 1994, lastbank,  0,   lastbank, lastbank, driver_device,  0, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

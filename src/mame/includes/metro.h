@@ -168,7 +168,7 @@ public:
 
 	// vmetal
 	DECLARE_WRITE8_MEMBER(vmetal_control_w);
-	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
+	DECLARE_WRITE8_MEMBER(vmetal_se_control_w);
 
 	DECLARE_DRIVER_INIT(karatour);
 	DECLARE_DRIVER_INIT(daitorid);

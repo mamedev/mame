@@ -7,9 +7,14 @@
  *
  *  Samples are currently looped, but whether they should and how, is unknown.
  *  Interface to the chip is also not 100% clear.
- *  Should there be any status signals signifying busy, end of sample - etc?
  *
- *  Heavily borrowed from the OKI M6295 source
+ *  This implementation, heavily borrowed from the OKI M6295 source, is based on
+ *  almost certainly incorrect assumptions about the chip's nature. It seems
+ *  that the ES8712 is actually a programmable counter which can stream ADPCM
+ *  samples when hooked up to a ROM and a M5205 or M6585 (whose VCK signal can
+ *  drive the counter). Neither of these seem to be used in conjunction with the
+ *  ES8712 on Dream 9 and Dream 9 Final, which suggests it may have been used
+ *  for an entirely different purpose there (perhaps to do with video timing).
  *
  **********************************************************************************************/
 
@@ -325,7 +330,7 @@ void es8712_device::play()
  *
 ***********************************************************************************************/
 
-WRITE8_MEMBER( es8712_device::es8712_w )
+WRITE8_MEMBER(es8712_device::write)
 {
 	switch (offset)
 	{
@@ -346,4 +351,13 @@ WRITE8_MEMBER( es8712_device::es8712_w )
 		default:    break;
 	}
 	m_start &= 0xfffff; m_end &= 0xfffff;
+}
+
+READ8_MEMBER(es8712_device::read)
+{
+	// busy state (other bits unknown)
+	if (offset == 0)
+		return m_playing ? 1 : 0;
+
+	return 0;
 }
