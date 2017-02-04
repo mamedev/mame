@@ -76,10 +76,10 @@ int configuration_manager::load_settings()
 			osd_file::error filerr = file.open(filename, ".cfg");
 
 			if (filerr != osd_file::error::NONE)
-				throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+				throw emu_fatalerror("Could not load controller file %s.cfg", filename.c_str());
 
 			if (!load_xml(file, config_type::CONTROLLER))
-				throw emu_fatalerror("Could not load controller file %s.cfg", controller);
+				throw emu_fatalerror("Could not load controller file %s.cfg", filename.c_str());
 		}
 	}
 
