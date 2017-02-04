@@ -15,7 +15,7 @@
 
 #include "nl_factory.h"
 #include "nl_config.h"
-#include "nl_types.h"
+#include "netlist_types.h"
 
 #include <stack>
 #include <vector>

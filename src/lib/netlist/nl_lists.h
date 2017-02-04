@@ -15,7 +15,7 @@
 #include <mutex>
 
 #include "nl_config.h"
-#include "nl_types.h"
+#include "netlist_types.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
 #include "plib/ptypes.h"

@@ -2,12 +2,12 @@
 // copyright-holders:Couriersud
 /*!
  *
- * \file nl_types.h
+ * \file netlist_types.h
  *
  */
 
-#ifndef NLTYPES_H_
-#define NLTYPES_H_
+#ifndef NETLIST_TYPES_H_
+#define NETLIST_TYPES_H_
 
 #include <cstdint>
 #include <unordered_map>
@@ -22,13 +22,13 @@ namespace netlist
 	//  Performance tracking
 	//============================================================
 
-	#if NL_KEEP_STATISTICS
+#if NL_KEEP_STATISTICS
 	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, true>;
 	using nperfcount_t = plib::chrono::counter<true>;
-	#else
+#else
 	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
 	using nperfcount_t = plib::chrono::counter<false>;
-	#endif
+#endif
 
 	//============================================================
 	//  Types needed by various includes
@@ -51,4 +51,4 @@ namespace netlist
 	}
 }
 
-#endif /* NLTYPES_H_ */
+#endif /* NETLIST_TYPES_H_ */
