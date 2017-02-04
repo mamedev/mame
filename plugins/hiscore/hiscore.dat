@@ -8778,7 +8778,7 @@ missile:
 missile2:
 suprmatk:
 suprmatkd:
-@:maincpu,program,002c,30,47,00
+@:maincpu,:videoram/share,002c,30,47,00
 
 
 ;(missile command (set 2)) clone (by GeoMan) - modified hiscore save
