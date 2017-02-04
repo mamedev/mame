@@ -51,44 +51,82 @@ namespace plib {
  * It derives a pointer to a member function.
  */
 
-#if (PHAS_PMF_INTERNAL)
+#if (PHAS_PMF_INTERNAL > 0)
 	class mfp
 	{
 	public:
 		// construct from any member function pointer
+#ifdef _MSC_VER
+		class __single_inheritance si_generic_class;
+		class generic_class { };
+#else
 		class generic_class;
+#endif
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
 		mfp(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0)
+		: m_function(0), m_this_delta(0), m_size(sizeof(mfp))
 		{
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
 		}
 
-		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
-		static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
+		template<typename MemberFunctionType, typename FunctionType, typename ObjectType>
+		static void get_mfp(MemberFunctionType mftp, FunctionType &func, ObjectType *&object)
 		{
 			mfp mfpo(mftp);
 			//return mfpo.update_after_bind<FunctionType>(object);
-			return reinterpret_cast<FunctionType>(
-					mfpo.convert_to_generic(reinterpret_cast<generic_class *>(object)));
+			generic_function rfunc(nullptr);
+			generic_class *robject = reinterpret_cast<generic_class *>(object);
+			mfpo.convert_to_generic(rfunc, robject);
+			func = reinterpret_cast<FunctionType>(rfunc);
+			object = reinterpret_cast<ObjectType *>(robject);
 		}
 
 	private:
 		// extract the generic function and adjust the object pointer
-		generic_function convert_to_generic(generic_class * object) const
+		void convert_to_generic(generic_function &func, generic_class *&object) const
 		{
-			// apply the "this" delta to the object first
-			generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+			if (PHAS_PMF_INTERNAL == 1)
+			{
+				// apply the "this" delta to the object first
+				generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 
-			// if the low bit of the vtable index is clear, then it is just a raw function pointer
-			if (!(m_function & 1))
-				return reinterpret_cast<generic_function>(m_function);
+				// if the low bit of the vtable index is clear, then it is just a raw function pointer
+				if (!(m_function & 1))
+					func = reinterpret_cast<generic_function>(m_function);
+				else
+				{
+					// otherwise, it is the byte index into the vtable where the actual function lives
+					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
+					func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
+				}
+				object = o_p_delta;
+			}
+			else if (PHAS_PMF_INTERNAL == 2)
+			{
+				if ((m_this_delta & 1) == 0) {
+					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+					func = reinterpret_cast<generic_function>(m_function);
+				}
+				else
+				{
+					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object));
 
-			// otherwise, it is the byte index into the vtable where the actual function lives
-			std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-			return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
+					// otherwise, it is the byte index into the vtable where the actual function lives
+					std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
+					func = *reinterpret_cast<generic_function *>(vtable_base + m_function + m_this_delta - 1);
+				}
+			}
+			else if (PHAS_PMF_INTERNAL == 3)
+			{
+				const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (generic_class::*)());
+
+				func = reinterpret_cast<generic_function>(m_function);
+				if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+					object = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
+			}
+
 		}
 
 		// actual state
@@ -96,6 +134,10 @@ namespace plib {
 													//    if even, it's a pointer to the function
 													//    if odd, it's the byte offset into the vtable
 		int                     m_this_delta;       // delta to apply to the 'this' pointer
+
+		int                     m_dummy1;			// only used for visual studio x64
+		int                     m_dummy2;
+		int						m_size;
 	};
 #endif
 
@@ -107,12 +149,18 @@ namespace plib {
 		class generic_class;
 #if defined (__INTEL_COMPILER) && defined (_M_X64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
 		using generic_function = int [((sizeof(void *) + 4 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
-#elif defined(_MSC_VER)// all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
-		using generic_function = int [((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
+#elif defined(_MSC_VER) // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
+		using generic_function = int[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
 #else
 		using generic_function = R (generic_class::*)(Targs...);
 #endif
-		pmfp_base() {}
+		pmfp_base()
+		{
+			int *p = reinterpret_cast<int *>(&m_func);
+			int *e = p + sizeof(generic_function) / sizeof(int);
+			for (; p < e; p++)
+				*p = 0;
+		}
 
 		template<typename MemberFunctionType, typename O>
 		void set_base(MemberFunctionType mftp, O *object)
@@ -130,6 +178,9 @@ namespace plib {
 		}
 	private:
 		generic_function m_func;
+#if 0 && defined(_MSC_VER)
+		int dummy[4]; 
+#endif
 	};
 
 #elif ((PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV) || (PPMF_TYPE == PPMF_TYPE_INTERNAL))
@@ -146,7 +197,9 @@ namespace plib {
 		{
 	#if (PPMF_TYPE == PPMF_TYPE_INTERNAL)
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
-			m_func = reinterpret_cast<generic_function>(plib::mfp::get_mfp<function_ptr>(mftp, object));
+			function_ptr func(nullptr);
+			plib::mfp::get_mfp(mftp, func, object);
+			m_func = reinterpret_cast<generic_function>(func);
 	#elif (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
 			R (O::* pFunc)(Targs...) = mftp;
 			m_func = reinterpret_cast<generic_function>((object->*pFunc));
@@ -159,6 +212,7 @@ namespace plib {
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
 		bool is_set() { return m_func != nullptr; }
+		generic_function get_function() const { return m_func; }
 	private:
 		generic_function m_func;
 	};
@@ -188,6 +242,9 @@ namespace plib {
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}
+
+		generic_class *object() const { return m_obj; }
+		bool has_object() const { return m_obj != nullptr; }
 	private:
 		generic_class *m_obj;
 	};

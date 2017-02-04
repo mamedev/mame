@@ -54,7 +54,7 @@ namespace netlist
 
 		struct entry_t final
 		{
-			constexpr entry_t() { }
+			constexpr entry_t() : m_exec_time(), m_object(nullptr) { }
 			constexpr entry_t(const Time &t, const Element &o) : m_exec_time(t), m_object(o) { }
 			constexpr entry_t(const entry_t &e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
 			constexpr entry_t(entry_t &&e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }

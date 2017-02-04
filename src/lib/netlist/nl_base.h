@@ -455,6 +455,10 @@ namespace netlist
 		core_device_t & m_device;
 };
 
+	/*! Delegate type for device notification.
+	 *
+	 */
+	typedef plib::pmfp<void> nldelegate;
 
 	// -----------------------------------------------------------------------------
 	// core_terminal_t
@@ -508,6 +512,8 @@ namespace netlist
 		void set_state(const state_e astate) NL_NOEXCEPT { m_state = astate; }
 
 		void reset();
+
+		nldelegate m_delegate;
 
 	private:
 		net_t * m_net;
@@ -1044,13 +1050,15 @@ namespace netlist
 
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
+		bool get_hint_deactivate() { return m_hint_deactivate; }
 
-		void set_delegate_pointer();
+		void set_default_delegate(detail::core_terminal_t &term);
 
 		/* stats */
 		nperftime_t  m_stat_total_time;
 		nperfcount_t m_stat_call_count;
 		nperfcount_t m_stat_inc_active;
+
 
 	protected:
 
@@ -1061,11 +1069,7 @@ namespace netlist
 
 		void do_update() NL_NOEXCEPT
 		{
-			#if (NL_USE_PMF_VIRTUAL)
 			update();
-			#else
-			m_static_update.call(this);
-			#endif
 		}
 
 		plib::plog_base<NL_DEBUG> &log();
@@ -1081,10 +1085,6 @@ namespace netlist
 
 	private:
 		bool m_hint_deactivate;
-
-	#if (!NL_USE_PMF_VIRTUAL)
-		plib::pmfp_base<void> m_static_update;
-	#endif
 	};
 
 	// -----------------------------------------------------------------------------
