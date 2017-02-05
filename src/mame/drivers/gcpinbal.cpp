@@ -99,13 +99,6 @@ void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_GCPINBAL_INTERRUPT1:
 		m_maincpu->set_input_line(1, HOLD_LINE);
 		break;
-	case TIMER_GCPINBAL_INTERRUPT3:
-		// IRQ3 is from the M6585
-		//if (!ADPCM_playing(0))
-		{
-			m_maincpu->set_input_line(3, HOLD_LINE);
-		}
-		break;
 	default:
 		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
 	}
@@ -116,7 +109,6 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 	/* Unsure of actual sequence */
 
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_GCPINBAL_INTERRUPT1);
-//  timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), TIMER_GCPINBAL_INTERRUPT3);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -163,13 +155,17 @@ WRITE8_MEMBER(gcpinbal_state::eeprom_w)
 	m_eeprom->cs_write(BIT(data, 0));
 }
 
-WRITE8_MEMBER(gcpinbal_state::unknown_w)
+WRITE8_MEMBER(gcpinbal_state::es8712_ack_w)
 {
+	// This probably works by resetting the ES-8712
+	m_maincpu->set_input_line(3, CLEAR_LINE);
+	m_adpcm_idle = 1;
+	m_msm->reset_w(1);
 }
 
 WRITE8_MEMBER(gcpinbal_state::es8712_w)
 {
-	// MSM6585 ADPCM - mini emulation
+	// MSM6585/ES-8712 ADPCM - mini emulation
 	switch (offset)
 	{
 		case 0:
@@ -201,7 +197,6 @@ WRITE8_MEMBER(gcpinbal_state::es8712_w)
 			if (m_msm_start < m_msm_end)
 			{
 				/* data written here is adpcm param? */
-				//popmessage("%08x %08x", m_msm_start + m_msm_bank, m_msm_end);
 				m_adpcm_idle = 0;
 				m_msm->reset_w(0);
 				m_adpcm_start = m_msm_start + m_msm_bank;
@@ -219,17 +214,17 @@ WRITE8_MEMBER(gcpinbal_state::es8712_w)
 ************************************************/
 
 
-/* Controlled through ioc? */
+// Controlled through ES-8712
 WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
-	if (!state)
+	if (!state || m_adpcm_idle)
 		return;
-	if (m_adpcm_idle)
-		m_msm->reset_w(1);
 	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
 	{
-		//m_msm->reset_w(1);
-		m_adpcm_start = m_msm_start + m_msm_bank;
+		m_adpcm_idle = 1;
+		m_msm->reset_w(1);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
+		//m_adpcm_start = m_msm_start + m_msm_bank;
 		m_adpcm_trigger = 0;
 	}
 	else
@@ -262,7 +257,7 @@ static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("IN1")
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(bank_w, 0xff00)
 	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE8(eeprom_w, 0xff00)
-	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(unknown_w, 0xff00)
+	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(es8712_ack_w, 0xff00)
 	AM_RANGE(0xd800a0, 0xd800a1) AM_MIRROR(0x2) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0xd800c0, 0xd800cd) AM_WRITE8(es8712_w, 0xff00)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM /* RAM */

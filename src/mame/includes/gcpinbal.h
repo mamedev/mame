@@ -12,8 +12,7 @@ class gcpinbal_state : public driver_device
 public:
 	enum
 	{
-		TIMER_GCPINBAL_INTERRUPT1,
-		TIMER_GCPINBAL_INTERRUPT3
+		TIMER_GCPINBAL_INTERRUPT1
 	};
 
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -70,7 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(d80060_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_WRITE8_MEMBER(es8712_ack_w);
 	DECLARE_WRITE8_MEMBER(es8712_w);
 	DECLARE_READ16_MEMBER(gcpinbal_tilemaps_word_r);
 	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
