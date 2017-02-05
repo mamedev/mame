@@ -32,7 +32,8 @@
     1992  Tant-R (Korea)             Sega              ?                C2
     1992  Waku Waku Marine           Sega              317-0140         C2
     1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
-    1994  PotoPoto (Japan)           Sega              317-0218         C2
+	1993  Sega Sonic Cosmo Fighter   Sega              317-0140         C2
+	1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
     1994  Stack Columns (World)      Sega              317-0223         C2
     1994  Ichidant-R (Japan)         Sega              317-0224         C2
@@ -1774,6 +1775,18 @@ ROM_START( sonicpop ) /* Sega Sonic Popcorn Shop (Rev.B) (c)1993 Sega - 834-9555
 ROM_END
 
 
+ROM_START( sonicfgt ) /* Sega Sonic Cosmo Fighter (c)1993 Sega - 834-10082 930719-1755T (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-16001.ic32", 0x000000, 0x040000, CRC(8ed1dc11) SHA1(cd1cb6066c2ff159bec88802bc4b7ca7fff2ed71) )
+	ROM_LOAD16_BYTE( "epr-16000.ic31", 0x000001, 0x040000, CRC(1440caec) SHA1(9e50c28544d6c42cdc7d3ae0f321670fed68fedb) )
+	ROM_LOAD16_BYTE( "epr-16003.ic34", 0x100000, 0x040000, CRC(8933e91c) SHA1(5dc7451874f97e0e5d0c666800c26907b9abf5f5) )
+	ROM_LOAD16_BYTE( "epr-16002.ic33", 0x100001, 0x040000, CRC(0ae979cd) SHA1(a4d4f096e976d4993123de0c2505382f878ea42a) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-16004.ic4", 0x000000, 0x040000, CRC(e87e8433) SHA1(b2b7945c7660ab2383049af5a2434768544a4ea8) )
+ROM_END
+
+
 ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(5347f8ce) SHA1(b95b99536157edfbf0d74a42f64235f47dca7ee1) )
@@ -2505,6 +2518,8 @@ GAME( 1992, wwmarine,   0,       segac2, wwmarine, segac2_state, bloxeedc, ROT0,
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1993, sonicpop,   0,       segac2, sonicpop, segac2_state, bloxeedc, ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
+
+GAME( 1993, sonicfgt,  0,        segac2, systemc_generic, segac2_state, bloxeedc, ROT0,   "Sega", "Sega Sonic Cosmo Fighter", 0 )
 
 GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
