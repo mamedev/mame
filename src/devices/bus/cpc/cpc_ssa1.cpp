@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpc_ssa1.h"
-#include "includes/amstrad.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

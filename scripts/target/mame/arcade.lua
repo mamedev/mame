@@ -265,6 +265,7 @@ SOUNDS["VOLT_REG"] = true
 --SOUNDS["MEA8000"] = true
 SOUNDS["DAC76"] = true
 SOUNDS["MM5837"] = true
+--SOUNDS["DAVE"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -339,6 +340,7 @@ VIDEOS["V9938"] = true
 VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
 VIDEOS["ZEUS2"] = true
+VIDEOS["PPU2C0X"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -2872,10 +2874,6 @@ files {
 	MAME_DIR .. "src/mame/includes/vsnes.h",
 	MAME_DIR .. "src/mame/machine/vsnes.cpp",
 	MAME_DIR .. "src/mame/video/vsnes.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.h",
-
-
 }
 
 createMAMEProjects(_target, _subtarget, "nix")

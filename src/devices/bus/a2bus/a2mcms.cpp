@@ -11,7 +11,6 @@
 *********************************************************************/
 
 #include "a2mcms.h"
-#include "includes/apple2.h"
 
 // the actual sound device (a slot device can't currently also be a sound device so we keep this private here)
 enum

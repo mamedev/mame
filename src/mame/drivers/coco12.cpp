@@ -107,19 +107,6 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( coco_cart_autostart )
-//-------------------------------------------------
-
-INPUT_PORTS_START( coco_cart_autostart )
-	PORT_START(CART_AUTOSTART_TAG)
-	PORT_CONFNAME( 0x01, 0x01, "Cart Auto-Start" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(    0x01, DEF_STR( On ))
-INPUT_PORTS_END
-
-
-
-//-------------------------------------------------
 //  INPUT_PORTS( coco_beckerport )
 //-------------------------------------------------
 
@@ -238,7 +225,6 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_cart_autostart )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END

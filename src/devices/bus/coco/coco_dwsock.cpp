@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "osdcore.h"
-#include "includes/coco.h"
 
 #include "coco_dwsock.h"
 

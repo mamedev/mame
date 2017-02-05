@@ -936,3 +936,16 @@ if (VIDEOS["EF9369"]~=null) then
 		MAME_DIR .. "src/devices/video/ef9369.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/ppu2c0x.h,VIDEOS["PPU2C0X"] = true
+--------------------------------------------------
+
+if (VIDEOS["PPU2C0X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ppu2c0x.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x.h",
+	}
+end
+

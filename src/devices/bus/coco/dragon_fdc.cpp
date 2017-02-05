@@ -69,7 +69,6 @@
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "includes/coco.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"

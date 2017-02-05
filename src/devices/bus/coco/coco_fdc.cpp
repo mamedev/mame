@@ -46,7 +46,6 @@
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "includes/coco.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"

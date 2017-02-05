@@ -8,7 +8,6 @@
 
 *********************************************************************/
 
-#include "includes/apple2.h"
 #include "a2dx1.h"
 #include "sound/volt_reg.h"
 

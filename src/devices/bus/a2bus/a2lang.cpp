@@ -13,7 +13,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "a2lang.h"
 
 
@@ -70,12 +69,12 @@ void a2bus_lang_device::device_reset()
 
 void a2bus_lang_device::langcard_touch(offs_t offset)
 {
-	uint32_t val, mask;
+/*	uint32_t val, mask;
 
 	if (LOG_LANGCARD)
 		logerror("language card bankswitch read, offset: $c08%0x\n", offset);
 
-	/* determine which flags to change */
+	// determine which flags to change 
 	mask = VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2;
 	val = 0;
 
@@ -93,9 +92,9 @@ void a2bus_lang_device::langcard_touch(offs_t offset)
 	if ((offset & 0x08) == 0)
 		val |= VAR_LCRAM2;
 
-	/* change the flags */
+	// change the flags
 	apple2_state *state = machine().driver_data<apple2_state>();
-	state->apple2_setvar(val, mask);
+	state->apple2_setvar(val, mask);*/
 }
 
 
@@ -106,7 +105,7 @@ void a2bus_lang_device::langcard_touch(offs_t offset)
 
 uint8_t a2bus_lang_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	apple2_state *state = machine().driver_data<apple2_state>();
+/*	apple2_state *state = machine().driver_data<apple2_state>();
 
 	// enforce "read twice" for c081/3/9/B
 	// but only on the II/II+ with a discrete language card.
@@ -128,7 +127,7 @@ uint8_t a2bus_lang_device::read_c0nx(address_space &space, uint8_t offset)
 	}
 
 	langcard_touch(offset);
-	last_offset = offset;
+	last_offset = offset;*/
 	return 0;
 }
 
