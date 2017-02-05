@@ -89,6 +89,12 @@ namespace webpp {
 			void send(std::string str) { m_ostream << m_header.str() << "Content-Length: " << str.length() << "\r\n\r\n" << str; }
 			size_t size() const { return m_streambuf.size(); }
 			std::shared_ptr<socket_type> socket() { return m_socket; }
+			
+			/// If true, force server to close the connection after the response have been sent.
+			///
+			/// This is useful when implementing a HTTP/1.0-server sending content
+			/// without specifying the content length.
+			bool close_connection_after_response = false;
 		};
 
 		class Content : public std::istream {
@@ -182,7 +188,7 @@ namespace webpp {
 		void remove_handler(std::string regex)
 		{
 			std::lock_guard<std::mutex> lock(m_resource_mutex);
-			for (auto &it = m_resource.begin(); it != m_resource.end(); ++it)
+			for (auto it = m_resource.begin(); it != m_resource.end(); ++it)
 			{
 				if (it->first.getstr() == regex)
 				{
@@ -427,6 +433,9 @@ namespace webpp {
 								on_error(request, std::error_code(EPROTO, std::generic_category()));
 							return;
 						}
+
+						if (response->close_connection_after_response)
+                            return;
 
 						auto range = request->header.equal_range("Connection");
 						case_insensitive_equals check;
