@@ -48,8 +48,6 @@ class a500_kbd_us_device : public device_t, public device_amiga_keyboard_interfa
 public:
 	// construction/destruction
 	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner,	uint32_t clock,
-		device_type type, const char *name, const char *shortname);
 
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
@@ -71,6 +69,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(check_reset);
 
 protected:
+	a500_kbd_us_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			device_type type,
+			const char *name,
+			const char *shortname,
+			const char *file);
+
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -110,7 +118,8 @@ private:
 	emu_timer *m_watchdog;
 	emu_timer *m_reset;
 
-	int m_kdat;
+	int m_host_kdat;
+	int m_mpu_kdat;
 	int m_kclk;
 
 	uint8_t m_port_c;

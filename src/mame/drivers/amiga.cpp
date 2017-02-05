@@ -1319,7 +1319,7 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w))
+	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
