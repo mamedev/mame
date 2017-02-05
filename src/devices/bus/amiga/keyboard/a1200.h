@@ -12,7 +12,6 @@
 #pragma once
 
 #include "keyboard.h"
-#include "cpu/m6805/m68hc05.h"
 
 
 //**************************************************************************
@@ -39,9 +38,8 @@ public:
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
-	// mpu I/O
+	// MPU I/O
 	DECLARE_READ8_MEMBER(mpu_portb_r);
-	DECLARE_READ8_MEMBER(mpu_portd_r);
 	DECLARE_WRITE8_MEMBER(mpu_porta_w);
 	DECLARE_WRITE8_MEMBER(mpu_portb_w);
 	DECLARE_WRITE8_MEMBER(mpu_portc_w);
@@ -56,12 +54,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_ioport_array<15>       m_rows;
-	required_ioport                 m_modifiers;
-	required_device<m68hc05_device> m_mpu;
+	required_ioport_array<15>   m_rows;
+	required_device<cpu_device> m_mpu;
 
-	u16                             m_row_drive;
-	bool                            m_host_kdat, m_mpu_kdat;
+	u16                         m_row_drive;
+	bool                        m_host_kdat, m_mpu_kdat;
 };
 
 } } } // namespace bus::amiga::keyboard

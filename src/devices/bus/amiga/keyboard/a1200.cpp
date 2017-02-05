@@ -13,6 +13,8 @@
 #include "a1200.h"
 #include "matrix.h"
 
+#include "cpu/m6805/m68hc05.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -50,7 +52,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_FRAGMENT(a1200kbd_revB)
 	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL_3MHz)
 	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
-	MCFG_M68HC05_PORTD_R_CB(READ8(a1200_kbd_device, mpu_portd_r));
+	MCFG_M68HC05_PORTD_R_CB(IOPORT("MOD"));
 	MCFG_M68HC05_PORTA_W_CB(WRITE8(a1200_kbd_device, mpu_porta_w));
 	MCFG_M68HC05_PORTB_W_CB(WRITE8(a1200_kbd_device, mpu_portb_w));
 	MCFG_M68HC05_PORTC_W_CB(WRITE8(a1200_kbd_device, mpu_portc_w));
@@ -75,7 +77,6 @@ a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *ta
 	: device_t(mconfig, A1200_KBD, "Amiga 1200 Keyboard Rev B", tag, owner, clock, "a1200kbd_rb", __FILE__)
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)
-	, m_modifiers(*this, "MOD")
 	, m_mpu(*this, "mpu")
 	, m_row_drive(0xffff)
 	, m_host_kdat(true)
@@ -103,11 +104,6 @@ READ8_MEMBER(a1200_kbd_device::mpu_portb_r)
 			result &= m_rows[row]->read();
 	}
 	return result;
-}
-
-READ8_MEMBER(a1200_kbd_device::mpu_portd_r)
-{
-	return m_modifiers->read();
 }
 
 WRITE8_MEMBER(a1200_kbd_device::mpu_porta_w)
