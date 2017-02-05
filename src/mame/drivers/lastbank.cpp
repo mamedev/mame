@@ -29,12 +29,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "tc0091lvc"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_essnd(*this, "essnd")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 	required_device<okim6295_device> m_oki;
+	required_device<es8712_device> m_essnd;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -222,6 +224,10 @@ READ8_MEMBER(lastbank_state::soundlatch2_r)
 WRITE8_MEMBER(lastbank_state::sound_flags_w)
 {
 	m_sound_flags = data;
+	if (!BIT(data, 4))
+		m_essnd->reset();
+	if (!BIT(data, 5))
+		m_oki->reset();
 }
 
 CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
