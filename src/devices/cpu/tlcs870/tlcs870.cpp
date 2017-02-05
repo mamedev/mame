@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*************************************************************************************************************
 
@@ -87,10 +87,12 @@ static const char *const reg16[] = {
 	"HL"
 };
 
+#ifdef UNUSED_DEFINTION
 static const char *const reg16p[] = {
 	"DE",
 	"HL"
 };
+#endif
 
 
 
