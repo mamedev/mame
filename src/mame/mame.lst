@@ -12974,6 +12974,11 @@ galeb                           //
 @source:galgame.cpp
 galgame                         // (c) 1971 Computer Recreations, Inc
 
+@source:galgames.cpp
+galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
+galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
+galgbios                        // (c) 1998 Creative Electronics & Software (CES)
+
 @source:galivan.cpp
 dangar                          // (c) 1986
 dangara                         // (c) 1986
@@ -35803,8 +35808,6 @@ tk80bs                          //
 990189v                         // 1980 TM 990/189 with Color Video Board
 
 @source:tmaster.cpp
-galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
-galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 tm                              // (c) 1996 Midway Games
 tm2k                            // (c) 1996 Midway Games
 tm2ka                           // (c) 1996 Midway Games

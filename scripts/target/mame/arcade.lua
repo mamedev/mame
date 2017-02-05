@@ -277,6 +277,7 @@ VIDEOS["SEGA315_5313"] = true
 VIDEOS["BUFSPRITE"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
+VIDEOS["CESBLIT"] = true
 --VIDEOS["CRT9007"] = true
 --VIDEOS["CRT9021"] = true
 --VIDEOS["CRT9212"] = true
@@ -722,6 +723,7 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"bfm",
 		"bmc",
 		"capcom",
+		"ces",
 		"cinemat",
 		"comad",
 		"cvs",
@@ -1392,6 +1394,12 @@ files {
 	MAME_DIR .. "src/mame/machine/kabuki.h",
 	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
 	MAME_DIR .. "src/mame/drivers/instantm.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "ces")
+files {
+	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
+	MAME_DIR .. "src/mame/drivers/galgames.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
@@ -4392,7 +4400,6 @@ files {
 	MAME_DIR .. "src/mame/machine/cdislave.h",
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
-	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",

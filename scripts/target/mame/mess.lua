@@ -278,6 +278,7 @@ VIDEOS["SEGA315_5313"] = true
 --VIDEOS+= BUFSPRITE"] = true
 VIDEOS["CDP1861"] = true
 VIDEOS["CDP1862"] = true
+--VIDEOS["CESBLIT"] = true
 VIDEOS["CRT9007"] = true
 VIDEOS["CRT9021"] = true
 VIDEOS["CRT9212"] = true

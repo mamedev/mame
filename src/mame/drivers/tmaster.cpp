@@ -2,17 +2,14 @@
 // copyright-holders:Luca Elia, Mariusz Wojcieszek, Peter Ferrie
 /***************************************************************************
 
-                      -= Touch Master / Galaxy Games =-
+                           -= Touch Master Games =-
 
          driver by Luca Elia (l.elia@tin.it) and Mariusz Wojcieszek
 
 
 CPU:    68000
-Video:  Blitter, double framebuffer
-Sound:  OKI6295
-
-[Touch Master]
-
+Video:  Blitter with two layers and double buffering (Xilinx FPGA)
+Sound:  OKI M6295
 Input:  Microtouch touch screen
 Other:  Dallas NVRAM + optional RTC
 
@@ -91,27 +88,17 @@ Chips:
         CY7C128A-55PC (x2 used for serial communication)
         W241024AJ-15 (x4 used for blitter frame buffer)
 
-******************************************************************
-
-[Galaxy Games]
-
-Input:  Trackballs and buttons
-Other:  EEPROM
-To Do:
-
-- Coin optics
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "machine/eepromser.h"
-#include "machine/microtch.h"
-#include "machine/mc68681.h"
-#include "machine/nvram.h"
 #include "machine/ds1204.h"
+#include "machine/mc68681.h"
+#include "machine/microtch.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/okim6295.h"
+#include "video/cesblit.h"
 
 /***************************************************************************
 
@@ -124,74 +111,61 @@ class tmaster_state : public driver_device
 public:
 	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_microtouch(*this,"microtouch"),
-		m_regs(*this, "regs"),
-		m_galgames_ram(*this, "galgames_ram"),
-		m_oki(*this, "oki"),
-		m_duart(*this, "duart68681"),
+		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_blitter(*this, "blitter"),
+		m_oki(*this, "oki"),
+		m_microtouch(*this,"microtouch"),
+		m_duart(*this, "duart68681")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_device> m_microtouch;
-	required_shared_ptr<uint16_t> m_regs;
-	optional_shared_ptr<uint16_t> m_galgames_ram;
-	required_device<okim6295_device> m_oki;
-	optional_device<mc68681_device> m_duart;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	DECLARE_WRITE_LINE_MEMBER(blitter_irq_callback);
 
-	int m_okibank;
-	uint8_t m_rtc_ram[8];
-	bitmap_ind16 m_bitmap[2][2];
-	uint16_t m_color;
-	uint16_t m_addr;
-	uint32_t m_gfx_offs;
-	uint32_t m_gfx_size;
-	int (tmaster_state::*m_compute_addr) (uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
-	uint16_t m_galgames_cart;
-	uint32_t m_palette_offset;
-	uint8_t m_palette_index;
-	uint8_t m_palette_data[3];
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_WRITE16_MEMBER(tmaster_color_w);
-	DECLARE_WRITE16_MEMBER(tmaster_addr_w);
-	DECLARE_WRITE16_MEMBER(tmaster_blitter_w);
-	DECLARE_READ16_MEMBER(tmaster_blitter_r);
-	DECLARE_READ_LINE_MEMBER(read_rand);
-	DECLARE_READ16_MEMBER(galgames_eeprom_r);
-	DECLARE_WRITE16_MEMBER(galgames_eeprom_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_offset_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_data_w);
-	DECLARE_READ16_MEMBER(galgames_okiram_r);
-	DECLARE_WRITE16_MEMBER(galgames_okiram_w);
-	DECLARE_WRITE16_MEMBER(galgames_cart_sel_w);
-	DECLARE_READ16_MEMBER(galgames_cart_clock_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_clock_w);
-	DECLARE_READ16_MEMBER(galgames_cart_data_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
-	DECLARE_READ16_MEMBER(dummy_read_01);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
-	DECLARE_DRIVER_INIT(galgames);
-	DECLARE_DRIVER_INIT(galgame2);
-	DECLARE_MACHINE_RESET(tmaster);
-	DECLARE_VIDEO_START(tmaster);
-	DECLARE_MACHINE_RESET(galgames);
-	DECLARE_VIDEO_START(galgames);
-	uint32_t screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
-	uint8_t binary_to_BCD(uint8_t data);
-	int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
-	int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
-	void tmaster_draw();
-	void galgames_update_rombank(uint32_t cart);
+
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+
+	DECLARE_READ16_MEMBER(rtc_r);
+	DECLARE_WRITE16_MEMBER(rtc_w);
+
+	DECLARE_READ_LINE_MEMBER(read_rand);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<cesblit_device> m_blitter;
+	required_device<okim6295_device> m_oki;
+	required_device<microtouch_device> m_microtouch;
+	required_device<mc68681_device> m_duart;
+
+	int m_okibank;
+
+	uint8_t m_rtc_ram[8];
 };
 
+WRITE_LINE_MEMBER(tmaster_state::blitter_irq_callback)
+{
+//	logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
+	m_maincpu->set_input_line(2, state);
+}
+
+/***************************************************************************
+
+                                   Video
+
+***************************************************************************/
+
+uint32_t tmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	return m_blitter->screen_update(screen, bitmap, cliprect);
+}
 
 /***************************************************************************
 
@@ -236,12 +210,10 @@ WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
 
 ***************************************************************************/
 
-
-uint8_t tmaster_state::binary_to_BCD(uint8_t data)
+uint8_t binary_to_bcd(uint8_t data)
 {
 	data %= 100;
-
-	return ((data / 10) << 4) | (data %10);
+	return ((data / 10) << 4) | (data % 10);
 }
 
 READ16_MEMBER(tmaster_state::rtc_r)
@@ -249,13 +221,13 @@ READ16_MEMBER(tmaster_state::rtc_r)
 	system_time systime;
 
 	machine().current_datetime(systime);
-	m_rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
-	m_rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
-	m_rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
-	m_rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
-	m_rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
-	m_rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
-	m_rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
+	m_rtc_ram[0x1] = binary_to_bcd(systime.local_time.second);
+	m_rtc_ram[0x2] = binary_to_bcd(systime.local_time.minute);
+	m_rtc_ram[0x3] = binary_to_bcd(systime.local_time.hour);
+	m_rtc_ram[0x4] = binary_to_bcd(systime.local_time.weekday);
+	m_rtc_ram[0x5] = binary_to_bcd(systime.local_time.mday);
+	m_rtc_ram[0x6] = binary_to_bcd(systime.local_time.month+1);
+	m_rtc_ram[0x7] = binary_to_bcd(systime.local_time.year % 100);
 
 	return m_rtc_ram[offset];
 }
@@ -268,261 +240,15 @@ WRITE16_MEMBER(tmaster_state::rtc_w)
 	}
 }
 
-
-/***************************************************************************
-
-                                Video & Blitter
-
-
-    Offset:     Bits:                     Value:
-
-        00
-
-        02      fedc ba-- ---- ----
-                ---- --9- ---- ----       Layer 1 Buffer To Display
-                ---- ---8 ---- ----       Layer 0 Buffer To Display
-                ---- ---- 7654 3210
-
-        04                                Width
-        06                                X
-
-        08                                Height - 1
-        0A                                Y
-
-        0C                                Source Address (low)
-        0E                                Source Address (mid)
-
-        10      fedc ba98 ---- ----
-                ---- ---- 7--- ----       Layer
-                ---- ---- -6-- ----       Buffer
-                ---- ---- --5- ----       Solid Fill
-                ---- ---- ---4 ----       flipped by lev.3 interrupt routine
-                ---- ---- ---- 3---       flipped by lev.2 interrupt routine
-                ---- ---- ---- -2--       flipped by lev.1 interrupt routine
-                ---- ---- ---- --1-       Flip Y
-                ---- ---- ---- ---0       Flip X
-
-    Addr Register:
-
-                fedc ba98 ---- ----       Solid Fill Pen
-                ---- ---- 7654 3210       Source Address (high)
-
-    Color Register:
-
-                fedc ba98 ---- ----       Source Pen (Pen Replacement Mode)
-                ---- ---- 7654 3210       Palette (0-f) / Destination Pen (Pen Replacement Mode)
-
-    A write to the source address (mid) triggers the blit.
-    A the end of the blit, a level 2 IRQ is issued.
-
-***************************************************************************/
-
-int tmaster_state::tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
-{
-	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
-}
-
-int tmaster_state::galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
-{
-	return reg_low | (reg_mid << 16);
-}
-
-VIDEO_START_MEMBER(tmaster_state,tmaster)
-{
-	int layer, buffer;
-	for (layer = 0; layer < 2; layer++)
-	{
-		for (buffer = 0; buffer < 2; buffer++)
-		{
-			m_screen->register_screen_bitmap(m_bitmap[layer][buffer]);
-			m_bitmap[layer][buffer].fill(0xff);
-		}
-	}
-
-	m_compute_addr = &tmaster_state::tmaster_compute_addr;
-}
-
-VIDEO_START_MEMBER(tmaster_state,galgames)
-{
-	VIDEO_START_CALL_MEMBER( tmaster );
-	m_compute_addr = &tmaster_state::galgames_compute_addr;
-}
-
-uint32_t tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (mask != 0) layers_ctrl &= mask;
-	}
-#endif
-
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if (layers_ctrl & 1)    copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)    copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
-
-	return 0;
-}
-
-WRITE16_MEMBER(tmaster_state::tmaster_color_w)
-{
-	COMBINE_DATA( &m_color );
-}
-
-WRITE16_MEMBER(tmaster_state::tmaster_addr_w)
-{
-	COMBINE_DATA( &m_addr );
-}
-
-void tmaster_state::tmaster_draw()
-{
-	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
-
-	uint8_t *gfxdata  =   memregion( "blitter" )->base() + m_gfx_offs;
-
-	uint16_t pen;
-
-	buffer  =   (m_regs[0x02/2] >> 8) & 3;   // 1 bit per layer, selects the currently displayed buffer
-	sw      =    m_regs[0x04/2];
-	sx      =    m_regs[0x06/2];
-	sh      =    m_regs[0x08/2] + 1;
-	sy      =    m_regs[0x0a/2];
-	addr    =   (this->*m_compute_addr)(
-					m_regs[0x0c/2],
-					m_regs[0x0e/2], m_addr);
-	mode    =    m_regs[0x10/2];
-
-	layer   =   (mode >> 7) & 1;    // layer to draw to
-	buffer  =   ((mode >> 6) & 1) ^ ((buffer >> layer) & 1);    // bit 6 selects whether to use the opposite buffer to that displayed
-	bitmap_ind16 &bitmap    =   m_bitmap[layer][buffer];
-
-	addr <<= 1;
-
-#ifdef MAME_DEBUG
-#if 0
-	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", machine().describe_context(),
-			sw,sh,sx,sy, addr, m_addr, m_color, mode
-	);
-#endif
-#endif
-
-	flipx = mode & 1;
-	flipy = mode & 2;
-
-	if (flipx)  { x0 = sw-1;    x1 = -1;    dx = -1;    sx -= sw-1; }
-	else        { x0 = 0;       x1 = sw;    dx = +1;    }
-
-	if (flipy)  { y0 = sh-1;    y1 = -1;    dy = -1;    sy -= sh-1; }
-	else        { y0 = 0;       y1 = sh;    dy = +1;    }
-
-	sx = (sx & 0x7fff) - (sx & 0x8000);
-	sy = (sy & 0x7fff) - (sy & 0x8000);
-
-	color = (m_color & 0x0f) << 8;
-
-	switch (mode & 0x20)
-	{
-		case 0x00:                          // blit with transparency
-			if (addr > m_gfx_size - sw*sh)
-			{
-				logerror("%s: blit error, addr %06x out of bounds\n", machine().describe_context(),addr);
-				addr = m_gfx_size - sw*sh;
-			}
-
-			if ( mode & 0x200 )
-			{
-				// copy from ROM, replacing occurrences of src pen with dst pen
-
-				uint8_t dst_pen = (m_color >> 8) & 0xff;
-				uint8_t src_pen = (m_color >> 0) & 0xff;
-
-				for (y = y0; y != y1; y += dy)
-				{
-					for (x = x0; x != x1; x += dx)
-					{
-						pen = gfxdata[addr++];
-
-						if (pen == src_pen)
-							pen = dst_pen;
-
-						if ((pen != 0xff) && (sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-							bitmap.pix16(sy + y, sx + x) = pen + color;
-					}
-				}
-			}
-			else
-			{
-				// copy from ROM as is
-
-				for (y = y0; y != y1; y += dy)
-				{
-					for (x = x0; x != x1; x += dx)
-					{
-						pen = gfxdata[addr++];
-
-						if ((pen != 0xff) && (sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-							bitmap.pix16(sy + y, sx + x) = pen + color;
-					}
-				}
-			}
-			break;
-
-		case 0x20:                          // solid fill
-			pen = ((m_addr >> 8) & 0xff) + color;
-
-			if ((pen & 0xff) == 0xff)
-				pen = 0xff;
-
-			for (y = y0; y != y1; y += dy)
-			{
-				for (x = x0; x != x1; x += dx)
-				{
-					if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						bitmap.pix16(sy + y, sx + x) = pen;
-				}
-			}
-			break;
-
-	}
-}
-
-WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
-{
-	COMBINE_DATA( m_regs + offset );
-	switch (offset*2)
-	{
-		case 0x0e:
-			tmaster_draw();
-			m_maincpu->set_input_line(2, HOLD_LINE);
-			break;
-	}
-}
-
-READ16_MEMBER(tmaster_state::tmaster_blitter_r)
-{
-	return 0x0000;  // bit 7 = 1 -> blitter busy
-}
-
 /***************************************************************************
 
                                 Memory Maps
 
 ***************************************************************************/
 
-/***************************************************************************
-                                Touch Master
-***************************************************************************/
-
 READ_LINE_MEMBER(tmaster_state::read_rand)
 {
-	return machine().rand()&1;
+	return machine().rand() & 1;
 }
 
 static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
@@ -537,10 +263,10 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE_PORT("OUT")
 
-	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE(tmaster_addr_w )
+	AM_RANGE( 0x300070, 0x300071 ) AM_DEVWRITE("blitter", cesblit_device, addr_hi_w )
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
-	AM_RANGE( 0x500010, 0x500011 ) AM_READ(tmaster_blitter_r )
+	AM_RANGE( 0x500000, 0x500011 ) AM_DEVWRITE("blitter", cesblit_device, regs_w )
+	AM_RANGE( 0x500010, 0x500011 ) AM_DEVREAD( "blitter", cesblit_device, status_r )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
@@ -548,251 +274,33 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 
-	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE(tmaster_color_w )
+	AM_RANGE( 0x800010, 0x800011 ) AM_DEVWRITE("blitter", cesblit_device, color_w )
 ADDRESS_MAP_END
-
-
-/***************************************************************************
-                                Galaxy Games
-***************************************************************************/
-
-// ROM/RAM Banking
-
-#define GALGAMES_BANK_000000_R  "000000_r"
-#define GALGAMES_BANK_000000_W  "000000_w"
-#define GALGAMES_BANK_200000_R  "200000_r"
-#define GALGAMES_BANK_200000_W  "200000_w"
-#define GALGAMES_BANK_240000_R  "240000_r"
-
-#define GALGAMES_RAM    0
-#define GALGAMES_ROM0   1
-#define GALGAMES_ROM1   2
-#define GALGAMES_ROM2   3
-#define GALGAMES_ROM3   4
-
-
-// NVRAM (5 x EEPROM)
-
-#define GALGAMES_EEPROM_BIOS  "eeprom_bios"
-#define GALGAMES_EEPROM_CART1 "eeprom_cart1"
-#define GALGAMES_EEPROM_CART2 "eeprom_cart2"
-#define GALGAMES_EEPROM_CART3 "eeprom_cart3"
-#define GALGAMES_EEPROM_CART4 "eeprom_cart4"
-
-static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
-
-READ16_MEMBER(tmaster_state::galgames_eeprom_r)
-{
-	eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[m_galgames_cart]);
-
-	return eeprom->do_read() ? 0x80 : 0x00;
-}
-
-WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
-{
-	if (data & ~0x0003)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",space.device().safe_pc(),data);
-
-	if ( ACCESSING_BITS_0_7 )
-	{
-		eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[m_galgames_cart]);
-
-		// latch the bit
-		eeprom->di_write(data & 0x0001);
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom->clk_write((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
-	}
-}
-
-// BT481A Palette RAMDAC
-
-WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_palette_offset = data & 0xff;
-		m_palette_index = 0;
-	}
-}
-WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_palette_data[m_palette_index] = data & 0xff;
-		if (++m_palette_index == 3)
-		{
-			int palette_base;
-			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				m_palette->set_pen_color(m_palette_offset + palette_base, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
-			m_palette_index = 0;
-			m_palette_offset++;
-		}
-	}
-}
-
-// Sound
-READ16_MEMBER(tmaster_state::galgames_okiram_r)
-{
-	return memregion("oki")->base()[offset] | 0xff00;
-}
-WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
-{
-	if (ACCESSING_BITS_0_7)
-		memregion("oki")->base()[offset] = data & 0xff;
-}
-
-// Carts (preliminary, PIC communication is not implemented)
-
-void tmaster_state::galgames_update_rombank(uint32_t cart)
-{
-	m_galgames_cart = cart;
-
-	m_gfx_offs = 0x200000 * cart;
-
-	if (membank(GALGAMES_BANK_000000_R)->entry() == GALGAMES_RAM)
-		membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + m_galgames_cart);  // rom
-
-	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + m_galgames_cart);  // rom
-}
-
-WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
-{
-	// cart selection (0 1 2 3 4 7)
-
-	if (ACCESSING_BITS_0_7)
-	{
-		int i;
-
-		switch( data & 0xff )
-		{
-			case 0x07:      // 7 resets the eeprom
-				for (i = 0; i < 5; i++)
-					machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[i])->cs_write(CLEAR_LINE);
-				break;
-
-			case 0x00:
-			case 0x01:
-			case 0x02:
-			case 0x03:
-			case 0x04:
-				machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[data & 0xff])->cs_write(ASSERT_LINE);
-				galgames_update_rombank(data & 0xff);
-				break;
-
-			default:
-				machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[0])->cs_write(ASSERT_LINE);
-				galgames_update_rombank(0);
-				logerror("%06x: unknown cart sel = %04x\n", space.device().safe_pc(), data);
-				break;
-		}
-	}
-}
-
-READ16_MEMBER(tmaster_state::galgames_cart_clock_r)
-{
-	return 0x0080;
-}
-
-WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		// bit 3 = clock
-
-		// ROM/RAM banking
-		if ((data & 0xf7) == 0x05)
-		{
-			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);   // ram
-			galgames_update_rombank(m_galgames_cart);
-			logerror("%06x: romram bank = %04x\n", space.device().safe_pc(), data);
-		}
-		else
-		{
-			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);  // rom
-			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);   // ram
-			logerror("%06x: unknown romram bank = %04x\n", space.device().safe_pc(), data);
-		}
-	}
-}
-
-READ16_MEMBER(tmaster_state::galgames_cart_data_r)
-{
-	return 0;
-}
-WRITE16_MEMBER(tmaster_state::galgames_cart_data_w)
-{
-}
-
-
-READ16_MEMBER(tmaster_state::dummy_read_01)
-{
-	return 0x3; // Pass the check at PC = 0xfae & a later one
-}
-
-static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
-
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_SHARE("galgames_ram")
-	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READ_BANK(GALGAMES_BANK_200000_R) AM_WRITE_BANK(GALGAMES_BANK_200000_W)
-	AM_RANGE( 0x240000, 0x3fffff ) AM_READ_BANK(GALGAMES_BANK_240000_R)
-
-	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
-	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE(tmaster_addr_w )
-	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE(tmaster_color_w )
-	AM_RANGE( 0x400020, 0x400021 ) AM_READ(tmaster_blitter_r )
-
-	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
-	AM_RANGE( 0x800020, 0x80003f ) AM_NOP   // ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
-
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE(galgames_palette_offset_w )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE(galgames_palette_data_w )
-
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ_PORT("TRACKBALL_1_X")
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITENOP
-	AM_RANGE( 0xd00002, 0xd00003 ) AM_READ_PORT("TRACKBALL_1_Y")
-	AM_RANGE( 0xd00004, 0xd00005 ) AM_READ_PORT("TRACKBALL_2_X")
-	AM_RANGE( 0xd00006, 0xd00007 ) AM_READ_PORT("TRACKBALL_2_Y")
-	AM_RANGE( 0xd00008, 0xd00009 ) AM_READ_PORT("P1")
-	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ_PORT("P2")
-	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READ_PORT("SYSTEM") AM_WRITENOP
-
-	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE(galgames_cart_sel_w )
-	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE(galgames_eeprom_r, galgames_eeprom_w )
-	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE(galgames_cart_data_r, galgames_cart_data_w )
-	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE(galgames_cart_clock_r, galgames_cart_clock_w )
-
-ADDRESS_MAP_END
-
 
 /***************************************************************************
 
                                 Input Ports
 
 ***************************************************************************/
+
 static INPUT_PORTS_START( tm )
 	PORT_START("COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN5 )    // "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN6 )    // "M. Coin 2 Input"
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)    // "DBV Input"
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )  // service coin?
-	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "Calibrate"
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, read_rand )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )    // "E. Coin 1" (ECA?) tmaster defaults to e. coin,
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )    // "E. Coin 2" (ECA?) rather than m. coin
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )    // "E. Coin 3" (ECA?) so they're coin1-coin4
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )    // "E. Coin 4" (ECA?)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )    // "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )    // "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    ) PORT_IMPULSE(2)    // "DBV Input"
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // service coin?
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )    // "Calibrate"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, read_rand )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1    )    // "E. Coin 1" (ECA?) tmaster defaults to e. coin,
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2    )    // "E. Coin 2" (ECA?) rather than m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3    )    // "E. Coin 3" (ECA?) so they're coin1-coin4
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4    )    // "E. Coin 4" (ECA?)
 
 	PORT_START("OUT")
 	//0800?
@@ -821,57 +329,9 @@ static INPUT_PORTS_START( tm4k )
 
 	PORT_MODIFY( "OUT" )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_rst )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_dq )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_dq )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_clk )
 INPUT_PORTS_END
-
-static INPUT_PORTS_START( galgames )
-	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // Button A (right)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // Button B (left)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // Button A (right)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // Button B (left)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1)          // DBA (coin)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )    // CS 1 (coin)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )    // CS 2 (coin)
-	PORT_SERVICE( 0x0004, IP_ACTIVE_HIGH )  // System Check
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("TRACKBALL_1_X")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
-
-	PORT_START("TRACKBALL_1_Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
-
-	PORT_START("TRACKBALL_2_X")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
-
-	PORT_START("TRACKBALL_2_Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
-INPUT_PORTS_END
-
 
 /***************************************************************************
 
@@ -879,31 +339,27 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(tmaster_state,tmaster)
-{
-	m_gfx_offs = 0;
-	m_gfx_size = memregion("blitter")->bytes();
-
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::scanline_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 0) // vblank, FIXME
+	if (scanline == 0) // vblank, FIXME
 		m_maincpu->set_input_line(3, HOLD_LINE);
-	else if((scanline % 16) == 0)
+	else if ((scanline % 16) == 0)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	// lev 2 triggered at the end of the blit
 }
 
+int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
+{
+	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
+}
+
 static MACHINE_CONFIG_START( tm, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
-
-	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
 
 	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
@@ -913,19 +369,23 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
+	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tmaster_state,tmaster)
+	MCFG_CESBLIT_ADD("blitter", "screen", XTAL_32MHz)
+	MCFG_CESBLIT_COMPUTE_ADDR(tmaster_compute_addr)
+	MCFG_CESBLIT_IRQ_CB(WRITELINE(tmaster_state, blitter_irq_callback))
 
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 16, OKIM6295_PIN7_HIGH)  /* 1.5Mhz? clock frequency & pin 7 not verified */
@@ -935,71 +395,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tmds1204, tm )
 	MCFG_DS1204_ADD("ds1204")
 MACHINE_CONFIG_END
-
-MACHINE_RESET_MEMBER(tmaster_state,galgames)
-{
-	m_gfx_offs = 0;
-	m_gfx_size = 0x200000;
-
-	membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);  // rom
-	membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);       // ram
-
-	membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);       // ram
-	membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);       // ram
-
-	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);  // rom
-
-	galgames_update_rombank(0);
-
-	m_maincpu->reset();
-}
-
-static MACHINE_CONFIG_START( galgames, tmaster_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(galgames_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
-
-	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_BIOS)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_CART1)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_CART2)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_CART3)
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_CART4)
-
-	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state, galgames )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(400, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(tmaster_state,galgames)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-/*
-    Each cartridge contains a PIC, that should provide, among other things, the following header:
-
-    4345 5331 3939 3700 0c10 ffb3 3c00 0000       "CES1997"
-    fffe f2f7 8557 c119 0000 0000 2340 188e
-*/
-static MACHINE_CONFIG_DERIVED( galgame2, galgames )
-//  MCFG_CPU_ADD("pic", PIC12C508, XTAL_24MHz / 2)
-MACHINE_CONFIG_END
-
 
 /***************************************************************************
 
@@ -1687,168 +1082,6 @@ ROM_START( tm8k902 )
 	ROM_LOAD( "tm8k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
 
-/***************************************************************************
-
-Galaxy Games BIOS v. 1.90
-
-This is a multi-game cocktail cabinet released in 1998.  Namco seems to have
-made some cartridges for it (or at least licensed their IP).
-
-Trackball-based. 'BIOS' has 7 built-in games. There are two LEDs on the PCB.
-
-More information here : http://www.cesgames.com/museum/galaxy/index.html
-
-----
-
-Board silkscreened  237-0211-00
-                    REV.-D
-
-Cartridge based mother board
-Holds up to 4 cartridges
-Chips labeled
-    GALAXY U1 V1.90 12/1/98
-    GALAXY U2 V1.90 12/1/98
-
-Motorola MC68HC000FN12
-24 MHz oscillator
-Xilinx XC5206
-Xilinx XC5202
-BT481AKPJ110 (Palette RAMDAC)
-NKK N341024SJ-15    x8  (128kB RAM)
-OKI M6295 8092352-2
-
-PAL16V8H-15 @ U24   Blue dot on it
-PAL16V8H-15 @ U25   Yellow dot on it
-PAL16V8H-15 @ U26   Red dot on it
-PAL16V8H-15 @ U27   Green dot on it
-PAL16V8H-15 @ U45   red dot on it
-
-4 known game carts where produced, these are:
-
-Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
-            Twenty One Thunder Plus, Power Pairs, Prism Poker Plus & Have A Cow
-Star Pak 2: Pack-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
-Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
-Star Pak 4: Berzerk, Neon Nightmare, Battle Checkers, Orbit, Deep Sea Shadow, Star Tiger & Orbit Freefall
-
-Copyright notice in rom state: Creative Electronics & Software Written by Keith M. Kolmos May 29,1998
-
-***************************************************************************/
-
-#define GALGAMES_BIOS_ROMS \
-	ROM_SYSTEM_BIOS( 0, "0",   "v1.90" ) \
-	ROMX_LOAD( "galaxy.u2", 0x000000, 0x100000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083), ROM_SKIP(1) | ROM_BIOS(1) ) \
-	ROMX_LOAD( "galaxy.u1", 0x000001, 0x100000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760), ROM_SKIP(1) | ROM_BIOS(1) )
-
-#define GALGAMES_MB_PALS \
-	ROM_REGION( 0xa00, "pals", 0) \
-	ROM_LOAD( "16v8h-blue.u24",    0x000, 0x117, NO_DUMP ) \
-	ROM_LOAD( "16v8h-yellow.u25",  0x200, 0x117, NO_DUMP ) \
-	ROM_LOAD( "16v8h-magenta.u26", 0x400, 0x117, NO_DUMP ) \
-	ROM_LOAD( "16v8h-green.u27",   0x600, 0x117, NO_DUMP ) \
-	ROM_LOAD( "16v8h-red.u45",     0x800, 0x117, NO_DUMP )
-
-ROM_START( galgbios )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	GALGAMES_BIOS_ROMS
-
-	ROM_REGION( 0x200000, "blitter", 0 )
-	ROM_COPY( "maincpu", 0x00000, 0, 0x200000 )
-
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
-	// RAM, filled by the 68000 and fed to the OKI
-
-	GALGAMES_MB_PALS
-ROM_END
-
-/***************************************************************************
-
-Galaxy Games StarPak 2
-
-NAMCO 307 Cartridge, has surface mount Flash chips in it:
-
-.u1 am29f800BB
-.u2 am29f800BB
-.u4 pic 12c508
-
-Board silkscreened  237-0209-00
-                    REV.-C
-
-***************************************************************************/
-
-ROM_START( galgame2 )
-	ROM_REGION( 0x200000 * 2, "maincpu", 0 )
-	GALGAMES_BIOS_ROMS
-	ROM_LOAD16_BYTE( "namco.u2",  0x200000, 0x100000, CRC(f43c0c54) SHA1(4a13946c3d173b0e4ab25b01849574fa3302b417) )
-	ROM_LOAD16_BYTE( "namco.u1",  0x200001, 0x100000, CRC(b8c34a8b) SHA1(40d3b35f573d2bd2ae1c7d876c55fc436864fa3f) )
-
-	ROM_REGION( 0x9db, "pic", 0 )
-	ROM_LOAD( "namco.u4", 0x000, 0x9db, CRC(63ec1224) SHA1(2966b2aa431e6b8d46cbba18a6fc4de7395caa04) )
-
-	ROM_REGION( 0x200000 * 2, "blitter", 0 )
-	ROM_COPY( "maincpu", 0x00000, 0, 0x200000 * 2 )
-
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
-	// RAM, filled by the 68000 and fed to the OKI
-
-	GALGAMES_MB_PALS
-ROM_END
-
-
-DRIVER_INIT_MEMBER(tmaster_state,galgames)
-{
-	uint8_t *ROM  =   memregion("maincpu")->base();
-	int cart;
-
-	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
-	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
-
-	membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
-	membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
-
-	membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
-
-	membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
-	membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
-
-	membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  m_galgames_ram);
-
-	membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
-
-	// More ROM banks at 0x200000-0x3fffff (carts)
-
-	for (cart = 1; cart <= 4; cart++)
-	{
-		uint8_t *CART = memregion("maincpu")->base();
-
-		if  (0x200000 * (cart+1) <= memregion("maincpu")->bytes())
-			CART += 0x200000 * cart;
-
-		membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
-		membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
-	}
-}
-
-DRIVER_INIT_MEMBER(tmaster_state,galgame2)
-{
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
-
-	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
-	ROM[0x118da/2] = 0x4a06;
-	ROM[0x118dc/2] = 0x6704;
-	ROM[0x118de/2] = 0x7000;
-	ROM[0x118e0/2] = 0x6002;
-	ROM[0x118e2/2] = 0x7001;
-	ROM[0x118e4/2] = 0x4e71;
-	ROM[0x118e6/2] = 0x4e71;
-	ROM[0x118e8/2] = 0x4e71;
-
-	// Cartdridge check on game selection screen
-	ROM[0x12da0/2] = 0x4e71;
-
-	DRIVER_INIT_CALL(galgames);
-}
-
 GAME( 1996, tm,       0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )
 GAME( 1996, tmdo,     tm,       tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",         0 )
 GAME( 1996, tm2k,     0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)", 0 )
@@ -1874,5 +1107,3 @@ GAME( 1999, tm7kmna,  tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT
 GAME( 1999, tm7keval, tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X Evaluation)",    0 )
 GAME( 2000, tm8k,     0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",      0 )
 GAME( 2000, tm8k902,  tm8k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",      0 )
-GAME( 1998, galgbios, 0,        galgames, galgames, tmaster_state, galgames, ROT0, "Creative Electronics & Software",         "Galaxy Games (BIOS v1.90)",              MACHINE_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, tmaster_state, galgame2, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",                 0 )

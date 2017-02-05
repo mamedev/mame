@@ -79,6 +79,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/cesblit.h,VIDEOS["CESBLIT"] = true
+--------------------------------------------------
+
+if (VIDEOS["CESBLIT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/cesblit.cpp",
+		MAME_DIR .. "src/devices/video/cesblit.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/crt9007.h,VIDEOS["CRT9007"] = true
 --------------------------------------------------
 
