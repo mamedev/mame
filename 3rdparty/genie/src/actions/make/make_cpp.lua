@@ -262,7 +262,7 @@
 		_p('  ifdef WINDRES')
 		_p('    RESCOMP = $(WINDRES)')
 		_p('  else')
-		_p('    RESCOMP = windres')
+		_p('    RESCOMP = %s', cc.rc or 'windres')
 		_p('  endif')
 		_p('endif')
 		_p('')

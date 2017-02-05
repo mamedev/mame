@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 737 (commit 35301d9b1fb086eba05c8f5fc99cc52652a0fa83)
+	version 753 (commit 47cb33b4c8b2e7684ca320794a2b41e26ae47163)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -179,7 +179,7 @@ PS3.
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
 	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
 	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
-	Nikolay Aleksiev.
+	Nikolay Aleksiev, Jon Olson.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie
