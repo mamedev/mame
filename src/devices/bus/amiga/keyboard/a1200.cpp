@@ -181,7 +181,7 @@ static INPUT_PORTS_START(a1200_us_keyboard)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_FRAGMENT(a1200kbd_revA)
+MACHINE_CONFIG_FRAGMENT(a1200kbd_revB)
 	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL_3MHz)
 	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
 	MCFG_M68HC05_PORTD_R_CB(READ8(a1200_kbd_device, mpu_portd_r));
@@ -192,7 +192,7 @@ MACHINE_CONFIG_FRAGMENT(a1200kbd_revA)
 MACHINE_CONFIG_END
 
 
-ROM_START(a1200kbd_revA)
+ROM_START(a1200kbd_revB)
 	ROM_REGION(0x2000, "mpu", 0)
 	ROM_LOAD("DFA_Rev_B_A1200_HC705.bin", 0x0000, 0x2000, CRC(2a77eec4) SHA1(301ec6a69404457d912c89e3fc54095eda9f0e93))
 ROM_END
@@ -214,7 +214,7 @@ device_type const A1200_KBD = &device_creator<a1200_kbd_device>;
 //**************************************************************************
 
 a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, A1200_KBD, "Amiga 1200 Keyboard Rev A", tag, owner, clock, "a1200kbd_ra", __FILE__)
+	: device_t(mconfig, A1200_KBD, "Amiga 1200 Keyboard Rev B", tag, owner, clock, "a1200kbd_rb", __FILE__)
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)
 	, m_modifiers(*this, "MOD")
@@ -285,12 +285,12 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 
 machine_config_constructor a1200_kbd_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME(a1200kbd_revA);
+	return MACHINE_CONFIG_NAME(a1200kbd_revB);
 }
 
 const tiny_rom_entry *a1200_kbd_device::device_rom_region() const
 {
-	return ROM_NAME(a1200kbd_revA);
+	return ROM_NAME(a1200kbd_revB);
 }
 
 ioport_constructor a1200_kbd_device::device_input_ports() const
