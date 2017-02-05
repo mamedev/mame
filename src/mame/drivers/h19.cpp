@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, Mark Garlanger
 /***************************************************************************
 
         Heathkit H19
@@ -33,6 +33,34 @@
         However, a keyclick can be heard, to assure you it does in fact work.
 
 ****************************************************************************/
+/***************************************************************************
+ Memory Layout
+   The U435 three-to-eight line decoder uses A14 and A15 to generate three memory addresses:
+
+   1.   Program ROM        0x0000
+
+   2.   Scratchpad RAM     0x4000
+
+   3.   Display Memory     0xF800
+
+
+ Port Layout
+
+   Only address lines A5, A6, A7 are used by the U442 three-to-eight line decoder
+
+   1.   Keyboard encoder                    0x80
+   2.   Keyboard status                     0xA0
+   3.   CRT controller                      0x60
+   4.   Power-up configuration (primary)    0x00
+   5.   Power-up configuration (secondary)  0x20
+   6.   ACE (communications)                0x40
+   7.   Bell enable                         0xE0
+   8.   Key click enable                    0xC0
+
+   Decoder U442 is enabled only during an I/O read or write operation to elimnate the
+   possibility of false decoding on a refresh address coming from the Z80.
+
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -41,8 +69,11 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 
+// Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL_12_288MHz / 6)
-#define H19_BEEP_FRQ (H19_CLOCK / 1024)
+
+// Beep Frequency is 1 KHz
+#define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
 
 class h19_state : public driver_device
@@ -115,11 +146,11 @@ READ8_MEMBER( h19_state::h19_a0_r )
 WRITE8_MEMBER( h19_state::h19_c0_w )
 {
 /* Beeper control - a 96L02 contains 2 oneshots, one for bell and one for keyclick.
-- lengths need verifying
+
     offset 00-1F = keyclick
     offset 20-3F = terminal bell */
 
-	uint8_t length = (offset & 0x20) ? 200 : 4;
+	uint8_t length = (offset & 0x20) ? 200 : 6;
 	m_beep->set_state(1);
 	timer_set(attotime::from_msec(length), TIMER_BEEP_OFF);
 }
@@ -360,7 +391,7 @@ static const gfx_layout h19_charlayout =
 {
 	8, 10,                  /* 8 x 10 characters */
 	128,                    /* 128 characters */
-	1,                  /* 1 bits per pixel */
+	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -391,8 +422,8 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -418,14 +449,7 @@ MACHINE_CONFIG_END
 ROM_START( h19 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// Original
-	ROM_SYSTEM_BIOS(0, "orig", "Original")
-	ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(1))
-	// Super H19 ROM (
-	ROM_SYSTEM_BIOS(1, "super", "Super 19")
-	ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117), ROM_BIOS(2))
-	// Watzman ROM
-	ROM_SYSTEM_BIOS(2, "watzman", "Watzman")
-	ROMX_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(3))
+	ROM_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
@@ -434,11 +458,38 @@ ROM_START( h19 )
 	ROM_REGION( 0x1000, "keyboard", 0 )
 	// Original dump
 	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+ROM_START( super19 )
+	// Super H19 ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+ROM_START( watz19 )
+	// Watzman ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 	// Watzman keyboard
+	ROM_REGION( 0x1000, "keyboard", 0 )
 	ROM_LOAD( "keybd.bin", 0x0800, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
-/* Driver (year is either 1978 or 1979) */
+/*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
+COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", MACHINE_NOT_WORKING )
+/*  TODO - verify the years for these third-party replacement ROMs. */
+COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_NOT_WORKING )
+COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", MACHINE_NOT_WORKING )
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", MACHINE_NOT_WORKING )
