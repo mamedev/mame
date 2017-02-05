@@ -1,12 +1,12 @@
 //
-//Copyright (C) 2014-2016 LunarG, Inc.
-//Copyright (C) 2015-2016 Google, Inc.
+// Copyright (C) 2014-2016 LunarG, Inc.
+// Copyright (C) 2015-2016 Google, Inc.
 //
-//All rights reserved.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -20,18 +20,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 //
 // Visit the nodes in the glslang intermediate tree representation to
@@ -161,7 +161,7 @@ protected:
     spv::Id makeSmearedConstant(spv::Id constant, int vectorSize);
     spv::Id createAtomicOperation(glslang::TOperator op, spv::Decoration precision, spv::Id typeId, std::vector<spv::Id>& operands, glslang::TBasicType typeProxy);
     spv::Id createInvocationsOperation(glslang::TOperator op, spv::Id typeId, std::vector<spv::Id>& operands, glslang::TBasicType typeProxy);
-    spv::Id CreateInvocationsVectorOperation(spv::Op op, spv::Id typeId, std::vector<spv::Id>& operands);
+    spv::Id CreateInvocationsVectorOperation(spv::Op op, spv::GroupOperation groupOperation, spv::Id typeId, std::vector<spv::Id>& operands);
     spv::Id createMiscOperation(glslang::TOperator op, spv::Decoration precision, spv::Id typeId, std::vector<spv::Id>& operands, glslang::TBasicType typeProxy);
     spv::Id createNoArgOperation(glslang::TOperator op, spv::Decoration precision, spv::Id typeId);
     spv::Id getSymbolId(const glslang::TIntermSymbol* node);
@@ -221,7 +221,7 @@ spv::SourceLanguage TranslateSourceLanguage(glslang::EShSource source, EProfile 
             return spv::SourceLanguageUnknown;
         }
     case glslang::EShSourceHlsl:
-        //Use SourceLanguageUnknown instead of SourceLanguageHLSL for now, until Vulkan knows what HLSL is
+        // Use SourceLanguageUnknown instead of SourceLanguageHLSL for now, until Vulkan knows what HLSL is
         return spv::SourceLanguageUnknown;
     default:
         return spv::SourceLanguageUnknown;
@@ -439,7 +439,6 @@ spv::Decoration TranslateNoContractionDecoration(const glslang::TQualifier& qual
         return spv::DecorationMax;
 }
 
-
 // Translate a glslang built-in variable to a SPIR-V built in decoration.  Also generate
 // associated capabilities when required.  For some built-in variables, a capability
 // is generated only when using the variable in an executable instruction, but not when
@@ -483,6 +482,15 @@ spv::BuiltIn TGlslangToSpvTraverser::TranslateBuiltInDecoration(glslang::TBuiltI
 
     case glslang::EbvViewportIndex:
         builder.addCapability(spv::CapabilityMultiViewport);
+#ifdef NV_EXTENSIONS
+        if (glslangIntermediate->getStage() == EShLangVertex ||
+            glslangIntermediate->getStage() == EShLangTessControl ||
+            glslangIntermediate->getStage() == EShLangTessEvaluation)
+        {
+            builder.addExtension(spv::E_SPV_NV_viewport_array2);
+            builder.addCapability(spv::CapabilityShaderViewportIndexLayerNV);
+        }
+#endif
         return spv::BuiltInViewportIndex;
 
     case glslang::EbvSampleId:
@@ -499,6 +507,18 @@ spv::BuiltIn TGlslangToSpvTraverser::TranslateBuiltInDecoration(glslang::TBuiltI
 
     case glslang::EbvLayer:
         builder.addCapability(spv::CapabilityGeometry);
+#ifdef NV_EXTENSIONS
+        if (!memberDeclaration)
+        {
+            if (glslangIntermediate->getStage() == EShLangVertex ||
+                glslangIntermediate->getStage() == EShLangTessControl ||
+                glslangIntermediate->getStage() == EShLangTessEvaluation)
+            {
+                builder.addExtension(spv::E_SPV_NV_viewport_array2);
+                builder.addCapability(spv::CapabilityShaderViewportIndexLayerNV);
+            }
+        }
+#endif
         return spv::BuiltInLayer;
 
     case glslang::EbvPosition:             return spv::BuiltInPosition;
@@ -608,6 +628,21 @@ spv::BuiltIn TGlslangToSpvTraverser::TranslateBuiltInDecoration(glslang::TBuiltI
         builder.addExtension(spv::E_SPV_AMD_shader_explicit_vertex_parameter);
         return spv::BuiltInBaryCoordPullModelAMD;
 #endif
+
+#ifdef NV_EXTENSIONS
+    case glslang::EbvViewportMaskNV:
+        builder.addExtension(spv::E_SPV_NV_viewport_array2);
+        builder.addCapability(spv::CapabilityShaderViewportMaskNV);
+        return spv::BuiltInViewportMaskNV;
+    case glslang::EbvSecondaryPositionNV:
+        builder.addExtension(spv::E_SPV_NV_stereo_view_rendering);
+        builder.addCapability(spv::CapabilityShaderStereoViewNV);
+        return spv::BuiltInSecondaryPositionNV;
+    case glslang::EbvSecondaryViewportMaskNV:
+        builder.addExtension(spv::E_SPV_NV_stereo_view_rendering);
+        builder.addCapability(spv::CapabilityShaderStereoViewNV);
+        return spv::BuiltInSecondaryViewportMaskNV;
+#endif 
     default:                               return spv::BuiltInMax;
     }
 }
@@ -1116,6 +1151,9 @@ bool TGlslangToSpvTraverser::visitBinary(glslang::TVisit /* visit */, glslang::T
             builder.accessChainPushSwizzle(swizzle, convertGlslangToSpvType(node->getLeft()->getType()));
         }
         return false;
+    case glslang::EOpMatrixSwizzle:
+        logger->missingFunctionality("matrix swizzle");
+        return true;
     case glslang::EOpLogicalOr:
     case glslang::EOpLogicalAnd:
         {
@@ -1410,7 +1448,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
     {
         if (node->isUserDefined())
             result = handleUserFunctionCall(node);
-        //assert(result);  // this can happen for bad shaders because the call graph completeness checking is not yet done
+        // assert(result);  // this can happen for bad shaders because the call graph completeness checking is not yet done
         if (result) {
             builder.clearAccessChain();
             builder.setAccessChainRValue(result);
@@ -1633,7 +1671,7 @@ bool TGlslangToSpvTraverser::visitAggregate(glslang::TVisit visit, glslang::TInt
 
                 // Does it need a swizzle inversion?  If so, evaluation is inverted;
                 // operate first on the swizzle base, then apply the swizzle.
-                if (glslangOperands[0]->getAsOperator() && 
+                if (glslangOperands[0]->getAsOperator() &&
                     glslangOperands[0]->getAsOperator()->getOp() == glslang::EOpVectorSwizzle)
                     invertedType = convertGlslangToSpvType(glslangOperands[0]->getAsBinaryNode()->getLeft()->getType());
             }
@@ -1960,7 +1998,7 @@ spv::Id TGlslangToSpvTraverser::getSampledType(const glslang::TSampler& sampler)
 // is applied.
 spv::Id TGlslangToSpvTraverser::getInvertedSwizzleType(const glslang::TIntermTyped& node)
 {
-    if (node.getAsOperator() && 
+    if (node.getAsOperator() &&
         node.getAsOperator()->getOp() == glslang::EOpVectorSwizzle)
         return convertGlslangToSpvType(node.getAsBinaryNode()->getLeft()->getType());
     else
@@ -2013,7 +2051,6 @@ spv::Id TGlslangToSpvTraverser::convertGlslangToSpvType(const glslang::TType& ty
 #ifdef AMD_EXTENSIONS
     case glslang::EbtFloat16:
         builder.addExtension(spv::E_SPV_AMD_gpu_shader_half_float);
-        builder.addCapability(spv::CapabilityFloat16);
         spvType = builder.makeFloatType(16);
         break;
 #endif
@@ -2138,7 +2175,6 @@ spv::Id TGlslangToSpvTraverser::convertGlslangToSpvType(const glslang::TType& ty
 
     return spvType;
 }
-
 
 // Do full recursive conversion of a glslang structure (or block) type to a SPIR-V Id.
 // explicitLayout can be kept the same throughout the hierarchical recursive walk.
@@ -2275,6 +2311,22 @@ void TGlslangToSpvTraverser::decorateStructType(const glslang::TType& type,
             spv::BuiltIn builtIn = TranslateBuiltInDecoration(glslangMember.getQualifier().builtIn, true);
             if (builtIn != spv::BuiltInMax)
                 addMemberDecoration(spvType, member, spv::DecorationBuiltIn, (int)builtIn);
+
+#ifdef NV_EXTENSIONS
+            if (builtIn == spv::BuiltInLayer) {
+                // SPV_NV_viewport_array2 extension
+                if (glslangMember.getQualifier().layoutViewportRelative){
+                    addMemberDecoration(spvType, member, (spv::Decoration)spv::DecorationViewportRelativeNV);
+                    builder.addCapability(spv::CapabilityShaderViewportMaskNV);
+                    builder.addExtension(spv::E_SPV_NV_viewport_array2);
+                }
+                if (glslangMember.getQualifier().layoutSecondaryViewportRelativeOffset != -2048){
+                    addMemberDecoration(spvType, member, (spv::Decoration)spv::DecorationSecondaryViewportRelativeNV, glslangMember.getQualifier().layoutSecondaryViewportRelativeOffset);
+                    builder.addCapability(spv::CapabilityShaderStereoViewNV);
+                    builder.addExtension(spv::E_SPV_NV_stereo_view_rendering);
+                }
+            }
+#endif
         }
     }
 
@@ -2546,6 +2598,12 @@ void TGlslangToSpvTraverser::declareUseOfStructMember(const glslang::TTypeList& 
     case glslang::EbvClipDistance:
     case glslang::EbvCullDistance:
     case glslang::EbvPointSize:
+#ifdef NV_EXTENSIONS
+    case glslang::EbvLayer:
+    case glslang::EbvViewportMaskNV:
+    case glslang::EbvSecondaryPositionNV:
+    case glslang::EbvSecondaryViewportMaskNV:
+#endif
         // Generate the associated capability.  Delegate to TranslateBuiltInDecoration.
         // Alternately, we could just call this for any glslang built-in, since the
         // capability already guards against duplicates.
@@ -3012,7 +3070,7 @@ spv::Id TGlslangToSpvTraverser::createImageTextureFunctionCall(glslang::TIntermO
         }
         // copy the projective coordinate if we have to
         if (projTargetComp != projSourceComp) {
-            spv::Id projComp = builder.createCompositeExtract(params.coords, 
+            spv::Id projComp = builder.createCompositeExtract(params.coords,
                                                               builder.getScalarTypeId(builder.getTypeId(params.coords)),
                                                               projSourceComp);
             params.coords = builder.createCompositeInsert(projComp, params.coords,
@@ -3742,6 +3800,18 @@ spv::Id TGlslangToSpvTraverser::createUnaryOperation(glslang::TOperator op, spv:
     case glslang::EOpMinInvocationsNonUniform:
     case glslang::EOpMaxInvocationsNonUniform:
     case glslang::EOpAddInvocationsNonUniform:
+    case glslang::EOpMinInvocationsInclusiveScan:
+    case glslang::EOpMaxInvocationsInclusiveScan:
+    case glslang::EOpAddInvocationsInclusiveScan:
+    case glslang::EOpMinInvocationsInclusiveScanNonUniform:
+    case glslang::EOpMaxInvocationsInclusiveScanNonUniform:
+    case glslang::EOpAddInvocationsInclusiveScanNonUniform:
+    case glslang::EOpMinInvocationsExclusiveScan:
+    case glslang::EOpMaxInvocationsExclusiveScan:
+    case glslang::EOpAddInvocationsExclusiveScan:
+    case glslang::EOpMinInvocationsExclusiveScanNonUniform:
+    case glslang::EOpMaxInvocationsExclusiveScanNonUniform:
+    case glslang::EOpAddInvocationsExclusiveScanNonUniform:
 #endif
     {
         std::vector<spv::Id> operands;
@@ -4129,26 +4199,66 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
 #endif
 
     spv::Op opCode = spv::OpNop;
-
     std::vector<spv::Id> spvGroupOperands;
+    spv::GroupOperation groupOperation = spv::GroupOperationMax;
+
     if (op == glslang::EOpBallot || op == glslang::EOpReadFirstInvocation ||
         op == glslang::EOpReadInvocation) {
         builder.addExtension(spv::E_SPV_KHR_shader_ballot);
         builder.addCapability(spv::CapabilitySubgroupBallotKHR);
+    } else if (op == glslang::EOpAnyInvocation ||
+        op == glslang::EOpAllInvocations ||
+        op == glslang::EOpAllInvocationsEqual) {
+        builder.addExtension(spv::E_SPV_KHR_subgroup_vote);
+        builder.addCapability(spv::CapabilitySubgroupVoteKHR);
     } else {
         builder.addCapability(spv::CapabilityGroups);
 #ifdef AMD_EXTENSIONS
         if (op == glslang::EOpMinInvocationsNonUniform ||
             op == glslang::EOpMaxInvocationsNonUniform ||
-            op == glslang::EOpAddInvocationsNonUniform)
+            op == glslang::EOpAddInvocationsNonUniform ||
+            op == glslang::EOpMinInvocationsInclusiveScanNonUniform ||
+            op == glslang::EOpMaxInvocationsInclusiveScanNonUniform ||
+            op == glslang::EOpAddInvocationsInclusiveScanNonUniform ||
+            op == glslang::EOpMinInvocationsExclusiveScanNonUniform ||
+            op == glslang::EOpMaxInvocationsExclusiveScanNonUniform ||
+            op == glslang::EOpAddInvocationsExclusiveScanNonUniform)
             builder.addExtension(spv::E_SPV_AMD_shader_ballot);
 #endif
 
         spvGroupOperands.push_back(builder.makeUintConstant(spv::ScopeSubgroup));
 #ifdef AMD_EXTENSIONS
-        if (op == glslang::EOpMinInvocations || op == glslang::EOpMaxInvocations || op == glslang::EOpAddInvocations ||
-            op == glslang::EOpMinInvocationsNonUniform || op == glslang::EOpMaxInvocationsNonUniform || op == glslang::EOpAddInvocationsNonUniform)
-            spvGroupOperands.push_back(spv::GroupOperationReduce);
+        switch (op) {
+        case glslang::EOpMinInvocations:
+        case glslang::EOpMaxInvocations:
+        case glslang::EOpAddInvocations:
+        case glslang::EOpMinInvocationsNonUniform:
+        case glslang::EOpMaxInvocationsNonUniform:
+        case glslang::EOpAddInvocationsNonUniform:
+            groupOperation = spv::GroupOperationReduce;
+            spvGroupOperands.push_back(groupOperation);
+            break;
+        case glslang::EOpMinInvocationsInclusiveScan:
+        case glslang::EOpMaxInvocationsInclusiveScan:
+        case glslang::EOpAddInvocationsInclusiveScan:
+        case glslang::EOpMinInvocationsInclusiveScanNonUniform:
+        case glslang::EOpMaxInvocationsInclusiveScanNonUniform:
+        case glslang::EOpAddInvocationsInclusiveScanNonUniform:
+            groupOperation = spv::GroupOperationInclusiveScan;
+            spvGroupOperands.push_back(groupOperation);
+            break;
+        case glslang::EOpMinInvocationsExclusiveScan:
+        case glslang::EOpMaxInvocationsExclusiveScan:
+        case glslang::EOpAddInvocationsExclusiveScan:
+        case glslang::EOpMinInvocationsExclusiveScanNonUniform:
+        case glslang::EOpMaxInvocationsExclusiveScanNonUniform:
+        case glslang::EOpAddInvocationsExclusiveScanNonUniform:
+            groupOperation = spv::GroupOperationExclusiveScan;
+            spvGroupOperands.push_back(groupOperation);
+            break;
+        default:
+            break;
+        }
 #endif
     }
 
@@ -4157,24 +4267,18 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
 
     switch (op) {
     case glslang::EOpAnyInvocation:
-        opCode = spv::OpGroupAny;
+        opCode = spv::OpSubgroupAnyKHR;
         break;
     case glslang::EOpAllInvocations:
-        opCode = spv::OpGroupAll;
+        opCode = spv::OpSubgroupAllKHR;
         break;
     case glslang::EOpAllInvocationsEqual:
-    {
-        spv::Id groupAll = builder.createOp(spv::OpGroupAll, typeId, spvGroupOperands);
-        spv::Id groupAny = builder.createOp(spv::OpGroupAny, typeId, spvGroupOperands);
-
-        return builder.createBinOp(spv::OpLogicalOr, typeId, groupAll,
-                                   builder.createUnaryOp(spv::OpLogicalNot, typeId, groupAny));
-    }
-
+        opCode = spv::OpSubgroupAllEqualKHR;
+        break;
     case glslang::EOpReadInvocation:
         opCode = spv::OpSubgroupReadInvocationKHR;
         if (builder.isVectorType(typeId))
-            return CreateInvocationsVectorOperation(opCode, typeId, operands);
+            return CreateInvocationsVectorOperation(opCode, groupOperation, typeId, operands);
         break;
     case glslang::EOpReadFirstInvocation:
         opCode = spv::OpSubgroupFirstInvocationKHR;
@@ -4204,7 +4308,15 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
     case glslang::EOpMinInvocations:
     case glslang::EOpMaxInvocations:
     case glslang::EOpAddInvocations:
-        if (op == glslang::EOpMinInvocations) {
+    case glslang::EOpMinInvocationsInclusiveScan:
+    case glslang::EOpMaxInvocationsInclusiveScan:
+    case glslang::EOpAddInvocationsInclusiveScan:
+    case glslang::EOpMinInvocationsExclusiveScan:
+    case glslang::EOpMaxInvocationsExclusiveScan:
+    case glslang::EOpAddInvocationsExclusiveScan:
+        if (op == glslang::EOpMinInvocations ||
+            op == glslang::EOpMinInvocationsInclusiveScan ||
+            op == glslang::EOpMinInvocationsExclusiveScan) {
             if (isFloat)
                 opCode = spv::OpGroupFMin;
             else {
@@ -4213,7 +4325,9 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
                 else
                     opCode = spv::OpGroupSMin;
             }
-        } else if (op == glslang::EOpMaxInvocations) {
+        } else if (op == glslang::EOpMaxInvocations ||
+                   op == glslang::EOpMaxInvocationsInclusiveScan ||
+                   op == glslang::EOpMaxInvocationsExclusiveScan) {
             if (isFloat)
                 opCode = spv::OpGroupFMax;
             else {
@@ -4230,13 +4344,21 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
         }
 
         if (builder.isVectorType(typeId))
-            return CreateInvocationsVectorOperation(opCode, typeId, operands);
+            return CreateInvocationsVectorOperation(opCode, groupOperation, typeId, operands);
 
         break;
     case glslang::EOpMinInvocationsNonUniform:
     case glslang::EOpMaxInvocationsNonUniform:
     case glslang::EOpAddInvocationsNonUniform:
-        if (op == glslang::EOpMinInvocationsNonUniform) {
+    case glslang::EOpMinInvocationsInclusiveScanNonUniform:
+    case glslang::EOpMaxInvocationsInclusiveScanNonUniform:
+    case glslang::EOpAddInvocationsInclusiveScanNonUniform:
+    case glslang::EOpMinInvocationsExclusiveScanNonUniform:
+    case glslang::EOpMaxInvocationsExclusiveScanNonUniform:
+    case glslang::EOpAddInvocationsExclusiveScanNonUniform:
+        if (op == glslang::EOpMinInvocationsNonUniform ||
+            op == glslang::EOpMinInvocationsInclusiveScanNonUniform ||
+            op == glslang::EOpMinInvocationsExclusiveScanNonUniform) {
             if (isFloat)
                 opCode = spv::OpGroupFMinNonUniformAMD;
             else {
@@ -4246,7 +4368,9 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
                     opCode = spv::OpGroupSMinNonUniformAMD;
             }
         }
-        else if (op == glslang::EOpMaxInvocationsNonUniform) {
+        else if (op == glslang::EOpMaxInvocationsNonUniform ||
+                 op == glslang::EOpMaxInvocationsInclusiveScanNonUniform ||
+                 op == glslang::EOpMaxInvocationsExclusiveScanNonUniform) {
             if (isFloat)
                 opCode = spv::OpGroupFMaxNonUniformAMD;
             else {
@@ -4264,7 +4388,7 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
         }
 
         if (builder.isVectorType(typeId))
-            return CreateInvocationsVectorOperation(opCode, typeId, operands);
+            return CreateInvocationsVectorOperation(opCode, groupOperation, typeId, operands);
 
         break;
 #endif
@@ -4278,7 +4402,7 @@ spv::Id TGlslangToSpvTraverser::createInvocationsOperation(glslang::TOperator op
 }
 
 // Create group invocation operations on a vector
-spv::Id TGlslangToSpvTraverser::CreateInvocationsVectorOperation(spv::Op op, spv::Id typeId, std::vector<spv::Id>& operands)
+spv::Id TGlslangToSpvTraverser::CreateInvocationsVectorOperation(spv::Op op, spv::GroupOperation groupOperation, spv::Id typeId, std::vector<spv::Id>& operands)
 {
 #ifdef AMD_EXTENSIONS
     assert(op == spv::OpGroupFMin || op == spv::OpGroupUMin || op == spv::OpGroupSMin ||
@@ -4322,7 +4446,7 @@ spv::Id TGlslangToSpvTraverser::CreateInvocationsVectorOperation(spv::Op op, spv
             spvGroupOperands.push_back(operands[1]);
         } else {
             spvGroupOperands.push_back(builder.makeUintConstant(spv::ScopeSubgroup));
-            spvGroupOperands.push_back(spv::GroupOperationReduce);
+            spvGroupOperands.push_back(groupOperation);
             spvGroupOperands.push_back(scalar);
         }
 
@@ -4731,12 +4855,12 @@ spv::Id TGlslangToSpvTraverser::getSymbolId(const glslang::TIntermSymbol* symbol
     if (builtIn != spv::BuiltInMax)
         addDecoration(id, spv::DecorationBuiltIn, (int)builtIn);
 
-#ifdef NV_EXTENSIONS 
+#ifdef NV_EXTENSIONS
     if (builtIn == spv::BuiltInSampleMask) {
           spv::Decoration decoration;
           // GL_NV_sample_mask_override_coverage extension
           if (glslangIntermediate->getLayoutOverrideCoverage())
-              decoration = (spv::Decoration)spv::OverrideCoverageNV;
+              decoration = (spv::Decoration)spv::DecorationOverrideCoverageNV;
           else
               decoration = (spv::Decoration)spv::DecorationMax;
         addDecoration(id, decoration);
@@ -4744,9 +4868,25 @@ spv::Id TGlslangToSpvTraverser::getSymbolId(const glslang::TIntermSymbol* symbol
             builder.addExtension(spv::E_SPV_NV_sample_mask_override_coverage);
         }
     }
+    else if (builtIn == spv::BuiltInLayer) {
+        // SPV_NV_viewport_array2 extension
+        if (symbol->getQualifier().layoutViewportRelative)
+        {
+            addDecoration(id, (spv::Decoration)spv::DecorationViewportRelativeNV);
+            builder.addCapability(spv::CapabilityShaderViewportMaskNV);
+            builder.addExtension(spv::E_SPV_NV_viewport_array2);
+        }
+        if(symbol->getQualifier().layoutSecondaryViewportRelativeOffset != -2048)
+        {
+            addDecoration(id, (spv::Decoration)spv::DecorationSecondaryViewportRelativeNV, symbol->getQualifier().layoutSecondaryViewportRelativeOffset);
+            builder.addCapability(spv::CapabilityShaderStereoViewNV);
+            builder.addExtension(spv::E_SPV_NV_stereo_view_rendering);
+        }
+    }
+
     if (symbol->getQualifier().layoutPassthrough) {
-        addDecoration(id, spv::PassthroughNV);
-        builder.addCapability(spv::GeometryShaderPassthroughNV);
+        addDecoration(id, spv::DecorationPassthroughNV);
+        builder.addCapability(spv::CapabilityGeometryShaderPassthroughNV);
         builder.addExtension(spv::E_SPV_NV_geometry_shader_passthrough);
     }
 #endif
@@ -4831,7 +4971,9 @@ spv::Id TGlslangToSpvTraverser::createSpvConstant(const glslang::TIntermTyped& n
             return accessChainLoad(sub_tree->getType());
         } else if (auto* const_union_array = &sn->getConstArray()){
             int nextConst = 0;
-            return createSpvConstantFromConstUnionArray(sn->getType(), *const_union_array, nextConst, true);
+            spv::Id id = createSpvConstantFromConstUnionArray(sn->getType(), *const_union_array, nextConst, true);
+            builder.addName(id, sn->getName().c_str());
+            return id;
         }
     }
 

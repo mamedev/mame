@@ -13,8 +13,4 @@
 
 #include "dbg.h"
 
-#if !BX_COMPILER_MSVC
-#	define _strdup strdup
-#endif // !BX_COMPILER_MSVC
-
 #endif // __TEST_H__
