@@ -291,9 +291,23 @@ int test_quat_ctr()
 	return Error;
 }
 
+int test_size()
+{
+	int Error = 0;
+
+	Error += 16 == sizeof(glm::quat) ? 0 : 1;
+	Error += 32 == sizeof(glm::dquat) ? 0 : 1;
+	Error += glm::quat().length() == 4 ? 0 : 1;
+	Error += glm::dquat().length() == 4 ? 0 : 1;
+	Error += glm::quat::length() == 4 ? 0 : 1;
+	Error += glm::dquat::length() == 4 ? 0 : 1;
+
+	return Error;
+}
+
 int main()
 {
-	int Error(0);
+	int Error = 0;
 
 	Error += test_quat_ctr();
 	Error += test_quat_mul_vec();
@@ -307,6 +321,7 @@ int main()
 	Error += test_quat_normalize();
 	Error += test_quat_euler();
 	Error += test_quat_slerp();
+	Error += test_size();
 
 	return Error;
 }
