@@ -23,8 +23,6 @@ TODO
 ----
 
  - Screen flipping support
- - Understand role of bit 5 of IN1
- - Hook up 93C46 EEPROM
  - Hook up ES-8712
  - Sort out the IOC commands for the M6585 & ES-8712
  - Is SW3 actually used?
@@ -64,7 +62,7 @@ ES-9209B
    CPU: TMP68HC000P-16
  Sound: OKI M6295
         OKI M6585
-        Ecxellent ES-8712
+        Excellent ES-8712
    OSC: 32MHz, 14.31818MHz & 1056kHz, 640kHz resonators
    RAM: Sony CXK5864BSP-10L 8K x 8bit high speed CMOS SRAM
         Alliance AS7C256-20PC 32K x 8bit CMOS SRAM
@@ -189,8 +187,11 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 			m_oki->set_rom_bank((data & 0x800) >> 11);
 			break;
 
+		// 93C46 serial EEPROM (status read at D80087)
 		case 0x45:
-			//m_adpcm_idle = 1;
+			m_eeprom->di_write(BIT(data >> 8, 2));
+			m_eeprom->clk_write(BIT(data >> 8, 1));
+			m_eeprom->cs_write(BIT(data >> 8, 0));
 			break;
 
 		// OKIM6295
@@ -368,7 +369,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )  // This bit gets tested (search for d8 00 87)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -445,7 +446,6 @@ void gcpinbal_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_trigger));
-	save_item(NAME(m_adpcm_data));
 }
 
 void gcpinbal_state::machine_reset()
@@ -462,7 +462,6 @@ void gcpinbal_state::machine_reset()
 	m_adpcm_start = 0;
 	m_adpcm_end = 0;
 	m_adpcm_trigger = 0;
-	m_adpcm_data = 0;
 	m_bg0_gfxset = 0;
 	m_bg1_gfxset = 0;
 	m_msm_start = 0;
@@ -476,6 +475,8 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

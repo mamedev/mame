@@ -2,6 +2,7 @@
 // copyright-holders:David Graves, R. Belmont
 
 #include "machine/74157.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 #include "video/excellent_spr.h"
@@ -18,6 +19,7 @@ public:
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom"),
 		m_oki(*this, "oki"),
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
@@ -30,6 +32,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
 	required_device<msm6585_device> m_msm;
 	required_device<hct157_device> m_adpcm_select;
@@ -59,7 +62,6 @@ public:
 	uint32_t      m_adpcm_end;
 	uint32_t      m_adpcm_idle;
 	uint8_t       m_adpcm_trigger;
-	uint8_t       m_adpcm_data;
 
 	DECLARE_READ16_MEMBER(ioc_r);
 	DECLARE_WRITE16_MEMBER(ioc_w);
