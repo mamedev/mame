@@ -24,7 +24,8 @@ public:
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
 		m_tilemapram(*this, "tilemapram"),
-		m_ioc_ram(*this, "ioc_ram"),
+		m_d80010_ram(*this, "d80010"),
+		m_d80060_ram(*this, "d80060"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen")
@@ -39,7 +40,8 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_tilemapram;
-	required_shared_ptr<uint16_t> m_ioc_ram;
+	required_shared_ptr<uint16_t> m_d80010_ram;
+	required_shared_ptr<uint16_t> m_d80060_ram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -63,8 +65,13 @@ public:
 	uint32_t      m_adpcm_idle;
 	uint8_t       m_adpcm_trigger;
 
-	DECLARE_READ16_MEMBER(ioc_r);
-	DECLARE_WRITE16_MEMBER(ioc_w);
+	DECLARE_WRITE16_MEMBER(d80010_w);
+	DECLARE_WRITE8_MEMBER(d80040_w);
+	DECLARE_WRITE16_MEMBER(d80060_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_WRITE8_MEMBER(es8712_w);
 	DECLARE_READ16_MEMBER(gcpinbal_tilemaps_word_r);
 	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
