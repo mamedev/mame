@@ -106,5 +106,8 @@ device_amiga_keyboard_interface::~device_amiga_keyboard_interface()
 SLOT_INTERFACE_START( amiga_keyboard_devices )
 	SLOT_INTERFACE("a500_us", A500_KBD_US)
 	SLOT_INTERFACE("a500_de", A500_KBD_DE)
+	SLOT_INTERFACE("a500_fr", A500_KBD_FR)
+	SLOT_INTERFACE("a500_it", A500_KBD_IT)
+	SLOT_INTERFACE("a500_se", A500_KBD_SE)
 	SLOT_INTERFACE("a1200_us", A1200_KBD)
 SLOT_INTERFACE_END
