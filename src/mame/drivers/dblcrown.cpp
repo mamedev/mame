@@ -47,6 +47,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
@@ -79,9 +80,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t m_vram_bank[2];
 	uint8_t m_mux_data;
-	uint8_t m_lamps_data;
 
-	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
@@ -91,12 +90,10 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vram_bank_r);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(in_mux_r);
 	DECLARE_READ8_MEMBER(in_mux_type_r);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(lamps_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
@@ -157,11 +154,6 @@ uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	}
 
 	return 0;
-}
-
-READ8_MEMBER( dblcrown_state::bank_r)
-{
-	return m_bank;
 }
 
 WRITE8_MEMBER( dblcrown_state::bank_w)
@@ -246,11 +238,6 @@ WRITE8_MEMBER( dblcrown_state::vram_bank_w)
 		printf("vram bank = %02x\n",data);
 }
 
-READ8_MEMBER( dblcrown_state::mux_r)
-{
-	return m_mux_data;
-}
-
 WRITE8_MEMBER( dblcrown_state::mux_w)
 {
 	m_mux_data = data;
@@ -307,11 +294,6 @@ WRITE8_MEMBER( dblcrown_state::output_w )
 }
 
 
-READ8_MEMBER( dblcrown_state::lamps_r )
-{
-	return m_lamps_data;
-}
-
 WRITE8_MEMBER( dblcrown_state::lamps_w )
 {
 /*  bits
@@ -333,8 +315,6 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
 	output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
 	output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
 	output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
-
-	m_lamps_data = data;
 }
 
 WRITE8_MEMBER(dblcrown_state::watchdog_w)
@@ -377,10 +357,8 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWD")
 	AM_RANGE(0x04, 0x04) AM_READ(in_mux_r)
 	AM_RANGE(0x05, 0x05) AM_READ(in_mux_type_r)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r, lamps_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ymz", ymz284_device, address_data_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(watchdog_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END
@@ -638,9 +616,14 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(dblcrown_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(dblcrown_state, bank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(dblcrown_state, mux_w))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
+	MCFG_SOUND_ADD("ymz", YMZ284, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
