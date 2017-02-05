@@ -17,6 +17,9 @@ Click one of the followings links to take you straight to that option - or scrol
 <a href="#warnings">                                    `    -w, --warn`</a><br />
 <a href="#reporting-timings">                           `    -d, --durations`</a><br />
 <a href="#input-file">                                  `    -f, --input-file`</a><br />
+<a href="#run-section">                                 `    -c, --section`</a><br />
+<a href="#filenames-as-tags">                           `    -#, --filenames-as-tags`</a><br />
+
 
 </br>
 
@@ -66,6 +69,8 @@ A series of tags form an AND expression wheras a comma-separated sequence forms 
 <pre>[one][two],[three]</pre>
 This matches all tests tagged `[one]` and `[two]`, as well as all tests tagged `[three]`
 
+Test names containing special characters, such as `,` or `[` can specify them on the command line using `\`.
+`\` also escapes itself.
 
 <a id="choosing-a-reporter-to-use"></a>
 ## Choosing a reporter to use
@@ -115,7 +120,7 @@ Sometimes this results in a flood of failure messages and you'd rather just see 
 --list-reporters
 </pre>
 
-```-l``` or ```--list-tests`` will list all registered tests, along with any tags.
+```-l``` or ```--list-tests``` will list all registered tests, along with any tags.
 If one or more test-specs have been supplied too then only the matching tests will be listed.
 
 ```-t``` or ```--list-tags``` lists all available tags, along with the number of test cases they match. Again, supplying test specs limits the tags that match.
@@ -214,6 +219,59 @@ In either case the actual value for the seed is printed as part of Catch's outpu
 <pre>-h, -?, --help</pre>
 
 Prints the command line arguments to stdout
+
+
+<a id="run-section"></a>
+## Specify the section to run
+<pre>-s, --section &lt;section name&gt;</pre>
+
+To limit execution to a specific section within a test case, use this option one or more times.
+To narrow to sub-sections use multiple instances, where each subsequent instance specifies a deeper nesting level.
+
+E.g. if you have:
+
+<pre>
+TEST_CASE( "Test" ) {
+  SECTION( "sa" ) {
+    SECTION( "sb" ) {
+      /*...*/
+    }
+    SECTION( "sc" ) {
+      /*...*/
+    }
+  }
+  SECTION( "sd" ) {
+    /*...*/
+  }
+}
+</pre>
+
+Then you can run `sb` with:
+<pre>./MyExe Test -c sa -c sb</pre>
+
+Or run just `sd` with:
+<pre>./MyExe Test -c sd</pre>
+
+To run all of `sa`, including `sb` and `sc` use:
+<pre>./MyExe Test -c sa</pre>
+
+There are some limitations of this feature to be aware of:
+- Code outside of sections being skipped will still be executed - e.g. any set-up code in the TEST_CASE before the
+start of the first section.</br>
+- At time of writing, wildcards are not supported in section names.
+- If you specify a section without narrowing to a test case first then all test cases will be executed 
+(but only matching sections within them).
+
+
+<a id="filenames-as-tags"></a>
+## Filenames as tags
+<pre>-#, --filenames-as-tags</pre>
+
+When this option is used then every test is given an additional tag which is formed of the unqualified 
+filename it is found in, with any extension stripped, prefixed with the `#` character.
+
+So, for example,  tests within the file `~\Dev\MyProject\Ferrets.cpp` would be tagged `[#Ferrets]`.
+
 
 ---
 

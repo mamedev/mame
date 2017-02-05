@@ -51,9 +51,9 @@ namespace Catch {
         }
 
         if( !config.testSpec().hasFilters() )
-            Catch::cout() << pluralise( matchedTests, "test case" ) << "\n" << std::endl;
+            Catch::cout() << pluralise( matchedTests, "test case" ) << '\n' << std::endl;
         else
-            Catch::cout() << pluralise( matchedTests, "matching test case" ) << "\n" << std::endl;
+            Catch::cout() << pluralise( matchedTests, "matching test case" ) << '\n' << std::endl;
         return matchedTests;
     }
 
@@ -68,8 +68,8 @@ namespace Catch {
                 ++it ) {
             matchedTests++;
             TestCaseInfo const& testCaseInfo = it->getTestCaseInfo();
-            if( startsWith( testCaseInfo.name, "#" ) )
-               Catch::cout() << "\"" << testCaseInfo.name << "\"" << std::endl;
+            if( startsWith( testCaseInfo.name, '#' ) )
+               Catch::cout() << '"' << testCaseInfo.name << '"' << std::endl;
             else
                Catch::cout() << testCaseInfo.name << std::endl;
         }
@@ -132,9 +132,9 @@ namespace Catch {
                                                     .setInitialIndent( 0 )
                                                     .setIndent( oss.str().size() )
                                                     .setWidth( CATCH_CONFIG_CONSOLE_WIDTH-10 ) );
-            Catch::cout() << oss.str() << wrapper << "\n";
+            Catch::cout() << oss.str() << wrapper << '\n';
         }
-        Catch::cout() << pluralise( tagCounts.size(), "tag" ) << "\n" << std::endl;
+        Catch::cout() << pluralise( tagCounts.size(), "tag" ) << '\n' << std::endl;
         return tagCounts.size();
     }
 
@@ -153,9 +153,9 @@ namespace Catch {
                                                         .setWidth( CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen-8 ) );
             Catch::cout() << "  "
                     << it->first
-                    << ":"
+                    << ':'
                     << std::string( maxNameLen - it->first.size() + 2, ' ' )
-                    << wrapper << "\n";
+                    << wrapper << '\n';
         }
         Catch::cout() << std::endl;
         return factories.size();
