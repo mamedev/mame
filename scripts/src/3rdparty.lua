@@ -730,6 +730,65 @@ links {
 }
 end
 end
+
+--------------------------------------------------
+-- BX library objects
+--------------------------------------------------
+
+project "bx"
+	uuid "238318fe-49f5-4eb4-88be-0618900f5eac"
+	kind "StaticLib"
+
+	defines {
+		"__STDC_LIMIT_MACROS",
+		"__STDC_FORMAT_MACROS",
+		"__STDC_CONSTANT_MACROS",
+	}
+	
+	configuration { "vs*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
+		}
+	configuration { "mingw*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
+		}
+
+	configuration { "osx* or xcode4" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+
+	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+	
+	configuration { }
+	
+	includedirs {
+		MAME_DIR .. "3rdparty/bx/include",
+	}
+	
+	files {
+		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
+		MAME_DIR .. "3rdparty/bx/src/crt.cpp",
+		MAME_DIR .. "3rdparty/bx/src/crtimpl.cpp",
+		MAME_DIR .. "3rdparty/bx/src/debug.cpp",
+		MAME_DIR .. "3rdparty/bx/src/dtoa.cpp",
+		MAME_DIR .. "3rdparty/bx/src/fpumath.cpp",
+		MAME_DIR .. "3rdparty/bx/src/mutex.cpp",
+		MAME_DIR .. "3rdparty/bx/src/os.cpp",
+		MAME_DIR .. "3rdparty/bx/src/sem.cpp",
+		MAME_DIR .. "3rdparty/bx/src/string.cpp",
+		MAME_DIR .. "3rdparty/bx/src/thread.cpp",
+	}
+
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
