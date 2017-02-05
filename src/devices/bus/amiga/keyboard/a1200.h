@@ -22,6 +22,8 @@
 extern device_type const A1200_KBD;
 
 
+namespace bus { namespace amiga { namespace keyboard {
+
 //**************************************************************************
 //  TYPE DECLARATIONS
 //**************************************************************************
@@ -61,5 +63,7 @@ private:
 	u16                             m_row_drive;
 	bool                            m_host_kdat, m_mpu_kdat;
 };
+
+} } } // namespace bus::amiga::keyboard
 
 #endif // DEVICES_BUS_AMIGA_KEYBOARD_A1200_H

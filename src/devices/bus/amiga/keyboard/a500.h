@@ -2,20 +2,20 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-	Amiga 500 Keyboard
+    Amiga 500 Keyboard
 
-	Assembly part numbers:
+    Assembly part numbers:
 
-	- 312502-01  U.S./Canada
-	- 312502-02  Germany/Austria
-	- 312502-03  France/Belgium
-	- 312502-04  Italy
-	- 312502-05  Sweden/Finland
-	- 312502-06  Spain
-	- 312502-07  Denmark
-	- 312502-08  Switzerland
-	- 312502-09  Norway
-	- 312502-12  UK
+    - 312502-01  U.S./Canada
+    - 312502-02  Germany/Austria
+    - 312502-03  France/Belgium
+    - 312502-04  Italy
+    - 312502-05  Sweden/Finland
+    - 312502-06  Spain
+    - 312502-07  Denmark
+    - 312502-08  Switzerland
+    - 312502-09  Norway
+    - 312502-12  UK
 
     Amiga 1000 (for reference, to be moved):
 
@@ -32,10 +32,11 @@
 
 #pragma once
 
-#include "emu.h"
 #include "keyboard.h"
 #include "cpu/m6502/m6502.h"
 
+
+namespace bus { namespace amiga { namespace keyboard {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -111,8 +112,7 @@ private:
 
 	required_device<m6502_device> m_mpu;
 	required_ioport m_special;
-	required_ioport_array<7> m_row_d;
-	required_ioport_array<8> m_row_c;
+	required_ioport_array<15> m_rows;
 
 	emu_timer *m_timer;
 	emu_timer *m_watchdog;
@@ -139,6 +139,9 @@ public:
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
+
+} } } // namespace bus::amiga::keyboard
+
 
 // device type definition
 extern const device_type A500_KBD_US;
