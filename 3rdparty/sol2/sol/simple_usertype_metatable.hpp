@@ -90,7 +90,7 @@ namespace sol {
 					}
 					luaL_getmetatable(L, metakey);
 					int tableindex = lua_gettop(L);
-					if (type_of(L, tableindex) == type::nil) {
+					if (type_of(L, tableindex) == type::lua_nil) {
 						continue;
 					}
 					stack::set_field<false, true>(L, stack_reference(L, 2), stack_reference(L, 3), tableindex);
@@ -131,9 +131,9 @@ namespace sol {
 			}
 			// Check table storage first for a method that works
 			luaL_getmetatable(L, sm.metakey);
-			if (type_of(L, -1) != type::nil) {
+			if (type_of(L, -1) != type::lua_nil) {
 				stack::get_field<false, true>(L, accessor.c_str(), lua_gettop(L));
-				if (type_of(L, -1) != type::nil) {
+				if (type_of(L, -1) != type::lua_nil) {
 					// Woo, we found it?
 					lua_remove(L, -2);
 					return 1;
@@ -302,7 +302,7 @@ namespace sol {
 	private:
 		template<std::size_t... I, typename Tuple>
 		simple_usertype_metatable(usertype_detail::verified_tag, std::index_sequence<I...>, lua_State* L, Tuple&& args)
-			: callconstructfunc(nil),
+			: callconstructfunc(lua_nil),
 			indexfunc(&usertype_detail::indexing_fail<true>), newindexfunc(&usertype_detail::indexing_fail<false>),
 			indexbase(&usertype_detail::simple_core_indexing_call<true>), newindexbase(&usertype_detail::simple_core_indexing_call<false>),
 			indexbaseclasspropogation(usertype_detail::walk_all_bases<true>), newindexbaseclasspropogation(&usertype_detail::walk_all_bases<false>),

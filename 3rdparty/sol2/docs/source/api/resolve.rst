@@ -19,6 +19,7 @@ utility to pick overloaded C++ function calls
 	int overloaded(int x, int y, int z);
 
 	struct thing {
+		int overloaded() const;
 		int overloaded(int x);
 		int overloaded(int x, int y);
 		int overloaded(int x, int y, int z);
@@ -33,8 +34,9 @@ You can disambiguate them using ``resolve``:
 	auto two_argument_func = resolve<int(int, int)>( overloaded );
 	auto three_argument_func = resolve<int(int, int, int)>( overloaded );
 	auto member_three_argument_func = resolve<int(int, int, int)>( &thing::overloaded );
+	auto member_zero_argument_const_func = resolve<int() const>( &thing::overloaded );
 
-This resolution becomes useful when setting functions on a :doc:`table<table>` or :doc:`state_view<state>`:
+It is *important* to note that ``const`` is placed at the end for when you desire const overloads. You will get compiler errors if you are not specific and do not properly disambiguate for const member functions. This resolution also becomes useful when setting functions on a :doc:`table<table>` or :doc:`state_view<state>`:
 
 ..  code-block:: cpp
 	:linenos:

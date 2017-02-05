@@ -39,7 +39,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};
@@ -60,7 +60,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};
@@ -90,7 +90,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};
