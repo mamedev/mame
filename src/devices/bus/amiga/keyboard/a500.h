@@ -42,6 +42,11 @@ extern const device_type A500_KBD_DE;
 extern const device_type A500_KBD_FR;
 extern const device_type A500_KBD_IT;
 extern const device_type A500_KBD_SE;
+extern const device_type A500_KBD_ES;
+extern const device_type A500_KBD_DK;
+extern const device_type A500_KBD_CH;
+extern const device_type A500_KBD_NO;
+extern const device_type A500_KBD_GB;
 
 
 namespace bus { namespace amiga { namespace keyboard {
@@ -183,6 +188,61 @@ class a500_kbd_se_device : public a500_kbd_device
 {
 public:
 	a500_kbd_se_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_es_device
+
+class a500_kbd_es_device : public a500_kbd_device
+{
+public:
+	a500_kbd_es_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_dk_device
+
+class a500_kbd_dk_device : public a500_kbd_device
+{
+public:
+	a500_kbd_dk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_ch_device
+
+class a500_kbd_ch_device : public a500_kbd_device
+{
+public:
+	a500_kbd_ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_no_device
+
+class a500_kbd_no_device : public a500_kbd_device
+{
+public:
+	a500_kbd_no_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_gb_device
+
+class a500_kbd_gb_device : public a500_kbd_device
+{
+public:
+	a500_kbd_gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

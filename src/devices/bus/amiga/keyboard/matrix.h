@@ -18,6 +18,11 @@ INPUT_PORTS_EXTERN(matrix_de);
 INPUT_PORTS_EXTERN(matrix_fr);
 INPUT_PORTS_EXTERN(matrix_it);
 INPUT_PORTS_EXTERN(matrix_se);
+INPUT_PORTS_EXTERN(matrix_es);
+INPUT_PORTS_EXTERN(matrix_dk);
+INPUT_PORTS_EXTERN(matrix_ch);
+INPUT_PORTS_EXTERN(matrix_no);
+INPUT_PORTS_EXTERN(matrix_gb);
 
 } } } // namespace bus::amiga::keyboard
 

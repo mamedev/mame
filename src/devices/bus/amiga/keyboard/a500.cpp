@@ -25,6 +25,11 @@ const device_type A500_KBD_DE = &device_creator<bus::amiga::keyboard::a500_kbd_d
 const device_type A500_KBD_FR = &device_creator<bus::amiga::keyboard::a500_kbd_fr_device>;
 const device_type A500_KBD_IT = &device_creator<bus::amiga::keyboard::a500_kbd_it_device>;
 const device_type A500_KBD_SE = &device_creator<bus::amiga::keyboard::a500_kbd_se_device>;
+const device_type A500_KBD_ES = &device_creator<bus::amiga::keyboard::a500_kbd_es_device>;
+const device_type A500_KBD_DK = &device_creator<bus::amiga::keyboard::a500_kbd_dk_device>;
+const device_type A500_KBD_CH = &device_creator<bus::amiga::keyboard::a500_kbd_ch_device>;
+const device_type A500_KBD_NO = &device_creator<bus::amiga::keyboard::a500_kbd_no_device>;
+const device_type A500_KBD_GB = &device_creator<bus::amiga::keyboard::a500_kbd_gb_device>;
 
 
 namespace bus { namespace amiga { namespace keyboard {
@@ -108,6 +113,31 @@ INPUT_PORTS_START( a500_se_keyboard )
 	PORT_INCLUDE(matrix_se)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( a500_es_keyboard )
+	PORT_INCLUDE(a500_special)
+	PORT_INCLUDE(matrix_es)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( a500_dk_keyboard )
+	PORT_INCLUDE(a500_special)
+	PORT_INCLUDE(matrix_dk)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( a500_ch_keyboard )
+	PORT_INCLUDE(a500_special)
+	PORT_INCLUDE(matrix_ch)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( a500_no_keyboard )
+	PORT_INCLUDE(a500_special)
+	PORT_INCLUDE(matrix_no)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( a500_gb_keyboard )
+	PORT_INCLUDE(a500_special)
+	PORT_INCLUDE(matrix_gb)
+INPUT_PORTS_END
+
 } // anonymous namespace
 
 
@@ -126,6 +156,11 @@ ioport_constructor a500_kbd_de_device::device_input_ports() const { return INPUT
 ioport_constructor a500_kbd_fr_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_fr_keyboard ); }
 ioport_constructor a500_kbd_it_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_it_keyboard ); }
 ioport_constructor a500_kbd_se_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_se_keyboard ); }
+ioport_constructor a500_kbd_es_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_es_keyboard ); }
+ioport_constructor a500_kbd_dk_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_dk_keyboard ); }
+ioport_constructor a500_kbd_ch_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_ch_keyboard ); }
+ioport_constructor a500_kbd_no_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_no_keyboard ); }
+ioport_constructor a500_kbd_gb_device::device_input_ports() const { return INPUT_PORTS_NAME( a500_gb_keyboard ); }
 
 
 //**************************************************************************
@@ -160,50 +195,57 @@ a500_kbd_device::a500_kbd_device(
 {
 }
 
-//-------------------------------------------------
-//  a500_kbd_us_device - constructor
-//-------------------------------------------------
 
 a500_kbd_us_device::a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_US, "Amiga 500 Keyboard (U.S./Canada)", "a500_kbd_us", __FILE__)
 {
 }
 
-//-------------------------------------------------
-//  a500_kbd_de_device - constructor
-//-------------------------------------------------
-
 a500_kbd_de_device::a500_kbd_de_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_DE, "Amiga 500 Keyboard (Germany/Austria)", "a500_kbd_de", __FILE__)
 {
 }
-
-//-------------------------------------------------
-//  a500_kbd_fr_device - constructor
-//-------------------------------------------------
 
 a500_kbd_fr_device::a500_kbd_fr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_FR, "Amiga 500 Keyboard (France/Belgium)", "a500_kbd_fr", __FILE__)
 {
 }
 
-//-------------------------------------------------
-//  a500_kbd_it_device - constructor
-//-------------------------------------------------
-
 a500_kbd_it_device::a500_kbd_it_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_IT, "Amiga 500 Keyboard (Italy)", "a500_kbd_it", __FILE__)
 {
 }
 
-//-------------------------------------------------
-//  a500_kbd_se_device - constructor
-//-------------------------------------------------
-
 a500_kbd_se_device::a500_kbd_se_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_SE, "Amiga 500 Keyboard (Sweden/Finland)", "a500_kbd_se", __FILE__)
 {
 }
+
+a500_kbd_es_device::a500_kbd_es_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_ES, "Amiga 500 Keyboard (Spain)", "a500_kbd_es", __FILE__)
+{
+}
+
+a500_kbd_dk_device::a500_kbd_dk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_DK, "Amiga 500 Keyboard (Denmark)", "a500_kbd_dk", __FILE__)
+{
+}
+
+a500_kbd_ch_device::a500_kbd_ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_CH, "Amiga 500 Keyboard (Switzerland)", "a500_kbd_ch", __FILE__)
+{
+}
+
+a500_kbd_no_device::a500_kbd_no_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_NO, "Amiga 500 Keyboard (Norway)", "a500_kbd_no", __FILE__)
+{
+}
+
+a500_kbd_gb_device::a500_kbd_gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_NO, "Amiga 500 Keyboard (UK)", "a500_kbd_gb", __FILE__)
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
