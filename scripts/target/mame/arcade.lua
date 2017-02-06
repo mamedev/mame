@@ -1399,7 +1399,6 @@ files {
 createMAMEProjects(_target, _subtarget, "ces")
 files {
 	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
-	MAME_DIR .. "src/mame/drivers/galgames.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
