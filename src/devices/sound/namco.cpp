@@ -19,7 +19,9 @@
     Pole Position does more complicated sound mixing: a 4051 multiplexes
     wavetable sound with four signals derived from the 52XX and 54XX, the
     selected signal is distributed to four volume control sections, and
-    finally the engine noise is mixed into all four channels.
+    finally the engine noise is mixed into all four channels. The later
+    CUS30 also uses the 99XX DAC, or two 99XX in the optional 16-channel
+    stereo configuration, but it uses no PROM and delivers its own samples.
 
 ***************************************************************************/
 
