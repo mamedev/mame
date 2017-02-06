@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+
+#define MASTER_CLOCK (XTAL_12MHz)
+#define CPU_CLOCK (MASTER_CLOCK/4)
+#define SOUND_CLOCK (MASTER_CLOCK/8)
+
 class marineb_state : public driver_device
 {
 public:

@@ -24,6 +24,7 @@ TODO:
 
 #include "emu.h"
 #include "audio/galaxian.h"
+#include "includes/galaxian.h"
 
 /*************************************
  *
@@ -31,10 +32,8 @@ TODO:
  *
  *************************************/
 
-#define XTAL                    18432000
-
-#define SOUND_CLOCK             (XTAL/6/2)          /* 1.536 MHz */
-#define RNG_RATE                (XTAL/3*2)          /* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
+#define SOUND_CLOCK             (GALAXIAN_MASTER_CLOCK/6/2)          /* 1.536 MHz */
+#define RNG_RATE                (GALAXIAN_MASTER_CLOCK/3*2)          /* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
 
 /* 74LS259 */
 #define GAL_INP_BG_DAC          NODE_10     /* at 9M Q4 to Q7 in schematics */
