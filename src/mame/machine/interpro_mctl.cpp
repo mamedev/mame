@@ -11,7 +11,7 @@
 * TODO
 *   - too long to list
 */
-#include "interpro_mcga.h"
+#include "interpro_mctl.h"
 
 #define VERBOSE 0
 #if VERBOSE
