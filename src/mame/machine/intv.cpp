@@ -48,6 +48,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 }
 
 // I/O for the Tape Drive
+// (to be moved to a device)
 struct tape_drive_state_type
 {
 	/* read state */
@@ -279,6 +280,7 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 	}
 }
 
+#if 0
 static int max_bits = 0;
 static unsigned char *tape_data;
 
@@ -313,6 +315,7 @@ void set_tape_bit(int position, int data)
 	else
 		tape_data[byte] &= (~data_mask);
 }
+#endif
 
 #if defined(LATER)
 int intvkbd_tape_init(int id)
@@ -363,7 +366,6 @@ void intvkbd_tape_exit(int id)
 		}
 	}
 }
-#endif
 
 void update_tape_drive(void)
 {
@@ -424,29 +426,26 @@ void update_tape_drive(void)
 	else
 		tape_drive.leader_detect = 0;
 }
+#endif
 
 ////////////
-
-static bool not_busy = 1;	// printer state
-static bool not_paper = 0; // printer state - we always have paper
-static bool not_busy_enable = 0;  // interface state?
 
 READ8_MEMBER( intv_state::intvkbd_periph_r )
 {
 	uint8_t value = 0;
 	switch(offset) {
 		case 0x06:
-			if (not_busy_enable)
-				if (not_busy)
+			if (m_printer_not_busy_enable)
+				if (m_printer_not_busy)
 					value |= 0x80;
-			if (not_paper)
+			if (m_printer_no_paper)
 				value |= 0x10;
 			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,value);
 			
 			// After one query of busy, 
 			// next time the state is not_busy
-			if (not_busy == 0) 
-				not_busy = 1;
+			if (!m_printer_not_busy) 
+				m_printer_not_busy = true;
 				
 			return value;
 		break;
@@ -461,23 +460,20 @@ READ8_MEMBER( intv_state::intvkbd_periph_r )
 
 WRITE8_MEMBER( intv_state::intvkbd_periph_w )
 {
-	static FILE *fp = 0;
-	
 	switch(offset) {
 		case 0x06:
 			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
 			if (data & 0x20)
-				not_busy_enable = 1;
+				m_printer_not_busy_enable = true;
 			else
-				not_busy_enable = 0;
+				m_printer_not_busy_enable = false;
 		break;
 		case 0x07:
 			//logerror("Printing: 0x%02x, %c\n",data,data);
-			if (fp == 0)
-				fp = fopen("printer.txt","wb");
-			fputc(data, fp);
-			fflush(fp);
-			not_busy = 0;
+			// For testing, print to stdout
+			fputc(data, stdout);
+			fflush(stdout);
+			m_printer_not_busy = false;
 		break;
 		default:
 			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
@@ -562,6 +558,13 @@ void intv_state::machine_reset()
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(CP1610_R7, 0x1000);
+	
+	if (m_is_keybd)
+	{
+		m_printer_not_busy = true;			// printer state
+		m_printer_no_paper = false;			// printer state
+		m_printer_not_busy_enable = false;	// printer interface state
+	}
 }
 
 void intv_state::machine_start()
