@@ -9,6 +9,7 @@ There are three IRQ sources:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/osborne1.h"
 
 
@@ -416,7 +417,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
 		// signal (set by bit 1 of the value written to 0x2400).  Of course
 		// it depends on the value wrapping around to zero when it counts
-		// past 0x7F
+		// past 0x7F.
 		uint16_t const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
 
 		for (uint16_t x = 0; x < (hires ? 104 : 52); x++)
@@ -510,4 +511,26 @@ void osborne1_state::update_acia_rxc_txc()
 	attoseconds_t const dividend = (ATTOSECONDS_PER_SECOND / 100) * (m_acia_rxc_txc_state ? m_acia_rxc_txc_p_high : m_acia_rxc_txc_p_low);
 	attoseconds_t const divisor = (15974400 / 100) / m_acia_rxc_txc_div;
 	m_acia_rxc_txc_timer->adjust(attotime(0, dividend / divisor));
+}
+
+
+MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
+{
+	// TODO: work out how scrolling works - it doesn't seem to be using the same PIA output bits
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix32(y);
+	for (uint8_t x = 0; x < x_count; ++x)
+	{
+		uint8_t const chr = m_ram->pointer()[0xF000 + (ma >> 1) + x];
+		uint8_t const clr = (m_ram->pointer()[0x10000 + (ma >> 1) + x] & 0x80) ? 2 : 1;
+
+		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
+
+		for (unsigned bit = 0; 8 > bit; ++bit)
+			*p++ = palette[BIT(gfx, 7 - bit) ? clr : 0];
+	}
+}
+
+MC6845_ON_UPDATE_ADDR_CHANGED(osborne1nv_state::crtc_update_addr_changed)
+{
 }

@@ -29438,6 +29438,7 @@ osbexec                         // 1982 Osborne Executive
 
 @source:osborne1.cpp
 osborne1                        // 1981 Osborne-1
+osborne1nv                      // 1984 Osborne-1 (Nuevo Video)
 
 @source:osi.cpp
 c1p                             //

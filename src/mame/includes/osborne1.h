@@ -9,14 +9,19 @@
 #ifndef OSBORNE1_H_
 #define OSBORNE1_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
+
 #include "sound/speaker.h"
+
 #include "bus/ieee488/ieee488.h"
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+
+#include "video/mc6845.h"
+
 
 class osborne1_state : public driver_device
 {
@@ -132,34 +137,50 @@ protected:
 	required_memory_bank    m_bank_fxxx;
 
 	// configuration (reloaded on reset)
-	uint8_t           m_screen_pac;
-	uint8_t           m_acia_rxc_txc_div;
-	uint8_t           m_acia_rxc_txc_p_low;
-	uint8_t           m_acia_rxc_txc_p_high;
+	uint8_t         m_screen_pac;
+	uint8_t         m_acia_rxc_txc_div;
+	uint8_t         m_acia_rxc_txc_p_low;
+	uint8_t         m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
-	uint8_t           m_ub4a_q;
-	uint8_t           m_ub6a_q;
-	uint8_t           m_rom_mode;
-	uint8_t           m_bit_9;
+	uint8_t         m_ub4a_q;
+	uint8_t         m_ub6a_q;
+	uint8_t         m_rom_mode;
+	uint8_t         m_bit_9;
 
 	// onboard video state
-	uint8_t           m_scroll_x;
-	uint8_t           m_scroll_y;
-	uint8_t           m_beep_state;
+	uint8_t         m_scroll_x;
+	uint8_t         m_scroll_y;
+	uint8_t         m_beep_state;
 	emu_timer       *m_video_timer;
 	bitmap_ind16    m_bitmap;
-	uint8_t           *m_p_chargen;
+	uint8_t         *m_p_chargen;
 	tilemap_t       *m_tilemap;
 
 	// SCREEN-PAC registers
-	uint8_t           m_resolution;
-	uint8_t           m_hc_left;
+	uint8_t         m_resolution;
+	uint8_t         m_hc_left;
 
 	// serial state
-	uint8_t           m_acia_irq_state;
-	uint8_t           m_acia_rxc_txc_state;
+	uint8_t         m_acia_irq_state;
+	uint8_t         m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
+};
+
+
+class osborne1nv_state : public osborne1_state
+{
+public:
+	osborne1nv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		osborne1_state(mconfig, type, tag),
+		m_palette(*this, "palette")
+	{ }
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
+
+protected:
+	required_device<palette_device> m_palette;
 };
 
 #endif /* OSBORNE1_H_ */
