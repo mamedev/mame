@@ -36,7 +36,7 @@ public:
 	DECLARE_READ16_MEMBER(reg00_r) { return m_reg[0]; }
 	DECLARE_WRITE16_MEMBER(reg00_w) { m_reg[0] = data; }
 	DECLARE_READ16_MEMBER(control_r) { return m_control; }
-	DECLARE_WRITE16_MEMBER(control_w);
+	virtual DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(error_r) { return m_error; }
 	DECLARE_WRITE16_MEMBER(error_w) { m_error = data; }
 	DECLARE_READ8_MEMBER(frcrd_r) { return m_frcrd; }
