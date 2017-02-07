@@ -24,7 +24,7 @@
 #ifndef NLD_7448_H_
 #define NLD_7448_H_
 
-#include "nl_setup.h"
+#include "../nl_setup.h"
 
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device

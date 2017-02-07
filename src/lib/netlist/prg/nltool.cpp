@@ -8,12 +8,12 @@
 
 ****************************************************************************/
 
-#include "plib/poptions.h"
-#include "nl_setup.h"
-#include "nl_parser.h"
-#include "devices/net_lib.h"
-#include "tools/nl_convert.h"
-#include "solver/nld_solver.h"
+#include "netlist/plib/poptions.h"
+#include "netlist/nl_setup.h"
+#include "netlist/nl_parser.h"
+#include "netlist/devices/net_lib.h"
+#include "netlist/tools/nl_convert.h"
+#include "netlist/solver/nld_solver.h"
 
 class tool_options_t : public plib::options
 {

@@ -21,9 +21,9 @@ project "netlist"
 	}
 
 	includedirs {
-		MAME_DIR .. "src/lib/netlist",
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/lib/util",
+		MAME_DIR .. "src/lib",
+	--	MAME_DIR .. "src/osd",
+	--	MAME_DIR .. "src/lib/util",
 	--      ext_includedir("expat"),
 	}
 

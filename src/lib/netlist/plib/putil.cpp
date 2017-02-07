@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <initializer_list>
 
-#include "plib/putil.h"
-#include "plib/ptypes.h"
-#include "plib/plists.h"
+#include "putil.h"
+#include "ptypes.h"
+#include "plists.h"
 
 namespace plib
 {

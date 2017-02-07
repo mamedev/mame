@@ -505,25 +505,15 @@ if _OPTIONS["SEPARATE_BIN"]~="1" then
 end
 
 links {
-	"utils",
-	ext_lib("expat"),
-	"7z",
-	"ocore_" .. _OPTIONS["osd"],
 	"netlist",
-	ext_lib("zlib"),
-	ext_lib("flac"),
-	ext_lib("utf8proc"),
 }
 
 includedirs {
-	MAME_DIR .. "src/osd",
-	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/lib/netlist",
+	MAME_DIR .. "src/lib",
 }
 
 files {
 	MAME_DIR .. "src/lib/netlist/prg/nltool.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -550,20 +540,20 @@ if _OPTIONS["SEPARATE_BIN"]~="1" then
 end
 
 links {
-	"utils",
-	"ocore_" .. _OPTIONS["osd"],
+--	"utils",
+--	"ocore_" .. _OPTIONS["osd"],
 	"netlist",
 }
 
 includedirs {
-	MAME_DIR .. "src/osd",
-	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/lib/netlist",
+--	MAME_DIR .. "src/osd",
+--	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "src/lib",
 }
 
 files {
 	MAME_DIR .. "src/lib/netlist/prg/nlwav.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
+--	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }

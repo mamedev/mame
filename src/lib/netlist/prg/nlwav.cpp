@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 #include <cstring>
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/pstream.h"
-#include "plib/poptions.h"
-#include "plib/ppmf.h"
-#include "nl_setup.h"
+#include "../plib/pstring.h"
+#include "../plib/plists.h"
+#include "../plib/pstream.h"
+#include "../plib/poptions.h"
+#include "../plib/ppmf.h"
+#include "../nl_setup.h"
 
 class nlwav_options_t : public plib::options
 {

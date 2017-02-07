@@ -9,8 +9,8 @@
 #include <cmath>
 #include <unordered_map>
 #include "nl_convert.h"
-#include "plib/palloc.h"
-#include "plib/putil.h"
+#include "../plib/palloc.h"
+#include "../plib/putil.h"
 
 /* FIXME: temporarily defined here - should be in a file */
 /* FIXME: family logic in netlist is convoluted, create

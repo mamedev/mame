@@ -5,9 +5,9 @@
  *
  */
 
-#include "solver/nld_solver.h"
-#include "analog/nlid_twoterm.h"
-#include "nl_setup.h"
+#include "../solver/nld_solver.h"
+#include "nlid_twoterm.h"
+#include "../nl_setup.h"
 
 #include <cmath>
 

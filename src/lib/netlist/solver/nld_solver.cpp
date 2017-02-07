@@ -33,13 +33,13 @@
 #include <algorithm>
 #include <cmath>  // <<= needed by windows build
 
-#include "nl_lists.h"
+#include "../nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"
 #endif
 
-#include "nl_factory.h"
+#include "../nl_factory.h"
 
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"

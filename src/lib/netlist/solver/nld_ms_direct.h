@@ -10,9 +10,9 @@
 
 #include <algorithm>
 
-#include "solver/nld_solver.h"
-#include "solver/nld_matrix_solver.h"
-#include "solver/vector_base.h"
+#include "nld_solver.h"
+#include "nld_matrix_solver.h"
+#include "vector_base.h"
 
 /* Disabling dynamic allocation gives a ~10% boost in performance
  * This flag has been added to support continuous storage for arrays

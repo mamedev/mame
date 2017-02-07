@@ -42,9 +42,9 @@
 
 #include <algorithm>
 
-#include "solver/nld_solver.h"
-#include "solver/nld_matrix_solver.h"
-#include "solver/vector_base.h"
+#include "nld_solver.h"
+#include "nld_matrix_solver.h"
+#include "vector_base.h"
 
 namespace netlist
 {

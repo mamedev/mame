@@ -8,7 +8,7 @@
 #ifndef NLID_FOURTERM_H_
 #define NLID_FOURTERM_H_
 
-#include "nl_base.h"
+#include "../nl_base.h"
 
 namespace netlist {
 	namespace analog {

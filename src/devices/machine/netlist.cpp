@@ -17,7 +17,7 @@
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
 
-#include "plib/palloc.h"
+#include "netlist/plib/palloc.h"
 
 #include "debugger.h"
 

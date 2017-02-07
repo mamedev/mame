@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "solver/nld_ms_direct.h"
-#include "solver/nld_solver.h"
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
 
 namespace netlist
 {

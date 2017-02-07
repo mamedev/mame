@@ -33,8 +33,8 @@
 #ifndef NLID_TWOTERM_H_
 #define NLID_TWOTERM_H_
 
-#include "nl_base.h"
-#include "plib/pfunction.h"
+#include "../nl_base.h"
+#include "../plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation

@@ -21,7 +21,7 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I../.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
@@ -175,7 +175,7 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang clang-5 mingw doc
 
 clang:
-		$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
+		$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
