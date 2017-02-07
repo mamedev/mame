@@ -88,7 +88,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void rom_bank_updated() { }
+	virtual void rom_bank_updated() override { }
 
 	bool is_selected();
 
@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GALGAMES_SLOT, "Galaxy Games Slot", tag, owner, clock, "galgames_slot", __FILE__),
 	device_memory_interface(mconfig, *this),
-	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_delegate(FUNC(slot_map), this)),
+	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_delegate(FUNC(galgames_slot_device::slot_map), this)),
 	m_ram(*this, "ram"),
 	m_cart0(*this, "^cart0"),
 	m_cart1(*this, "^cart1"),
