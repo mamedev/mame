@@ -84,7 +84,10 @@ TODO:
   tested, too.
 
 * Fix emulation of the Nuevo Video board (scrolling, interrupts, CRTC video
-  RAM updates).  It would be nice to get a schematic for this.
+  RAM updates).  It would be nice to get a schematic for this.  The board
+  doesn't appear to have adders necessary to combine the MA output of the
+  CRTC with the PIA outputs, and without additional connections to the
+  mainboard it would be pretty hard to actually get the PIA output at all.
 
 ***************************************************************************/
 
@@ -207,9 +210,7 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME( 0x08, 0, "Alpha Lock" ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_NAME("Alpha Lock")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -382,8 +383,11 @@ ROM_START( osborne1nv )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
+
+	ROM_REGION( 0x0800, "nuevo", 0 )
+	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY          FULLNAME                   FLAGS */
 COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,  osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )

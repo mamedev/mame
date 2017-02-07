@@ -270,7 +270,6 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 	m_bank_fxxx->configure_entries(0, 1, m_ram->pointer() + 0xF000, 0);
 	m_bank_fxxx->configure_entries(1, 1, m_ram->pointer() + 0x10000, 0);
 
-	m_p_chargen = memregion("chargen")->base();
 	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
@@ -516,15 +515,16 @@ void osborne1_state::update_acia_rxc_txc()
 
 MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 {
-	// TODO: work out how scrolling works - it doesn't seem to be using the same PIA output bits
+	// TODO: work out how the scroll offset actually gets here
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint16_t const base = (((m_pia1->b_output() & 0x1F) << 7) + ((ma & 0x3F00) >> 1)) & 0xF80;
 	uint32_t *p = &bitmap.pix32(y);
 	for (uint8_t x = 0; x < x_count; ++x)
 	{
-		uint8_t const chr = m_ram->pointer()[0xF000 + (ma >> 1) + x];
-		uint8_t const clr = (m_ram->pointer()[0x10000 + (ma >> 1) + x] & 0x80) ? 2 : 1;
+		uint8_t const chr = m_ram->pointer()[0xF000 | base | ((ma + x) & 0x7f)];
+		uint8_t const clr = (m_ram->pointer()[0x10000 | base | ((ma + x) & 0x7f)] & 0x80) ? 2 : 1;
 
-		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)];
+		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
 
 		for (unsigned bit = 0; 8 > bit; ++bit)
 			*p++ = palette[BIT(gfx, 7 - bit) ? clr : 0];
