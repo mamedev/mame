@@ -191,7 +191,7 @@ class clipper_device : public cpu_device
 public:
 	clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
-	DECLARE_READ_LINE_MEMBER(ssw) { return m_ssw; }
+	DECLARE_READ32_MEMBER(ssw) { return m_ssw; }
 
 protected:
 	// device-level overrides
