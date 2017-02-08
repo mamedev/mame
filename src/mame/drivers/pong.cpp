@@ -47,14 +47,22 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "emu.h"
 
 #include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
+
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+
 #include "video/fixfreq.h"
+
+#include "netlist/devices/net_lib.h"
+
 #include "machine/nl_breakout.h"
 #include "machine/nl_pong.h"
 #include "machine/nl_pongd.h"
+
 #include "breakout.lh"
+
+#include <cmath>
+
 
 /*
  * H count width to 512
@@ -81,8 +89,8 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL_PONG         (0x105+1)       // 262
-#define H_TOTAL_PONG         (0x1C6+1)       // 454
+#define V_TOTAL_PONG    (0x105+1)       // 262
+#define H_TOTAL_PONG    (0x1C6+1)       // 454
 
 /*
  * Breakout's H1 signal:
