@@ -937,6 +937,41 @@ ROM_START( spacecho2 )
 	ROM_LOAD( "mb7052.6m",    0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
+/*
+Speak & Help
+
+Single layer re-engineered pcb, very tidy and working.
+
+All dumps are in label.location format, see the two 
+included photos for one of the pcb with and without the 
+speech? daughterboard plugged in for verification.
+
+Roms are all mitsubishi 2716, proms are fujitsu MB7052.
+
+https://youtu.be/YuWZ8hZ-MtY
+Unique speech, as detailed in video, seems will require additional work to emulate correctly.
+*/
+
+ROM_START( speakhlp )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "b1.56t",       0x0000, 0x0800, CRC(ce009d85) SHA1(d8683d358ff04ffa0eef574e42a8f3885f538ecc) ) 
+	ROM_LOAD( "b2.5t",        0x0800, 0x0800, CRC(935219f1) SHA1(83d41eb8af6dc5d44d578c01c123872e75fa927e) ) 
+	ROM_LOAD( "b3.45t",       0x1000, 0x0800, CRC(083c28de) SHA1(82e159f218f60e9c06ff78f2e52572f8f5a6c530) ) 
+	ROM_LOAD( "b4.4t",        0x1800, 0x0800, CRC(b0927e3b) SHA1(cc5f030dcbc93d5265dbf17a2425acdb921ab18b) ) 
+	ROM_LOAD( "b5.3t",        0x2000, 0x0800, CRC(ccd25c4e) SHA1(d6d5722d746dd22cecacfea407e798f4531eea99) ) 
+	ROM_LOAD( "b6.23t",       0x2800, 0x0800, CRC(a657dd4b) SHA1(4f6b85ccf5449d08f5c7f5dc6f59d0df276d9994) ) 
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "b07.5b",       0x0000, 0x0800, CRC(c9317d91) SHA1(b509ce371d89ad39acaefea732eb955a11df1ed9) ) 
+	ROM_LOAD( "b09.4b",       0x1000, 0x0800, CRC(29310c32) SHA1(d5d5953111d81661ab98c950d94e5912fc907445) ) 
+	ROM_LOAD( "b010.3b",      0x1800, 0x0800, CRC(4d567bc9) SHA1(6bc05213042d9069a054b2ae044f04938a9bfe06) ) 
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
+	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
+	ROM_LOAD( "prom.6k",      0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
+	ROM_LOAD( "prom.6m",      0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
 ROM_START( ttmahjng )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "ju04",         0x0000, 0x1000, CRC(fe7c693a) SHA1(be0630557e0bcd9ec2e9542cc4a4d947889ec57a) )
@@ -1055,5 +1090,6 @@ GAME( 1980, stratvoxa,speakres, stratvox, stratvox, driver_device, 0,        ROT
 GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, driver_device, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
