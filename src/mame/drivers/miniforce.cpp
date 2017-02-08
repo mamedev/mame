@@ -10,34 +10,34 @@
  * required to start the work with this driver.
  *
  * +=============================================================================================================================+
- * |  CPU-20   |     |     |     |     |     |     |WFC-1|     |  SYS68K/PWR-09A | SYS68K/WFMOD-50                               |
- * |           |     |     |     |     |     |     |     |     |                 |                                               |
- * | RST       |     |     |     |     |     |     |O RUN|     |                 |                                               |
- * | ABT       |     |     |     |     |     |     | R/L |     |O +5v            |+---------------------------------------------+|
- * |           |     |     |     |     |     |     |O LOC|     |O +12v           ||                                             ||
- * |O RUN O RUN|     |     |     |     |     |     |O ERR|     |O -12v           ||                                             ||
- * |O HLT      |     |     |     |     |     |     |O BSY|     |O ON             ||                                             ||
- * |O BM       |     |     |     |     |     |     |     |     |                 ||                                             ||
- * |           |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
- * |O FLM O SL0|     |     |     |     |     |     |     |     |                 || FDD                                         ||
- * |O EPR O SL1|     |     |     |     |     |     |     |     |                 ||                                             ||
- * |O 2WS      |     |     |     |     |     |     |     |     |    +-------+    ||                                             ||
- * |O 4WS      |     |     |     |     |     |     |     |     |    |   o   |PWR ||                                             ||
- * |O 6WS      |     |     |     |     |     |     |     |     |    |       |    |+---------------------------------------------+|
- * |O 8WS      |     |     |     |     |     |     |     |     |    +-------+    |                                               |
- * |O12WS      |     |     |     |     |     |     |     |     |                 |                                               |
- * |O14WS      |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
- * |           |     |     |     |     |     |     |     |     |                 || HDD                                         ||
- * | CSH       |     |     |     |     |     |     |     |     |                 ||                                             ||
- * | R/M       |     |     |     |     |     |     |     |     |                 ||                                             ||
- * |           |     |     |     |     |     |     |     |     |                 ||                                             ||
- * |  o        |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
- * |  o        |     |     |     |     |     |     |     |     |                 ||                                             ||
- * |  o        |     |     |     |     |     |     |     |     |                 ||                                             ||
- * |  o        |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |CPU  |SRAM |     |     |     |     |     |     |WFC-1|     |  SYS68K/PWR-09A | SYS68K/WFMOD-50                               |
+ * |-21  | -22 |     |     |     |     |     |     |     |     |                 |                                               |
+ * | RST |     |     |     |     |     |     |     |O RUN|     |                 |                                               |
+ * | ABT |     |     |     |     |     |     |     | R/L |     |O +5v            |+---------------------------------------------+|
+ * |     |     |     |     |     |     |     |     |O LOC|     |O +12v           ||                                             ||
+ * |O RUN|O RUN|     |     |     |     |     |     |O ERR|     |O -12v           ||                                             ||
+ * |O HLT|     |     |     |     |     |     |     |O BSY|     |O ON             ||                                             ||
+ * |O BM |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |     |     |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
+ * |O FLM|O SL0|     |     |     |     |     |     |     |     |                 || FDD                                         ||
+ * |O EPR|O SL1|     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |O 2WS|     |     |     |     |     |     |     |     |     |    +-------+    ||                                             ||
+ * |O 4WS|     |     |     |     |     |     |     |     |     |    |   o   |PWR ||                                             ||
+ * |O 6WS|     |     |     |     |     |     |     |     |     |    |       |    |+---------------------------------------------+|
+ * |O 8WS|     |     |     |     |     |     |     |     |     |    +-------+    |                                               |
+ * |O12WS|     |     |     |     |     |     |     |     |     |                 |                                               |
+ * |O14WS|     |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
+ * |     |     |     |     |     |     |     |     |     |     |                 || HDD                                         ||
+ * | CSH |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * | R/M |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |     |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |  o  |     |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
+ * |  o  |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |  o  |     |     |     |     |     |     |     |     |     |                 ||                                             ||
+ * |  o  |     |     |     |     |     |     |     |     |     |                 ||                                             ||
  * | RS232/422 |     |     |     |     |     |     |     |     |                 ||                                             ||
- * | P4    P3  |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
- * |           |     |     |     |     |     |     |     |     |                 |                                               |
+ * | P4  | P3  |     |     |     |     |     |     |     |     |                 |+---------------------------------------------+|
+ * |     |     |     |     |     |     |     |     |     |     |                 |                                               |
  * |SLOT1|SLOT2|SLOT3|SLOT4|SLOT5|SLOT6|SLOT7|SLOT7|SLOT9|     |                 |                                               |
  * +=============================================================================================================================+
  *
@@ -100,6 +100,7 @@
 #include "bus/vme/vme_fccpu20.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
+#include "bus/vme/vme_mzr8300.h"
 #include "machine/clock.h"
 
 #define LOG_GENERAL 0x01
@@ -164,7 +165,7 @@ static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(miniforce_vme_cards)
-	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
+	SLOT_INTERFACE("fccpu21", VME_FCCPU21)
 	SLOT_INTERFACE("fcisio", VME_FCISIO1)
 	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
 SLOT_INTERFACE_END
@@ -173,17 +174,17 @@ SLOT_INTERFACE_END
  * Machine configuration
  */
 MACHINE_CONFIG_START (miniforce, miniforce_state)
-//  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
+//	MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", miniforce_vme_cards, "fccpu20")
-	MCFG_VME_SLOT_ADD ("vme", "slot2", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot3", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot4", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot5", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot6", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot7", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot8", miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", "slot9", miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, miniforce_vme_cards, "fccpu21")
+	MCFG_VME_SLOT_ADD ("vme", 2, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 3, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 4, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 5, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 6, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 7, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 8, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 9, miniforce_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 ROM_START(miniforce)
