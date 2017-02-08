@@ -94,7 +94,10 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device (mconfig, type, tag) 
 	{
 	}
+	virtual void machine_start () override { LOGSETUP("%s\n", FUNCNAME); }
+//	virtual void machine_reset () override;
 
+	DECLARE_DRIVER_INIT(cpu20)		{ LOGSETUP("%s\n", FUNCNAME); }
 	DECLARE_DRIVER_INIT(cpu21s)		{ LOGSETUP("%s\n", FUNCNAME); }
 	DECLARE_DRIVER_INIT(cpu21)		{ LOGSETUP("%s\n", FUNCNAME); }
 	DECLARE_DRIVER_INIT(cpu21a)		{ LOGSETUP("%s\n", FUNCNAME); }
@@ -139,37 +142,37 @@ SLOT_INTERFACE_END
 /* Machine configurations */
 MACHINE_CONFIG_START (cpu20, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu20_vme_cards, "fccpu20")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu20_vme_cards, "fccpu20")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21s, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21s_vme_cards, "fccpu21s")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21s_vme_cards, "fccpu21s")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21_vme_cards, "fccpu21")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21_vme_cards, "fccpu21")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21a, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21a_vme_cards, "fccpu21a")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21a_vme_cards, "fccpu21a")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21ya, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21ya_vme_cards, "fccpu21ya")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21ya_vme_cards, "fccpu21ya")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21b, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21b_vme_cards, "fccpu21b")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21b_vme_cards, "fccpu21b")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (cpu21yb, cpu20_state)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", cpu21yb_vme_cards, "fccpu21yb")
+	MCFG_VME_SLOT_ADD ("vme", 1, cpu21yb_vme_cards, "fccpu21yb")
 MACHINE_CONFIG_END
 
 /* ROM configurations */
