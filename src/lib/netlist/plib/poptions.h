@@ -193,7 +193,6 @@ private:
 	pstring m_app;
 };
 
-
 }
 
 #endif /* POPTIONS_H_ */

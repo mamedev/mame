@@ -8,18 +8,18 @@
 
 ****************************************************************************/
 
-#include "netlist/plib/poptions.h"
+#include "netlist/plib/pmain.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/tools/nl_convert.h"
 #include "netlist/solver/nld_solver.h"
 
-class tool_options_t : public plib::options
+class tool_app_t : public plib::app
 {
 public:
-	tool_options_t() :
-		plib::options(),
+	tool_app_t() :
+		plib::app(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header:docheader", "run|convert|listdevices|static|header"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
@@ -63,13 +63,24 @@ public:
 	plib::option_str_limit opt_type;
 	plib::option_example opt_ex1;
 	plib::option_example opt_ex2;
+
+	int execute();
+	pstring usage();
+
+private:
+	void run();
+	void static_compile();
+
+	void mac_out(const pstring s, const bool cont = true);
+	void cmac(const netlist::factory::element_t *e);
+	void mac(const netlist::factory::element_t *e);
+
+	void create_header();
+	void create_docheader();
+
+	void listdevices();
+
 };
-
-static plib::pstdout pout_strm;
-static plib::pstderr perr_strm;
-
-static plib::putf8_fmt_writer pout(pout_strm);
-static plib::putf8_fmt_writer perr(perr_strm);
 
 static NETLIST_START(dummy)
 	/* Standard stuff */
@@ -176,21 +187,12 @@ private:
 void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
 {
 	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
-	pout("{}", err);
+	// FIXME: ...
+	//pout("{}", err);
 	if (l == plib::plog_level::FATAL)
 		throw netlist::nl_exception(err);
 }
 
-
-// FIXME: usage should go elsewhere
-void usage(tool_options_t &opts);
-
-void usage(tool_options_t &opts)
-{
-	pout("{}\n", opts.help(
-			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
-			"nltool [options]").c_str());
-}
 
 struct input_t
 {
@@ -249,7 +251,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 	return ret;
 }
 
-static void run(tool_options_t &opts)
+void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
 	t.start();
@@ -259,18 +261,18 @@ static void run(tool_options_t &opts)
 
 	nt.init();
 
-	if (!opts.opt_verb())
+	if (!opt_verb())
 		nt.log().verbose.set_enabled(false);
-	if (opts.opt_quiet())
+	if (opt_quiet())
 		nt.log().warning.set_enabled(false);
 
-	nt.read_netlist(opts.opt_file(), opts.opt_name(),
-			opts.opt_logs(),
-			opts.opt_defines(), opts.opt_rfolders());
+	nt.read_netlist(opt_file(), opt_name(),
+			opt_logs(),
+			opt_defines(), opt_rfolders());
 
-	std::vector<input_t> inps = read_input(nt.setup(), opts.opt_inp());
+	std::vector<input_t> inps = read_input(nt.setup(), opt_inp());
 
-	double ttr = opts.opt_ttr();
+	double ttr = opt_ttr();
 	t.stop();
 
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
@@ -298,7 +300,7 @@ static void run(tool_options_t &opts)
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
-static void static_compile(tool_options_t &opts)
+void tool_app_t::static_compile()
 {
 	netlist_tool_t nt("netlist");
 
@@ -307,9 +309,9 @@ static void static_compile(tool_options_t &opts)
 	nt.log().verbose.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
-	nt.read_netlist(opts.opt_file(), opts.opt_name(),
-			opts.opt_logs(),
-			opts.opt_defines(), opts.opt_rfolders());
+	nt.read_netlist(opt_file(), opt_name(),
+			opt_logs(),
+			opt_defines(), opt_rfolders());
 
 	plib::putf8_writer w(pout_strm);
 	std::map<pstring, pstring> mp;
@@ -325,7 +327,7 @@ static void static_compile(tool_options_t &opts)
 
 }
 
-static void mac_out(const pstring s, const bool cont = true)
+void tool_app_t::mac_out(const pstring s, const bool cont)
 {
 	static const unsigned RIGHT = 72;
 	if (cont)
@@ -339,7 +341,7 @@ static void mac_out(const pstring s, const bool cont = true)
 		pout("{1}\n", s);
 }
 
-static void cmac(const netlist::factory::element_t *e)
+void tool_app_t::cmac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
@@ -359,7 +361,7 @@ static void cmac(const netlist::factory::element_t *e)
 	mac_out("", false);
 }
 
-static void mac(const netlist::factory::element_t *e)
+void tool_app_t::mac(const netlist::factory::element_t *e)
 {
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
@@ -383,7 +385,7 @@ static void mac(const netlist::factory::element_t *e)
 	}
 }
 
-static void create_header(tool_options_t &opts)
+void tool_app_t::create_header()
 {
 	netlist_tool_t nt("netlist");
 
@@ -428,7 +430,7 @@ static void create_header(tool_options_t &opts)
 
 }
 
-static void create_docheader(tool_options_t &opts)
+void tool_app_t::create_docheader()
 {
 	netlist_tool_t nt("netlist");
 
@@ -479,13 +481,13 @@ static void create_docheader(tool_options_t &opts)
     listdevices - list all known devices
 -------------------------------------------------*/
 
-static void listdevices(tool_options_t &opts)
+void tool_app_t::listdevices()
 {
 	netlist_tool_t nt("netlist");
 	nt.init();
-	if (!opts.opt_verb())
+	if (!opt_verb())
 		nt.log().verbose.set_enabled(false);
-	if (opts.opt_quiet())
+	if (opt_quiet())
 		nt.log().warning.set_enabled(false);
 
 	netlist::factory::list_t &list = nt.setup().factory();
@@ -576,10 +578,16 @@ static const pstring pmf_verbose[] =
 };
 #endif
 
-int main(int argc, char *argv[])
+pstring tool_app_t::usage()
 {
-	tool_options_t opts;
-	int ret;
+	return help(
+			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
+			"nltool [options]");
+}
+
+int tool_app_t::execute()
+{
+	tool_app_t opts;
 
 	/* make SIGFPE actually deliver signals on supoorted platforms */
 	plib::fpsignalenabler::global_enable(true);
@@ -588,20 +596,14 @@ int main(int argc, char *argv[])
 	//perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	//perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
 	//printf("test2 %f\n", std::exp(-14362.38064713));
-	if ((ret = opts.parse(argc, argv)) != argc)
-	{
-		perr("Error parsing {}\n", argv[ret]);
-		usage(opts);
-		return 1;
-	}
 
-	if (opts.opt_help())
+	if (opt_help())
 	{
-		usage(opts);
+		pout(usage());
 		return 0;
 	}
 
-	if (opts.opt_version())
+	if (opt_version())
 	{
 		pout(
 			"nltool (netlist) 0.1\n"
@@ -615,47 +617,47 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		pstring cmd = opts.opt_cmd();
+		pstring cmd = opt_cmd();
 		if (cmd == "listdevices")
-			listdevices(opts);
+			listdevices();
 		else if (cmd == "run")
-			run(opts);
+			run();
 		else if (cmd == "static")
-			static_compile(opts);
+			static_compile();
 		else if (cmd == "header")
-			create_header(opts);
+			create_header();
 		else if (cmd == "docheader")
-			create_docheader(opts);
+			create_docheader();
 		else if (cmd == "convert")
 		{
 			pstring contents;
 			plib::postringstream ostrm;
-			if (opts.opt_file() == "-")
+			if (opt_file() == "-")
 			{
 				plib::pstdin f;
 				ostrm.write(f);
 			}
 			else
 			{
-				plib::pifilestream f(opts.opt_file());
+				plib::pifilestream f(opt_file());
 				ostrm.write(f);
 			}
 			contents = ostrm.str();
 
 			pstring result;
-			if (opts.opt_type().equals("spice"))
+			if (opt_type().equals("spice"))
 			{
 				nl_convert_spice_t c;
 				c.convert(contents);
 				result = c.result();
 			}
-			else if (opts.opt_type().equals("eagle"))
+			else if (opt_type().equals("eagle"))
 			{
 				nl_convert_eagle_t c;
 				c.convert(contents);
 				result = c.result();
 			}
-			else if (opts.opt_type().equals("rinf"))
+			else if (opt_type().equals("rinf"))
 			{
 				nl_convert_rinf_t c;
 				c.convert(contents);
@@ -667,7 +669,8 @@ int main(int argc, char *argv[])
 		else
 		{
 			perr("Unknown command {}\n", cmd.c_str());
-			usage(opts);
+			//FIXME: usage_short
+			perr(usage());
 			return 1;
 		}
 	}
@@ -683,3 +686,7 @@ int main(int argc, char *argv[])
 	pstring::resetmem();
 	return 0;
 }
+
+PMAIN(tool_app_t)
+
+//plib::app *appconstructor() { return new tool_app_t(); }
