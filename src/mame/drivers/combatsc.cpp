@@ -7,6 +7,7 @@
 TODO:
 - Ugly text flickering in various places, namely the text when you finish level 1.
   This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
+- understand how the trackball really works for clone sets.
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
   sprites).
@@ -14,7 +15,6 @@ TODO:
   wrestling, and heads in intermission after firing range III)
 - hook up sound in bootleg (the current sound is a hack, making use of the
   Konami ROMset)
-- understand how the trackball really works
 - YM2203 pitch is wrong. Fixing it screws up the tempo.
 
   Update: 3MHz(24MHz/8) is the more appropriate clock speed for the 2203.
@@ -1004,8 +1004,8 @@ DRIVER_INIT_MEMBER(combatsc_state,combatsc)
  *************************************/
 
 GAME( 1988, combatsc,  0,        combatsc,  combatsc, combatsc_state,  combatsc,  ROT0, "Konami",  "Combat School (joystick)", 0 )
-GAME( 1987, combatsct, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (trackball)", 0 )
-GAME( 1987, combatscj, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", 0 )
-GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 1)", 0 )
-GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 2)", 0 )
+GAME( 1987, combatsct, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, combatscj, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 1)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 2)", MACHINE_NOT_WORKING )
 GAME( 1988, combatscb, combatsc, combatscb, combatscb, driver_device, 0,         ROT0, "bootleg", "Combat School (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
