@@ -2,10 +2,11 @@
 // copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
 #include "video/stic.h"
+#include "video/tms9927.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
 
-
+// Dual Port Memory handlers
 
 WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 {
@@ -35,215 +36,450 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	RAM[offset] = data;
 }
 
-
-
 READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 {
-	unsigned char rv;
-
-	if (offset < 0x100)
-	{
-		switch (offset)
-		{
-			case 0x000:
-				rv = m_io_test->read() & 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
-				break;
-			case 0x001:
-				rv = (m_io_test->read() & 0x40) << 1;
-				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
-				break;
-			case 0x002:
-				rv = (m_io_test->read() & 0x20) << 2;
-				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
-				break;
-			case 0x003:
-				rv = (m_io_test->read() & 0x10) << 3;
-				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
-				break;
-			case 0x004:
-				rv = (m_io_test->read() & 0x08) << 4;
-				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
-				break;
-			case 0x005:
-				rv = (m_io_test->read() & 0x04) << 5;
-				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
-				break;
-			case 0x006:
-				if (m_sr1_int_pending)
-					rv = 0x00;
-				else
-					rv = 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
-				break;
-			case 0x007:
-				if (m_tape_int_pending)
-					rv = 0x00;
-				else
-					rv = 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
-				break;
-			case 0x060: /* Keyboard Read */
-				rv = 0xff;
-				if (m_intvkbd_keyboard_col < 10)
-					rv = m_intv_keyboard[m_intvkbd_keyboard_col]->read();
-				break;
-			case 0x80:
-				rv = 0x00;
-				logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
-				m_tape_int_pending = 0;
-				break;
-			case 0xa0:
-				rv = 0x00;
-				logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
-				m_sr1_int_pending = 0;
-				break;
-			case 0xc0:
-			case 0xc1:
-			case 0xc2:
-			case 0xc3:
-			case 0xc4:
-			case 0xc5:
-			case 0xc6:
-			case 0xc7:
-			case 0xc8:
-			case 0xc9:
-			case 0xca:
-			case 0xcb:
-			case 0xcc:
-			case 0xcd:
-			case 0xce:
-			case 0xcf:
-				/* TMS9927 regs */
-				rv = intvkbd_tms9927_r(space, offset-0xc0);
-				break;
-			default:
-				rv = (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
-				logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
-				break;
-		}
-		return rv;
-	}
-	else
-		return (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
+	return (m_intvkbd_dualport_ram[offset+0x200]&0x0300)>>8;
 }
-
-static const char *const tape_motor_mode_desc[8] =
-{
-	"IDLE", "IDLE", "IDLE", "IDLE",
-	"EJECT", "PLAY/RECORD", "REWIND", "FF"
-};
 
 WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 {
-	unsigned int mask;
+	unsigned int mask = m_intvkbd_dualport_ram[offset+0x200] & 0x00ff;
+	m_intvkbd_dualport_ram[offset+0x200] = mask | ((data<<8)&0x0300);
+}
 
-	if (offset < 0x100)
+// I/O for the Tape Drive
+// (to be moved to a device)
+struct tape_drive_state_type
+{
+	/* read state */
+	int read_data;			/* 0x4000 */
+	int ready;				/* 0x4001 */
+	int leader_detect;		/* 0x4002 */
+	int tape_missing;		/* 0x4003 */
+	int playing;			/* 0x4004 */
+	int no_data;			/* 0x4005 */
+
+	/* write state */
+	int motor_state;		/* 0x4020-0x4022 */
+	int writing;			/* 0x4023 */
+	int audio_b_mute;		/* 0x4024 */
+	int audio_a_mute;		/* 0x4025 */
+	int channel_select;		/* 0x4026 */
+	int erase;				/* 0x4027 */
+	int write_data;			/* 0x4040 */
+
+	/* bit_counter */
+	int bit_counter;
+} tape_drive;
+
+//static const char *const tape_motor_mode_desc[8] =
+//{
+//	"IDLE", "IDLE", "IDLE", "IDLE",
+//	"EJECT", "PLAY/RECORD", "REWIND", "FF"
+//};
+
+
+READ8_MEMBER( intv_state::intvkbd_io_r )
+{
+	unsigned char rv = 0x00;
+
+	switch (offset)
 	{
-		switch (offset)
+		// These next 8 locations all map to bit7
+		case 0x000:
+			// "Data from Cassette"
+			// Tape drive does the decoding to bits
+			//rv = m_io_test->read() & 0x80;
+			rv = tape_drive.read_data << 7;
+			break;
+		case 0x001:
+			// "Watermark"
+			// 0 = Drive Busy Executing Command?, 1 = Drive Ok?
+			//rv = (m_io_test->read() & 0x40) << 1;
+			rv = tape_drive.ready << 7;
+			break;
+		case 0x002:
+			// "End of Tape"
+			// 0 = Recordable surface, 1 = Leader Detect
+			// (Leader is transparent, optical sensor)
+			//rv = (m_io_test->read() & 0x20) << 2;
+			rv = tape_drive.leader_detect << 7;
+			//logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
+			break;
+		case 0x003:
+			// "Cassette Present"
+			// 0 = Tape Present, 1 = Tape Not Present
+			//rv = (m_io_test->read() & 0x10) << 3;
+			rv = tape_drive.tape_missing << 7;
+			//logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
+			break;
+		case 0x004:
+			// "NOT Inter Record Gap (IRG)"
+			// 0 = Not Playing/Recording?, 1 = Playing/Recording?
+			//rv = (m_io_test->read() & 0x08) << 4;
+			rv = tape_drive.playing << 7;
+			//logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
+			break;
+		case 0x005:
+			// "Dropout"
+			// 0 = Data Detect, 1 = No Data
+			//rv = (m_io_test->read() & 0x04) << 5;
+			rv = tape_drive.no_data << 7;
+			//logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
+			break;
+		case 0x006:
+			// "NOT Clock Interrupt"
+			if (m_sr1_int_pending)
+				rv = 0x00;
+			else
+				rv = 0x80;
+			//logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
+			break;
+		case 0x007:
+			// "NOT Tape Interrupt"
+			if (m_tape_int_pending)
+				rv = 0x00;
+			else
+				rv = 0x80;
+			//logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
+			break;
+		case 0x060:
+			// "Read Keyboard"
+			rv = 0xff;
+			if (m_intvkbd_keyboard_col < 10)
+				rv = m_intv_keyboard[m_intvkbd_keyboard_col]->read();
+			break;
+		case 0x80:
+			// "Clear Tape Interrupt"
+			rv = 0x00;
+			//logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
+			m_tape_int_pending = 0;
+			break;
+		case 0xa0:
+			// "Clear Clock Interrupt"
+			rv = 0x00;
+			//logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
+			m_sr1_int_pending = 0;
+			break;
+		default:
+			//logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
+			break;
+	}
+	return rv;
+}
+
+WRITE8_MEMBER( intv_state::intvkbd_io_w )
+{
+	switch (offset)
+	{
+		// Bits from offset $20 to $47 are all bit0, write only
+		// These are all set to zero by system reset
+		case 0x020:
+			// "Tape Drive Control: Enable"
+			tape_drive.motor_state &= 3;
+			if (data & 1)
+				tape_drive.motor_state |= 4;
+			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+			break;
+		case 0x021:
+			// "Tape Drive Control: Forward"
+			tape_drive.motor_state &= 5;
+			if (data & 1)
+				tape_drive.motor_state |= 2;
+			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+			break;
+		case 0x022:
+			// "Tape Drive Control: Fast"
+			tape_drive.motor_state &= 6;
+			if (data & 1)
+				tape_drive.motor_state |= 1;
+			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+			break;
+		case 0x023:
+			// "Tape Drive Control: Record"
+			// 0=Read, 1=Write
+			tape_drive.writing = (data & 1);
+			break;
+		case 0x024:
+			// "Tape Drive Control: Mute 1"
+			// 0=Enable Channel B Audio, 1=Mute
+			tape_drive.audio_b_mute = (data & 1);
+			break;
+		case 0x025:
+			// "Tape Drive Control: Mute 2"
+			// 0=Enable Channel A Audio, 1=Mute
+			tape_drive.audio_a_mute = (data & 1);
+			break;
+		case 0x026:
+			// "Tape Drive Control: Mode"
+			// If read mode:
+			//	0=Read Channel B Data, 1 = Read Channel A Data
+			// If write mode:
+			//  0=Write Channel B data, 1 = Record Channel B Audio
+			tape_drive.channel_select = (data & 1);
+		case 0x027:
+			break;
+			// "Tape Drive Control: Erase"
+			tape_drive.erase = (data & 1);
+			break;
+		case 0x040:
+			// Data to Tape
+			tape_drive.write_data = (data & 1);
+			break;
+		case 0x041:
+			// "Tape Interrupt Enable"
+			//if (data & 1)
+				//logerror("TAPE: Tape Interrupts Enabled\n");
+			//else
+				//logerror("TAPE: Tape Interrupts Disabled\n");
+			m_tape_interrupts_enabled = (data & 1);
+			break;
+		case 0x042:
+			// "NOT External Interrupt Enable"
+			//if (data & 1)
+				//logerror("TAPE: Cart Bus Interrupts Disabled\n");
+			//else
+				//logerror("TAPE: Cart Bus Interrupts Enabled\n");
+			break;
+		case 0x043:
+			// "NOT Blank Screen"
+			if (data & 0x01)
+				m_intvkbd_text_blanked = 0;
+			else
+				m_intvkbd_text_blanked = 1;
+			break;
+		case 0x044:
+			m_intvkbd_keyboard_col &= 0x0e;
+			m_intvkbd_keyboard_col |= (data&0x01);
+			break;
+		case 0x045:
+			m_intvkbd_keyboard_col &= 0x0d;
+			m_intvkbd_keyboard_col |= ((data&0x01)<<1);
+			break;
+		case 0x046:
+			m_intvkbd_keyboard_col &= 0x0b;
+			m_intvkbd_keyboard_col |= ((data&0x01)<<2);
+			break;
+		case 0x047:
+			m_intvkbd_keyboard_col &= 0x07;
+			m_intvkbd_keyboard_col |= ((data&0x01)<<3);
+			break;
+		case 0x80:
+			// "Clear Tape Interrupt"
+			//logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
+			m_tape_int_pending = 0;
+			break;
+		case 0xa0:
+			// "Clear Clock Interrupt"
+			//logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
+			m_sr1_int_pending = 0;
+			break;
+		default:
+			//logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
+			break;
+	}
+}
+
+#if 0
+static int max_bits = 0;
+static unsigned char *tape_data;
+
+void get_tape_bit(int position, int channel, int *data_present, int *data)
+{
+	int byte = (position >> 2)*2 + channel;
+	int data_present_mask = 1 << ((3-(position % 4))*2 + 1);
+	int data_mask = 1 << ((3-(position % 4))*2);
+
+	//printf("%d\t0x%02x 0x%02x\n",byte,data_present_mask,data_mask);
+
+	if (tape_data[byte] & data_present_mask)
+		*data_present = 1;
+	else
+		*data_present = 0;
+
+	if (tape_data[byte] & data_mask)
+		*data = 1;
+	else
+		*data = 0;
+}
+
+void set_tape_bit(int position, int data)
+{
+	int byte = (position >> 2)*2 + 1;
+	int data_present_mask = 1 << ((3-(position % 4))*2 + 1);
+	int data_mask = 1 << ((3-(position % 4))*2);
+
+	tape_data[byte] |= data_present_mask;
+	if (data)
+		tape_data[byte] |= data_mask;
+	else
+		tape_data[byte] &= (~data_mask);
+}
+#endif
+
+#if defined(LATER)
+int intvkbd_tape_init(int id)
+{
+	FILE *tapefile;
+	int filesize;
+
+	if (!(tapefile = image_fopen (IO_CASSETTE, id, OSD_FILETYPE_IMAGE, OSD_FOPEN_READ)))
+	{
+		return INIT_FAIL;
+	}
+
+	filesize = osd_fsize(tapefile);
+	tape_data = (unsigned char *)malloc(filesize);
+	osd_fread(tapefile, tape_data, filesize);
+
+	osd_fclose(tapefile);
+
+	max_bits = 2*filesize;
+
+	tape_drive.tape_missing = 0;
+	tape_drive.leader_detect = 0;
+	tape_drive.ready = 1;
+
+	tape_drive.bit_counter = 0;
+	return INIT_PASS;
+}
+
+void intvkbd_tape_exit(int id)
+{
+	FILE *tapefile;
+	int filesize;
+
+	if (tape_data)
+	{
+		if (!(tapefile = image_fopen (IO_CASSETTE, id, OSD_FILETYPE_IMAGE, OSD_FOPEN_RW)))
 		{
-			case 0x020:
-				m_tape_motor_mode &= 3;
-				if (data & 1)
-					m_tape_motor_mode |= 4;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
-				break;
-			case 0x021:
-				m_tape_motor_mode &= 5;
-				if (data & 1)
-					m_tape_motor_mode |= 2;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
-				break;
-			case 0x022:
-				m_tape_motor_mode &= 6;
-				if (data & 1)
-					m_tape_motor_mode |= 1;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
-				break;
-			case 0x023:
-			case 0x024:
-			case 0x025:
-			case 0x026:
-			case 0x027:
-				m_tape_unknown_write[offset - 0x23] = (data & 1);
-				break;
-			case 0x040:
-				m_tape_unknown_write[5] = (data & 1);
-				break;
-			case 0x041:
-				if (data & 1)
-					logerror("TAPE: Tape Interrupts Enabled\n");
-				else
-					logerror("TAPE: Tape Interrupts Disabled\n");
-				m_tape_interrupts_enabled = (data & 1);
-				break;
-			case 0x042:
-				if (data & 1)
-					logerror("TAPE: Cart Bus Interrupts Disabled\n");
-				else
-					logerror("TAPE: Cart Bus Interrupts Enabled\n");
-				break;
-			case 0x043:
-				if (data & 0x01)
-					m_intvkbd_text_blanked = 0;
-				else
-					m_intvkbd_text_blanked = 1;
-				break;
-			case 0x044:
-				m_intvkbd_keyboard_col &= 0x0e;
-				m_intvkbd_keyboard_col |= (data&0x01);
-				break;
-			case 0x045:
-				m_intvkbd_keyboard_col &= 0x0d;
-				m_intvkbd_keyboard_col |= ((data&0x01)<<1);
-				break;
-			case 0x046:
-				m_intvkbd_keyboard_col &= 0x0b;
-				m_intvkbd_keyboard_col |= ((data&0x01)<<2);
-				break;
-			case 0x047:
-				m_intvkbd_keyboard_col &= 0x07;
-				m_intvkbd_keyboard_col |= ((data&0x01)<<3);
-				break;
-			case 0x80:
-				logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
-				m_tape_int_pending = 0;
-				break;
-			case 0xa0:
-				logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
-				m_sr1_int_pending = 0;
-				break;
-			case 0xc0:
-			case 0xc1:
-			case 0xc2:
-			case 0xc3:
-			case 0xc4:
-			case 0xc5:
-			case 0xc6:
-			case 0xc7:
-			case 0xc8:
-			case 0xc9:
-			case 0xca:
-			case 0xcb:
-			case 0xcc:
-			case 0xcd:
-			case 0xce:
-			case 0xcf:
-				/* TMS9927 regs */
-				intvkbd_tms9927_w(space, offset-0xc0, data);
-				break;
-			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
-				break;
+			filesize = osd_fsize(tapefile);
+			osd_fwrite(tapefile, tape_data, filesize);
+			osd_fclose(tapefile);
+
+			free(tape_data);
+			tape_data = 0;
+
+			max_bits = 0;
+			tape_drive.tape_missing = 1;
+			tape_drive.bit_counter = 0;
+		}
+	}
+}
+
+void update_tape_drive(void)
+{
+	/* temp */
+
+	if (tape_drive.writing)
+	{
+		if (tape_drive.channel_select == 0) /* data */
+		{
+			set_tape_bit(tape_drive.bit_counter,tape_drive.write_data);
+		}
+		else
+		{
+			/* recording audio - TBD */
 		}
 	}
 	else
 	{
-		mask = m_intvkbd_dualport_ram[offset] & 0x00ff;
-		m_intvkbd_dualport_ram[offset] = mask | ((data<<8)&0x0300);
+		int channel;
+		int data_present;
+		int data;
+
+		channel = tape_drive.channel_select ^ 1;
+
+		get_tape_bit(tape_drive.bit_counter,channel,&data_present,&data);
+
+		tape_drive.no_data = data_present ^ 1;
+		tape_drive.read_data = data;
+
+		/* temporary */
+		tape_drive.playing = data_present ^ 1;
+	}
+
+	if (tape_drive.motor_state == 5) /* Playing */
+	{
+		tape_drive.bit_counter++;
+		if (tape_drive.bit_counter >= max_bits)
+			tape_drive.bit_counter = max_bits-1;
+	}
+
+	if (tape_drive.motor_state == 6) /* Rewinding */
+	{
+		tape_drive.bit_counter-=4;
+		//tape_drive.bit_counter--;
+		if (tape_drive.bit_counter < 0)
+			tape_drive.bit_counter = 0;
+	}
+	if (tape_drive.motor_state == 7) /* FastFwd */
+	{
+		tape_drive.bit_counter+=2;
+		//tape_drive.bit_counter++;
+		if (tape_drive.bit_counter >= max_bits)
+			tape_drive.bit_counter = max_bits-1;
+	}
+
+	if ((tape_drive.bit_counter == 0) || (tape_drive.bit_counter == max_bits-1))
+		tape_drive.leader_detect = 1;
+	else
+		tape_drive.leader_detect = 0;
+}
+#endif
+
+////////////
+
+READ8_MEMBER( intv_state::intvkbd_periph_r )
+{
+	uint8_t value = 0;
+	switch(offset) {
+		case 0x06:
+			if (m_printer_not_busy_enable)
+				if (m_printer_not_busy)
+					value |= 0x80;
+			if (m_printer_no_paper)
+				value |= 0x10;
+			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,value);
+			
+			// After one query of busy, 
+			// next time the state is not_busy
+			if (!m_printer_not_busy) 
+				m_printer_not_busy = true;
+				
+			return value;
+		break;
+		case 0x07:
+		
+		default:
+			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,0xff);
+			return 0xff;
+		break;
 	}
 }
 
+WRITE8_MEMBER( intv_state::intvkbd_periph_w )
+{
+	switch(offset) {
+		case 0x06:
+			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
+			if (data & 0x20)
+				m_printer_not_busy_enable = true;
+			else
+				m_printer_not_busy_enable = false;
+		break;
+		case 0x07:
+			//logerror("Printing: 0x%02x, %c\n",data,data);
+			// For testing, print to stdout
+			fputc(data, stdout);
+			fflush(stdout);
+			m_printer_not_busy = false;
+		break;
+		default:
+			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
+		break;
+	}
+}
 
 READ16_MEMBER( intv_state::intv_stic_r )
 {
@@ -322,6 +558,13 @@ void intv_state::machine_reset()
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(CP1610_R7, 0x1000);
+	
+	if (m_is_keybd)
+	{
+		m_printer_not_busy = true;			// printer state
+		m_printer_no_paper = false;			// printer state
+		m_printer_not_busy_enable = false;	// printer interface state
+	}
 }
 
 void intv_state::machine_start()
@@ -346,12 +589,7 @@ void intv_state::machine_start()
 		save_item(NAME(m_intvkbd_keyboard_col));
 		save_item(NAME(m_tape_int_pending));
 		save_item(NAME(m_tape_interrupts_enabled));
-		save_item(NAME(m_tape_unknown_write));
 		save_item(NAME(m_tape_motor_mode));
-		save_item(NAME(m_tms9927_num_rows));
-		save_item(NAME(m_tms9927_cursor_col));
-		save_item(NAME(m_tms9927_cursor_row));
-		save_item(NAME(m_tms9927_last_row));
 	}
 
 	if (m_cart && m_cart->exists())
@@ -436,3 +674,39 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 
 	m_stic->screenrefresh();
 }
+
+#if defined(LATER)
+
+INTERRUPT_GEN( intvkbd_interrupt2 )
+{
+	static int tape_interrupt_divider = 0;
+
+	tape_interrupt_divider++;
+	tape_interrupt_divider = tape_interrupt_divider % 50;
+
+	if (tape_interrupt_divider == 0)
+	{
+#if 0
+			update_tape_drive();
+
+		/* do sr1 interrupt plus possible tape interrupt */
+		if (tape_interrupts_enabled)
+			tape_int_pending = 1;
+#endif
+		sr1_int_pending = 1;
+		cpu_set_irq_line(1, 0, PULSE_LINE);
+	}
+	else
+	{
+			update_tape_drive();
+
+		/* do only possible tape interrupt */
+		if (tape_interrupts_enabled)
+		{
+			tape_int_pending = 1;
+			cpu_set_irq_line(1, 0, PULSE_LINE);
+		}
+	}
+
+}
+#endif

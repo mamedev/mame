@@ -1,62 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
+#include "video/tms9927.h"
 #include "includes/intv.h"
 
 void intv_state::video_start()
 {
-	m_tms9927_num_rows = 25;
 }
-
-
-/* very rudimentary support for the tms9927 character generator IC */
-
-
-READ8_MEMBER( intv_state::intvkbd_tms9927_r )
-{
-	uint8_t rv;
-	switch (offset)
-	{
-		case 8:
-			rv = m_tms9927_cursor_row;
-			break;
-		case 9:
-			/* note: this is 1-based */
-			rv = m_tms9927_cursor_col;
-			break;
-		case 11:
-			m_tms9927_last_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
-			rv = m_tms9927_last_row;
-			break;
-		default:
-			rv = 0;
-	}
-	return rv;
-}
-
-WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
-{
-	switch (offset)
-	{
-		case 3:
-			m_tms9927_num_rows = (data & 0x3f) + 1;
-			break;
-		case 6:
-			m_tms9927_last_row = data;
-			break;
-		case 11:
-			m_tms9927_last_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
-			break;
-		case 12:
-			/* note: this is 1-based */
-			m_tms9927_cursor_col = data;
-			break;
-		case 13:
-			m_tms9927_cursor_row = data;
-			break;
-	}
-}
-
 
 uint32_t intv_state::screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -64,45 +14,46 @@ uint32_t intv_state::screen_update_intv(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-
 uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int x,y,offs;
-	int current_row;
-//  char c;
-
 	/* Draw the underlying INTV screen first */
 	m_stic->screen_update(screen, bitmap, cliprect);
 
 	/* if the intvkbd text is not blanked, overlay it */
 	if (!m_intvkbd_text_blanked)
 	{
-		current_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
-		for(y=0;y<24;y++)
+		uint8_t *videoram = m_videoram;
+		int xoffset = STIC_OVERSCAN_LEFT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE;
+		int yoffset = STIC_OVERSCAN_TOP_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE;
+		
+		rectangle cursor_rect;
+		m_crtc->cursor_bounds(cursor_rect);
+		int cursor_col = cursor_rect.min_x / 8;
+		int cursor_row = cursor_rect.min_y / 8;
+
+		int current_row = m_crtc->upscroll_offset() % 24;
+
+		for(int y=0;y<24;y++)
 		{
-			for(x=0;x<40;x++)
+			for(int x=0;x<40;x++)
 			{
-				offs = current_row*64+x;
-
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-					videoram[offs],
-					7, /* white */
-					0,0,
-					x<<3,y<<3, 0);
-			}
-			if (current_row == m_tms9927_cursor_row)
-			{
-				/* draw the cursor as a solid white block */
-				/* (should use a filled rect here!) */
-
+				if ((cursor_row == current_row) && (cursor_col == x+1)) {
+					/* draw the cursor as a solid white block */
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					191, /* a block */
 					7,   /* white   */
 					0,0,
-					(m_tms9927_cursor_col-1)<<3,y<<3, 0);
+					xoffset+(x<<3), yoffset+(y<<3), 0);
+				} else {
+					int offs = current_row*64+x;
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					videoram[offs],
+					7, /* white */
+					0,0,
+					xoffset+(x<<3), yoffset+(y<<3), 0);
+				}
 			}
-			current_row = (current_row + 1) % m_tms9927_num_rows;
+			current_row = (current_row + 1) % 24;
 		}
 	}
 

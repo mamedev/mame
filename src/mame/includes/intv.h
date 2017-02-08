@@ -38,6 +38,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "ay8914"),
 		m_stic(*this, "stic"),
+		m_crtc(*this, "crtc"),
 		m_cart(*this, "cartslot"),
 		m_intvkbd_dualport_ram(*this, "dualport_ram"),
 		m_videoram(*this, "videoram"),
@@ -54,6 +55,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8914_device> m_sound;
 	required_device<stic_device> m_stic;
+	optional_device<tms9927_device> m_crtc;
 	optional_device<intv_cart_slot_device> m_cart;
 	optional_shared_ptr<uint16_t> m_intvkbd_dualport_ram;
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -78,25 +80,26 @@ public:
 	uint8_t m_ram8[256];
 
 	// Keyboard Component
-	DECLARE_READ8_MEMBER(intvkbd_tms9927_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_tms9927_w);
 	DECLARE_WRITE16_MEMBER(intvkbd_dualport16_w);
 	DECLARE_READ8_MEMBER(intvkbd_dualport8_lsb_r);
 	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_lsb_w);
 	DECLARE_READ8_MEMBER(intvkbd_dualport8_msb_r);
 	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_msb_w);
+	DECLARE_READ8_MEMBER(intvkbd_io_r);
+	DECLARE_WRITE8_MEMBER(intvkbd_io_w);
+	DECLARE_READ8_MEMBER(intvkbd_periph_r);
+	DECLARE_WRITE8_MEMBER(intvkbd_periph_w);
 
-	uint8_t m_tms9927_num_rows;
-	uint8_t m_tms9927_cursor_col;
-	uint8_t m_tms9927_cursor_row;
-	uint8_t m_tms9927_last_row;
+	bool m_printer_not_busy;		// printer state
+	bool m_printer_no_paper;		// printer state
+	bool m_printer_not_busy_enable;	// printer interface state
 
 	int m_intvkbd_text_blanked;
 	int m_intvkbd_keyboard_col;
 	int m_tape_int_pending;
 	int m_tape_interrupts_enabled;
-	int m_tape_unknown_write[6];
 	int m_tape_motor_mode;
+	
 	DECLARE_DRIVER_INIT(intvecs);
 	DECLARE_DRIVER_INIT(intvkbd);
 	DECLARE_DRIVER_INIT(intv);
