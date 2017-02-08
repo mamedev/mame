@@ -88,6 +88,9 @@ TODO:
   doesn't appear to have adders necessary to combine the MA output of the
   CRTC with the PIA outputs, and without additional connections to the
   mainboard it would be pretty hard to actually get the PIA output at all.
+  However, both vertical scrolling and both manual (ctrl-left/right) and
+  automatic horizontal scrolling work when booted to stock Osborne CP/M,
+  so something must be getting the values to the CRTC.
 
 ***************************************************************************/
 
