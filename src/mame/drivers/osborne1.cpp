@@ -83,14 +83,8 @@ TODO:
   Centronics parallel over the same physical interface, so this should be
   tested, too.
 
-* Fix emulation of the Nuevo Video board (scrolling, interrupts, CRTC video
-  RAM updates).  It would be nice to get a schematic for this.  The board
-  doesn't appear to have adders necessary to combine the MA output of the
-  CRTC with the PIA outputs, and without additional connections to the
-  mainboard it would be pretty hard to actually get the PIA output at all.
-  However, both vertical scrolling and both manual (ctrl-left/right) and
-  automatic horizontal scrolling work when booted to stock Osborne CP/M,
-  so something must be getting the values to the CRTC.
+* Complete emulation of the Nuevo Video board (interrupts, CRTC video RAM
+  updates).  It would be nice to get a schematic for this.
 
 ***************************************************************************/
 
@@ -133,7 +127,7 @@ static ADDRESS_MAP_START( osborne1nv_io, AS_IO, 8, osborne1_state )
 	AM_RANGE( 0x00, 0x03 ) AM_WRITE(bankswitch_w)
 	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE( 0x05, 0x05 ) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	// seems to be something at 0x06 as well, but no idea what
+	// seems to be something at 0x06 as well, but no idea what - BIOS writes 0x07 on boot
 ADDRESS_MAP_END
 
 
