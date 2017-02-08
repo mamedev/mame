@@ -515,14 +515,13 @@ void osborne1_state::update_acia_rxc_txc()
 
 MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 {
-	// TODO: work out how the scroll offset actually gets here
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint16_t const base = (((m_pia1->b_output() & 0x1F) << 7) + ((ma & 0x3F00) >> 1)) & 0xF80;
+	ma = (ma >> 1) | 0xf000;
 	uint32_t *p = &bitmap.pix32(y);
 	for (uint8_t x = 0; x < x_count; ++x)
 	{
-		uint8_t const chr = m_ram->pointer()[0xF000 | base | ((ma + x) & 0x7f)];
-		uint8_t const clr = (m_ram->pointer()[0x10000 | base | ((ma + x) & 0x7f)] & 0x80) ? 2 : 1;
+		uint8_t const chr = m_ram->pointer()[ma + x];
+		uint8_t const clr = BIT(m_ram->pointer()[ma + x + 0x1000], 7) ? 2 : 1;
 
 		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
 
