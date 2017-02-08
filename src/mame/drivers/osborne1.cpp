@@ -72,8 +72,9 @@ character generator ROM, so the mainboard's character generator ROM doesn't
 need to be moved.  However, it doesn't behave like the SCREEN-PAC.  It uses
 a Synertek SY6545-1 with its pixel clock derived from a 12.288MHz crystal
 mapped at 0x04/0x05 in I/O space.  It runs at 640x240 (80x24) at just below
-60Hz.  We don't know how video RAM contention on video RAM is handled, how
-scrolling works, or whether the CRTC can generate VBL interrupts.
+60Hz and doesn't allow resolution switching.  We don't know how video RAM
+contention on video RAM is handled, or whether the CRTC can generate VBL
+interrupts.
 
 
 TODO:
