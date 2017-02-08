@@ -35541,6 +35541,9 @@ terracreo                       // (c) 1985
 test410                         //
 test420                         //
 
+@source:testconsole.cpp
+whousetc                        //
+
 @source:tetrisp2.cpp
 nndmseal                        // (c) 1997 I'Max/Jaleco
 nndmseala                       // (c) 1997 I'Max/Jaleco
