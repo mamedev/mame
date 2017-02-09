@@ -85,34 +85,35 @@ public:
 	};
 
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_ace(*this, "ins8250"),
-		m_beep(*this, "beeper"),
-		m_p_videoram(*this, "videoram"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_ace(*this, "ins8250")
+		, m_beep(*this, "beeper")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<ins8250_device> m_ace;
-	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(h19_80_r);
 	DECLARE_READ8_MEMBER(h19_a0_r);
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	DECLARE_WRITE8_MEMBER(h19_kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<palette_device> m_palette;
-	uint8_t *m_p_chargen;
+
+private:
 	uint8_t m_term_data;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<palette_device> m_palette;
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<ins8250_device> m_ace;
+	required_device<beep_device> m_beep;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -347,7 +348,6 @@ void h19_state::machine_reset()
 
 void h19_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )

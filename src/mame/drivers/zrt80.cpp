@@ -32,13 +32,14 @@ public:
 	};
 
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_8250(*this, "ins8250"),
-		m_beep(*this, "beeper"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_8250(*this, "ins8250")
+		, m_beep(*this, "beeper")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -47,20 +48,19 @@ public:
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	const uint8_t *m_p_chargen;
-	required_shared_ptr<uint8_t> m_p_videoram;
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_8250;
 	required_device<beep_device> m_beep;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -209,7 +209,6 @@ void zrt80_state::machine_reset()
 
 void zrt80_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )

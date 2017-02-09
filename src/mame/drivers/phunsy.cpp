@@ -41,26 +41,27 @@ class phunsy_state : public driver_device
 {
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cass(*this, "cassette"),
-		m_p_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
 	DECLARE_DRIVER_INIT(phunsy);
-	DECLARE_READ8_MEMBER( phunsy_data_r );
-	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
-	DECLARE_WRITE8_MEMBER( phunsy_data_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_READ8_MEMBER(phunsy_data_r);
+	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
+	DECLARE_WRITE8_MEMBER(phunsy_data_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
 	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
-	const uint8_t *m_p_chargen;
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
@@ -69,6 +70,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -206,7 +208,6 @@ PALETTE_INIT_MEMBER(phunsy_state, phunsy)
 
 void phunsy_state::video_start()
 {
-	m_p_chargen = memregion( "chargen" )->base();
 }
 
 
