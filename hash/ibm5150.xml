@@ -4419,6 +4419,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="Nova Logic" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bubble Bobble (USA) (Disk 1).img" size="368640" crc="1dad38e6" sha1="6b2f5f9655ed5002dfd72b33b2cfb857c432752a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bubble Bobble (USA) (Disk 2).img" size="368640" crc="26d72672" sha1="de10177bd95e576dcc00e90e73ad181bd97f5577" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="budokan">
 		<description>Budokan - The Martial Spirit</description>
 		<year>1989</year>
