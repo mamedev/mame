@@ -795,7 +795,7 @@ void cli_frontend::listmedia(const char *gamename)
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s %s\n", std::string(16,'-').c_str(), std::string(27,'-').c_str(), std::string(34,'-').c_str());
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
