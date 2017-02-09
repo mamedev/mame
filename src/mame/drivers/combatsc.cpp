@@ -13,8 +13,7 @@ TODO:
   sprites).
 - in combatscb, wrong sprite/char priority (see cpu head at beginning of arm
   wrestling, and heads in intermission after firing range III)
-- hook up sound in bootleg (the current sound is a hack, making use of the
-  Konami ROMset)
+- improve sound hook up in bootleg.
 - YM2203 pitch is wrong. Fixing it screws up the tempo.
 
   Update: 3MHz(24MHz/8) is the more appropriate clock speed for the 2203.
