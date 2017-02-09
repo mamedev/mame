@@ -32,6 +32,8 @@
 #include "includes/hp9845.h"
 #include "softlist.h"
 #include "bus/hp_optroms/hp_optrom.h"
+#include "hp9845b.lh"
+#include "render.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -495,8 +497,12 @@ void hp9845b_state::set_graphic_mode(bool graphic)
 				logerror("GS=%d\n" , graphic);
 				if (m_graphic_sel) {
 						m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * GVIDEO_HTOTAL * GVIDEO_VTOTAL);
+						// Set graphic mode view (1.23:1 aspect ratio)
+						machine().render().first_target()->set_view(1);
 				} else {
 						m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+						// Set alpha mode view (1.92:1 aspect ratio)
+						machine().render().first_target()->set_view(0);
 				}
 		}
 }
@@ -1073,6 +1079,8 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
 		MCFG_TIMER_DRIVER_ADD("gv_timer", hp9845b_state, gv_timer)
+
+	MCFG_DEFAULT_LAYOUT(layout_hp9845b)
 
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845b_state , kb_scan , attotime::from_hz(100))
