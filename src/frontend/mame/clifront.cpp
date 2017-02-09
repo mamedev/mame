@@ -507,7 +507,7 @@ void cli_frontend::listbrothers(const char *gamename)
 	}
 
 	// print the header
-	osd_printf_info("Source file:         Name:            Parent:\n");
+	osd_printf_info("%-20s %-16s %s\n", "Source file:", "Name:", "Parent:");
 
 	// output the entries found
 	drivlist.reset();
@@ -568,7 +568,7 @@ void cli_frontend::listroms(const char *gamename)
 			osd_printf_info("\n");
 		first = false;
 		osd_printf_info("ROMs required for driver \"%s\".\n"
-				"Name                                   Size Checksum\n", drivlist.driver().name);
+	                	"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
 
 		// iterate through roms
 		for (device_t &device : device_iterator(drivlist.config().root_device()))
@@ -576,7 +576,7 @@ void cli_frontend::listroms(const char *gamename)
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// accumulate the total length of all chunks
-					uint32_t length = 0;
+					int64_t length = -1;
 					if (ROMREGION_ISROMDATA(region))
 						length = rom_file_size(rom);
 
@@ -585,10 +585,10 @@ void cli_frontend::listroms(const char *gamename)
 					osd_printf_info("%-32s ", name);
 
 					// output the length next
-					if (length >= 1)
-						osd_printf_info("%10u", length);
+					if (length >= 0)
+						osd_printf_info("%10u", unsigned(uint64_t(length)));
 					else
-						osd_printf_info("          ");
+						osd_printf_info("%10s", "");
 
 					// output the hash data
 					util::hash_collection hashes(ROM_GETHASHDATA(rom));
@@ -734,8 +734,8 @@ void cli_frontend::listslots(const char *gamename)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
-	printf("SYSTEM           SLOT NAME        SLOT OPTIONS     SLOT DEVICE NAME\n");
-	printf("---------------- ---------------- ---------------- ----------------------------\n");
+	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
+	printf("%s %s %s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(28,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -794,8 +794,8 @@ void cli_frontend::listmedia(const char *gamename)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
-	printf("SYSTEM           MEDIA NAME       (brief)    IMAGE FILE EXTENSIONS SUPPORTED\n");
-	printf("---------------- --------------------------- ---------------------------------\n");
+	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
+	printf("%s %s %s\n", std::string(16,'-').c_str(), std::string(27,'-').c_str(), std::string(34,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
