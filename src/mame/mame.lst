@@ -2581,6 +2581,7 @@ bldwolfj                        // (c) 1988 Data East Corporation (Japan)
 
 @source:battlex.cpp
 battlex                         // (c) 1982 Omori E. Co., Ltd.
+dodgeman						//
 
 @source:battlnts.cpp
 battlnts                        // GX777 (c) 1987
@@ -10027,6 +10028,7 @@ ddsomb                          // 23/02/1996 (c) 1996 (Brazil)
 ddsomh                          // 23/02/1996 (c) 1996 (Hispanic)
 ddsomj                          // 19/06/1996 (c) 1996 (Japan)
 ddsomjr1                        // 06/02/1996 (c) 1996 (Japan)
+ddsomjr2                        // 23/02/1996 (c) 1996 (Japan)
 ddsomr1                         // 23/02/1996 (c) 1996 (Euro)
 ddsomr2                         // 09/02/1996 (c) 1996 (Euro)
 ddsomr3                         // 08/02/1996 (c) 1996 (Euro)
@@ -10958,6 +10960,7 @@ cburnrub2                       // 27
 cdiscon1                        // 19 1982.04 Disco No.1
 cdsteljn                        // 14 1981.06 DS Telejan
 cexplore                        // 18 1982.02 Explorer
+cfboy0a1                        // DT-1[12]0-A-1 1981.08    Flash Boy (Japan) (DECO Cassette MD) (Ver 1) // version verified // vertical scrolling (early version)
 cfghtice                        // 40 1984.04 Fighting Ice Hockey
 cfishing                        // 25 1982.10 Fishing
 cflyball                        // 35 1983.?? Flying Ball/Bampoline
@@ -11976,6 +11979,7 @@ deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
 deluxe4u                        // (c) 2000 ESD
 hedpanic                        // (c) 2000 ESD
+hedpanica                       // (c) 1999 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
 hedpanico                       // (c) 1999 ESD
 jumppop                         // (c) 2001 ESD
@@ -12970,6 +12974,11 @@ galeb                           //
 
 @source:galgame.cpp
 galgame                         // (c) 1971 Computer Recreations, Inc
+
+@source:galgames.cpp
+galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
+galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
+galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:galivan.cpp
 dangar                          // (c) 1986
@@ -14038,6 +14047,7 @@ diamondpf                       //
 diamondpg                       //
 excalibr                        //
 excalibrf                       //
+excalibrg                       //
 genesisp                        //
 genesispf                       //
 genesispg                       //
@@ -14130,6 +14140,8 @@ venus                           // bootleg
 
 @source:h19.cpp
 h19                             //
+super19                         //
+watz19                          //
 
 @source:h8.cpp
 h8                              //
@@ -14725,6 +14737,7 @@ lhbv33c                         // (c) 1995
 nkishusp                        // (c) 1998
 ryukobou                        // (c) 1995
 vbowl                           // (c) 1996
+vbowlhk                         // (c) 1996
 vbowlj                          // (c) 1996
 wlcc                            // (c) 1996
 xymg                            // (c) 1996
@@ -20472,6 +20485,7 @@ mcombats                        // bootleg
 missile                         // 035820-035825    (c) 1980, 1 ROM update to rev 2 board
 missile1                        // 035820-035825    (c) 1980
 missile2                        // 035820-035825    (c) 1980
+missilea                        // bootleg (Ugames)
 missilem                        // hack
 suprmatk                        // (c) 1980 + (c) 1981 Gencomp
 suprmatkd                       // (c) 1980 + (c) 1981 Gencomp
@@ -29424,6 +29438,7 @@ osbexec                         // 1982 Osborne Executive
 
 @source:osborne1.cpp
 osborne1                        // 1981 Osborne-1
+osborne1nv                      // 1984 Osborne-1 (Nuevo Video)
 
 @source:osi.cpp
 c1p                             //
@@ -31860,6 +31875,7 @@ route16c                        // (c) 1981 Tehkan/Sun + Centuri license
 routex                          // bootleg
 spacecho                        // bootleg
 spacecho2                       // bootleg
+speakhlp                        // bootleg
 speakres                        // [Sun Electronics]
 speakresb                       // bootleg
 stratvox                        // [1980 Sun Electronics] Taito
@@ -32601,6 +32617,7 @@ puyopuy2                        // (c) 1994 Compile + Sega license
 ribbit                          // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
+sonicfgt                        // (c) 1993 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega
 tantr                           // (c) 1992 Sega
@@ -34510,6 +34527,7 @@ vfremix                         // 1995.06 Virtua Fighter Remix
 vmahjong                        // 1997.02 Virtual Mahjong (Micronet)
 winterht                        // 1997.10 Winter Heat (Data East)
 znpwfv                          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
+znpwfvt                         // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
 
 @source:su2000.cpp
 su2000                          // (c) 1993 Virtuality
@@ -35179,6 +35197,7 @@ puzznicb                        // bootleg
 puzznicba                       // bootleg
 puzznici                        // bootleg
 puzznicj                        // C20 (c) 1989 Taito Corporation (Japan)
+puzznicu                        // C20 (c) 1989 Taito America Corporation (US)
 raimais                         // B36 (c) 1988 Taito Corporation (Japan)
 raimaisj                        // B36 (c) 1988 Taito Corporation
 raimaisjo                       // B36 (c) 1988 Taito Corporation
@@ -35522,6 +35541,9 @@ terracreo                       // (c) 1985
 test410                         //
 test420                         //
 
+@source:testconsole.cpp
+whousetc                        //
+
 @source:tetrisp2.cpp
 nndmseal                        // (c) 1997 I'Max/Jaleco
 nndmseala                       // (c) 1997 I'Max/Jaleco
@@ -35795,8 +35817,6 @@ tk80bs                          //
 990189v                         // 1980 TM 990/189 with Color Video Board
 
 @source:tmaster.cpp
-galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
-galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 tm                              // (c) 1996 Midway Games
 tm2k                            // (c) 1996 Midway Games
 tm2ka                           // (c) 1996 Midway Games
@@ -37353,6 +37373,7 @@ defence                         // bootleg
 defender                        // (c) 1980
 defenderb                       // (c) 1980
 defenderg                       // (c) 1980
+defenderj                       // (c) 1980
 defenderw                       // (c) 1980
 defndjeu                        // bootleg
 inferno                         // (c) 1984

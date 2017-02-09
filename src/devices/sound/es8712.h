@@ -40,7 +40,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( es8712_w );
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read);
 
 public:
 	void play();

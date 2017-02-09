@@ -25,31 +25,35 @@ namespace netlist
 {
 namespace detail
 {
-#if (USE_MEMPOOL)
-static plib::mempool pool(6553600, 64);
 
-void * object_t::operator new (size_t size)
-{
-	return pool.alloc(size);
-}
+	static plib::mempool *pool()
+	{
+		static plib::mempool *s_pool = nullptr;
+		if (s_pool == nullptr)
+			s_pool = new plib::mempool(65536, 16);
+		return s_pool;
+	}
 
-void object_t::operator delete (void * mem)
-{
-	if (mem)
-		pool.free(mem);
-}
-#else
-void * object_t::operator new (size_t size)
-{
-	return ::operator new(size);
-}
+	void * object_t::operator new (size_t size)
+	{
+		void *ret = nullptr;
+		if ((USE_MEMPOOL))
+			ret = pool()->alloc(size);
+		else
+			ret = ::operator new(size);
+		return ret;
+	}
 
-void object_t::operator delete (void * mem)
-{
-	if (mem)
-		::operator delete(mem);
-}
-#endif
+	void object_t::operator delete (void * mem)
+	{
+		if (mem)
+		{
+			if ((USE_MEMPOOL))
+				pool()->free(mem);
+			else
+				::operator delete(mem);
+		}
+	}
 
 }
 
@@ -361,12 +365,6 @@ void netlist_t::start()
 	/* resolve inputs */
 	setup().resolve_inputs();
 
-	/* Make sure devices are fully created - now done in register_dev */
-
-	log().debug("Setting delegate pointers ...\n");
-	for (auto &dev : m_devices)
-		dev->set_delegate_pointer();
-
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
@@ -390,6 +388,14 @@ void netlist_t::start()
 	}
 	else
 		m_solver->post_start();
+
+	for (auto &n : m_nets)
+		for (auto & term : n->m_core_terms)
+		{
+			//core_device_t *dev = reinterpret_cast<core_device_t *>(term->m_delegate.object());
+			core_device_t *dev = &term->device();
+			dev->set_default_delegate(*term);
+		}
 
 }
 
@@ -427,6 +433,14 @@ void netlist_t::reset()
 	//if (m_solver != nullptr)
 	//  m_solver->do_reset();
 
+	std::unordered_map<core_device_t *, bool> m;
+
+	for (auto &d : m_devices)
+	{
+		m[d.get()] = d->get_hint_deactivate();
+	}
+
+
 	// Reset all nets once !
 	for (auto & n : m_nets)
 		n->reset();
@@ -444,15 +458,66 @@ void netlist_t::reset()
 	 * INFO: The order here affects power up of e.g. breakout. However, such
 	 * variations are explicitly stated in the breakout manual.
 	 */
-#if 0
-	for (std::size_t i = 0; i < m_devices.size(); i++)
+
+	const unsigned startup_strategy = 1; //! \note make this a parameter
+
+	switch (startup_strategy)
 	{
-		m_devices[i]->update_dev();
+		case 0:
+		{
+			std::vector<core_device_t *> d;
+			std::vector<nldelegate *> t;
+			log().verbose("Using default startup strategy");
+			for (auto &n : m_nets)
+				for (auto & term : n->m_core_terms)
+					if (term->m_delegate.has_object())
+					{
+						if (!plib::container::contains(t, &term->m_delegate))
+						{
+							t.push_back(&term->m_delegate);
+							term->m_delegate();
+						}
+						core_device_t *dev = reinterpret_cast<core_device_t *>(term->m_delegate.object());
+						if (!plib::container::contains(d, dev))
+							d.push_back(dev);
+					}
+			log().verbose("Call update on devices which need parameter update:");
+			for (auto & dev : m_devices)
+				if (dev->needs_update_after_param_change())
+				{
+					if (!plib::container::contains(d, dev.get()))
+					{
+						d.push_back(dev.get());
+						log().verbose("\t ...{1}", dev->name());
+						dev->update_dev();
+					}
+				}
+			log().verbose("Devices not yet updated:");
+			for (auto &dev : m_devices)
+				if (!plib::container::contains(d, dev.get()))
+					log().verbose("\t ...{1}", dev->name());
+					//x->update_dev();
+		}
+		break;
+		case 1:		// brute force backward
+		{
+			std::size_t i = m_devices.size();
+			while (i>0)
+				m_devices[--i]->update_dev();
+		}
+		break;
+		case 2: 	// brute force forward
+		{
+			for (std::size_t i = 0; i < m_devices.size(); i++)
+				m_devices[i]->update_dev();
+		}
+		break;
 	}
-#else
-	std::size_t i = m_devices.size();
-	while (i>0)
-		m_devices[--i]->update_dev();
+
+#if 1
+	/* the above may screw up m_active and the list */
+	for (auto &n : m_nets)
+		n->rebuild_list();
 #endif
 }
 
@@ -568,7 +633,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-core_device_t *netlist_t::pget_single_device(const pstring classname, bool (*cc)(core_device_t *))
+core_device_t *netlist_t::get_single_device(const pstring classname, bool (*cc)(core_device_t *))
 {
 	core_device_t *ret = nullptr;
 	for (auto &d : m_devices)
@@ -594,9 +659,6 @@ core_device_t::core_device_t(netlist_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner)
 	, m_hint_deactivate(false)
-#if (!NL_USE_PMF_VIRTUAL)
-	, m_static_update()
-#endif
 {
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
@@ -607,9 +669,6 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	, logic_family_t()
 	, netlist_ref(owner.netlist())
 	, m_hint_deactivate(false)
-#if (!NL_USE_PMF_VIRTUAL)
-	, m_static_update()
-#endif
 {
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
@@ -621,11 +680,9 @@ core_device_t::~core_device_t()
 {
 }
 
-void core_device_t::set_delegate_pointer()
+void core_device_t::set_default_delegate(detail::core_terminal_t &term)
 {
-#if (!NL_USE_PMF_VIRTUAL)
-	m_static_update.set_base(&core_device_t::update, this);
-#endif
+	term.m_delegate.set(&core_device_t::update, this);
 }
 
 plib::plog_base<NL_DEBUG> &core_device_t::log()
@@ -772,7 +829,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	static const unsigned masks[4] =
+	const unsigned masks[4] =
 	{
 		0,
 		core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE,
@@ -780,16 +837,16 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 		0
 	};
 
-	const unsigned mask = masks[ m_cur_Q  * 2 + m_new_Q ];
+	const unsigned mask = masks[ (m_cur_Q << 1) | m_new_Q ];
 
-	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+	m_in_queue = 2; /* mark as taken ... */
 
 	for (auto & p : m_list_active)
 	{
 		p.device().m_stat_call_count.inc();
 		if ((p.state() & mask) != 0)
-			p.device().update_dev();
+			p.m_delegate();
 	}
 }
 
@@ -891,6 +948,8 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
 {
+	//m_delegate.set(&core_device_t::update, &dev);
+	//m_delegate.set(&core_device_t::update_dev, &dev);
 }
 
 detail::core_terminal_t::~core_terminal_t()
@@ -1199,4 +1258,26 @@ std::unique_ptr<plib::pistream> param_data_t::stream()
 
 
 	} //namespace devices
+
+	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_t *>(this) != nullptr;
+	}
+
+	bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_t *>(this) != nullptr;
+	}
+
+	bool detail::net_t::is_logic() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const logic_net_t *>(this) != nullptr;
+	}
+
+	bool detail::net_t::is_analog() const NL_NOEXCEPT
+	{
+		return dynamic_cast<const analog_net_t *>(this) != nullptr;
+	}
+
+
 } // namespace netlist

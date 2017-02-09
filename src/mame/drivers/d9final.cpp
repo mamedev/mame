@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_SHARE("lo_vram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_SHARE("hi_vram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_SHARE("cram")
-	AM_RANGE(0xf000, 0xf007) AM_READ(prot_latch_r) //AM_DEVWRITE("essnd", es8712_device, es8712_w)
+	AM_RANGE(0xf000, 0xf007) AM_READ(prot_latch_r) //AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("rtc", rtc62421_device, read, write)
 ADDRESS_MAP_END
 

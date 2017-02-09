@@ -33,6 +33,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if !BX_COMPILER_MSVC
+#	define _strdup strdup
+#endif // !BX_COMPILER_MSVC
+
 struct complex {
 	complex() {data = 0;}
 	complex(const char* s) { data = strdup(s); }
@@ -156,7 +160,7 @@ TEST(vector_complex_popback) {
 	v.push_back("24");
 
 	CHECK(v.back() == "24");
-	
+
 	v.pop_back();
 
 	CHECK(v.back() == "12");

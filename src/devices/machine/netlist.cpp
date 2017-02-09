@@ -10,13 +10,22 @@
 
 #include "emu.h"
 #include "netlist.h"
+
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+
 #include "plib/palloc.h"
+
 #include "debugger.h"
+
+#include <cmath>
+#include <memory>
+#include <string>
+#include <utility>
+
 
 //#define LOG_DEV_CALLS(x)   printf x
 #define LOG_DEV_CALLS(x)   do { } while (0)

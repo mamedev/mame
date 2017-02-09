@@ -16,8 +16,8 @@ static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 
 #define HCOUNT               (m_reg[0] + 1)
 #define INTERLACED           ((m_reg[1] >> 7) & 0x01)
-#define HSYNC_WIDTH          ((m_reg[1] >> 4) & 0x0f)
-#define HSYNC_DELAY          ((m_reg[1] >> 0) & 0x07)
+#define HSYNC_WIDTH          (((m_reg[1] >> 3) & 0x0f) + 1)
+#define HSYNC_DELAY          (((m_reg[1] >> 0) & 0x07) + 1)
 #define SCANS_PER_DATA_ROW   (((m_reg[2] >> 3) & 0x0f) + 1)
 #define CHARS_PER_DATA_ROW   (chars_per_row_value[(m_reg[2] >> 0) & 0x07])
 #define SKEW_BITS            (skew_bits_value[(m_reg[3] >> 6) & 0x03])
@@ -45,6 +45,10 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	, device_video_interface(mconfig, *this)
 	, m_write_vsyn(*this)
 	, m_hpixels_per_column(0)
+	, m_overscan_left(0)
+	, m_overscan_right(0)
+	, m_overscan_top(0)
+	, m_overscan_bottom(0)
 	, m_selfload(*this, finder_base::DUMMY_TAG)
 	, m_reset(0)
 {
@@ -108,7 +112,7 @@ void tms9927_device::device_reset()
 
 void tms9927_device::device_stop()
 {
-	osd_printf_debug("TMS9937: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
+	osd_printf_debug("TMS9927: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
 						m_clock,
 						m_total_hpix,
 						0, m_visible_hpix,
@@ -194,7 +198,6 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 	}
 }
 
-
 WRITE8_MEMBER( tms9927_device::write )
 {
 	switch (offset)
@@ -270,8 +273,7 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 
 void tms9927_device::recompute_parameters(bool postload)
 {
-	uint16_t offset_hpix, offset_vpix;
-	attoseconds_t refresh;
+    attoseconds_t refresh;
 	rectangle visarea;
 
 	if (m_reset)
@@ -286,11 +288,8 @@ void tms9927_device::recompute_parameters(bool postload)
 	m_visible_vpix = DATA_ROWS_PER_FRAME * SCANS_PER_DATA_ROW;
 
 	m_start_datarow = (LAST_DISP_DATA_ROW + 1) % DATA_ROWS_PER_FRAME;
-	/* determine the horizontal/vertical offsets */
-	offset_hpix = HSYNC_DELAY * m_hpixels_per_column;
-	offset_vpix = VERTICAL_DATA_START;
 
-	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS, m_start_datarow);
+	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
 	m_valid_config = true;
@@ -310,10 +309,10 @@ void tms9927_device::recompute_parameters(bool postload)
 	/* update */
 	if (!m_valid_config)
 		return;
-
+	
 	/* create a visible area */
-	/* fix me: how do the offsets fit in here? */
-	visarea.set(0, m_visible_hpix - 1, 0, m_visible_vpix - 1);
+	visarea.set(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1, 
+	            0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
 
 	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 
@@ -321,4 +320,5 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	m_vsyn = 0;
 	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
+
 }

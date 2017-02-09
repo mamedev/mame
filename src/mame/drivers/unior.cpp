@@ -49,13 +49,15 @@ ToDo:
 class unior_state : public driver_device
 {
 public:
-	unior_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit"),
-		m_dma(*this, "dma"),
-		m_uart(*this, "uart"),
-		m_palette(*this, "palette")
+	unior_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit")
+		, m_dma(*this, "dma")
+		, m_uart(*this, "uart")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
+		, m_p_vram(*this, "vram")
 	{
 	}
 
@@ -74,8 +76,6 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	uint8_t *m_p_vram;
-	uint8_t *m_p_chargen;
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
@@ -85,8 +85,9 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
 	required_device<i8251_device> m_uart;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_vram;
 };
 
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
@@ -383,8 +384,6 @@ void unior_state::machine_reset()
 
 void unior_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_vram = memregion("vram")->base();
 }
 
 static MACHINE_CONFIG_START( unior, unior_state )

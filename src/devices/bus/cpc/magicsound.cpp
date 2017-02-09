@@ -8,10 +8,9 @@
  */
 
 #include "emu.h"
-#include "includes/amstrad.h"
 #include "magicsound.h"
 #include "sound/volt_reg.h"
-
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

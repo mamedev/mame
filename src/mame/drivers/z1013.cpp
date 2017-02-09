@@ -61,25 +61,29 @@ class z1013_state : public driver_device
 {
 public:
 	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
-	m_p_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(k7659_port_b_r);
-	required_shared_ptr<uint8_t> m_p_videoram;
-	const uint8_t *m_p_chargen;
+	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
+	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( z1013 );
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -221,7 +225,6 @@ INPUT_PORTS_END
 
 void z1013_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

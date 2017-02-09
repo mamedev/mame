@@ -16,7 +16,7 @@
 namespace Catch {
 
     inline TestCaseInfo::SpecialProperties parseSpecialTag( std::string const& tag ) {
-        if( startsWith( tag, "." ) ||
+        if( startsWith( tag, '.' ) ||
             tag == "hide" ||
             tag == "!hide" )
             return TestCaseInfo::IsHidden;
@@ -26,6 +26,8 @@ namespace Catch {
             return TestCaseInfo::ShouldFail;
         else if( tag == "!mayfail" )
             return TestCaseInfo::MayFail;
+        else if( tag == "!nonportable" )
+            return TestCaseInfo::NonPortable;
         else
             return TestCaseInfo::None;
     }
@@ -100,7 +102,7 @@ namespace Catch {
 
         std::ostringstream oss;
         for( std::set<std::string>::const_iterator it = tags.begin(), itEnd = tags.end(); it != itEnd; ++it ) {
-            oss << "[" << *it << "]";
+            oss << '[' << *it << ']';
             std::string lcaseTag = toLower( *it );
             testCaseInfo.properties = static_cast<TestCaseInfo::SpecialProperties>( testCaseInfo.properties | parseSpecialTag( lcaseTag ) );
             testCaseInfo.lcaseTags.insert( lcaseTag );

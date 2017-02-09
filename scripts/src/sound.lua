@@ -1424,3 +1424,15 @@ if (SOUNDS["MM5837"]~=null) then
 		MAME_DIR .. "src/devices/sound/mm5837.h",
 	}
 end
+
+---------------------------------------------------
+-- Intelligent Designs DAVE
+--@src/devices/sound/dave.h,MACHINES["DAVE"] = true
+---------------------------------------------------
+
+if (SOUNDS["DAVE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dave.cpp",
+		MAME_DIR .. "src/devices/sound/dave.h",
+	}
+end

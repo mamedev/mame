@@ -6,8 +6,8 @@
 
 #include "emu.h"
 #include "ddi1.h"
-#include "includes/amstrad.h"
 #include "softlist.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

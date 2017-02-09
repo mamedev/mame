@@ -83,6 +83,7 @@ CPUS["RSP"] = true
 CPUS["ALPHA8201"] = true
 CPUS["COP400"] = true
 CPUS["TLCS90"] = true
+CPUS["TLCS870"] = true
 CPUS["TLCS900"] = true
 CPUS["MB88XX"] = true
 CPUS["MB86233"] = true
@@ -265,6 +266,7 @@ SOUNDS["VOLT_REG"] = true
 --SOUNDS["MEA8000"] = true
 SOUNDS["DAC76"] = true
 SOUNDS["MM5837"] = true
+--SOUNDS["DAVE"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -275,6 +277,7 @@ VIDEOS["SEGA315_5313"] = true
 VIDEOS["BUFSPRITE"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
+VIDEOS["CESBLIT"] = true
 --VIDEOS["CRT9007"] = true
 --VIDEOS["CRT9021"] = true
 --VIDEOS["CRT9212"] = true
@@ -339,6 +342,7 @@ VIDEOS["V9938"] = true
 VIDEOS["VOODOO"] = true
 VIDEOS["VOODOO_PCI"] = true
 VIDEOS["ZEUS2"] = true
+VIDEOS["PPU2C0X"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -719,6 +723,7 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"bfm",
 		"bmc",
 		"capcom",
+		"ces",
 		"cinemat",
 		"comad",
 		"cvs",
@@ -1389,6 +1394,12 @@ files {
 	MAME_DIR .. "src/mame/machine/kabuki.h",
 	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
 	MAME_DIR .. "src/mame/drivers/instantm.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "ces")
+files {
+	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
+	MAME_DIR .. "src/mame/drivers/galgames.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
@@ -2872,10 +2883,6 @@ files {
 	MAME_DIR .. "src/mame/includes/vsnes.h",
 	MAME_DIR .. "src/mame/machine/vsnes.cpp",
 	MAME_DIR .. "src/mame/video/vsnes.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.h",
-
-
 }
 
 createMAMEProjects(_target, _subtarget, "nix")
@@ -4393,7 +4400,6 @@ files {
 	MAME_DIR .. "src/mame/machine/cdislave.h",
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
-	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",

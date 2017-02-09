@@ -603,6 +603,7 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 test_t400.cpp
+testconsole.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

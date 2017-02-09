@@ -95,16 +95,6 @@ using nl_double = double;
  * approach will be automatically selected.
  */
 
-//#define NL_USE_PMF_VIRTUAL         1
-
-#ifndef NL_USE_PMF_VIRTUAL
-	#if PPMF_TYPE == PPMF_TYPE_PMF
-	#define NL_USE_PMF_VIRTUAL     1
-	#else
-	#define NL_USE_PMF_VIRTUAL     0
-	#endif
-#endif
-
 //============================================================
 //  WARNINGS
 //============================================================
@@ -113,11 +103,6 @@ using nl_double = double;
 #if (!(HAS_OPENMP))
 #error To use openmp compile and link with "-fopenmp"
 #endif
-#endif
-
-#ifdef __APPLE__
-#undef  USE_MEMPOOL
-#define USE_MEMPOOL                 (0)
 #endif
 
 #endif /* NLCONFIG_H_ */

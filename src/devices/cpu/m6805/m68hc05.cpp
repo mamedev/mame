@@ -72,9 +72,14 @@ ROM_END
 //constexpr u16 M68HC05_VECTOR_SPI        = 0xfff4;
 //constexpr u16 M68HC05_VECTOR_SCI        = 0xfff6;
 constexpr u16 M68HC05_VECTOR_TIMER      = 0xfff8;
-//constexpr u16 M68HC05_VECTOR_INT        = 0xfffa;
+constexpr u16 M68HC05_VECTOR_IRQ        = 0xfffa;
 constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
 //constexpr u16 M68HC05_VECTOR_RESET      = 0xfffe;
+
+constexpr u16 M68HC05_INT_IRQ           = u16(1) << 0;
+constexpr u16 M68HC05_INT_TIMER         = u16(1) << 1;
+
+constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
 
 } // anonymous namespace
 
@@ -118,9 +123,13 @@ m68hc05_device::m68hc05_device(
 	, m_port_cb_r{ *this, *this, *this, *this }
 	, m_port_cb_w{ *this, *this, *this, *this }
 	, m_port_bits{ 0xff, 0xff, 0xff, 0xff }
+	, m_port_interrupt{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_input{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_latch{ 0xff, 0xff, 0xff, 0xff }
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
+	, m_port_irq_state(false)
+	, m_irq_line_state(false)
+	, m_irq_latch(0)
 	, m_tcmp_cb(*this)
 	, m_tcap_state(false)
 	, m_tcr(0x00)
@@ -139,28 +148,43 @@ m68hc05_device::m68hc05_device(
 }
 
 
-void m68hc05_device::set_port_bits(u8 a, u8 b, u8 c, u8 d)
+void m68hc05_device::set_port_bits(std::array<u8, PORT_COUNT> const &bits)
 {
 	if (configured() || started())
 		throw emu_fatalerror("Attempt to set physical port bits after configuration");
-	m_port_bits[0] = a;
-	m_port_bits[1] = b;
-	m_port_bits[2] = c;
-	m_port_bits[3] = d;
+
+	for (unsigned i = 0; PORT_COUNT > i; ++i)
+		m_port_bits[i] = bits[i];
+}
+
+void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interrupt)
+{
+	u8 diff(0x00);
+	for (unsigned i = 0; PORT_COUNT > i; ++i)
+	{
+		diff |= (m_port_interrupt[i] ^ interrupt[i]) & ~m_port_ddr[i];
+		m_port_interrupt[i] = interrupt[i];
+		if (interrupt[i] && !m_port_cb_r[i].isnull())
+			logerror("PORT%c has interrupts enabled with pulled inputs, behaviour may be incorrect\n", 'A' + i);
+	}
+	if (diff) update_port_irq();
 }
 
 READ8_MEMBER(m68hc05_device::port_r)
 {
 	offset &= PORT_COUNT - 1;
-	if (!m_port_cb_r[offset].isnull())
+	if (!space.debugger_access() && !m_port_cb_r[offset].isnull())
 	{
 		u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
-		if (newval != m_port_input[offset])
+		u8 const diff(newval ^ m_port_input[offset]);
+		if (diff)
 		{
 			LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02X)\n",
 					char('A' + offset), newval, ~m_port_ddr[offset] & m_port_bits[offset], m_port_input[offset]);
 		}
 		m_port_input[offset] = newval;
+		if (diff & m_port_interrupt[offset] & ~m_port_ddr[offset])
+			update_port_irq();
 	}
 	return port_value(offset);
 }
@@ -189,10 +213,26 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 {
 	offset &= PORT_COUNT - 1;
 	data &= m_port_bits[offset];
-	if (data != m_port_ddr[offset])
+	u8 const diff(data ^ m_port_ddr[offset]);
+	if (diff)
 	{
 		LOGIOPORT("write DDR%c: %02X (was %02X)\n", char('A' + offset), data, m_port_ddr[offset]);
 		m_port_ddr[offset] = data;
+		if (diff & m_port_interrupt[offset])
+		{
+			if (!m_port_cb_r[offset].isnull())
+			{
+				u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
+				u8 const diff(newval ^ m_port_input[offset]);
+				if (diff)
+				{
+					LOGIOPORT("read PORT%c: new input = %02X & %02X (was %02X)\n",
+							char('A' + offset), newval, ~m_port_ddr[offset] & m_port_bits[offset], m_port_input[offset]);
+				}
+				m_port_input[offset] = newval;
+			}
+			update_port_irq();
+		}
 		m_port_cb_w[offset](space, 0, port_value(offset), m_port_ddr[offset]);
 	}
 }
@@ -210,9 +250,9 @@ WRITE8_MEMBER(m68hc05_device::tcr_w)
 			BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 1), BIT(data, 0));
 	m_tcr = data;
 	if (m_tcr & m_tsr & 0xe0)
-		m_pending_interrupts |= u16(1) << M68HC05_TCAP_LINE;
+		m_pending_interrupts |= M68HC05_INT_TIMER;
 	else
-		m_pending_interrupts &= ~(u16(1) << M68HC05_TCAP_LINE);
+		m_pending_interrupts &= ~M68HC05_INT_TIMER;
 }
 
 READ8_MEMBER(m68hc05_device::tsr_r)
@@ -245,7 +285,7 @@ READ8_MEMBER(m68hc05_device::icr_r)
 				LOGTIMER("read ICRL, clear ICF\n");
 				m_tsr &= 0x7f;
 				m_tsr_seen &= 0x7f;
-				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~(u16(1) << M68HC05_TCAP_LINE);
+				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~M68HC05_INT_TIMER;
 			}
 			if (m_inhibit_cap) LOGTIMER("read ICRL, enable capture\n");
 			m_inhibit_cap = false;
@@ -269,7 +309,7 @@ READ8_MEMBER(m68hc05_device::ocr_r)
 		LOGTIMER("read OCRL, clear OCF\n");
 		m_tsr &= 0xbf;
 		m_tsr_seen &= 0xbf;
-		if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~(u16(1) << M68HC05_TCAP_LINE);
+		if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~M68HC05_INT_TIMER;
 	}
 	return u8(m_ocr >> (low ? 0 : 8));
 }
@@ -289,7 +329,7 @@ WRITE8_MEMBER(m68hc05_device::ocr_w)
 				LOGTIMER("write OCRL, clear OCF\n");
 				m_tsr &= 0xbf;
 				m_tsr_seen &= 0xbf;
-				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~(u16(1) << M68HC05_TCAP_LINE);
+				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~M68HC05_INT_TIMER;
 			}
 			if (m_inhibit_cmp) LOGTIMER("write OCRL, enable compare\n");
 			m_inhibit_cmp = false;
@@ -323,7 +363,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 				LOGTIMER("read TRL, clear TOF\n");
 				m_tsr &= 0xdf;
 				m_tsr_seen &= 0xdf;
-				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~(u16(1) << M68HC05_TCAP_LINE);
+				if (!(m_tcr & m_tsr & 0xe0)) m_pending_interrupts &= ~M68HC05_INT_TIMER;
 			}
 		}
 		return m_trl_buf[alt];
@@ -387,9 +427,13 @@ void m68hc05_device::device_start()
 	m_tcmp_cb.resolve_safe();
 
 	// save digital I/O
+	save_item(NAME(m_port_interrupt));
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_ddr));
+	save_item(NAME(m_port_irq_state));
+	save_item(NAME(m_irq_line_state));
+	save_item(NAME(m_irq_latch));
 
 	// save timer/counter
 	save_item(NAME(m_tcap_state));
@@ -413,8 +457,10 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_ncope));
 
 	// digital I/O state unaffected by reset
+	std::fill(std::begin(m_port_interrupt), std::end(m_port_interrupt), 0x00);
 	std::fill(std::begin(m_port_input), std::end(m_port_input), 0xff);
 	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0xff);
+	m_irq_line_state = false;
 
 	// timer state unaffected by reset
 	m_tcap_state = false;
@@ -428,6 +474,9 @@ void m68hc05_device::device_start()
 	m_coprst = 0x00;
 	m_copcr = 0x00;
 	m_ncope = 0;
+
+	// expose most basic state to debugger
+	state_add(M68HC05_IRQLATCH, "IRQLATCH", m_irq_latch).mask(0x01);
 }
 
 void m68hc05_device::device_reset()
@@ -436,6 +485,8 @@ void m68hc05_device::device_reset()
 
 	// digital I/O reset
 	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0x00);
+	m_irq_latch = 0;
+	update_port_irq();
 
 	// timer reset
 	m_tcr &= 0x02;
@@ -456,6 +507,18 @@ void m68hc05_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
+	case M68HC05_IRQ_LINE:
+		if ((CLEAR_LINE != state) && !m_irq_line_state)
+		{
+			LOGINT("/IRQ edge%s\n", (m_port_irq_state || m_irq_latch) ? "" : ", set IRQ latch");
+			if (!m_port_irq_state)
+			{
+				m_irq_latch = 1;
+				m_pending_interrupts |= M68HC05_INT_IRQ;
+			}
+		}
+		m_irq_line_state = ASSERT_LINE == state;
+		break;
 	case M68HC05_TCAP_LINE:
 		if ((bool(state) != m_tcap_state) && (bool(state) == tcr_iedg()))
 		{
@@ -464,28 +527,22 @@ void m68hc05_device::execute_set_input(int inputnum, int state)
 			{
 				m_tsr |= 0x80;
 				m_icr = m_counter;
-				if (m_tcr & m_tsr & 0xe0) m_pending_interrupts |= u16(1) << M68HC05_TCAP_LINE;
+				if (m_tcr & m_tsr & 0xe0) m_pending_interrupts |= M68HC05_INT_TIMER;
 			}
 		}
 		m_tcap_state = bool(state);
 		break;
 	default:
-		if (m_irq_state[inputnum] != state)
-		{
-			m_irq_state[inputnum] = (state == ASSERT_LINE) ? ASSERT_LINE : CLEAR_LINE;
-
-			if (state != CLEAR_LINE)
-				m_pending_interrupts |= u16(1) << inputnum;
-		}
+		fatalerror("m68hc05[%s]: unknown input line %d", tag(), inputnum);
 	}
 }
 
-uint64_t m68hc05_device::execute_clocks_to_cycles(uint64_t clocks) const
+u64 m68hc05_device::execute_clocks_to_cycles(u64 clocks) const
 {
 	return (clocks + 1) / 2;
 }
 
-uint64_t m68hc05_device::execute_cycles_to_clocks(uint64_t cycles) const
+u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
 {
 	return cycles * 2;
 }
@@ -494,9 +551,9 @@ uint64_t m68hc05_device::execute_cycles_to_clocks(uint64_t cycles) const
 offs_t m68hc05_device::disasm_disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+		const u8 *oprom,
+		const u8 *opram,
+		u32 options)
 {
 	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options);
 }
@@ -504,35 +561,33 @@ offs_t m68hc05_device::disasm_disassemble(
 
 void m68hc05_device::interrupt()
 {
-	if (m_pending_interrupts & M68HC05_INT_MASK)
+	if ((m_pending_interrupts & M68HC05_INT_MASK) && !(CC & IFLAG))
 	{
-		if (!(CC & IFLAG))
-		{
-			pushword(m_pc);
-			pushbyte(m_x);
-			pushbyte(m_a);
-			pushbyte(m_cc);
-			SEI;
-			standard_irq_callback(0);
+		pushword(m_pc);
+		pushbyte(m_x);
+		pushbyte(m_a);
+		pushbyte(m_cc);
+		SEI;
+		standard_irq_callback(0);
 
-			/*if (BIT(m_pending_interrupts, M68705_IRQ_LINE))
-			{
-				LOGINT("servicing /INT interrupt\n");
-				m_pending_interrupts &= ~(1 << M68705_IRQ_LINE);
-				rm16(M68705_VECTOR_INT, m_pc);
-			}
-			else*/ if (BIT(m_pending_interrupts, M68HC05_TCAP_LINE))
-			{
-				LOGINT("servicing timer interrupt\n");
-				rm16(M68HC05_VECTOR_TIMER, m_pc);
-			}
-			else
-			{
-				throw emu_fatalerror("Unknown pending interrupt");
-			}
-			m_icount -= 10;
-			burn_cycles(10);
+		if (m_pending_interrupts & M68HC05_INT_IRQ)
+		{
+			LOGINT("servicing external interrupt\n");
+			m_irq_latch = 0;
+			m_pending_interrupts &= ~M68HC05_INT_IRQ;
+			rm16(M68HC05_VECTOR_IRQ, m_pc);
 		}
+		else if (m_pending_interrupts & M68HC05_INT_TIMER)
+		{
+			LOGINT("servicing timer interrupt\n");
+			rm16(M68HC05_VECTOR_TIMER, m_pc);
+		}
+		else
+		{
+			fatalerror("m68hc05[%s]: unknown pending interrupt(s) %x", tag(), m_pending_interrupts);
+		}
+		m_icount -= 10;
+		burn_cycles(10);
 	}
 }
 
@@ -561,7 +616,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 			m_tcmp_cb(tcr_olvl() ? 1 : 0);
 		}
 	}
-	if (m_tcr & m_tsr & 0xe0) m_pending_interrupts |= u16(1) << M68HC05_TCAP_LINE;
+	if (m_tcr & m_tsr & 0xe0) m_pending_interrupts |= M68HC05_INT_TIMER;
 
 	// run programmable COP
 	u32 const pcop_timeout(u32(1) << ((copcr_cm() << 1) + 15));
@@ -584,6 +639,20 @@ void m68hc05_device::burn_cycles(unsigned count)
 }
 
 
+void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
+{
+	for (unsigned i = 0; PORT_COUNT > i; ++i)
+	{
+		if (m_port_bits[i])
+			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i).c_str(), m_port_latch[i]).mask(m_port_bits[i]);
+	}
+	for (unsigned i = 0; PORT_COUNT > i; ++i)
+	{
+		if (ddr[i] && m_port_bits[i])
+			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i).c_str(), m_port_ddr[i]).mask(m_port_bits[i]);
+	}
+}
+
 void m68hc05_device::add_timer_state()
 {
 	state_add(M68HC05_TCR, "TCR", m_tcr).mask(0x7f);
@@ -605,6 +674,31 @@ void m68hc05_device::add_ncop_state()
 {
 	state_add(M68HC05_NCOPE, "NCOPE", m_ncope).mask(0x01);
 	state_add(M68HC05_NCOP, "NCOP", m_ncop_cnt).mask(0x0001ffff);
+}
+
+
+u8 m68hc05_device::port_value(unsigned offset) const
+{
+	return (m_port_latch[offset] & m_port_ddr[offset]) | (m_port_input[offset] & ~m_port_ddr[offset]);
+}
+
+void m68hc05_device::update_port_irq()
+{
+	u8 state(0x00);
+	for (unsigned i = 0; i < PORT_COUNT; ++i)
+		state |= m_port_interrupt[i] & ~m_port_ddr[i] & ~m_port_input[i];
+
+	if (bool(state) != m_port_irq_state)
+	{
+		LOGINT("I/O port IRQ state now %u%s\n",
+				state ? 1 : 0, (!m_irq_line_state && state && !m_irq_latch) ? ", set IRQ latch" : "");
+		m_port_irq_state = bool(state);
+		if (!m_irq_line_state && state)
+		{
+			m_irq_latch = 1;
+			m_pending_interrupts |= M68HC05_INT_IRQ;
+		}
+	}
 }
 
 
@@ -664,7 +758,7 @@ DEVICE_ADDRESS_MAP_START( c4_map, 8, m68hc05c4_device )
 ADDRESS_MAP_END
 
 
-m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: m68hc05_device(
 			mconfig,
 			tag,
@@ -676,7 +770,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			"m68hc05c4",
 			__FILE__)
 {
-	set_port_bits(0xff, 0xff, 0xff, 0xbf);
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
 
@@ -685,6 +779,7 @@ void m68hc05c4_device::device_start()
 {
 	m68hc05_device::device_start();
 
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 }
 
@@ -692,9 +787,9 @@ void m68hc05c4_device::device_start()
 offs_t m68hc05c4_device::disasm_disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+		const u8 *oprom,
+		const u8 *opram,
+		u32 options)
 {
 	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
 }
@@ -735,7 +830,7 @@ DEVICE_ADDRESS_MAP_START( c8_map, 8, m68hc05c8_device )
 ADDRESS_MAP_END
 
 
-m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: m68hc05_device(
 			mconfig,
 			tag,
@@ -747,7 +842,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			"m68hc05c8",
 			__FILE__)
 {
-	set_port_bits(0xff, 0xff, 0xff, 0xbf);
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
 
@@ -755,6 +850,7 @@ void m68hc05c8_device::device_start()
 {
 	m68hc05_device::device_start();
 
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 }
 
@@ -762,9 +858,9 @@ void m68hc05c8_device::device_start()
 offs_t m68hc05c8_device::disasm_disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+		const u8 *oprom,
+		const u8 *opram,
+		u32 options)
 {
 	// same I/O registers as MC68HC05C4
 	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
@@ -812,7 +908,7 @@ DEVICE_ADDRESS_MAP_START( c8a_map, 8, m68hc705c8a_device )
 ADDRESS_MAP_END
 
 
-m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: m68hc705_device(
 			mconfig,
 			tag,
@@ -824,7 +920,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			"m68hc705c8a",
 			__FILE__)
 {
-	set_port_bits(0xff, 0xff, 0xff, 0xbf);
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
 
@@ -838,6 +934,7 @@ void m68hc705c8a_device::device_start()
 {
 	m68hc705_device::device_start();
 
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 	add_pcop_state();
 	add_ncop_state();
@@ -847,16 +944,18 @@ void m68hc705c8a_device::device_reset()
 {
 	m68hc705_device::device_reset();
 
-	set_ncope(rdmem(0xfff1));
+	// latch MOR registers on reset
+	set_port_interrupt(std::array<u8, PORT_COUNT>{{ 0x00, u8(rdmem(0xfff0)), 0x00, 0x00 }});
+	set_ncope(BIT(rdmem(0xfff1), 0));
 }
 
 
 offs_t m68hc705c8a_device::disasm_disassemble(
 		std::ostream &stream,
 		offs_t pc,
-		const uint8_t *oprom,
-		const uint8_t *opram,
-		uint32_t options)
+		const u8 *oprom,
+		const u8 *opram,
+		u32 options)
 {
 	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc705c8a_syms);
 }

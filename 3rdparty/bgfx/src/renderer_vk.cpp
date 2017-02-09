@@ -4262,6 +4262,11 @@ BX_UNUSED(currentSamplerStateIdx);
 							restoreScissor = true;
 							Rect scissorRect;
 							scissorRect.intersect(viewScissorRect,_render->m_rectCache.m_cache[scissor]);
+							if (scissorRect.isZeroArea() )
+							{
+								continue;
+							}
+
 							VkRect2D rc;
 							rc.offset.x      = scissorRect.m_x;
 							rc.offset.x      = scissorRect.m_y;
@@ -4435,10 +4440,11 @@ BX_UNUSED(presentMin, presentMax);
 //		perfStats.numCompute    = statsKeyType[1];
 //		perfStats.maxGpuLatency = maxGpuLatency;
 
-		if (_render->m_debug & (BGFX_DEBUG_IFH | BGFX_DEBUG_STATS) )
+		if (_render->m_debug & (BGFX_DEBUG_IFH|BGFX_DEBUG_STATS) )
 		{
 //			PIX_BEGINEVENT(D3DCOLOR_RGBA(0x40, 0x40, 0x40, 0xff), L"debugstats");
 
+//			m_needPresent = true;
 			TextVideoMem& tvm = m_textVideoMem;
 
 			static int64_t next = now;

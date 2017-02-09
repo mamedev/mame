@@ -42,6 +42,12 @@
 	*     do not have Port-C implemented.                                      *
 	*  TLP (07-Sep-2009) Ver 1.14                                              *
 	*   - Edge sense control for the T0 count input was incorrectly reversed   *
+	*  LE (05-Feb-2017) Ver 1.15                                               *
+	*   - Allow writing all bits of the status register except TO and PD.      *
+	*     This enables e.g. bcf, bsf or clrf to change the flags when the      *
+	*     status register is the destination.                                  *
+	*   - Changed rlf and rrf to update the carry flag in the last step.       *
+	*     Fixes the case where the status register is the destination.         *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
@@ -381,7 +387,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 		case 02:    PCL = data;
 					m_PC = ((STATUS & PA_REG) << 4) | data;
 					break;
-		case 03:    STATUS &= (uint8_t)(~PA_REG); STATUS |= (data & PA_REG);
+		case 03:    STATUS = (STATUS & (TO_FLAG | PD_FLAG)) | (data & (uint8_t)(~(TO_FLAG | PD_FLAG)));
 					break;
 		case 04:    FSR = (data | (uint8_t)(~m_picRAMmask));
 					break;
@@ -432,6 +438,14 @@ void pic16c5x_device::illegal()
 	logerror("PIC16C5x:  PC=%03x,  Illegal opcode = %04x\n", (m_PC-1), m_opcode.w.l);
 }
 
+/*
+  Note:
+  According to the manual, if the STATUS register is the destination for an instruction that affects the Z, DC or C bits
+  then the write to these three bits is disabled. These bits are set or cleared according to the device logic.
+  To ensure this is correctly emulated, in instructions that write to the file registers, always change the status flags
+  *after* storing the result of the instruction.
+  e.g. CALCULATE_*, SET(STATUS,*_FLAG) and CLR(STATUS,*_FLAG) should appear as the last steps of the instruction emulation.
+*/
 
 void pic16c5x_device::addwf()
 {
@@ -622,21 +636,23 @@ void pic16c5x_device::retlw()
 void pic16c5x_device::rlf()
 {
 	m_ALU = GET_REGFILE(ADDR);
+	uint8_t bit7 = m_ALU & 0x80;
 	m_ALU <<= 1;
 	if (STATUS & C_FLAG) m_ALU |= 1;
-	if (GET_REGFILE(ADDR) & 0x80) SET(STATUS, C_FLAG);
-	else CLR(STATUS, C_FLAG);
 	STORE_RESULT(ADDR, m_ALU);
+	if (bit7) SET(STATUS, C_FLAG);
+	else CLR(STATUS, C_FLAG);
 }
 
 void pic16c5x_device::rrf()
 {
 	m_ALU = GET_REGFILE(ADDR);
+	uint8_t bit0 = m_ALU & 1;
 	m_ALU >>= 1;
 	if (STATUS & C_FLAG) m_ALU |= 0x80;
-	if (GET_REGFILE(ADDR) & 1) SET(STATUS, C_FLAG);
-	else CLR(STATUS, C_FLAG);
 	STORE_RESULT(ADDR, m_ALU);
+	if (bit0) SET(STATUS, C_FLAG);
+	else CLR(STATUS, C_FLAG);
 }
 
 void pic16c5x_device::sleepic()

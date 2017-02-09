@@ -94,7 +94,34 @@ Notes:
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
 -   vmetal: has Sega and Taito logos in the roms ?!
+-   vmetal: Many samples in the ADPCM ROM are actually not used.
 
+	Snd         Offset Writes                 Sample Range
+	     0000 0004 0002 0006 000a 0008 000c
+	--   ----------------------------------   -------------
+	00   006e 0001 00ab 003c 0002 003a 003a   01ab6e-023a3c
+	01   003d 0002 003a 001d 0002 007e 007e   023a3d-027e1d
+	02   00e2 0003 0005 002e 0003 00f3 00f3   0305e2-03f32e
+	03   000a 0005 001e 00f6 0005 00ec 00ec   051e0a-05ecf6
+	04   00f7 0005 00ec 008d 0006 0060 0060   05ecf7-06608d
+	05   0016 0008 002e 0014 0009 0019 0019   082e16-091914
+	06   0015 0009 0019 0094 000b 0015 0015   091915-0b1594
+	07   0010 000d 0012 00bf 000d 0035 0035   0d1210-0d35bf
+	08   00ce 000e 002f 0074 000f 0032 0032   0e2fce-0f3274
+	09   0000 0000 0000 003a 0000 007d 007d   000000-007d3a
+	0a   0077 0000 00fa 008d 0001 00b6 00b6   00fa77-01b68d
+	0b   008e 0001 00b6 00b3 0002 0021 0021   01b68e-0221b3
+	0c   0062 0002 00f7 0038 0003 00de 00de   02f762-03de38
+	0d   00b9 0005 00ab 00ef 0006 0016 0016   05abb9-0616ef
+	0e   00dd 0007 0058 00db 0008 001a 001a   0758dd-081adb
+	0f   00dc 0008 001a 002e 0008 008a 008a   081adc-088a2e
+	10   00db 0009 00d7 00ff 000a 0046 0046   09d7db-0a46ff
+	11   0077 000c 0003 006d 000c 0080 0080   0c0377-0c806d
+	12   006e 000c 0080 006c 000d 0002 0002   0c806e-0d026c
+	13   006d 000d 0002 002b 000d 0041 0041   0d026d-0d412b
+	14   002c 000d 0041 002a 000d 00be 00be   0d412c-0dbe2a
+	15   002b 000d 00be 0029 000e 0083 0083   0dbe2b-0e8329
+	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
 
 driver modified by Hau
 ***************************************************************************/
@@ -1897,40 +1924,9 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER(metro_state::vmetal_es8712_w)
+WRITE8_MEMBER(metro_state::vmetal_se_control_w)
 {
-	/* Many samples in the ADPCM ROM are actually not used.
-
-	Snd         Offset Writes                 Sample Range
-	     0000 0004 0002 0006 000a 0008 000c
-	--   ----------------------------------   -------------
-	00   006e 0001 00ab 003c 0002 003a 003a   01ab6e-023a3c
-	01   003d 0002 003a 001d 0002 007e 007e   023a3d-027e1d
-	02   00e2 0003 0005 002e 0003 00f3 00f3   0305e2-03f32e
-	03   000a 0005 001e 00f6 0005 00ec 00ec   051e0a-05ecf6
-	04   00f7 0005 00ec 008d 0006 0060 0060   05ecf7-06608d
-	05   0016 0008 002e 0014 0009 0019 0019   082e16-091914
-	06   0015 0009 0019 0094 000b 0015 0015   091915-0b1594
-	07   0010 000d 0012 00bf 000d 0035 0035   0d1210-0d35bf
-	08   00ce 000e 002f 0074 000f 0032 0032   0e2fce-0f3274
-	09   0000 0000 0000 003a 0000 007d 007d   000000-007d3a
-	0a   0077 0000 00fa 008d 0001 00b6 00b6   00fa77-01b68d
-	0b   008e 0001 00b6 00b3 0002 0021 0021   01b68e-0221b3
-	0c   0062 0002 00f7 0038 0003 00de 00de   02f762-03de38
-	0d   00b9 0005 00ab 00ef 0006 0016 0016   05abb9-0616ef
-	0e   00dd 0007 0058 00db 0008 001a 001a   0758dd-081adb
-	0f   00dc 0008 001a 002e 0008 008a 008a   081adc-088a2e
-	10   00db 0009 00d7 00ff 000a 0046 0046   09d7db-0a46ff
-	11   0077 000c 0003 006d 000c 0080 0080   0c0377-0c806d
-	12   006e 000c 0080 006c 000d 0002 0002   0c806e-0d026c
-	13   006d 000d 0002 002b 000d 0041 0041   0d026d-0d412b
-	14   002c 000d 0041 002a 000d 00be 00be   0d412c-0dbe2a
-	15   002b 000d 00be 0029 000e 0083 0083   0dbe2b-0e8329
-	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
-	*/
-
-	m_essnd->es8712_w(space, offset, data);
-	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
+	logerror("%s: Writing %02x to $500000\n", machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
@@ -1958,7 +1954,8 @@ static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x500000, 0x50000d) AM_WRITE8(vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(vmetal_se_control_w, 0xff00)
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", es8712_device, write, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 

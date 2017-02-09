@@ -15,8 +15,7 @@
 
 #include "emu.h"
 #include "ggenie.h"
-#include "includes/nes.h"
-
+#include "bus/nes/nes_carts.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1

@@ -18,25 +18,28 @@ class k8915_state : public driver_device
 {
 public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( k8915_52_r );
-	DECLARE_READ8_MEMBER( k8915_53_r );
-	DECLARE_WRITE8_MEMBER( k8915_a8_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	required_shared_ptr<uint8_t> m_p_videoram;
-	uint8_t *m_p_chargen;
+	DECLARE_READ8_MEMBER(k8915_52_r);
+	DECLARE_READ8_MEMBER(k8915_53_r);
+	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_DRIVER_INIT(k8915);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t m_framecnt;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(k8915);
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ8_MEMBER( k8915_state::k8915_52_r )
@@ -93,7 +96,6 @@ DRIVER_INIT_MEMBER(k8915_state,k8915)
 
 void k8915_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -575,6 +575,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
+
+	// TODO: mono? ch.0 doesn't output any sound in-game
+	MCFG_SOUND_MODIFY("ymz")
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

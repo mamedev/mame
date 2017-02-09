@@ -39,21 +39,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	required_shared_ptr<uint8_t> m_p_videoram;
-	const uint8_t* m_p_chargen;
+	DECLARE_DRIVER_INIT(plan80);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(plan80);
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ8_MEMBER( plan80_state::plan80_04_r )
@@ -176,7 +177,6 @@ DRIVER_INIT_MEMBER(plan80_state,plan80)
 
 void plan80_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t plan80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

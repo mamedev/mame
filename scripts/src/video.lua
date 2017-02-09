@@ -79,6 +79,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/cesblit.h,VIDEOS["CESBLIT"] = true
+--------------------------------------------------
+
+if (VIDEOS["CESBLIT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/cesblit.cpp",
+		MAME_DIR .. "src/devices/video/cesblit.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/crt9007.h,VIDEOS["CRT9007"] = true
 --------------------------------------------------
 
@@ -936,3 +948,16 @@ if (VIDEOS["EF9369"]~=null) then
 		MAME_DIR .. "src/devices/video/ef9369.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/ppu2c0x.h,VIDEOS["PPU2C0X"] = true
+--------------------------------------------------
+
+if (VIDEOS["PPU2C0X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ppu2c0x.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x.h",
+	}
+end
+

@@ -1,8 +1,48 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_NE555.c
+/*!
+ *  \file nld_NE555.cpp
  *
+ *  \page NE555 NE555: PRECISION TIMERS
+ *
+ *  The Swiss army knife for timing purposes
+ *
+ *  \section ne555_1 Synopsis
+ *
+ *  \snippet devsyn.dox.h NE555 synopsis
+ *  \snippet devsyn.dox.h NE555_DIP synopsis
+
+ *  \section ne555_11 "C" Synopsis
+ *
+ *  \snippet devsyn.dox.h NE555 csynopsis
+ *  \snippet devsyn.dox.h NE555_DIP csynopsis
+ *
+ *  For the \c NE555 use verbose pin assignments like \c name.TRIG or \c name.OUT.
+ *  For the \c NE555_DIP use pin numbers like \c name.1.
+ *
+ *  \section ne555_2 Connection Diagram
+ *
+ *  <pre>
+ *          +--------+
+ *      GND |1  ++  8| VCC
+ *     TRIG |2      7| DISCH
+ *      OUT |3      6| THRES
+ *    RESET |4      5| CONT
+ *          +--------+
+ *  </pre>
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  \section ne555_3 Function Table
+ *
+ *  Please refer to the datasheet.
+ *
+ *  \section ne555_4 Limitations
+ *
+ *  Internal resistor network currently fixed to 5k.
+ *
+ *  \section ne555_5 Example
+ *  \snippet ne555_astable.c ne555 example
  */
 
 #include "nld_ne555.h"
@@ -96,6 +136,7 @@ namespace netlist
 		m_R3.do_reset();
 		m_RDIS.do_reset();
 
+		/* FIXME make resistance a parameter, properly model other variants */
 		m_R1.set_R(5000);
 		m_R2.set_R(5000);
 		m_R3.set_R(5000);

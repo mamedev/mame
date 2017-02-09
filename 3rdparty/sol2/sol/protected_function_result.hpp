@@ -73,7 +73,7 @@ namespace sol {
 
 	public:
 		protected_function_result() = default;
-		protected_function_result(lua_State* L, int index = -1, int returncount = 0, int popcount = 0, call_status err = call_status::ok) noexcept : L(L), index(index), returncount(returncount), popcount(popcount), err(err) {
+		protected_function_result(lua_State* Ls, int idx = -1, int retnum = 0, int popped = 0, call_status pferr = call_status::ok) noexcept : L(Ls), index(idx), returncount(retnum), popcount(popped), err(pferr) {
 
 		}
 		protected_function_result(const protected_function_result&) = default;

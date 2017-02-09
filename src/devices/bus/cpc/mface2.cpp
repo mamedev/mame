@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "mface2.h"
-#include "includes/amstrad.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

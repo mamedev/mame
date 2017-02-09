@@ -7,11 +7,10 @@
     Natural keyboard input support.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef EMU_NATKEYBOARD_H
 #define EMU_NATKEYBOARD_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -57,11 +56,17 @@ public:
 	std::string dump();
 
 private:
+	enum
+	{
+		SHIFT_COUNT = UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1,
+		SHIFT_STATES = 1 << SHIFT_COUNT
+	};
+
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		char32_t    ch;
-		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
+		char32_t        ch;
+		ioport_field *  field[SHIFT_COUNT + 1];
 	};
 
 	// internal helpers
@@ -80,6 +85,7 @@ private:
 	u32                             m_bufbegin;         // index of starting character
 	u32                             m_bufend;           // index of ending character
 	std::vector<char32_t>           m_buffer;           // actual buffer
+	unsigned                        m_fieldnum;         // current step in multi-key sequence
 	bool                            m_status_keydown;   // current keydown status
 	bool                            m_last_cr;          // was the last char a CR?
 	emu_timer *                     m_timer;            // timer for posting characters

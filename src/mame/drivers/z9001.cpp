@@ -43,32 +43,35 @@ class z9001_state : public driver_device
 {
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_framecnt(0),
-		m_beeper(*this, "beeper"),
-		m_cass(*this, "cassette"),
-		m_p_colorram(*this, "colorram"),
-		m_p_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_framecnt(0)
+		, m_maincpu(*this, "maincpu")
+		, m_beeper(*this, "beeper")
+		, m_cass(*this, "cassette")
+		, m_p_colorram(*this, "colorram")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	uint8_t m_framecnt;
-	required_device<beep_device> m_beeper;
-	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<uint8_t> m_p_colorram;
-	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	const uint8_t *m_p_chargen;
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	uint8_t m_framecnt;
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
 	virtual void video_start() override;
-	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_beeper;
+	required_device<cassette_image_device> m_cass;
+	required_shared_ptr<uint8_t> m_p_colorram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
@@ -128,7 +131,6 @@ void z9001_state::machine_reset()
 
 void z9001_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

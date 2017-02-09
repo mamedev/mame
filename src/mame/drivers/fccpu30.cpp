@@ -657,7 +657,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu30_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.

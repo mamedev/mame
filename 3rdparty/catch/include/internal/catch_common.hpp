@@ -10,16 +10,27 @@
 
 #include "catch_common.h"
 
+#include <cstring>
+
 namespace Catch {
 
     bool startsWith( std::string const& s, std::string const& prefix ) {
-        return s.size() >= prefix.size() && s.substr( 0, prefix.size() ) == prefix;
+        return s.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), s.begin());
+    }
+    bool startsWith( std::string const& s, char prefix ) {
+        return !s.empty() && s[0] == prefix;
     }
     bool endsWith( std::string const& s, std::string const& suffix ) {
-        return s.size() >= suffix.size() && s.substr( s.size()-suffix.size(), suffix.size() ) == suffix;
+        return s.size() >= suffix.size() && std::equal(suffix.rbegin(), suffix.rend(), s.rbegin());
+    }
+    bool endsWith( std::string const& s, char suffix ) {
+        return !s.empty() && s[s.size()-1] == suffix;
     }
     bool contains( std::string const& s, std::string const& infix ) {
         return s.find( infix ) != std::string::npos;
+    }
+    bool contains( std::string const& s, char infix ) {
+        return s.find(infix) != std::string::npos;
     }
     char toLowerCh(char c) {
         return static_cast<char>( ::tolower( c ) );
@@ -37,7 +48,7 @@ namespace Catch {
         std::string::size_type start = str.find_first_not_of( whitespaceChars );
         std::string::size_type end = str.find_last_not_of( whitespaceChars );
 
-        return start != std::string::npos ? str.substr( start, 1+end-start ) : "";
+        return start != std::string::npos ? str.substr( start, 1+end-start ) : std::string();
     }
 
     bool replaceInPlace( std::string& str, std::string const& replaceThis, std::string const& withThis ) {
@@ -60,29 +71,25 @@ namespace Catch {
     {}
 
     std::ostream& operator << ( std::ostream& os, pluralise const& pluraliser ) {
-        os << pluraliser.m_count << " " << pluraliser.m_label;
+        os << pluraliser.m_count << ' ' << pluraliser.m_label;
         if( pluraliser.m_count != 1 )
-            os << "s";
+            os << 's';
         return os;
     }
 
-    SourceLineInfo::SourceLineInfo() : line( 0 ){}
+    SourceLineInfo::SourceLineInfo() : file(""), line( 0 ){}
     SourceLineInfo::SourceLineInfo( char const* _file, std::size_t _line )
     :   file( _file ),
         line( _line )
     {}
-    SourceLineInfo::SourceLineInfo( SourceLineInfo const& other )
-    :   file( other.file ),
-        line( other.line )
-    {}
     bool SourceLineInfo::empty() const {
-        return file.empty();
+        return file[0] == '\0';
     }
     bool SourceLineInfo::operator == ( SourceLineInfo const& other ) const {
-        return line == other.line && file == other.file;
+        return line == other.line && (file == other.file || std::strcmp(file, other.file) == 0);
     }
     bool SourceLineInfo::operator < ( SourceLineInfo const& other ) const {
-        return line < other.line || ( line == other.line  && file < other.file );
+        return line < other.line || ( line == other.line && (std::strcmp(file, other.file) < 0));
     }
 
     void seedRng( IConfig const& config ) {
@@ -95,16 +102,16 @@ namespace Catch {
 
     std::ostream& operator << ( std::ostream& os, SourceLineInfo const& info ) {
 #ifndef __GNUG__
-        os << info.file << "(" << info.line << ")";
+        os << info.file << '(' << info.line << ')';
 #else
-        os << info.file << ":" << info.line;
+        os << info.file << ':' << info.line;
 #endif
         return os;
     }
 
     void throwLogicError( std::string const& message, SourceLineInfo const& locationInfo ) {
         std::ostringstream oss;
-        oss << locationInfo << ": Internal Catch error: '" << message << "'";
+        oss << locationInfo << ": Internal Catch error: '" << message << '\'';
         if( alwaysTrue() )
             throw std::logic_error( oss.str() );
     }

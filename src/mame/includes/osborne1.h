@@ -9,14 +9,19 @@
 #ifndef OSBORNE1_H_
 #define OSBORNE1_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
+
 #include "sound/speaker.h"
+
 #include "bus/ieee488/ieee488.h"
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+
+#include "video/mc6845.h"
+
 
 class osborne1_state : public driver_device
 {
@@ -54,11 +59,12 @@ public:
 		m_bank_0xxx(*this, "bank_0xxx"),
 		m_bank_1xxx(*this, "bank_1xxx"),
 		m_bank_fxxx(*this, "bank_fxxx"),
+		m_p_chargen(*this, "chargen"),
 		m_video_timer(nullptr),
-		m_p_chargen(nullptr),
 		m_tilemap(nullptr),
 		m_acia_rxc_txc_timer(nullptr)
-	{ }
+	{
+	}
 
 
 	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
@@ -86,7 +92,7 @@ public:
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device>             m_maincpu;
 	required_device<gfxdecode_device>       m_gfxdecode;
@@ -106,8 +112,8 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	bool set_rom_mode(uint8_t value);
-	bool set_bit_9(uint8_t value);
+	bool set_rom_mode(u8 value);
+	bool set_bit_9(u8 value);
 	void update_irq();
 	void update_acia_rxc_txc();
 
@@ -130,36 +136,55 @@ protected:
 	required_memory_bank    m_bank_0xxx;
 	required_memory_bank    m_bank_1xxx;
 	required_memory_bank    m_bank_fxxx;
+	required_region_ptr<u8> m_p_chargen;
 
 	// configuration (reloaded on reset)
-	uint8_t           m_screen_pac;
-	uint8_t           m_acia_rxc_txc_div;
-	uint8_t           m_acia_rxc_txc_p_low;
-	uint8_t           m_acia_rxc_txc_p_high;
+	u8              m_screen_pac;
+	u8              m_acia_rxc_txc_div;
+	u8              m_acia_rxc_txc_p_low;
+	u8              m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
-	uint8_t           m_ub4a_q;
-	uint8_t           m_ub6a_q;
-	uint8_t           m_rom_mode;
-	uint8_t           m_bit_9;
+	u8              m_ub4a_q;
+	u8              m_ub6a_q;
+	u8              m_rom_mode;
+	u8              m_bit_9;
 
 	// onboard video state
-	uint8_t           m_scroll_x;
-	uint8_t           m_scroll_y;
-	uint8_t           m_beep_state;
+	u8              m_scroll_x;
+	u8              m_scroll_y;
+	u8              m_beep_state;
 	emu_timer       *m_video_timer;
 	bitmap_ind16    m_bitmap;
-	uint8_t           *m_p_chargen;
 	tilemap_t       *m_tilemap;
 
 	// SCREEN-PAC registers
-	uint8_t           m_resolution;
-	uint8_t           m_hc_left;
+	u8              m_resolution;
+	u8              m_hc_left;
 
 	// serial state
-	uint8_t           m_acia_irq_state;
-	uint8_t           m_acia_rxc_txc_state;
+	u8              m_acia_irq_state;
+	u8              m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
+};
+
+
+class osborne1nv_state : public osborne1_state
+{
+public:
+	osborne1nv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		osborne1_state(mconfig, type, tag),
+		m_palette(*this, "palette"),
+		m_p_nuevo(*this, "nuevo")
+	{
+	}
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
+
+protected:
+	required_device<palette_device> m_palette;
+	required_region_ptr<u8>         m_p_nuevo;
 };
 
 #endif /* OSBORNE1_H_ */

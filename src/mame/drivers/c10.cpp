@@ -28,14 +28,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(c10);
 private:
 	required_device<cpu_device> m_maincpu;
-	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -83,7 +84,6 @@ void c10_state::machine_reset()
 
 void c10_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

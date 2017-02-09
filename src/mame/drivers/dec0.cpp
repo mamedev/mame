@@ -92,35 +92,54 @@ startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
 Dudes).  Most of the MCU program isn't utilised.
 
 
+Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
+
+Heavy Barrel
+Bad Dudes vs. Dragonninja
+Dragonninja
+Birdie Try
+Robocop
+Hippodrome
+Fighting Fantasy
+Secret Agent
+Sly Spy
+Midnight Resistance
+Boulderdash
+
+Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy use the 'MEC-M1'
+motherboard and another plug-in game board containing all the ROMs.
+Sly Spy, Midnight Resistance and Boulderdash use the same graphics chips but are single pcbs.
+
 PCB Layouts
 -----------
 
-Bad Dudes vs Dragonninja
-Data East, 1988
-
 Main Board:
-This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome
 
-DE-0297-3 (earlier version DE-0295-1 uses PGA custom chips)
-MEC-M1
+This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy
+
+PCB number: MEC-M1 DE-0297-3 (uses QFP custom chips)
+or
+MEC-M1 DE-0295-1 (uses PGA custom chips)
+or
+DE-0289-2 (uses PGA custom chips and MEC-M1 not written on PCB)
 |------------------------------------------------------------------|
 |               TMM2018                                    12MHz   |
 |               TMM2018                                            |
-|               TMM2018          MB7122                 TC5565     |
+|               TMM2018          MB7122                            |
 |                                                       TC5565     |
-|                                                       TMM2018    |
-|                                                       TMM2018    |
-|          20MHz                                  MB7116           |
+|                                                       TC5565     |
+|                                                MB7116 TMM2018    |
+|          20MHz                                        TMM2018    |
 |J  RCDM-I1                                                        |
-|A  RCDM-I1                                TMM2018     |---------| |
-|M  RCDM-I1                                            |L7B0072  | |
-|M  RCDM-I1                                TMM2018     |DATAEAST | |
-|A  RCDM-I1                                            |BAC 06   | |
-|   RCDM-I1                                TMM2018     |---------| |
-|    DSW2       68000P10                   TMM2018                 |
-|    DSW1                                 |---------|  |---------| |
-|                              RP65C02    |L7B0073  |  |L7B0072  | |
-|UPC3403      TC5565                      |DATAEAST |  |DATAEAST | |
+|A  RCDM-I1                                            |---------| |
+|M  RCDM-I1                             TMM2018        |L7B0072  | |
+|M  RCDM-I1                             TMM2018        |DATAEAST | |
+|A  RCDM-I1                             TMM2018        |BAC 06   | |
+|   RCDM-I1    |-------------|          TMM2018        |---------| |
+|    DSW2      |   68000P10  |                                     |
+|    DSW1      |-------------|            |---------|  |---------| |
+|                                         |L7B0073  |  |L7B0072  | |
+|UPC3403      TC5565          RP65C02     |DATAEAST |  |DATAEAST | |
 |CN4   YM3014 TC5565        TMM2018       |MXC 06   |  |BAC 06   | |
 |VOL   YM3014 YM3812                      |---------|  |---------| |
 |MB3730      YM2203             CN2                CN1             |
@@ -132,8 +151,8 @@ Notes:
       YM3812  - Clock input 3.000MHz [12/4]
       TMM2018 - 2k x8 SRAM
       TC5565  - 8k x8 SRAM
-      MB7122  - 1k x4 bipolar PROM
-      MB7116  - 512b x4 bipolar PROM
+      MB7122  - 1k x4 bipolar PROM with label "A-2" at location E17
+      MB7116  - 512b x4 bipolar PROM with label "A-1" at location C12
       RCDM-I1 - Custom resistor array
       DSW1/2  - 8-position DIP switches
       L7B007x - DECO custom graphics chips (QFP160 or PGA type)
@@ -144,26 +163,26 @@ Notes:
       ------------
       VSync - 57.4162Hz
       HSync - 15.6172kHz
-      OSC1  - 20.00006MHz
-      XTAL1 - 11.9938MHz
+      OSC1  - 20.00006MHz (20MHz)
+      XTAL1 - 11.9938MHz (12MHz)
 
 
-ROM Board:
-This board is used with Heavy Barrel, Bad Dudes & Birdie Try only.
-There is another type of ROM board used with Robocop & Hippodrome which
-is different (but not documented here)
+ROM Board Type 1:
 
-DE-0299-2 (earlier version DE-0293-2 uses PGA custom chips)
-MEC-M1
+This board is used with Heavy Barrel, Bad Dudes & Birdie Try
+All ROMs are in sockets. Boards that do not use some positions
+do not have the socket populated (i.e. Bad Dudes)
+
+DE-0299-2 (earlier version DE-0293-2 or DE-0293-1 uses PGA custom chips)
 |-------------------------------------------------------|
-|C4558  CN2          7.8A      CN1                      |
-|       1.3A 2.4A 3.6A  i8751 9.12A 10.14A 11.16A 12.17A|
-| M6295                 8MHz                            |
-|CN9                                                    |
+|C4558          CN2  7.8A              CN1              |
+|       1.3A 2.4A 3.6A        9.12A 10.14A 11.16A 12.17A|
+| M6295               I8751_31.9A                       |
+|CN9                    8MHz                            |
 |                                                       |
 |       4.3C 5.4C 6.6C       13.12C 14.14C 15.16C 16.17C|
+|  8.2C                                                 |
 |                                                       |
-|8.2C                                                   |
 |                 |---------|                           |
 |                 |L7B0072  | TMM2018                   |
 |CN5              |DATAEAST |17.12D 18.14D 19.16D 20.17D|
@@ -172,31 +191,140 @@ MEC-M1
 |CN6                                                    |
 |                            21.12F 22.14F 23.16F 24.17F|
 |                   27.7F 28.9F                         |
-|CN7                                                    |
-|                                                       |
-|                                                       |
+|CN7        D4701                                       |
+|   LA6339                                              |
+|   LA6339  D4701                                       |
 |CN8                29.7J 30.9J      25.15J 26.16J      |
 |-------------------------------------------------------|
 Notes:
-      i8751     - intel 8751 microcontroller, clock input 8.000MHz
+      i8751     - Intel 8751 microcontroller, clock input 8.000MHz
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
-      L7B0072   - DECO custom graphics chip (QFP160 or PGA type)
+      L7B0072   - DECO custom graphics chip (QFP160 or PGA type). Populated on ALL PCBs even if not used.
+                  If ROMs 27/28/29 & 30 are not populated this chip is not used
       TMM2018   - 2k x8 SRAM
+      C4558     - NEC C4558 Dual Op Amp
+      LA6339    - Sanyo LA6339 High Performance Quad Comparator
+      D4701     - NEC uPD4701 X,Y 2-axis Incremental Encoder Counter
       CN1/2     - 96-pin connectors joining to Main Board
-      CN5/6/7/8 - Connectors for other inputs/buttons (these are not populated on
-                  Bad Dudes but are used with Birdie Try/Heavy Barrel etc)
+      CN5/6     - Connectors for other inputs/buttons. Not populated on Bad Dudes.
+                  Used for the rotary joysticks on Heavy Barrel
+      CN7/8     - Connectors for trackball inputs for player 1 and player 2. Not populated on Bad Dudes or Heavy Barrel.
+                  Used for trackballs on Birdie Try
       CN9       - 6-pin cable joining to Main Board
-
       ROMs      - All ROM locations shown but not all are populated.
-                  All DECO games use a ROM code on the label....
+                  All DECO games use a game code on the label....
                    - Bad Dudes    = EI    \
                    - Birdie Try   = EK     |
                    - Dragon Ninja = EG     | These also change for different country/regions
-                   - Heavy Barrel = EC    /
+                   - Heavy Barrel = EC    /  Some Heavy Barrel boards only have numbers on the stickers
                   All ROMs are 27512/27256 EPROM/maskROM
-                  All ROMs have a number location on the board next to the chip. The chips
-                  can also be referenced via the numbers & letters on the side of the board.
-                  For example, both of these are the same chip.... EI30.30 or EI30.9J
+                  All ROMs have a number location on the board next to the chip and that same number is used
+                  as part of the ROM label. The chips can also be referenced via the numbers & letters on the
+                  side of the board. For example EI30.30 or EI30.9J. Both of these are the same chip and the
+                  game code identifies the game, which in this case is Bad Dudes.
+
+ROM usage per game
+------------------
+     Location  3A    4A    6A    3C    4C    6C    8A    2C    12A   14A   16A   17A   12C   14C   16C   17C   12D   14D   16D   17D   12F   14F   16F   17F   15J   16J   7F    9F    7J    9J    9A
+Game           1     2     3     4     5     6     7     8     9     10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Birdie Try     EK01  EK02  EK03  EK04  EK05  EK06  EK07  EK08  EK09  EK10  EK11  EK12  EK13  EK14  EK15  EK16  EK17  EK18  EK19  EK20  EK21  EK22  EK23  EK24  EK25  EK26  -     -     -     -     EK31-1
+Bad Dudes      EI01  -     EI03  EI04  -     EI06  EI07  EI08  EI09  EI10  EI11  EI12  EI13  EI14  EI15  EI16  -     EI18  -     EI20  -     EI22  -     EI24  EI25  EI26  -     EI28  -     EI30  EI31
+Dragon Ninja   EG01  -     EG03  EG04  -     EG06  EG07  EG08  EG09  EG10  EG11  EG12  EG13  EG14  EG15  EG16  -     EG18  -     EG20  -     EG22  -     EG24  EG25  EG26  -     EG28  -     EG30  EG31
+Heavy Barrel   EC01  EC02  EC03  EC04  EC05  EC06  EC07  EC08  EC09  EC10  EC11  EC12  EC13  EC14  EC15  EC16  EC17  EC18  EC19  EC20  EC21  EC22  EC23  EC24  EC25  EC26  EC27  EC28  EC29  EC30  EC31
+
+Note the games can be converted by swapping all of the ROMs and MCU. For example on a Birdie Try PCB, when the 
+ROMs are swapped for the 'hbarrel' set from MAME, the board will run Heavy Barrel. I can confirm the MCU dump 
+from the 'hbarrel' MAME ROM set (HB31.9A) and 'baddudes' MAME ROM set (EI31.9A) works fine on the real PCB.
+
+
+ROM Board Type 2:
+
+This board is used with Hippodrome & Fighting Fantasy
+
+DE-0318-4
+|-------------------------------------------------------|
+|               CN2                    CN1              |
+|                                                       |
+|       EX00.B1    EX04.C1                              |
+|CN4                                                    |
+|       EX01-3.B3  PZ-1.C3            EX13.F3   EX18.G3 |
+|                                                       |
+|       EX02-3.B4  EX05.C4            EX14.F4   EX19.G4 |
+|                                                       |
+|       EX03.B5    EX06.C5  EX10.D5   EX15.F5   EX20.G5 |
+|                                                       |
+|       M6295      EX07.C6  EX11.D6   EX16.F6   EX21.G6 |
+|     4558                  EX12.D8   EX17.F8   EX22.G8 |
+||--|                                 TMM2018           |
+||  |       |---------|               TMM2018   EX23.G10|
+||49|       |   47    |            |---------|          |
+||  |       |---------|            |L7B0072  |  EX24.G11|
+||  |           TMM2063            |DATAEAST |          |
+||--| 21.4772MHz                   |BAC 06   |  EX25.G13|
+|           |---|  EX08.C15        |---------|          |
+|    C1060  | 45|                                       |
+|-----------|---|---------------------------------------|
+Notes:
+      49        - Unknown DIP40 ASIC (no clock input so not an MCU)
+      47        - Unknown SDIP52 ASIC (no clock input so not an MCU)
+      45        - HuC6280 sound CPU in disguise as Data East custom chip #45. Clock input 21.4772MHz on pin 10
+      M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
+      4558      - NEC C4558 Dual Op Amp
+      C1060     - NEC uPC1060C 2.5V High Precision Reference Voltage Circuit
+      L7B0072   - DECO custom graphics chip (QFP160)
+      TMM2018   - 2k x8 SRAM
+      TMM2063   - 8k x8 SRAM
+      PZ-1.C3   - MMI PAL16L8 marked "PZ-1"
+      CN1/2     - 96-pin connectors joining to Main Board
+      CN4       - 6-pin cable joining to Main Board
+      ROMs      - All ROMs are 27512/27256 EPROM/maskROM
+                  All ROMs have a number location under the chip and that same number is used
+                  as part of the ROM label. The chips can also be referenced via the numbers
+                  & letters on the side of the board. For example EX25.G13 or EX25.25 are the
+                  same chip. Game code on the ROM labels for Hippodrome/Fighting Fantasy is
+                  EV, EW or EX.
+
+
+ROM Board Type 3:
+
+This board is used only with Robocop
+
+DE-0316-4
+|-------------------------------------------------------|
+|               CN2                    CN1              |
+|4558 PZ-1.B15                                          |
+|                EP03-3.C14 EP06.E14  EP10.F14          |
+|CN4                                                    |
+|     EP00-3.B13            EP07.E13  EP11.F13  EP18.H13|
+|M6295                                                  |
+|     EP01-4.B12 EP04-3.C12 EP08.E12  EP12.F12  EP19.H12|
+|                                                       |
+|     EP02.B11   EP05-4.C11 EP09.E11  EP13.F11  EP20.H11|
+|                           TMM2063                     |
+|  PZ-0.A9                  TMM2063             EP21.H10|
+|                                                       |
+| 21.4772MHz              |---------| EP14.F7   EP22.H7 |
+| |------|                |L7B0072  |           EP23.H6 |
+| |DEC-01|                |DATAEAST | EP15.F4           |
+| |      |                |BAC 06   |                   |
+| |------|  |---------|   |---------| EP16.F3           |
+|  2018     | DEM-01  |                                 |
+|           |---------|               EP17.F2           |
+|  PZ-2.A2                                              |
+|-------------------------------------------------------|
+Notes:
+      DEM-01    - Unknown SDIP52 ASIC (no clock input so not an MCU, decapping it found only ASIC, no ROM)
+      DEC-01    - HuC6280 sound CPU in disguise as Data East custom chip DEC-01. Clock input 21.4772MHz on pin 10
+      M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
+      4558      - NEC C4558 Dual Op Amp
+      L7B0072   - DECO custom graphics chip (QFP160)
+      TMM2018   - 2k x8 SRAM
+      TMM2063   - 8k x8 SRAM
+      PZ-*      - MMI PAL16L8 PALs
+      CN1/2     - 96-pin connectors joining to Main Board
+      CN4       - 6-pin cable joining to Main Board
+      ROMs      - All ROMs are 27512/27256 EPROM/maskROM
 
 ***************************************************************************/
 

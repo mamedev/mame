@@ -404,7 +404,6 @@ void NETLIB_NAME(solver)::post_start()
 		}
 
 		// FIXME ...
-		ms->set_delegate_pointer();
 		ms->setup(grp);
 
 		log().verbose("Solver {1}", ms->name());

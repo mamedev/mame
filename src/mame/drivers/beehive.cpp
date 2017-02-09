@@ -31,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		{ }
 
 	DECLARE_READ8_MEMBER(beehive_60_r);
@@ -39,8 +40,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	uint8_t m_keyline;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -234,7 +235,6 @@ void beehive_state::machine_reset()
 
 void beehive_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

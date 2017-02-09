@@ -17,6 +17,7 @@ if (TARGET gmock)
     ${CMAKE_CURRENT_SOURCE_DIR}/HexFloat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Hlsl.FromFile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.FromFile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Link.FromFile.Vk.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Pp.FromFile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Spv.FromFile.cpp
     # -- Remapper tests
@@ -40,9 +41,15 @@ if (TARGET gmock)
     ${PROJECT_SOURCE_DIR}
     ${gmock_SOURCE_DIR}/include
     ${gtest_SOURCE_DIR}/include)
-  target_link_libraries(glslangtests PRIVATE
-    SPVRemapper glslang OSDependent OGLCompiler HLSL glslang
-    SPIRV glslang-default-resource-limits gmock)
+
+  set(LIBRARIES
+      SPVRemapper glslang OSDependent OGLCompiler glslang
+      SPIRV glslang-default-resource-limits)
+  if(ENABLE_HLSL)
+    set(LIBRARIES ${LIBRARIES} HLSL)
+  endif(ENABLE_HLSL)
+  target_link_libraries(glslangtests PRIVATE ${LIBRARIES} gmock)
+
   add_test(NAME glslang-gtests
-	   COMMAND glslangtests --test-root "${GLSLANG_TEST_DIRECTORY}")
+    COMMAND glslangtests --test-root "${GLSLANG_TEST_DIRECTORY}")
 endif()

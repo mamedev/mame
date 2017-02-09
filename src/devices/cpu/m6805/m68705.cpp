@@ -78,6 +78,8 @@ constexpr u16 M68705_VECTOR_INT         = 0xfffa;
 constexpr u16 M68705_VECTOR_SWI         = 0xfffc;
 constexpr u16 M68705_VECTOR_RESET       = 0xfffe;
 
+constexpr u16 M68705_INT_MASK           = 0x03;
+
 } // anonymous namespace
 
 

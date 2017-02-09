@@ -2126,6 +2126,18 @@ if (CPUS["TLCS90"]~=null) then
 end
 
 --------------------------------------------------
+-- Toshiba TLCS-870 Series
+--@src/devices/cpu/tlcs870/tlcs870.h,CPUS["TLCS870"] = true
+--------------------------------------------------
+
+if (CPUS["TLCS870"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.h",
+	}
+end
+
+--------------------------------------------------
 -- Toshiba TLCS-900 Series
 --@src/devices/cpu/tlcs900/tlcs900.h,CPUS["TLCS900"] = true
 --------------------------------------------------

@@ -440,11 +440,15 @@ extern int LoadEXRFromMemory(float *out_rgba, const unsigned char *memory,
 #include "zfp.h"
 #endif
 
+#if __cplusplus > 199711L
+// C++11
+#include <cstdint>
+#endif // __cplusplus > 199711L
+
 namespace tinyexr {
 
 #if __cplusplus > 199711L
 // C++11
-#include <cstdint>
 typedef uint64_t tinyexr_uint64;
 typedef int64_t tinyexr_int64;
 #else
@@ -7076,7 +7080,7 @@ static const char *ReadString(std::string *s, const char *ptr) {
 static bool ReadAttribute(std::string *name, std::string *type,
                           std::vector<unsigned char> *data, size_t *marker_size,
                           const char *marker, size_t size) {
-  size_t name_len = bx::strnlen(marker, size);
+  size_t name_len = strnlen(marker, size);
   if (name_len == size) {
     // String does not have a terminating character.
     return false;
@@ -7086,7 +7090,7 @@ static bool ReadAttribute(std::string *name, std::string *type,
   marker += name_len + 1;
   size -= name_len + 1;
 
-  size_t type_len = bx::strnlen(marker, size);
+  size_t type_len = strnlen(marker, size);
   if (type_len == size) {
     return false;
   }

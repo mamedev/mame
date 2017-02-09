@@ -1,5 +1,12 @@
+/*
+ * Documentation settings
+ */
 
-/*! \mainpage notitle
+/*!
+ *
+ * \mainpage Netlist
+
+
 
 ##Netlist
 

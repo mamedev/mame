@@ -171,14 +171,20 @@ void vme_mzr8300_card_device::device_start()
 
 	/* Setup r/w handlers for first SIO in A16 */
 	uint32_t base = 0xFF0000;
-	m_vme->install_device(base + 0, base + 1, // Channel B - Data
-							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 2, base + 3, // Channel B - Control
-							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 4, base + 5, // Channel A - Data
-							 read8_delegate(FUNC(z80sio_device::da_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::da_w), subdevice<z80sio_device>("sio0")), 0x00ff);
-	m_vme->install_device(base + 6, base + 7, // Channel A - Control
-							 read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")), write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	//	m_vme->static_set_custom_spaces(*this);
+
+	m_vme->install_device(vme_device::A16_SC, base + 0, base + 1, // Channel B - Data
+						  read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 2, base + 3, // Channel B - Control
+						  read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 4, base + 5, // Channel A - Data
+						  read8_delegate(FUNC(z80sio_device::da_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::da_w), subdevice<z80sio_device>("sio0")), 0x00ff);
+	m_vme->install_device(vme_device::A16_SC, base + 6, base + 7, // Channel A - Control
+						  read8_delegate(FUNC(z80sio_device::ca_r),  subdevice<z80sio_device>("sio0")),
+						  write8_delegate(FUNC(z80sio_device::ca_w), subdevice<z80sio_device>("sio0")), 0x00ff);
 }
 
 void vme_mzr8300_card_device::device_reset()

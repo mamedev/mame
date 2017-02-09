@@ -552,13 +552,13 @@ OP_HANDLER( swi )
 // $8E STOP inherent    ----
 OP_HANDLER( stop )
 {
-	fatalerror("m6805: unimplemented STOP");
+	fatalerror("m6805[%s]: unimplemented STOP", tag());
 }
 
 // $8F WAIT inherent    ----
 OP_HANDLER( wait )
 {
-	fatalerror("m6805: unimplemented WAIT");
+	fatalerror("m6805[%s]: unimplemented WAIT", tag());
 }
 
 

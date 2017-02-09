@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START (fccpu1, force68k_state)
 
 	// VME interface
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu1_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, fccpu1_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 #if 0 /*

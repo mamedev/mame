@@ -896,6 +896,24 @@ ROM_START(excalibrf)
 	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(9f194744) SHA1(dbd73b546071c3d4f0dcfe21e3e646da716c5b71))
 ROM_END
 
+ROM_START(excalibrg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("prom2g.cpu", 0x1000, 0x0800, CRC(49079396) SHA1(92361a87464e39afeb74fe531b7d4356323405b8))
+	ROM_CONTINUE(0x9000, 0x0800)
+	ROM_RELOAD(0x5000, 0x0800)
+	ROM_CONTINUE(0xd000, 0x0800)
+	ROM_LOAD("prom1g.cpu", 0x2000, 0x2000, CRC(504fad7a) SHA1(6648778d537161e9bdcf2955209e1525e90a3617))
+	ROM_RELOAD(0x6000, 0x2000)
+	ROM_RELOAD(0xa000, 0x2000)
+	ROM_RELOAD(0xe000, 0x2000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("drom1.snd", 0x8000, 0x8000, CRC(a4368cd0) SHA1(c48513e56899938dc83a3545d8ee9def3dc1491f))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("yrom1.snd", 0x8000, 0x8000, CRC(9f194744) SHA1(dbd73b546071c3d4f0dcfe21e3e646da716c5b71))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Genesis (#705)
 /-------------------------------------------------------------------*/
@@ -1746,6 +1764,7 @@ GAME(1988, robowars,  0,        gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "
 GAME(1988, robowarsf, robowars, gts80b_s2, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Robo-War (French)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, excalibr,  0,        gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Excalibur",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, excalibrf, excalibr, gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Excalibur (French)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988, excalibrg, excalibr, gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Excalibur (German)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, badgirls,  0,        gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bad Girls",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, badgirlsf, badgirls, gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bad Girls (French)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, badgirlsg, badgirls, gts80b_s3, gts80b, gts80b_state, gts80b, ROT0, "Gottlieb",               "Bad Girls (German)",   MACHINE_IS_SKELETON_MECHANICAL)

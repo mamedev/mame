@@ -21,7 +21,7 @@ public:
 	tool_options_t() :
 		plib::options(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header", "run|convert|listdevices|static|header"),
+		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header:docheader", "run|convert|listdevices|static|header"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for files"),
@@ -339,6 +339,50 @@ static void mac_out(const pstring s, const bool cont = true)
 		pout("{1}\n", s);
 }
 
+static void cmac(const netlist::factory::element_t *e)
+{
+	auto v = plib::psplit(e->param_desc(), ",");
+	pstring vs;
+	for (auto s : v)
+		vs += ", p" + s.replace("+","").replace(".","_");
+	mac_out("#define " + e->name() + "(name" + vs + ")");
+	mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");
+
+	for (auto s : v)
+	{
+		pstring r(s.replace("+","").replace(".","_"));
+		if (s.startsWith("+"))
+			mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
+		else
+			mac_out("\tNETDEV_PARAMI(name, " + r + ", p" + r + ")");
+	}
+	mac_out("", false);
+}
+
+static void mac(const netlist::factory::element_t *e)
+{
+	auto v = plib::psplit(e->param_desc(), ",");
+	pstring vs;
+	for (auto s : v)
+	{
+		vs += ", " + s.replace("+","").replace(".","_");
+	}
+	pout("{1}(name{2})\n", e->name(), vs);
+	if (v.size() > 0)
+	{
+		pout("/*\n");
+		for (auto s : v)
+		{
+			pstring r(s.replace("+","").replace(".","_"));
+			if (s.startsWith("+"))
+				pout("{1:10}: Terminal\n",r);
+			else
+				pout("{1:10}: Parameter\n", r);
+		}
+		pout("*/\n");
+	}
+}
+
 static void create_header(tool_options_t &opts)
 {
 	netlist_tool_t nt("netlist");
@@ -376,27 +420,58 @@ static void create_header(tool_options_t &opts)
 			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
 			pout("{1}\n", pstring("// ").rpad("-", 72));
 		}
-		auto v = plib::psplit(e->param_desc(), ",");
-		pstring vs;
-		for (auto s : v)
-			vs += ", p" + s.replace("+","").replace(".","_");
-		mac_out("#define " + e->name() + "(name" + vs + ")");
-		mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");                                        \
-
-		for (auto s : v)
-		{
-			pstring r(s.replace("+","").replace(".","_"));
-			if (s.startsWith("+"))
-				mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
-			else
-				mac_out("\tNETDEV_PARAMI(name, " + r + ", p" + r + ")");
-		}
-		mac_out("", false);
+		cmac(e.get());
 	}
 	pout("#endif // __PLIB_PREPROCESSOR__\n");
 	pout("#endif\n");
 	nt.stop();
 
+}
+
+static void create_docheader(tool_options_t &opts)
+{
+	netlist_tool_t nt("netlist");
+
+	nt.init();
+
+	nt.log().verbose.set_enabled(false);
+	nt.log().warning.set_enabled(false);
+
+	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
+			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
+	nt.setup().include("dummy");
+
+	std::vector<pstring> devs;
+	for (auto &e : nt.setup().factory())
+		devs.push_back(e->name());
+	std::sort(devs.begin(), devs.end(), [&](pstring &a, pstring &b) { return a < b; });
+
+	pout("// license:GPL-2.0+\n");
+	pout("// copyright-holders:Couriersud\n");
+	pout("/* ----------------------------------------------------------------------------\n");
+	pout(" *  Automatically created file. DO NOT MODIFY.\n");
+	pout(" * ---------------------------------------------------------------------------*/\n");
+	pout("/*!\n");
+	pout(" * \\page devices Devices\n");
+	pout(" *\n");
+	pout(" * Below is a list of all the devices currently known to the system ...\n");
+	pout(" *\n");
+
+	for (auto &s : devs)
+		pout(" *         - \\subpage {1}\n", s);
+
+	pout(" *\n");
+
+	for (auto &e : nt.setup().factory())
+	{
+		pout("//! [{1} csynopsis]\n", e->name());
+		cmac(e.get());
+		pout("//! [{1} csynopsis]\n", e->name());
+		pout("//! [{1} synopsis]\n", e->name());
+		mac(e.get());
+		pout("//! [{1} synopsis]\n", e->name());
+	}
+	nt.stop();
 }
 
 
@@ -549,6 +624,8 @@ int main(int argc, char *argv[])
 			static_compile(opts);
 		else if (cmd == "header")
 			create_header(opts);
+		else if (cmd == "docheader")
+			create_docheader(opts);
 		else if (cmd == "convert")
 		{
 			pstring contents;

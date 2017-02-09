@@ -7,6 +7,8 @@
 
 #include "m6805.h"
 
+#include <array>
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -73,7 +75,18 @@ protected:
 		M68HC05_CC = M6805_CC,
 		M68HC05_IRQ_STATE = M6805_IRQ_STATE,
 
-		M68HC05_TCR = 0x10,
+		M68HC05_IRQLATCH = 0x10,
+
+		M68HC05_LATCHA,
+		M68HC05_LATCHB,
+		M68HC05_LATCHC,
+		M68HC05_LATCHD,
+		M68HC05_DDRA,
+		M68HC05_DDRB,
+		M68HC05_DDRC,
+		M68HC05_DDRD,
+
+		M68HC05_TCR,
 		M68HC05_TSR,
 		M68HC05_ICR,
 		M68HC05_OCR,
@@ -100,7 +113,8 @@ protected:
 			char const *shortname,
 			char const *source);
 
-	void set_port_bits(u8 a, u8 b, u8 c, u8 d);
+	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
+	void set_port_interrupt(std::array<u8, PORT_COUNT> const &interrupt);
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_latch_w);
 	DECLARE_READ8_MEMBER(port_ddr_r);
@@ -124,28 +138,27 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override;
 
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
+			const u8 *oprom,
 			const uint8_t *opram,
-			uint32_t options) override;
+			u32 options) override;
 
 	virtual void interrupt() override;
 	virtual void burn_cycles(unsigned count) override;
 
+	void add_port_state(std::array<bool, PORT_COUNT> const &ddr);
 	void add_timer_state();
 	void add_pcop_state();
 	void add_ncop_state();
 
 private:
-	u8 port_value(unsigned offset) const
-	{
-		return (m_port_latch[offset] & m_port_ddr[offset]) | (m_port_input[offset] & ~m_port_ddr[offset]);
-	}
+	u8 port_value(unsigned offset) const;
+	void update_port_irq();
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
@@ -166,9 +179,12 @@ private:
 	devcb_read8         m_port_cb_r[PORT_COUNT];
 	devcb_write8        m_port_cb_w[PORT_COUNT];
 	u8                  m_port_bits[PORT_COUNT];
+	u8                  m_port_interrupt[PORT_COUNT];
 	u8                  m_port_input[PORT_COUNT];
 	u8                  m_port_latch[PORT_COUNT];
 	u8                  m_port_ddr[PORT_COUNT];
+	bool                m_port_irq_state, m_irq_line_state;
+	u8                  m_irq_latch;
 
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;
@@ -221,9 +237,9 @@ protected:
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+			const u8 *oprom,
+			const u8 *opram,
+			u32 options) override;
 };
 
 
@@ -242,9 +258,9 @@ protected:
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+			const u8 *oprom,
+			const u8 *opram,
+			u32 options) override;
 };
 
 
@@ -266,9 +282,9 @@ protected:
 	virtual offs_t disasm_disassemble(
 			std::ostream &stream,
 			offs_t pc,
-			const uint8_t *oprom,
-			const uint8_t *opram,
-			uint32_t options) override;
+			const u8 *oprom,
+			const u8 *opram,
+			u32 options) override;
 };
 
 
@@ -276,7 +292,6 @@ protected:
  * 68HC05 section
  ****************************************************************************/
 
-#define M68HC05_INT_MASK            0x03
 #define M68HC05_IRQ_LINE            (M6805_IRQ_LINE + 0)
 #define M68HC05_TCAP_LINE           (M6805_IRQ_LINE + 1)
 

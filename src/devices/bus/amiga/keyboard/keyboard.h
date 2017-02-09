@@ -2,13 +2,13 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-	Amiga Keyboard Interface
+    Amiga Keyboard Interface
 
-	Serial data and reset control
+    Serial data and reset control
 
-	- KDAT (serial data)
-	- KCLK (serial clock)
-	- KRST (reset output)
+    - KDAT (serial data)
+    - KCLK (serial clock)
+    - KRST (reset output)
 
 ***************************************************************************/
 

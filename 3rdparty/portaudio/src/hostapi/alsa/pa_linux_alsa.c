@@ -676,7 +676,7 @@ PaAlsaHostApiRepresentation;
 typedef struct PaAlsaDeviceInfo
 {
     PaDeviceInfo baseDeviceInfo;
-    char *alsaName;
+    const char *alsaName;
     int isPlug;
     int minInputChannels;
     int minOutputChannels;
@@ -982,7 +982,7 @@ static PaUint32 PaAlsaVersionNum(void)
 /* Helper struct */
 typedef struct
 {
-    char *alsaName;
+    const char *alsaName;
     char *name;
     int isPlug;
     int hasPlayback;
@@ -1079,9 +1079,9 @@ static int IgnorePlugin( const char *pluginId )
 }
 
 /* Skip past parts at the beginning of a (pcm) info name that are already in the card name, to avoid duplication */
-static char *SkipCardDetailsInName( char *infoSkipName, char *cardRefName )
+static const char *SkipCardDetailsInName( const char *infoSkipName, const char *cardRefName )
 {
-    char *lastSpacePosn = infoSkipName;
+    const char *lastSpacePosn = infoSkipName;
 
     /* Skip matching chars; but only in chunks separated by ' ' (not part words etc), so track lastSpacePosn */
     while( *cardRefName )
@@ -1238,7 +1238,7 @@ static PaError BuildDeviceList( PaAlsaHostApiRepresentation *alsaApi )
     int res;
     int blocking = SND_PCM_NONBLOCK;
     int usePlughw = 0;
-    char *hwPrefix = "";
+    const char *hwPrefix = "";
     char alsaCardName[50];
 #ifdef PA_ENABLE_DEBUG_OUTPUT
     PaTime startTime = PaUtil_GetTime();
@@ -1292,7 +1292,8 @@ static PaError BuildDeviceList( PaAlsaHostApiRepresentation *alsaApi )
 
         while( alsa_snd_ctl_pcm_next_device( ctl, &devIdx ) == 0 && devIdx >= 0 )
         {
-            char *alsaDeviceName, *deviceName, *infoName;
+	    char *alsaDeviceName, *deviceName;
+	    const char *infoName;
             size_t len;
             int hasPlayback = 0, hasCapture = 0;
 
@@ -1319,7 +1320,7 @@ static PaError BuildDeviceList( PaAlsaHostApiRepresentation *alsaApi )
                 continue;
             }
 
-            infoName = SkipCardDetailsInName( (char *)alsa_snd_pcm_info_get_name( pcmInfo ), cardName );
+            infoName = SkipCardDetailsInName( alsa_snd_pcm_info_get_name( pcmInfo ), cardName );
 
             /* The length of the string written by snprintf plus terminating 0 */
             len = snprintf( NULL, 0, "%s: %s (%s)", cardName, infoName, buf ) + 1;

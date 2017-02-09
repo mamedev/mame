@@ -202,6 +202,7 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "vic1111.h"
 #include "vic1112.h"
 #include "vic1210.h"
+#include "videopak.h"
 #include "speakeasy.h"
 
 SLOT_INTERFACE_START( vic20_expansion_cards )
@@ -211,6 +212,7 @@ SLOT_INTERFACE_START( vic20_expansion_cards )
 	SLOT_INTERFACE("16k", VIC1111)
 	SLOT_INTERFACE("fe3", VIC20_FE3)
 	SLOT_INTERFACE("speakez", VIC20_SPEAKEASY)
+	SLOT_INTERFACE("videopak", VIC20_VIDEO_PAK)
 
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)

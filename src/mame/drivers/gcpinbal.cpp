@@ -23,12 +23,11 @@ TODO
 ----
 
  - Screen flipping support
- - Understand role of bit 5 of IN1
- - Hook up 93C46 EEPROM
- - Hook up ES-8712
- - Sort out the IOC commands for the M6585 & ES-8712
+ - Modernize ES-8712 and hook up to MSM6585 and HCT157
+ - Figure out which customs use D80010-D80077 and merge implementation with Aquarium
  - Is SW3 actually used?
  - Missing row scroll (column scroll?)
+   Reference video showing effect: https://www.youtube.com/watch?v=zBGjncVsSf4
 
 BGMs (controlled by OKI MSM6585 sound chip)
   MSM6585: is an upgraded MSM5205 voice synth IC.
@@ -64,7 +63,7 @@ ES-9209B
    CPU: TMP68HC000P-16
  Sound: OKI M6295
         OKI M6585
-        Ecxellent ES-8712
+        Excellent ES-8712
    OSC: 32MHz, 14.31818MHz & 1056kHz, 640kHz resonators
    RAM: Sony CXK5864BSP-10L 8K x 8bit high speed CMOS SRAM
         Alliance AS7C256-20PC 32K x 8bit CMOS SRAM
@@ -101,13 +100,6 @@ void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_GCPINBAL_INTERRUPT1:
 		m_maincpu->set_input_line(1, HOLD_LINE);
 		break;
-	case TIMER_GCPINBAL_INTERRUPT3:
-		// IRQ3 is from the M6585
-		//if (!ADPCM_playing(0))
-		{
-			m_maincpu->set_input_line(3, HOLD_LINE);
-		}
-		break;
 	default:
 		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
 	}
@@ -118,7 +110,6 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 	/* Unsure of actual sequence */
 
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_GCPINBAL_INTERRUPT1);
-//  timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), TIMER_GCPINBAL_INTERRUPT3);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -127,122 +118,95 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
                           IOC
 ***********************************************************/
 
-READ16_MEMBER(gcpinbal_state::ioc_r)
+WRITE16_MEMBER(gcpinbal_state::d80010_w)
 {
-	/* 20 (only once), 76, a0 are read in log */
-
-	switch (offset)
-	{
-		case 0x80/2:
-			return ioport("DSW")->read();
-
-		case 0x84/2:
-			return ioport("IN0")->read();
-
-		case 0x86/2:
-			return ioport("IN1")->read();
-
-		case 0x50:
-		case 0x51:
-			return m_oki->read(space, 0) << 8;
-
-	}
-
-//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.device().safe_pc(),offset);
-
-	return m_ioc_ram[offset];
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	COMBINE_DATA(&m_d80010_ram[offset]);
 }
 
-
-WRITE16_MEMBER(gcpinbal_state::ioc_w)
+WRITE8_MEMBER(gcpinbal_state::d80040_w)
 {
-	COMBINE_DATA(&m_ioc_ram[offset]);
+	logerror("Writing byte value %02X to offset %X\n", data, offset);
+}
 
-//  switch (offset)
-//  {
-//      case 0x??:  /* */
-//          return;
-//
-//      case 0x88/2:    /* coin control (+ others) ??? */
+WRITE16_MEMBER(gcpinbal_state::d80060_w)
+{
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	COMBINE_DATA(&m_d80060_ram[offset]);
+}
+
+WRITE8_MEMBER(gcpinbal_state::bank_w)
+{
+	// MSM6585 bank, coin LEDs, maybe others?
+	m_msm_bank = data & 0x10 ? 0x100000 : 0;
+	m_oki->set_rom_bank((data & 0x20) >> 5);
+
+	m_bg0_gfxset = (data & 0x04) ? 0x1000 : 0;
+	m_bg1_gfxset = (data & 0x08) ? 0x1000 : 0;
+
 //          machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 //          machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-//popmessage(" address %04x value %04x", offset, data);
-//  }
+}
 
+WRITE8_MEMBER(gcpinbal_state::eeprom_w)
+{
+	// 93C46 serial EEPROM (status read at D80087)
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 0));
+}
+
+WRITE8_MEMBER(gcpinbal_state::es8712_ack_w)
+{
+	// This probably works by resetting the ES-8712
+	m_maincpu->set_input_line(3, CLEAR_LINE);
+	m_adpcm_idle = 1;
+	m_msm->reset_w(1);
+}
+
+WRITE8_MEMBER(gcpinbal_state::es8712_w)
+{
+	// MSM6585/ES-8712 ADPCM - mini emulation
 	switch (offset)
 	{
-		// these are all written every frame
-		case 0x3b:
-		case 0xa:
-		case 0xc:
-		case 0xb:
-		case 0xd:
-		case 0xe:
-		case 0xf:
-		case 0x10:
-		case 0x47:
-			break;
-
-		// MSM6585 bank, coin LEDs, maybe others?
-		case 0x44:
-			m_msm_bank = data & 0x1000 ? 0x100000 : 0;
-			m_oki->set_rom_bank((data & 0x800) >> 11);
-			break;
-
-		case 0x45:
-			//m_adpcm_idle = 1;
-			break;
-
-		// OKIM6295
-		case 0x50:
-		case 0x51:
-			m_oki->write(space, 0, data >> 8);
-			break;
-
-		// MSM6585 ADPCM - mini emulation
-		case 0x60:
+		case 0:
 			m_msm_start &= 0xffff00;
-			m_msm_start |= (data >> 8);
-			break;
-		case 0x61:
-			m_msm_start &= 0xff00ff;
 			m_msm_start |= data;
 			break;
-		case 0x62:
-			m_msm_start &= 0x00ffff;
+		case 1:
+			m_msm_start &= 0xff00ff;
 			m_msm_start |= (data << 8);
 			break;
-		case 0x63:
-			m_msm_end &= 0xffff00;
-			m_msm_end |= (data >> 8);
+		case 2:
+			m_msm_start &= 0x00ffff;
+			m_msm_start |= (data << 16);
 			break;
-		case 0x64:
-			m_msm_end &= 0xff00ff;
+		case 3:
+			m_msm_end &= 0xffff00;
 			m_msm_end |= data;
 			break;
-		case 0x65:
-			m_msm_end &= 0x00ffff;
+		case 4:
+			m_msm_end &= 0xff00ff;
 			m_msm_end |= (data << 8);
 			break;
-		case 0x66:
+		case 5:
+			m_msm_end &= 0x00ffff;
+			m_msm_end |= (data << 16);
+			break;
+		case 6:
+			logerror("ES-8712 playing sample %08x-%08x\n", m_msm_start + m_msm_bank, m_msm_end);
 			if (m_msm_start < m_msm_end)
 			{
 				/* data written here is adpcm param? */
-				//popmessage("%08x %08x", m_msm_start + m_msm_bank, m_msm_end);
 				m_adpcm_idle = 0;
 				m_msm->reset_w(0);
 				m_adpcm_start = m_msm_start + m_msm_bank;
 				m_adpcm_end = m_msm_end;
-//              ADPCM_stop(0);
-//              ADPCM_play(0, start+bank, end-start);
 			}
 			break;
-
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
 			break;
 	}
-
 }
 
 
@@ -251,17 +215,17 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 ************************************************/
 
 
-/* Controlled through ioc? */
+// Controlled through ES-8712
 WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
-	if (!state)
+	if (!state || m_adpcm_idle)
 		return;
-	if (m_adpcm_idle)
-		m_msm->reset_w(1);
 	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
 	{
-		//m_msm->reset_w(1);
-		m_adpcm_start = m_msm_start + m_msm_bank;
+		m_adpcm_idle = 1;
+		m_msm->reset_w(1);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
+		//m_adpcm_start = m_msm_start + m_msm_bank;
 		m_adpcm_trigger = 0;
 	}
 	else
@@ -286,7 +250,17 @@ static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_SHARE("tilemapram")
 	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_SHARE("ioc_ram")
+	AM_RANGE(0xd80010, 0xd8002f) AM_RAM_WRITE(d80010_w) AM_SHARE("d80010")
+	AM_RANGE(0xd80040, 0xd8005b) AM_WRITE8(d80040_w, 0x00ff)
+	AM_RANGE(0xd80060, 0xd80077) AM_RAM_WRITE(d80060_w) AM_SHARE("d80060")
+	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
+	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("IN0")
+	AM_RANGE(0xd80086, 0xd80087) AM_READ_PORT("IN1")
+	AM_RANGE(0xd80088, 0xd80089) AM_WRITE8(bank_w, 0xff00)
+	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE8(eeprom_w, 0xff00)
+	AM_RANGE(0xd8008e, 0xd8008f) AM_WRITE8(es8712_ack_w, 0xff00)
+	AM_RANGE(0xd800a0, 0xd800a1) AM_MIRROR(0x2) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0xd800c0, 0xd800cd) AM_WRITE8(es8712_w, 0xff00)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM /* RAM */
 ADDRESS_MAP_END
 
@@ -368,7 +342,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )  // This bit gets tested (search for d8 00 87)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -445,7 +419,6 @@ void gcpinbal_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_trigger));
-	save_item(NAME(m_adpcm_data));
 }
 
 void gcpinbal_state::machine_reset()
@@ -462,7 +435,6 @@ void gcpinbal_state::machine_reset()
 	m_adpcm_start = 0;
 	m_adpcm_end = 0;
 	m_adpcm_trigger = 0;
-	m_adpcm_data = 0;
 	m_bg0_gfxset = 0;
 	m_bg1_gfxset = 0;
 	m_msm_start = 0;
@@ -476,6 +448,8 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

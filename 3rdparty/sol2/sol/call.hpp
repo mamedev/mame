@@ -52,7 +52,7 @@ namespace sol {
 		struct constructor_match {
 			T* obj;
 
-			constructor_match(T* obj) : obj(obj) {}
+			constructor_match(T* o) : obj(o) {}
 
 			template <typename Fx, std::size_t I, typename... R, typename... Args>
 			int operator()(types<Fx>, index_value<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) const {
@@ -76,7 +76,7 @@ namespace sol {
 				if (meta::find_in_pack_v<index_value<traits::free_arity>, index_value<M>...>::value) {
 					return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
-				if (traits::free_arity != fxarity) {
+				if (!traits::runtime_variadics_t::value && traits::free_arity != fxarity) {
 					return overload_match_arity(types<Fxs...>(), std::index_sequence<In...>(), std::index_sequence<traits::free_arity, M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
 				stack::record tracking{};
@@ -100,7 +100,7 @@ namespace sol {
 				if (meta::find_in_pack_v<index_value<traits::free_arity>, index_value<M>...>::value) {
 					return overload_match_arity(types<>(), std::index_sequence<>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
-				if (traits::free_arity != fxarity) {
+				if (!traits::runtime_variadics_t::value && traits::free_arity != fxarity) {
 					return overload_match_arity(types<>(), std::index_sequence<>(), std::index_sequence<traits::free_arity, M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
 				return matchfx(types<Fx>(), index_value<I>(), return_types(), args_list(), L, fxarity, start, std::forward<Args>(args)...);
@@ -115,7 +115,7 @@ namespace sol {
 				if (meta::find_in_pack_v<index_value<traits::free_arity>, index_value<M>...>::value) {
 					return overload_match_arity(types<Fx1, Fxs...>(), std::index_sequence<I1, In...>(), std::index_sequence<M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
-				if (traits::free_arity != fxarity) {
+				if (!traits::runtime_variadics_t::value && traits::free_arity != fxarity) {
 					return overload_match_arity(types<Fx1, Fxs...>(), std::index_sequence<I1, In...>(), std::index_sequence<traits::free_arity, M...>(), std::forward<Match>(matchfx), L, fxarity, start, std::forward<Args>(args)...);
 				}
 				stack::record tracking{};
@@ -161,7 +161,7 @@ namespace sol {
 
 			userdataref.push();
 			luaL_getmetatable(L, &meta[0]);
-			if (type_of(L, -1) == type::nil) {
+			if (type_of(L, -1) == type::lua_nil) {
 				lua_pop(L, 1);
 				return luaL_error(L, "sol: unable to get usertype metatable");
 			}
@@ -278,7 +278,7 @@ namespace sol {
 #ifdef SOL_SAFE_USERTYPE
 				auto maybeo = stack::check_get<Ta*>(L, 1);
 				if (!maybeo || maybeo.value() == nullptr) {
-					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
+					return luaL_error(L, "sol: received nil for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
 				}
 				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, std::forward<Fx>(f), *o);
@@ -368,9 +368,9 @@ namespace sol {
 				auto maybeo = stack::check_get<Ta*>(L, 1);
 				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
-						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
+						return luaL_error(L, "sol: 'self' argument is lua_nil (bad '.' access?)");
 					}
-					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
+					return luaL_error(L, "sol: 'self' argument is lua_nil (pass 'self' as first argument)");
 				}
 				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, f, *o);
@@ -401,7 +401,7 @@ namespace sol {
 
 				userdataref.push();
 				luaL_getmetatable(L, &metakey[0]);
-				if (type_of(L, -1) == type::nil) {
+				if (type_of(L, -1) == type::lua_nil) {
 					lua_pop(L, 1);
 					return luaL_error(L, "sol: unable to get usertype metatable");
 				}
@@ -430,7 +430,7 @@ namespace sol {
 
 					userdataref.push();
 					luaL_getmetatable(L, &metakey[0]);
-					if (type_of(L, -1) == type::nil) {
+					if (type_of(L, -1) == type::lua_nil) {
 						lua_pop(L, 1);
 						std::string err = "sol: unable to get usertype metatable for ";
 						err += usertype_traits<T>::name();
@@ -501,7 +501,7 @@ namespace sol {
 			};
 
 			static int call(lua_State* L, F& fx) {
-				return overload_match_arity<Fs...>(on_match(), L, lua_gettop(L), 1, fx);
+				return overload_match_arity<Fs...>(on_match(), L, lua_gettop(L) - boost, 1 + boost, fx);
 			}
 		};
 
@@ -521,9 +521,9 @@ namespace sol {
 				auto maybeo = stack::check_get<Ta*>(L, 1);
 				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
-						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
+						return luaL_error(L, "sol: 'self' argument is lua_nil (bad '.' access?)");
 					}
-					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
+					return luaL_error(L, "sol: 'self' argument is lua_nil (pass 'self' as first argument)");
 				}
 				object_type* o = static_cast<object_type*>(maybeo.value());
 #else

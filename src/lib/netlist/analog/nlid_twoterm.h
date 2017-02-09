@@ -348,7 +348,7 @@ NETLIB_OBJECT_DERIVED(D, twoterm)
 {
 public:
 	NETLIB_CONSTRUCTOR_DERIVED(D, twoterm)
-	, m_model(*this, "MODEL", "")
+	, m_model(*this, "MODEL", "D")
 	, m_D(*this, "m_D")
 	{
 		register_subalias("A", m_P);

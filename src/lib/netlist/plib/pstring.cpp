@@ -415,16 +415,19 @@ static inline std::size_t countleadbits(std::size_t x)
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	bool b = s->dec_and_check();
-	if ( b && s != &m_zero)
+	if (s != nullptr)
 	{
-		if (stk != nullptr)
+		bool b = s->dec_and_check();
+		if ( b && s != &m_zero)
 		{
-			size_type sn= ((32 - countleadbits(s->len())) + 1) / 2;
-			stk[sn].push(s);
+			if (stk != nullptr)
+			{
+				size_type sn= ((32 - countleadbits(s->len())) + 1) / 2;
+				stk[sn].push(s);
+			}
+			else
+				plib::pfree_array(reinterpret_cast<char *>(s));
 		}
-		else
-			plib::pfree_array(reinterpret_cast<char *>(s));
 	}
 }
 

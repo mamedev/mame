@@ -15,7 +15,7 @@
 #include <mutex>
 
 #include "nl_config.h"
-#include "nl_types.h"
+#include "netlist_types.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
 #include "plib/ptypes.h"
@@ -52,12 +52,13 @@ namespace netlist
 	{
 	public:
 
-		struct entry_t
+		struct entry_t final
 		{
-			entry_t() { }
-			entry_t(const Time &t, const Element &o) : m_exec_time(t), m_object(o) { }
-			entry_t(const entry_t &e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
-			entry_t(entry_t &&e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
+			constexpr entry_t() : m_exec_time(), m_object(nullptr) { }
+			constexpr entry_t(const Time &t, const Element &o) : m_exec_time(t), m_object(o) { }
+			constexpr entry_t(const entry_t &e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
+			constexpr entry_t(entry_t &&e) : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
+			~entry_t() = default;
 
 			entry_t& operator=(entry_t && other)
 			{
@@ -76,8 +77,8 @@ namespace netlist
 			clear();
 		}
 
-		std::size_t capacity() const { return m_list.size(); }
-		bool empty() const { return (m_end == &m_list[1]); }
+		constexpr std::size_t capacity() const { return m_list.size(); }
+		constexpr bool empty() const { return (m_end == &m_list[1]); }
 
 		void push(entry_t &&e) noexcept
 		{
@@ -95,9 +96,13 @@ namespace netlist
 			m_prof_call.inc();
 		}
 
+#if 0
 		entry_t pop() noexcept              { return std::move(*(--m_end)); }
 		const entry_t &top() const noexcept { return std::move(*(m_end-1)); }
-
+#else
+		entry_t pop() noexcept              { return *(--m_end); }
+		const entry_t &top() const noexcept { return *(m_end-1); }
+#endif
 		void remove(const Element &elem) noexcept
 		{
 			/* Lock */
@@ -137,9 +142,9 @@ namespace netlist
 
 		// save state support & mame disasm
 
-		const entry_t *listptr() const { return &m_list[1]; }
-		std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
-		const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
+		constexpr const entry_t *listptr() const { return &m_list[1]; }
+		constexpr std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
+		constexpr const entry_t & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
 
 	private:
 	#if HAS_OPENMP && USE_OPENMP
