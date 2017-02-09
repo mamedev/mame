@@ -175,6 +175,25 @@ extern const game_driver GAME_NAME(NAME) =  \
 	nullptr                                    \
 };
 
+// standard computer definition macro with additional monitor type
+#define COMPM(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)   \
+extern const game_driver GAME_NAME(NAME) =  \
+{                                           \
+	__FILE__,                               \
+	#PARENT,                                \
+	#NAME,                                  \
+	FULLNAME,                               \
+	#YEAR,                                  \
+	COMPANY,                                \
+	MACHINE_CONFIG_NAME(MACHINE),           \
+	INPUT_PORTS_NAME(INPUT),                \
+	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	ROM_NAME(NAME),                         \
+	#COMPAT,                                \
+	(MONITOR)|(FLAGS)|GAME_TYPE_COMPUTER,        \
+	NULL                                    \
+};
+
 // standard system definition macro
 #define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)   \
 extern const game_driver GAME_NAME(NAME) =  \
