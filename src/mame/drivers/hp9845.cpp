@@ -265,7 +265,10 @@ hp9845b_state::hp9845b_state(const machine_config &mconfig, device_type type, co
 			  m_t15(*this , "t15"),
 			  m_beeper(*this , "beeper"),
 			  m_beep_timer(*this , "beep_timer"),
-			  m_io_slot0(*this , "slot0")
+			  m_io_slot0(*this , "slot0"),
+			  m_io_slot1(*this , "slot1"),
+			  m_io_slot2(*this , "slot2"),
+			  m_io_slot3(*this , "slot3")
 {
 }
 
@@ -1127,6 +1130,9 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 
 	MCFG_HP9845_IO_SLOT_ADD("slot0")
+	MCFG_HP9845_IO_SLOT_ADD("slot1")
+	MCFG_HP9845_IO_SLOT_ADD("slot2")
+	MCFG_HP9845_IO_SLOT_ADD("slot3")
 MACHINE_CONFIG_END
 
 ROM_START( hp9845a )
