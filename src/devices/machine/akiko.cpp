@@ -499,8 +499,6 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 
 		if (LOG_AKIKO_CD) logerror( "DMA: sector %d - address %08x\n", m_cdrom_lba_cur, m_cdrom_address[0] + (index*4096) );
 
-		printf( "DMA: sector %d - address %08x\n", m_cdrom_lba_cur, m_cdrom_address[0] + (index*4096) );
-
 		// write sector data to host memory
 		for (int i = 0; i < 2352; i++)
 			mem_w8(m_cdrom_address[0] + (index*4096) + i, buf[i]);
