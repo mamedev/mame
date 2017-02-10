@@ -707,21 +707,6 @@ static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM         /* Internal RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metro_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(metro_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(metro_sound_rombank_w)
-ADDRESS_MAP_END
-
-/*****************/
-
-
-static ADDRESS_MAP_START( daitorid_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(daitorid_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(daitorid_sound_rombank_w)
-ADDRESS_MAP_END
-
 /*****************/
 
 
@@ -3656,6 +3641,27 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_FRAGMENT( metro_upd7810_sound )
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, metro_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( daitorid_upd7810_sound )
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, daitorid_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, daitorid_sound_rombank_w))
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( daitorid, metro_state )
 
 	/* basic machine hardware */
@@ -3664,10 +3670,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3705,10 +3708,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3745,10 +3745,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3785,10 +3782,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3825,10 +3819,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3864,10 +3855,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4046,10 +4034,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4086,10 +4071,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4126,10 +4108,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)     /* Not confiremd */
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4167,10 +4146,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4207,10 +4183,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
