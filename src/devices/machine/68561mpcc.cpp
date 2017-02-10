@@ -43,41 +43,36 @@ FEATURES
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-#define LOG_GENERAL 0x001
-#define LOG_SETUP   0x002
-#define LOG_PRINTF  0x004
-#define LOG_READ    0x008
-#define LOG_INT     0x010
-#define LOG_CMD     0x020
-#define LOG_TX      0x040
-#define LOG_RCV     0x080
-#define LOG_CTS     0x100
-#define LOG_DCD     0x200
-#define LOG_SYNC    0x400
-#define LOG_CHAR    0x800
-#define LOG_RX     0x1000
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
+#define LOG_READ    (1U <<  4)
+#define LOG_CMD     (1U <<  5)
+#define LOG_TX      (1U <<  6)
+#define LOG_RCV     (1U <<  7)
+#define LOG_CTS     (1U <<  8)
+#define LOG_DCD     (1U <<  9)
+#define LOG_SYNC    (1U <<  10)
+#define LOG_CHAR    (1U <<  11)
+#define LOG_RX      (1U <<  12)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_GENERAL)
+//#define VERBOSE ( LOG_SETUP | LOG_GENERAL | LOG_INT)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
-#define LOGCMD(...)   LOGMASK(LOG_CMD,     __VA_ARGS__)
-#define LOGTX(...)    LOGMASK(LOG_TX,      __VA_ARGS__)
-#define LOGRCV(...)   LOGMASK(LOG_RCV,     __VA_ARGS__)
-#define LOGCTS(...)   LOGMASK(LOG_CTS,     __VA_ARGS__)
-#define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
-#define LOGSYNC(...)  LOGMASK(LOG_SYNC,    __VA_ARGS__)
-#define LOGCHAR(...)  LOGMASK(LOG_CHAR,    __VA_ARGS__)
-#define LOGRX(...)    LOGMASK(LOG_RX,      __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
+#define LOGCHAR(...)  LOGMASKED(LOG_CHAR,    __VA_ARGS__)
+#define LOGRX(...)    LOGMASKED(LOG_RX,      __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -104,6 +99,7 @@ const device_type MPCC68561A = &device_creator<mpcc68561A_device>;
 mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	  device_serial_interface(mconfig, *this),
+	  m_irq(CLEAR_LINE),
 	  m_variant(variant),
 	  m_rxc(0),
 	  m_txc(0),
@@ -282,17 +278,17 @@ void mpcc_device::device_reset()
 
 	// Init out callbacks to known inactive state
 	m_out_txd_cb(1);
-	m_out_dtr_cb(1);
-	m_out_rts_cb(1);
-	m_out_rtxc_cb(1);
-	m_out_trxc_cb(1);
-	m_out_int_cb(1);
+	m_out_dtr_cb(CLEAR_LINE);
+	m_out_rts_cb(CLEAR_LINE);
+	m_out_rtxc_cb(CLEAR_LINE);
+	m_out_trxc_cb(CLEAR_LINE);
+	m_out_int_cb(CLEAR_LINE);
+	m_irq = CLEAR_LINE;
 }
 
 /*
  * Serial device implementation
  */
-
 void mpcc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	device_serial_interface::device_timer(timer, id, param, ptr);
@@ -614,7 +610,6 @@ void mpcc_device::tra_complete()
 		// Check if Tx interrupts are enabled
 		if (m_tier & REG_TIER_TDRA)
 		{
-			// TODO: Check circumstances, eg int on first or every character etc
 			trigger_interrupt(INT_TX_TDRA);
 		}
 	}       // Check if sending BREAK
@@ -709,18 +704,27 @@ void mpcc_device::check_interrupts()
 	}
 
 	// update IRQ line
-	// If we are not serving any interrupt the IRQ is asserted already and we need to do nothing
+	// If we are not serving any interrupt we need to check for a new interrupt or 
+	//   otherwise the IRQ line is asserted already and we need to do nothing
 	if ((state & INT_ACK) == 0)
 	{
 		// If there is a new interrupt not yet acknowledged IRQ needs to be asserted
 		if (state & INT_REQ)
 		{
-			m_out_int_cb(ASSERT_LINE);
+			if (m_irq != ASSERT_LINE)
+			{
+				m_out_int_cb(ASSERT_LINE);
+				m_irq = ASSERT_LINE;
+			}
 		}
 		// Otherwise we just clear the IRQ line allowing other devices to interrupt
 		else
 		{
-			m_out_int_cb(CLEAR_LINE);
+			if (m_irq != CLEAR_LINE)
+			{
+				m_out_int_cb(CLEAR_LINE);
+				m_irq = CLEAR_LINE;
+			}
 		}
 	}
 }
@@ -773,6 +777,62 @@ void mpcc_device::trigger_interrupt(int source)
 	check_interrupts();
 }
 
+//-------------------------------------------------------------------------
+//  update_interrupt - called when an interrupt condition has been cleared
+//-------------------------------------------------------------------------
+void mpcc_device::update_interrupts(int source)
+{
+	LOGINT("%s %s \n",FUNCNAME, tag());
+
+	switch(source)
+	{
+	case INT_TX_TDRA:
+	case INT_TX_TFC:
+	case INT_TX_TUNRN:
+	case INT_TX_TFERR:
+		if ( m_tsr & (REG_TSR_TDRA | REG_TSR_TFC | REG_TSR_TUNRN | REG_TSR_TFERR) )
+		{
+			LOGINT(" - Found unserved TX interrupt %02x\n", m_tsr);
+			m_int_state[TX_INT_PRIO] = INT_REQ; // Still TX interrupts to serve
+		}
+		else
+		{
+			m_int_state[TX_INT_PRIO] = INT_NONE; // No more TX interrupts to serve
+		}
+		break;
+	case INT_RX_RDA:
+	case INT_RX_EOF:
+	case INT_RX_CPERR:
+	case INT_RX_FRERR:
+	case INT_RX_ROVRN:
+	case INT_RX_RAB:
+		if ( m_rsr & (REG_RSR_RDA | REG_RSR_EOF | REG_RSR_CPERR | REG_RSR_FRERR | REG_RSR_ROVRN | REG_RSR_RAB))
+		{
+			LOGINT(" - Found unserved RX interrupt %02x\n", m_rsr);
+			m_int_state[RX_INT_PRIO] = INT_REQ; // Still RX interrupts to serve
+		}
+		else
+		{
+			m_int_state[RX_INT_PRIO] = INT_NONE; // No more RX interrupts to serve
+		}
+		break;
+	case INT_SR_CTS:
+	case INT_SR_DSR:
+	case INT_SR_DCD:
+		if ( m_sisr & (REG_SISR_CTST | REG_SISR_DSRT | REG_SISR_DCDT ) )
+		{
+			LOGINT(" - Found unserved SR interrupt %02x\n", m_sisr);
+			m_int_state[SR_INT_PRIO] = INT_REQ; // Still SR interrupts to serve
+		}
+		else
+		{
+			m_int_state[SR_INT_PRIO] = INT_NONE; // No more SR interrupts to serve
+		}
+		break;
+	}
+	check_interrupts();
+}
+
 //-------------------------------------------------
 //  Read register
 //-------------------------------------------------
@@ -785,9 +845,9 @@ READ8_MEMBER( mpcc_device::read )
 	case 0x00: data = do_rsr(); break;
 	case 0x01: data = do_rcr(); break;
 	case 0x02: data = do_rdr(); break;
-	case 0x04: data = m_rivnr; logerror("MPCC: Reg RIVNR not implemented\n"); break;
+	case 0x04: data = do_rivnr(); break;
 	case 0x05: data = do_rier(); break;
-	case 0x08: data = m_tsr; break; logerror("MPCC: Reg TSR not implemented\n"); break;
+	case 0x08: data = do_tsr(); break;
 	case 0x09: data = do_tcr(); break;
 	//case 0x0a: data = m_tdr; break; // TDR is a write only register
 	case 0x0c: data = do_tivnr(); break;
@@ -804,9 +864,9 @@ READ8_MEMBER( mpcc_device::read )
 	case 0x1d: data = do_brdr2(); break;
 	case 0x1e: data = do_ccr(); break;
 	case 0x1f: data = do_ecr(); break;
-	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
+	default: logerror("%s:%s invalid register accessed: %02x\n", m_owner->tag(), tag(), offset);
 	}
-	LOGR(" * %s Reg %02x -> %02x  \n", m_owner->tag(), offset, data);
+	LOGR(" * %s Reg %02x -> %02x  \n", tag(), offset, data);
 	return data;
 }
 
@@ -815,15 +875,15 @@ READ8_MEMBER( mpcc_device::read )
 //-------------------------------------------------
 WRITE8_MEMBER( mpcc_device::write )
 {
-	LOGSETUP(" * %s Reg %02x <- %02x  \n", m_owner->tag(), offset, data);
+	LOGSETUP(" * %s Reg %02x <- %02x  \n", tag(), offset, data);
 	switch(offset)
 	{
 	case 0x00: do_rsr(data); break;
 	case 0x01: do_rcr(data); break;
 	//case 0x02: m_rdr = data; break; // RDR is a read only register
-	case 0x04: m_rivnr = data; logerror("MPCC: Reg RIVNR not implemented\n"); break;
+	case 0x04: do_rivnr(data); break;
 	case 0x05: do_rier(data); break;
-	case 0x08: m_tsr = data; logerror("MPCC: Reg TSR not implemented\n"); break;
+	case 0x08: do_tsr(data); break;
 	case 0x09: do_tcr(data); break;
 	case 0x0a: m_tdr = data; LOGCHAR("*%c", data); do_tdr(data); break;
 	case 0x0c: do_tivnr(data); break;
@@ -840,14 +900,17 @@ WRITE8_MEMBER( mpcc_device::write )
 	case 0x1d: do_brdr2(data); break;
 	case 0x1e: do_ccr(data); break;
 	case 0x1f: do_ecr(data); break;
-	default: logerror("%s invalid register accessed: %02x\n", m_owner->tag(), offset);
+	default: logerror("%s:%s invalid register accessed: %02x\n", m_owner->tag(), tag(), offset);
 	}
 }
 
+// TODO: Sync clear of error bits with readout from fifo
+// TODO: implement Idle bit
 void mpcc_device::do_rsr(uint8_t data)
 {
 	LOG("%s -> %02x\n", FUNCNAME, data);
 	m_rsr = data;
+	update_interrupts(INT_RX);
 }
 
 uint8_t mpcc_device::do_rsr()
@@ -886,6 +949,13 @@ uint8_t mpcc_device::do_rdr()
 	{
 		// load data from the FIFO
 		data = m_rx_data_fifo.dequeue();
+
+		// Check if this was the last data and reset the interrupt and status register accordingly
+		if (m_rx_data_fifo.empty())
+		{
+			m_rsr &= ~REG_RSR_RDA;
+			update_interrupts(INT_RX_RDA);
+		}
 	}
 	else
 	{
@@ -897,6 +967,19 @@ uint8_t mpcc_device::do_rdr()
 	return data;
 }
 
+void mpcc_device::do_rivnr(uint8_t data)
+{
+	LOG("%s -> %02x\n", FUNCNAME, data);
+	m_rivnr = data;
+	LOGSETUP(" - Rx Int vector: %02x\n", m_tivnr);
+}
+
+uint8_t mpcc_device::do_rivnr()
+{
+	uint8_t data = m_rivnr;
+	LOG("%s <- %02x\n", FUNCNAME, data);
+	return data;
+}
 
 void mpcc_device::do_rier(uint8_t data)
 {
@@ -932,6 +1015,7 @@ void mpcc_device::do_tdr(uint8_t data)
 		if (m_tx_data_fifo.full())
 		{
 			m_tsr &= ~REG_TSR_TDRA; // Mark fifo as full
+			update_interrupts(INT_TX_TDRA);
 		}
 	}
 
@@ -944,12 +1028,30 @@ void mpcc_device::do_tdr(uint8_t data)
 			LOGTX("- Setting up transmitter\n");
 			transmit_register_setup(m_tx_data_fifo.dequeue()); // Load the shift register, reload is done in tra_complete()
 			m_tsr |= REG_TSR_TDRA; // Now there is a slot in the FIFO available again
+			if (m_tier & REG_TIER_TDRA)
+			{
+				trigger_interrupt(INT_TX_TDRA);
+			}
 		}
 		else
 		{
 			LOGTX("- Transmitter not empty\n");
 		}
 	}
+}
+
+void mpcc_device::do_tsr(uint8_t data)
+{
+	LOGINT("%s -> %02x\n", FUNCNAME, data);
+	m_tsr = data;
+	update_interrupts(INT_TX);
+}
+
+uint8_t mpcc_device::do_tsr()
+{
+	uint8_t data = m_tsr;
+	LOGR("%s <- %02x\n", FUNCNAME, data);
+	return data;
 }
 
 void mpcc_device::do_tcr(uint8_t data)
@@ -1012,6 +1114,7 @@ void mpcc_device::do_sisr(uint8_t data)
 	if (data & REG_SISR_CTST) m_sisr &= ~REG_SISR_CTST;
 	if (data & REG_SISR_DSRT) m_sisr &= ~REG_SISR_DSRT;
 	if (data & REG_SISR_DCDT) m_sisr &= ~REG_SISR_DCDT;
+	update_interrupts(INT_SR);
 
 	LOGSETUP(" - CTS %d transitioned: %d\n", (m_sisr & REG_SISR_CTSLVL) ? 1 :0, (m_sisr & REG_SISR_CTST) ? 1 : 0);
 	LOGSETUP(" - DSR %d transitioned: %d\n", (m_sisr & REG_SISR_DSRLVL) ? 1 :0, (m_sisr & REG_SISR_DSRT) ? 1 : 0);
