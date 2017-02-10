@@ -116,7 +116,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
-
+	virtual uint8_t* get_cart_base();
 private:
 	static const device_timer_id TIMER_FLP_CLEAR = 0;
 

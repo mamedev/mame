@@ -203,3 +203,16 @@ WRITE8_MEMBER(z88cart_slot_device::write)
 	if (m_cart)
 		m_cart->write(space, offset, data);
 }
+
+
+/*-------------------------------------------------
+    get_cart_base
+-------------------------------------------------*/
+
+uint8_t* z88cart_slot_device::get_cart_base()
+{
+	if (m_cart)
+		return m_cart->get_cart_base();
+	else
+		return nullptr;
+}

@@ -21,7 +21,20 @@ inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t c
 // convert absolute offset into correct address to get data from
 inline uint8_t* z88_state::convert_address(uint32_t offset)
 {
-	return (offset < 0x80000 ? m_bios : m_ram_base) + (offset & 0x7ffff);
+	uint8_t *ptr = nullptr;
+
+	if (offset < 0x080000) // rom
+		ptr = m_bios + (offset & 0x7ffff);
+	else if (offset < 0x100000) // slot0
+		ptr = m_ram_base + (offset & 0x7ffff);
+	else if (offset < 0x200000) // slot1
+		ptr = m_carts[1]->get_cart_base() + (offset & 0xfffff);
+	else if (offset < 0x300000) // slot2
+		ptr = m_carts[2]->get_cart_base() + (offset & 0xfffff);
+	else if (offset < 0x400000) // slot3
+		ptr = m_carts[3]->get_cart_base() + (offset & 0xfffff);
+
+	return ptr;
 }
 
 /***************************************************************************
