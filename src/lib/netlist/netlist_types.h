@@ -9,12 +9,12 @@
 #ifndef NETLIST_TYPES_H_
 #define NETLIST_TYPES_H_
 
-#include <cstdint>
-#include <unordered_map>
-
 #include "nl_config.h"
 #include "plib/pchrono.h"
 #include "plib/pstring.h"
+
+#include <cstdint>
+#include <unordered_map>
 
 namespace netlist
 {

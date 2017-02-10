@@ -5,9 +5,6 @@
  *
  */
 
-#include <cstring>
-#include <cmath>
-
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
@@ -20,6 +17,9 @@
 #include "macro/nlm_base.h"
 
 #include "nl_errstr.h"
+
+#include <cstring>
+#include <cmath>
 
 namespace netlist
 {

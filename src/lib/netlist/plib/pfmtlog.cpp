@@ -5,13 +5,13 @@
  *
  */
 
+#include "pfmtlog.h"
+#include "palloc.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdarg>
 #include <algorithm>
-
-#include "pfmtlog.h"
-#include "palloc.h"
 
 namespace plib {
 

@@ -8,9 +8,10 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
+#include "pstring.h"
+
 #include <vector>
 #include <memory>
-#include "pstring.h"
 
 namespace plib {
 

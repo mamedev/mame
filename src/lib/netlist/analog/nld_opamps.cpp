@@ -11,7 +11,6 @@
 #include "nlid_twoterm.h"
 #include "nlid_fourterm.h"
 
-
 #include <cmath>
 
 namespace netlist

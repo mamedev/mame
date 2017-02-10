@@ -7,11 +7,11 @@
 #ifndef NLTIME_H_
 #define NLTIME_H_
 
-#include <cstdint>
-
 #include "nl_config.h"
 #include "plib/ptypes.h"
 #include "plib/pstate.h"
+
+#include <cstdint>
 
 //============================================================
 //  MACROS

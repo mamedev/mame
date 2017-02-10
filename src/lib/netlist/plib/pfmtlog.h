@@ -7,10 +7,10 @@
 #ifndef PFMT_H_
 #define PFMT_H_
 
-#include <limits>
-
 #include "pstring.h"
 #include "ptypes.h"
+
+#include <limits>
 
 namespace plib {
 

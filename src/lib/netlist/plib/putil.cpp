@@ -1,14 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "putil.h"
+#include "ptypes.h"
+#include "plists.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include <initializer_list>
-
-#include "putil.h"
-#include "ptypes.h"
-#include "plists.h"
 
 namespace plib
 {
