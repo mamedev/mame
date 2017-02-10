@@ -69,6 +69,9 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
 	required_device<hp9845_io_slot_device> m_io_slot0;
+	required_device<hp9845_io_slot_device> m_io_slot1;
+	required_device<hp9845_io_slot_device> m_io_slot2;
+	required_device<hp9845_io_slot_device> m_io_slot3;
 
 	void set_video_mar(uint16_t mar);
 	void video_fill_buff(bool buff_idx);
