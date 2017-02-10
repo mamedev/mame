@@ -385,7 +385,16 @@ public:
 			m_chip_ram.write(byteoffs >> 1, data);
 	}
 
-	DECLARE_READ16_MEMBER(chip_ram_r) { return chip_ram_r(offset); }
+	DECLARE_READ16_MEMBER(chip_ram_r)
+	{
+		return chip_ram_r(offset & ~1) & mem_mask;
+	}
+
+	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	{
+		uint16_t val = chip_ram_r(offset & ~1) & ~mem_mask;
+		chip_ram_w(offset & ~1, val | data);
+	}
 
 	/* sprite states */
 	uint8_t m_sprite_comparitor_enable_mask;

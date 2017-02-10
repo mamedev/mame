@@ -337,6 +337,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
 
+	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
 	DECLARE_DRIVER_INIT(cubo);
@@ -374,6 +375,12 @@ private:
 	void mgnumber_input_hack();
 	void mgprem11_input_hack();
 };
+
+
+WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
+{
+	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
+}
 
 
 /*************************************
@@ -1033,7 +1040,10 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_I2CMEM_PAGE_SIZE(16)
 	MCFG_I2CMEM_DATA_SIZE(1024)
 
-	MCFG_AKIKO_ADD("akiko", "maincpu")
+	MCFG_AKIKO_ADD("akiko")
+	MCFG_AKIKO_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AKIKO_INT_CB(WRITELINE(cubo_state, akiko_int_w))
 	MCFG_AKIKO_SCL_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_scl))
 	MCFG_AKIKO_SDA_READ_HANDLER(DEVREADLINE("i2cmem", i2cmem_device, read_sda))
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
