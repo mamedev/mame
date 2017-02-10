@@ -72,6 +72,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-5012 Ganbare Chinsan Ooshoubu  NEC MC-8123A       804B54  1C00
 317-5??? Ninja Kid II (sound CPU)  NEC MC-8123A 646   27998D  1800
 317-???? Center Court (sound CPU)  NEC MC-8123B 703   640506  1800
+312-???? Omega                                        861226  1C00?
 
 ***************************************************************************/
 
