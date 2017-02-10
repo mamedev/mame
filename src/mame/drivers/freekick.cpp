@@ -175,6 +175,15 @@ WRITE8_MEMBER(freekick_state::freekick_ff_w)
  *
  *************************************/
 
+static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM // ram is 2x sony cxk5813d-55
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram")   // from gigas, just to have a region
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")  // from gigas, just to have a region
+	AM_RANGE(0xd900, 0xdfff) AM_RAM
+	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -265,6 +274,38 @@ ADDRESS_MAP_END
  *  Game-specific port definitions
  *
  *************************************/
+
+static INPUT_PORTS_START( omega )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW3:8")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( pbillrd )
 	PORT_START("IN0")
@@ -618,6 +659,31 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 	m_cnt = 0;
 }
 
+static MACHINE_CONFIG_START( omega, freekick_state )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_CPU_PROGRAM_MAP(omega_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+
+	// video hardware
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x200)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( base, freekick_state )
 
 	/* basic machine hardware */
@@ -721,6 +787,33 @@ MACHINE_CONFIG_END
  *  ROM definition(s)
  *
  *************************************/
+
+ROM_START( omega )
+	ROM_REGION(0xc000, "maincpu", 0) // encrypted
+	ROM_LOAD("17.m10", 0x0000, 0x4000, CRC(c7de0993) SHA1(35ecd464935faba1dc7d0dbf48e1b17153626bfd)) // 27128
+	ROM_LOAD("8.n10",  0x4000, 0x8000, CRC(9bb61910) SHA1(f8a1210dbf93e901e246e6adf4cd905acc3ef376)) // 27256
+
+	ROM_REGION(0x2000, "user1", 0) // MC8123 key
+	ROM_LOAD("omega.key", 0x0000, 0x2000, CRC(0a63943f) SHA1(9e581ea0c5bf6c0ed5d402d3bab053766b8e44c2))
+
+	ROM_REGION(0xc000, "gfx1", 0)
+	ROM_LOAD("1.a10",  0x00000, 0x04000, CRC(e0aeada9) SHA1(ed00f6dca4f9701ff89390922d39341b179597c7)) // 27128
+	ROM_LOAD("2.c10",  0x04000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
+	ROM_LOAD("3.d10",  0x08000, 0x04000, CRC(c678b202) SHA1(ee93385e11158ccaf51a22d813bd7020c04cfdad)) // 27128
+
+	ROM_REGION(0xc000, "gfx2", 0)
+	ROM_LOAD("4.f10",  0x00000, 0x04000, CRC(bf780a8e) SHA1(53bfabf74f1a7782c6c1803498a24da0bf8db995)) // 27128
+	ROM_LOAD("5.h10",  0x04000, 0x04000, CRC(b491647f) SHA1(88017033a781ecc49a83241bc49e2077a480ac2b)) // 27128
+	ROM_LOAD("6.j10",  0x08000, 0x04000, CRC(65beba5b) SHA1(e6d61dc52dcbb30570b48d7b1d7807dd0be41400)) // 27128
+
+	ROM_REGION(0x600, "proms", 0)
+	ROM_LOAD("tbp24s10n.3e", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD("tbp24s10n.3f", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD("tbp24s10n.3g", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD("tbp24s10n.4e", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD("tbp24s10n.4f", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD("tbp24s10n.4g", 0x000, 0x100, NO_DUMP)
+ROM_END
 
 ROM_START( pbillrd )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
@@ -1078,41 +1171,6 @@ ROM_START( gigasm2b )
 ROM_END
 
 
-ROM_START( omega )
-	ROM_REGION(0xc000, "maincpu", 0) // encrypted
-	ROM_LOAD("17.m10", 0x0000, 0x4000, CRC(c7de0993) SHA1(35ecd464935faba1dc7d0dbf48e1b17153626bfd)) // 27128
-	ROM_LOAD("8.n10",  0x4000, 0x8000, CRC(9bb61910) SHA1(f8a1210dbf93e901e246e6adf4cd905acc3ef376)) // 27256
-
-	ROM_REGION(0x2000, "user1", 0) // MC8123 key
-	ROM_LOAD("omega.key", 0x0000, 0x2000, CRC(0a63943f) SHA1(9e581ea0c5bf6c0ed5d402d3bab053766b8e44c2))
-
-	ROM_REGION(0xc000, "gfx1", 0)
-	ROM_LOAD("4.f10",  0x00000, 0x04000, CRC(bf780a8e) SHA1(53bfabf74f1a7782c6c1803498a24da0bf8db995)) // 27128
-	ROM_LOAD("5.h10",  0x04000, 0x04000, CRC(b491647f) SHA1(88017033a781ecc49a83241bc49e2077a480ac2b)) // 27128
-	ROM_LOAD("6.j10",  0x08000, 0x04000, CRC(65beba5b) SHA1(e6d61dc52dcbb30570b48d7b1d7807dd0be41400)) // 27128
-
-	ROM_REGION(0xc000, "gfx2", 0)
-	ROM_LOAD("1.a10",  0x00000, 0x04000, CRC(e0aeada9) SHA1(ed00f6dca4f9701ff89390922d39341b179597c7)) // 27128
-	ROM_LOAD("3.d10",  0x04000, 0x04000, CRC(c678b202) SHA1(ee93385e11158ccaf51a22d813bd7020c04cfdad)) // 27128
-	ROM_LOAD("2.c10",  0x08000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
-	// are the above two roms swapped properly here? they are in the '1,3,2' order on gigas but that may be incorrect here...
-
-	ROM_REGION(0x600, "proms", 0)
-	ROM_LOAD("tbp24s10n.3e", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.3f", 0x100, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.3g", 0x200, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4e", 0x300, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4f", 0x400, 0x100, NO_DUMP)
-	ROM_LOAD("tbp24s10n.4g", 0x500, 0x100, NO_DUMP)
-	// temporarily using gigas' color proms for now until the proms above get dumped; wrong colors on sprites/gfx2 layer.
-	ROM_LOAD( "3a.bin", 0x0000, 0x0100, BAD_DUMP CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) )
-	ROM_LOAD( "4d.bin", 0x0100, 0x0100, BAD_DUMP CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) )
-	ROM_LOAD( "4a.bin", 0x0200, 0x0100, BAD_DUMP CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) )
-	ROM_LOAD( "3d.bin", 0x0300, 0x0100, BAD_DUMP CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) )
-	ROM_LOAD( "3b.bin", 0x0400, 0x0100, BAD_DUMP CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) )
-	ROM_LOAD( "3c.bin", 0x0500, 0x0100, BAD_DUMP CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
-ROM_END
-
 
 ROM_START( gigas ) /* From an actual Sega board 834-6167 with mc-8123: 317-5002 */
 /* The MC-8123 is located on a small daughterboard which plugs into the z80 socket;
@@ -1156,7 +1214,6 @@ XTAL: 18.432MHz
 PROMs: 82s129 x6 (not dumped yet, probably match existing archives....)
 
 Note: MCU dump has fixed bits, but read is good. If not correct, it's protected.
-Note2: what mcu dump? the 8748 in oigas?
 */
 
 ROM_START( gigasb )
@@ -1252,11 +1309,11 @@ DRIVER_INIT_MEMBER(freekick_state,gigas)
  *
  *************************************/
 /*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT     ROT     COMPANY                         FULLNAME                                FLAGS  */
+GAME( 1986, omega,     0,        omega,     omega,    freekick_state, gigas,   ROT270, "Nihon System",                 "Omega",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigas,     0,        gigas,     gigas,    freekick_state, gigas,   ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasb,    gigas,    gigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, oigas,     gigas ,   oigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1986, omega,     gigas,    gigas,     gigas,    freekick_state, gigas,   ROT270, "Nihon System",                 "Omega",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // not working due to protection issues (it is impossible to die)... is omega the prototype the undumped gigas MarkII non-bootleg? or is it a special 'redemption version' of the undumped gigas MarkII? It has a giant "MarkII" logo in its gfx roms...
 GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  driver_device,  0,       ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrds,  pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pbillrdsa, pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", MACHINE_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
