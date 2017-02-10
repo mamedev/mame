@@ -73,10 +73,6 @@ void pci9050_device::device_start()
 	m_user_output_handler.resolve();
 }
 
-void pci9050_device::device_config_complete()
-{
-}
-
 void pci9050_device::device_reset()
 {
 	pci_device::device_reset();

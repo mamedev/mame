@@ -1772,13 +1772,3 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_groups, 0, sizeof(m_groups));
 	memset(m_regs_main, 0, sizeof(m_regs_main));
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf271_device::device_config_complete()
-{
-}

@@ -176,13 +176,3 @@ ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, dev
 		m_irq_handler(*this)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym3812_device::device_config_complete()
-{
-}

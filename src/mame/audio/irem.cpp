@@ -42,16 +42,6 @@ m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, co
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void irem_audio_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

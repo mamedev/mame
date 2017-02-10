@@ -57,16 +57,6 @@ phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const 
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void phoenix_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

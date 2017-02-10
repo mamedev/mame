@@ -1035,13 +1035,3 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 		m_last_fm_data(0)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf278b_device::device_config_complete()
-{
-}

@@ -16,14 +16,6 @@ igs028_device::igs028_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void igs028_device::device_config_complete()
-{
-}
-
-void igs028_device::device_validity_check(validity_checker &valid) const
-{
-}
-
 void igs028_device::device_start()
 {
 	m_sharedprotram = nullptr;

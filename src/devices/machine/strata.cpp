@@ -201,16 +201,6 @@ void strataflash_device::device_start(void)
 		m_prot_regs[i] = machine().rand();
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void strataflash_device::device_config_complete()
-{
-}
-
 /*
     read a 8/16-bit word from FEEPROM
 */

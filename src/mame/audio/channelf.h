@@ -18,7 +18,6 @@ public:
 	void sound_w(int mode);
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides

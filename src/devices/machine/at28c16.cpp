@@ -43,32 +43,11 @@ at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, 
 	: device_t(mconfig, AT28C16, "AT28C16", tag, owner, clock, "at28c16", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_space_config("at28c16", ENDIANNESS_BIG, 8,  12, 0, *ADDRESS_MAP_NAME( at28c16_map8 )),
 		m_a9_12v( 0 ),
 		m_oe_12v( 0 ),
 		m_last_write( -1 ),
 		m_default_data(*this, DEVICE_SELF, AT28C16_DATA_BYTES)
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void at28c16_device::device_config_complete()
-{
-	m_space_config = address_space_config( "at28c16", ENDIANNESS_BIG, 8,  12, 0, *ADDRESS_MAP_NAME( at28c16_map8 ) );
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void at28c16_device::device_validity_check(validity_checker &valid) const
 {
 }
 
@@ -95,15 +74,6 @@ void at28c16_device::device_start()
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );
 	save_item( NAME(m_last_write) );
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void at28c16_device::device_reset()
-{
 }
 
 
