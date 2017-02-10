@@ -159,6 +159,12 @@ public:
 
 	template<class _Object> static devcb_base &set_pt_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pt_in_cb.set_callback(object); }
 
+	DECLARE_WRITE8_MEMBER(pa_w);
+	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_WRITE8_MEMBER(pc_w);
+	DECLARE_WRITE8_MEMBER(pd_w);
+	DECLARE_WRITE8_MEMBER(pf_w);
+
 protected:
 	// flags
 	enum

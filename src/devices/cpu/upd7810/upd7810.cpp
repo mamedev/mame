@@ -505,24 +505,49 @@ offs_t upd78c05_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(upd78c05)(this, stream, pc, oprom, opram, options);
 }
 
+WRITE8_MEMBER(upd7810_device::pa_w)
+{
+	COMBINE_DATA(&m_pa_in);
+}
+
+WRITE8_MEMBER(upd7810_device::pb_w)
+{
+	COMBINE_DATA(&m_pb_in);
+}
+
+WRITE8_MEMBER(upd7810_device::pc_w)
+{
+	COMBINE_DATA(&m_pc_in);
+}
+
+WRITE8_MEMBER(upd7810_device::pd_w)
+{
+	COMBINE_DATA(&m_pd_in);
+}
+
+WRITE8_MEMBER(upd7810_device::pf_w)
+{
+	COMBINE_DATA(&m_pf_in);
+}
+
 uint8_t upd7810_device::RP(offs_t port)
 {
 	uint8_t data = 0xff;
 	switch (port)
 	{
 	case UPD7810_PORTA:
-		if (m_ma)   // NS20031301 no need to read if the port is set as output
-			m_pa_in = m_pa_in_cb();
+		if (m_ma && !m_pa_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+			m_pa_in = m_pa_in_cb(0, m_ma);
 		data = (m_pa_in & m_ma) | (m_pa_out & ~m_ma);
 		break;
 	case UPD7810_PORTB:
-		if (m_mb)   // NS20031301 no need to read if the port is set as output
-			m_pb_in = m_pb_in_cb();
+		if (m_mb && !m_pb_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+			m_pb_in = m_pb_in_cb(0, m_mb);
 		data = (m_pb_in & m_mb) | (m_pb_out & ~m_mb);
 		break;
 	case UPD7810_PORTC:
-		if (m_mc)   // NS20031301 no need to read if the port is set as output
-			m_pc_in = m_pc_in_cb();
+		if (m_mc && !m_pc_in_cb.isnull())   // NS20031301 no need to read if the port is set as output
+			m_pc_in = m_pc_in_cb(0, m_mc);
 		data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
 		if (m_mcc & 0x01)   /* PC0 = TxD output */
 			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
@@ -542,7 +567,8 @@ uint8_t upd7810_device::RP(offs_t port)
 			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		m_pd_in = m_pd_in_cb();
+		if (!m_pd_in_cb.isnull())
+			m_pd_in = m_pd_in_cb();
 		switch (m_mm & 0x07)
 		{
 		case 0x00:          /* PD input mode, PF port mode */
@@ -557,7 +583,8 @@ uint8_t upd7810_device::RP(offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		m_pf_in = m_pf_in_cb();
+		if (m_mf && !m_pf_in_cb.isnull())
+			m_pf_in = m_pf_in_cb(0, m_mf);
 		switch (m_mm & 0x06)
 		{
 		case 0x00:          /* PD input/output mode, PF port mode */
@@ -1522,11 +1549,11 @@ void upd7810_device::base_device_start()
 	m_an6_func.resolve_safe(0);
 	m_an7_func.resolve_safe(0);
 
-	m_pa_in_cb.resolve_safe(0);
-	m_pb_in_cb.resolve_safe(0);
-	m_pc_in_cb.resolve_safe(0);
-	m_pd_in_cb.resolve_safe(0);
-	m_pf_in_cb.resolve_safe(0);
+	m_pa_in_cb.resolve();
+	m_pb_in_cb.resolve();
+	m_pc_in_cb.resolve();
+	m_pd_in_cb.resolve();
+	m_pf_in_cb.resolve();
 
 	m_pa_out_cb.resolve_safe();
 	m_pb_out_cb.resolve_safe();
