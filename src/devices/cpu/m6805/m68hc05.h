@@ -149,6 +149,7 @@ protected:
 			u32 options) override;
 
 	virtual void interrupt() override;
+	virtual bool test_il() override;
 	virtual void burn_cycles(unsigned count) override;
 
 	void add_port_state(std::array<bool, PORT_COUNT> const &ddr);
