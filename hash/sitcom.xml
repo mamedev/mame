@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="sitcom" description="SITCOM">
+
+	<software name="flash1">
+		<description>Flash 1</description>
+		<publisher>Izabella Malcolm</publisher>
+		<year>2002</year>
+		<part name="bitb1" interface="rs232">
+			<dataarea name="bitb" size="99">
+				<rom name="flash1.hex" size="99" crc="23fe0130" sha1="6f77c78d651de1c9d8d50239c50efa991970511c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="san">
+		<description>San</description>
+		<publisher>San Bergmans</publisher>
+		<year>2002</year>
+		<part name="bitb1" interface="rs232">
+			<dataarea name="bitb" size="122">
+				<rom name="san.hex" size="122" crc="fecdae5e" sha1="bca50b488330f08146f6978b2d098c048e6dae69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
