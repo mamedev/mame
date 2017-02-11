@@ -21,8 +21,6 @@
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
-#undef min
-#undef max
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
