@@ -66,6 +66,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
 
+	DECLARE_WRITE8_MEMBER(update_pia_pa);
+	DECLARE_WRITE8_MEMBER(update_pia_pb);
+
 	DECLARE_INPUT_CHANGED_MEMBER(buttons);
 
 protected:
@@ -110,10 +113,25 @@ INPUT_PORTS_END
 void sitcom_state::machine_start()
 {
 	save_item(NAME(m_rxd));
+
+	m_rxd = true;
 }
 
 void sitcom_state::machine_reset()
 {
+	m_bank->set_bank(0);
+}
+
+WRITE8_MEMBER( sitcom_state::update_pia_pa )
+{
+	for (int i = 0; 8 > i; ++i)
+		output().set_indexed_value("pa", i, BIT(data, i));
+}
+
+WRITE8_MEMBER( sitcom_state::update_pia_pb )
+{
+	for (int i = 0; 8 > i; ++i)
+		output().set_indexed_value("pb", i, BIT(data, i));
 }
 
 INPUT_CHANGED_MEMBER( sitcom_state::buttons )
@@ -149,6 +167,8 @@ MACHINE_CONFIG_START( sitcom, sitcom_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("pia", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(sitcom_state, update_pia_pa))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(sitcom_state, update_pia_pb))
 
 	// video hardware
 	MCFG_DEVICE_ADD("ds0", DL1414T, 0) // left display
