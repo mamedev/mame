@@ -233,7 +233,7 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 u16 hh_cop400_state::read_inputs(int columns)
 {
 	// active low
-	u16 ret = 0xffff;
+	u16 ret = ~0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)

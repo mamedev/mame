@@ -14315,6 +14315,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+leboom                          // Lakeside
 maniac                          // Ideal
 
 @source:hh_sm510.cpp
