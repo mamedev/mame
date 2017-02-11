@@ -92,11 +92,7 @@ protected:
 	virtual void machine_reset() override
 	{
 		for (required_device<dl1416_device> const &dsp : m_dsp)
-		{
-			dsp->ce_w(0);
-			dsp->wr_w(0);
 			dsp->cu_w(1);
-		}
 	}
 
 	required_device_array<dl1416_device, 4> m_dsp;
@@ -106,10 +102,10 @@ protected:
 ADDRESS_MAP_START(program_map, AS_PROGRAM, 8, whouse_testcons_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2003) AM_DEVWRITE("dsp0", dl1416_device, data_w)
-	AM_RANGE(0x2004, 0x2007) AM_DEVWRITE("dsp1", dl1416_device, data_w)
-	AM_RANGE(0x2008, 0x200b) AM_DEVWRITE("dsp2", dl1416_device, data_w)
-	AM_RANGE(0x200c, 0x200f) AM_DEVWRITE("dsp3", dl1416_device, data_w)
+	AM_RANGE(0x2000, 0x2003) AM_DEVWRITE("dsp0", dl1416_device, bus_w)
+	AM_RANGE(0x2004, 0x2007) AM_DEVWRITE("dsp1", dl1416_device, bus_w)
+	AM_RANGE(0x2008, 0x200b) AM_DEVWRITE("dsp2", dl1416_device, bus_w)
+	AM_RANGE(0x200c, 0x200f) AM_DEVWRITE("dsp3", dl1416_device, bus_w)
 	AM_RANGE(0x2800, 0x28ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("row0")
