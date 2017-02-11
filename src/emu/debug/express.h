@@ -13,7 +13,9 @@
 #ifndef __EXPRESS_H__
 #define __EXPRESS_H__
 
+#include "emucore.h"
 #include <functional>
+#include <unordered_map>
 
 
 
