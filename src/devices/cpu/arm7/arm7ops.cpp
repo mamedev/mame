@@ -1538,6 +1538,8 @@ const arm7_cpu_device::arm7ops_ophandler arm7_cpu_device::ops_handler[0x20] =
 
 void arm7_cpu_device::arm9ops_undef(uint32_t insn)
 {
+	// unsupported instruction
+	LOG(("ARM7: Instruction %08X unsupported\n", insn));
 }
 
 void arm7_cpu_device::arm9ops_1(uint32_t insn)
@@ -1546,10 +1548,12 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 	if ((insn & 0x00f10020) == 0x00000000)
 	{
 		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
 	}
 	else if ((insn & 0x00ff00f0) == 0x00010000) /* set endianness (SETEND) */
 	{
 		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
 	}
 	else
 	{
@@ -1563,6 +1567,7 @@ void arm7_cpu_device::arm9ops_57(uint32_t insn)
 	if ((insn & 0x0070f000) == 0x0050f000)
 	{
 		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
 	}
 	else
 	{
@@ -1576,10 +1581,12 @@ void arm7_cpu_device::arm9ops_89(uint32_t insn)
 	if ((insn & 0x005f0f00) == 0x004d0500)
 	{
 		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
 	}
 	else if ((insn & 0x00500f00) == 0x00100a00) /* Return From Exception (RFE) */
 	{
 		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
 	}
 	else
 	{
@@ -1589,8 +1596,9 @@ void arm7_cpu_device::arm9ops_89(uint32_t insn)
 
 void arm7_cpu_device::arm9ops_ab(uint32_t insn)
 {
-	// blx
+	// BLX
 	HandleBranch(insn, true);
+	set_cpsr(GET_CPSR|T_MASK);
 }
 
 void arm7_cpu_device::arm9ops_c(uint32_t insn)
@@ -1599,6 +1607,7 @@ void arm7_cpu_device::arm9ops_c(uint32_t insn)
 	if ((insn & 0x00e00000) == 0x00400000)
 	{
 		// unsupported
+		arm9ops_undef(insn);
 	}
 	else
 	{
@@ -1610,6 +1619,7 @@ void arm7_cpu_device::arm9ops_e(uint32_t insn)
 {
 	/* Additional coprocessor register transfer */
 	// unsupported
+	arm9ops_undef(insn);
 }
 
 
