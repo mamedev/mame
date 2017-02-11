@@ -129,7 +129,6 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 	, m_write_a(*this)
 	, m_write_b(*this)
 	, m_write_c(*this)
-	, m_read_t0(*this)
 {
 }
 
@@ -201,9 +200,6 @@ void pic16c5x_device::update_internalram_ptr()
 #define INDF    M_RDRAM(FSR)
 
 #define ADDR    (m_opcode.b.l & 0x1f)
-
-#define  RISING_EDGE_T0  (( (int)(T0_in - m_old_T0) > 0) ? 1 : 0)
-#define FALLING_EDGE_T0  (( (int)(T0_in - m_old_T0) < 0) ? 1 : 0)
 
 
 /********  The following is the Status Flag register definition.  *********/
@@ -850,7 +846,6 @@ void pic16c5x_device::device_start()
 	m_write_a.resolve_safe();
 	m_write_b.resolve_safe();
 	m_write_c.resolve_safe();
-	m_read_t0.resolve_safe(0);
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();
@@ -861,7 +856,7 @@ void pic16c5x_device::device_start()
 	save_item(NAME(m_TRISA));
 	save_item(NAME(m_TRISB));
 	save_item(NAME(m_TRISC));
-	save_item(NAME(m_old_T0));
+	save_item(NAME(m_rtcc));
 	save_item(NAME(m_old_data));
 	save_item(NAME(m_picRAMmask));
 	save_item(NAME(m_WDT));
@@ -998,7 +993,6 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	FSR   |= (uint8_t)(~m_picRAMmask);
 	m_prescaler = 0;
 	m_delay_timer = 0;
-	m_old_T0 = 0;
 	m_inst_cycles = 0;
 }
 
@@ -1083,6 +1077,18 @@ void pic16c5x_device::pic16c5x_update_timer(int counts)
 	}
 }
 
+WRITE_LINE_MEMBER(pic16c5x_device::write_rtcc)
+{
+	state = (state) ? 1 : 0;
+
+	/* Count mode, edge triggered */
+	if (T0CS && state != m_rtcc)
+		if ((T0SE && !state) || (!T0SE && state))
+			pic16c5x_update_timer(1);
+
+	m_rtcc = state;
+}
+
 
 /****************************************************************************
  *  Execute IPeriod. Return 0 if emulation should be stopped
@@ -1090,8 +1096,6 @@ void pic16c5x_device::pic16c5x_update_timer(int counts)
 
 void pic16c5x_device::execute_run()
 {
-	uint8_t T0_in;
-
 	update_internalram_ptr();
 
 	do
@@ -1123,21 +1127,7 @@ void pic16c5x_device::execute_run()
 				(this->*s_opcode_00x[(m_opcode.b.l & 0x1f)].function)();
 			}
 
-			if (T0CS) {                     /* Count mode */
-				T0_in = m_read_t0() ? 1 : 0;
-				if (T0SE) {                 /* Count falling edge T0 input */
-					if (FALLING_EDGE_T0) {
-						pic16c5x_update_timer(1);
-					}
-				}
-				else {                      /* Count rising edge T0 input */
-					if (RISING_EDGE_T0) {
-						pic16c5x_update_timer(1);
-					}
-				}
-				m_old_T0 = T0_in;
-			}
-			else {                          /* Timer mode */
+			if (!T0CS) { /* Timer mode */
 				if (m_delay_timer) {
 					m_delay_timer--;
 				}

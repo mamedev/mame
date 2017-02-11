@@ -44,10 +44,6 @@ enum
 #define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
 	devcb = &pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
-// T0 pin (readline)
-#define MCFG_PIC16C5x_T0_CB(_devcb) \
-	devcb = &pic16c5x_device::set_t0_callback(*device, DEVCB_##_devcb);
-
 // CONFIG register
 #define MCFG_PIC16C5x_SET_CONFIG(_data) \
 	pic16c5x_device::set_config_static(*device, _data);
@@ -77,7 +73,7 @@ public:
 	template<class _Object> static devcb_base &set_write_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(object); }
 
-	template<class _Object> static devcb_base &set_t0_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_t0.set_callback(object); }
+	DECLARE_WRITE_LINE_MEMBER(write_rtcc); // RTCC pin
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
@@ -151,7 +147,7 @@ private:
 	int     m_picmodel;
 	int     m_delay_timer;
 	uint16_t  m_temp_config;
-	uint8_t   m_old_T0;
+	int     m_rtcc;
 	int8_t    m_old_data;
 	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
@@ -167,7 +163,6 @@ private:
 	devcb_write8 m_write_a;
 	devcb_write8 m_write_b;
 	devcb_write8 m_write_c;
-	devcb_read_line m_read_t0;
 
 	// For debugger
 	int m_debugger_temp;
