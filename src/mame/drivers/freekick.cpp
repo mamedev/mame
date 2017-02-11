@@ -949,12 +949,10 @@ ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU module */
 	ROM_LOAD( "82s129.3c", 0x0500, 0x0100, CRC(cc1657e5) SHA1(358f20dce376c2389009f9673ce38b297af863f6) )
 ROM_END
 
-// all ROMs were HN4827128G-25, except 17, HN27256G-25
-// CPU module marked 3?7-500B, but seems to act the same as above
-ROM_START( pbillrdsa )
+ROM_START( pbillrdsa ) /* all ROMs were HN4827128G-25, except 17, HN27256G-25, CPU module marked 317-5008, but seems to act the same as above */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "29",  0x0000, 0x4000, CRC(da020258) SHA1(172276061c2e06bcf3477488734a72598412181b) ) /* encrypted */ // label scraped off, might be 20
-	ROM_LOAD( "17",  0x4000, 0x8000, CRC(9bb3d467) SHA1(5d61c80c920363cbcb548f4a08434e2a05b3d5f3) ) /* encrypted */
+	ROM_LOAD( "20", 0x0000, 0x4000, CRC(da020258) SHA1(172276061c2e06bcf3477488734a72598412181b) ) /* encrypted */
+	ROM_LOAD( "17", 0x4000, 0x8000, CRC(9bb3d467) SHA1(5d61c80c920363cbcb548f4a08434e2a05b3d5f3) ) /* encrypted */
 	ROM_LOAD( "19", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
