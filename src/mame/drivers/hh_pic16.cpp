@@ -30,6 +30,8 @@
 
 #include "maniac.lh"
 
+//#include "hh_pic16_test.lh" // common test-layout - use external artwork
+
 
 class hh_pic16_state : public driver_device
 {

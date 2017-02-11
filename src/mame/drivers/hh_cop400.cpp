@@ -30,7 +30,7 @@
 #include "mdallas.lh"
 #include "qkracer.lh"
 
-#include "hh_cop400_test.lh" // common test-layout - use external artwork
+//#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
 
 class hh_cop400_state : public driver_device

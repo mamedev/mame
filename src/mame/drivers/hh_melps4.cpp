@@ -12,7 +12,7 @@
 #include "cpu/melps4/m58846.h"
 #include "sound/speaker.h"
 
-#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_melps4_state : public driver_device
