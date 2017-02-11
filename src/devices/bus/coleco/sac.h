@@ -11,7 +11,6 @@
 #ifndef __COLECO_SUPER_ACTION_CONTROLLER__
 #define __COLECO_SUPER_ACTION_CONTROLLER__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

@@ -28,6 +28,7 @@
  *
  */
 
+#include "emu.h"
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"

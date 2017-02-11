@@ -31,7 +31,6 @@
 #ifndef __BBC_ANALOGUE_SLOT__
 #define __BBC_ANALOGUE_SLOT__
 
-#include "emu.h"
 
 
 //**************************************************************************

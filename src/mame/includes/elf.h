@@ -6,7 +6,6 @@
 #define __INCLUDES_ELF__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"

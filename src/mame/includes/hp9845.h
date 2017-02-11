@@ -6,7 +6,6 @@
 #ifndef _HP9845_H_
 #define _HP9845_H_
 
-#include "emu.h"
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/hp_taco.h"
 #include "sound/beep.h"

@@ -64,6 +64,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"

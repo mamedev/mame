@@ -11,7 +11,6 @@
 #ifndef MAME_DEVICES_A2BUS_MOUSE_H
 #define MAME_DEVICES_A2BUS_MOUSE_H
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/6821pia.h"
 #include "cpu/m6805/m68705.h"

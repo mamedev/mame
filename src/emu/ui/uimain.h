@@ -13,7 +13,6 @@
 #ifndef __BASIC_UI_H__
 #define __BASIC_UI_H__
 
-#include "emu.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

@@ -41,6 +41,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc77.h"
 
 

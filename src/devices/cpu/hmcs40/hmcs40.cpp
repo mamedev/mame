@@ -14,6 +14,7 @@
 #define IS_PMOS 0
 #define IS_CMOS ~0
 
+#include "emu.h"
 #include "hmcs40.h"
 #include "debugger.h"
 

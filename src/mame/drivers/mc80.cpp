@@ -19,6 +19,7 @@ for various things, but none of that is working.
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mc80.h"
 
 static ADDRESS_MAP_START(mc8020_mem, AS_PROGRAM, 8, mc80_state)

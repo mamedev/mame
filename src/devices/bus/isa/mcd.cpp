@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+#include "emu.h"
 #include "mcd.h"
 #include "coreutil.h"
 

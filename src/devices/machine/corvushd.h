@@ -15,7 +15,6 @@
 #ifndef CORVUSHD_H_
 #define CORVUSHD_H_
 
-#include "emu.h"
 #include "imagedev/harddriv.h"
 #include <ctype.h>
 

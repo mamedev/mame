@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "m24_z8000.h"
 
 const device_type M24_Z8000 = &device_creator<m24_z8000_device>;

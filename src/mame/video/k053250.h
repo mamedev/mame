@@ -7,7 +7,6 @@
 //  Konami 053250 road generator
 //
 
-#include "emu.h"
 
 #define MCFG_K053250_ADD(_tag, _palette_tag, _screen_tag, offx, offy)  \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \

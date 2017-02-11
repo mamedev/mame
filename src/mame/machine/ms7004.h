@@ -5,7 +5,6 @@
 #ifndef __MS7004_H__
 #define __MS7004_H__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
 #include "sound/beep.h"

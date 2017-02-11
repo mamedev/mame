@@ -9,7 +9,6 @@
 #ifndef PP01_H_
 #define PP01_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"

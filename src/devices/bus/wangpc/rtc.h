@@ -11,7 +11,6 @@
 #ifndef __WANGPC_RTC__
 #define __WANGPC_RTC__
 
-#include "emu.h"
 #include "wangpc.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9517a.h"

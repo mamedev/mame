@@ -23,6 +23,7 @@ Game Status:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/gamecom.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"

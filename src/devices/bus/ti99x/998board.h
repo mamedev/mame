@@ -16,7 +16,6 @@
 #ifndef __MAPPER8__
 #define __MAPPER8__
 
-#include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
 #include "video/tms9928a.h"

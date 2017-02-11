@@ -16,6 +16,7 @@
  *  Created on: 31/01/2014
  */
 
+#include "emu.h"
 #include "pds.h"
 
 const device_type ISA8_PDS = &device_creator<isa8_pds_device>;

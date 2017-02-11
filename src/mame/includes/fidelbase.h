@@ -6,7 +6,6 @@
 *
 ******************************************************************************/
 
-#include "emu.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
 #include "bus/generic/slot.h"

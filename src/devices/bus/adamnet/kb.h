@@ -11,7 +11,6 @@
 #ifndef __ADAM_KB__
 #define __ADAM_KB__
 
-#include "emu.h"
 #include "adamnet.h"
 #include "cpu/m6800/m6800.h"
 

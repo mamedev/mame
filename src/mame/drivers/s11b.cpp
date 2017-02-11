@@ -20,6 +20,7 @@
     - Cyclone: Nothing. The game doesn't bother to check if the ball is ready before allowing start. Insert 1 or more credits first, of course.
 */
 
+#include "emu.h"
 #include "includes/s11b.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"

@@ -20,6 +20,7 @@ ToDo:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/scmp/scmp.h"
 #include "zac_proto.lh"

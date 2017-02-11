@@ -13,7 +13,6 @@
 #ifndef __BUDDHA_H__
 #define __BUDDHA_H__
 
-#include "emu.h"
 #include "zorro.h"
 #include "machine/autoconfig.h"
 #include "machine/ataintf.h"

@@ -6,7 +6,6 @@
 #ifndef INTERPRO_IOGA_H_
 #define INTERPRO_IOGA_H_
 
-#include "emu.h"
 
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0)

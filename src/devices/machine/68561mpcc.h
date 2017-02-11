@@ -38,7 +38,6 @@
 #ifndef MPCC68561_H
 #define MPCC68561_H
 
-#include "emu.h"
 
 /* Variant ADD macros - use the right one to enable the right feature set! */
 #define MCFG_MPCC68560_ADD(_tag, _clock, _rx, _tx) \

@@ -37,7 +37,6 @@
 #ifndef __CDP1864__
 #define __CDP1864__
 
-#include "emu.h"
 #include "machine/rescap.h"
 #include "video/resnet.h"
 

@@ -145,7 +145,6 @@
 #ifndef __Z80DART_H__
 #define __Z80DART_H__
 
-#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 

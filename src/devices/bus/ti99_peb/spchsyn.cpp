@@ -21,6 +21,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "spchsyn.h"
 #include "sound/wave.h"
 #include "machine/spchrom.h"

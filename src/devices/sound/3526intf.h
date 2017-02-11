@@ -5,7 +5,6 @@
 #ifndef __3526INTF_H__
 #define __3526INTF_H__
 
-#include "emu.h"
 
 #define MCFG_YM3526_IRQ_HANDLER(_devcb) \
 	devcb = &ym3526_device::set_irq_handler(*device, DEVCB_##_devcb);

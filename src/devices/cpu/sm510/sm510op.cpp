@@ -3,6 +3,7 @@
 
 // shared opcode handlers
 
+#include "emu.h"
 #include "sm510.h"
 
 

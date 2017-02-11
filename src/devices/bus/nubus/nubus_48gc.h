@@ -5,7 +5,6 @@
 #ifndef __NUBUS_48GC_H__
 #define __NUBUS_48GC_H__
 
-#include "emu.h"
 #include "nubus.h"
 
 //**************************************************************************

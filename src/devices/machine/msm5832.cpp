@@ -18,6 +18,7 @@
 
 */
 
+#include "emu.h"
 #include "msm5832.h"
 
 

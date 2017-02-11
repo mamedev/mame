@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 
+#include "emu.h"
 #include "includes/kaypro.h"
 
 

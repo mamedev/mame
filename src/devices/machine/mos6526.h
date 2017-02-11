@@ -60,7 +60,6 @@
 #ifndef __MOS6526__
 #define __MOS6526__
 
-#include "emu.h"
 
 
 

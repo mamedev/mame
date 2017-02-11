@@ -153,6 +153,7 @@ B0000x-xxxxxx: see V7, -800000
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/fidelbase.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"

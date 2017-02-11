@@ -13,7 +13,6 @@
 #ifndef __MEMEXMEM__
 #define __MEMEXMEM__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/ram.h"
 

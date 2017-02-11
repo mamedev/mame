@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 /* 68307 */
 
+#include "emu.h"
 #include "68307.h"
 
 /* 68307 SERIAL Module */

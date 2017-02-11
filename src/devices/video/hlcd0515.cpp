@@ -13,6 +13,7 @@
 
 */
 
+#include "emu.h"
 #include "video/hlcd0515.h"
 
 

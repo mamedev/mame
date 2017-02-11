@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "i6300esb.h"
 
 const device_type I6300ESB_WATCHDOG = &device_creator<i6300esb_watchdog_device>;

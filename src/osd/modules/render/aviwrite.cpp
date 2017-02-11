@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "aviwrite.h"
 #include "modules/lib/osdobj_common.h"
 

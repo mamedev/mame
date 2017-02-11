@@ -4,7 +4,6 @@
 #define VME_FCCPU20_H
 #pragma once
 
-#include "emu.h"
 
 #include "machine/68561mpcc.h"
 #include "machine/68230pit.h"

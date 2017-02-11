@@ -9,7 +9,6 @@
 #ifndef __GROMPORT__
 #define __GROMPORT__
 
-#include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
 #include "softlist_dev.h"

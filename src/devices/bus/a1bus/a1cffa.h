@@ -11,7 +11,6 @@
 #ifndef __A1BUS_CFFA__
 #define __A1BUS_CFFA__
 
-#include "emu.h"
 #include "a1bus.h"
 #include "machine/ataintf.h"
 

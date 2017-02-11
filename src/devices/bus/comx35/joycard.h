@@ -11,7 +11,6 @@
 #ifndef __COMX_JOY__
 #define __COMX_JOY__
 
-#include "emu.h"
 #include "exp.h"
 
 

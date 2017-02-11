@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "a2bus.h"
 #include "cpu/nec/nec.h"
 #include "bus/pc_kbd/keyboards.h"

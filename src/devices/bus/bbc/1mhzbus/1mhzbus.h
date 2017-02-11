@@ -77,7 +77,6 @@
 #ifndef __BBC_1MHZBUS_SLOT__
 #define __BBC_1MHZBUS_SLOT__
 
-#include "emu.h"
 
 
 //**************************************************************************

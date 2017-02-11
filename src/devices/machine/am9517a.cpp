@@ -39,6 +39,7 @@
 
 */
 
+#include "emu.h"
 #include "am9517a.h"
 
 

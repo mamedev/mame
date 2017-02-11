@@ -11,7 +11,6 @@
 #ifndef __PLUS4_STANDARD_CARTRIDGE__
 #define __PLUS4_STANDARD_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 
 

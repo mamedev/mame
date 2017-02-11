@@ -10,7 +10,6 @@
 #define MCFG_SEGAZ80_SET_DECRYPTED_TAG(_tag) \
 	segacrp2_z80_device::set_decrypted_tag(*device, _tag);
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 
 // base class

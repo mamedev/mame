@@ -12,7 +12,6 @@
 #define __C64_GEOCABLE__
 
 
-#include "emu.h"
 #include "user.h"
 #include "bus/centronics/ctronics.h"
 

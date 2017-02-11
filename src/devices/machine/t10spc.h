@@ -9,7 +9,6 @@ t10spc.h
 #ifndef _T10SPC_H_
 #define _T10SPC_H_
 
-#include "emu.h"
 
 class t10spc
 {

@@ -3,7 +3,6 @@
 #ifndef __BUS_MIDI_H__
 #define __BUS_MIDI_H__
 
-#include "emu.h"
 
 #define MCFG_MIDI_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, MIDI_PORT, 0) \

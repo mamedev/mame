@@ -47,6 +47,7 @@
 
 */
 
+#include "emu.h"
 #include "c2040.h"
 
 

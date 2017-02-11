@@ -12,7 +12,6 @@
 #define __MAGIC_DESK__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

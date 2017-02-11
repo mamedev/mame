@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "swiftlink.h"
 #include "bus/rs232/rs232.h"
 

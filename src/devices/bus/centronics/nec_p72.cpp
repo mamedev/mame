@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ramiro Polla
 
+#include "emu.h"
 #include "nec_p72.h"
 
 

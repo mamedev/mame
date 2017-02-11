@@ -5,6 +5,7 @@
  *
  */
 
+#include "emu.h"
 #include "ns11prot.h"
 
 ns11_keycus_device::ns11_keycus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

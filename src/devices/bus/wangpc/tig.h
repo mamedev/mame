@@ -11,7 +11,6 @@
 #ifndef __WANGPC_TIG__
 #define __WANGPC_TIG__
 
-#include "emu.h"
 #include "wangpc.h"
 #include "video/upd7220.h"
 

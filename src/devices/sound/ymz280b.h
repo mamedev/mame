@@ -12,7 +12,6 @@
 #ifndef __YMZ280B_H__
 #define __YMZ280B_H__
 
-#include "emu.h"
 
 #define MAKE_WAVS           0
 

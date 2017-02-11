@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
+#include "emu.h"
 #include "includes/osi.h"
 
 /* Palette Initialization */

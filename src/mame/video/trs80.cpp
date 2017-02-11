@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/trs80.h"
 
 /* Bit assignment for "state->m_mode"

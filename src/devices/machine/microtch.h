@@ -3,7 +3,6 @@
 #ifndef _MICROTOUCH_H
 #define _MICROTOUCH_H
 
-#include "emu.h"
 
 
 class microtouch_device :

@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "rp5c01.h"
 
 

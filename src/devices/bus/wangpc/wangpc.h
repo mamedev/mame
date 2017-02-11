@@ -14,7 +14,6 @@
 #ifndef __WANGPC_BUS__
 #define __WANGPC_BUS__
 
-#include "emu.h"
 
 
 

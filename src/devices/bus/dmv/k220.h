@@ -5,7 +5,6 @@
 #ifndef __DMV_K220_H__
 #define __DMV_K220_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"

@@ -11,7 +11,6 @@
 #ifndef __ISA8_PC1640_IGA__
 #define __ISA8_PC1640_IGA__
 
-#include "emu.h"
 #include "isa.h"
 #include "ega.h"
 

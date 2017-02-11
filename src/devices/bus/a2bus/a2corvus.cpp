@@ -40,6 +40,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2corvus.h"
 #include "imagedev/harddriv.h"
 

@@ -9,7 +9,6 @@
 #ifndef __AQUARIUS__
 #define __AQUARIUS__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tea1002.h"
 #include "imagedev/cassette.h"

@@ -5,7 +5,6 @@
 #ifndef __KC_D004_H__
 #define __KC_D004_H__
 
-#include "emu.h"
 #include "kc.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"

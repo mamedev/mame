@@ -9,7 +9,6 @@
 #ifndef UT88_H_
 #define UT88_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "sound/wave.h"

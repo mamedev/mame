@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Olivier Galibert
 
+#include "emu.h"
 #include "i8271.h"
 
 const device_type I8271 = &device_creator<i8271_device>;

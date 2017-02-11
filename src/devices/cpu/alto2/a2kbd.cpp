@@ -5,6 +5,7 @@
  *   Xerox AltoII memory mapped I/O keyboard
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 /**

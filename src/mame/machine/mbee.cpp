@@ -11,6 +11,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mbee.h"
 #include "machine/z80bin.h"
 

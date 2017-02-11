@@ -13,7 +13,6 @@
 #ifndef __COCO_MULTI_H__
 #define __COCO_MULTI_H__
 
-#include "emu.h"
 #include "cococart.h"
 
 

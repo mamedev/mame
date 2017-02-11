@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "volt_reg.h"
 
 const device_type VOLTAGE_REGULATOR = &device_creator<voltage_regulator_device>;

@@ -77,6 +77,7 @@ DONE (x) (p=partly)         NMOS         CMOS
    x/p = Features that has been implemented  n/a = features that will not
 ***************************************************************************/
 
+#include "emu.h"
 #include "scnxx562.h"
 
 //**************************************************************************

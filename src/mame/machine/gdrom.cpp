@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "gdrom.h"
 
 #define GDROM_BUSY_STATE    0x00

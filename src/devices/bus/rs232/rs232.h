@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 #define MCFG_RS232_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, RS232_PORT, 0) \

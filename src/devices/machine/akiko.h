@@ -17,7 +17,6 @@
 #ifndef __AKIKO_H__
 #define __AKIKO_H__
 
-#include "emu.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 

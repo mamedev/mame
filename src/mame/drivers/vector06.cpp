@@ -23,6 +23,7 @@ TODO:
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/vector06.h"
 #include "formats/vector06_dsk.h"
 #include "softlist.h"

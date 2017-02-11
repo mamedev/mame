@@ -13,7 +13,6 @@
 #ifndef APOLLO_H_
 #define APOLLO_H_
 
-#include "emu.h"
 
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"

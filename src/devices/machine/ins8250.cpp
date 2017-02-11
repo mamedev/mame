@@ -84,6 +84,7 @@ History:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "machine/ins8250.h"
 
 const device_type INS8250 = &device_creator<ins8250_device>;

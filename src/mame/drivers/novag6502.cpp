@@ -52,6 +52,7 @@ instead of magnet sensors.
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/novagbase.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"

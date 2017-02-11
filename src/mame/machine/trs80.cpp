@@ -13,6 +13,7 @@ MAX_SECTORS     5       and granules of sectors
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/trs80.h"
 
 

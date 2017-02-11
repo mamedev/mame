@@ -12,6 +12,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco3.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"

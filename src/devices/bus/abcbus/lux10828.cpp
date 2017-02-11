@@ -120,6 +120,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "lux10828.h"
 
 

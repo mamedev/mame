@@ -7,6 +7,7 @@
     2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here. */
 
 
+#include "emu.h"
 #include "includes/super80.h"
 
 

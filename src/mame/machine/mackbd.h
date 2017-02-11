@@ -5,7 +5,6 @@
 #ifndef __MACKBD_H__
 #define __MACKBD_H__
 
-#include "emu.h"
 
 
 

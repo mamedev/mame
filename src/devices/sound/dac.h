@@ -15,7 +15,6 @@
 #ifndef __DAC_H__
 #define __DAC_H__
 
-#include "emu.h"
 
 #define DAC_VREF_POS_INPUT (0)
 #define DAC_VREF_NEG_INPUT (1)

@@ -9,7 +9,6 @@
 #ifndef MZ80_H_
 #define MZ80_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"

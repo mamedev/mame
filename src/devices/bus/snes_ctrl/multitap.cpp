@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "multitap.h"
 #include "joypad.h"
 #include "twintap.h"

@@ -11,7 +11,6 @@
 #ifndef __MC1502_FDC__
 #define __MC1502_FDC__
 
-#include "emu.h"
 
 #include "imagedev/flopdrv.h"
 #include "isa.h"

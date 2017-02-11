@@ -9,7 +9,6 @@
 #ifndef EINSTEIN_H_
 #define EINSTEIN_H_
 
-#include "emu.h"
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd_fdc.h"

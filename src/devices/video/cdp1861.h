@@ -26,7 +26,6 @@
 #ifndef __CDP1861__
 #define __CDP1861__
 
-#include "emu.h"
 
 
 

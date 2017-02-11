@@ -29,7 +29,6 @@
 #ifndef __CBM2_EXPANSION_SLOT__
 #define __CBM2_EXPANSION_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 

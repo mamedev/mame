@@ -20,6 +20,7 @@
 
 */
 
+#include "emu.h"
 #include "lmc1992.h"
 
 

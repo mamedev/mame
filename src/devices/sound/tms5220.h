@@ -5,7 +5,6 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
-#include "emu.h"
 #include "machine/spchrom.h"
 
 enum

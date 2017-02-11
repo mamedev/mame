@@ -50,6 +50,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"

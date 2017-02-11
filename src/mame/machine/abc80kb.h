@@ -11,7 +11,6 @@
 #ifndef __ABC80_KEYBOARD__
 #define __ABC80_KEYBOARD__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

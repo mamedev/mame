@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "rs232.h"
 
 const device_type RS232_PORT = &device_creator<rs232_port_device>;

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/mikromik.h"
 
 #define HORIZONTAL_CHARACTER_PIXELS 10

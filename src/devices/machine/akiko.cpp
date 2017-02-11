@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "akiko.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"

@@ -6,7 +6,6 @@
 #define VERIFONE_TRANZ330_H
 
 // single-driver build must have emu.h here
-#include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

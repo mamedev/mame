@@ -27,6 +27,7 @@
     February 2012: rewritten as a class, adding DSR support
 
 ****************************************************************************/
+#include "emu.h"
 #include "myarcmem.h"
 
 /* This card has two CRU bases where it answers. */

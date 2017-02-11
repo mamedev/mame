@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "isa_cards.h"
 
 SLOT_INTERFACE_START( pc_isa8_cards )

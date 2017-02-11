@@ -30,6 +30,7 @@
     Includes
 
 ************************************************************/
+#include "emu.h"
 #include "includes/aussiebyte.h"
 
 

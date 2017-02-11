@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#include "emu.h"
 #include "includes/interpro.h"
 #include "debugger.h"
 

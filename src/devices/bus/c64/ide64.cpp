@@ -19,6 +19,7 @@
 
 */
 
+#include "emu.h"
 #include "ide64.h"
 
 

@@ -176,6 +176,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/fmtowns.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"

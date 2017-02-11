@@ -11,7 +11,6 @@
 #ifndef __MCF5206E_PERIPHERAL_H__
 #define __MCF5206E_PERIPHERAL_H__
 
-#include "emu.h"
 
 
 

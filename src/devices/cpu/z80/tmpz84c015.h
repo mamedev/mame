@@ -12,7 +12,6 @@
 #ifndef __TMPZ84C015__
 #define __TMPZ84C015__
 
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"

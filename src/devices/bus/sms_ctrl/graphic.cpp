@@ -32,6 +32,7 @@ THen 2 nibbles are read to form a byte containing the absolute Y coordiante.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "graphic.h"
 
 

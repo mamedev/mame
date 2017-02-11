@@ -25,6 +25,7 @@
  * some test data. The Online LED will blink at each line.
  */
 
+#include "emu.h"
 #include "epson_lx810l.h"
 #include "sound/volt_reg.h"
 

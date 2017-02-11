@@ -42,6 +42,7 @@
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
 
+#include "emu.h"
 #include "logmacro.h"
 
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)

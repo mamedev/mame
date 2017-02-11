@@ -11,6 +11,7 @@
  *  - S3D is not implemented at all, so no 2D/3D acceleration yet.
  */
 
+#include "emu.h"
 #include "s3virge.h"
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)

@@ -39,7 +39,6 @@
 #ifndef __NEWBRAIN_EXPANSION_SLOT__
 #define __NEWBRAIN_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

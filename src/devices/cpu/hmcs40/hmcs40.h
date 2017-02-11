@@ -9,7 +9,6 @@
 #ifndef _HMCS40_H_
 #define _HMCS40_H_
 
-#include "emu.h"
 
 
 // I/O ports setup

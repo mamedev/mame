@@ -8,7 +8,6 @@
 #ifndef __SPCHROMS_H
 #define __SPCHROMS_H
 
-#include "emu.h"
 
 class speechrom_device : public device_t
 {

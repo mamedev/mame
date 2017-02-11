@@ -3,7 +3,6 @@
 #ifndef __XEROX820__
 #define __XEROX820__
 
-#include "emu.h"
 #include "bus/scsi/sa1403d.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"

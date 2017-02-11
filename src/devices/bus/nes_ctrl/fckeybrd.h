@@ -12,7 +12,6 @@
 #define __NES_FCKEYBRD__
 
 
-#include "emu.h"
 #include "ctrl.h"
 #include "imagedev/cassette.h"
 

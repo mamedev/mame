@@ -24,6 +24,7 @@
 
 */
 
+#include "emu.h"
 #include "64h156.h"
 
 

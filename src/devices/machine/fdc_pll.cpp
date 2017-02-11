@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "fdc_pll.h"
 
 std::string fdc_pll_t::tts(attotime t)

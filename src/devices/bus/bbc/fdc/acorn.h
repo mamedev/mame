@@ -10,7 +10,6 @@
 #ifndef __BBC_ACORN__
 #define __BBC_ACORN__
 
-#include "emu.h"
 #include "fdc.h"
 #include "machine/i8271.h"
 #include "machine/wd_fdc.h"

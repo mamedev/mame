@@ -12,6 +12,7 @@
 
 #define VERBOSE 0
 
+#include "emu.h"
 #include "machine/apollo_kbd.h"
 #include "sound/beep.h"
 

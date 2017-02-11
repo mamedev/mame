@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cb2snd.h"
 #include "sound/volt_reg.h"
 

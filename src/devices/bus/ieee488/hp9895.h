@@ -13,7 +13,6 @@
 #ifndef _HP9895_H_
 #define _HP9895_H_
 
-#include "emu.h"
 #include "ieee488.h"
 #include "cpu/z80/z80.h"
 #include "machine/phi.h"

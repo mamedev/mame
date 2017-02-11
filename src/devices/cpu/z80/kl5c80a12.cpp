@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "kl5c80a12.h"
 
 const device_type KL5C80A12 = &device_creator<kl5c80a12_device>;

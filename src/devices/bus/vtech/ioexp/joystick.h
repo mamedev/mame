@@ -14,7 +14,6 @@
 #ifndef __VTECH_IOEXP_JOYSTICK_H__
 #define __VTECH_IOEXP_JOYSTICK_H__
 
-#include "emu.h"
 #include "ioexp.h"
 
 

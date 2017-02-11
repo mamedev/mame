@@ -11,7 +11,6 @@
 #ifndef __A2BUS_RAMCARD16K__
 #define __A2BUS_RAMCARD16K__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

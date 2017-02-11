@@ -33,6 +33,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/wswan.h"
 #include "softlist.h"
 #include "wswan.lh"

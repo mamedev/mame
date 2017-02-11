@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "shark.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"

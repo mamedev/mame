@@ -13,7 +13,6 @@
 #ifndef __A2BUS_EZCGI__
 #define __A2BUS_EZCGI__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"

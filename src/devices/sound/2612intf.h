@@ -5,7 +5,6 @@
 #ifndef __2612INTF_H__
 #define __2612INTF_H__
 
-#include "emu.h"
 
 void ym2612_update_request(void *param);
 

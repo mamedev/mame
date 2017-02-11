@@ -181,6 +181,7 @@ below are simply made to the banking address to run on other boards.
 +---+-----------------+---+---+------------------+---+
 */
 
+#include "emu.h"
 #include "includes/multfish.h"
 
 TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)

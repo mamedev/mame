@@ -8,6 +8,7 @@
  *
  */
 
+#include "emu.h"
 #include "mb89371.h"
 
 const device_type MB89371 = &device_creator<mb89371_device>;

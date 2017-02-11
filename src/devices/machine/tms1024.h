@@ -9,7 +9,6 @@
 #ifndef _TMS1024_H_
 #define _TMS1024_H_
 
-#include "emu.h"
 
 
 // ports setup

@@ -8,6 +8,7 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
+#include "emu.h"
 #include "antic.h"
 
 #ifdef MAME_DEBUG

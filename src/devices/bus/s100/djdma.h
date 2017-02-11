@@ -11,7 +11,6 @@
 #ifndef __S100_DJDMA__
 #define __S100_DJDMA__
 
-#include "emu.h"
 #include "s100.h"
 #include "cpu/z80/z80.h"
 

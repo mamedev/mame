@@ -14,7 +14,6 @@
 #ifndef __HORIZON__
 #define __HORIZON__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/ram.h"
 

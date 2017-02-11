@@ -11,7 +11,6 @@
 #ifndef __VIC20_MEGACART__
 #define __VIC20_MEGACART__
 
-#include "emu.h"
 #include "exp.h"
 
 

@@ -11,7 +11,6 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "bus/a2bus/a2bus.h"

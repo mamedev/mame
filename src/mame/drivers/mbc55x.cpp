@@ -16,6 +16,7 @@ ToDo:
 */
 
 
+#include "emu.h"
 #include "includes/mbc55x.h"
 #include "softlist.h"
 

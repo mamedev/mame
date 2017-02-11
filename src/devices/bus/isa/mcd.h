@@ -5,7 +5,6 @@
 #ifndef __MCD_H__
 #define __MCD_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "imagedev/chd_cd.h"
 

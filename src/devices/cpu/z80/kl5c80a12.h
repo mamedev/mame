@@ -18,7 +18,6 @@
 #ifndef __KL5C80A12__
 #define __KL5C80A12__
 
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 

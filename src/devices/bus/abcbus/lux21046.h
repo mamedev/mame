@@ -11,7 +11,6 @@
 #ifndef __LUXOR_55_21046__
 #define __LUXOR_55_21046__
 
-#include "emu.h"
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

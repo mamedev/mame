@@ -12,6 +12,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "lpc210x.h"
 
 const device_type LPC2103 = &device_creator<lpc210x_device>;

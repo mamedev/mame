@@ -26,7 +26,6 @@
 #ifndef __HD64610__
 #define __HD64610__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

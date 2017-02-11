@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "comxpl80.h"
 
 

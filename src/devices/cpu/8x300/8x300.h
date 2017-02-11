@@ -10,7 +10,6 @@
 #ifndef _8X300_H_
 #define _8X300_H_
 
-#include "emu.h"
 
 // Register enumeration
 enum

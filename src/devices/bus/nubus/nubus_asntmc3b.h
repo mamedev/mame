@@ -5,7 +5,6 @@
 #ifndef __NUBUS_ASNTMC3B_H__
 #define __NUBUS_ASNTMC3B_H__
 
-#include "emu.h"
 #include "nubus.h"
 #include "machine/dp8390.h"
 

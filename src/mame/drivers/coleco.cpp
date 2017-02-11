@@ -63,6 +63,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/coleco.h"
 #include "softlist.h"
 

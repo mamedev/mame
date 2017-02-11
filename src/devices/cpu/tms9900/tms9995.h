@@ -10,7 +10,6 @@
 #ifndef __TMS9995_H__
 #define __TMS9995_H__
 
-#include "emu.h"
 #include "debugger.h"
 #include "tms99com.h"
 

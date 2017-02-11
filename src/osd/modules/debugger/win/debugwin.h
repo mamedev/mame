@@ -20,7 +20,6 @@
 #undef min
 #undef max
 
-#include "emu.h"
 
 
 class debugview_info;

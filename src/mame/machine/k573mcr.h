@@ -10,7 +10,6 @@
 #ifndef __K573MCR_H__
 #define __K573MCR_H__
 
-#include "emu.h"
 
 extern const device_type KONAMI_573_MEMORY_CARD_READER;
 

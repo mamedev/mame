@@ -28,6 +28,7 @@
 
 */
 
+#include "emu.h"
 #include "ocean.h"
 
 

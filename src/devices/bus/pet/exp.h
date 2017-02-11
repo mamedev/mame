@@ -13,7 +13,6 @@
 #ifndef __PET_EXPANSION_SLOT__
 #define __PET_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

@@ -13,6 +13,7 @@
 
  ***************************************************************************/
 
+#include "emu.h"
 #include "wswan.h"
 
 const device_type WSWAN_VIDEO = &device_creator<wswan_video_device>;

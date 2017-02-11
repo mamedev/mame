@@ -10,7 +10,6 @@
 #ifndef WPC_DOT_H_
 #define WPC_DOT_H_
 
-#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "audio/wpcsnd.h"
 #include "audio/dcs.h"

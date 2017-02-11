@@ -30,6 +30,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "sio.h"
 
 

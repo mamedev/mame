@@ -14,6 +14,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/isa/isa.h"

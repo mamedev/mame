@@ -37,6 +37,7 @@ easier to manage.
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/dragon.h"
 
 

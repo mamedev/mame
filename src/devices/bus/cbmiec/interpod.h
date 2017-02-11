@@ -11,7 +11,6 @@
 #ifndef __INTERPOD__
 #define __INTERPOD__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
