@@ -3,7 +3,7 @@
 /**************************************************************************************
 
     PINBALL
-    Videodens
+    Video Dens S.A., Madrid
 
     PinMAME used as reference. The Break '86 manual scan available on the net includes
     a mostly illegible schematic.
@@ -223,5 +223,5 @@ ROM_START(papillon)
 ROM_END
 
 
-GAME(1986, break86,  0,    vd,  break86,  driver_device, 0,  ROT0,  "Videodens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, driver_device, 0,  ROT0,  "Videodens", "Papillon", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  driver_device, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, driver_device, 0,  ROT0,  "Video Dens", "Papillon", MACHINE_IS_SKELETON_MECHANICAL)

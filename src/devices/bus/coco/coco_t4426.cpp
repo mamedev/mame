@@ -41,12 +41,11 @@
 
 #include "emu.h"
 #include "coco_t4426.h"
-#include "includes/coco.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
-#define LOG_PIA		0x08
+#define LOG_PIA     0x08
 
 #define VERBOSE 0 //(LOG_PIA | LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
@@ -74,6 +73,7 @@
 #define UART_TAG        "acia"
 #define PIA_TAG         "pia"
 #define CARTSLOT_TAG    "t4426"
+#define CART_AUTOSTART_TAG      "cart_autostart"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -109,6 +109,17 @@ ROM_START( coco_t4426 )
 	ROM_RELOAD(0x18000,0x1000)
 ROM_END
 
+//-------------------------------------------------
+//  INPUT_PORTS( coco_cart_autostart )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( coco_cart_autostart )
+	PORT_START(CART_AUTOSTART_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Cart Auto-Start" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -129,7 +140,7 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type 
 	,m_cart(nullptr)
 	,m_owner(nullptr)
 	,m_select(0)
-	,m_autostart(*this, ":" CART_AUTOSTART_TAG)
+	,m_autostart(*this, CART_AUTOSTART_TAG)
 	,m_uart(*this, UART_TAG)
 	,m_pia(*this, PIA_TAG)
 {
@@ -141,7 +152,7 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, const char *
 	,m_cart(nullptr)
 	,m_owner(nullptr)
 	,m_select(0)
-	,m_autostart(*this, ":" CART_AUTOSTART_TAG)
+	,m_autostart(*this, CART_AUTOSTART_TAG)
 	,m_uart(*this, UART_TAG)
 	,m_pia(*this, PIA_TAG)
 {
@@ -178,6 +189,16 @@ const tiny_rom_entry *coco_t4426_device::device_rom_region() const
 	LOG("%s()\n", FUNCNAME );
 	return ROM_NAME( coco_t4426 );
 }
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_t4426_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_cart_autostart );
+}
+
 
 /*-------------------------------------------------
     device_reset - device-specific startup
@@ -225,8 +246,8 @@ WRITE8_MEMBER(coco_t4426_device::write)
 /*----------------------------------------------------
     pia_A_w - PIA port A write
 
- The T4426 cartridge PIA Port A is connected to 
- the CE* input of each 2764 ROM and used for banking  
+ The T4426 cartridge PIA Port A is connected to
+ the CE* input of each 2764 ROM and used for banking
  in the correct BASIC module at C000-DFFF
  The main cartridge ROM at E000-FF00 is fixed however
 -----------------------------------------------------*/

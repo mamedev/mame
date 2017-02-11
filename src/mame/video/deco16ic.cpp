@@ -735,7 +735,7 @@ static int deco16_pf_update(
 		if (tilemap_8x8)
 		{
 			int numrows = rows;
-			
+
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
 			if (!(tilemapsizes & 4))
 				numrows = rows >> 1;

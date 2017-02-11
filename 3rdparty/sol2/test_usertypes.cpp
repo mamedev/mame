@@ -235,6 +235,28 @@ void des(T& e) {
 	e.~T();
 }
 
+struct matrix_xf {
+	float a, b;
+
+	static matrix_xf from_lua_table(sol::table t) {
+		matrix_xf m;
+		m.a = t[1][1];
+		m.b = t[1][2];
+		return m;
+	}
+};
+
+struct matrix_xi {
+	int a, b;
+
+	static matrix_xi from_lua_table(sol::table t) {
+		matrix_xi m;
+		m.a = t[1][1];
+		m.b = t[1][2];
+		return m;
+	}
+};
+
 TEST_CASE("usertype/usertype", "Show that we can create classes from usertype and use them") {
 	sol::state lua;
 
@@ -942,6 +964,30 @@ t = thing(256)
 	thing& y = lua["t"];
 	INFO(y.v);
 	REQUIRE(y.v == 256);
+}
+
+TEST_CASE("usertype/call_constructor-factories", "make sure tables can be passed to factory-based call constructors") {
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.new_usertype<matrix_xf>("mat",
+		sol::call_constructor, sol::factories(&matrix_xf::from_lua_table)
+	);
+
+	lua.script("m = mat{ {1.1, 2.2} }");
+
+	lua.new_usertype<matrix_xi>("mati",
+		sol::call_constructor, sol::factories(&matrix_xi::from_lua_table)
+	);
+
+	lua.script("mi = mati{ {1, 2} }");
+
+	matrix_xf& m = lua["m"];
+	REQUIRE(m.a == 1.1f);
+	REQUIRE(m.b == 2.2f);
+	matrix_xi& mi = lua["mi"];
+	REQUIRE(mi.a == 1);
+	REQUIRE(mi.b == 2);
 }
 
 TEST_CASE("usertype/call_constructor_2", "prevent metatable regression") {

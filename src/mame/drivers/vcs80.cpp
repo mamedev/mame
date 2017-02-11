@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
-	
+
 	/* bankdev */
 	MCFG_DEVICE_ADD("bdmem", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vcs80_bd_mem)

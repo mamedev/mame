@@ -81,8 +81,8 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( sh4_soundram_w );
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	
-	
+
+
 	required_device<sh4_base_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<powervr2_device> m_powervr2;

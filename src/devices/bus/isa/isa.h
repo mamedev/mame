@@ -93,7 +93,7 @@
 	isa16_slot_device::static_set_isa16_slot(*device, owner, _isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
-	downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
+	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
 
 #define MCFG_ISA_OUT_IRQ2_CB(_devcb) \
 	devcb = &isa8_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
@@ -191,7 +191,7 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	static void static_set_custom_spaces(device_t &device);
-	template<class _iochck> void set_iochck_callback(_iochck iochck) { m_write_iochck.set_callback(iochck); }
+	template<class _iochck> devcb_base &set_iochck_callback(_iochck iochck) { return m_write_iochck.set_callback(iochck); }
 	template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<isa8_device &>(device).m_out_irq2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq3_callback(device_t &device, _Object object) { return downcast<isa8_device &>(device).m_out_irq3_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq4_callback(device_t &device, _Object object) { return downcast<isa8_device &>(device).m_out_irq4_cb.set_callback(object); }

@@ -251,6 +251,41 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 0;
 		break;
 
+	case T10MMC_CMD_PLAY_AUDIO_MSF:
+		m_lba = (command[5] % 75) + ((command[4] * 75) % (60*75)) + (command[3] * (75*60));
+		m_blocks = (command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
+
+		// special cases: lba of 0 means MSF of 00:02:00
+		if (m_lba == 0)
+		{
+			m_lba = 150;
+		}
+		else if (m_lba == 0xffffffff)
+		{
+			m_device->logerror("T10MMC: play audio from current not implemented!\n");
+		}
+
+		m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n", 
+			m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
+
+		trk = cdrom_get_track(m_cdrom, m_lba);
+
+		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+		{
+			m_cdda->start_audio(m_lba, m_blocks);
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+		}
+		else
+		{
+			m_device->logerror("T10MMC: track is NOT audio!\n");
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+		}
+
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 0;
+		break;
+
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
 		// be careful: tracks here are zero-based, but the SCSI command
 		// uses the real CD track number which is 1-based!

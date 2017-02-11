@@ -773,4 +773,15 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="interceptor">
+		<description>Interceptor</description>
+		<year>198?</year>
+		<publisher>Blair Rideout</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="7201560">
+				<rom name="interceptor.wav" size="7201560" crc="144ad2be" sha1="621776831dacde4d25777eb87300c0e9e692b74f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

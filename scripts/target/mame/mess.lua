@@ -134,6 +134,7 @@ CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
 CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
+CPUS["CLIPPER"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -167,7 +168,7 @@ SOUNDS["SN76496"] = true
 SOUNDS["POKEY"] = true
 SOUNDS["TIA"] = true
 SOUNDS["NES_APU"] = true
-SOUNDS["AMIGA"] = true
+SOUNDS["PAULA_8364"] = true
 SOUNDS["ASTROCADE"] = true
 --SOUNDS["NAMCO"] = true
 --SOUNDS["NAMCO_15XX"] = true
@@ -266,6 +267,7 @@ SOUNDS["VOLT_REG"] = true
 SOUNDS["MEA8000"] = true
 --SOUNDS["DAC76"] = true
 --SOUNDS["MM5837"] = true
+SOUNDS["DAVE"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -276,6 +278,7 @@ VIDEOS["SEGA315_5313"] = true
 --VIDEOS+= BUFSPRITE"] = true
 VIDEOS["CDP1861"] = true
 VIDEOS["CDP1862"] = true
+--VIDEOS["CESBLIT"] = true
 VIDEOS["CRT9007"] = true
 VIDEOS["CRT9021"] = true
 VIDEOS["CRT9212"] = true
@@ -301,6 +304,7 @@ VIDEOS["HUC6202"] = true
 VIDEOS["HUC6260"] = true
 VIDEOS["HUC6261"] = true
 VIDEOS["HUC6270"] = true
+VIDEOS["HUC6271"] = true
 VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
@@ -342,6 +346,7 @@ VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
 VIDEOS["GBA_LCD"] = true
 VIDEOS["MGA2064W"] = true
+VIDEOS["PPU2C0X"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -608,6 +613,7 @@ BUSES["ADAMNET"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
 BUSES["APRICOT_KEYBOARD"] = true
+BUSES["AMIGA_KEYBOARD"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BBC_FDC"] = true
@@ -944,6 +950,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"imp",
 		"intel",
+		"interpro",
 		"interton",
 		"intv",
 		"isc",
@@ -1062,6 +1069,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"vtech",
 		"wang",
 		"wavemate",
+		"westinghouse",
 		"xerox",
 		"xussrpc",
 		"yamaha",
@@ -1154,8 +1162,6 @@ files {
 	MAME_DIR .. "src/mame/machine/kabuki.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.h",
 	MAME_DIR .. "src/mame/video/pk8000.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.cpp",
-	MAME_DIR .. "src/mame/video/ppu2c0x.h",
 	MAME_DIR .. "src/mame/machine/snes.cpp",
 	MAME_DIR .. "src/mame/audio/snes_snd.cpp",
 	MAME_DIR .. "src/mame/audio/snes_snd.h",
@@ -1168,6 +1174,8 @@ files {
 	MAME_DIR .. "src/mame/video/rdpblend.h",
 	MAME_DIR .. "src/mame/video/rdptpipe.cpp",
 	MAME_DIR .. "src/mame/video/rdptpipe.h",
+	MAME_DIR .. "src/mame/video/pin64.cpp",
+	MAME_DIR .. "src/mame/video/pin64.h",
 	MAME_DIR .. "src/mame/machine/megadriv.cpp",
 	MAME_DIR .. "src/mame/drivers/naomi.cpp",
 	MAME_DIR .. "src/mame/includes/naomi.h",
@@ -1328,10 +1336,6 @@ createMESSProjects(_target, _subtarget, "amiga")
 files {
 	MAME_DIR .. "src/mame/drivers/amiga.cpp",
 	MAME_DIR .. "src/mame/includes/amiga.h",
-	MAME_DIR .. "src/mame/machine/a1200kbd.cpp",
-	MAME_DIR .. "src/mame/machine/a1200kbd.h",
-	MAME_DIR .. "src/mame/machine/amigakbd.cpp",
-	MAME_DIR .. "src/mame/machine/amigakbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "amstrad")
@@ -1494,7 +1498,6 @@ files {
 createMESSProjects(_target, _subtarget, "banctec")
 files {
 	MAME_DIR .. "src/mame/drivers/banctec.cpp",
-	MAME_DIR .. "src/mame/includes/banctec.h",
 }
 
 createMESSProjects(_target, _subtarget, "bandai")
@@ -1840,8 +1843,6 @@ files {
 createMESSProjects(_target, _subtarget, "enterprise")
 files {
 	MAME_DIR .. "src/mame/drivers/ep64.cpp",
-	MAME_DIR .. "src/mame/audio/dave.cpp",
-	MAME_DIR .. "src/mame/audio/dave.h",
 	MAME_DIR .. "src/mame/video/nick.cpp",
 	MAME_DIR .. "src/mame/video/nick.h",
 }
@@ -2074,6 +2075,22 @@ createMESSProjects(_target, _subtarget, "imp")
 files {
 	MAME_DIR .. "src/mame/drivers/tim011.cpp",
 	MAME_DIR .. "src/mame/drivers/tim100.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "interpro")
+files {
+	MAME_DIR .. "src/mame/drivers/interpro.cpp",
+	MAME_DIR .. "src/mame/includes/interpro.h",
+	MAME_DIR .. "src/mame/machine/cammu.h",
+	MAME_DIR .. "src/mame/machine/cammu.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.h",
+	MAME_DIR .. "src/mame/machine/interpro_ioga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_mcga.h",
+	MAME_DIR .. "src/mame/machine/interpro_mcga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_sga.h",
+	MAME_DIR .. "src/mame/machine/interpro_sga.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "interton")
@@ -3195,6 +3212,11 @@ files {
 	MAME_DIR .. "src/mame/includes/wangpc.h",
 	MAME_DIR .. "src/mame/machine/wangpckb.cpp",
 	MAME_DIR .. "src/mame/machine/wangpckb.h",
+}
+
+createMESSProjects(_target, _subtarget, "westinghouse")
+files {
+	MAME_DIR .. "src/mame/drivers/testconsole.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wavemate")

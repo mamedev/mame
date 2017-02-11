@@ -30,7 +30,7 @@
 #define SHORTxLCONST_32		/* enable compiler-specific DCT optimization */
 /* Note: the above define is known to improve the code with Microsoft C 6.00A.
  * I do not know whether it is good for later compiler versions.
- * Please report any info on this point to jpeg-info@uc.ag.
+ * Please report any info on this point to jpeg-info@jpegclub.org.
  */
 
 #endif /* JPEG_INTERNALS */

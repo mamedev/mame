@@ -96,12 +96,12 @@ static NETLIST_START(nl_mario_snd1)
 	NET_C(R7.2, 2J_B.FC)
 	NET_C(C4.2, GND)
 
-	SN74LS629(1J_B, CAP_N(39))		/* C5 */
+	SN74LS629(1J_B, CAP_N(39))      /* C5 */
 	NET_C(1J_B.RNG, V5)
 	NET_C(1J_B.ENQ, ttllow)
 	NET_C(GND, 1J_B.GND)
 
-	SN74LS629(2J_B, CAP_N(6.8))		/* C16 */
+	SN74LS629(2J_B, CAP_N(6.8))     /* C16 */
 	NET_C(2J_B.RNG, V5)
 	NET_C(2J_B.ENQ, ttllow)
 	NET_C(GND, 2J_B.GND)

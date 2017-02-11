@@ -29,7 +29,9 @@ public:
 		m_spr(*this, "vsystem_spr"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_soundbank(*this, "soundbank"),
+		m_okibank(*this, "okibank") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg1videoram;
@@ -53,7 +55,8 @@ public:
 	optional_device<vsystem_spr2_device> m_spr_old2; //  or a pair of them..
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-
+	optional_memory_bank m_soundbank;
+	optional_memory_bank m_okibank;
 
 	/* video-related */
 	tilemap_t   *m_bg1_tilemap;

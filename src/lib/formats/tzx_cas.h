@@ -12,6 +12,8 @@
 
 #include "cassimg.h"
 
+extern const struct CassetteFormat tzx_cassette_format;
+
 CASSETTE_FORMATLIST_EXTERN(tzx_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(cdt_cassette_formats);
 

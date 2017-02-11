@@ -42,6 +42,12 @@
 	*     do not have Port-C implemented.                                      *
 	*  TLP (07-Sep-2009) Ver 1.14                                              *
 	*   - Edge sense control for the T0 count input was incorrectly reversed   *
+	*  LE (05-Feb-2017) Ver 1.15                                               *
+	*   - Allow writing all bits of the status register except TO and PD.      *
+	*     This enables e.g. bcf, bsf or clrf to change the flags when the      *
+	*     status register is the destination.                                  *
+	*   - Changed rlf and rrf to update the carry flag in the last step.       *
+	*     Fixes the case where the status register is the destination.         *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
@@ -69,6 +75,7 @@
 
 const device_type PIC16C54 = &device_creator<pic16c54_device>;
 const device_type PIC16C55 = &device_creator<pic16c55_device>;
+const device_type PIC1655 = &device_creator<pic1655_device>;
 const device_type PIC16C56 = &device_creator<pic16c56_device>;
 const device_type PIC16C57 = &device_creator<pic16c57_device>;
 const device_type PIC16C58 = &device_creator<pic16c58_device>;
@@ -137,6 +144,11 @@ pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+pic1655_device::pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic16c5x_device(mconfig, PIC1655, "PIC1655", tag, owner, clock, "pic1655", 9, 5, 0x1655)
+{
+}
+
 pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C56, "PIC16C56", tag, owner, clock, "pic16c56", 10, 5, 0x16C56)
 {
@@ -171,8 +183,8 @@ void pic16c5x_device::update_internalram_ptr()
 #define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 
-#define M_RDRAM(A)      (((A) < 8) ? m_internalram[A] : PIC16C5x_RAM_RDMEM(A))
-#define M_WRTRAM(A,V)   do { if ((A) < 8) m_internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
+#define M_RDRAM(A)      (((A) < 9) ? m_internalram[A] : PIC16C5x_RAM_RDMEM(A))
+#define M_WRTRAM(A,V)   do { if ((A) < 9) m_internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
 #define M_RDOP(A)       PIC16C5x_RDOP(A)
 #define ADDR_MASK       0x7ff
 
@@ -185,6 +197,7 @@ void pic16c5x_device::update_internalram_ptr()
 #define PORTA   m_internalram[5]
 #define PORTB   m_internalram[6]
 #define PORTC   m_internalram[7]
+#define PORTD   m_internalram[8]
 #define INDF    M_RDRAM(FSR)
 
 #define ADDR    (m_opcode.b.l & 0x1f)
@@ -315,7 +328,7 @@ void pic16c5x_device::PUSH_STACK(uint16_t data)
 
 uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
 {
-	uint8_t data;
+	uint8_t data = 0;
 
 	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (FSR & m_picRAMmask);
@@ -329,26 +342,36 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 
 	switch(addr)
 	{
-		case 00:    /* Not an actual register, so return 0 */
+		case 0:     /* Not an actual register, so return 0 */
 					data = 0;
 					break;
-		case 04:    data = (FSR | (uint8_t)(~m_picRAMmask));
+		case 4:     data = (FSR | (uint8_t)(~m_picRAMmask));
 					break;
-		case 05:    data = m_read_a(PIC16C5x_PORTA, 0xff);
-					data &= m_TRISA;
-					data |= ((uint8_t)(~m_TRISA) & PORTA);
-					data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
+		case 5:     if (m_picmodel == 0x1655) {
+						data = m_read_a(PIC16C5x_PORTA, 0xff) & 0x0f;
+					}
+					else {
+						data = m_read_a(PIC16C5x_PORTA, 0xff);
+						data &= m_TRISA;
+						data |= ((uint8_t)(~m_TRISA) & PORTA);
+						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
+					}
 					break;
-		case 06:    data = m_read_b(PIC16C5x_PORTB, 0xff);
-					data &= m_TRISB;
-					data |= ((uint8_t)(~m_TRISB) & PORTB);
+		case 6:     if (m_picmodel != 0x1655) { /* B is output-only on 1655 */
+						data = m_read_b(PIC16C5x_PORTB, 0xff);
+						data &= m_TRISB;
+						data |= ((uint8_t)(~m_TRISB) & PORTB);
+					}
 					break;
-		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
+		case 7:     if (m_picmodel == 0x1655) {
+						data = m_read_c(PIC16C5x_PORTC, 0xff) & PORTC;
+					}
+					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						data = m_read_c(PIC16C5x_PORTC, 0xff);
 						data &= m_TRISC;
 						data |= ((uint8_t)(~m_TRISC) & PORTC);
 					}
-					else {              /* PIC16C54, PIC16C56, PIC16C58 */
+					else { /* PIC16C54, PIC16C56, PIC16C58 */
 						data = M_RDRAM(addr);
 					}
 					break;
@@ -372,31 +395,40 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 
 	switch(addr)
 	{
-		case 00:    /* Not an actual register, nothing to save */
+		case 0:     /* Not an actual register, nothing to save */
 					break;
-		case 01:    m_delay_timer = 2;      /* Timer starts after next two instructions */
-					if (PSA == 0) m_prescaler = 0;  /* Must clear the Prescaler */
+		case 1:     m_delay_timer = 2; /* Timer starts after next two instructions */
+					if (PSA == 0) m_prescaler = 0; /* Must clear the Prescaler */
 					TMR0 = data;
 					break;
-		case 02:    PCL = data;
+		case 2:     PCL = data;
 					m_PC = ((STATUS & PA_REG) << 4) | data;
 					break;
-		case 03:    STATUS &= (uint8_t)(~PA_REG); STATUS |= (data & PA_REG);
+		case 3:     STATUS = (STATUS & (TO_FLAG | PD_FLAG)) | (data & (uint8_t)(~(TO_FLAG | PD_FLAG)));
 					break;
-		case 04:    FSR = (data | (uint8_t)(~m_picRAMmask));
+		case 4:     FSR = (data | (uint8_t)(~m_picRAMmask));
 					break;
-		case 05:    data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
-					m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
-					PORTA = data;
+		case 5:     if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
+						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
+						m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
+						PORTA = data;
+					}
 					break;
-		case 06:    m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
+		case 6:     if (m_picmodel == 0x1655)
+						m_write_b(PIC16C5x_PORTB, data, 0xff);
+					else
+						m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
 					PORTB = data;
 					break;
-		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
+		case 7:     if (m_picmodel == 0x1655) {
+						m_write_c(PIC16C5x_PORTC, data, 0xff);
+						PORTC = data;
+					}
+					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
 						PORTC = data;
 					}
-					else {      /* PIC16C54, PIC16C56, PIC16C58 */
+					else { /* PIC16C54, PIC16C56, PIC16C58 */
 						M_WRTRAM(addr, data);
 					}
 					break;
@@ -432,6 +464,14 @@ void pic16c5x_device::illegal()
 	logerror("PIC16C5x:  PC=%03x,  Illegal opcode = %04x\n", (m_PC-1), m_opcode.w.l);
 }
 
+/*
+  Note:
+  According to the manual, if the STATUS register is the destination for an instruction that affects the Z, DC or C bits
+  then the write to these three bits is disabled. These bits are set or cleared according to the device logic.
+  To ensure this is correctly emulated, in instructions that write to the file registers, always change the status flags
+  *after* storing the result of the instruction.
+  e.g. CALCULATE_*, SET(STATUS,*_FLAG) and CLR(STATUS,*_FLAG) should appear as the last steps of the instruction emulation.
+*/
 
 void pic16c5x_device::addwf()
 {
@@ -475,7 +515,7 @@ void pic16c5x_device::btfss()
 {
 	if ((GET_REGFILE(ADDR) & bit_set[POS]) == bit_set[POS])
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -485,7 +525,7 @@ void pic16c5x_device::btfsc()
 {
 	if ((GET_REGFILE(ADDR) & bit_set[POS]) == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -539,7 +579,7 @@ void pic16c5x_device::decfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -565,7 +605,7 @@ void pic16c5x_device::incfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -622,21 +662,23 @@ void pic16c5x_device::retlw()
 void pic16c5x_device::rlf()
 {
 	m_ALU = GET_REGFILE(ADDR);
+	uint8_t bit7 = m_ALU & 0x80;
 	m_ALU <<= 1;
 	if (STATUS & C_FLAG) m_ALU |= 1;
-	if (GET_REGFILE(ADDR) & 0x80) SET(STATUS, C_FLAG);
-	else CLR(STATUS, C_FLAG);
 	STORE_RESULT(ADDR, m_ALU);
+	if (bit7) SET(STATUS, C_FLAG);
+	else CLR(STATUS, C_FLAG);
 }
 
 void pic16c5x_device::rrf()
 {
 	m_ALU = GET_REGFILE(ADDR);
+	uint8_t bit0 = m_ALU & 1;
 	m_ALU >>= 1;
 	if (STATUS & C_FLAG) m_ALU |= 0x80;
-	if (GET_REGFILE(ADDR) & 1) SET(STATUS, C_FLAG);
-	else CLR(STATUS, C_FLAG);
 	STORE_RESULT(ADDR, m_ALU);
+	if (bit0) SET(STATUS, C_FLAG);
+	else CLR(STATUS, C_FLAG);
 }
 
 void pic16c5x_device::sleepic()
@@ -668,11 +710,11 @@ void pic16c5x_device::tris()
 {
 	switch(m_opcode.b.l & 0x7)
 	{
-		case 05:    if   (m_TRISA == m_W) break;
+		case 5:     if   (m_TRISA == m_W) break;
 					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (uint8_t)(~m_TRISA) & 0x0f, 0xff); break; }
-		case 06:    if   (m_TRISB == m_W) break;
+		case 6:     if   (m_TRISB == m_W) break;
 					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (uint8_t)(~m_TRISB), 0xff); break; }
-		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
+		case 7:     if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						if   (m_TRISC == m_W) break;
 						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (uint8_t)(~m_TRISC), 0xff); break; }
 					}
@@ -706,8 +748,8 @@ void pic16c5x_device::xorwf()
 
 const pic16c5x_device::pic16c5x_opcode pic16c5x_device::s_opcode_main[256]=
 {
-/*00*/  {1, &pic16c5x_device::nop     },{0, &pic16c5x_device::illegal   },{1, &pic16c5x_device::movwf     },{1, &pic16c5x_device::movwf     },
-		{1, &pic16c5x_device::clrw    },{0, &pic16c5x_device::illegal   },{1, &pic16c5x_device::clrf      },{1, &pic16c5x_device::clrf      },
+/*00*/  {1, &pic16c5x_device::nop     },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::movwf     },{1, &pic16c5x_device::movwf     },
+		{1, &pic16c5x_device::clrw    },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::clrf      },{1, &pic16c5x_device::clrf      },
 /*08*/  {1, &pic16c5x_device::subwf   },{1, &pic16c5x_device::subwf     },{1, &pic16c5x_device::subwf     },{1, &pic16c5x_device::subwf     },
 		{1, &pic16c5x_device::decf    },{1, &pic16c5x_device::decf      },{1, &pic16c5x_device::decf      },{1, &pic16c5x_device::decf      },
 /*10*/  {1, &pic16c5x_device::iorwf   },{1, &pic16c5x_device::iorwf     },{1, &pic16c5x_device::iorwf     },{1, &pic16c5x_device::iorwf     },
@@ -775,10 +817,10 @@ const pic16c5x_device::pic16c5x_opcode pic16c5x_device::s_opcode_main[256]=
 
 const pic16c5x_device::pic16c5x_opcode pic16c5x_device::s_opcode_00x[16]=
 {
-/*00*/  {1, &pic16c5x_device::nop     },{0, &pic16c5x_device::illegal   },{1, &pic16c5x_device::option    },{1, &pic16c5x_device::sleepic   },
+/*00*/  {1, &pic16c5x_device::nop     },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::option    },{1, &pic16c5x_device::sleepic   },
 		{1, &pic16c5x_device::clrwdt  },{1, &pic16c5x_device::tris      },{1, &pic16c5x_device::tris      },{1, &pic16c5x_device::tris      },
-/*08*/  {0, &pic16c5x_device::illegal },{0, &pic16c5x_device::illegal   },{0, &pic16c5x_device::illegal   },{0, &pic16c5x_device::illegal   },
-		{0, &pic16c5x_device::illegal },{0, &pic16c5x_device::illegal   },{0, &pic16c5x_device::illegal   },{0, &pic16c5x_device::illegal   }
+/*08*/  {1, &pic16c5x_device::illegal },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::illegal   },
+		{1, &pic16c5x_device::illegal },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::illegal   },{1, &pic16c5x_device::illegal   }
 };
 
 
@@ -816,13 +858,6 @@ void pic16c5x_device::device_start()
 	save_item(NAME(m_W));
 	save_item(NAME(m_ALU));
 	save_item(NAME(m_OPTION));
-	save_item(NAME(TMR0));
-	save_item(NAME(PCL));
-	save_item(NAME(STATUS));
-	save_item(NAME(FSR));
-	save_item(NAME(PORTA));
-	save_item(NAME(PORTB));
-	save_item(NAME(PORTC));
 	save_item(NAME(m_TRISA));
 	save_item(NAME(m_TRISB));
 	save_item(NAME(m_TRISC));
@@ -831,8 +866,7 @@ void pic16c5x_device::device_start()
 	save_item(NAME(m_picRAMmask));
 	save_item(NAME(m_WDT));
 	save_item(NAME(m_prescaler));
-	save_item(NAME(m_STACK[0]));
-	save_item(NAME(m_STACK[1]));
+	save_item(NAME(m_STACK));
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PREVPC));
 	save_item(NAME(m_CONFIG));
@@ -909,7 +943,7 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = TMR0;
 			break;
 		case PIC16C5x_PRTA:
-			m_debugger_temp = PORTA & 0x0f;
+			m_debugger_temp = PORTA;
 			break;
 		case PIC16C5x_PRTB:
 			m_debugger_temp = PORTB;
@@ -962,7 +996,6 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_OPTION = (T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG);
 	PCL    = 0xff;
 	FSR   |= (uint8_t)(~m_picRAMmask);
-	PORTA &= 0x0f;
 	m_prescaler = 0;
 	m_delay_timer = 0;
 	m_old_T0 = 0;
@@ -1081,7 +1114,7 @@ void pic16c5x_device::execute_run()
 			m_PC++;
 			PCL++;
 
-			if ((m_opcode.w.l & 0xff0) != 0x000)    {   /* Do all opcodes except the 00? ones */
+			if (m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { /* Do all opcodes except the 00? ones */
 				m_inst_cycles = s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].cycles;
 				(this->*s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].function)();
 			}

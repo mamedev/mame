@@ -179,16 +179,6 @@ ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym2612_device::device_config_complete()
-{
-}
-
 
 const device_type YM3438 = &device_creator<ym3438_device>;
 

@@ -1,7 +1,7 @@
 // license:MIT
 // copyright-holders:Alfred Bratterud
-// NOTE: Author allowed MAME project to distribute this file under MIT 
-//		 license. Other projects need to do it under Apache 2 license
+// NOTE: Author allowed MAME project to distribute this file under MIT
+//       license. Other projects need to do it under Apache 2 license
 //
 // This file is a part of the IncludeOS unikernel - www.includeos.org
 //

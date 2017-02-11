@@ -1223,7 +1223,9 @@ namespace bgfx { namespace mtl
 			if (NULL != m_capture)
 			{
 				if (NULL == m_screenshotTarget)
+				{
 					return;
+				}
 
 				m_renderCommandEncoder.endEncoding();
 
@@ -1239,7 +1241,13 @@ namespace bgfx { namespace mtl
 
 				if (m_screenshotTarget.pixelFormat() == MTLPixelFormatRGBA8Uint)
 				{
-					imageSwizzleBgra8(m_resolution.m_width, m_resolution.m_height, m_resolution.m_width*4, m_capture, m_capture);
+					imageSwizzleBgra8(
+						  m_capture
+						, m_resolution.m_width
+						, m_resolution.m_height
+						, m_resolution.m_width*4
+						, m_capture
+						);
 				}
 
 				g_callback->captureFrame(m_capture, m_captureSize);
@@ -1247,11 +1255,13 @@ namespace bgfx { namespace mtl
 				RenderPassDescriptor renderPassDescriptor = newRenderPassDescriptor();
 				setFrameBuffer(renderPassDescriptor, m_renderCommandEncoderFrameBufferHandle);
 
-				for(uint32_t ii = 0; ii < g_caps.limits.maxFBAttachments; ++ii)
+				for (uint32_t ii = 0; ii < g_caps.limits.maxFBAttachments; ++ii)
 				{
 					MTLRenderPassColorAttachmentDescriptor* desc = renderPassDescriptor.colorAttachments[ii];
-					if ( desc.texture != NULL)
+					if (NULL != desc.texture)
+					{
 						desc.loadAction = MTLLoadActionLoad;
+					}
 				}
 
 				RenderPassDepthAttachmentDescriptor depthAttachment = renderPassDescriptor.depthAttachment;
@@ -1802,7 +1812,7 @@ namespace bgfx { namespace mtl
 
 	void writeString(bx::WriterI* _writer, const char* _str)
 	{
-		bx::write(_writer, _str, (int32_t)strlen(_str) );
+		bx::write(_writer, _str, (int32_t)bx::strnlen(_str) );
 	}
 
 	void ShaderMtl::create(const Memory* _mem)
@@ -2679,6 +2689,7 @@ namespace bgfx { namespace mtl
 
 	void FrameBufferMtl::create(uint8_t _num, const Attachment* _attachment)
 	{
+		m_denseIdx = UINT16_MAX;
 		m_num = 0;
 		m_width = 0;
 		m_height = 0;
@@ -3406,14 +3417,17 @@ namespace bgfx { namespace mtl
 					{
 						Rect scissorRect;
 						scissorRect.intersect(viewScissorRect, _render->m_rectCache.m_cache[scissor]);
-						rc.x   = scissorRect.m_x;
-						rc.y    = scissorRect.m_y;
+						if (scissorRect.isZeroArea() )
+						{
+							continue;
+						}
+
+						rc.x      = scissorRect.m_x;
+						rc.y      = scissorRect.m_y;
 						rc.width  = scissorRect.m_width;
 						rc.height = scissorRect.m_height;
-
-						if ( rc.width == 0 || rc.height == 0 )
-							continue;
 					}
+
 					rce.setScissorRect(rc);
 				}
 

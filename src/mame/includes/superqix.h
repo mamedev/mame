@@ -159,21 +159,21 @@ protected:
 
 	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_ioport_array<2>		m_dsw;
-	required_ioport_array<2>		m_dials;
-	optional_ioport_array<2>		m_plungers;
-	optional_device<m68705p_device>	m_mcu;
-	optional_device<samples_device>	m_samples;
-	optional_region_ptr<u8>			m_samples_region;
+	required_ioport_array<2>        m_dsw;
+	required_ioport_array<2>        m_dials;
+	optional_ioport_array<2>        m_plungers;
+	optional_device<m68705p_device> m_mcu;
+	optional_device<samples_device> m_samples;
+	optional_region_ptr<u8>         m_samples_region;
 
-	std::unique_ptr<s16[]>			m_samplebuf;
+	std::unique_ptr<s16[]>          m_samplebuf;
 
 	// HLE-related for prebillian
 	int m_curr_player;
 
 	// 68705 related
-	u8	m_portB_out;
-	u8	m_portC_out;
+	u8  m_portB_out;
+	u8  m_portC_out;
 
 	// spinner quadrature stuff
 	int m_oldpos[2];

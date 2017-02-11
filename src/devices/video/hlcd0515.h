@@ -16,7 +16,7 @@
 #define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
 	hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
 
-// DATA OUT pin
+// DATA OUT pin, don't use on HLCD0569
 #define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
 	hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
 
@@ -46,6 +46,8 @@
    COL11 19 |           | 22 COL13
      GND 20 |___________| 21 COL12
 
+    HLCD 0569 doesn't have DATA OUT, instead it has what seems like OSC OUT on pin 34.
+    
     OSC is tied to a capacitor, the result frequency is 50000 * cap(in uF), eg. 0.01uF cap = 500Hz.
     Internally, this is divided by 2, and by number of rows to get display refresh frequency.
 */
@@ -54,15 +56,15 @@ class hlcd0515_device : public device_t
 {
 public:
 	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
+	hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 colmax, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_write_cols_callback(device_t &device, _Object object) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_data_callback(device_t &device, _Object object) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_cs);
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_data);
+	DECLARE_WRITE_LINE_MEMBER(write_cs);
+	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
 
 protected:
 	// device-level overrides
@@ -70,17 +72,23 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual void set_control();
+	void clock_data(int col);
+
+	u8 m_colmax;    // number of column pins
+	
 	int m_cs;       // input pin state
 	int m_clock;    // "
 	int m_data;     // "
 	int m_count;
 	u8 m_control;
-	bool m_blank;	// display blank/visible
+	bool m_blank;   // display blank/visible
 	u8 m_rowmax;    // number of rows output by lcd (max 8)
 	u8 m_rowout;    // current row for lcd output
 	u8 m_rowsel;    // current row for data in/out
-	u32 m_ram[8];   // 8x25bit ram
-	
+	u32 m_buffer;   // data in/out shift register
+	u32 m_ram[8];   // internal lcd ram, 8 rows
+
 	emu_timer *m_lcd_timer;
 
 	// callbacks
@@ -93,6 +101,9 @@ class hlcd0569_device : public hlcd0515_device
 {
 public:
 	hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void set_control() override;
 };
 
 

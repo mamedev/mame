@@ -216,13 +216,3 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 		m_region(*this, DEVICE_SELF)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void y8950_device::device_config_complete()
-{
-}

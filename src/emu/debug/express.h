@@ -139,7 +139,7 @@ protected:
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
 	std::string     m_name;                     // name of the symbol
-	std::string		m_format;					// format of symbol (or empty if unspecified)
+	std::string     m_format;                   // format of symbol (or empty if unspecified)
 	void *          m_ref;                      // internal reference
 };
 

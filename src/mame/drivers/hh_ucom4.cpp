@@ -76,7 +76,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset
@@ -2166,7 +2166,6 @@ INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
 {
 	set_clock();
 }
-
 
 void tmtennis_state::set_clock()
 {

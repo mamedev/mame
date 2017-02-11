@@ -97,10 +97,11 @@ namespace Catch {
 
 
             do {
-                m_trackerContext.startRun();
+                ITracker& rootTracker = m_trackerContext.startRun();
+                dynamic_cast<SectionTracker&>( rootTracker ).addInitialFilters( m_config->getSectionsToRun() );
                 do {
                     m_trackerContext.startCycle();
-                    m_testCaseTracker = &SectionTracker::acquire( m_trackerContext, testInfo.name );
+                    m_testCaseTracker = &SectionTracker::acquire( m_trackerContext, TestCaseTracking::NameAndLocation( testInfo.name, testInfo.lineInfo ) );
                     runCurrentTest( redirectedCout, redirectedCerr );
                 }
                 while( !m_testCaseTracker->isSuccessfullyCompleted() && !aborting() );
@@ -146,7 +147,7 @@ namespace Catch {
                 m_messages.clear();
 
             // Reset working state
-            m_lastAssertionInfo = AssertionInfo( "", m_lastAssertionInfo.lineInfo, "{Unknown expression after the reported line}" , m_lastAssertionInfo.resultDisposition );
+            m_lastAssertionInfo = AssertionInfo( std::string(), m_lastAssertionInfo.lineInfo, "{Unknown expression after the reported line}" , m_lastAssertionInfo.resultDisposition );
             m_lastResult = result;
         }
 
@@ -155,10 +156,7 @@ namespace Catch {
             Counts& assertions
         )
         {
-            std::ostringstream oss;
-            oss << sectionInfo.name << "@" << sectionInfo.lineInfo;
-
-            ITracker& sectionTracker = SectionTracker::acquire( m_trackerContext, oss.str() );
+            ITracker& sectionTracker = SectionTracker::acquire( m_trackerContext, TestCaseTracking::NameAndLocation( sectionInfo.name, sectionInfo.lineInfo ) );
             if( !sectionTracker.isOpen() )
                 return false;
             m_activeSections.push_back( &sectionTracker );
@@ -217,7 +215,7 @@ namespace Catch {
         virtual std::string getCurrentTestName() const {
             return m_activeTestCase
                 ? m_activeTestCase->getTestCaseInfo().name
-                : "";
+                : std::string();
         }
 
         virtual const AssertionResult* getLastResult() const {
@@ -247,11 +245,11 @@ namespace Catch {
             deltaTotals.testCases.failed = 1;
             m_reporter->testCaseEnded( TestCaseStats(   testInfo,
                                                         deltaTotals,
-                                                        "",
-                                                        "",
+                                                        std::string(),
+                                                        std::string(),
                                                         false ) );
             m_totals.testCases.failed++;
-            testGroupEnded( "", m_totals, 1, 1 );
+            testGroupEnded( std::string(), m_totals, 1, 1 );
             m_reporter->testRunEnded( TestRunStats( m_runInfo, m_totals, false ) );
         }
 
@@ -270,7 +268,7 @@ namespace Catch {
             Counts prevAssertions = m_totals.assertions;
             double duration = 0;
             try {
-                m_lastAssertionInfo = AssertionInfo( "TEST_CASE", testCaseInfo.lineInfo, "", ResultDisposition::Normal );
+                m_lastAssertionInfo = AssertionInfo( "TEST_CASE", testCaseInfo.lineInfo, std::string(), ResultDisposition::Normal );
 
                 seedRng( *m_config );
 

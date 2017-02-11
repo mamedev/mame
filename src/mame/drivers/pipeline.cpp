@@ -110,20 +110,20 @@ public:
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
 protected:
-	required_device<cpu_device>			m_maincpu;
-	required_device<m68705r_device>		m_mcu;
-	required_device<gfxdecode_device>	m_gfxdecode;
-	required_device<palette_device>		m_palette;
+	required_device<cpu_device>         m_maincpu;
+	required_device<m68705r_device>     m_mcu;
+	required_device<gfxdecode_device>   m_gfxdecode;
+	required_device<palette_device>     m_palette;
 
-	required_shared_ptr<u8>	m_vram1;
-	required_shared_ptr<u8>	m_vram2;
+	required_shared_ptr<u8> m_vram1;
+	required_shared_ptr<u8> m_vram2;
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 
-	u8						m_vidctrl;
-	std::unique_ptr<u8[]>	m_palram;
-	u8						m_fromMCU;
+	u8                      m_vidctrl;
+	std::unique_ptr<u8[]>   m_palram;
+	u8                      m_fromMCU;
 };
 
 

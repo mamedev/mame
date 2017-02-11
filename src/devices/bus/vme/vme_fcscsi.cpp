@@ -72,10 +72,10 @@
  * - 68010 CPU for local control (10MHz)
  * - 68450 DMA Controller for local transfers (10MHz)
  * - Dual Ported l28Kbyte 0 wait state static RAM between the VMEbus and the local CPU
- * - SCSlbus interface built with the NCR 5386S SCSlbus controller. 
+ * - SCSlbus interface built with the NCR 5386S SCSlbus controller.
  *   o Programmable as an initiator or target
  *   o Transfer rate up to 1.5Mbyte/s
- * - SHUGART compatible floppy interface with the WD1772 FDC. Up to 4 floppy drives can be 
+ * - SHUGART compatible floppy interface with the WD1772 FDC. Up to 4 floppy drives can be
  *   controlled independent of the SCSlbus
  * - All I/O signals available on P2 connector 4 different interrupt request signals to the VMEbus. Each
  *   channel contains a software programmable IRQ level (1 to 7) and vector
@@ -102,7 +102,7 @@
  *
  * VME side A24 address map - Dual ported RAM
  * ----------------------------------------------------------
- * Default Range     Description 
+ * Default Range     Description
  * ----------------------------------------------------------
  * A00000 - A00000  Status word Bits 8:RESET 9:HALT 10:WD
  * A00001 - A0000F  BIM - See below
@@ -176,7 +176,7 @@
 #endif
 
 //**************************************************************************
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type VME_FCSCSI1 = &device_creator<vme_fcscsi1_card_device>;

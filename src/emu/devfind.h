@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include <iterator>
+#include <stdexcept>
+#include <type_traits>
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -65,6 +69,27 @@ private:
 	T m_array[Count];
 
 public:
+	/// \brief Element type for Container concept
+	typedef T value_type;
+
+	/// \brief Reference to element type for Container concept
+	typedef T &reference;
+
+	/// \brief Reference to constant element type for Container concept
+	typedef T const &const_reference;
+
+	/// \brief Iterator for Container concept
+	typedef T *iterator;
+
+	/// \brief Constant iterator for Container concept
+	typedef T const *const_iterator;
+
+	/// \brief Iterator difference type for Container concept
+	typedef typename std::iterator_traits<iterator>::difference_type difference_type;
+
+	/// \brief Size type for Container concept
+	typedef std::make_unsigned_t<difference_type> size_type;
+
 	/// \brief Construct with programmatically generated tags
 	///
 	/// Specify a format string and starting number.  A single unsigned
@@ -102,11 +127,72 @@ public:
 	{
 	}
 
+	/// \brief Get iterator to first element
+	///
+	/// Returns an iterator to the first element in the array.
+	/// \return Iterator to first element.
+	const_iterator begin() const { return m_array; }
+	iterator begin() { return m_array; }
+
+	/// \brief Get iterator beyond last element
+	///
+	/// Returns an iterator one past the last element in the array.
+	/// \return Iterator one past last element.
+	const_iterator end() const { return m_array + Count; }
+	iterator end() { return m_array + Count; }
+
+	/// \brief Get constant iterator to first element
+	///
+	/// Returns a constant iterator to the first element in the array.
+	/// \return Constant iterator to first element.
+	const_iterator cbegin() const { return m_array; }
+
+	/// \brief Get constant iterator beyond last element
+	///
+	/// Returns aconstant iterator one past the last element in the
+	/// array.
+	/// \return Constant iterator one past last element.
+	const_iterator cend() const { return m_array + Count; }
+
+	/// \brief Get array size
+	///
+	/// Returns number of elements in the array (compile-time constant).
+	/// \return The size of the array.
+	constexpr size_type size() const { return Count; }
+
+	/// \brief Get maximum array size
+	///
+	/// Returns maximum number of elements in the array (compile-time
+	/// constant, always equal to the size of the array).
+	/// \return The size of the array.
+	constexpr size_type max_size() const { return Count; }
+
+	/// \brief Does array have no elements
+	///
+	/// Returns whether the arary has no elements (compile-time
+	/// constant).
+	/// \return True if the array has no elements, false otherwise.
+	constexpr bool empty() const { return !Count; }
+
+	/// \brief Get first element
+	///
+	/// Returns a reference to the first element in the array.
+	/// \return Reference to first element.
+	T const &front() const { return m_array[0]; }
+	T &front() { return m_array[0]; }
+
+	/// \brief Get last element
+	///
+	/// Returns a reference to the last element in the array.
+	/// \return Reference to last element.
+	T const &back() const { return m_array[Count - 1]; }
+	T &back() { return m_array[Count - 1]; }
+
 	/// \brief Element accessor (const)
 	///
 	/// Returns a const reference to the element at the supplied index.
 	/// \param [in] index Index of desired element (zero-based).
-	/// \return Reference to element at specified index.
+	/// \return Constant reference to element at specified index.
 	T const &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
 
 	/// \brief Element accessor (non-const)
@@ -116,11 +202,16 @@ public:
 	/// \return Reference to element at specified index.
 	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
 
-	/// \brief Get array size
+	/// \brief Checked element accesor
 	///
-	/// Returns number of objects in array (compile-time constant).
-	/// \return The size of the array.
-	constexpr unsigned size() const { return Count; }
+	/// Returns a reference to the element at the supplied index if less
+	/// than the size of the array, or throws std::out_of_range
+	/// otherwise.
+	/// \param [in] index Index of desired element (zero-based).
+	/// \return Reference to element at specified index.
+	/// \throw std::out_of_range
+	T const &at(unsigned index) const { if (Count > index) return m_array[index]; else throw std::out_of_range("Index out of range"); }
+	T &at(unsigned index) { if (Count > index) return m_array[index]; else throw std::out_of_range("Index out of range"); }
 };
 
 

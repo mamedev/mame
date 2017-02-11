@@ -90,16 +90,6 @@ newport_video_device::newport_video_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void newport_video_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

@@ -69,22 +69,20 @@ static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 ADDRESS_MAP_END
 
 
-tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
-{
-}
-
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char* shortname, const char* source)
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor internal_pgm, address_map_constructor internal_data)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, internal_pgm)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, internal_data)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
 {
 }
 
+tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms32051_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__,
+		ADDRESS_MAP_NAME(tms32051_internal_pgm),
+		ADDRESS_MAP_NAME(tms32051_internal_data))
+{
+}
 
 
 /**************************************************************************
@@ -107,7 +105,9 @@ ADDRESS_MAP_END
 
 
 tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__)
+	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__,
+		ADDRESS_MAP_NAME(tms32053_internal_pgm),
+		ADDRESS_MAP_NAME(tms32053_internal_data))
 {
 }
 
@@ -657,10 +657,4 @@ void tms32053_device::device_reset()
 	m_idle = false;
 
 	CHANGE_PC(0);
-}
-
-void tms32053_device::device_config_complete()
-{
-	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_pgm));
-	m_data_config = address_space_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_data));
 }

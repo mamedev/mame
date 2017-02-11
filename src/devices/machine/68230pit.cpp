@@ -911,7 +911,7 @@ uint8_t pit68230_device::rr_pitreg_pcdr()
 	{
 		m_pcdr |= (m_pcil & ~m_pcddr);
 	}
-	
+
 	if (m_pcdr != 0) { LOGDR("%s %s <- %02x\n",tag(), FUNCNAME, m_pcdr); }
 
 	return m_pcdr;

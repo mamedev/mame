@@ -38,7 +38,6 @@
 #define _ENABLE_SCROLLX
 #define _ENABLE_SCROLLY
 //#define _ENABLE_SCREEN_RESIZE
-//#define _ENABLE_ROTATE_ZOOM
 //#define _SHOW_VIDEO_DEBUG
 
 #define GFX_8X8_4BIT    0
@@ -831,6 +830,31 @@ static const char *const mode[] = {
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
+inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap)
+{
+	//int xc, yc;
+	//double r, alpha, sin_theta, cos_theta;
+	//const rectangle &visarea = screen.visible_area();
+	
+	if( m_regs.s.r7 & r7_zron )
+	{
+		// old code, for reference.
+		//xc = m_ax >> 16;
+		//yc = m_ay >> 16;
+		//r = sqrt( (double)( xc * xc + yc * yc ) );
+		//alpha = atan( (double)xc / (double)yc );
+		//sin_theta = (double)m_dyx / (double)0x10000;
+		//cos_theta = (double)m_dx / (double)0x10000;
+		
+		source_tilemap->draw_roz(screen, bitmap, cliprect, 
+				m_ax, m_ay,
+				m_dx, m_dxy, m_dyx, m_dy, true, 0, 0 );
+	}
+	else
+		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
+}
+
+
 uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _SHOW_VIDEO_DEBUG
@@ -839,21 +863,17 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 #ifdef _ENABLE_SCROLLY
 	int col;
 #endif
-#ifdef _ENABLE_ROTATE_ZOOM
-	int xc, yc;
-	double r, alpha, sin_theta, cos_theta;
-#endif
 	rectangle finalclip;
 	const rectangle &visarea = screen.visible_area();
 
 	// clip to the current bitmap
 	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
-
+	bitmap.fill(0, visarea );
+	
 	// punt if not initialized
 	if (m_page_x == 0 || m_page_y == 0)
 	{
-		bitmap.fill(0, finalclip);
 		return 0;
 	}
 
@@ -951,7 +971,6 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	 *    now we can render the screen
 	 */
 
-#if 1
 	// LBO - need to implement proper pen marking for sprites as well as set aside a non-transparent
 	// pen to be used for background fills when plane B is disabled.
 	if ((m_regs.s.r7 & r7_md) & MD_1PLANE)
@@ -961,34 +980,11 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 //      m_work_bitmap.fill(1, *visarea);
 	}
 	else
-#endif
-		m_tilemap_B->draw(screen, m_work_bitmap, finalclip, 0, 0 );
-
-#ifdef _ENABLE_ROTATE_ZOOM
-
-	/*
-	*    fudge - translate ax,ay to startx, starty each time
-	*/
-
-	xc = m_ax >> 16;
-	yc = m_ay >> 16;
-	r = sqrt( (double)( xc * xc + yc * yc ) );
-	alpha = atan( (double)xc / (double)yc );
-	sin_theta = (double)m_dyx / (double)0x10000;
-	cos_theta = (double)m_dx / (double)0x10000;
-
-	if( m_regs.s.zron )
-	copyrozbitmap( bitmap, finalclip, &m_work_bitmap,
-					( visarea.min_x << 16 ) +
-					m_ax + 0x10000 * r *
-					( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
-					( visarea.min_y << 16 ) +
-					m_ay + 0x10000 * r *
-					( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
-					m_dx, m_dxy, m_dyx, m_dy, 0);
-	else
-#endif
-	copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
+	{
+		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
+		
+		copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
+	}
 
 	// for some reason we can't use an opaque m_tilemap_A
 	// so use a transparent but clear the work bitmap first
@@ -999,19 +995,9 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		(m_regs.s.r11 & r11_prm) == PRM_ASEBDX )
 		draw_sprites(bitmap, finalclip);
 
-	m_tilemap_A->draw(screen, m_work_bitmap, finalclip, 0, 0 );
-
-#ifdef _ENABLE_ROTATE_ZOOM
-	if( m_regs.s.zron )
-	copyrozbitmap_trans( bitmap, finalclip, &m_work_bitmap,
-					m_ax, // + ( visarea.min_x << 16 ),
-					m_ay, // + ( visarea.min_y << 16 ),
-					m_dx, m_dxy, m_dyx, m_dy, 0,
-					0 );
-	else
-#endif
-	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0 );
-
+	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
+	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
+	
 	if ((m_regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(m_regs.s.r11 & r11_prm) == PRM_SEABDX)
 		draw_sprites(bitmap,finalclip );

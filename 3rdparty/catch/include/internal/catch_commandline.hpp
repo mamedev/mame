@@ -23,13 +23,14 @@ namespace Catch {
         config.abortAfter = x;
     }
     inline void addTestOrTags( ConfigData& config, std::string const& _testSpec ) { config.testsOrTags.push_back( _testSpec ); }
+    inline void addSectionToRun( ConfigData& config, std::string const& sectionName ) { config.sectionsToRun.push_back( sectionName ); }
     inline void addReporterName( ConfigData& config, std::string const& _reporterName ) { config.reporterNames.push_back( _reporterName ); }
 
     inline void addWarning( ConfigData& config, std::string const& _warning ) {
         if( _warning == "NoAssertions" )
             config.warnings = static_cast<WarnAbout::What>( config.warnings | WarnAbout::NoAssertions );
         else
-            throw std::runtime_error( "Unrecognised warning: '" + _warning + "'" );
+            throw std::runtime_error( "Unrecognised warning: '" + _warning + '\'' );
     }
     inline void setOrder( ConfigData& config, std::string const& order ) {
         if( startsWith( "declared", order ) )
@@ -39,7 +40,7 @@ namespace Catch {
         else if( startsWith( "random", order ) )
             config.runOrder = RunTests::InRandomOrder;
         else
-            throw std::runtime_error( "Unrecognised ordering: '" + order + "'" );
+            throw std::runtime_error( "Unrecognised ordering: '" + order + '\'' );
     }
     inline void setRngSeed( ConfigData& config, std::string const& seed ) {
         if( seed == "time" ) {
@@ -64,7 +65,7 @@ namespace Catch {
     }
     inline void setUseColour( ConfigData& config, std::string const& value ) {
         std::string mode = toLower( value );
-        
+
         if( mode == "yes" )
             config.useColour = UseColour::Yes;
         else if( mode == "no" )
@@ -85,10 +86,10 @@ namespace Catch {
         std::string line;
         while( std::getline( f, line ) ) {
             line = trim(line);
-            if( !line.empty() && !startsWith( line, "#" ) ) {
-                if( !startsWith( line, "\"" ) )
-                    line = "\"" + line + "\"";
-                addTestOrTags( config, line + "," );
+            if( !line.empty() && !startsWith( line, '#' ) ) {
+                if( !startsWith( line, '"' ) )
+                    line = '"' + line + '"';
+                addTestOrTags( config, line + ',' );
             }
         }
     }
@@ -176,6 +177,10 @@ namespace Catch {
             .describe( "adds a tag for the filename" )
             .bind( &ConfigData::filenamesAsTags );
 
+        cli["-c"]["--section"]
+                .describe( "specify section to run" )
+                .bind( &addSectionToRun, "section name" );
+
         // Less common commands which don't have a short form
         cli["--list-test-names-only"]
             .describe( "list all/matching test cases names only" )
@@ -196,7 +201,7 @@ namespace Catch {
         cli["--force-colour"]
             .describe( "force colourised output (deprecated)" )
             .bind( &forceColour );
-        
+
         cli["--use-colour"]
             .describe( "should output be colourised" )
             .bind( &setUseColour, "yes|no" );

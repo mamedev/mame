@@ -9,30 +9,22 @@
 ****************************************************************************/
 
 #include "net_lib.h"
-#include "nl_factory.h"
-#include "solver/nld_solver.h"
+#include "../nl_factory.h"
+#include "../solver/nld_solver.h"
 
 
 #define xstr(s) # s
 
-#if 0
-#define ENTRY1(nic, name, defparam) factory.register_device<nic>( # name, xstr(nic), defparam );
-#define ENTRY(nic, name, defparam) ENTRY1(NETLIB_NAME(nic), name, defparam)
-#endif
-
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip;
 
-//#define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (# name, xstr(nic), defparam) );
 #define ENTRYX1(nic, name, defparam, decl) factory.register_device( decl (pstring(# name), pstring(xstr(nic)), pstring(defparam)) );
 #define ENTRYX(nic, name, defparam) { NETLIB_DEVICE_DECL(nic) ENTRYX1(NETLIB_NAME(nic), name, defparam, decl_ ## nic) }
 
 namespace netlist
 {
-	using namespace netlist::analog;
-
 	namespace devices
 	{
-static void initialize_factory(factory::list_t &factory)
+	void initialize_factory(factory::list_t &factory)
 {
 	ENTRYX(R,                   RES,                    "R")
 	ENTRYX(POT,                 POT,                    "R")
@@ -162,10 +154,3 @@ static void initialize_factory(factory::list_t &factory)
 	} //namespace devices
 } // namespace netlist
 
-namespace netlist
-{
-	void initialize_factory(factory::list_t &factory)
-	{
-		devices::initialize_factory(factory);
-	}
-}

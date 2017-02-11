@@ -7,19 +7,35 @@
 AQUARIUM
 EXCELLENT SYSTEMS
 ES-9206
-                                   3
-                      14.318MHz                 7
-       ES 9207
-                                        8
-       ES 9303
-                                       ES 9208  2
++------------------------------------------------+
+|                  6116      23C16000   23C16000*|
+|         YM2151   6116      23C16000*  23C16000*|
+|                    +-------+ +-------+         |
+|     1.056MHz M6295 |ES-9303| |ES 9207|         |
+|YM3012              |       | |       | AS7C256 |
+|                    +-------+ +-------+ AS7C256 |
+|J                                       AS7C256 |
+|A                    4         AS7C256  AS7C256 |
+|M                Z80B   32MHz                   |
+|M                5      68000P-16  14.318MHz    |
+|A                    PAL   AS7C256      AS7C256 |
+|                        +-------+       AS7C256 |
+|         PAL            |ES-9208|  PB1       3  |
+|     1   PAL  6         |       |   8   27C4096*|
+|                        +-------+               |
+|SW4*SW3* SW2 SW1    AS7C256       2        7    |
++------------------------------------------------+
 
-AQUARF1              68000-16            6
+   CPU: TMP68HC000P-16
+ Sound: Z0840006PSC Z80B
+        OKI M6295, YM2151 & YM3012 DAC
+   OSC: 32MHz, 14.31818MHz & 1056kHz resonator
+Custom: EXCELLENT SYSTEM ES-9208 347101 (QFP160)
+        EXCELLENT SYSTEM LTD. ES 9207 9343 T (QFP208)
+        ES-9303 EXCELLENT 9338 C001 (QFP120)
+ Other: PB1 - Push button reset
 
-                                                 SW1
-   YM2151  M6295  4  32MHz               1
-                     Z80-6  5                    SW2Q
-
+* Denotes unpopulated components
 
 
 Notes:
@@ -29,6 +45,7 @@ Notes:
 // Sound banking + video references
 // https://www.youtube.com/watch?v=nyAQPrkt_a4
 // https://www.youtube.com/watch?v=0gn2Kj2M46Q
+
 
 */
 
@@ -314,7 +331,6 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_portmap)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -340,68 +356,68 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
 ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "aquar3.bin",  0x000000, 0x080000, CRC(f197991e) SHA1(0a217d735e2643605dbfd6ee20f98f46b37d4838) )
+	ROM_LOAD16_WORD_SWAP( "aquar3.13h",  0x000000, 0x080000, CRC(f197991e) SHA1(0a217d735e2643605dbfd6ee20f98f46b37d4838) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
-	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
+	ROM_LOAD( "excellent_5.10c",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
+	ROM_LOAD( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
 	/* data is expanded here from USER1 */
 	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar6",      0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
+	ROM_LOAD( "excellent_6.15d", 0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
 	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar8",      0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
+	ROM_LOAD( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
 	/* data is expanded here from USER2 */
 	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar7",      0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
+	ROM_LOAD( "excellent_7.17g", 0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
 	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
-	ROM_LOAD( "aquar2",   0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
+	ROM_LOAD( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
-	ROM_LOAD( "aquarf1",     0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) )
+	ROM_LOAD( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
+	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
 ROM_START( aquariumj )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
+	ROM_LOAD16_WORD_SWAP( "excellent_3.13h",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
-	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
+	ROM_LOAD( "excellent_5.10c",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
+	ROM_LOAD( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
 	/* data is expanded here from USER1 */
 	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar6",      0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
+	ROM_LOAD( "excellent_6.15d", 0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
 	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar8",      0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
+	ROM_LOAD( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
 	/* data is expanded here from USER2 */
 	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
-	ROM_LOAD( "aquar7",      0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
+	ROM_LOAD( "excellent_7.17g", 0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
 	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
-	ROM_LOAD( "aquar2",   0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
+	ROM_LOAD( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
-	ROM_LOAD( "aquarf1",     0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) )
+	ROM_LOAD( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
+	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-GAME( 1996, aquarium, 0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, aquariumj,aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

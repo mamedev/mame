@@ -310,7 +310,7 @@ public:
 // ======================> m6809e_device
 
 #define MCFG_M6809E_LIC_CB(_devcb) \
-	m6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
+	devcb = &m6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
 
 
 class m6809e_device : public m6809_base_device

@@ -14,10 +14,6 @@ segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const 
 }
 
 
-void segaic16_road_device::device_config_complete()
-{
-}
-
 void segaic16_road_device::device_start()
 {
 }

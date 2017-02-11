@@ -17,8 +17,8 @@
     - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
     - investigate on POR bit
     - test 2dd more
-	- clean-ups/split into devices.
-	
+    - clean-ups/split into devices.
+
     TODO (PC-9801RS):
     - extra features;
     - keyboard shift doesn't seem to disable properly;
@@ -44,7 +44,7 @@
     - AD&D Champions of Krynn
     - AI Shougi (asserts upon loading, 3'5 image?)
     - Aki no Tsukasa no Fushigi no Kabe (works in PC-9801RS only)
-	- alice
+    - alice
     - Aoki Ookami no Shiroki Mejika - Gengis Khan
     - Arcshu
     - Arcus 2
@@ -62,54 +62,54 @@
 
     * Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
-	- runners (size assert)
-	- Sorcerian (2dd image)
-	- Twilight Zone 3 (2dd image)
+    - runners (size assert)
+    - Sorcerian (2dd image)
+    - Twilight Zone 3 (2dd image)
 
     List of per-game TODO:
     - 4dboxing: inputs are unresponsive;
-	- 4dboxing: crashes after user disk creation (regression);
-	- agumixsl: non-interlace mode doesn't resize graphics, has rectangle selection bugs (note: needs GDC = 5 MHz to boot);
+    - 4dboxing: crashes after user disk creation (regression);
+    - agumixsl: non-interlace mode doesn't resize graphics, has rectangle selection bugs (note: needs GDC = 5 MHz to boot);
     - agenesis: fails loading, attempting to read IDE RAM switch port;
-	- alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-	- applecl1: can't pass hands apparently;
-	- arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
+    - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
+    - applecl1: can't pass hands apparently;
+    - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
     - atragon: HDD install disk swap doesn't work?
-	- asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
+    - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
     - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
-	- bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
-	- bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
-	- bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
-	
+    - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
+    - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
+    - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
+
     - deflektr: no sound, moans about a DIP-SW setting during loading, has timing issues (keyboard being too fast on PC-9801RS);
-	- edge: has gfx glitch when intro scrolls to top-left;
-	- edge: user disk creation is offset?
+    - edge: has gfx glitch when intro scrolls to top-left;
+    - edge: user disk creation is offset?
     - idolsaga: Moans with a "(program) ended. remove the floppy disk and turn off the power."
-	- karateka: no sound;
-	- lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
+    - karateka: no sound;
+    - lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
     - madoum1, madoum2, madoum3: doesn't display bitmap gfxs during gameplay;
     - quarth: sound cuts off at title screen, doesn't work on 9801rs (bogus "corrupt .exe" detected);
     - prinmak2, tim: cursor stays stuck when using mouse (works with keyboard);
     - puyopuyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
     - runners: wrong double height on the title screen;
-	- rusty: black stripes when scrolling;
-	- rusty: voice pitches are too slow (tested with -26 and -86);
+    - rusty: black stripes when scrolling;
+    - rusty: voice pitches are too slow (tested with -26 and -86);
     - win211: EGC drawing issue (byte wide writes?)
-	- win31: doesn't boot at 
-	
-	per-game TODO (Dounjishi SW):
+    - win31: doesn't boot at
+
+    per-game TODO (Dounjishi SW):
     - Absolutely Mahjong: Transitions are too fast.
-	
+
     per-game TODO (PC-9821):
     - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
     - Policenauts: CD-ROM drive not found;
 
     Notes:
-	- annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
+    - annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
     - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS
-	- fhtag2: product key is 001J0283TA 100001
+    - fhtag2: product key is 001J0283TA 100001
     - To deprotect BASIC modules set 0xcd7 in ram to 0
 
 ========================================================================================
@@ -595,13 +595,13 @@ public:
 	DECLARE_WRITE16_MEMBER(grcg_gvram_w);
 	DECLARE_READ16_MEMBER(grcg_gvram0_r);
 	DECLARE_WRITE16_MEMBER(grcg_gvram0_w);
-	
+
 	DECLARE_READ16_MEMBER(pc9821_grcg_gvram_r);
 	DECLARE_WRITE16_MEMBER(pc9821_grcg_gvram_w);
 	DECLARE_READ16_MEMBER(pc9821_grcg_gvram0_r);
 	DECLARE_WRITE16_MEMBER(pc9821_grcg_gvram0_w);
 	uint16_t m_pc9821_256vram_bank;
-	
+
 	DECLARE_READ16_MEMBER(upd7220_grcg_r);
 	DECLARE_WRITE16_MEMBER(upd7220_grcg_w);
 	void egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask);
@@ -2313,41 +2313,41 @@ READ8_MEMBER(pc9801_state::ext2_video_ff_r)
 	uint8_t res;
 
 	res = 0;
-	
+
 	switch(m_ext2_ff)
 	{
-//		case 0x00: ?
-//		case 0x01: 200 line color / b&w mode (i/o 0x68 -> 0x02)
-//		case 0x02: Odd-numbered raster mask  (i/o 0x68 -> 0x08)
+//      case 0x00: ?
+//      case 0x01: 200 line color / b&w mode (i/o 0x68 -> 0x02)
+//      case 0x02: Odd-numbered raster mask  (i/o 0x68 -> 0x08)
 		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
-//		case 0x04: palette mode (i/o 0x6a -> 0x00)
-//		case 0x05: GDC sync mode (i/o 0x6a -> 0x40)
-//		case 0x06: unknown (i/o 0x6a -> 0x44)
-//		case 0x07: EGC compatibility mode (i/o 0x6a -> 0x04)
-//		case 0x08: Protected mode f/f (i/o 0x6a -> 0x06)
-//		case 0x09: GDC clock #0 (i/o 0x6a -> 0x82)
+//      case 0x04: palette mode (i/o 0x6a -> 0x00)
+//      case 0x05: GDC sync mode (i/o 0x6a -> 0x40)
+//      case 0x06: unknown (i/o 0x6a -> 0x44)
+//      case 0x07: EGC compatibility mode (i/o 0x6a -> 0x04)
+//      case 0x08: Protected mode f/f (i/o 0x6a -> 0x06)
+//      case 0x09: GDC clock #0 (i/o 0x6a -> 0x82)
 		case 0x0a: res = m_ex_video_ff[ANALOG_256_MODE]; break; // 256 color mode
-//		case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
-//		case 0x0c: unknown
-//		case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
-//		case 0x0e: 65536 color GFX mode (i/o 0x6a -> 0x22)
-//		case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
-//		case 0x10: unknown (i/o 0x6a -> 0x6a)
-//		case 0x11: Reverse mode related (i/o 0x6a -> 0x26)
-//		case 0x12: 256 color overscan color (i/o 0x6a -> 0x2c)
-//		case 0x13: Reverse mode related (i/o 0x6a -> 0x28)
-//		case 0x14: AGDC Drawing processor selection (i/o 0x6a -> 0x66)
-//		case 0x15: unknown (i/o 0x6a -> 0x60)
-//		case 0x16: unknown (i/o 0x6a -> 0xc2)
-//		case 0x17: bitmap config direction (i/o 0x6a -> 0x6c)
-//		case 0x18: High speed palette write (i/o 0x6a -> 0x2a)
-//		case 0x19: unknown (i/o 0x6a -> 0x48)
-//		case 0x1a: unknown (i/o 0x6a -> 0xc8)
-//		case 0x1b: unknown (i/o 0x6a -> 0x2e)
-//		case 0x1c: unknown (i/o 0x6a -> 0x6e)
-//		case 0x1d: unknown (i/o 0x6a -> 0xc0)
-//		case 0x1e: unknown (i/o 0x6a -> 0x80 or 0x46?)
-//		case 0x1f: unknown (i/o 0x6a -> 0x08)
+//      case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
+//      case 0x0c: unknown
+//      case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
+//      case 0x0e: 65536 color GFX mode (i/o 0x6a -> 0x22)
+//      case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
+//      case 0x10: unknown (i/o 0x6a -> 0x6a)
+//      case 0x11: Reverse mode related (i/o 0x6a -> 0x26)
+//      case 0x12: 256 color overscan color (i/o 0x6a -> 0x2c)
+//      case 0x13: Reverse mode related (i/o 0x6a -> 0x28)
+//      case 0x14: AGDC Drawing processor selection (i/o 0x6a -> 0x66)
+//      case 0x15: unknown (i/o 0x6a -> 0x60)
+//      case 0x16: unknown (i/o 0x6a -> 0xc2)
+//      case 0x17: bitmap config direction (i/o 0x6a -> 0x6c)
+//      case 0x18: High speed palette write (i/o 0x6a -> 0x2a)
+//      case 0x19: unknown (i/o 0x6a -> 0x48)
+//      case 0x1a: unknown (i/o 0x6a -> 0xc8)
+//      case 0x1b: unknown (i/o 0x6a -> 0x2e)
+//      case 0x1c: unknown (i/o 0x6a -> 0x6e)
+//      case 0x1d: unknown (i/o 0x6a -> 0xc0)
+//      case 0x1e: unknown (i/o 0x6a -> 0x80 or 0x46?)
+//      case 0x1f: unknown (i/o 0x6a -> 0x08)
 		default:
 			if(m_ext2_ff < 0x20)
 				popmessage("PC-9821: read ext2 f/f with value %02x",m_ext2_ff);
@@ -2383,7 +2383,7 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
 	{
 		return space.read_word(0xf00000|(offset*2)|((m_analog256.write_bank)*0x8000),mem_mask);
 	}
-	
+
 	return grcg_gvram_r(space,offset,mem_mask);
 }
 
@@ -2394,7 +2394,7 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
 		space.write_word(0xf00000|(offset*2)|(m_analog256.write_bank*0x8000),data,mem_mask);
 		return;
 	}
-	
+
 	grcg_gvram_w(space,offset,data,mem_mask);
 }
 
@@ -2405,12 +2405,12 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
 		switch(offset*2)
 		{
 			case 4: return m_analog256.write_bank;
-//			case 6: return m_analog256.read_bank;
+//          case 6: return m_analog256.read_bank;
 		}
-		
+
 		//return 0;
 	}
-	
+
 	return grcg_gvram0_r(space,offset,mem_mask);
 }
 
@@ -2422,11 +2422,11 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 		switch(offset*2)
 		{
 			case 4: COMBINE_DATA(&m_analog256.write_bank); break;
-//			case 6: COMBINE_DATA(&m_analog256.read_bank); break;
+//          case 6: COMBINE_DATA(&m_analog256.read_bank); break;
 		}
 		//return;
 	}
-	
+
 	grcg_gvram0_w(space,offset,data,mem_mask);
 }
 

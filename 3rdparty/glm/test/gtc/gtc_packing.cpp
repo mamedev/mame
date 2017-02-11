@@ -173,7 +173,8 @@ int test_Snorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackSnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packSnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackSnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.01f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -197,7 +198,8 @@ int test_Unorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackUnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packUnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackUnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.001f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -239,13 +241,29 @@ int test_F3x9_E1x5()
 	Tests.push_back(glm::vec3(0.5f));
 	Tests.push_back(glm::vec3(0.9f));
 
-	for (std::size_t i = 0; i < Tests.size(); ++i)
+	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
 		glm::uint32 p0 = glm::packF3x9_E1x5(Tests[i]);
 		glm::vec3 v0 = glm::unpackF3x9_E1x5(p0);
 		glm::uint32 p1 = glm::packF3x9_E1x5(v0);
 		glm::vec3 v1 = glm::unpackF3x9_E1x5(p1);
 		Error += glm::all(glm::epsilonEqual(v0, v1, 0.01f)) ? 0 : 1;
+	}
+
+	return Error;
+}
+
+int test_RGBM()
+{
+	int Error = 0;
+
+	for(std::size_t i = 0; i < 1024; ++i)
+	{
+		glm::vec3 const Color(i);
+		glm::vec4 const RGBM = glm::packRGBM(Color);
+		glm::vec3 const Result= glm::unpackRGBM(RGBM);
+
+		Error += glm::all(glm::epsilonEqual(Color, Result, 0.01f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -511,7 +529,7 @@ int test_packUnorm()
 	{
 		glm::vec2 B(A[i]);
 		glm::u16vec2 C = glm::packUnorm<glm::uint16>(B);
-		glm::vec2 D = glm::unpackUnorm<glm::uint16, float>(C);
+		glm::vec2 D = glm::unpackUnorm<float>(C);
 		Error += glm::all(glm::epsilonEqual(B, D, 1.0f / 255.f)) ? 0 : 1;
 		assert(!Error);
 	}
@@ -532,7 +550,7 @@ int test_packSnorm()
 	{
 		glm::vec2 B(A[i]);
 		glm::i16vec2 C = glm::packSnorm<glm::int16>(B);
-		glm::vec2 D = glm::unpackSnorm<glm::int16, float>(C);
+		glm::vec2 D = glm::unpackSnorm<float>(C);
 		Error += glm::all(glm::epsilonEqual(B, D, 1.0f / 32767.0f * 2.0f)) ? 0 : 1;
 		assert(!Error);
 	}
@@ -671,8 +689,10 @@ int main()
 
 	Error += test_F2x11_1x10();
 	Error += test_F3x9_E1x5();
-	Error += test_Snorm3x10_1x2();
+	Error += test_RGBM();
 	Error += test_Unorm3x10_1x2();
+	Error += test_Snorm3x10_1x2();
+
 	Error += test_I3x10_1x2();
 	Error += test_U3x10_1x2();
 	Error += test_Half1x16();

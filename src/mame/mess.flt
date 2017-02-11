@@ -268,6 +268,7 @@ indigo.cpp
 indy_indigo2.cpp
 instruct.cpp
 interact.cpp
+interpro.cpp
 intv.cpp
 ipc.cpp
 ipds.cpp
@@ -602,6 +603,7 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 test_t400.cpp
+testconsole.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

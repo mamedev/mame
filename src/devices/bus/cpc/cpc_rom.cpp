@@ -8,10 +8,10 @@
 
 #include "emu.h"
 #include "cpc_rom.h"
-#include "includes/amstrad.h"
 
 const device_type CPC_ROM = &device_creator<cpc_rom_device>;
 
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE

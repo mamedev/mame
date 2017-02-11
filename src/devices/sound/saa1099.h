@@ -56,12 +56,12 @@ struct saa1099_noise
 	saa1099_noise() :
 		counter(0.0),
 		freq(0.0),
-		level(0) {}
+		level(0xFFFFFFFF) {}
 
 	/* vars to simulate the noise generator output */
 	double counter;
 	double freq;
-	int level;                      /* noise polynomial shifter */
+	uint32_t level;                      /* noise polynomial shifter */
 };
 
 

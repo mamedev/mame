@@ -136,16 +136,6 @@ k053251_device::k053251_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053251_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

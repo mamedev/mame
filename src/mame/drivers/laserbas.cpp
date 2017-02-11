@@ -8,7 +8,7 @@
 TODO:
 - Video: weird palette changes, Laserbase colors, missing bg scrolling between stages (CRT address lines + m_hset ( or m_vset ?))
 - Sound: sound related i/o writes ( out_w handler )
-- Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB 
+- Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB
 TS 20.01.2017
 
 There's incomplete schematics available. It's missing a couple of important elements (analog sound, interrupts).
@@ -93,7 +93,7 @@ public:
 	int m_bset;
 	int m_scl;
 	bool     m_flipscreen;
-	uint16_t m_z1data[4];
+	uint64_t m_z1data;
 	void write_pit_out(int num, int state);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -110,7 +110,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out_5_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -128,12 +128,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 {
 	int scanline = param;
 
-	if(scanline == 0 || scanline == 135) 
+	if(scanline == 0 || scanline == 135)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE );
 	}
 
-	if(scanline == 240 && m_nmi) 
+	if(scanline == 240 && m_nmi)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -141,42 +141,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 {
-	int x, x_max, dx, pixaddr;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
-	
+	int x = 0;
+	int x_max = 0x100;
+	int dx = 1;
+
 	if (m_flipscreen)
 	{
-		y=0x100-y-1-0x20;
-		dx = -1;
-		x = 0x100-1;     
+		y = 0xdf - y;
+		x = 0xff;
 		x_max = -1;
-	}
-	else
-	{
-		dx = 1;
-		x = 0;     
-		x_max = 0x100;
+		dx = -1;
 	}
 
-	pixaddr=y<<8;
-	     
+	int pixaddr = y << 8;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	uint32_t *b = &bitmap.pix32(y);
+
+	while (x != x_max)
 	{
-		while ( x != x_max )
-		{
-			uint32_t offset = (pixaddr>>1)&0x7fff;
-			uint8_t p1    =   m_vram[offset];
-			uint8_t p2    =   m_vram[offset+0x8000]; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
+		int offset = (pixaddr >> 1) & 0x7fff;
+		int shift = (pixaddr & 1) * 4; // two 4 bit pixels in one byte
+		int p1 = (m_vram[offset] >> shift) & 0xf;
+		int p2 = (m_vram[offset + 0x8000] >> shift) & 0xf; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
+		int p;
 
-			uint8_t shift =   (pixaddr & 1)?4:0; // two 4 bit pixels in one byte
-			p1 = (p1>>shift) & 0xf;
-			p2 = (p2>>shift) & 0xf;
+		if (p2)
+			p = p2;
+		else if (p1)
+			p = p1 + 16;
+		else
+			p = m_bset;
 
-			p[x] = palette[p2?:(p1?(p1+16):m_bset)]; // layer 2 | layer 1 | bg pen
+		b[x] = palette[p];
 
-			++pixaddr;
-			x += dx;
-		}
+		pixaddr++;
+		x += dx;
 	}
 }
 
@@ -198,8 +197,8 @@ WRITE8_MEMBER(laserbas_state::videoctrl_w)
 		m_flipscreen = !(data & 0x80);
 		m_vset = (data>>3)&7; // inc-ed on interrupts ( 8 ints / frame ?)
 		m_hset = data&7;
-	} 
-	else 
+	}
+	else
 	{
 		data^=0xff;
 		m_bset = data>>4; // bg pen
@@ -210,33 +209,22 @@ WRITE8_MEMBER(laserbas_state::videoctrl_w)
 
 READ8_MEMBER(laserbas_state::z1_r)
 {
-	uint8_t res = 0;
+	m_z1data = (m_z1data >> 10) | (uint64_t(offset & 0x03ff) << 30);
 
-	m_z1data[0] = m_z1data[1];
-	m_z1data[1] = m_z1data[2];
-	m_z1data[2] = m_z1data[3];
-	m_z1data[3] = offset;
+	auto const x = [this] (unsigned b) { return BIT(m_z1data, b); };
+	auto const nx = [this] (unsigned b) { return BIT(~m_z1data, b); };
+	auto const MUX2 = [] (bool s, uint16_t a, uint16_t b) { return s ? a : b; };
 
-#define x(o) (1 & (m_z1data[o / 10] >> (o % 10)))
-#define nx(o) (1 & ~(m_z1data[o / 10] >> (o % 10)))
-#define MUX2(s, a, b) ((s) ? (a) : (b))
+	uint8_t const bit7 = MUX2(x(36) & x(33), x(31) ^ x(35), (nx(33) & (nx(20) | nx(36))) | (nx(36) & x(24)));
+	uint8_t const bit6 = MUX2(x(36), MUX2(x(33), x(29), nx(23) | x(30)), x(33) & x(15));
+	uint8_t const bit5 = MUX2(x(36), nx(33) & x(27), x(32) | x(33));
+	uint8_t const bit4 = MUX2(x(36), MUX2(x(33), nx(24), nx(35)), MUX2(nx(33), x(4), MUX2(nx(26), x(5) & x(23), MUX2(x(23), x(19), nx(13) | x(20)))));
+	uint8_t const bit3 = MUX2(x(36), x(33) & x(11), MUX2(x(33), x(25) | nx(31), x(24)));
+	uint8_t const bit2 = MUX2(x(33), MUX2(x(36), x(28), x(20)), MUX2(x(36), nx(11), nx(39)));
+	uint8_t const bit1 = MUX2(x(36), MUX2(x(23), MUX2(x(26), nx(18), nx(10)) | x(33), MUX2(x(26), x(1), x(29)) & nx(33)), MUX2(x(33), x(7), x(17)));
+	uint8_t const bit0 = MUX2(x(33), MUX2(x(36), x(22), nx(26)), MUX2(x(36), x(14), x(21)));
 
-	res =
-		MUX2(x(36) & x(33), x(31) ^ x(35), (nx(33) & (nx(20) | nx(36))) | (nx(36) & x(24))) << 7
-		| MUX2(x(36), MUX2(x(33), x(29), nx(23) | x(30)), x(33) & x(15)) << 6
-		| MUX2(x(36), nx(33) & x(27), x(32) | x(33)) << 5
-		| MUX2(x(36), MUX2(x(33), nx(24), nx(35)), MUX2(nx(33), x(4), MUX2(nx(26), x(5) & x(23), MUX2(x(23), x(19), nx(13) | x(20))))) << 4
-		| MUX2(x(36), x(33) & x(11), MUX2(x(33), x(25) | nx(31), x(24))) << 3
-		| MUX2(x(33), MUX2(x(36), x(28), x(20)), MUX2(x(36), nx(11), nx(39))) << 2
-		| MUX2(x(36), MUX2(x(23), MUX2(x(26), nx(18), nx(10)) | x(33), MUX2(x(26), x(1), x(29)) & nx(33)), MUX2(x(33), x(7), x(17))) << 1
-		| MUX2(x(33), MUX2(x(36), x(22), nx(26)), MUX2(x(36), x(14), x(21))) << 0
-	;
-
-#undef MUX2
-#undef nx
-#undef x
-
-	return res;
+	return (bit7 << 7) | (bit6 << 6) | (bit5 << 5) | (bit4 << 4) | (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | (bit0 << 0);
 }
 
 READ8_MEMBER(laserbas_state::track_lo_r)
@@ -295,7 +283,7 @@ void laserbas_state::write_pit_out(int num, int state)
 	if((!state)& m_cnt_out[num]){ // 0->1 rising edge CLK
 		m_counter[num] = (m_counter[num]+1)&0x0f; // 4 bit counters 74393
 	}
-	int data =(state) | ((m_counter[num]&7)<<1); // combine output from 8253 with counter bits 0-3 
+	int data =(state) | ((m_counter[num]&7)<<1); // combine output from 8253 with counter bits 0-3
 	data<<=4;
 	if(m_counter[num]&8) data^=0x0f; // counter bit 4 xors the data ( 7486 x 6)
 	switch(num){
@@ -306,7 +294,7 @@ void laserbas_state::write_pit_out(int num, int state)
 		case 4: m_dac5->write(data);break;
 		case 5: m_dac6->write(data);break;
 	}
-	
+
 	m_cnt_out[num]=state;
 }
 
@@ -416,7 +404,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK*4)
+	MCFG_CPU_ADD("maincpu", Z80, CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
 	MCFG_CPU_IO_MAP(laserbas_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", laserbas_state, laserbas_scanline, "screen", 0, 1)
@@ -452,12 +440,12 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16) 
+	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac3", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac4", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_SOUND_ADD("dac5", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
-	MCFG_SOUND_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16) 
+	MCFG_SOUND_ADD("dac6", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
@@ -465,7 +453,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	
+
 MACHINE_CONFIG_END
 
 /*
@@ -556,6 +544,6 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
-GAME( 1980, futflash, 		 0, laserbas, laserbas, driver_device, 0, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, futflash,        0, laserbas, laserbas, driver_device, 0, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, laserbas, futflash, laserbas, laserbas, driver_device, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, laserbasa,futflash, laserbas, laserbas, driver_device, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

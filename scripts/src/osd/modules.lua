@@ -221,6 +221,10 @@ function osdmodulesbuild()
 		defines {
 			"NO_USE_PORTAUDIO",
 		}
+	else
+		includedirs {
+			ext_includedir("portaudio"),
+		}
 	end
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then

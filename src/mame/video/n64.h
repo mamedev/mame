@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/poly.h"
+#include "pin64.h"
 
 /*****************************************************************************/
 
@@ -128,7 +129,7 @@ class n64_rdp;
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"
 
-typedef void (*rdp_command_t)(uint32_t w1, uint32_t w2);
+typedef void (*rdp_command_t)(uint64_t w1);
 
 class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8, 32000>
 {
@@ -163,7 +164,7 @@ public:
 	}
 
 	void        process_command_list();
-	uint32_t      read_data(uint32_t address);
+	uint64_t      read_data(uint32_t address);
 	void        disassemble(char* buffer);
 
 	void        set_machine(running_machine& machine) { m_machine = &machine; }
@@ -224,43 +225,43 @@ public:
 	bool            z_compare(uint32_t zcurpixel, uint32_t dzcurpixel, uint32_t sz, uint16_t dzpix, rdp_span_aux* userdata, const rdp_poly_state &object);
 
 	// Commands
-	void        cmd_invalid(uint32_t w1, uint32_t w2);
-	void        cmd_noop(uint32_t w1, uint32_t w2);
-	void        cmd_triangle(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_z(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_t(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_tz(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_s(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_sz(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_st(uint32_t w1, uint32_t w2);
-	void        cmd_triangle_stz(uint32_t w1, uint32_t w2);
-	void        cmd_tex_rect(uint32_t w1, uint32_t w2);
-	void        cmd_tex_rect_flip(uint32_t w1, uint32_t w2);
-	void        cmd_sync_load(uint32_t w1, uint32_t w2);
-	void        cmd_sync_pipe(uint32_t w1, uint32_t w2);
-	void        cmd_sync_tile(uint32_t w1, uint32_t w2);
-	void        cmd_sync_full(uint32_t w1, uint32_t w2);
-	void        cmd_set_key_gb(uint32_t w1, uint32_t w2);
-	void        cmd_set_key_r(uint32_t w1, uint32_t w2);
-	void        cmd_set_fill_color32(uint32_t w1, uint32_t w2);
-	void        cmd_set_convert(uint32_t w1, uint32_t w2);
-	void        cmd_set_scissor(uint32_t w1, uint32_t w2);
-	void        cmd_set_prim_depth(uint32_t w1, uint32_t w2);
-	void        cmd_set_other_modes(uint32_t w1, uint32_t w2);
-	void        cmd_load_tlut(uint32_t w1, uint32_t w2);
-	void        cmd_set_tile_size(uint32_t w1, uint32_t w2);
-	void        cmd_load_block(uint32_t w1, uint32_t w2);
-	void        cmd_load_tile(uint32_t w1, uint32_t w2);
-	void        cmd_fill_rect(uint32_t w1, uint32_t w2);
-	void        cmd_set_tile(uint32_t w1, uint32_t w2);
-	void        cmd_set_fog_color(uint32_t w1, uint32_t w2);
-	void        cmd_set_blend_color(uint32_t w1, uint32_t w2);
-	void        cmd_set_prim_color(uint32_t w1, uint32_t w2);
-	void        cmd_set_env_color(uint32_t w1, uint32_t w2);
-	void        cmd_set_combine(uint32_t w1, uint32_t w2);
-	void        cmd_set_texture_image(uint32_t w1, uint32_t w2);
-	void        cmd_set_mask_image(uint32_t w1, uint32_t w2);
-	void        cmd_set_color_image(uint32_t w1, uint32_t w2);
+	void        cmd_invalid(uint64_t w1);
+	void        cmd_noop(uint64_t w1);
+	void        cmd_triangle(uint64_t w1);
+	void        cmd_triangle_z(uint64_t w1);
+	void        cmd_triangle_t(uint64_t w1);
+	void        cmd_triangle_tz(uint64_t w1);
+	void        cmd_triangle_s(uint64_t w1);
+	void        cmd_triangle_sz(uint64_t w1);
+	void        cmd_triangle_st(uint64_t w1);
+	void        cmd_triangle_stz(uint64_t w1);
+	void        cmd_tex_rect(uint64_t w1);
+	void        cmd_tex_rect_flip(uint64_t w1);
+	void        cmd_sync_load(uint64_t w1);
+	void        cmd_sync_pipe(uint64_t w1);
+	void        cmd_sync_tile(uint64_t w1);
+	void        cmd_sync_full(uint64_t w1);
+	void        cmd_set_key_gb(uint64_t w1);
+	void        cmd_set_key_r(uint64_t w1);
+	void        cmd_set_fill_color32(uint64_t w1);
+	void        cmd_set_convert(uint64_t w1);
+	void        cmd_set_scissor(uint64_t w1);
+	void        cmd_set_prim_depth(uint64_t w1);
+	void        cmd_set_other_modes(uint64_t w1);
+	void        cmd_load_tlut(uint64_t w1);
+	void        cmd_set_tile_size(uint64_t w1);
+	void        cmd_load_block(uint64_t w1);
+	void        cmd_load_tile(uint64_t w1);
+	void        cmd_fill_rect(uint64_t w1);
+	void        cmd_set_tile(uint64_t w1);
+	void        cmd_set_fog_color(uint64_t w1);
+	void        cmd_set_blend_color(uint64_t w1);
+	void        cmd_set_prim_color(uint64_t w1);
+	void        cmd_set_env_color(uint64_t w1);
+	void        cmd_set_combine(uint64_t w1);
+	void        cmd_set_texture_image(uint64_t w1);
+	void        cmd_set_mask_image(uint64_t w1);
+	void        cmd_set_color_image(uint64_t w1);
 
 	void        rgbaz_clip(int32_t sr, int32_t sg, int32_t sb, int32_t sa, int32_t* sz, rdp_span_aux* userdata);
 	void        rgbaz_correct_triangle(int32_t offx, int32_t offy, int32_t* r, int32_t* g, int32_t* b, int32_t* a, int32_t* z, rdp_span_aux* userdata, const rdp_poly_state &object);
@@ -271,6 +272,8 @@ public:
 
 	uint16_t decompress_cvmask_frombyte(uint8_t x);
 	void lookup_cvmask_derivatives(uint32_t mask, uint8_t* offx, uint8_t* offy, rdp_span_aux* userdata);
+
+	void        mark_frame() { m_capture.mark_frame(*m_machine); }
 
 	misc_state_t m_misc_state;
 
@@ -344,8 +347,8 @@ private:
 	uint32_t  m_z_complete_dec_table[0x4000]; //the same for decompressed z values, 14b
 	uint8_t   m_compressed_cvmasks[0x10000]; //16bit cvmask -> to byte
 
-	uint32_t  m_cmd_data[0x1000];
-	uint32_t  m_temp_rect_data[0x1000];
+	uint64_t  m_cmd_data[0x800];
+	uint64_t  m_temp_rect_data[0x800];
 
 	int32_t   m_cmd_ptr;
 	int32_t   m_cmd_cur;
@@ -366,6 +369,8 @@ private:
 	// Texture perspective division
 	int32_t m_norm_point_rom[64];
 	int32_t m_norm_slope_rom[64];
+
+	pin64_t m_capture;
 
 	static uint32_t s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];

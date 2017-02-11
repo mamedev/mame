@@ -2,13 +2,13 @@
 // copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
-	68153 BIM Bus Interrupter Module
+    68153 BIM Bus Interrupter Module
 
-	The Bus Interrupter Module (BIM) provides an interface between interrupting devices and a system bus such as
-	the VMEbus or VERSAbus™. It generates a maximum of 7 bus interrupts on the IRQ1-IRQ7 outputs and responds to 
-	interrupt acknowledge cycles for up to 4 independent slaves. The BIM can also supply an interrupt vector 
-	during an interrupt acknowledge cycle. Moreover, it sits in the interrupt acknowledge daisychain which allows 
-	for multiple interrupts on the level acknowledged.
+    The Bus Interrupter Module (BIM) provides an interface between interrupting devices and a system bus such as
+    the VMEbus or VERSAbus™. It generates a maximum of 7 bus interrupts on the IRQ1-IRQ7 outputs and responds to
+    interrupt acknowledge cycles for up to 4 independent slaves. The BIM can also supply an interrupt vector
+    during an interrupt acknowledge cycle. Moreover, it sits in the interrupt acknowledge daisychain which allows
+    for multiple interrupts on the level acknowledged.
 
  ----- Features ----------------------------------------------------------
  x 4 channels
@@ -19,7 +19,7 @@
    Full functionality is implemented
 
  -------------------------------------------------------------------------
-  Level of implementation:  x = done p = partial 
+  Level of implementation:  x = done p = partial
  -------------------------------------------------------------------------
 
 */
@@ -27,27 +27,22 @@
 #include "68153bim.h"
 #include "cpu/m68000/m68000.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-#define LOG_INT     0x08
-#define LOG_READ    0x10
-#define LOG_IACK    0x20
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
+#define LOG_READ    (1U <<  3)
+#define LOG_IACK    (1U <<  4)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP | LOG_INT | LOG_IACK) //LOG_GENERAL | LOG_READ)
+//#define VERBOSE ( LOG_SETUP | LOG_INT | LOG_IACK | LOG_GENERAL | LOG_READ)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
-#define LOGIACK(...)  LOGMASK(LOG_IACK,    __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+//#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGIACK(...)  LOGMASKED(LOG_IACK,    __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -65,7 +60,7 @@
 //**************************************************************************
 // device type definition
 const device_type MC68153_CHANNEL   = &device_creator<bim68153_channel>;
-const device_type MC68153  			= &device_creator<bim68153_device>;
+const device_type MC68153           = &device_creator<bim68153_device>;
 const device_type EI68C153          = &device_creator<ei68c153_device>;
 
 //-------------------------------------------------
@@ -185,16 +180,17 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 {
 	int vec = M68K_INT_ACK_AUTOVECTOR;
 	int found = 0;
-	//	int level = 0;
+	//  int level = 0;
 	int ch = -1;
 
 	LOGIACK("%s %s()\n", tag(), FUNCNAME);
 
-	/* 1. No further action required — This occurs if IACKIN is not asserted. Asserting IACKN only starts the BIM activity. 
-	 *    If the daisy chain signal never reaches the BIM (IACKIN is not asserted), another interrupter has responded to the 
-	 *	  IACK cycle. The cycle will end, the IACK is negated, and no additional action is required. */
+	/* 1. No further action required — This occurs if IACKIN is not asserted. Asserting IACKN only starts the BIM activity.
+	 *    If the daisy chain signal never reaches the BIM (IACKIN is not asserted), another interrupter has responded to the
+	 *    IACK cycle. The cycle will end, the IACK is negated, and no additional action is required. */
 	if (m_iackin == CLEAR_LINE)
 	{
+		LOGIACK(" - IRQ cleared due to IACKIN\n");
 		m_out_iackout_cb(CLEAR_LINE);
 		m_out_int_cb(CLEAR_LINE);  // should really be tristated
 		return MAX_VECTOR + 1; // This is a 68K emulation specific response and will terminate the iack cycle
@@ -205,15 +201,15 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 		if (elem->m_int_state == bim68153_channel::PENDING && elem->m_control & bim68153_channel::REG_CNTRL_INT_ENABLE)
 		{   // and the level matches
 			if ((elem->m_control & bim68153_channel::REG_CNTRL_INT_LVL_MSK) == irqline)
-			{	// then remember it
+			{   // then remember it
 				ch = get_channel_index(elem);
+				found = 1;
 			}
-			found = 1;
 		}
 	}
-	/* 2. Pass on the interrupt daisy chain — For this case, IACKIN input is asserted by the preceding daisy chain interrupter, 
-	 * and IACKOUT output is in turn asserted. The daisy chain signal is passed on when no interrupts are pending on a matching 
-	 * level or when any possible interrupts are disabled. The Interrupt Enable (IRE) bit of a control register can disable any 
+	/* 2. Pass on the interrupt daisy chain — For this case, IACKIN input is asserted by the preceding daisy chain interrupter,
+	 * and IACKOUT output is in turn asserted. The daisy chain signal is passed on when no interrupts are pending on a matching
+	 * level or when any possible interrupts are disabled. The Interrupt Enable (IRE) bit of a control register can disable any
 	 * interrupt requests, and in turn, any possible matches */
 	if (found == 0)
 	{
@@ -226,10 +222,10 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 
 	if ((m_chn[ch]->m_control & bim68153_channel::REG_CNTRL_INT_EXT) == 0)
 	{
-		/* 3. Respond internally - For this case, IACKIN is asserted and a match is found. The BIM completes the IACK cycle by 
-		 * supplying an interrupt vector from the proper vector register followed by a DTACK signal asserted because the interrupt 
-		 * acknowledge cycle is completed by this device. For the BIM to respond in this mode of operation, the EXTERNAL/INTERNAl 
-		 * control register bit (X/IN) must be zero. For each source of interrupt request, the associated control register determines 
+		/* 3. Respond internally - For this case, IACKIN is asserted and a match is found. The BIM completes the IACK cycle by
+		 * supplying an interrupt vector from the proper vector register followed by a DTACK signal asserted because the interrupt
+		 * acknowledge cycle is completed by this device. For the BIM to respond in this mode of operation, the EXTERNAL/INTERNAl
+		 * control register bit (X/IN) must be zero. For each source of interrupt request, the associated control register determines
 		 * the BIM response to an IACK cycle, and the X/IN bit sets this response either internally (X/IN = 0 ) or externally (X/IN = 1). */
 
 		vec = m_chn[ch]->m_vector; // Internal vector
@@ -237,8 +233,8 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 	else
 	{
 		/* 4. Respond externally — For the final case, IACKIN is also asserted, a match is found and the associated control register has
-		 * X/IN bit set to one. The BIM does not assert IACKOUT and does assert INTAE low.INTAE signals that the requesting device must 
-		 * complete the IACK cycle (supplying a vector and DTACK) and that the 2-bit code contained on outputs INTALO and INTAL1 shows 
+		 * X/IN bit set to one. The BIM does not assert IACKOUT and does assert INTAE low.INTAE signals that the requesting device must
+		 * complete the IACK cycle (supplying a vector and DTACK) and that the 2-bit code contained on outputs INTALO and INTAL1 shows
 		 * which interrupt source is being acknowledged*/
 
 		vec = m_chn[ch]->m_out_iack_cb();  // External vector
@@ -255,7 +251,7 @@ IRQ_CALLBACK_MEMBER(bim68153_device::iack)
 		m_chn[ch]->m_control &= ~bim68153_channel::REG_CNTRL_INT_ENABLE;
 	}
 
-	// This is not explicitly said in the 68153 datasheet but what would a flag be used for otherwise? 
+	// This is not explicitly said in the 68153 datasheet but what would a flag be used for otherwise?
 	m_chn[ch]->m_control &= ~bim68153_channel::REG_CNTRL_INT_FLAG;
 
 	m_out_iackout_cb(CLEAR_LINE);
@@ -291,7 +287,7 @@ void bim68153_device::trigger_interrupt(int ch)
 	m_out_iackout_cb(ASSERT_LINE);
 
 	// Set flag
-	// This is not explicitly said in the 68153 datasheet but what would a flag be used for otherwise? 
+	// This is not explicitly said in the 68153 datasheet but what would a flag be used for otherwise?
 	m_chn[ch]->m_control |= bim68153_channel::REG_CNTRL_INT_FLAG;
 
 	// assert interrupt
@@ -306,7 +302,7 @@ READ8_MEMBER( bim68153_device::read )
 	int vc = offset & REG_VECTOR;
 	int ch = offset & CHN_MSK;
 
-	LOGR(" * %s %d Reg %s -> %02x  \n", m_owner->tag(), ch, vc ? "vector" : "control", 
+	LOGR(" * %s %d Reg %s -> %02x  \n", tag(), ch, vc ? "vector" : "control",
 			 vc ? m_chn[ch]->do_bimreg_vector_r() : m_chn[ch]->do_bimreg_control_r());
 
 	return vc ? m_chn[ch]->do_bimreg_vector_r() : m_chn[ch]->do_bimreg_control_r();
@@ -320,7 +316,7 @@ WRITE8_MEMBER( bim68153_device::write )
 	int vc = offset & REG_VECTOR;
 	int ch = offset & CHN_MSK;
 
-	LOGSETUP(" * %s %d Reg %s <- %02x  \n", m_owner->tag(), ch, vc ? "vector" : "control", data);
+	LOGSETUP(" * %s %d Reg %s <- %02x  \n", tag(), ch, vc ? "vector" : "control", data);
 
 	if (vc)
 		m_chn[ch]->do_bimreg_vector_w(data);
@@ -380,7 +376,7 @@ void bim68153_channel::device_reset()
 /* Trigger an interrupt */
 WRITE_LINE_MEMBER( bim68153_channel::int_w )
 {
-	LOGINT("%s Ch %d: %d\n",FUNCNAME, m_index, state);
+	LOGINT("%s Ch %d: %s\n",FUNCNAME, m_index, state == CLEAR_LINE ? "Cleared" : "Asserted");
 	if (state == ASSERT_LINE)
 	{
 		m_bim->trigger_interrupt(m_index);
@@ -404,10 +400,10 @@ void bim68153_channel::do_bimreg_control_w(uint8_t data)
 	LOG("%s ch %d set control to %02x\n", FUNCNAME, m_index, data);
 	LOGSETUP(" - Lev:%d Auto Disable:%d Int Enable:%d Vector:%d Auto Clear:%d Flag:%d\n",
 			 data & REG_CNTRL_INT_LVL_MSK,
-			 data & REG_CNTRL_INT_AUT_DIS ? 1 : 0, 
-			 data & REG_CNTRL_INT_ENABLE  ? 1 : 0, 
-			 data & REG_CNTRL_INT_EXT     ? 1 : 0, 
-			 data & REG_CNTRL_INT_AUT_CLR ? 1 : 0, 
+			 data & REG_CNTRL_INT_AUT_DIS ? 1 : 0,
+			 data & REG_CNTRL_INT_ENABLE  ? 1 : 0,
+			 data & REG_CNTRL_INT_EXT     ? 1 : 0,
+			 data & REG_CNTRL_INT_AUT_CLR ? 1 : 0,
 			 data & REG_CNTRL_INT_FLAG    ? 1 : 0);
 
 	m_control = data;

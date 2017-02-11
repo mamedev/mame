@@ -348,13 +348,6 @@ WRITE8_MEMBER( fp1100_state::portc_w )
 	m_centronics->write_strobe(BIT(data, 6));
 }
 
-static ADDRESS_MAP_START(fp1100_slave_io, AS_IO, 8, fp1100_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(porta_w)
-	AM_RANGE(0x01, 0x01) AM_READ(portb_r) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(portc_r,portc_w)
-ADDRESS_MAP_END
-
 
 /* Input ports */
 static INPUT_PORTS_START( fp1100 )
@@ -648,7 +641,11 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 
 	MCFG_CPU_ADD( "sub", UPD7801, MAIN_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )
-	MCFG_CPU_IO_MAP( fp1100_slave_io )
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fp1100_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(fp1100_state, portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(fp1100_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fp1100_state, portc_w))
 	MCFG_UPD7810_TXD(WRITELINE(fp1100_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(fp1100_state, fp1100)

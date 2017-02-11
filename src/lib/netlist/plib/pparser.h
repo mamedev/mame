@@ -8,19 +8,16 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
+#include "pstring.h"
+#include "plists.h"
+#include "pstream.h"
+
 #include <unordered_map>
 #include <cstdint>
 
-#include "pconfig.h"
-#include "pstring.h"
-#include "plists.h"
-#include "putil.h"
-#include "pstream.h"
-
 namespace plib {
-class ptokenizer
+class ptokenizer : nocopyassignmove
 {
-	P_PREVENT_COPYING(ptokenizer)
 public:
 	explicit ptokenizer(plib::putf8_reader &strm);
 
@@ -148,9 +145,8 @@ private:
 };
 
 
-class ppreprocessor
+class ppreprocessor : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(ppreprocessor)
 public:
 
 	struct define_t
@@ -168,7 +164,7 @@ public:
 	void process(putf8_reader &istrm, putf8_writer &ostrm);
 
 protected:
-	double expr(const plib::pstring_vector_t &sexpr, std::size_t &start, int prio);
+	double expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
 	pstring replace_macros(const pstring &line);
 	virtual void error(const pstring &err);
@@ -178,7 +174,7 @@ private:
 	pstring process_line(const pstring &line);
 
 	std::unordered_map<pstring, define_t> m_defines;
-	plib::pstring_vector_t m_expr_sep;
+	std::vector<pstring> m_expr_sep;
 
 	std::uint_least64_t m_ifflag; // 31 if levels
 	int m_level;

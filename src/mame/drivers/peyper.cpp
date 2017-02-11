@@ -15,7 +15,7 @@
   Nemesis (Peyper)
   Odisea Paris-Dakar (Peyper)
   Hang-On (Sonic)
-  Ator (Videodens)
+  Ator (Video Dens)
 
   Others not emulated (need roms):
   Night Fever (Sonic)
@@ -834,7 +834,7 @@ ROM_START(wolfman)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Ator (198?)
+/ Ator (1985)
 /-------------------------------------------------------------------*/
 ROM_START(ator)
 	ROM_REGION(0x6000, "maincpu", 0)
@@ -869,5 +869,5 @@ GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Nemesis", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper", "Odisea Paris-Dakar", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 198?, ator,     0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Videodens", "Ator", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Video Dens", "Ator", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
 GAME( 1994, lancelot, 0,        peyper,   sonstwar, driver_device,0,       ROT0,  "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)

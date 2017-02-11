@@ -24,6 +24,7 @@ Bugs
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/aim65.h"
 #include "softlist.h"
 #include "aim65.lh"
@@ -181,15 +182,15 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds1))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
 	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds2))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
 	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds3))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
 	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds4))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
 	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds5))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -286,4 +287,4 @@ ROM_END
 ***************************************************************************/
 
 /*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_NO_SOUND_HW )
+COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

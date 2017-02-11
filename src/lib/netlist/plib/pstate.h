@@ -8,12 +8,11 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
-#include <memory>
-#include <type_traits>
-
-#include "plists.h"
 #include "pstring.h"
 #include "ptypes.h"
+
+#include <vector>
+#include <memory>
 
 // ----------------------------------------------------------------------------------------
 // state saving ...

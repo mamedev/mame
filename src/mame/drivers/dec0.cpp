@@ -51,38 +51,95 @@ ToDo:
 - Get rid of ROM patches in Sly Spy and Hippodrome;
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified;
-- Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
+- Finally, get a proper decap of the MCUs used by Dragonninja and Birdie Try;
 
+
+Bad Dudes MCU dump came from an MCU that had been damaged during a misguided
+attempt at decapping.  Data didn't read consistently, and the final dump was
+built up from multiple dumps by taking the most common value for each location.
+It appears there may be one bit error in the dump.  The MCU implements a
+command to calculate a program ROM checksum and compare the low byte of the
+result to a value supplied by the host CPU, but with the dump as-is, it doesn't
+work.  Here's the code in question:
+
+0AB0: 51 50    acall   $0A50
+0AB2: C3       clr     c
+0AB3: 48       orl     a,r0
+0AB4: 70 02    jnz     $0AB8
+0AB6: 80 89    sjmp    $0A41
+0AB8: 21 F0    ajmp    $09F0
+
+The function at $0A50 reads the expected value from the host, $0A41 is the
+normal command response, and $09F0 is the error response.  The orl instruction
+doesn't make sense here.  However, changing it from 48 to 60 makes it an xrl
+instruction which would work as expected.
+
+Unfortunately the game doesn't issue this command during the attract loop or
+first level, so I haven't been able to test it.  I can't even use the checksum
+function to verify that the program is good because the expected value mod 256
+has to be supplied by the host.
+
+The current Dragonninja MCU program was made by hacking the expected startup
+synchronisation command in the Bad Dudes MCU program (location $09A4 changed
+from $0B to $03).  There may be other differences in a real Dragonninja MCU.
+The table of expected values for command 7 is the same for Dragonninja (from
+debugging main CPU program).
+
+Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
+$3B), $07 (return table index if parameter matches table otherwise reset) and
+$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
+startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
+Dudes).  Most of the MCU program isn't utilised.
+
+
+Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
+
+Heavy Barrel
+Bad Dudes vs. Dragonninja
+Dragonninja
+Birdie Try
+Robocop
+Hippodrome
+Fighting Fantasy
+Secret Agent
+Sly Spy
+Midnight Resistance
+Boulderdash
+
+Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy use the 'MEC-M1'
+motherboard and another plug-in game board containing all the ROMs.
+Sly Spy, Midnight Resistance and Boulderdash use the same graphics chips but are single pcbs.
 
 PCB Layouts
 -----------
 
-Bad Dudes vs Dragonninja
-Data East, 1988
-
 Main Board:
-This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome
 
-DE-0297-3 (earlier version DE-0295-1 uses PGA custom chips)
-MEC-M1
+This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy
+
+PCB number: MEC-M1 DE-0297-3 (uses QFP custom chips)
+or
+MEC-M1 DE-0295-1 (uses PGA custom chips)
+or
+DE-0289-2 (uses PGA custom chips and MEC-M1 not written on PCB)
 |------------------------------------------------------------------|
 |               TMM2018                                    12MHz   |
 |               TMM2018                                            |
-|               TMM2018          MB7122                 TC5565     |
+|               TMM2018          MB7122                            |
 |                                                       TC5565     |
-|                                                       TMM2018    |
-|                                                       TMM2018    |
-|          20MHz                                  MB7116           |
+|                                                       TC5565     |
+|                                                MB7116 TMM2018    |
+|          20MHz                                        TMM2018    |
 |J  RCDM-I1                                                        |
-|A  RCDM-I1                                TMM2018     |---------| |
-|M  RCDM-I1                                            |L7B0072  | |
-|M  RCDM-I1                                TMM2018     |DATAEAST | |
-|A  RCDM-I1                                            |BAC 06   | |
-|   RCDM-I1                                TMM2018     |---------| |
-|    DSW2       68000P10                   TMM2018                 |
-|    DSW1                                 |---------|  |---------| |
-|                              RP65C02    |L7B0073  |  |L7B0072  | |
-|UPC3403      TC5565                      |DATAEAST |  |DATAEAST | |
+|A  RCDM-I1                                            |---------| |
+|M  RCDM-I1                             TMM2018        |L7B0072  | |
+|M  RCDM-I1                             TMM2018        |DATAEAST | |
+|A  RCDM-I1                             TMM2018        |BAC 06   | |
+|   RCDM-I1    |-------------|          TMM2018        |---------| |
+|    DSW2      |   68000P10  |                                     |
+|    DSW1      |-------------|            |---------|  |---------| |
+|                                         |L7B0073  |  |L7B0072  | |
+|UPC3403      TC5565          RP65C02     |DATAEAST |  |DATAEAST | |
 |CN4   YM3014 TC5565        TMM2018       |MXC 06   |  |BAC 06   | |
 |VOL   YM3014 YM3812                      |---------|  |---------| |
 |MB3730      YM2203             CN2                CN1             |
@@ -94,8 +151,8 @@ Notes:
       YM3812  - Clock input 3.000MHz [12/4]
       TMM2018 - 2k x8 SRAM
       TC5565  - 8k x8 SRAM
-      MB7122  - 1k x4 bipolar PROM
-      MB7116  - 512b x4 bipolar PROM
+      MB7122  - 1k x4 bipolar PROM with label "A-2" at location E17
+      MB7116  - 512b x4 bipolar PROM with label "A-1" at location C12
       RCDM-I1 - Custom resistor array
       DSW1/2  - 8-position DIP switches
       L7B007x - DECO custom graphics chips (QFP160 or PGA type)
@@ -106,26 +163,26 @@ Notes:
       ------------
       VSync - 57.4162Hz
       HSync - 15.6172kHz
-      OSC1  - 20.00006MHz
-      XTAL1 - 11.9938MHz
+      OSC1  - 20.00006MHz (20MHz)
+      XTAL1 - 11.9938MHz (12MHz)
 
 
-ROM Board:
-This board is used with Heavy Barrel, Bad Dudes & Birdie Try only.
-There is another type of ROM board used with Robocop & Hippodrome which
-is different (but not documented here)
+ROM Board Type 1:
 
-DE-0299-2 (earlier version DE-0293-2 uses PGA custom chips)
-MEC-M1
+This board is used with Heavy Barrel, Bad Dudes & Birdie Try
+All ROMs are in sockets. Boards that do not use some positions
+do not have the socket populated (i.e. Bad Dudes)
+
+DE-0299-2 (earlier version DE-0293-2 or DE-0293-1 uses PGA custom chips)
 |-------------------------------------------------------|
-|C4558  CN2          7.8A      CN1                      |
-|       1.3A 2.4A 3.6A  i8751 9.12A 10.14A 11.16A 12.17A|
-| M6295                 8MHz                            |
-|CN9                                                    |
+|C4558          CN2  7.8A              CN1              |
+|       1.3A 2.4A 3.6A        9.12A 10.14A 11.16A 12.17A|
+| M6295               I8751_31.9A                       |
+|CN9                    8MHz                            |
 |                                                       |
 |       4.3C 5.4C 6.6C       13.12C 14.14C 15.16C 16.17C|
+|  8.2C                                                 |
 |                                                       |
-|8.2C                                                   |
 |                 |---------|                           |
 |                 |L7B0072  | TMM2018                   |
 |CN5              |DATAEAST |17.12D 18.14D 19.16D 20.17D|
@@ -134,31 +191,140 @@ MEC-M1
 |CN6                                                    |
 |                            21.12F 22.14F 23.16F 24.17F|
 |                   27.7F 28.9F                         |
-|CN7                                                    |
-|                                                       |
-|                                                       |
+|CN7        D4701                                       |
+|   LA6339                                              |
+|   LA6339  D4701                                       |
 |CN8                29.7J 30.9J      25.15J 26.16J      |
 |-------------------------------------------------------|
 Notes:
-      i8751     - intel 8751 microcontroller, clock input 8.000MHz
+      i8751     - Intel 8751 microcontroller, clock input 8.000MHz
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
-      L7B0072   - DECO custom graphics chip (QFP160 or PGA type)
+      L7B0072   - DECO custom graphics chip (QFP160 or PGA type). Populated on ALL PCBs even if not used.
+                  If ROMs 27/28/29 & 30 are not populated this chip is not used
       TMM2018   - 2k x8 SRAM
+      C4558     - NEC C4558 Dual Op Amp
+      LA6339    - Sanyo LA6339 High Performance Quad Comparator
+      D4701     - NEC uPD4701 X,Y 2-axis Incremental Encoder Counter
       CN1/2     - 96-pin connectors joining to Main Board
-      CN5/6/7/8 - Connectors for other inputs/buttons (these are not populated on
-                  Bad Dudes but are used with Birdie Try/Heavy Barrel etc)
+      CN5/6     - Connectors for other inputs/buttons. Not populated on Bad Dudes.
+                  Used for the rotary joysticks on Heavy Barrel
+      CN7/8     - Connectors for trackball inputs for player 1 and player 2. Not populated on Bad Dudes or Heavy Barrel.
+                  Used for trackballs on Birdie Try
       CN9       - 6-pin cable joining to Main Board
-
       ROMs      - All ROM locations shown but not all are populated.
-                  All DECO games use a ROM code on the label....
+                  All DECO games use a game code on the label....
                    - Bad Dudes    = EI    \
                    - Birdie Try   = EK     |
                    - Dragon Ninja = EG     | These also change for different country/regions
-                   - Heavy Barrel = EC    /
+                   - Heavy Barrel = EC    /  Some Heavy Barrel boards only have numbers on the stickers
                   All ROMs are 27512/27256 EPROM/maskROM
-                  All ROMs have a number location on the board next to the chip. The chips
-                  can also be referenced via the numbers & letters on the side of the board.
-                  For example, both of these are the same chip.... EI30.30 or EI30.9J
+                  All ROMs have a number location on the board next to the chip and that same number is used
+                  as part of the ROM label. The chips can also be referenced via the numbers & letters on the
+                  side of the board. For example EI30.30 or EI30.9J. Both of these are the same chip and the
+                  game code identifies the game, which in this case is Bad Dudes.
+
+ROM usage per game
+------------------
+     Location  3A    4A    6A    3C    4C    6C    8A    2C    12A   14A   16A   17A   12C   14C   16C   17C   12D   14D   16D   17D   12F   14F   16F   17F   15J   16J   7F    9F    7J    9J    9A
+Game           1     2     3     4     5     6     7     8     9     10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Birdie Try     EK01  EK02  EK03  EK04  EK05  EK06  EK07  EK08  EK09  EK10  EK11  EK12  EK13  EK14  EK15  EK16  EK17  EK18  EK19  EK20  EK21  EK22  EK23  EK24  EK25  EK26  -     -     -     -     EK31-1
+Bad Dudes      EI01  -     EI03  EI04  -     EI06  EI07  EI08  EI09  EI10  EI11  EI12  EI13  EI14  EI15  EI16  -     EI18  -     EI20  -     EI22  -     EI24  EI25  EI26  -     EI28  -     EI30  EI31
+Dragon Ninja   EG01  -     EG03  EG04  -     EG06  EG07  EG08  EG09  EG10  EG11  EG12  EG13  EG14  EG15  EG16  -     EG18  -     EG20  -     EG22  -     EG24  EG25  EG26  -     EG28  -     EG30  EG31
+Heavy Barrel   EC01  EC02  EC03  EC04  EC05  EC06  EC07  EC08  EC09  EC10  EC11  EC12  EC13  EC14  EC15  EC16  EC17  EC18  EC19  EC20  EC21  EC22  EC23  EC24  EC25  EC26  EC27  EC28  EC29  EC30  EC31
+
+Note the games can be converted by swapping all of the ROMs and MCU. For example on a Birdie Try PCB, when the 
+ROMs are swapped for the 'hbarrel' set from MAME, the board will run Heavy Barrel. I can confirm the MCU dump 
+from the 'hbarrel' MAME ROM set (HB31.9A) and 'baddudes' MAME ROM set (EI31.9A) works fine on the real PCB.
+
+
+ROM Board Type 2:
+
+This board is used with Hippodrome & Fighting Fantasy
+
+DE-0318-4
+|-------------------------------------------------------|
+|               CN2                    CN1              |
+|                                                       |
+|       EX00.B1    EX04.C1                              |
+|CN4                                                    |
+|       EX01-3.B3  PZ-1.C3            EX13.F3   EX18.G3 |
+|                                                       |
+|       EX02-3.B4  EX05.C4            EX14.F4   EX19.G4 |
+|                                                       |
+|       EX03.B5    EX06.C5  EX10.D5   EX15.F5   EX20.G5 |
+|                                                       |
+|       M6295      EX07.C6  EX11.D6   EX16.F6   EX21.G6 |
+|     4558                  EX12.D8   EX17.F8   EX22.G8 |
+||--|                                 TMM2018           |
+||  |       |---------|               TMM2018   EX23.G10|
+||49|       |   47    |            |---------|          |
+||  |       |---------|            |L7B0072  |  EX24.G11|
+||  |           TMM2063            |DATAEAST |          |
+||--| 21.4772MHz                   |BAC 06   |  EX25.G13|
+|           |---|  EX08.C15        |---------|          |
+|    C1060  | 45|                                       |
+|-----------|---|---------------------------------------|
+Notes:
+      49        - Unknown DIP40 ASIC (no clock input so not an MCU)
+      47        - Unknown SDIP52 ASIC (no clock input so not an MCU)
+      45        - HuC6280 sound CPU in disguise as Data East custom chip #45. Clock input 21.4772MHz on pin 10
+      M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
+      4558      - NEC C4558 Dual Op Amp
+      C1060     - NEC uPC1060C 2.5V High Precision Reference Voltage Circuit
+      L7B0072   - DECO custom graphics chip (QFP160)
+      TMM2018   - 2k x8 SRAM
+      TMM2063   - 8k x8 SRAM
+      PZ-1.C3   - MMI PAL16L8 marked "PZ-1"
+      CN1/2     - 96-pin connectors joining to Main Board
+      CN4       - 6-pin cable joining to Main Board
+      ROMs      - All ROMs are 27512/27256 EPROM/maskROM
+                  All ROMs have a number location under the chip and that same number is used
+                  as part of the ROM label. The chips can also be referenced via the numbers
+                  & letters on the side of the board. For example EX25.G13 or EX25.25 are the
+                  same chip. Game code on the ROM labels for Hippodrome/Fighting Fantasy is
+                  EV, EW or EX.
+
+
+ROM Board Type 3:
+
+This board is used only with Robocop
+
+DE-0316-4
+|-------------------------------------------------------|
+|               CN2                    CN1              |
+|4558 PZ-1.B15                                          |
+|                EP03-3.C14 EP06.E14  EP10.F14          |
+|CN4                                                    |
+|     EP00-3.B13            EP07.E13  EP11.F13  EP18.H13|
+|M6295                                                  |
+|     EP01-4.B12 EP04-3.C12 EP08.E12  EP12.F12  EP19.H12|
+|                                                       |
+|     EP02.B11   EP05-4.C11 EP09.E11  EP13.F11  EP20.H11|
+|                           TMM2063                     |
+|  PZ-0.A9                  TMM2063             EP21.H10|
+|                                                       |
+| 21.4772MHz              |---------| EP14.F7   EP22.H7 |
+| |------|                |L7B0072  |           EP23.H6 |
+| |DEC-01|                |DATAEAST | EP15.F4           |
+| |      |                |BAC 06   |                   |
+| |------|  |---------|   |---------| EP16.F3           |
+|  2018     | DEM-01  |                                 |
+|           |---------|               EP17.F2           |
+|  PZ-2.A2                                              |
+|-------------------------------------------------------|
+Notes:
+      DEM-01    - Unknown SDIP52 ASIC (no clock input so not an MCU, decapping it found only ASIC, no ROM)
+      DEC-01    - HuC6280 sound CPU in disguise as Data East custom chip DEC-01. Clock input 21.4772MHz on pin 10
+      M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
+      4558      - NEC C4558 Dual Op Amp
+      L7B0072   - DECO custom graphics chip (QFP160)
+      TMM2018   - 2k x8 SRAM
+      TMM2063   - 8k x8 SRAM
+      PZ-*      - MMI PAL16L8 PALs
+      CN1/2     - 96-pin connectors joining to Main Board
+      CN4       - 6-pin cable joining to Main Board
+      ROMs      - All ROMs are 27512/27256 EPROM/maskROM
 
 ***************************************************************************/
 
@@ -1561,6 +1727,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( baddudes, dec0 )
 
+	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( drgninjab, dec0 )
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
@@ -1803,8 +1979,8 @@ ROM_START( baddudes )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "ei07.8a",   0x8000, 0x8000, CRC(9fb1ef4b) SHA1(f4dd0773be93c2ad8b0faacd12939c531b5aa130) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ei31.9a",   0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - see notes */
+	ROM_LOAD( "ei31.9a",   0x0000, 0x1000, CRC(2a8745d2) SHA1(f15ab17b1e7836d603135f5c66ca2e3d72f6e4a2) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "ei25.15j",  0x00000, 0x08000, CRC(bcf59a69) SHA1(486727e19c12ea55b47e2ef773d0d0471cf50083) )
@@ -1846,8 +2022,8 @@ ROM_START( drgninja )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - using hacked baddudes program */
+	ROM_LOAD( "i8751",     0x0000, 0x1000, CRC(c3f6bc70) SHA1(3c80197dc70c6cb283df5d11d29a9d9baabcd99b) BAD_DUMP )
 
 	/* various graphic and sound roms also differ when compared to baddudes */
 
@@ -3389,8 +3565,8 @@ DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
 //    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE/DEVICE,   INIT, MONITOR,COMPANY,                 FULLNAME,            FLAGS
 GAME( 1987, hbarrel,    0,        hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hbarrelw,   hbarrel,  hbarrel,  hbarrel,  dec0_state,  hbarrel, ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes, baddudes, dec0_state,  hbarrel, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes, drgninja, dec0_state,  hbarrel, ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, birdtry,    0,        birdtry,  birdtry,  dec0_state,  birdtry, ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection controls game related data, impossible to emulate without a working PCB
 GAME( 1988, robocop,    0,        robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopw,   robocop,  robocop,  robocop,  dec0_state,  robocop, ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
@@ -3416,17 +3592,15 @@ GAME( 1990, bouldashj,  bouldash, slyspy,   bouldash, dec0_state,   slyspy, ROT0
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb, robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninjab,  baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-
-
+GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, robocop,    ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,  midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj, midresb, dec0_state,  midresb,  ROT0,   "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl,   ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 68705 not dumped, might be the same as midresb
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
 GAME( 1988, automat,    robocop,  automat,  robocop,  dec0_state,  robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?

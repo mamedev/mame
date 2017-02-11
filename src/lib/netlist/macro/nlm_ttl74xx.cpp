@@ -2,8 +2,7 @@
 // copyright-holders:Couriersud
 #include "nlm_ttl74xx.h"
 
-#include "devices/nld_truthtable.h"
-#include "devices/nld_system.h"
+#include "../devices/nld_system.h"
 
 
 /*
@@ -377,7 +376,7 @@ static NETLIST_START(TTL_7427_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
-				/*       +--------------+      */
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -413,11 +412,11 @@ static NETLIST_START(TTL_7430_DIP)
 		s1.A,  /*     A |1     ++    14| VCC  */ VCC.I,
 		s1.B,  /*     B |2           13| NC   */ NC.I,
 		s1.C,  /*     C |3           12| H    */ s1.H,
-		s1.D,  /*     D |4    7420   11| G    */ s1.G,
+		s1.D,  /*     D |4    7430   11| G    */ s1.G,
 		s1.E,  /*     E |5           10| NC   */ NC.I,
 		s1.F,  /*     F |6            9| NC   */ NC.I,
 		GND.I, /*   GND |7            8| Y    */ s1.Q
-				/*       +--------------+      */
+			   /*       +--------------+      */
 	)
 NETLIST_END()
 

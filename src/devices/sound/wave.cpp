@@ -38,16 +38,6 @@ wave_device::wave_device(const machine_config &mconfig, const char *tag, device_
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wave_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

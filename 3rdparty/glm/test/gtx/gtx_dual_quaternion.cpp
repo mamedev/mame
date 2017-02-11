@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/dual_quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/epsilon.hpp>
@@ -174,15 +175,30 @@ int test_dual_quat_ctr()
 	return Error;
 }
 
+int test_size()
+{
+	int Error = 0;
+
+	Error += 32 == sizeof(glm::dualquat) ? 0 : 1;
+	Error += 64 == sizeof(glm::ddualquat) ? 0 : 1;
+	Error += glm::dualquat().length() == 2 ? 0 : 1;
+	Error += glm::ddualquat().length() == 2 ? 0 : 1;
+	Error += glm::dualquat::length() == 2 ? 0 : 1;
+	Error += glm::ddualquat::length() == 2 ? 0 : 1;
+
+	return Error;
+}
+
 int main()
 {
-	int Error(0);
+	int Error = 0;
 
 	Error += test_dual_quat_ctr();
 	Error += test_dquat_type();
 	Error += test_scalars();
 	Error += test_inverse();
 	Error += test_mul();
+	Error += test_size();
 
 	return Error;
 }

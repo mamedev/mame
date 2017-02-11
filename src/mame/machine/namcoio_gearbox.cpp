@@ -2,24 +2,24 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Namco 6-speed Gearbox device
-	
-    Used in Ridge Racer deluxe cabinet, Ace Driver and Driver's Eyes
-	User side gear scheme:
-	1 3 5
-	|-|-|
-	2 4 6
+    Namco 6-speed Gearbox device
 
-	Being a mechanical part there are currently two methods hooked up,
-	emulated and natural. 
-	First one just uses whatever is read in the inputs, second one 
-	simulates clutch lock as in a real car.
-	
-	TODO:
-	- check clutch lock via real HW, and get a way to lock current gear via 
-	  MAME's input system;
-	- Custom part #;
-	- gear output for artwork system;
+    Used in Ridge Racer deluxe cabinet, Ace Driver and Driver's Eyes
+    User side gear scheme:
+    1 3 5
+    |-|-|
+    2 4 6
+
+    Being a mechanical part there are currently two methods hooked up,
+    emulated and natural.
+    First one just uses whatever is read in the inputs, second one
+    simulates clutch lock as in a real car.
+
+    TODO:
+    - check clutch lock via real HW, and get a way to lock current gear via
+      MAME's input system;
+    - Custom part #;
+    - gear output for artwork system;
 
 ***************************************************************************/
 
@@ -74,7 +74,7 @@ static INPUT_PORTS_START( gearbox_inputs )
 	PORT_START("GEARBOX")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Gearbox Up")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gearbox Down")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Gearbox Left") 
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Gearbox Left")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Gearbox Right")
 
 	PORT_START("CLUTCH")
@@ -105,21 +105,21 @@ CUSTOM_INPUT_MEMBER( namcoio_gearbox_device::in_r )
 {
 	if(ioport("CONFIG")->read() & 1)
 		return ioport("GEARBOX")->read() & 0xf;
-	
+
 	bool clutch_pressed = (ioport("CLUTCH")->read() & 1) == 0;
-	const char gearbox_output[16] = { '-', '-', '-', '-', 
-									  '-', '6', '5', 'N', 
-									  '-', '2', '1', 'N', 
+	const char gearbox_output[16] = { '-', '-', '-', '-',
+									  '-', '6', '5', 'N',
+									  '-', '2', '1', 'N',
 									  '-', '4', '3', 'N' };
-	
+
 	if(ioport("CONFIG")->read() & 2)
 		popmessage("%c %c",gearbox_output[m_gearbox_state],clutch_pressed == true ? '*' : '.');
-	
+
 	if(clutch_pressed == false)
 		return m_gearbox_state;
-	
+
 	m_gearbox_state = ioport("GEARBOX")->read() & 0xf;
-	
+
 	return 0xf; // return neutral while changing gear
 }
 

@@ -227,13 +227,7 @@ READ8_MEMBER( funkball_state::serial_r )
 WRITE8_MEMBER( funkball_state::serial_w )
 {
 	if(offset == 0)
-	{
-		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline.
-		if(data == 0x0d)
-			m_terminal->write(space,0,0x0a);
-		else
-			m_terminal->write(space,0,data);
-	}
+		m_terminal->write(space,0,data);
 }
 
 uint8_t funkball_state::funkball_config_reg_r()

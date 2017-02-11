@@ -79,6 +79,7 @@ CPU_DISASSEMBLE( avr8 );
 CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cdp1801 );
 CPU_DISASSEMBLE( cdp1802 );
+CPU_DISASSEMBLE( clipper );
 CPU_DISASSEMBLE( coldfire );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
@@ -138,6 +139,8 @@ CPU_DISASSEMBLE( m6803 );
 CPU_DISASSEMBLE( m68030 );
 CPU_DISASSEMBLE( m68040 );
 CPU_DISASSEMBLE( m6805 );
+CPU_DISASSEMBLE( m146805 );
+CPU_DISASSEMBLE( m68hc05 );
 CPU_DISASSEMBLE( m6808 );
 CPU_DISASSEMBLE( m6809 );
 CPU_DISASSEMBLE( m68340 );
@@ -248,6 +251,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ccpu",        _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
 	{ "cdp1801",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1801) },
 	{ "cdp1802",     _8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
+	{ "clipper",     _16le,  0, CPU_DISASSEMBLE_NAME(clipper) },
 	{ "coldfire",    _16be,  0, CPU_DISASSEMBLE_NAME(coldfire) },
 	{ "cop410",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",      _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
@@ -309,6 +313,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "m68030",      _16be,  0, CPU_DISASSEMBLE_NAME(m68030) },
 	{ "m68040",      _16be,  0, CPU_DISASSEMBLE_NAME(m68040) },
 	{ "m6805",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6805) },
+	{ "m146805",     _8bit,  0, CPU_DISASSEMBLE_NAME(m146805) },
+	{ "m68hc05",     _8bit,  0, CPU_DISASSEMBLE_NAME(m68hc05) },
 	{ "m6808",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6808) },
 	{ "m6809",       _8bit,  0, CPU_DISASSEMBLE_NAME(m6809) },
 	{ "m68340",      _16be,  0, CPU_DISASSEMBLE_NAME(m68340) },

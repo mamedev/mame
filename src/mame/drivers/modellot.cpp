@@ -24,9 +24,10 @@ class modellot_state : public driver_device
 {
 public:
 	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -34,12 +35,13 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
+
 private:
 	uint8_t m_term_data;
-	const uint8_t *m_p_chargen;
 	virtual void machine_reset() override;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
@@ -81,7 +83,6 @@ WRITE8_MEMBER( modellot_state::kbd_put )
 void modellot_state::machine_reset()
 {
 	m_term_data = 1;
-	m_p_chargen = memregion("chargen")->base();
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 

@@ -13,7 +13,8 @@
     TODO:
     - cforteb emulation (was initially sforteba romset)
     - verify supercon IRQ and beeper frequency
-    - why is sforte H and 1 leds always on?
+    - sforte irq active time (21.5us is too long)
+    - sforte/sexpert led handling is correct?
     - printer port
 
 ******************************************************************************
@@ -74,7 +75,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
-	// Super Constellation	
+	// Super Constellation
 	DECLARE_WRITE8_MEMBER(supercon_mux_w);
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
 	DECLARE_READ8_MEMBER(supercon_input1_r);
@@ -353,7 +354,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_mux_w)
 
 	// d3: enable beeper
 	m_beeper->set_state(data >> 3 & 1);
-	
+
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
 	display_matrix(8, 8, m_led_data, m_inp_mux);
@@ -413,9 +414,10 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
 	// if lcd is disabled, misc control
 	if (~m_lcd_control & 4)
 	{
-		// d5,d6: led data
-		display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
-		
+		// d5,d6: led data, but not both at same time?
+		if ((data & 0x60) != 0x60)
+			display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
+
 		// d7: enable beeper
 		m_beeper->set_state(data >> 7 & 1);
 	}
@@ -804,7 +806,7 @@ static MACHINE_CONFIG_START( sexpert, novag6502_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
-	
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
@@ -838,7 +840,9 @@ static MACHINE_CONFIG_DERIVED( sforte, sexpert )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
-	
+	MCFG_TIMER_MODIFY("irq_on")
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(15)) // active for ?us
+
 	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END
 

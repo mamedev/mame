@@ -6,13 +6,15 @@
 
 *********************************************************************/
 
-#ifndef __BITBNGR_H__
-#define __BITBNGR_H__
+#ifndef MAME_DEVICES_IMAGEDEV_BITBNGR_H
+#define MAME_DEVICES_IMAGEDEV_BITBNGR_H
 
 class bitbanger_device : public device_t,
 	public device_image_interface
 {
 public:
+	static void static_set_interface(device_t &device, const char *_interface) { downcast<bitbanger_device &>(device).m_interface = _interface; }
+
 	// construction/destruction
 	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -28,6 +30,7 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return ""; }
 
 	void output(uint8_t data);
@@ -37,9 +40,15 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
+
+private:
+	char const *m_interface;
 };
+
+#define MCFG_BITBANGER_INTERFACE(_interface) \
+	bitbanger_image_device::static_set_interface(*device, _interface);
 
 // device type definition
 extern const device_type BITBANGER;
 
-#endif /* __BITBNGR_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_BITBNGR_H

@@ -18,14 +18,17 @@ project "glslang"
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4005", -- warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+			"/wd4100", -- error C4100: 'inclusionDepth' : unreferenced formal parameter
 		}
 
 	configuration { "not vs*" }
 		buildoptions {
+			"-Wno-deprecated-register",
 			"-Wno-ignored-qualifiers",
 			"-Wno-inconsistent-missing-override",
 			"-Wno-missing-field-initializers",
 			"-Wno-reorder",
+			"-Wno-return-type",
 			"-Wno-shadow",
 			"-Wno-sign-compare",
 			"-Wno-undef",
@@ -46,10 +49,9 @@ project "glslang"
 		}
 
 	configuration {}
-
-	flags {
-		"Optimize",
-	}
+		defines {
+			"ENABLE_HLSL=1",
+		}
 
 	includedirs {
 		GLSLANG,
@@ -98,14 +100,19 @@ project "shaderc"
 		path.join(GLSL_OPTIMIZER, "src"),
 	}
 
-	flags {
-		"Optimize",
+	links {
+		"bx",
 	}
 
-	removeflags {
-		-- GCC 4.9 -O2 + -fno-strict-aliasing don't work together...
-		"OptimizeSpeed",
-	}
+	configuration { "Release" }
+		flags {
+			"Optimize",
+		}
+
+		removeflags {
+			-- GCC 4.9 -O2 + -fno-strict-aliasing don't work together...
+			"OptimizeSpeed",
+		}
 
 	configuration { "vs*" }
 		includedirs {
@@ -144,6 +151,11 @@ project "shaderc"
 	configuration { "vs*" }
 		includedirs {
 			path.join(GLSL_OPTIMIZER, "include/c99"),
+		}
+
+	configuration { "vs20* or mingw*" }
+		links {
+			"psapi",
 		}
 
 	configuration {}

@@ -8,10 +8,11 @@
 #ifndef P_UTIL_H_
 #define P_UTIL_H_
 
-#include <initializer_list>
+#include "pstring.h"
 
-#include "plib/pstring.h"
-#include "plib/plists.h"
+#include <initializer_list>
+#include <algorithm>
+#include <vector> // <<= needed by windows build
 
 namespace plib
 {
@@ -66,13 +67,8 @@ namespace plib
 	// string list
 	// ----------------------------------------------------------------------------------------
 
-	class pstring_vector_t : public std::vector<pstring>
-	{
-	public:
-		pstring_vector_t() : std::vector<pstring>() { }
-		pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty = false);
-		pstring_vector_t(const pstring &str, const pstring_vector_t &onstrl);
-	};
+	std::vector<pstring> psplit(const pstring &str, const pstring &onstr, bool ignore_empty = false);
+	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
 
 }
 

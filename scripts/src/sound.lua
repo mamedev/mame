@@ -154,13 +154,13 @@ end
 
 ---------------------------------------------------
 -- Amiga audio hardware
---@src/devices/sound/amiga.h,SOUNDS["AMIGA"] = true
+--@src/devices/machine/8364_paula.h,SOUNDS["PAULA_8364"] = true
 ---------------------------------------------------
 
-if (SOUNDS["AMIGA"]~=null) then
+if (SOUNDS["PAULA_8364"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/amiga.cpp",
-		MAME_DIR .. "src/devices/sound/amiga.h",
+		MAME_DIR .. "src/devices/machine/8364_paula.cpp",
+		MAME_DIR .. "src/devices/machine/8364_paula.h",
 	}
 end
 
@@ -1422,5 +1422,17 @@ if (SOUNDS["MM5837"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/mm5837.cpp",
 		MAME_DIR .. "src/devices/sound/mm5837.h",
+	}
+end
+
+---------------------------------------------------
+-- Intelligent Designs DAVE
+--@src/devices/sound/dave.h,MACHINES["DAVE"] = true
+---------------------------------------------------
+
+if (SOUNDS["DAVE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dave.cpp",
+		MAME_DIR .. "src/devices/sound/dave.h",
 	}
 end

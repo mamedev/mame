@@ -1476,7 +1476,7 @@ static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
@@ -1488,7 +1488,7 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
@@ -1568,10 +1568,10 @@ static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)	
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
-	
+
 static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
@@ -1716,7 +1716,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( winrungp )
 	PORT_INCLUDE(winrun)
-	
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
@@ -1733,7 +1733,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_MODIFY("DIAL0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1850,8 +1850,8 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 {
 	int scanline = param;
-//	int cur_posirq = get_posirq_scanline()*2;
-	
+//  int cur_posirq = get_posirq_scanline()*2;
+
 	if(scanline == 240*2)
 	{
 		m_master_intc->vblank_irq_trigger();
@@ -1859,7 +1859,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		if(m_gpu_intc)
 			m_gpu_intc->vblank_irq_trigger();
 	}
-	
+
 	if(m_gpu_intc != nullptr)
 	{
 		if(scanline == (0xff-m_gpu_intc->get_posirq_line())*2)

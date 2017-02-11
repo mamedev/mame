@@ -54,6 +54,10 @@ project "bx.test"
 		path.join(BX_DIR, "tests/dbg.*"),
 	}
 
+	links {
+		"bx",
+	}
+
 	configuration { "vs* or mingw*" }
 		links {
 			"psapi",
@@ -107,6 +111,10 @@ project "bx.bench"
 		path.join(BX_DIR, "tests/*_bench.cpp"),
 		path.join(BX_DIR, "tests/*_bench.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
+	}
+
+	links {
+		"bx",
 	}
 
 	configuration { "vs* or mingw*" }

@@ -23,10 +23,10 @@
 	i8089_device::set_databus_width(*device, _databus_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
-	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
+	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
 
 #define MCFG_I8089_SINTR2(_sintr2) \
-	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
+	devcb = &downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
 
 
 //**************************************************************************
@@ -47,8 +47,8 @@ public:
 	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _sintr1> void set_sintr1_callback(_sintr1 sintr1) { m_write_sintr1.set_callback(sintr1); }
-	template<class _sintr2> void set_sintr2_callback(_sintr2 sintr2) { m_write_sintr2.set_callback(sintr2); }
+	template<class _sintr1> devcb_base &set_sintr1_callback(_sintr1 sintr1) { return m_write_sintr1.set_callback(sintr1); }
+	template<class _sintr2> devcb_base &set_sintr2_callback(_sintr2 sintr2) { return m_write_sintr2.set_callback(sintr2); }
 
 	// static configuration helpers
 	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }

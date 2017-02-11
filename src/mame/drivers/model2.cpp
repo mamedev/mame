@@ -4830,7 +4830,7 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
 	ROM_LOAD( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
-ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 836-13275 */
+ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, Sega Game ID# 836-13274, ROM board ID# 836-13275 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-19992b.15", 0x000000, 0x080000, CRC(6d3e78d5) SHA1(40d18ee284ea2e038f7e3d04db56e793ab3e3dd5) ) /* sum16 492A printed on label */
 	ROM_LOAD32_WORD( "epr-19993b.16", 0x000002, 0x080000, CRC(765dc9ce) SHA1(a718c32ca27ec1fb5ed2d7d3797ea7e906510a04) ) /* sum16 B955 printed on label */

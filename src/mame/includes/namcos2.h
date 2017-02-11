@@ -143,7 +143,7 @@ public:
 	void reset_all_subcpus(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-	
+
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
@@ -334,7 +334,7 @@ public:
 
 	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-	
+
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;

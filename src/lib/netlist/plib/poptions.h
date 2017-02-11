@@ -10,8 +10,6 @@
 #ifndef POPTIONS_H_
 #define POPTIONS_H_
 
-#include <cstddef>
-
 #include "pstring.h"
 #include "plists.h"
 #include "putil.h"
@@ -67,7 +65,7 @@ public:
 
 	/* no_argument options will be called with "" argument */
 
-	virtual int parse(ATTR_UNUSED pstring argument) = 0;
+	virtual int parse(const pstring &argument) = 0;
 
 	pstring short_opt() { return m_short; }
 	pstring long_opt() { return m_long; }
@@ -85,7 +83,7 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument) override;
+	virtual int parse(const pstring &argument) override;
 
 	pstring operator ()() { return m_val; }
 private:
@@ -96,17 +94,19 @@ class option_str_limit : public option
 {
 public:
 	option_str_limit(options &parent, pstring ashort, pstring along, pstring defval, pstring limit, pstring help)
-	: option(parent, ashort, along, help, true), m_val(defval), m_limit(limit, ":")
-	{}
+	: option(parent, ashort, along, help, true), m_val(defval)
+	{
+		m_limit = plib::psplit(limit, ":");
+	}
 
-	virtual int parse(pstring argument) override;
+	virtual int parse(const pstring &argument) override;
 
 	pstring operator ()() { return m_val; }
-	const plib::pstring_vector_t &limit() { return m_limit; }
+	const std::vector<pstring> &limit() { return m_limit; }
 
 private:
 	pstring m_val;
-	plib::pstring_vector_t m_limit;
+	std::vector<pstring> m_limit;
 };
 
 class option_bool : public option
@@ -116,7 +116,7 @@ public:
 	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
-	virtual int parse(ATTR_UNUSED pstring argument) override;
+	virtual int parse(const pstring &argument) override;
 
 	bool operator ()() { return m_val; }
 private:
@@ -130,11 +130,25 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	virtual int parse(pstring argument) override;
+	virtual int parse(const pstring &argument) override;
 
 	double operator ()() { return m_val; }
 private:
 	double m_val;
+};
+
+class option_long : public option
+{
+public:
+	option_long(options &parent, pstring ashort, pstring along, long defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
+	{}
+
+	virtual int parse(const pstring &argument) override;
+
+	long operator ()() { return m_val; }
+private:
+	long m_val;
 };
 
 class option_vec : public option
@@ -144,7 +158,7 @@ public:
 	: option(parent, ashort, along, help, true)
 	{}
 
-	virtual int parse(pstring argument) override;
+	virtual int parse(const pstring &argument) override;
 
 	std::vector<pstring> operator ()() { return m_val; }
 private:
@@ -178,7 +192,6 @@ private:
 	std::vector<option_base *> m_opts;
 	pstring m_app;
 };
-
 
 }
 

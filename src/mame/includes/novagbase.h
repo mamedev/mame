@@ -47,7 +47,7 @@ public:
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
 	u32 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);

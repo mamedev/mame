@@ -1339,6 +1339,8 @@ if (CPUS["M6805"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 	}
 end
 
@@ -2124,6 +2126,18 @@ if (CPUS["TLCS90"]~=null) then
 end
 
 --------------------------------------------------
+-- Toshiba TLCS-870 Series
+--@src/devices/cpu/tlcs870/tlcs870.h,CPUS["TLCS870"] = true
+--------------------------------------------------
+
+if (CPUS["TLCS870"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.h",
+	}
+end
+
+--------------------------------------------------
 -- Toshiba TLCS-900 Series
 --@src/devices/cpu/tlcs900/tlcs900.h,CPUS["TLCS900"] = true
 --------------------------------------------------
@@ -2414,4 +2428,20 @@ end
 
 if (CPUS["MB86901"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sparc/sparcdasm.cpp")
+end
+
+--------------------------------------------------
+-- Intergraph CLIPPER (C100/C300/C400) series
+--@src/devices/cpu/clipper/clipper.h,CPUS["CLIPPER"] = true
+--------------------------------------------------
+
+if (CPUS["CLIPPER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/clipper/clipper.cpp",
+		MAME_DIR .. "src/devices/cpu/clipper/clipper.h",
+	}
+end
+
+if (CPUS["CLIPPER"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/clipper/clipperd.cpp")
 end

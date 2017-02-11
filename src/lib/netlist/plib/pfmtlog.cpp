@@ -5,16 +5,13 @@
  *
  */
 
-#include <cstring>
-//FIXME:: pstring should be locale free
-#include <cctype>
-#include <cstdlib>
-#include <cstdio>
-
-#include <algorithm>
-
 #include "pfmtlog.h"
 #include "palloc.h"
+
+#include <cstring>
+#include <cstdlib>
+#include <cstdarg>
+#include <algorithm>
 
 namespace plib {
 

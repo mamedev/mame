@@ -17,3 +17,4 @@ Other
 
 * [Why Catch?](why-catch.md)
 * [Contributing](contributing.md)
+* [Release Notes](release-notes.md)

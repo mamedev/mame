@@ -6,6 +6,7 @@
  */
 
 #include "nld_9316.h"
+#include "../nl_base.h"
 
 #define MAXCNT 15
 
@@ -161,22 +162,22 @@ namespace netlist
 	{
 		if (m_loadq)
 		{
-			switch (m_cnt())
+			if (m_cnt < MAXCNT - 1)
 			{
-				case MAXCNT - 1:
-					m_cnt = MAXCNT;
-					m_RC.push(m_ent, NLTIME_FROM_NS(27));
-					m_QA.push(1, NLTIME_FROM_NS(20));
-					break;
-				case MAXCNT:
-					m_RC.push(0, NLTIME_FROM_NS(27));
-					m_cnt = 0;
-					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
-					break;
-				default:
-					m_cnt++;
-					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
-					break;
+				m_cnt++;
+				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
+			}
+			else if (m_cnt == MAXCNT - 1)
+			{
+				m_cnt = MAXCNT;
+				m_RC.push(m_ent, NLTIME_FROM_NS(27));
+				m_QA.push(1, NLTIME_FROM_NS(20));
+			}
+			else // MAXCNT
+			{
+				m_RC.push(0, NLTIME_FROM_NS(27));
+				m_cnt = 0;
+				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 			}
 		}
 		else

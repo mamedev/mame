@@ -27,7 +27,10 @@ const device_type HUC6261 = &device_creator<huc6261_device>;
 
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
-		device_video_interface(mconfig, *this), m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
+		device_video_interface(mconfig, *this), 
+		m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6272_tag(nullptr),
+		m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_huc6272(nullptr),
+		m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data_a(0), m_pixel_data_b(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
 {
 	// Set up UV lookup table
 	for ( int ur = 0; ur < 256; ur++ )
@@ -38,10 +41,10 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 			int32_t u = ur - 128;
 			int32_t v = vr - 128;
 
-			r =              - 1.13983 * v;
+			r =              + 1.13983 * v;
 			g = -0.35465 * u - 0.58060 * v;
 			b =  2.03211 * u;
-
+			
 			m_uv_lookup[ ( ur << 8 ) | vr ][0] = r;
 			m_uv_lookup[ ( ur << 8 ) | vr ][1] = g;
 			m_uv_lookup[ ( ur << 8 ) | vr ][2] = b;
@@ -53,8 +56,8 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 inline uint32_t huc6261_device::yuv2rgb(uint32_t yuv)
 {
 	int32_t r, g, b;
-	uint8_t y = yuv >> 16;
-	uint16_t uv = yuv & 0xffff;
+	uint8_t y = yuv >> 8;
+	uint16_t uv = ((yuv & 0xf0) << 8) | ((yuv & 0xf) << 4);
 
 	r = y + m_uv_lookup[uv][0];
 	g = y + m_uv_lookup[uv][1];
@@ -70,6 +73,20 @@ inline uint32_t huc6261_device::yuv2rgb(uint32_t yuv)
 	return ( r << 16 ) | ( g << 8 ) | b;
 }
 
+void huc6261_device::apply_pal_offs(uint16_t *pix_data)
+{
+	// sprite
+	if(*pix_data & 0x100)
+	{
+		*pix_data &= 0xff;
+		*pix_data += ((m_palette_offset[0] & 0x7f00) >> 8) << 1;
+	}
+	else // background
+		*pix_data += (m_palette_offset[0] & 0x7f) << 1;
+
+	*pix_data &= 0x1ff;
+}
+
 void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int vpos = m_screen->vpos();
@@ -77,18 +94,26 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int h = m_last_h;
 	int v = m_last_v;
 	uint32_t *bitmap_line = &m_bmp->pix32(v);
-
+	
 	while ( h != hpos || v != vpos )
 	{
 		if ( m_pixel_clock == 0 )
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data = m_huc6270_b->next_pixel( machine().dummy_space(), 0, 0xffff );
+			m_pixel_data_a = m_huc6270_a->next_pixel( machine().dummy_space(), 0, 0xffff );
+			m_pixel_data_b = m_huc6270_b->next_pixel( machine().dummy_space(), 0, 0xffff );
+			apply_pal_offs(&m_pixel_data_a);
+			apply_pal_offs(&m_pixel_data_b);
+
 			g_profiler.stop();
 		}
 
-		bitmap_line[ h ] = yuv2rgb( ( ( m_palette[m_pixel_data] & 0xff00 ) << 8 ) | ( ( m_palette[m_pixel_data] & 0xf0 ) << 8 ) | ( ( m_palette[m_pixel_data] & 0x0f ) << 4 ) );
+		bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_a ] );
+		// TODO: is mixing correct?
+		if((m_pixel_data_b & 0xff) != 0)
+			bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_b ] );
+
 		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
 		h = ( h + 1 ) % HUC6261_WPF;
 
@@ -267,21 +292,21 @@ WRITE16_MEMBER( huc6261_device::write )
 			switch( m_register )
 			{
 				/* Control register */
-				// -x-------------- Enable HuC6271: 0 - disabled, 1 - enabled
-				// --x------------- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
-				// ---x------------ Enable HuC6272 BG2: 0 - disabled, 1 - enabled
-				// ----x----------- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
-				// -----x---------- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
-				// ------x--------- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
-				// -------x-------- Enable HuC6270 BG: 0 - disabled, 1 - enabled
-				// --------x------- Number of SPR colors?: 0 - 16, 1 - 256
-				// ---------x------ Number of BG colors?: 0 - 16, 1 - 256
-				// ------------x--- Dot clock: 0 - 5MHz, 1 - 7MHz
-				// -------------x-- Synchronization: 0 - internal, 1 - external
-				// --------------xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
+				// -x-- ---- ---- ---- Enable HuC6271: 0 - disabled, 1 - enabled
+				// --x- ---- ---- ---- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
+				// ---x ---- ---- ---- Enable HuC6272 BG2: 0 - disabled, 1 - enabled
+				// ---- x--- ---- ---- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
+				// ---- -x-- ---- ---- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
+				// ---- --x- ---- ---- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
+				// ---- ---x ---- ---- Enable HuC6270 BG: 0 - disabled, 1 - enabled
+				// ---- ---- x--- ---- Number of SPR colors?: 0 - 16, 1 - 256
+				// ---- ---- -x-- ---- Number of BG colors?: 0 - 16, 1 - 256
+				// ---- ---- ---- x--- Dot clock: 0 - 5MHz, 1 - 7MHz
+				// ---- ---- ---- -x-- Synchronization: 0 - internal, 1 - external
+				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
 				case 0x00:
 					m_control = data;
-					m_pixels_per_clock = ( data & 0x04 ) ? 3 : 4;
+					m_pixels_per_clock = ( data & 0x08 ) ? 3 : 4;
 					break;
 
 				// Palette address
@@ -297,20 +322,12 @@ WRITE16_MEMBER( huc6261_device::write )
 					m_address = ( m_address + 1 ) & 0x1FF;
 					break;
 
-				// Palette offset 0
+				// Palette offset 0-3
 				case 0x04:
-					break;
-
-				// Palette offset 1
 				case 0x05:
-					break;
-
-				// Palette offset 2
 				case 0x06:
-					break;
-
-				// Palette offset 3
 				case 0x07:
+					m_palette_offset[m_register & 3] = data;
 					break;
 
 				// Priority 0
@@ -393,16 +410,19 @@ void huc6261_device::device_start()
 	/* Make sure we are supplied all our mandatory tags */
 	assert( m_huc6270_a_tag != nullptr );
 	assert( m_huc6270_b_tag != nullptr );
+	assert( m_huc6272_tag != nullptr );
 
 	m_timer = timer_alloc();
 	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
 	m_huc6270_b = machine().device<huc6270_device>(m_huc6270_b_tag);
+	m_huc6272 = machine().device<huc6272_device>(m_huc6272_tag);
 
 	m_bmp = std::make_unique<bitmap_rgb32>(HUC6261_WPF, HUC6261_LPF );
 
 	/* We want to have valid devices */
 	assert( m_huc6270_a != nullptr );
 	assert( m_huc6270_b != nullptr );
+	assert( m_huc6272 != nullptr );
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));
@@ -414,7 +434,8 @@ void huc6261_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_pixels_per_clock));
-	save_item(NAME(m_pixel_data));
+	save_item(NAME(m_pixel_data_a));
+	save_item(NAME(m_pixel_data_b));
 	save_item(NAME(m_pixel_clock));
 }
 

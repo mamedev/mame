@@ -151,7 +151,7 @@ Notes: (All IC's shown)
 
 #include "emu.h"
 #include "softlist.h"
-#include "audio/dave.h"
+#include "sound/dave.h"
 #include "bus/rs232/rs232.h"
 #include "bus/ep64/exp.h"
 #include "cpu/z80/z80.h"

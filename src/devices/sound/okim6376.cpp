@@ -135,16 +135,6 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void okim6376_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

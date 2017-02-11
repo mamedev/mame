@@ -323,7 +323,7 @@ pri_alp_bitmap
 */
 
 
-void taito_f3_state::device_post_load() 
+void taito_f3_state::device_post_load()
 {
 	/* force a reread of the dynamic tiles in the pixel layer */
 	m_gfxdecode->gfx(3)->mark_all_dirty();

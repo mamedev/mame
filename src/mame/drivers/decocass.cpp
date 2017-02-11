@@ -14,23 +14,30 @@
     The Dumping Union
     Team Japump!!!
     Hau
+	Jean-Francois Del Nero
+	Omar Cornut
+	Game Preservation Society
+	Joseph Redon
 
     The DECO cassette system consists of three PCBS in a card cage:
     Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
     One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control), two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external amp and volume control)
-    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms (main processor and bios, graphics, dipswitches?)
-    One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc
+    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor and bios, graphics, dipswitches?)
+    One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
     One DE-0066B-0 card rack board that the other three boards plug into.
-    TODO: get more info about this older boardset: D. Widel has some info about it on his page at http://www.widel.com/stuff/decopin.htm
+	This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
-    Later boardset: (1984 onward, schematic is dated 10/83)
+    Later boardset: (1984 onward, schematic is dated October 1983)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
     One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (DECO Cassette control, inputs)
-    One DE-0109C-0 card rack board that the other three boards plug into.
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs)
+    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for DE-109C-0 is shorter than in earlier versions)
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
-    Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
+    Each cassette has one track on it and is separated into clock and data by two Magtek IC in the player, for a form of synchronous serial.
+	The data is stored in blocks with headers and CRC16 checksums.
+	The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
+	The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
 
  ***********************************************************************/
 
@@ -656,6 +663,26 @@ static INPUT_PORTS_START( cfishing )
 	/* Switches 5, 6, 7 & 8 are listed as "Not Used" and "Don't Change" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cfboy0a1 ) /* 12 */
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Number of The Deco Kids" )                PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, "Bonus Points" )                           PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "5000" )
+	PORT_DIPSETTING(    0x04, "10000" )
+	PORT_DIPSETTING(    0x02, "15000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
+	PORT_DIPNAME( 0x08, 0x08, "Number of Alien Missiles" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )	
+	PORT_DIPNAME( 0x10, 0x10, "Alien Craft Movement" )                   PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
+	/* Switches 6 to 8 are shown as "Country Code" (A to F) and "Don't Change" */
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -863,6 +890,13 @@ static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clocknch)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( cfboy0a1, decocass ) /* 12 */
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cfboy0a1)
 MACHINE_CONFIG_END
 
 
@@ -1235,6 +1269,17 @@ ROM_START( clocknch )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "clocknch.cas",  0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
+ROM_END
+
+/* 12 Flash Boy (early vertical Japan version, then horizontal version), The Deco Kid (early vertical World version, then vertical version) */
+ROM_START( cfboy0a1 ) // version MD 0-A-1 verified, 105 blocks, decrypted main data CRC(7ca358f0)
+	DECOCASS_BIOS_AO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1120-a-1.cas", 0x0000, 0x6a00, CRC(c6746dc0) SHA1(816ccb61dfa2745a9ef918d9a50d1cd91493c9ed) )
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1120-a.rom",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
 ROM_END
 
 /* 13 */
@@ -1788,7 +1833,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
-/* 12 */ // 1981.08 Flash Boy/DECO Kid
+/* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_state, decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) [DECO Cassette MD] (No.12/Ver.0/Set.1,Japan)", 0 )
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
 /* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_state, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette) (Japan)", 0 )

@@ -13,7 +13,7 @@
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	downcast<mpu401_device *>(device)->set_irqf(DEVCB_##_irqf);
+	devcb = &downcast<mpu401_device *>(device)->set_irqf(DEVCB_##_irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,9 +30,9 @@ public:
 
 	required_device<m6801_cpu_device> m_ourcpu;
 
-	template<class _write> void set_irqf(_write wr)
+	template<class _write> devcb_base &set_irqf(_write wr)
 	{
-		write_irq.set_callback(wr);
+		return write_irq.set_callback(wr);
 	}
 
 	devcb_write_line write_irq;

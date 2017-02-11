@@ -7,9 +7,6 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
-#include <cstdarg>
-#include <cstddef>
-
 #include "pconfig.h"
 #include "pstring.h"
 #include "pfmtlog.h"
@@ -20,9 +17,8 @@ namespace plib {
 // pstream: things common to all streams
 // -----------------------------------------------------------------------------
 
-class pstream
+class pstream : nocopyassignmove
 {
-	P_PREVENT_COPYING(pstream)
 public:
 
 	using pos_type = std::size_t;
@@ -73,7 +69,6 @@ private:
 
 class pistream : public pstream
 {
-	P_PREVENT_COPYING(pistream)
 public:
 
 	explicit pistream(const unsigned flags) : pstream(flags) {}
@@ -98,7 +93,6 @@ protected:
 
 class postream : public pstream
 {
-	P_PREVENT_COPYING(postream)
 public:
 
 	explicit postream(unsigned flags) : pstream(flags) {}
@@ -124,7 +118,6 @@ private:
 
 class pomemstream : public postream
 {
-	P_PREVENT_COPYING(pomemstream)
 public:
 
 	pomemstream();
@@ -148,8 +141,6 @@ private:
 
 class postringstream : public postream
 {
-	P_PREVENT_COPYING(postringstream )
-
 public:
 
 	postringstream() : postream(0) { }
@@ -176,7 +167,6 @@ private:
 
 class pofilestream : public postream
 {
-	P_PREVENT_COPYING(pofilestream)
 public:
 
 	explicit pofilestream(const pstring &fname);
@@ -204,7 +194,6 @@ private:
 
 class pstderr : public pofilestream
 {
-	P_PREVENT_COPYING(pstderr)
 public:
 	pstderr();
 	virtual ~pstderr();
@@ -216,7 +205,6 @@ public:
 
 class pstdout : public pofilestream
 {
-	P_PREVENT_COPYING(pstdout)
 public:
 	pstdout();
 	virtual ~pstdout();
@@ -228,7 +216,6 @@ public:
 
 class pifilestream : public pistream
 {
-	P_PREVENT_COPYING(pifilestream)
 public:
 
 	explicit pifilestream(const pstring &fname);
@@ -257,7 +244,6 @@ private:
 
 class pstdin : public pifilestream
 {
-	P_PREVENT_COPYING(pstdin)
 public:
 
 	pstdin();
@@ -270,7 +256,6 @@ public:
 
 class pimemstream : public pistream
 {
-	P_PREVENT_COPYING(pimemstream)
 public:
 
 	pimemstream(const void *mem, const pos_type len);
@@ -296,7 +281,6 @@ private:
 
 class pistringstream : public pimemstream
 {
-	P_PREVENT_COPYING(pistringstream)
 public:
 	pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
 	virtual ~pistringstream();
@@ -312,9 +296,8 @@ private:
 
 /* this digests linux & dos/windows text files */
 
-class putf8_reader
+class putf8_reader : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(putf8_reader)
 public:
 	explicit putf8_reader(pistream &strm) : m_strm(strm) {}
 	virtual ~putf8_reader() {}
@@ -349,9 +332,8 @@ private:
 // putf8writer_t: writer on top of ostream
 // -----------------------------------------------------------------------------
 
-class putf8_writer
+class putf8_writer : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(putf8_writer)
 public:
 	explicit putf8_writer(postream &strm) : m_strm(strm) {}
 	virtual ~putf8_writer() {}
@@ -378,7 +360,6 @@ private:
 
 class putf8_fmt_writer : public pfmt_writer_t<>, public putf8_writer
 {
-	P_PREVENT_COPYING(putf8_fmt_writer)
 public:
 
 	explicit putf8_fmt_writer(postream &strm);

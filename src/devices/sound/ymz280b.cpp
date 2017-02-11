@@ -962,13 +962,3 @@ ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, d
 {
 	memset(m_voice, 0, sizeof(m_voice));
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymz280b_device::device_config_complete()
-{
-}

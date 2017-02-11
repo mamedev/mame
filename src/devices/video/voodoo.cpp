@@ -5761,16 +5761,6 @@ voodoo_device::~voodoo_device()
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void voodoo_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
