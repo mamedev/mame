@@ -178,8 +178,8 @@ WRITE8_MEMBER(freekick_state::freekick_ff_w)
 static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // ram is 2x sony cxk5813d-55
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram")   // from gigas, just to have a region
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")  // from gigas, just to have a region
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
@@ -744,8 +744,15 @@ static MACHINE_CONFIG_START( omega, freekick_state )
 	MCFG_CPU_PROGRAM_MAP(omega_map)
 	MCFG_CPU_IO_MAP(omega_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
+	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
+	MCFG_SCREEN_PALETTE("palette")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x200)
 
@@ -878,14 +885,15 @@ ROM_START( omega )
 	ROM_LOAD("omega.key", 0x0000, 0x2000, CRC(0a63943f) SHA1(9e581ea0c5bf6c0ed5d402d3bab053766b8e44c2))
 
 	ROM_REGION(0xc000, "gfx1", 0)
-	ROM_LOAD("1.a10",  0x00000, 0x04000, CRC(e0aeada9) SHA1(ed00f6dca4f9701ff89390922d39341b179597c7)) // 27128
-	ROM_LOAD("2.c10",  0x04000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
-	ROM_LOAD("3.d10",  0x08000, 0x04000, CRC(c678b202) SHA1(ee93385e11158ccaf51a22d813bd7020c04cfdad)) // 27128
-
-	ROM_REGION(0xc000, "gfx2", 0)
 	ROM_LOAD("4.f10",  0x00000, 0x04000, CRC(bf780a8e) SHA1(53bfabf74f1a7782c6c1803498a24da0bf8db995)) // 27128
 	ROM_LOAD("5.h10",  0x04000, 0x04000, CRC(b491647f) SHA1(88017033a781ecc49a83241bc49e2077a480ac2b)) // 27128
 	ROM_LOAD("6.j10",  0x08000, 0x04000, CRC(65beba5b) SHA1(e6d61dc52dcbb30570b48d7b1d7807dd0be41400)) // 27128
+
+	ROM_REGION(0xc000, "gfx2", 0)
+	ROM_LOAD("1.a10",  0x00000, 0x04000, CRC(e0aeada9) SHA1(ed00f6dca4f9701ff89390922d39341b179597c7)) // 27128
+	ROM_LOAD("3.d10",  0x04000, 0x04000, CRC(c678b202) SHA1(ee93385e11158ccaf51a22d813bd7020c04cfdad)) // 27128
+	ROM_LOAD("2.c10",  0x08000, 0x04000, CRC(dbc0a47f) SHA1(b617c5a10c655e7befaeaecd9ce736e972285e6b)) // 27128
+	// are the above two roms swapped properly here? they are in the '1,3,2' order on gigas but that may be incorrect here...
 
 	ROM_REGION(0x600, "proms", 0)
 	ROM_LOAD("tbp24s10n.3e", 0x000, 0x100, NO_DUMP)
@@ -894,6 +902,13 @@ ROM_START( omega )
 	ROM_LOAD("tbp24s10n.4e", 0x000, 0x100, NO_DUMP)
 	ROM_LOAD("tbp24s10n.4f", 0x000, 0x100, NO_DUMP)
 	ROM_LOAD("tbp24s10n.4g", 0x000, 0x100, NO_DUMP)
+	// temporarily using gigas' color proms for now until the proms above get dumped; wrong colors on sprites/gfx2 layer.
+	ROM_LOAD( "1.pr", 0x0000, 0x0100, BAD_DUMP CRC(a784e71f) SHA1(1741ce98d719bad6cc5ea42337ef897f2435bbab) ) // REMOVE when actual proms are dumped
+	ROM_LOAD( "6.pr", 0x0100, 0x0100, BAD_DUMP CRC(376df30c) SHA1(cc95920cd1c133da1becc7d92f4b187b56a90ec7) ) // REMOVE when actual proms are dumped
+	ROM_LOAD( "5.pr", 0x0200, 0x0100, BAD_DUMP CRC(4edff5bd) SHA1(305efc7ad7f86635489a655e214e216ac02b904d) ) // REMOVE when actual proms are dumped
+	ROM_LOAD( "4.pr", 0x0300, 0x0100, BAD_DUMP CRC(fe201a4e) SHA1(15f8ecfcf6c63ffbf9777bec9b203c319ba1b96c) ) // REMOVE when actual proms are dumped
+	ROM_LOAD( "2.pr", 0x0400, 0x0100, BAD_DUMP CRC(5796cc4a) SHA1(39576c4e48fd7ac52fc652a1ae0573db3d878878) ) // REMOVE when actual proms are dumped
+	ROM_LOAD( "3.pr", 0x0500, 0x0100, BAD_DUMP CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) ) // REMOVE when actual proms are dumped
 ROM_END
 
 ROM_START( pbillrd )
@@ -1388,7 +1403,7 @@ DRIVER_INIT_MEMBER(freekick_state,gigas)
  *
  *************************************/
 /*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT     ROT     COMPANY                         FULLNAME                                FLAGS  */
-GAME( 1986, omega,     0,        omega,     omega,    freekick_state, gigas,   ROT270, "Nihon System",                 "Omega",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, omega,     0,        omega,     omega,    freekick_state, gigas,   ROT270, "Nihon System",                 "Omega",                                MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigas,     0,        gigas,     gigas,    freekick_state, gigas,   ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gigasb,    gigas,    gigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, oigas,     gigas ,   oigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
