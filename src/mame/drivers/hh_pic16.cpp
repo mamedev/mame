@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Sean Riddle, Kevin Horton
 /***************************************************************************
 
   GI PIC16xx-driven dedicated handhelds or other simple devices.
@@ -19,8 +19,7 @@
 
 
   TODO:
-  - it doesn't work, emu/cpu/pic16c5x needs some love (dev note: hack to make it
-    playable: remove the TRIS masks)
+  - x
 
 ***************************************************************************/
 
@@ -52,8 +51,7 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	u8 m_b;                         // MCU port B data
-	u8 m_c;                         // MCU port C data
+	u8 m_port[4];                   // MCU port A-D write data
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
@@ -68,6 +66,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
+	void set_display_segmask(u32 digits, u32 mask);
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
@@ -86,8 +85,7 @@ void hh_pic16_state::machine_start()
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
-	m_b = 0;
-	m_c = 0;
+	memset(m_port, 0, sizeof(m_port));
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -99,8 +97,7 @@ void hh_pic16_state::machine_start()
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
-	save_item(NAME(m_b));
-	save_item(NAME(m_c));
+	save_item(NAME(m_port));
 }
 
 void hh_pic16_state::machine_reset()
@@ -188,6 +185,17 @@ void hh_pic16_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
+void hh_pic16_state::set_display_segmask(u32 digits, u32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
 void hh_pic16_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
@@ -213,7 +221,9 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool
 
   Ideal Maniac, by Ralph Baer
   * PIC1655A-036
-
+  * 2 7seg LEDs, 1-bit sound
+  
+  This is a reflex game for 2 to 4 players, 1 button per player.
 
 ***************************************************************************/
 
@@ -231,20 +241,14 @@ public:
 
 WRITE8_MEMBER(maniac_state::output_w)
 {
-	// B,C: outputs
-	offset -= PIC16C5x_PORTB;
-	if (offset)
-		m_c = data;
-	else
-		m_b = data;
+	m_port[offset] = data;
 
-	// d7: speaker out
-	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
+	// B7,C7: speaker out
+	m_speaker->level_w((m_port[PIC16C5x_PORTB] >> 7 & 1) | (m_port[PIC16C5x_PORTC] >> 6 & 2));
 
-	// d0-d6: 7seg
-	m_display_segmask[offset] = 0x7f;
-	m_display_state[offset] = ~data & 0x7f;
-
+	// B0-6,C0-6: 7seg data
+	m_display_state[offset-PIC16C5x_PORTB] = ~data & 0x7f;
+	set_display_segmask(3, 0x7f);
 	set_display_size(7, 2);
 	display_update();
 }
@@ -254,10 +258,10 @@ WRITE8_MEMBER(maniac_state::output_w)
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // bottom-right
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // upper-right
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // bottom-left
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // upper-left
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // top button, increment clockwise
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
 static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
@@ -265,7 +269,7 @@ static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 850000) // RC osc. R=13.4K, C=470pf, but unknown RC curve - measured 800-890kHz
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=~13.4K, C=47pF
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(maniac_state, output_w))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(maniac_state, output_w))
@@ -298,4 +302,4 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, maniac,    0,        0, maniac,  maniac, driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, maniac,    0,        0, maniac,  maniac, driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
