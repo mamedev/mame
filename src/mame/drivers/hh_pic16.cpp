@@ -263,11 +263,10 @@ static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC16C55, 850000) // RC osc. R=13.4K, C=470pf, but unknown RC curve - measured 800-890kHz
+	MCFG_CPU_ADD("maincpu", PIC1655, 850000) // RC osc. R=13.4K, C=470pf, but unknown RC curve - measured 800-890kHz
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(maniac_state, output_w))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(maniac_state, output_w))
-	MCFG_PIC16C5x_SET_CONFIG(0) // ?
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_maniac)
