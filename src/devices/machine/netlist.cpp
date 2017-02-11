@@ -183,8 +183,11 @@ public:
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
 		, m_offset(*this, "OFFSET", 0.0)
+		, m_buffer(nullptr)
 		, m_sample(netlist::netlist_time::from_hz(1)) //sufficiently big enough
 		, m_in(*this, "IN")
+		, m_cur(0.0)
+		, m_last_pos(0)
 		, m_last_buffer(*this, "m_last_buffer", netlist::netlist_time::zero())
 	{
 	}
@@ -255,6 +258,8 @@ public:
 	: netlist::device_t(anetlist, name)
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
+	, m_pos(0)
+	, m_num_channel(0)
 	{
 		connect(m_feedback, m_Q);
 		m_inc = netlist::netlist_time::from_nsec(1);
@@ -266,7 +271,6 @@ public:
 			m_param_mult[i] = std::make_unique<netlist::param_double_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
 			m_param_offset[i] = std::make_unique<netlist::param_double_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
-		m_num_channel = 0;
 	}
 
 	static const int MAX_INPUT_CHANNELS = 10;
