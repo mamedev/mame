@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
@@ -23,7 +24,6 @@
 #undef min
 #undef max
 
-#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 
