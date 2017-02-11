@@ -192,8 +192,12 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	if (sector_length) {
 		*sector_length = 1 << (sector_info[pos + 3] + 7);
 	}
-	if (flags)
-		*flags = (sector_info[pos + 5] & 0x40) ? ID_FLAG_DELETED_DATA : 0;
+	if (flags) {
+		*flags = 0;
+		if (sector_info[pos + 4] & 0x20) *flags |= ID_FLAG_CRC_ERROR_IN_ID_FIELD;
+		if (sector_info[pos + 5] & 0x20) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;
+		if (sector_info[pos + 5] & 0x40) *flags |= ID_FLAG_DELETED_DATA;
+	}
 	return retVal;
 }
 
