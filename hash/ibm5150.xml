@@ -4834,6 +4834,64 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="infocom">
+		<description>The Lost Treasures of Infocom</description>
+		<year>1991</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 1).img" size="737280" crc="a492f4fd" sha1="939ca3d32761b7293cf7d3219603568a1647df46" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 2).img" size="737280" crc="7ee8846b" sha1="7bc3ed5dede7cdc9cf25b4ed82deb415a84cd197" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 3).img" size="737280" crc="7bef3a8f" sha1="b9372196640db8a6f1fd294d384c1408a6a1c9c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 4).img" size="737280" crc="7a129d8d" sha1="7c0b07f1dfedb03cb8ddab679a5246eb2780d5bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 5).img" size="737280" crc="ef482956" sha1="79570daae5786ceacffd16698512c7ae9b036b1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infocom2">
+		<description>The Lost Treasures of Infocom II</description>
+		<year>1992</year>
+		<publisher>Infocom</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 1).img" size="737280" crc="596566c7" sha1="e01a35d006435c1f70d17b3f25496c6b64b846bd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 2).img" size="737280" crc="ef055a56" sha1="a41b1947b604e60ae8db82f27e70cf84844982f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 3).img" size="737280" crc="658fb10e" sha1="4fd25943edb3d2fde097fb782320325e1608ce6d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 4).img" size="737280" crc="5cf5d235" sha1="e5b8756f2de8140ae5475fe5843c0c28dcf7574b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lurkingh">
 		<description>The Lurking Horror</description>
 		<year>1987</year>
@@ -4841,6 +4899,55 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman">
+		<description>Mega Man</description>
+		<year>1990</year>
+		<publisher>Capcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man (USA).img" size="368640" crc="1d82bd43" sha1="39f02096d6c9b20cf19bdc3542f3129f2e464bc2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman3">
+		<description>Mega Man III (5.25")</description>
+		<year>1992</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man 3 (USA) (v1.2) (5.25'') (Disk 1).img" size="368640" crc="c179fcd5" sha1="69d396c08f2401f650b012d6f2636a9c9fe9781e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man 3 (USA) (v1.2) (5.25'') (Disk 2).img" size="368640" crc="08605dac" sha1="e39671b35d36b3ab3661ca880e3ea19815c34c6a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman3_35" cloneof="megaman3">
+		<description>Mega Man III (3.5")</description>
+		<year>1992</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mega Man 3 (USA) (v1.2) (3.5'').img" size="737280" crc="9f40613b" sha1="f196af28dd74526294b4a790de76e81bbffc4c81" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgear">
+		<description>Metal Gear</description>
+		<year>1990</year>
+		<publisher>Ultra Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Metal Gear (USA) (5.25'').img" size="368640" crc="837e245f" sha1="367f55a67525d4afd7a2eca9ff2f2239d07e75ea" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4858,6 +4965,44 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ppersia">
+		<description>Prince of Persia (5.25", v1.3)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia (World) (v1.3) (5.25'') (Disk 1).img" size="368640" crc="0cdb1b44" sha1="c795ac4c7290a25982f18f23cb1efbd2a33d324d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia (World) (v1.3) (5.25'') (Disk 2).img" size="368640" crc="15b13749" sha1="196b1f4b7334f54f2228234aa1aae4aeef92f3c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia35" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.3)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia (World) (v1.3) (3.5'').img" size="737280" crc="62336557" sha1="adb0b10899baa7cb0e53b612e12e6ae7ac929400" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiaa" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia (World) (v1.1) (Hit Squad).img" size="737280" crc="0c386185" sha1="b194505c710acd1da5aeea34415b1ae5bb4979dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
 	<software name="purplesa" supported="no">
 		<description>Purple Saturn Day</description>
@@ -4871,6 +5016,36 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "339570">
 				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop">
+		<description>RoboCop</description>
+		<year>1989</year>
+		<publisher>Data East</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 1).img" size="368640" crc="e835c199" sha1="9209b03a25ac6b0b56ad97e5dd07bb253a4d9396" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 2).img" size="368640" crc="eaa03d9a" sha1="250ed513f84de58ed7724a1cddcae40989922963" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 3).img" size="368640" crc="1d2f1444" sha1="2cfb47a07ec8067f1bb52d19d44a4c34fd6aa8ec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 4).img" size="368640" crc="64190df0" sha1="48c8faafebaa4bf6c089e7aefb817241f9e4f0b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
