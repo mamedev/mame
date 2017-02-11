@@ -5,8 +5,8 @@
 
 	<software name="san">
 		<description>San</description>
-		<publisher>San Bergmans</publisher>
 		<year>2002</year>
+		<publisher>San Bergmans</publisher>
 		<part name="bitb1" interface="rs232">
 			<dataarea name="bitb" size="122">
 				<rom name="san.hex" size="122" crc="fecdae5e" sha1="bca50b488330f08146f6978b2d098c048e6dae69" offset="0" />
@@ -16,8 +16,8 @@
 
 	<software name="flash1">
 		<description>Flash 1</description>
-		<publisher>Izabella Malcolm</publisher>
 		<year>2002</year>
+		<publisher>Izabella Malcolm</publisher>
 		<part name="bitb1" interface="rs232">
 			<dataarea name="bitb" size="99">
 				<rom name="flash1.hex" size="99" crc="23fe0130" sha1="6f77c78d651de1c9d8d50239c50efa991970511c" offset="0" />
@@ -27,8 +27,8 @@
 
 	<software name="lesson1">
 		<description>Lesson 1</description>
-		<publisher>Izabella Malcolm</publisher>
 		<year>2002</year>
+		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson1a" interface="rs232">
 			<dataarea name="bitb" size="50">
 				<rom name="lesson1a.hex" size="50" crc="2027ac09" sha1="86319391baa71eb95a99d9f839a87dd589abdf72" offset="0" />
@@ -48,8 +48,8 @@
 
 	<software name="lesson2">
 		<description>Lesson 2</description>
-		<publisher>Izabella Malcolm</publisher>
 		<year>2002</year>
+		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson2a" interface="rs232">
 			<dataarea name="bitb" size="96">
 				<rom name="lesson2a.hex" size="96" crc="85fd2f2c" sha1="d4ff642d6927760ad0260f9c0aa5f48113f3b75e" offset="0" />
@@ -74,8 +74,8 @@
 
 	<software name="lesson3">
 		<description>Lesson 3</description>
-		<publisher>Izabella Malcolm</publisher>
 		<year>2002</year>
+		<publisher>Izabella Malcolm</publisher>
 		<part name="lesson3a" interface="rs232">
 			<dataarea name="bitb" size="268">
 				<rom name="lesson3a.hex" size="268" crc="e5886094" sha1="9cccbeccc6fe6880362a2445f14c01711b27b69d" offset="0" />
@@ -94,6 +94,32 @@
 		<part name="lesson3d" interface="rs232">
 			<dataarea name="bitb" size="174">
 				<rom name="lesson3d.hex" size="174" crc="e1f03069" sha1="0ffaea1fefc3c9e36c16525e9af4c7f50662e2a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lesson4">
+		<description>Lesson 4</description>
+		<year>2002</year>
+		<publisher>Izabella Malcolm</publisher>
+		<part name="lesson4a" interface="rs232">
+			<dataarea name="bitb" size="188">
+				<rom name="lesson4a.hex" size="188" crc="ff5fc778" sha1="7b34cc5a59e601d1469037f234e98d9fbbe6fd78" offset="0" />
+			</dataarea>
+		</part>
+		<part name="lesson4b" interface="rs232">
+			<dataarea name="bitb" size="170">
+				<rom name="lesson4b.hex" size="170" crc="3dc0d400" sha1="205b347815c34fb168392db8d11089f878d327e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="lesson4c" interface="rs232">
+			<dataarea name="bitb" size="210">
+				<rom name="lesson4c.hex" size="210" crc="5a92157a" sha1="c9772c7d3da575a3a5b014491394047dce92ca13" offset="0" />
+			</dataarea>
+		</part>
+		<part name="lesson4d" interface="rs232">
+			<dataarea name="bitb" size="218">
+				<rom name="lesson4d.hex" size="218" crc="715e0714" sha1="1064aab9ede23f29f80a1f55db341f20487c3eaf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
