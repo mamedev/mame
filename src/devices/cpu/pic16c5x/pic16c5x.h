@@ -22,10 +22,11 @@ enum
 {
 	PIC16C5x_PORTA = 0,
 	PIC16C5x_PORTB,
-	PIC16C5x_PORTC
+	PIC16C5x_PORTC,
+	PIC16C5x_PORTD
 };
 
-// port a, 4 bits, 2-way
+// port a, 4 or 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_A_CB(_devcb) \
 	devcb = &pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
