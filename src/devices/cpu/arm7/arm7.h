@@ -126,7 +126,7 @@ protected:
 	void HandleCoProcDO(uint32_t insn);
 	void HandleCoProcRT(uint32_t insn);
 	void HandleCoProcDT(uint32_t insn);
-	void HandleBranch(uint32_t insn);
+	void HandleBranch(uint32_t insn, bool h_bit);
 	void HandleMemSingle(uint32_t insn);
 	void HandleHalfWordDT(uint32_t insn);
 	void HandleSwap(uint32_t insn);
@@ -136,6 +136,7 @@ protected:
 	void HandleSMulLong(uint32_t insn);
 	void HandleUMulLong(uint32_t insn);
 	void HandleMemBlock(uint32_t insn);
+
 	void arm7ops_0123(uint32_t insn);
 	void arm7ops_4567(uint32_t insn);
 	void arm7ops_89(uint32_t insn);
@@ -143,6 +144,15 @@ protected:
 	void arm7ops_cd(uint32_t insn);
 	void arm7ops_e(uint32_t insn);
 	void arm7ops_f(uint32_t insn);
+
+	void arm9ops_undef(uint32_t insn);
+	void arm9ops_1(uint32_t insn);
+	void arm9ops_57(uint32_t insn);
+	void arm9ops_89(uint32_t insn);
+	void arm9ops_ab(uint32_t insn);
+	void arm9ops_c(uint32_t insn);
+	void arm9ops_e(uint32_t insn);
+
 	void set_cpsr(uint32_t val);
 	bool arm7_tlb_translate(offs_t &addr, int flags);
 	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
@@ -268,7 +278,7 @@ protected:
 	static const arm7thumb_ophandler thumb_handler[0x40*0x10];
 
 	typedef void ( arm7_cpu_device::*arm7ops_ophandler )(uint32_t);
-	static const arm7ops_ophandler ops_handler[0x10];
+	static const arm7ops_ophandler ops_handler[0x20];
 
 	//
 	// DRC
