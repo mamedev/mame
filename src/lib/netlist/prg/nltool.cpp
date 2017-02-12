@@ -15,6 +15,8 @@
 #include "netlist/tools/nl_convert.h"
 #include "netlist/solver/nld_solver.h"
 
+#include <cstring>
+
 class tool_app_t : public plib::app
 {
 public:
@@ -177,6 +179,27 @@ public:
 		}
 	}
 
+	void save_state()
+	{
+		state().pre_save();
+		std::size_t size = 0;
+		for (auto const & s : state().save_list())
+			size += ((s->m_dt.size * s->m_count + sizeof(unsigned) - 1) / sizeof(unsigned));
+
+		auto buf = plib::palloc_array<unsigned>(size);
+		auto p = buf;
+
+		for (auto const & s : state().save_list())
+		{
+			std::size_t sz = s->m_dt.size * s->m_count;
+			if (s->m_dt.is_float || s->m_dt.is_integral)
+				std::memcpy(p, s->m_ptr, sz );
+			else
+				log().fatal("found unsupported save element {1}\n", s->m_name);
+			p += ((sz + sizeof(unsigned) - 1) / sizeof(unsigned));
+		}
+	}
+
 protected:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const override;
@@ -292,6 +315,7 @@ void tool_app_t::run()
 		pos++;
 	}
 	nt.process_queue(netlist::netlist_time::from_double(ttr) - nlt);
+	nt.save_state();
 	nt.stop();
 
 	t.stop();
