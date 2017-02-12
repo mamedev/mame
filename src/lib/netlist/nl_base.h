@@ -589,9 +589,9 @@ namespace netlist
 			}
 		}
 
-		state_var<nl_double *> m_Idr1; // drive current
-		state_var<nl_double *> m_go1;  // conductance for Voltage from other term
-		state_var<nl_double *> m_gt1;  // conductance for total conductance
+		nl_double *m_Idr1; // drive current
+		nl_double *m_go1;  // conductance for Voltage from other term
+		nl_double *m_gt1;  // conductance for total conductance
 
 	};
 

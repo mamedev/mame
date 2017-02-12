@@ -994,9 +994,9 @@ logic_t::~logic_t()
 terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 : analog_t(dev, aname, STATE_BIDIR)
 , m_otherterm(nullptr)
-, m_Idr1(*this, "m_Idr1", nullptr)
-, m_go1(*this, "m_go1", nullptr)
-, m_gt1(*this, "m_gt1", nullptr)
+, m_Idr1(nullptr)
+, m_go1(nullptr)
+, m_gt1(nullptr)
 {
 	netlist().setup().register_term(*this);
 }

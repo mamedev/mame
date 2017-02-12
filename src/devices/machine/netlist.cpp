@@ -918,15 +918,9 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 		if (s->m_dt.is_float)
 		{
 			if (s->m_dt.size == sizeof(double))
-			{
-				double *td = s->resolved<double>();
-				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
-			}
+				save_pointer((double *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(float))
-			{
-				float *td = s->resolved<float>();
-				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
-			}
+				save_pointer((float *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else
 				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.c_str());
 		}
