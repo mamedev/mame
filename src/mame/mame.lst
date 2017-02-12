@@ -33732,6 +33732,7 @@ simpsons4pa                     // GX072 (c) 1991
 
 @source:sitcom.cpp
 sitcom                          //
+sitcomtmr                       //
 
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
