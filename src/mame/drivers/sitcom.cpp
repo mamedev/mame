@@ -111,6 +111,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(shutter_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(update_shutter);
+	DECLARE_INPUT_CHANGED_MEMBER(update_speed);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -180,7 +181,7 @@ INPUT_PORTS_START( sitcomtmr )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPEED")
-	PORT_CONFNAME(0xff, 0x1e, "Shutter Speed")
+	PORT_CONFNAME(0xff, 0x1e, "Shutter Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, sitcom_timer_state, update_speed, 0)
 	PORT_CONFSETTING(0x00, "B")
 	PORT_CONFSETTING(0x01, "1")
 	PORT_CONFSETTING(0x02, "1/2")
@@ -267,6 +268,18 @@ INPUT_CHANGED_MEMBER( sitcom_timer_state::update_shutter )
 	{
 		m_shutter = true;
 		m_shutter_timer->adjust(attotime::from_hz(speed));
+	}
+}
+
+INPUT_CHANGED_MEMBER( sitcom_timer_state::update_speed )
+{
+	if (!newval)
+	{
+		m_shutter = bool(BIT(m_buttons->read(), 2));
+	}
+	else if (!oldval)
+	{
+		m_shutter = false;
 	}
 }
 
