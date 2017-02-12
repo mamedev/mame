@@ -857,6 +857,7 @@ void pic16c5x_device::device_start()
 	save_item(NAME(m_TRISB));
 	save_item(NAME(m_TRISC));
 	save_item(NAME(m_rtcc));
+	save_item(NAME(m_count_pending));
 	save_item(NAME(m_old_data));
 	save_item(NAME(m_picRAMmask));
 	save_item(NAME(m_WDT));
@@ -994,6 +995,7 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_prescaler = 0;
 	m_delay_timer = 0;
 	m_inst_cycles = 0;
+	m_count_pending = false;
 }
 
 void pic16c5x_device::pic16c5x_soft_reset()
@@ -1084,7 +1086,7 @@ WRITE_LINE_MEMBER(pic16c5x_device::write_rtcc)
 	/* Count mode, edge triggered */
 	if (T0CS && state != m_rtcc)
 		if ((T0SE && !state) || (!T0SE && state))
-			pic16c5x_update_timer(1);
+			m_count_pending = true;
 
 	m_rtcc = state;
 }
@@ -1110,6 +1112,9 @@ void pic16c5x_device::execute_run()
 		}
 		else
 		{
+			if (m_count_pending) /* RTCC clocked while in Count mode */
+				pic16c5x_update_timer(1);
+			
 			m_PREVPC = m_PC;
 
 			debugger_instruction_hook(this, m_PC);
@@ -1141,6 +1146,7 @@ void pic16c5x_device::execute_run()
 		}
 
 		m_icount -= m_inst_cycles;
+		m_count_pending = false;
 
 	} while (m_icount > 0);
 }

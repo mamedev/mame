@@ -148,6 +148,7 @@ private:
 	int     m_delay_timer;
 	uint16_t  m_temp_config;
 	int     m_rtcc;
+	bool    m_count_pending;
 	int8_t    m_old_data;
 	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
