@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/clock.h"
 #include "sound/speaker.h"
 
 #include "maniac.lh"
@@ -249,6 +250,122 @@ u16 hh_pic16_state::read_inputs(int columns)
 
 /***************************************************************************
 
+  Atari Touch Me
+  * PIC1655A-053
+  * 2 7seg LEDs + 4 other LEDs, 1-bit sound
+  
+***************************************************************************/
+
+class touchme_state : public hh_pic16_state
+{
+public:
+	touchme_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	void update_speaker();
+	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_READ8_MEMBER(read_c) { return 0xff; }
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+void touchme_state::prepare_display()
+{
+}
+
+void touchme_state::update_speaker()
+{
+	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
+}
+
+READ8_MEMBER(touchme_state::read_a)
+{
+	// A: multiplexed inputs
+	return read_inputs(3) & 0xf;
+}
+
+WRITE8_MEMBER(touchme_state::write_b)
+{
+	// B0-B2: input mux
+	m_inp_mux = data & 7;
+	
+	// B0,B1: digit select
+	// B3-B6: leds
+	m_b = data;
+	prepare_display();
+	
+	// B7: speaker lead 1
+	update_speaker();
+}
+
+WRITE8_MEMBER(touchme_state::write_c)
+{
+	// C0-C6: digit segments
+	m_c = data;
+	prepare_display();
+
+	// C7: speaker lead 2
+	update_speaker();
+}
+
+
+// config
+
+static INPUT_PORTS_START( touchme )
+	PORT_START("IN.0") // B0 port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 )
+
+	PORT_START("IN.1") // B1 port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+
+	PORT_START("IN.2") // B2 port A
+	PORT_CONFNAME( 0x07, 0x01^0x07, "Game Select")
+	PORT_CONFSETTING(    0x01^0x07, "1" )
+	PORT_CONFSETTING(    0x02^0x07, "2" )
+	PORT_CONFSETTING(    0x04^0x07, "3" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static const s16 touchme_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+
+static MACHINE_CONFIG_START( touchme, touchme_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(touchme_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(touchme_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(READ8(touchme_state, read_c))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(touchme_state, write_c))
+	
+	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", pic1655_device, write_rtcc))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_touchme)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, touchme_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Ideal Maniac, by Ralph Baer
   * PIC1655A-036
   * 2 7seg LEDs, 1-bit sound
@@ -270,6 +387,7 @@ public:
 	{ }
 
 	void prepare_display();
+	void update_speaker();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 };
@@ -286,14 +404,19 @@ void maniac_state::prepare_display()
 	display_update();
 }
 
+void maniac_state::update_speaker()
+{
+	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
+}
+
 WRITE8_MEMBER(maniac_state::write_b)
 {
 	// B0-B6: left 7seg
 	m_b = data;
 	prepare_display();
-
-	// B7,C7: speaker out
-	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
+	
+	// B7: speaker lead 1
+	update_speaker();
 }
 
 WRITE8_MEMBER(maniac_state::write_c)
@@ -302,8 +425,8 @@ WRITE8_MEMBER(maniac_state::write_c)
 	m_c = data;
 	prepare_display();
 
-	// B7,C7: speaker out
-	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
+	// C7: speaker lead 2
+	update_speaker();
 }
 
 
@@ -322,7 +445,7 @@ static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=~13.4K, C=47pF
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=~13.4K, C=470pF
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(maniac_state, write_b))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(maniac_state, write_c))
@@ -453,6 +576,12 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( touchme )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "pic1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
+ROM_END
+
+
 ROM_START( maniac )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
@@ -466,7 +595,9 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, maniac,    0,        0, maniac,  maniac, driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT COMPAT MACHINE INPUT    INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1978, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari", "Touch Me (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1980, leboom,    0,        0, leboom,  leboom, driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
