@@ -135,6 +135,8 @@ protected:
 
 private:
 	entry_t::list_t m_save;
+	entry_t::list_t m_custom;
+
 };
 
 template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);
