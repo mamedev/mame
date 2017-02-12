@@ -44,6 +44,12 @@ enum
 #define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
 	devcb = &pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
+// port d, 8 bits, 2-way
+#define MCFG_PIC16C5x_READ_D_CB(_devcb) \
+	devcb = &pic16c5x_device::set_read_d_callback(*device, DEVCB_##_devcb);
+#define MCFG_PIC16C5x_WRITE_D_CB(_devcb) \
+	devcb = &pic16c5x_device::set_write_d_callback(*device, DEVCB_##_devcb);
+
 // CONFIG register
 #define MCFG_PIC16C5x_SET_CONFIG(_data) \
 	pic16c5x_device::set_config_static(*device, _data);
@@ -52,10 +58,12 @@ enum
 
 extern const device_type PIC16C54;
 extern const device_type PIC16C55;
-extern const device_type PIC1655;
 extern const device_type PIC16C56;
 extern const device_type PIC16C57;
 extern const device_type PIC16C58;
+
+extern const device_type PIC1650;
+extern const device_type PIC1655;
 
 
 class pic16c5x_device : public cpu_device
@@ -68,10 +76,12 @@ public:
 	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_c.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_d.set_callback(object); }
 
 	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_d.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_rtcc); // RTCC pin
 
@@ -161,9 +171,11 @@ private:
 	devcb_read8 m_read_a;
 	devcb_read8 m_read_b;
 	devcb_read8 m_read_c;
+	devcb_read8 m_read_d;
 	devcb_write8 m_write_a;
 	devcb_write8 m_write_b;
 	devcb_write8 m_write_c;
+	devcb_write8 m_write_d;
 
 	// For debugger
 	int m_debugger_temp;
@@ -246,14 +258,6 @@ public:
 };
 
 
-class pic1655_device : public pic16c5x_device
-{
-public:
-	// construction/destruction
-	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
 class pic16c56_device : public pic16c5x_device
 {
 public:
@@ -275,6 +279,22 @@ class pic16c58_device : public pic16c5x_device
 public:
 	// construction/destruction
 	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class pic1650_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class pic1655_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #endif  /* __PIC16C5X_H__ */

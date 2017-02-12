@@ -75,10 +75,12 @@
 
 const device_type PIC16C54 = &device_creator<pic16c54_device>;
 const device_type PIC16C55 = &device_creator<pic16c55_device>;
-const device_type PIC1655 = &device_creator<pic1655_device>;
 const device_type PIC16C56 = &device_creator<pic16c56_device>;
 const device_type PIC16C57 = &device_creator<pic16c57_device>;
 const device_type PIC16C58 = &device_creator<pic16c58_device>;
+
+const device_type PIC1650 = &device_creator<pic1650_device>;
+const device_type PIC1655 = &device_creator<pic1655_device>;
 
 
 /****************************************************************************
@@ -126,9 +128,11 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 	, m_read_a(*this)
 	, m_read_b(*this)
 	, m_read_c(*this)
+	, m_read_d(*this)
 	, m_write_a(*this)
 	, m_write_b(*this)
 	, m_write_c(*this)
+	, m_write_d(*this)
 {
 }
 
@@ -140,11 +144,6 @@ pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag,
 
 pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C55, "PIC16C55", tag, owner, clock, "pic16c55", 9, 5, 0x16C55)
-{
-}
-
-pic1655_device::pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pic16c5x_device(mconfig, PIC1655, "PIC1655", tag, owner, clock, "pic1655", 9, 5, 0x1655)
 {
 }
 
@@ -160,6 +159,16 @@ pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag,
 
 pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pic16c5x_device(mconfig, PIC16C58, "PIC16C58", tag, owner, clock, "pic16c58", 11, 7, 0x16C58)
+{
+}
+
+pic1650_device::pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic16c5x_device(mconfig, PIC1650, "PIC1650", tag, owner, clock, "pic1650", 9, 5, 0x1650)
+{
+}
+
+pic1655_device::pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic16c5x_device(mconfig, PIC1655, "PIC1655", tag, owner, clock, "pic1655", 9, 5, 0x1655)
 {
 }
 
@@ -343,7 +352,11 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 					break;
 		case 4:     data = (FSR | (uint8_t)(~m_picRAMmask));
 					break;
-		case 5:     if (m_picmodel == 0x1655) {
+		case 5:     /* read port A */
+					if (m_picmodel == 0x1650) {
+						data = m_read_a(PIC16C5x_PORTA, 0xff) & PORTA;
+					}
+					else if (m_picmodel == 0x1655) {
 						data = m_read_a(PIC16C5x_PORTA, 0xff) & 0x0f;
 					}
 					else {
@@ -353,13 +366,18 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
 					}
 					break;
-		case 6:     if (m_picmodel != 0x1655) { /* B is output-only on 1655 */
+		case 6:     /* read port B */
+					if (m_picmodel == 0x1650) {
+						data = m_read_b(PIC16C5x_PORTB, 0xff) & PORTB;
+					}
+					else if (m_picmodel != 0x1655) { /* B is output-only on 1655 */
 						data = m_read_b(PIC16C5x_PORTB, 0xff);
 						data &= m_TRISB;
 						data |= ((uint8_t)(~m_TRISB) & PORTB);
 					}
 					break;
-		case 7:     if (m_picmodel == 0x1655) {
+		case 7:     /* read port C */
+					if (m_picmodel == 0x1650 || m_picmodel == 0x1655) {
 						data = m_read_c(PIC16C5x_PORTC, 0xff) & PORTC;
 					}
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
@@ -368,6 +386,14 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 						data |= ((uint8_t)(~m_TRISC) & PORTC);
 					}
 					else { /* PIC16C54, PIC16C56, PIC16C58 */
+						data = M_RDRAM(addr);
+					}
+					break;
+		case 8:     /* read port D */
+					if (m_picmodel == 0x1650) {
+						data = m_read_d(PIC16C5x_PORTD, 0xff) & PORTD;
+					}
+					else {
 						data = M_RDRAM(addr);
 					}
 					break;
@@ -404,29 +430,40 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 					break;
 		case 4:     FSR = (data | (uint8_t)(~m_picRAMmask));
 					break;
-		case 5:     if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
+		case 5:     /* write port A */
+					if (m_picmodel == 0x1650) {
+						m_write_a(PIC16C5x_PORTA, data, 0xff);
+					}
+					else if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
 						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
 						m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
-						PORTA = data;
 					}
+					PORTA = data;
 					break;
-		case 6:     if (m_picmodel == 0x1655)
+		case 6:     /* write port B */
+					if (m_picmodel == 0x1650 || m_picmodel == 0x1655) {
 						m_write_b(PIC16C5x_PORTB, data, 0xff);
-					else
+					}
+					else {
 						m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
+					}
 					PORTB = data;
 					break;
-		case 7:     if (m_picmodel == 0x1655) {
+		case 7:     /* write port C */
+					if (m_picmodel == 0x1650 || m_picmodel == 0x1655) {
 						m_write_c(PIC16C5x_PORTC, data, 0xff);
-						PORTC = data;
 					}
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
 						PORTC = data;
 					}
-					else { /* PIC16C54, PIC16C56, PIC16C58 */
-						M_WRTRAM(addr, data);
+					PORTC = data; /* also writes to RAM */
+					break;
+		case 8:     /* write port D */
+					if (m_picmodel == 0x1650) {
+						m_write_d(PIC16C5x_PORTD, data, 0xff);
 					}
+					PORTD = data; /* also writes to RAM */
 					break;
 		default:    M_WRTRAM(addr, data);
 					break;
@@ -829,7 +866,7 @@ enum
 {
 	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
 	PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
-	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
+	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC, PIC16C5x_PRTD,
 	PIC16C5x_WDT,  PIC16C5x_TRSA, PIC16C5x_TRSB, PIC16C5x_TRSC,
 	PIC16C5x_PSCL
 };
@@ -843,9 +880,11 @@ void pic16c5x_device::device_start()
 	m_read_a.resolve_safe(0);
 	m_read_b.resolve_safe(0);
 	m_read_c.resolve_safe(0);
+	m_read_d.resolve_safe(0);
 	m_write_a.resolve_safe();
 	m_write_b.resolve_safe();
 	m_write_c.resolve_safe();
+	m_write_d.resolve_safe();
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();
@@ -883,9 +922,10 @@ void pic16c5x_device::device_start()
 	state_add( PIC16C5x_OPT,  "OPT",  m_OPTION).formatstr("%02X");
 	state_add( PIC16C5x_STK0, "STK0", m_STACK[0]).mask(0xfff).formatstr("%03X");
 	state_add( PIC16C5x_STK1, "STK1", m_STACK[1]).mask(0xfff).formatstr("%03X");
-	state_add( PIC16C5x_PRTA, "PRTA", m_debugger_temp).mask(0xf).callimport().callexport().formatstr("%01X");
+	state_add( PIC16C5x_PRTA, "PRTA", m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
 	state_add( PIC16C5x_PRTB, "PRTB", m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
 	state_add( PIC16C5x_PRTC, "PRTC", m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
+	state_add( PIC16C5x_PRTD, "PRTD", m_debugger_temp).mask(0xff).callimport().callexport().formatstr("%02X");
 	state_add( PIC16C5x_TRSA, "TRSA", m_TRISA).mask(0xf).formatstr("%01X");
 	state_add( PIC16C5x_TRSB, "TRSB", m_TRISB).formatstr("%02X");
 	state_add( PIC16C5x_TRSC, "TRSC", m_TRISC).formatstr("%02X");
@@ -919,6 +959,9 @@ void pic16c5x_device::state_import(const device_state_entry &entry)
 		case PIC16C5x_PRTC:
 			PORTC = m_debugger_temp;
 			break;
+		case PIC16C5x_PRTD:
+			PORTD = m_debugger_temp;
+			break;
 		case PIC16C5x_FSR:
 			FSR = ((m_debugger_temp & m_picRAMmask) | (uint8_t)(~m_picRAMmask));
 			break;
@@ -946,6 +989,9 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 			break;
 		case PIC16C5x_PRTC:
 			m_debugger_temp = PORTC;
+			break;
+		case PIC16C5x_PRTD:
+			m_debugger_temp = PORTD;
 			break;
 		case PIC16C5x_FSR:
 			m_debugger_temp = ((FSR) & m_picRAMmask) | (uint8_t)(~m_picRAMmask);
@@ -1123,7 +1169,7 @@ void pic16c5x_device::execute_run()
 			m_PC++;
 			PCL++;
 
-			if (m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { /* Do all opcodes except the 00? ones */
+			if (m_picmodel == 0x1650 || m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { /* Do all opcodes except the 00? ones */
 				m_inst_cycles = s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].cycles;
 				(this->*s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].function)();
 			}
