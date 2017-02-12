@@ -20736,6 +20736,7 @@ molecula                        //
 
 @source:momoko.cpp
 momoko                          // (c) 1986 Jaleco (Japanese text)
+momokob                         // bootleg
 momokoe                         // (c) 1986 Jaleco (English text)
 
 @source:monacogp.cpp
@@ -33732,7 +33733,6 @@ simpsons4pa                     // GX072 (c) 1991
 
 @source:sitcom.cpp
 sitcom                          //
-sitcomtmr                       //
 
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
