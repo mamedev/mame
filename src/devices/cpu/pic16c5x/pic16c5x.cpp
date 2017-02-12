@@ -48,6 +48,9 @@
 	*     status register is the destination.                                  *
 	*   - Changed rlf and rrf to update the carry flag in the last step.       *
 	*     Fixes the case where the status register is the destination.         *
+	*  hap (12-Feb-2017) Ver 1.16                                              *
+	*   - Added basic support for the old GI PIC1650 and PIC1655.              *
+	*   - Made RTCC(aka T0CKI) pin a writeline handler.                        *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
