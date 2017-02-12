@@ -4439,7 +4439,23 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="688atsub">
-		<description>688 Attack Sub</description>
+		<description>688 Attack Sub (5.25")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="688 Attack Sub Disk 1.bin" size="368640" crc="f1d4028c" sha1="7abb8494617da27dbe2e002fc2077405aa7298ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="688 Attack Sub Disk 2.bin" size="368640" crc="9f45960b" sha1="b8f133de7942df15e034a5b8f345a01f1affe1a5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="688atsub35" cloneof="688atsub">
+		<description>688 Attack Sub (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4680,10 +4696,40 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="crtoonrs">
+		<description>Cartooners</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners Program Disk.bin" size="368640" crc="5efe9b1c" sha1="38acb1d43b786cc01cf0e602121628e96b8240bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Art Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners Art Disk.bin" size="368640" crc="34d92806" sha1="d156cd9c08cb968be698ba0bebbc6e156d4362c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crtnspac">
+		<description>Cartooners in Space</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="Add-on disk for Cartooners" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners In Space.bin" size="368640" crc="e7246370" sha1="3e9a1c70ab677b8d0c48853f7d10ccf09b6dc7e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="caveugh">
 		<description>Caveman Ugh-Lympics</description>
 		<year>1988</year>
-		<publisher>Electronic Arts, Inc.</publisher>
+		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Dynamix, Inc." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -5406,6 +5452,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="starflg2a" cloneof="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (Alt)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight 2 Disk 1.bin" size="368640" crc="223da6ee" sha1="e3ee6eefe9f6b6109e6723691db496d7944130b7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight 2 Disk 2.bin" size="368640" crc="be83f4cb" sha1="04f4450fd1aad9558e882d925b96ebb1397b9d46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strkforc">
 		<description>Strike Force</description>
 		<!-- compilation of Striker, Flightmare, The Red Baron, and Kamikazi Alien -->
@@ -5512,6 +5575,22 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanygolf">
+		<description>Zany Golf</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Zany Golf Program Disk 1.bin" size="368640" crc="cd607615" sha1="f1c61f4a88628c855c4f766055b892cc6f51f7f0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Zany Golf Program Disk 2.bin" size="368640" crc="a8cddc3d" sha1="1302026fe22d921dc4513330d33bc16566b583b8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
