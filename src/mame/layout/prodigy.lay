@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="1">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<view name="Full Artwork">
+		<bounds left="0" top="0" right="840" bottom="1105" />
+
+		<bezel name="digit0" element="digit">
+			<bounds left="70" top="840" right="100" bottom="885" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="100" top="840" right="125" bottom="885" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="125" top="840" right="150" bottom="885" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="150" top="840" right="175" bottom="885" />
+		</bezel>
+
+	</view>
+</mamelayout>
