@@ -53,8 +53,6 @@ extern const device_type SPEAKER;
 class speaker_device : public device_t,
 						public device_mixer_interface
 {
-	friend resource_pool_object<speaker_device>::~resource_pool_object();
-
 public:
 	// construction/destruction
 	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

@@ -58,7 +58,6 @@ private:
 // debug view for disassembly
 class debug_view_disasm : public debug_view
 {
-	friend resource_pool_object<debug_view_disasm>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction
