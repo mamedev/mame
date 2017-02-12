@@ -268,7 +268,8 @@ hp9845b_state::hp9845b_state(const machine_config &mconfig, device_type type, co
 			  m_io_slot0(*this , "slot0"),
 			  m_io_slot1(*this , "slot1"),
 			  m_io_slot2(*this , "slot2"),
-			  m_io_slot3(*this , "slot3")
+			  m_io_slot3(*this , "slot3"),
+			  m_ram(*this , RAM_TAG)
 {
 }
 
@@ -283,15 +284,41 @@ uint32_t hp9845b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
+void hp9845b_state::setup_ram_block(unsigned block , unsigned offset)
+{
+	unsigned block_addr = block << 16;
+	m_lpu->space(AS_PROGRAM).install_ram(block_addr , block_addr + 0x7fff , m_ram->pointer() + offset);
+	m_ppu->space(AS_PROGRAM).install_ram(block_addr , block_addr + 0x7fff , m_ram->pointer() + offset);
+}
+
 void hp9845b_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
-		m_chargen = memregion("chargen")->base();
+	m_chargen = memregion("chargen")->base();
 
 	m_optional_chargen = memregion("optional_chargen")->base();
 
-				m_graphic_mem.resize(GVIDEO_MEM_SIZE);
+	m_graphic_mem.resize(GVIDEO_MEM_SIZE);
+
+	// setup RAM dynamically for -ramsize
+	// 0K..64K
+	setup_ram_block(0 , 0);
+	if (m_ram->size() >= 192 * 1024) {
+		// 64K..192K
+		setup_ram_block(004 , 0x10000);
+		setup_ram_block(006 , 0x20000);
+	}
+	if (m_ram->size() >= 320 * 1024) {
+		// 192K..320K
+		setup_ram_block(010 , 0x30000);
+		setup_ram_block(012 , 0x40000);
+	}
+	if (m_ram->size() >= 448 * 1024) {
+		// 320K..448K
+		setup_ram_block(014 , 0x50000);
+		setup_ram_block(016 , 0x60000);
+	}
 }
 
 void hp9845b_state::device_reset()
@@ -1039,14 +1066,40 @@ static MACHINE_CONFIG_START( hp9835a, hp9845_state )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9835a_rom")
 MACHINE_CONFIG_END
 
+/*
+	Global memory map in blocks of 32 kwords / 64 kbytes each:
+
+	block  0: 0x000000 - 0x007fff (LPU RAM)
+	block  1: 0x008000 - 0x00ffff (PPU RAM, only 0x00c000 - 0x00ffff used)
+	block  2: 0x010000 - 0x017fff (unused)
+	block  3: 0x018000 - 0x01ffff (LPU system ROM)
+	block  4: 0x020000 - 0x027fff (LPU RAM)
+	block  5: 0x028000 - 0x02ffff (PPU system ROM)
+	block  6: 0x030000 - 0x037fff (LPU RAM)
+	block  7: 0x038000 - 0x03ffff (LPU option ROM)
+	block 10: 0x040000 - 0x047fff (LPU RAM)
+	block 11: 0x048000 - 0x04ffff (PPU option ROM)
+	block 12: 0x050000 - 0x057fff (LPU RAM)
+	block 13: 0x058000 - 0x05ffff (LPU option ROM)
+	block 14: 0x060000 - 0x067fff (LPU RAM)
+	block 15: 0x068000 - 0x06ffff (PPU option ROM)
+	block 16: 0x070000 - 0x077fff (LPU RAM)
+	block 17: 0x078000 - 0x07ffff (unused)
+
+	notes:
+	- all block numbers are octal
+	- blocks 20 to 76 are reserved for 512 kbyte RAM boards (p/n 09845-66590)
+	- block 45 is reserved for the Test ROM
+	- memory addresses are continuous (for convenience, the mapping below uses block numbers as
+	  address part above 0xffff, so there are gaps between 0x8000 and 0xffff which are masked out).
+    - all LPU RAM is dynamically mapped at machine start according to -ramsize option
+*/
+
 static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845b_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x000000 , 0x007fff) AM_RAM AM_SHARE("lpu_ram")
 	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
-	AM_RANGE(0x020000 , 0x027fff) AM_RAM AM_SHARE("lpu_02_ram")
 	AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
-	AM_RANGE(0x040000 , 0x047fff) AM_RAM AM_SHARE("lpu_04_ram")
 	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
 ADDRESS_MAP_END
 
@@ -1129,10 +1182,16 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 
+	// I/O slots
 	MCFG_HP9845_IO_SLOT_ADD("slot0")
 	MCFG_HP9845_IO_SLOT_ADD("slot1")
 	MCFG_HP9845_IO_SLOT_ADD("slot2")
 	MCFG_HP9845_IO_SLOT_ADD("slot3")
+
+	// LPU memory options
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("192K")
+	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
 MACHINE_CONFIG_END
 
 ROM_START( hp9845a )

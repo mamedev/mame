@@ -11,6 +11,7 @@
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "screen.h"
+#include "machine/ram.h"
 
 class hp9845b_state : public driver_device
 {
@@ -72,7 +73,9 @@ private:
 	required_device<hp9845_io_slot_device> m_io_slot1;
 	required_device<hp9845_io_slot_device> m_io_slot2;
 	required_device<hp9845_io_slot_device> m_io_slot3;
+	required_device<ram_device> m_ram;
 
+	void setup_ram_block(unsigned block , unsigned offset);
 	void set_video_mar(uint16_t mar);
 	void video_fill_buff(bool buff_idx);
 	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
