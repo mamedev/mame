@@ -38,7 +38,6 @@ function datfile.open(file, vertag, fixupcb)
 		if fh then
 			break
 		end
-		return
 	end
 	-- remove unsafe chars from file for use in sql statement
 	file = file:gsub("[^%w%._]", "")
