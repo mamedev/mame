@@ -699,6 +699,16 @@ plib::plog_base<NL_DEBUG> &core_device_t::log()
 // device_t
 // ----------------------------------------------------------------------------------------
 
+device_t::device_t(netlist_t &owner, const pstring &name)
+: core_device_t(owner, name)
+{
+}
+
+device_t::device_t(core_device_t &owner, const pstring &name)
+: core_device_t(owner, name)
+{
+}
+
 device_t::~device_t()
 {
 	//log().debug("~net_device_t\n");
@@ -979,7 +989,19 @@ void detail::core_terminal_t::clear_net()
 	m_net = nullptr;
 }
 
+analog_t::analog_t(core_device_t &dev, const pstring &aname, const state_e state)
+: core_terminal_t(dev, aname, state)
+{
+}
+
 analog_t::~analog_t()
+{
+}
+
+logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state)
+	: core_terminal_t(dev, aname, state)
+	, logic_family_t()
+	, m_proxy(nullptr)
 {
 }
 
@@ -1238,6 +1260,11 @@ nl_double param_model_t::model_value(const pstring &entity)
 	if (m_map.size() == 0)
 		netlist().setup().model_parse(this->Value(), m_map);
 	return netlist().setup().model_value(m_map, entity);
+}
+
+param_data_t::param_data_t(device_t &device, const pstring name)
+: param_str_t(device, name, "")
+{
 }
 
 void param_data_t::changed()

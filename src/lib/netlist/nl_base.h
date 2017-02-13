@@ -528,10 +528,7 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
-		: core_terminal_t(dev, aname, state)
-		{
-		}
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~analog_t();
 
 		const analog_net_t & net() const NL_NOEXCEPT;
@@ -603,12 +600,7 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
-			: core_terminal_t(dev, aname, state)
-			, logic_family_t()
-			, m_proxy(nullptr)
-		{
-		}
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
@@ -982,8 +974,8 @@ namespace netlist
 	class param_data_t : public param_str_t
 	{
 	public:
-		param_data_t(device_t &device, const pstring name)
-		: param_str_t(device, name, "") { }
+		param_data_t(device_t &device, const pstring name);
+
 		std::unique_ptr<plib::pistream> stream();
 	protected:
 		virtual void changed() override;
@@ -1095,9 +1087,8 @@ namespace netlist
 	{
 	public:
 
-		template <class C>
-		device_t(C &owner, const pstring &name)
-			: core_device_t(owner, name) { }
+		device_t(netlist_t &owner, const pstring &name);
+		device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~device_t();
 
