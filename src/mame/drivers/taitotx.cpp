@@ -364,6 +364,17 @@ ROM_START( samspsen )
 	DISK_IMAGE( "samurai spirits sen.v1.00", 0, SHA1(5c687604066301a5b7c60f7fc778f0961efce0b6) )
 ROM_END
 
+ROM_START( kofxii )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
 
-GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "Samurai Spirits Sen (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	//2ff6b2d33ab7e915733a4328c73695de xii_ver.1.img
+	DISK_IMAGE( "kof xii.v1.00", 0, SHA1(9caaca4cf4d3bacd218932004f0c761337ee8a6f) )
+ROM_END
+
+
+GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "Samurai Spirits Sen (v1.00)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, kofxii,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "The King of Fighters XII (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
