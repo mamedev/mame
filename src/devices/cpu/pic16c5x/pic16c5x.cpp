@@ -50,7 +50,7 @@
 	*     Fixes the case where the status register is the destination.         *
 	*  hap (12-Feb-2017) Ver 1.16                                              *
 	*   - Added basic support for the old GI PIC1650 and PIC1655.              *
-	*   - Made RTCC(aka T0CKI) pin a writeline handler.                        *
+	*   - Made RTCC(aka T0CKI) pin an inputline handler.                       *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
@@ -1128,16 +1128,21 @@ void pic16c5x_device::pic16c5x_update_timer(int counts)
 	}
 }
 
-WRITE_LINE_MEMBER(pic16c5x_device::write_rtcc)
+void pic16c5x_device::execute_set_input(int line, int state)
 {
-	state = (state) ? 1 : 0;
+	switch (line)
+	{
+		case PIC16C5x_RTCC:
+			if (T0CS && state != m_rtcc) /* Count mode, edge triggered */
+				if ((T0SE && !state) || (!T0SE && state))
+					m_count_pending = true;
 
-	/* Count mode, edge triggered */
-	if (T0CS && state != m_rtcc)
-		if ((T0SE && !state) || (!T0SE && state))
-			m_count_pending = true;
+			m_rtcc = state;
+			break;
 
-	m_rtcc = state;
+		default:
+			break;
+	}
 }
 
 

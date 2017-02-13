@@ -356,7 +356,7 @@ static MACHINE_CONFIG_START( touchme, touchme_state )
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(touchme_state, write_c))
 	
 	MCFG_DEVICE_ADD("clock", CLOCK, 300000/4) // PIC CLKOUT, tied to RTCC
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", pic1655_device, write_rtcc))
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_touchme)
