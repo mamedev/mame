@@ -1156,8 +1156,9 @@ void pic16c5x_device::execute_run()
 
 	do
 	{
-		if (PD == 0)                        /* Sleep Mode */
+		if (PD == 0) /* Sleep Mode */
 		{
+			m_count_pending = false;
 			m_inst_cycles = 1;
 			debugger_instruction_hook(this, m_PC);
 			if (WDTE) {
@@ -1167,7 +1168,10 @@ void pic16c5x_device::execute_run()
 		else
 		{
 			if (m_count_pending) /* RTCC clocked while in Count mode */
+			{
+				m_count_pending = false;
 				pic16c5x_update_timer(1);
+			}
 			
 			m_PREVPC = m_PC;
 
@@ -1200,7 +1204,6 @@ void pic16c5x_device::execute_run()
 		}
 
 		m_icount -= m_inst_cycles;
-		m_count_pending = false;
 
 	} while (m_icount > 0);
 }
