@@ -3850,6 +3850,14 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( airco22b, namcos22s )
+
+	MCFG_SPEAKER_STANDARD_MONO("bodysonic")
+	
+	MCFG_SOUND_MODIFY("c352")
+	MCFG_SOUND_ROUTE(2, "bodysonic", 0.50)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( alpine, namcos22s )
 
 	/* basic machine hardware */
@@ -5655,7 +5663,7 @@ GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, victlap, 
 /* Super System22 games */
 GAME( 1994, alpinerd, 0,         alpine,    alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"          , MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerc, alpinerd,  alpine,    alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"          , MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         namcos22s, airco22,   namcos22_state, airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // various problems
+GAME( 1995, airco22b, 0,         airco22b,  airco22,   namcos22_state, airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // various problems
 GAME( 1995, cybrcycc, 0,         cybrcycc,  cybrcycc,  namcos22_state, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"          , MACHINE_IMPERFECT_GRAPHICS ) // 95/04/04
 GAME( 1995, dirtdash, 0,         dirtdash,  dirtdash,  namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                   , MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"           , MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
