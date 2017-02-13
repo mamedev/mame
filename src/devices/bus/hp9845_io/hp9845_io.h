@@ -48,7 +48,7 @@ public:
 	virtual void device_start() override;
 };
 
-class hp9845b_state;
+class hp9845_base_state;
 
 class hp9845_io_card_device : public device_t,
 							  public device_slot_card_interface
@@ -61,7 +61,7 @@ protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
-	hp9845b_state *m_sys;
+	hp9845_base_state *m_sys;
 	required_ioport m_select_code_port;
 	uint8_t m_my_sc;
 

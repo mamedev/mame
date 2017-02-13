@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
-// **************************
-// Driver for HP 9845B system
-// **************************
+// *******************************
+// Driver for HP 9845B/C/T systems
+// *******************************
 #ifndef _HP9845_H_
 #define _HP9845_H_
 
@@ -13,10 +13,10 @@
 #include "screen.h"
 #include "machine/ram.h"
 
-class hp9845b_state : public driver_device
+class hp9845_base_state : public driver_device
 {
 public:
-	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
-private:
+protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
 	required_device<screen_device> m_screen;
