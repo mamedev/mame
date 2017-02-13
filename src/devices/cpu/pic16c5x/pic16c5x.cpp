@@ -1132,6 +1132,7 @@ void pic16c5x_device::execute_set_input(int line, int state)
 {
 	switch (line)
 	{
+		/* RTCC/T0CKI pin */
 		case PIC16C5x_RTCC:
 			if (T0CS && state != m_rtcc) /* Count mode, edge triggered */
 				if ((T0SE && !state) || (!T0SE && state))
@@ -1167,8 +1168,7 @@ void pic16c5x_device::execute_run()
 		}
 		else
 		{
-			if (m_count_pending) /* RTCC clocked while in Count mode */
-			{
+			if (m_count_pending) { /* RTCC/T0CKI clocked while in Count mode */
 				m_count_pending = false;
 				pic16c5x_update_timer(1);
 			}

@@ -22,6 +22,10 @@ enum
 	PIC16C5x_RTCC = 0
 };
 
+// in the mid-90s RTCC was renamed to T0CKI
+#define PIC16C5x_T0CKI PIC16C5x_RTCC
+
+
 // i/o ports
 enum
 {
