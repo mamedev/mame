@@ -206,12 +206,12 @@ COIN LOCKOUT (A) |10 L | COIN LOCKOUT (B)
              NC* |13 P | NC*
              NC* |14 R | NC*
         1P RIGHT |15 S | 2P RIGHT \
-         lP LEFT |16 T | 2P LEFT  / Connect 15/16/S/T to the spinner left/right connections
+         1P LEFT |16 T | 2P LEFT  / Connect 15/16/S/T to the spinner left/right connections
       [1P RH UP] |17 U | [2P RH UP]
     [1P RH DOWN] |18 V | [2P RH DOWN]
    [1P RH RIGHT] |19 W | [2P RH RIGHT]
-    [lP RH LEFT] |20 X | [2P RH LEFT]
-   lP SERVE/FIRE |21 Y | 2P SERVE/FIRE
+    [1P RH LEFT] |20 X | [2P RH LEFT]
+   1P SERVE/FIRE |21 Y | 2P SERVE/FIRE
        [1P WARP] |22 Z | [2P WARP]
                  |-----|
 [] - these are present and readable on arkanoid pcb hardware, but the game never reads or uses these
