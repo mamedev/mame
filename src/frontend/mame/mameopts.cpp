@@ -85,7 +85,9 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 
 	// preopen all images (this allows slots to be assigned for all required software)
 	for (device_image_interface &image : image_interface_iterator(config.root_device()))
-		image.open_image_file(options);
+		// kludge to ignore virtual image types (bitbangers and the like)
+		if (image.file_extensions() != nullptr && *image.file_extensions() != '\0')
+			image.open_image_file(options);
 
 	// iterate through all slot devices
 	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
