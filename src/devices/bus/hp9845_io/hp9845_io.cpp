@@ -74,7 +74,7 @@ void hp9845_io_card_device::flg_w(int state)
 void hp9845_io_card_device::install_readwrite_handler(read16_delegate rhandler, write16_delegate whandler)
 {
 	if (m_sys == nullptr) {
-		m_sys = dynamic_cast<hp9845b_state*>(&machine().root_device());
+		m_sys = dynamic_cast<hp9845_base_state*>(&machine().root_device());
 		//printf("m_sys=%p\n" , m_sys);
 		m_sys->install_readwrite_handler(m_my_sc , rhandler, whandler);
 	}
