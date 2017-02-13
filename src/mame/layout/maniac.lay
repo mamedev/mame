@@ -20,9 +20,8 @@
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.2" blue="0.2" /></led7seg>
+		<led7seg><color red="1.0" green="0.2" blue="0.23" /></led7seg>
 	</element>
-
 
 
 <!-- build screen -->

@@ -28,7 +28,8 @@
 #include "machine/clock.h"
 #include "sound/speaker.h"
 
-#include "maniac.lh"
+#include "maniac.lh" // clickable
+#include "touchme.lh" // clickable
 
 //#include "hh_pic16_test.lh" // common test-layout - use external artwork
 
@@ -254,6 +255,12 @@ u16 hh_pic16_state::read_inputs(int columns)
   * PIC1655A-053
   * 2 7seg LEDs + 4 other LEDs, 1-bit sound
   
+  This is the handheld version of the 1974 arcade game.
+  
+  Known revisions:
+  - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC1655A-053
+  - Model BH-100 C013150 Rev 6 Atari 1979: AMI C10745 (custom ASIC)
+  
 ***************************************************************************/
 
 class touchme_state : public hh_pic16_state
@@ -267,7 +274,6 @@ public:
 	void update_speaker();
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_READ8_MEMBER(read_c) { return 0xff; }
 	DECLARE_WRITE8_MEMBER(write_c);
 };
 
@@ -275,6 +281,8 @@ public:
 
 void touchme_state::prepare_display()
 {
+	set_display_segmask(3, 0x7f);
+	display_matrix(7, 7, m_c, ~m_b & 0x7b);
 }
 
 void touchme_state::update_speaker()
@@ -318,15 +326,15 @@ WRITE8_MEMBER(touchme_state::write_c)
 static INPUT_PORTS_START( touchme )
 	PORT_START("IN.0") // B0 port A
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Last")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("High")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Skill")
 
 	PORT_START("IN.1") // B1 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Blue Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green Button")
 
 	PORT_START("IN.2") // B2 port A
 	PORT_CONFNAME( 0x07, 0x01^0x07, "Game Select")
@@ -341,17 +349,17 @@ static const s16 touchme_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 static MACHINE_CONFIG_START( touchme, touchme_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_CPU_ADD("maincpu", PIC1655, 300000) // approximation - RC osc. R=100K, C=47pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(touchme_state, read_a))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(touchme_state, write_b))
-	MCFG_PIC16C5x_READ_C_CB(READ8(touchme_state, read_c))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(touchme_state, write_c))
 	
-	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_DEVICE_ADD("clock", CLOCK, 300000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", pic1655_device, write_rtcc))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_touchme)
+	MCFG_DEFAULT_LAYOUT(layout_touchme)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -596,7 +604,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT    INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1978, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari", "Touch Me (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1978, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari", "Touch Me (handheld, PIC1655A version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
