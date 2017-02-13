@@ -39,6 +39,7 @@
 #include "machine/clock.h"
 #include "sound/speaker.h"
 
+#include "leboom.lh" // clickable
 #include "maniac.lh" // clickable
 #include "touchme.lh" // clickable
 
@@ -487,7 +488,21 @@ MACHINE_CONFIG_END
 
   Lakeside Le Boom
   * PIC1655A-061
-  * 1 led, 1-bit sound with decay
+  * 1 led, 1-bit sound with volume decay
+  
+  This is a tabletop timebomb defusion game. It's shaped like an aerial bomb,
+  and starts 'ticking' when the player opens the keypad door. To begin, select
+  the game mode, rows(keypad size), and fuse duration.
+  
+  Game modes as described on the box:
+  1: Eliminate the buttons one by one in the order set out by the computer. Press
+     one twice and you'll be sorry!
+  2: For 2 or more players. Take turns pressing the buttons, remember which ones.
+     Press a button a second time and watch out, it's all over.
+  3: The computer picks one secret button that stops the fuse. You must press it
+     on your 5th turn. Listen to the clues and you'll do fine.
+  4: The computer picks a secret combination. Find it first by listening to the
+     clues. Find the right order and you'll get it to fizzle out.
   
 ***************************************************************************/
 
@@ -532,40 +547,40 @@ WRITE8_MEMBER(leboom_state::write_c)
 
 static INPUT_PORTS_START( leboom )
 	PORT_START("IN.0") // B0 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Red Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Red Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Red Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Red Button 4")
 
 	PORT_START("IN.1") // B1 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Red-Red Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Red-Green Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Red-Yellow Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Red-Blue Button")
 
 	PORT_START("IN.2") // B2 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Shortest")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Short")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Long")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Longest")
 
 	PORT_START("IN.3") // B3 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Yellow Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Yellow Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Yellow Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Yellow Button 4")
 
 	PORT_START("IN.4") // B4 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Blue Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Blue Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Blue Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Blue Button 4")
 
 	PORT_START("IN.5") // B5 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Blue Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Blue Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Blue Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Blue Button 8")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( leboom, leboom_state )
@@ -574,10 +589,11 @@ static MACHINE_CONFIG_START( leboom, leboom_state )
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
 	MCFG_PIC16C5x_READ_A_CB(READ8(leboom_state, read_a))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(leboom_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(leboom_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_leboom)
+	MCFG_DEFAULT_LAYOUT(layout_leboom)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -619,4 +635,4 @@ CONS( 1979, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari",
 
 CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
