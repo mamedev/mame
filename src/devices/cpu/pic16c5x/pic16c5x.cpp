@@ -458,7 +458,6 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 					}
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
-						PORTC = data;
 					}
 					PORTC = data; /* also writes to RAM */
 					break;
