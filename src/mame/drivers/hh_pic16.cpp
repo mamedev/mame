@@ -6,25 +6,25 @@
 
   known chips:
 
-  serial   device  etc.
+  serial  device  etc.
 -----------------------------------------------------------
- *024      1655    1979, <unknown> Football (have dump)
- *033      1655A   1979, Toytronic Football (have dump)
- @036      1655A   1979, Ideal Maniac
- *043      1655A   1979, Calfax/Caprice Pro-Action Baseball (have dump)
- *051      1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (have dump)
- @053      1655A   1979, Atari Touch Me
- @061      1655A   1980, Lakeside Le Boom
- @094      1655A   1980, GAF Melody Madness
- *110      1650A   1979, Tiger Rocket Pinball (have dump)
- *133      1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
- *144      1650A   1980, U.S. Games Football/Tandy 2-Player Football (model 60-2156) (have dump)
- *192      1650    19??, (a phone dialer, have dump)
- *255      1655    19??, (a talking clock, have dump)
+ *024     1655    1979, <unknown> Football (have dump)
+ *033     1655A   1979, Toytronic Football (have dump)
+ @036     1655A   1979, Ideal Maniac
+ *043     1655A   1979, Calfax/Caprice Pro-Action Baseball (have dump)
+ *051     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (have dump)
+ @053     1655A   1979, Atari Touch Me
+ @061     1655A   1980, Lakeside Le Boom
+ @094     1655A   1980, GAF Melody Madness
+ @110     1650A   1979, Tiger/Tandy Rocket Pinball
+ *133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
+ *144     1650A   1980, U.S. Games Football/Tandy 2-Player Football (model 60-2156) (have dump)
+ *192     1650    19??, (a phone dialer, have dump)
+ *255     1655    19??, (a talking clock, have dump)
 
   inconsistent:
 
- *69-11557 1655A   1979, U.S. Games Basketball/Tandy Electronic Basketball (have dump)
+ *<none>  1655A   1979, U.S. Games Basketball/Tandy Electronic Basketball (have dump)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -270,7 +270,7 @@ u16 hh_pic16_state::read_inputs(int columns)
   
   This is the handheld version of the 1974 arcade game.
   
-  Known revisions:
+  known revisions:
   - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC1655A-053
   - Model BH-100 C013150 Rev 6 Atari 1979: AMI C10745 (custom ASIC)
   
@@ -444,38 +444,38 @@ static INPUT_PORTS_START( melodym )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Button 5")
 
 	PORT_START("IN.1") // B3 port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Button 6")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Button 7")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Button 8")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Button 9")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Button 10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 6")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Button 7")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Button 8")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Button 9")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Button 10")
 
 	PORT_START("IN.2") // B4 port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 11")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Button 12")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button 11")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Button 12")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // there is no button 13
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Button 14")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Button 15")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button 14")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Button 15")
 
 	PORT_START("IN.3") // B5 port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button 16")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Button 17")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button 18")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button 19")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Button 20")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 16")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Button 17")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button 18")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Button 19")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Button 20")
 
 	PORT_START("IN.4") // B6 port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 21")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Button 22")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button 23")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Button 24")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Button 25")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Button 21")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Button 22")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Button 23")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("Button 24")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Button 25")
 
 	PORT_START("IN.5") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Novice")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Whiz")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Pro")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Note")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Novice")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Whiz")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Pro")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Note")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( melodym, melodym_state )
@@ -758,31 +758,143 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Electronics Rocket Pinball
+  * PIC1655A-110, 69-11397
+  * 3 7seg LEDs + 44 other LEDs, 1-bit sound
+  
+  known releases:
+  - Hong Kong: Rocket Pinball
+  - USA(1): Rocket Pinball, distributed by Tandy
+  - USA(2): Cosmic Pinball, distributed by Sears
+  
+***************************************************************************/
+
+class rockpin_state : public hh_pic16_state
+{
+public:
+	rockpin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_WRITE8_MEMBER(write_c);
+	DECLARE_WRITE8_MEMBER(write_d);
+};
+
+// handlers
+
+void rockpin_state::prepare_display()
+{
+}
+
+WRITE8_MEMBER(rockpin_state::write_a)
+{
+	// A3,A4(tied together): speaker out
+	m_speaker->level_w(data >> 3 & 3);
+	
+	// A0-A2: select digit
+	m_a = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(rockpin_state::write_b)
+{
+	// B0-B6: digit segments
+	m_b = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(rockpin_state::write_c)
+{
+	// C0-C7: led data
+	m_c = ~data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(rockpin_state::write_d)
+{
+	// D0-D5: led select
+	m_d = ~data;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( rockpin )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shoot")
+INPUT_PORTS_END
+
+static const s16 rockpin_speaker_levels[] = { 0, 0x3fff, 0x3fff, 0x7fff };
+
+static MACHINE_CONFIG_START( rockpin, rockpin_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1650, 500000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(rockpin_state, write_a))
+	MCFG_PIC16C5x_READ_B_CB(CONSTANT(0xff))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(rockpin_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(rockpin_state, write_c))
+	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
+	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(rockpin_state, write_d))
+	
+	MCFG_DEVICE_ADD("clock", CLOCK, 500000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_rockpin)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, rockpin_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
 
 ROM_START( touchme )
-	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
 ROM_END
 
 
 ROM_START( melodym )
-	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
 ROM_END
 
 
 ROM_START( maniac )
-	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
 ROM_END
 
 
 ROM_START( leboom )
-	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-061", 0x0000, 0x0400, CRC(5880eea1) SHA1(e3795b347fd5df9de084da36e33f6b70fbc0b0ae) )
+ROM_END
+
+
+ROM_START( rockpin )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic1650a-110_69-11397", 0x0000, 0x0400, CRC(d5396e77) SHA1(952feaff70fde53a9eda84c54704520d50749e78) )
 ROM_END
 
 
@@ -795,3 +907,5 @@ CONS( 1980, melodym,   0,        0, melodym, melodym, driver_device, 0, "GAF", "
 CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1979, rockpin,   0,        0, rockpin, rockpin, driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
