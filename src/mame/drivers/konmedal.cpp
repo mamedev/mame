@@ -41,13 +41,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<ymz280b_device> m_ymz;
 	
+	DECLARE_PALETTE_INIT(konmedal);
+	
 	READ8_MEMBER(vram_r);
 	WRITE8_MEMBER(vram_w);
 	READ8_MEMBER(magic_r);
 	WRITE8_MEMBER(bankswitch_w);
+	WRITE8_MEMBER(control2_w);
 
 private:
-	u8 m_control;
+	u8 m_control, m_control2;
 
 public:
 	virtual void machine_start() override;
@@ -58,9 +61,14 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 };
 
+WRITE8_MEMBER(konmedal_state::control2_w)
+{
+	m_control2 = data;
+}
+
 READ8_MEMBER(konmedal_state::vram_r)
 {
-	if (m_control == 0xf)
+	if (!(m_control2 & 0x80))
 	{
 		if (offset & 1)
 		{
@@ -73,7 +81,8 @@ READ8_MEMBER(konmedal_state::vram_r)
 	}
 	else if (m_control == 0)	// ROM readback
 	{
-		//return m_k056832->konmedal_rom_r(space, offset);		
+//		printf("offset %x\n", offset);
+		return m_k056832->konmedal_rom_r(space, offset);		
 	}
 	
 	return 0;
@@ -98,7 +107,7 @@ READ8_MEMBER(konmedal_state::magic_r)
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 //	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
-	*color = ((*color & 0x3c) << 2);
+	*color = 0; //((*color & 0x3c) << 2);
 }
 
 void konmedal_state::video_start()
@@ -120,6 +129,20 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 
 	return 0;
 }
+                    
+PALETTE_INIT_MEMBER(konmedal_state, konmedal)
+{
+	int i;
+	uint8_t *PROM = memregion("proms")->base();
+
+	for (i = 0; i < 256; i++)
+	{
+		palette.set_pen_color(i,
+			PROM[i]<<4,
+			PROM[0x100+i]<<4,
+			PROM[0x200+i]<<4);
+	}
+}
                                                              
 INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 {
@@ -140,6 +163,7 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xa000, 0xafff) AM_RAM	// work RAM?
 	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
 	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
+	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc500, 0xc500) AM_NOP	// read to reset watchdog
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
@@ -180,6 +204,7 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(konmedal_state, tile_callback)
