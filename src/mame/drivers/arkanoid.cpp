@@ -804,7 +804,7 @@ a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
 0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
 0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
 1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
-        *   *                                                       74LS139@IC80 side '1' *VERIFY ME*
+        *   *                                                       74LS139@IC80 side '1'
 1   1   0   0   x   *   *   *   *   *   *   *   *   *   *   *       RW  6116 SRAM
 1   1   0   1                                                       IO AREA
                                             *   *                   74LS155@IC25 both sides 1 and 2
