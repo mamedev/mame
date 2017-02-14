@@ -40,9 +40,14 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
 	required_device<ymz280b_device> m_ymz;
+	
+	READ8_MEMBER(vram_r);
+	WRITE8_MEMBER(vram_w);
+	READ8_MEMBER(magic_r);
+	WRITE8_MEMBER(bankswitch_w);
 
 private:
-	WRITE8_MEMBER(bankswitch_w);
+	u8 m_control;
 
 public:
 	virtual void machine_start() override;
@@ -53,6 +58,43 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 };
 
+READ8_MEMBER(konmedal_state::vram_r)
+{
+	if (m_control == 0xf)
+	{
+		if (offset & 1)
+		{
+			return m_k056832->ram_attr_lo_r(space, offset>>1);
+		}
+		else
+		{
+			return m_k056832->ram_code_lo_r(space, offset>>1);
+		}
+	}
+	else if (m_control == 0)	// ROM readback
+	{
+		//return m_k056832->konmedal_rom_r(space, offset);		
+	}
+	
+	return 0;
+}
+	
+WRITE8_MEMBER(konmedal_state::vram_w)
+{
+	if (offset & 1)
+	{
+		m_k056832->ram_attr_lo_w(space, offset>>1, data);
+		return;
+	}
+		
+	m_k056832->ram_code_lo_w(space, offset>>1, data);
+}
+
+READ8_MEMBER(konmedal_state::magic_r)
+{
+	return 0xc1;	// checked at 60f before reading a page of the VROM
+}
+	
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 //	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
@@ -87,18 +129,23 @@ INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 
 WRITE8_MEMBER(konmedal_state::bankswitch_w)
 {
-//	membank("bank1")->set_entry(data);
+	//printf("ROM bank %x (full %02x)\n", data>>4, data);
+	membank("bank1")->set_entry(data>>4);
+	m_control = data & 0xf;
 }
 
 static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM	// work RAM?
 	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
 	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
+	AM_RANGE(0xc500, 0xc500) AM_NOP	// read to reset watchdog
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
+	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
-	AM_RANGE(0xe800, 0xefff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( konmedal )
@@ -106,8 +153,8 @@ INPUT_PORTS_END
 
 void konmedal_state::machine_start()
 {
-//	membank("bank1")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x2000);
-//	membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 0x10, memregion("maincpu")->base(), 0x2000);
+	membank("bank1")->set_entry(4);
 }
 
 void konmedal_state::machine_reset()
@@ -126,7 +173,7 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
+	MCFG_SCREEN_VISIBLE_AREA(96, 416-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
 	MCFG_SCREEN_PALETTE("palette")
 
