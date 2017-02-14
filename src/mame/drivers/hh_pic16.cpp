@@ -42,6 +42,7 @@
 #include "leboom.lh" // clickable
 #include "maniac.lh" // clickable
 #include "melodym.lh" // clickable
+#include "rockpin.lh"
 #include "touchme.lh" // clickable
 
 //#include "hh_pic16_test.lh" // common test-layout - use external artwork
@@ -758,14 +759,14 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Tiger Electronics Rocket Pinball
+  Tiger Electronics Rocket Pinball (model 7-460)
   * PIC1655A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
   
   known releases:
   - Hong Kong: Rocket Pinball
-  - USA(1): Rocket Pinball, distributed by Tandy
-  - USA(2): Cosmic Pinball, distributed by Sears
+  - USA(1): Rocket Pinball (model 60-2140), distributed by Tandy
+  - USA(2): Cosmic Pinball (model 49-65456), distributed by Sears
   
 ***************************************************************************/
 
@@ -787,22 +788,32 @@ public:
 
 void rockpin_state::prepare_display()
 {
+	// 3 7seg leds from ports A and B
+	set_display_segmask(7, 0x7f);
+	display_matrix(7, 3, m_b, m_a, false);
+	
+	// 44 leds from ports C and D
+	for (int y = 0; y < 6; y++)
+		m_display_state[y+3] = (m_d >> y & 1) ? m_c : 0;
+
+	set_display_size(8, 3+6);
+	display_update();
 }
 
 WRITE8_MEMBER(rockpin_state::write_a)
 {
-	// A3,A4(tied together): speaker out
+	// A3,A4: speaker out
 	m_speaker->level_w(data >> 3 & 3);
 	
 	// A0-A2: select digit
-	m_a = data;
+	m_a = ~data & 7;
 	prepare_display();
 }
 
 WRITE8_MEMBER(rockpin_state::write_b)
 {
 	// B0-B6: digit segments
-	m_b = data;
+	m_b = data & 0x7f;
 	prepare_display();
 }
 
@@ -825,12 +836,13 @@ WRITE8_MEMBER(rockpin_state::write_d)
 
 static INPUT_PORTS_START( rockpin )
 	PORT_START("IN.0") // port A
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shoot")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Ball")
 INPUT_PORTS_END
 
-static const s16 rockpin_speaker_levels[] = { 0, 0x3fff, 0x3fff, 0x7fff };
+static const s16 rockpin_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( rockpin, rockpin_state )
 
@@ -849,7 +861,7 @@ static MACHINE_CONFIG_START( rockpin, rockpin_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_rockpin)
+	MCFG_DEFAULT_LAYOUT(layout_rockpin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -908,4 +920,4 @@ CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal",
 
 CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, rockpin,   0,        0, rockpin, rockpin, driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, rockpin,   0,        0, rockpin, rockpin, driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
