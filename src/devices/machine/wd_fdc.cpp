@@ -250,7 +250,7 @@ void wd_fdc_t::command_end()
 
 void wd_fdc_t::seek_start(int state)
 {
-	if (TRACE_COMMAND) logerror("seek %d %x (track=%d)\n", state, data, track);
+	if (TRACE_COMMAND) logerror("cmd: seek %d %x (track=%d)\n", state, data, track);
 	main_state = state;
 	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
@@ -435,7 +435,7 @@ bool wd_fdc_t::is_ready()
 
 void wd_fdc_t::read_sector_start()
 {
-	if (TRACE_COMMAND) logerror("read sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
+	if (TRACE_COMMAND) logerror("cmd: read sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -535,7 +535,7 @@ void wd_fdc_t::read_sector_continue()
 
 void wd_fdc_t::read_track_start()
 {
-	if (TRACE_COMMAND) logerror("read track (c=%02x) t=%d\n", command, track);
+	if (TRACE_COMMAND) logerror("cmd: read track (c=%02x) t=%d\n", command, track);
 
 	if(!is_ready()) {
 		command_end();
@@ -614,7 +614,7 @@ void wd_fdc_t::read_track_continue()
 
 void wd_fdc_t::read_id_start()
 {
-	if (TRACE_COMMAND) logerror("read id (c=%02x)\n", command);
+	if (TRACE_COMMAND) logerror("cmd: read id (c=%02x)\n", command);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -689,7 +689,7 @@ void wd_fdc_t::read_id_continue()
 
 void wd_fdc_t::write_track_start()
 {
-	if (TRACE_COMMAND) logerror("write track (c=%02x) t=%d\n", command, track);
+	if (TRACE_COMMAND) logerror("cmd: write track (c=%02x) t=%d\n", command, track);
 
 	if(!is_ready()) {
 		command_end();
@@ -800,7 +800,7 @@ void wd_fdc_t::write_track_continue()
 
 void wd_fdc_t::write_sector_start()
 {
-	if (TRACE_COMMAND) logerror("write sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
+	if (TRACE_COMMAND) logerror("cmd: write sector%s (c=%02x) t=%d, s=%d\n", command & 0x10 ? " multiple" : "", command, track, sector);
 
 	if(!is_ready()) {
 		command_end();
@@ -898,7 +898,7 @@ void wd_fdc_t::write_sector_continue()
 
 void wd_fdc_t::interrupt_start()
 {
-	if (TRACE_COMMAND) logerror("Forced interrupt (c=%02x)\n", command);
+	if (TRACE_COMMAND) logerror("cmd: forced interrupt (c=%02x)\n", command);
 
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
