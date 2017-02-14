@@ -15,7 +15,7 @@
  *051      1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (have dump)
  @053      1655A   1979, Atari Touch Me
  @061      1655A   1980, Lakeside Le Boom
- *094      1655A   1980, GAF Melody Madness (have dump)
+ @094      1655A   1980, GAF Melody Madness
  *110      1650A   1979, Tiger Rocket Pinball (have dump)
  *133      1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
  *144      1650A   1980, U.S. Games Football/Tandy 2-Player Football (model 60-2156) (have dump)
@@ -30,7 +30,7 @@
 
 
   TODO:
-  - leboom: speaker volume decay with discrete sound
+  - leboom discrete sound for volume decay (simulated for now)
 
 ***************************************************************************/
 
@@ -41,6 +41,7 @@
 
 #include "leboom.lh" // clickable
 #include "maniac.lh" // clickable
+#include "melodym.lh" // clickable
 #include "touchme.lh" // clickable
 
 //#include "hh_pic16_test.lh" // common test-layout - use external artwork
@@ -386,6 +387,121 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  GAF Melody Madness
+  * PIC1655A-094
+  * 2 lamps under tube, 1-bit sound
+  
+  Melody Madness is a tabletop music memory game, shaped like a jukebox.
+  It can also be played as a simple electronic piano.
+
+***************************************************************************/
+
+class melodym_state : public hh_pic16_state
+{
+public:
+	melodym_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_READ8_MEMBER(read_c);
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+WRITE8_MEMBER(melodym_state::write_b)
+{
+	// B2-B6: input mux
+	m_inp_mux = data >> 2 & 0x1f;
+}
+
+READ8_MEMBER(melodym_state::read_c)
+{
+	// C0-C4: multiplexed inputs
+	return read_inputs(5) | 0xe0;
+}
+
+WRITE8_MEMBER(melodym_state::write_c)
+{
+	// C6: both lamps
+	m_display_wait = 2;
+	display_matrix(1, 1, ~data >> 6 & 1, 1);
+	
+	// C7: speaker out
+	m_speaker->level_w(~data >> 7 & 1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( melodym )
+	PORT_START("IN.0") // B2 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Button 5")
+
+	PORT_START("IN.1") // B3 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Button 6")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Button 7")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Button 8")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Button 9")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Button 10")
+
+	PORT_START("IN.2") // B4 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 11")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Button 12")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // there is no button 13
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Button 14")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Button 15")
+
+	PORT_START("IN.3") // B5 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button 16")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Button 17")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button 18")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button 19")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Button 20")
+
+	PORT_START("IN.4") // B6 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 21")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Button 22")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button 23")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Button 24")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Button 25")
+
+	PORT_START("IN.5") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Novice")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Whiz")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Pro")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Note")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( melodym, melodym_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.5"))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(melodym_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(READ8(melodym_state, read_c))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(melodym_state, write_c))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_melodym)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Ideal Maniac, by Ralph Baer
   * PIC1655A-036
   * 2 7seg LEDs, 1-bit sound
@@ -488,7 +604,7 @@ MACHINE_CONFIG_END
 
   Lakeside Le Boom
   * PIC1655A-061
-  * 1 led, 1-bit sound with volume decay
+  * 1 led, 1-bit sound with RC circuit for volume decay
   
   This is a tabletop timebomb defusion game. It's shaped like an aerial bomb,
   and starts 'ticking' when the player opens the keypad door. To begin, select
@@ -516,9 +632,31 @@ public:
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+
+	void speaker_decay_reset();
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
+
+protected:
+	virtual void machine_start() override;
 };
 
 // handlers
+
+void leboom_state::speaker_decay_reset()
+{
+	if (~m_c & 0x80)
+		m_speaker_volume = 1.0;
+
+	m_speaker->set_output_gain(0, m_speaker_volume);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)
+{
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_decay_reset();
+	m_speaker_volume /= 1.015;
+}
 
 READ8_MEMBER(leboom_state::read_a)
 {
@@ -537,8 +675,11 @@ WRITE8_MEMBER(leboom_state::write_c)
 	// C4: single led
 	display_matrix(1, 1, data >> 4 & 1, 1);
 
+	// C7: speaker on
+	m_c = data;
+	speaker_decay_reset();
+
 	// C6: speaker out
-	// C7: speaker decay (TODO)
 	m_speaker->level_w(data >> 6 & 1);
 }
 
@@ -583,6 +724,15 @@ static INPUT_PORTS_START( leboom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Blue Button 8")
 INPUT_PORTS_END
 
+void leboom_state::machine_start()
+{
+	hh_pic16_state::machine_start();
+
+	// zerofill/init
+	m_speaker_volume = 0;
+	save_item(NAME(m_speaker_volume));
+}
+
 static MACHINE_CONFIG_START( leboom, leboom_state )
 
 	/* basic machine hardware */
@@ -599,6 +749,7 @@ static MACHINE_CONFIG_START( leboom, leboom_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", leboom_state, speaker_decay_sim, attotime::from_msec(25))
 MACHINE_CONFIG_END
 
 
@@ -617,6 +768,12 @@ ROM_START( touchme )
 ROM_END
 
 
+ROM_START( melodym )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "pic1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
+ROM_END
+
+
 ROM_START( maniac )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
@@ -632,6 +789,8 @@ ROM_END
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT    INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1980, melodym,   0,        0, melodym, melodym, driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

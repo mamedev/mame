@@ -2019,6 +2019,7 @@ MACHINE_CONFIG_END
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
+  * RC circuit for speaker volume decay
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
 ***************************************************************************/
@@ -2036,7 +2037,7 @@ public:
 
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	int m_speaker_volume;
+	double m_speaker_volume;
 
 protected:
 	virtual void machine_start() override;
@@ -2044,26 +2045,20 @@ protected:
 
 // handlers
 
-// Sound is controlled by two pins: D3 for pitch, and R13 for on/off. When turned
-// off, it does not mute instantly, but volume slowly decays. Until we emulate it
-// with discrete audio, this crude simulation will do.
-
-#define CDKONG_SPEAKER_MAX 0x10000
-#define CDKONG_SPEAKER_DECAY 50
-
 void cdkong_state::speaker_decay_reset()
 {
 	if (m_r[1] & 8)
-		m_speaker_volume = CDKONG_SPEAKER_MAX;
+		m_speaker_volume = 1.0;
+
+	m_speaker->set_output_gain(0, m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
+	// volume decays when speaker is off (divisor and timer period determine duration)
 	speaker_decay_reset();
-	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
-	m_speaker_volume /= 2;
+	m_speaker_volume /= 1.015;
 }
-
 
 void cdkong_state::prepare_display()
 {
@@ -2143,7 +2138,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
 
 
@@ -2155,6 +2150,7 @@ MACHINE_CONFIG_END
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
+  * discrete sound (when alien attacks)
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
   Select game mode on start:
