@@ -807,6 +807,7 @@ a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
         *   *                                                       74LS139@IC80 side '1'
 1   1   0   0   x   *   *   *   *   *   *   *   *   *   *   *       RW  6116 SRAM
 1   1   0   1                                                       IO AREA
+                                            *   *                   74LS139@IC80 side '2'
                                             *   *                   74LS155@IC25 both sides 1 and 2
 1   1   0   1   x   x   x   x   x   x   x   0   0   x   x   0       RW  YM2149 BC2 low
 1   1   0   1   x   x   x   x   x   x   x   0   0   x   x   1       RW  YM2149 BC2 high
