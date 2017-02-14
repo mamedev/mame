@@ -65,7 +65,6 @@ private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
@@ -203,11 +202,6 @@ PALETTE_INIT_MEMBER(phunsy_state, phunsy)
 
 		palette.set_pen_color( i, j, j, j );
 	}
-}
-
-
-void phunsy_state::video_start()
-{
 }
 
 

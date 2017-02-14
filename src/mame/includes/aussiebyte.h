@@ -34,6 +34,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_p_videoram(*this, "vram")
+		, m_p_attribram(*this, "aram")
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_pio1(*this, "pio1")
@@ -91,8 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(register_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
-	int m_centronics_busy;
-	required_device<palette_device> m_palette;
 
 private:
 	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
@@ -106,12 +107,14 @@ private:
 	uint8_t m_port35; // byte to be written to vram or aram
 	uint8_t m_video_index;
 	uint16_t m_cnt;
-	uint8_t *m_p_videoram;
-	uint8_t *m_p_attribram;
-	const uint8_t *m_p_chargen;
 	uint16_t m_alpha_address;
 	uint16_t m_graph_address;
+	int m_centronics_busy;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_attribram;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio1;

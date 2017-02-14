@@ -23,26 +23,46 @@ class nanos_state : public driver_device
 {
 public:
 	nanos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pio(*this, "z80pio"),
-	m_pio_0(*this, "z80pio_0"),
-	m_pio_1(*this, "z80pio_1"),
-	m_sio_0(*this, "z80sio_0"),
-	m_sio_1(*this, "z80sio_1"),
-	m_ctc_0(*this, "z80ctc_0"),
-	m_ctc_1(*this, "z80ctc_1"),
-	m_fdc(*this, "upd765"),
-	m_key_t(*this, "keyboard_timer"),
-	m_ram(*this, RAM_TAG),
-	m_region_maincpu(*this, "maincpu"),
-	m_bank1(*this, "bank1"),
-	m_bank2(*this, "bank2"),
-	m_bank3(*this, "bank3"),
-	m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"}),
-	m_linec(*this, "LINEC")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pio(*this, "z80pio")
+		, m_pio_0(*this, "z80pio_0")
+		, m_pio_1(*this, "z80pio_1")
+		, m_sio_0(*this, "z80sio_0")
+		, m_sio_1(*this, "z80sio_1")
+		, m_ctc_0(*this, "z80ctc_0")
+		, m_ctc_1(*this, "z80ctc_1")
+		, m_fdc(*this, "upd765")
+		, m_key_t(*this, "keyboard_timer")
+		, m_ram(*this, RAM_TAG)
+		, m_region_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"})
+		, m_linec(*this, "LINEC")
+		{ }
 
+	DECLARE_WRITE8_MEMBER( nanos_tc_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
+	DECLARE_READ8_MEMBER(nanos_port_a_r);
+	DECLARE_READ8_MEMBER(nanos_port_b_r);
+	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	uint8_t m_key_command;
+	uint8_t m_last_code;
+	uint8_t m_key_pressed;
+	uint8_t row_number(uint8_t code);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<z80pio_device> m_pio_0;
@@ -54,33 +74,13 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<timer_device> m_key_t;
 	required_device<ram_device> m_ram;
-	const uint8_t *m_p_chargen;
-	uint8_t m_key_command;
-	uint8_t m_last_code;
-	uint8_t m_key_pressed;
-	DECLARE_WRITE8_MEMBER( nanos_tc_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
-	DECLARE_READ8_MEMBER(nanos_port_a_r);
-	DECLARE_READ8_MEMBER(nanos_port_b_r);
-	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-protected:
 	required_memory_region m_region_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_ioport_array<7> m_lines;
 	required_ioport m_linec;
-	uint8_t row_number(uint8_t code);
 };
 
 
@@ -240,11 +240,6 @@ static INPUT_PORTS_START( nanos )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
-
-void nanos_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

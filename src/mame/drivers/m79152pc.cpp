@@ -17,18 +17,21 @@ class m79152pc_state : public driver_device
 {
 public:
 	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_p_attributes(*this, "attributes"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_p_attributes(*this, "attributes")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	uint8_t *m_p_chargen;
+	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)
@@ -53,11 +56,6 @@ void m79152pc_state::machine_reset()
 {
 }
 
-void m79152pc_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base()+4;
-}
-
 uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Attributes are unknown so are not implemented
@@ -74,7 +72,7 @@ uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_in
 			{
 				chr = m_p_videoram[x];
 				//attr = m_p_attributes[x];
-				gfx = m_p_chargen[(chr<<4) | ra ];
+				gfx = m_p_chargen[((chr<<4) | ra) + 4 ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

@@ -68,17 +68,28 @@ class pcm_state : public driver_device
 {
 public:
 	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pio_s(*this, "z80pio_s"),
-	m_pio_u(*this, "z80pio_u"),
-	m_sio(*this, "z80sio"),
-	m_ctc_s(*this, "z80ctc_s"),
-	m_ctc_u(*this, "z80ctc_u"),
-	m_speaker(*this, "speaker"),
-	m_cass(*this, "cassette"),
-	m_p_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pio_s(*this, "z80pio_s")
+		, m_pio_u(*this, "z80pio_u")
+		, m_sio(*this, "z80sio")
+		, m_ctc_s(*this, "z80ctc_s")
+		, m_ctc_u(*this, "z80ctc_u")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
+	DECLARE_READ8_MEMBER( pcm_85_r );
+	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
+	DECLARE_WRITE8_MEMBER( pcm_85_w );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	bool m_cone;
+	uint8_t m_85;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
@@ -87,17 +98,8 @@ public:
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER( pcm_85_r );
-	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
-	DECLARE_WRITE8_MEMBER( pcm_85_w );
-	uint8_t *m_p_chargen;
-	bool m_cone;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-private:
-	uint8_t m_85;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -181,11 +183,6 @@ INPUT_PORTS_END
 
 void pcm_state::machine_reset()
 {
-}
-
-void pcm_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

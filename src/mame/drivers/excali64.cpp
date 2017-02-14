@@ -54,6 +54,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY.%u", 0)
@@ -90,7 +91,6 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	const uint8_t *m_p_chargen;
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
 	uint8_t m_sys_status;
@@ -100,6 +100,7 @@ private:
 	bool m_motor;
 	bool m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
@@ -447,7 +448,6 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 {
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
-	m_p_chargen = memregion("chargen")->base();
 	m_p_hiresram = m_p_videoram + 0x2000;
 	uint8_t *main = memregion("roms")->base();
 	uint8_t *ram = memregion("rambank")->base();

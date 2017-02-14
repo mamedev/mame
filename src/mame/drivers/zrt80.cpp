@@ -53,7 +53,6 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -205,10 +204,6 @@ INPUT_PORTS_END
 void zrt80_state::machine_reset()
 {
 	m_term_data = 0;
-}
-
-void zrt80_state::video_start()
-{
 }
 
 MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )

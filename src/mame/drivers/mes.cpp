@@ -26,7 +26,6 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -50,10 +49,6 @@ static INPUT_PORTS_START( mes )
 INPUT_PORTS_END
 
 void mes_state::machine_reset()
-{
-}
-
-void mes_state::video_start()
 {
 }
 

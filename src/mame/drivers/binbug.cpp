@@ -61,28 +61,31 @@ class binbug_state : public driver_device
 {
 public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_rs232(*this, "keyboard"),
-		m_cass(*this, "cassette"),
-		m_p_videoram(*this, "videoram"),
-		m_p_attribram(*this, "attribram"),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_attribram(*this, "attribram")
+		, m_p_chargen(*this, "chargen")
+		, m_rs232(*this, "keyboard")
 	{
 	}
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ8_MEMBER(binbug_serial_r);
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
-	const uint8_t *m_p_chargen;
-	uint8_t m_framecnt;
-	virtual void video_start() override;
+	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	optional_device<rs232_port_device> m_rs232;
+	// needed by dg680 class
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+
+private:
+	uint8_t m_framecnt;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attribram;
-	required_device<cpu_device> m_maincpu;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
+	required_region_ptr<u8> m_p_chargen;
+	optional_device<rs232_port_device> m_rs232;
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
@@ -116,11 +119,6 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( binbug )
 INPUT_PORTS_END
-
-void binbug_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 uint32_t binbug_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -408,11 +406,10 @@ class dg680_state : public binbug_state
 {
 public:
 	dg680_state(const machine_config &mconfig, device_type type, const char *tag)
-		: binbug_state(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ctc(*this, "z80ctc"),
-	m_pio(*this, "z80pio")
-	{ }
+		: binbug_state(mconfig, type, tag)
+		, m_ctc(*this, "z80ctc")
+		, m_pio(*this, "z80pio")
+		{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
@@ -422,11 +419,12 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
+
+private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
 	uint8_t m_protection[0x100];
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
 };

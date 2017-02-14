@@ -40,8 +40,6 @@ public:
 private:
 	u8 m_video_address;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -74,10 +72,6 @@ WRITE8_MEMBER( banctec_state::videoram_w )
 {
 	m_videoram[m_video_address] = data;
 	m_video_address++;
-}
-
-void banctec_state::video_start()
-{
 }
 
 /* ROCKWELL 6545 - Transparent Memory Addressing */

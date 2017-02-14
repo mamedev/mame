@@ -28,7 +28,6 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -61,10 +60,6 @@ PALETTE_INIT_MEMBER( unistar_state, unistar )
 	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
 	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
-}
-
-void unistar_state::video_start()
-{
 }
 
 uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

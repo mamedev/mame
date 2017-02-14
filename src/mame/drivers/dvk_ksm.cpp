@@ -98,21 +98,19 @@ ksm|DVK KSM,
 class ksm_state : public driver_device
 {
 public:
-	ksm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_pic8259(*this, "pic8259"),
-		m_i8251line(*this, "i8251line"),
-		m_rs232(*this, "rs232"),
-		m_i8251kbd(*this, "i8251kbd"),
-		m_ms7004(*this, "ms7004"),
-		m_screen(*this, "screen")
-	{ }
+	ksm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_pic8259(*this, "pic8259")
+		, m_i8251line(*this, "i8251line")
+		, m_rs232(*this, "rs232")
+		, m_i8251kbd(*this, "i8251kbd")
+		, m_ms7004(*this, "ms7004")
+		, m_screen(*this, "screen")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -120,19 +118,20 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
 
-	const uint8_t *m_p_chargen;
 	struct {
 		uint8_t line;
 		uint16_t ptr;
 	} m_video;
 
-protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device>  m_pic8259;
@@ -141,6 +140,7 @@ protected:
 	required_device<i8251_device> m_i8251kbd;
 	required_device<ms7004_device> m_ms7004;
 	required_device<screen_device> m_screen;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START( ksm_mem, AS_PROGRAM, 8, ksm_state )
@@ -209,8 +209,6 @@ void ksm_state::machine_reset()
 
 void ksm_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ-1, 0, KSM_DISP_VERT-1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }

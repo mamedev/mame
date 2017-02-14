@@ -455,9 +455,6 @@ MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
 	m_port1a = 1;
 	m_alpha_address = 0;
 	m_graph_address = 0;
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("vram")->base();
-	m_p_attribram = memregion("aram")->base();
 	membank("bankr0")->set_entry(16); // point at rom
 	membank("bankw0")->set_entry(1); // always write to ram
 	membank("bank1")->set_entry(2);
