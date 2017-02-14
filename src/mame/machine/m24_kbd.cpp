@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "m24_kbd.h"
 
 const device_type M24_KEYBOARD = &device_creator<m24_keyboard_device>;

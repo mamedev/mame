@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "devicesviewer.h"
 
 #import "debugconsole.h"

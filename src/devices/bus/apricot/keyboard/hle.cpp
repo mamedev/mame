@@ -49,6 +49,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "hle.h"
 #include "machine/keyboard.ipp"
 

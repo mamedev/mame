@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 #include "nlm_ttl74xx.h"
 
-#include "devices/nld_system.h"
+#include "../devices/nld_system.h"
 
 
 /*

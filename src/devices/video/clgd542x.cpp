@@ -6,6 +6,7 @@
 
 */
 
+#include "emu.h"
 #include "clgd542x.h"
 
 #define LOG_REG 0

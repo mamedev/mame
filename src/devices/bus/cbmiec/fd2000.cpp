@@ -17,6 +17,7 @@
 
 */
 
+#include "emu.h"
 #include "fd2000.h"
 
 

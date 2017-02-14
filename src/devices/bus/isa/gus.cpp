@@ -7,6 +7,7 @@
  */
 
 
+#include "emu.h"
 #include "gus.h"
 #include "bus/midi/midi.h"
 #include "machine/clock.h"

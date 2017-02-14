@@ -11,7 +11,6 @@
 #ifndef __MB89371_H__
 #define __MB89371_H__
 
-#include "emu.h"
 
 class mb89371_device : public device_t
 {

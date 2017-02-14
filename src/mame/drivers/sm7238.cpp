@@ -55,29 +55,26 @@
 class sm7238_state : public driver_device
 {
 public:
-	sm7238_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_nvram(*this, "nvram"),
-		m_pic8259(*this, "pic8259"),
-		m_i8251line(*this, "i8251line"),
-		m_rs232(*this, "rs232"),
-		m_i8251kbd(*this, "i8251kbd"),
-		m_keyboard(*this, "keyboard"),
-		m_i8251prn(*this, "i8251prn"),
-		m_printer(*this, "prtr"),
-		m_t_hblank(*this, "t_hblank"),
-		m_t_vblank(*this, "t_vblank"),
-		m_t_color(*this, "t_color"),
-		m_t_iface(*this, "t_iface"),
-		m_screen(*this, "screen")
+	sm7238_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_pic8259(*this, "pic8259")
+		, m_i8251line(*this, "i8251line")
+		, m_rs232(*this, "rs232")
+		, m_i8251kbd(*this, "i8251kbd")
+		, m_keyboard(*this, "keyboard")
+		, m_i8251prn(*this, "i8251prn")
+		, m_printer(*this, "prtr")
+		, m_t_hblank(*this, "t_hblank")
+		, m_t_vblank(*this, "t_vblank")
+		, m_t_color(*this, "t_color")
+		, m_t_iface(*this, "t_iface")
+		, m_screen(*this, "screen")
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_PALETTE_INIT(sm7238);
 
@@ -86,6 +83,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(text_control_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
 
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
@@ -95,17 +94,18 @@ private:
 	void text_memory_clear();
 	void recompute_parameters();
 
-	const uint8_t *m_p_chargen;
 	struct {
 		uint8_t control;
 		uint8_t stride;
 		uint16_t ptr;
 	} m_video;
 
-protected:
-	required_shared_ptr<uint8_t> m_p_videoram;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -154,8 +154,6 @@ void sm7238_state::machine_reset()
 
 void sm7238_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ-1, 0, KSM_DISP_VERT-1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }

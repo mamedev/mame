@@ -14,7 +14,6 @@
 #ifndef __P1_SOUND__
 #define __P1_SOUND__
 
-#include "emu.h"
 
 #include "bus/midi/midi.h"
 #include "isa.h"

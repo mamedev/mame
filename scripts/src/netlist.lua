@@ -13,18 +13,25 @@ project "netlist"
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
+  if _OPTIONS["targetos"]=="windows" then
+    configuration { "mingw* or vs*" }
+      defines {
+        "UNICODE",
+        "_UNICODE",
+        "_WIN32_WINNT=0x0501",
+        "WIN32_LEAN_AND_MEAN",
+        "NOMINMAX",
+      }
+  end
+  
 	addprojectflags()
-
 
 	defines {
 		"__STDC_CONSTANT_MACROS",
 	}
 
 	includedirs {
-		MAME_DIR .. "src/lib/netlist",
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/lib/util",
-	--      ext_includedir("expat"),
+		MAME_DIR .. "src/lib",
 	}
 
 	files {
@@ -55,6 +62,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
+    MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
+    MAME_DIR .. "src/lib/netlist/plib/pmain.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",

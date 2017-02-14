@@ -6,6 +6,7 @@
 
 // TODO: multibus
 
+#include "emu.h"
 #include "isbc_215g.h"
 
 const device_type ISBC_215G = &device_creator<isbc_215g_device>;

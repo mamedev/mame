@@ -10,9 +10,9 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include <vector>
-
 #include "pstring.h"
+
+#include <vector>
 
 namespace plib {
 /* ----------------------------------------------------------------------------------------

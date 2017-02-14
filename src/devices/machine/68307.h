@@ -7,7 +7,6 @@
 #ifndef __M68307_H__
 #define __M68307_H__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 #include "68307sim.h"

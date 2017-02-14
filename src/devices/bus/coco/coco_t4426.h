@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cococart.h"
 #include "machine/6850acia.h"
 #include "machine/6821pia.h"

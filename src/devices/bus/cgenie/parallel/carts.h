@@ -11,7 +11,6 @@
 #ifndef __CGENIE_PARALLEL_CARTS_H__
 #define __CGENIE_PARALLEL_CARTS_H__
 
-#include "emu.h"
 
 #include "joystick.h"
 #include "printer.h"

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "floppy.h"
 #include "formats/nascom_dsk.h"
 #include "softlist.h"

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cdp1879.h"
 #include "machine/timehelp.h"
 

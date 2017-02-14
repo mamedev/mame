@@ -11,7 +11,6 @@
 #ifndef __XEROX_820_KEYBOARD__
 #define __XEROX_820_KEYBOARD__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

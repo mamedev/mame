@@ -7,6 +7,7 @@
  *    Z80 @ 4MHz
  */
 
+#include "emu.h"
 #include "decodmd1.h"
 #include "rendlay.h"
 

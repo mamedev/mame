@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Robbbert
 
+#include "emu.h"
 #include "includes/gamecom.h"
 
 

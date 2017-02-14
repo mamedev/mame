@@ -3,7 +3,6 @@
 #ifndef __SSI2001__
 #define __SSI2001__
 
-#include "emu.h"
 #include "isa.h"
 #include "sound/mos6581.h"
 #include "bus/pc_joy/pc_joy.h"

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#include "emu.h"
 #include "2203intf.h"
 #include "fm.h"
 

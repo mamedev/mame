@@ -11,7 +11,6 @@
 #ifndef __ADAM_PRN__
 #define __ADAM_PRN__
 
-#include "emu.h"
 #include "adamnet.h"
 #include "cpu/m6800/m6800.h"
 

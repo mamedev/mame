@@ -11,7 +11,6 @@
 #ifndef MAME_DEVICES_MACHINE_GEN_LATCH_H
 #define MAME_DEVICES_MACHINE_GEN_LATCH_H
 
-#include "emu.h"
 
 
 //**************************************************************************

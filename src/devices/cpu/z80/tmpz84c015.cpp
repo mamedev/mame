@@ -12,6 +12,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "tmpz84c015.h"
 
 const device_type TMPZ84C015 = &device_creator<tmpz84c015_device>;

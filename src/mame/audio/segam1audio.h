@@ -5,7 +5,6 @@
 #ifndef __SEGAM1AUDIO_H__
 #define __SEGAM1AUDIO_H__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2612intf.h"
 #include "sound/multipcm.h"

@@ -7,7 +7,6 @@
     Phill Harvey-Smith
     2009-11-29.
 */
-#include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"

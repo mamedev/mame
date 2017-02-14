@@ -36,7 +36,6 @@
 #ifndef __ISBX_SLOT__
 #define __ISBX_SLOT__
 
-#include "emu.h"
 
 
 

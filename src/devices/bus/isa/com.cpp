@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "com.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"

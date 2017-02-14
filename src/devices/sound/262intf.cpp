@@ -143,13 +143,3 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 		m_irq_handler(*this)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf262_device::device_config_complete()
-{
-}

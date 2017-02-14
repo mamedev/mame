@@ -314,6 +314,7 @@ public:
 	m_cdda(*this, "cdda")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
@@ -823,6 +824,11 @@ WRITE32_MEMBER( a4000_state::motherboard_w )
 	}
 
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
+}
+
+WRITE_LINE_MEMBER( cd32_state::akiko_int_w )
+{
+	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
 }
 
 void cd32_state::potgo_w(uint16_t data)
@@ -1813,7 +1819,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 	MCFG_I2CMEM_PAGE_SIZE(16)
 	MCFG_I2CMEM_DATA_SIZE(1024)
 
-	MCFG_AKIKO_ADD("akiko", "maincpu")
+	MCFG_AKIKO_ADD("akiko")
+	MCFG_AKIKO_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AKIKO_INT_CB(WRITELINE(cd32_state, akiko_int_w))
 	MCFG_AKIKO_SCL_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_scl))
 	MCFG_AKIKO_SDA_READ_HANDLER(DEVREADLINE("i2cmem", i2cmem_device, read_sda))
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))

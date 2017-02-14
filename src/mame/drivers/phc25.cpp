@@ -37,6 +37,7 @@ RUN
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "includes/phc25.h"
 
 /* Read/Write Handlers */

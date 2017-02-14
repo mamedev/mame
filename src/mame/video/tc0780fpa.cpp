@@ -399,16 +399,6 @@ tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0780fpa_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

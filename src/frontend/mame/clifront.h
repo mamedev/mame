@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "emuopts.h"
 
 // don't include osd_interface in header files

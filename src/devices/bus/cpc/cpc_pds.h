@@ -24,7 +24,6 @@
 #ifndef CPC_PDS_H_
 #define CPC_PDS_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "machine/z80pio.h"
 

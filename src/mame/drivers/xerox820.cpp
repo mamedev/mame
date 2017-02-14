@@ -47,6 +47,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/xerox820.h"
 #include "softlist.h"
 /* Read/Write Handlers */

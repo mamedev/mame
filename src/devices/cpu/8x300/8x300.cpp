@@ -9,6 +9,7 @@
  *  Written by Barry Rodewald
  */
 
+#include "emu.h"
 #include "8x300.h"
 #include "debugger.h"
 

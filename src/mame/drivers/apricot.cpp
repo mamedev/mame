@@ -11,6 +11,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
 #include "machine/ram.h"

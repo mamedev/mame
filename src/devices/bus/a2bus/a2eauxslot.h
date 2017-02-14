@@ -13,7 +13,6 @@
 #ifndef __A2EAUXSLOT_H__
 #define __A2EAUXSLOT_H__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

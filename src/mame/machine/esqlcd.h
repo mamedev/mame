@@ -3,7 +3,6 @@
 #ifndef ESQLCD_H
 #define ESQLCD_H
 
-#include "emu.h"
 #include "esqvfd.h"
 
 

@@ -1837,7 +1837,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 public:

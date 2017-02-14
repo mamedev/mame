@@ -28,6 +28,7 @@
 170 RETURN
 */
 
+#include "emu.h"
 #include "music64.h"
 
 

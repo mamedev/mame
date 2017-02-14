@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "2612intf.h"
 #include "fm.h"
 
@@ -176,16 +177,6 @@ ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym2612_device::device_config_complete()
 {
 }
 

@@ -589,9 +589,9 @@ namespace netlist
 			}
 		}
 
-		state_var<nl_double *> m_Idr1; // drive current
-		state_var<nl_double *> m_go1;  // conductance for Voltage from other term
-		state_var<nl_double *> m_gt1;  // conductance for total conductance
+		nl_double *m_Idr1; // drive current
+		nl_double *m_go1;  // conductance for Voltage from other term
+		nl_double *m_gt1;  // conductance for total conductance
 
 	};
 
@@ -1163,10 +1163,9 @@ namespace netlist
 		void on_post_load() override;
 
 	private:
-		struct names_t { char m_buf[64]; };
 		std::size_t m_qsize;
 		std::vector<netlist_time::internal_type> m_times;
-		std::vector<names_t> m_names;
+		std::vector<std::size_t> m_net_ids;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1208,7 +1207,8 @@ namespace netlist
 		void register_dev(plib::owned_ptr<core_device_t> dev);
 		void remove_dev(core_device_t *dev);
 
-		detail::net_t *find_net(const pstring &name);
+		detail::net_t *find_net(const pstring &name) const;
+		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()

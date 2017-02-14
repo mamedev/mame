@@ -17,6 +17,7 @@ ToDo:
 
 *********************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 
 #include "cpu/tms9900/tms9995.h"

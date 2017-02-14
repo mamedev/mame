@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "wd_fdc.h"
 
 #include "debugger.h"

@@ -11,7 +11,6 @@
 #ifndef _ESRIP_H
 #define _ESRIP_H
 
-#include "emu.h"
 
 /***************************************************************************
     COMPILE-TIME DEFINITIONS

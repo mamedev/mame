@@ -5,12 +5,13 @@
  *
  */
 
-#include <cmath>
-#include <stack>
 #include "pfunction.h"
 #include "pfmtlog.h"
 #include "putil.h"
 #include "pexception.h"
+
+#include <cmath>
+#include <stack>
 
 namespace plib {
 

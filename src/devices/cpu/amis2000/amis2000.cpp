@@ -18,6 +18,7 @@
 
 */
 
+#include "emu.h"
 #include "amis2000.h"
 #include "debugger.h"
 

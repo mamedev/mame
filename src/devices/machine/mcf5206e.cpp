@@ -836,16 +836,6 @@ mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mco
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mcf5206e_peripheral_device::device_config_complete()
-{
-}
-
 const address_space_config *mcf5206e_peripheral_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : nullptr;

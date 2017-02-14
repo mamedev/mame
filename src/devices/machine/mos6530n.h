@@ -57,7 +57,6 @@
 #ifndef __MOS6530n__
 #define __MOS6530n__
 
-#include "emu.h"
 
 
 

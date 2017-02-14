@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "pcd_kbd.h"
 
 const device_type PCD_KEYBOARD = &device_creator<pcd_keyboard_device>;

@@ -5,7 +5,6 @@
 #ifndef __BW2__
 #define __BW2__
 
-#include "emu.h"
 #include "bus/bw2/exp.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"

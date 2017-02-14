@@ -13,8 +13,8 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "akiko.h"
-#include "includes/amiga.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
 
@@ -81,9 +81,8 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	m_dma_timer(nullptr),
 	m_frame_timer(nullptr),
 	m_cdrom_is_device(0),
-	m_scl_w(*this),
-	m_sda_r(*this),
-	m_sda_w(*this)
+	m_mem_r(*this), m_mem_w(*this), m_int_w(*this),
+	m_scl_w(*this),	m_sda_r(*this),	m_sda_w(*this)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -98,18 +97,6 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	}
 }
 
-
-//-------------------------------------------------
-//  set_cputag - set cpu tag for cpu we working on
-//-------------------------------------------------
-
-void akiko_device::set_cputag(device_t &device, const char *tag)
-{
-	akiko_device &akiko = downcast<akiko_device &>(device);
-	akiko.m_cputag = tag;
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -117,6 +104,9 @@ void akiko_device::set_cputag(device_t &device, const char *tag)
 void akiko_device::device_start()
 {
 	// resolve callbacks
+	m_mem_r.resolve_safe(0xffff);
+	m_mem_w.resolve_safe();
+	m_int_w.resolve_safe();
 	m_scl_w.resolve_safe();
 	m_sda_r.resolve_safe(1);
 	m_sda_w.resolve_safe();
@@ -143,9 +133,6 @@ void akiko_device::device_start()
 	m_cdrom_cmd_start = 0;
 	m_cdrom_cmd_end = 0;
 	m_cdrom_cmd_resp = 0;
-
-	device_t *cpu = machine().device(m_cputag);
-	m_space = &cpu->memory().space(AS_PROGRAM);
 
 	m_cdrom_toc = nullptr;
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::dma_proc), this));
@@ -269,6 +256,19 @@ uint32_t akiko_device::nvram_read()
 
 	return v;
 }
+
+uint8_t akiko_device::mem_r8(offs_t offset)
+{
+	int shift = (offset & 1) ? 0 : 8;
+	return m_mem_r(offset, 0xff << shift) >> shift;
+}
+
+void akiko_device::mem_w8(offs_t offset, uint8_t data)
+{
+	int shift = (offset & 1) ? 0 : 8;
+	m_mem_w(offset, data << shift, 0xff << shift);
+}
+
 
 /*************************************
  *
@@ -413,8 +413,6 @@ uint8_t akiko_device::cdda_getstatus(uint32_t *lba)
 
 void akiko_device::set_cd_status(uint32_t status)
 {
-	amiga_state *amiga = machine().driver_data<amiga_state>();
-
 	m_cdrom_status[0] |= status;
 
 	if ( m_cdrom_status[0] & m_cdrom_status[1] )
@@ -422,7 +420,7 @@ void akiko_device::set_cd_status(uint32_t status)
 		if (LOG_AKIKO_CD)
 			logerror("Akiko CD IRQ\n");
 
-		amiga->custom_chip_w(REG_INTREQ, INTENA_SETCLR | INTENA_PORTS);
+		m_int_w(1);
 	}
 }
 
@@ -469,11 +467,9 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 
 	if ( m_cdrom_readreqmask & ( 1 << index ) )
 	{
-		amiga_state *amiga = machine().driver_data<amiga_state>();
 		uint32_t  track = cdrom_get_track( m_cdrom, m_cdrom_lba_cur );
 		uint32_t  datasize;// = cdrom_get_toc(m_cdrom)->tracks[track].datasize;
 		uint32_t  subsize = cdrom_get_toc( m_cdrom )->tracks[track].subsize;
-		int     i;
 
 		uint32_t  curmsf = lba_to_msf( m_cdrom_lba_cur );
 		memset( buf, 0, 16 );
@@ -504,16 +500,9 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 
 		if (LOG_AKIKO_CD) logerror( "DMA: sector %d - address %08x\n", m_cdrom_lba_cur, m_cdrom_address[0] + (index*4096) );
 
-		for( i = 0; i < 2352; i += 2 )
-		{
-			uint16_t  data;
-
-			data = buf[i];
-			data <<= 8;
-			data |= buf[i+1];
-
-			amiga->chip_ram_w(m_cdrom_address[0] + (index*4096) + i, data );
-		}
+		// write sector data to host memory
+		for (int i = 0; i < 2352; i++)
+			mem_w8(m_cdrom_address[0] + (index*4096) + i, buf[i]);
 
 		m_cdrom_readmask |= ( 1 << index );
 		m_cdrom_readreqmask &= ~( 1 << index );
@@ -561,7 +550,8 @@ void akiko_device::setup_response( int len, uint8_t *r1 )
 
 	for( i = 0; i < len; i++ )
 	{
-		m_space->write_byte( resp_addr + ((m_cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
+		offs_t addr = resp_addr + ((m_cdrom_cmd_resp + i) & 0xff);
+		mem_w8(addr, resp_buffer[i]);
 	}
 
 	m_cdrom_cmd_resp = (m_cdrom_cmd_resp+len) & 0xff;
@@ -620,7 +610,7 @@ void akiko_device::update_cdrom()
 	while ( m_cdrom_cmd_start != m_cdrom_cmd_end )
 	{
 		uint32_t  cmd_addr = m_cdrom_address[1] + 0x200 + m_cdrom_cmd_start;
-		int     cmd = m_space->read_byte( cmd_addr );
+		uint8_t cmd = mem_r8(cmd_addr);
 
 		memset( resp, 0, sizeof( resp ) );
 		resp[0] = cmd;
@@ -662,7 +652,7 @@ void akiko_device::update_cdrom()
 
 			for( i = 0; i < 13; i++ )
 			{
-				cmdbuf[i] = m_space->read_byte( cmd_addr );
+				cmdbuf[i] = mem_r8(cmd_addr);
 				cmd_addr &= 0xffffff00;
 				cmd_addr += ( m_cdrom_cmd_start + i + 1 ) & 0xff;
 			}
@@ -795,7 +785,7 @@ READ32_MEMBER( akiko_device::read )
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), m_space->device().safe_pc() );
+		logerror( "Reading AKIKO reg %0x [%s] at %s\n", offset, get_akiko_reg_name(offset), machine().describe_context());
 	}
 
 	switch( offset )
@@ -855,7 +845,7 @@ WRITE32_MEMBER( akiko_device::write )
 {
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, m_space->device().safe_pc() );
+		logerror( "Writing AKIKO reg %0x [%s] with %08x at %s\n", offset, get_akiko_reg_name(offset), data, machine().describe_context());
 	}
 
 	switch( offset )

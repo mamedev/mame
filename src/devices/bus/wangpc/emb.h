@@ -11,7 +11,6 @@
 #ifndef __WANGPC_EMB__
 #define __WANGPC_EMB__
 
-#include "emu.h"
 #include "wangpc.h"
 
 

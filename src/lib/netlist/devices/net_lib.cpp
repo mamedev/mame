@@ -9,8 +9,8 @@
 ****************************************************************************/
 
 #include "net_lib.h"
-#include "nl_factory.h"
-#include "solver/nld_solver.h"
+#include "../nl_factory.h"
+#include "../solver/nld_solver.h"
 
 
 #define xstr(s) # s

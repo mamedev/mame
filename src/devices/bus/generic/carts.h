@@ -11,7 +11,6 @@
 #ifndef __GENERIC_CARTS_H__
 #define __GENERIC_CARTS_H__
 
-#include "emu.h"
 
 #include "rom.h"
 #include "ram.h"

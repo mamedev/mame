@@ -30,7 +30,7 @@
 #include "mdallas.lh"
 #include "qkracer.lh"
 
-#include "hh_cop400_test.lh" // common test-layout - use external artwork
+//#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
 
 class hh_cop400_state : public driver_device
@@ -233,7 +233,7 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 u16 hh_cop400_state::read_inputs(int columns)
 {
 	// active low
-	u16 ret = 0xffff;
+	u16 ret = ~0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -869,7 +869,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_l_tristate) { return 0xff; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
@@ -926,7 +925,7 @@ static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
-	MCFG_COP400_READ_L_TRISTATE_CB(READ8(funrlgl_state, read_l_tristate))
+	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
 

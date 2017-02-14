@@ -11,7 +11,6 @@
 #ifndef __I80130__
 #define __I80130__
 
-#include "emu.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 

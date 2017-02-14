@@ -24,7 +24,6 @@ TODO:
 #ifndef _VIDEO_MCD212_H_
 #define _VIDEO_MCD212_H_
 
-#include "emu.h"
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
 #define MCD212_CURCNT_CUW           0x008000    // Cursor width

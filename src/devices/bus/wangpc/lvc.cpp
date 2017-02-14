@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "lvc.h"
 
 

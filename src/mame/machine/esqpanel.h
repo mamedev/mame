@@ -5,7 +5,6 @@
 #ifndef __ESQPANEL_H__
 #define __ESQPANEL_H__
 
-#include "emu.h"
 #include "machine/esqvfd.h"
 #include "machine/esqlcd.h"
 

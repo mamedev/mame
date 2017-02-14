@@ -7,7 +7,6 @@
 #ifndef __CAT702_H__
 #define __CAT702_H__
 
-#include "emu.h"
 
 extern const device_type CAT702;
 

@@ -10,6 +10,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "audio/gottlieb.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

@@ -9,7 +9,6 @@
 #ifndef _UCOM4_H_
 #define _UCOM4_H_
 
-#include "emu.h"
 
 
 // I/O ports setup

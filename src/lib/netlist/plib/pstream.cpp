@@ -5,13 +5,20 @@
  *
  */
 
+#include "pstream.h"
+#include "palloc.h"
+
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
 
-#include "pstream.h"
-#include "palloc.h"
+// VS2015 prefers _dup
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace plib {
 
@@ -167,7 +174,10 @@ void pofilestream::init()
 pofilestream::~pofilestream()
 {
 	if (m_actually_close)
+	{
+		fflush(static_cast<FILE *>(m_file));
 		fclose(static_cast<FILE *>(m_file));
+	}
 }
 
 void pofilestream::vwrite(const void *buf, const pos_type n)
@@ -175,6 +185,7 @@ void pofilestream::vwrite(const void *buf, const pos_type n)
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
+		//printf("%ld %ld %s\n", r, n, strerror(errno));
 		if (ferror(static_cast<FILE *>(m_file)))
 			throw file_write_e(m_filename);
 	}
@@ -214,7 +225,11 @@ postringstream::~postringstream()
 // -----------------------------------------------------------------------------
 
 pstderr::pstderr()
-: pofilestream(stderr, "<stderr>", false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stderr)), "wb"), "<stderr>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stderr)), "wb"), "<stderr>", true)
+#endif
 {
 }
 
@@ -227,7 +242,11 @@ pstderr::~pstderr()
 // -----------------------------------------------------------------------------
 
 pstdout::pstdout()
-: pofilestream(stdout, "<stdout>", false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stdout)), "wb"), "<stdout>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stdout)), "wb"), "<stdout>", true)
+#endif
 {
 }
 

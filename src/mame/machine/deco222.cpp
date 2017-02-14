@@ -5,6 +5,7 @@
  also sometimes implemented as basic logic outside the CPU on early revs and bootlegs */
 
 
+#include "emu.h"
 #include "deco222.h"
 
 

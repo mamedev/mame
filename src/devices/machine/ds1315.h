@@ -13,7 +13,6 @@
 #ifndef __DS1315_H__
 #define __DS1315_H__
 
-#include "emu.h"
 
 
 /***************************************************************************
@@ -44,7 +43,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

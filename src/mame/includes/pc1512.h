@@ -5,7 +5,6 @@
 #ifndef __PC1512__
 #define __PC1512__
 
-#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"

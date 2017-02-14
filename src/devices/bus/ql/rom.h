@@ -30,7 +30,6 @@
 #ifndef __QL_ROM_CARTRIDGE_SLOT__
 #define __QL_ROM_CARTRIDGE_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 

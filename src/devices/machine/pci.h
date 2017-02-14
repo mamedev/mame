@@ -3,7 +3,6 @@
 #ifndef PCI_H
 #define PCI_H
 
-#include "emu.h"
 
 #define MCFG_PCI_ROOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PCI_ROOT, 0)

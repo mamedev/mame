@@ -8,7 +8,6 @@
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
 
-#include "emu.h"
 #include "cpu/sh2/sh2.h"
 #include "sound/ymf278b.h"
 #include "machine/eepromser.h"

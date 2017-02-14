@@ -22,6 +22,7 @@
 
 */
 
+#include "emu.h"
 #include "c8050.h"
 
 

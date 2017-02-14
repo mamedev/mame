@@ -38,6 +38,7 @@ SMS version is not playing PSG sound on his Mark III with the FM unit.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "fm_unit.h"
 
 

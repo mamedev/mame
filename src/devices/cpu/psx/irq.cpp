@@ -7,6 +7,7 @@
  *
  */
 
+#include "emu.h"
 #include "psx.h"
 #include "irq.h"
 

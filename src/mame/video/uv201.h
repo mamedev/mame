@@ -56,7 +56,6 @@
 #ifndef __UV201__
 #define __UV201__
 
-#include "emu.h"
 
 
 

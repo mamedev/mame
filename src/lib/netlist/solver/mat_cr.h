@@ -11,8 +11,8 @@
 #define MAT_CR_H_
 
 #include <algorithm>
-#include "plib/pconfig.h"
-#include "plib/palloc.h"
+#include "../plib/pconfig.h"
+#include "../plib/palloc.h"
 
 template<std::size_t N, typename C = uint16_t, typename T = double>
 struct mat_cr_t

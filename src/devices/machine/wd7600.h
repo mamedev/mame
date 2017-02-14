@@ -9,7 +9,6 @@
 #ifndef WD7600_H_
 #define WD7600_H_
 
-#include "emu.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

@@ -11,7 +11,6 @@
 #ifndef __RENDER_COPYUTIL__
 #define __RENDER_COPYUTIL__
 
-#include "emu.h"
 
 class copy_util
 {

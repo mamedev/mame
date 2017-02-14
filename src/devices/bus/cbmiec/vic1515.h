@@ -11,7 +11,6 @@
 #ifndef __VIC1515__
 #define __VIC1515__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "cpu/mcs48/mcs48.h"
 

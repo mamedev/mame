@@ -12,7 +12,6 @@
 #define __PC1512_KEYBOARD__
 
 
-#include "emu.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/mcs48/mcs48.h"
 

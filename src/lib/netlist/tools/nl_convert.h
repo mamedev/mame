@@ -11,9 +11,9 @@
 #define NL_CONVERT_H_
 
 #include <memory>
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/pparser.h"
+#include "../plib/pstring.h"
+#include "../plib/plists.h"
+#include "../plib/pparser.h"
 
 /*-------------------------------------------------
     convert - convert a spice netlist

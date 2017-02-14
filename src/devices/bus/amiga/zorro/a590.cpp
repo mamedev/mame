@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "a590.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"

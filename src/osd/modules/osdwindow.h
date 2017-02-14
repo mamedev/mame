@@ -9,7 +9,6 @@
 #ifndef __OSDWINDOW__
 #define __OSDWINDOW__
 
-#include "emu.h"
 #include "render.h"
 #include "osdhelper.h"
 #include "../frontend/mame/ui/menuitem.h"

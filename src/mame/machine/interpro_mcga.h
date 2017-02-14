@@ -6,7 +6,6 @@
 #ifndef INTERPRO_MCGA_H_
 #define INTERPRO_MCGA_H_
 
-#include "emu.h"
 
 // mcga control register
 #define MCGA_CTRL_OPTMASK    0x00000003

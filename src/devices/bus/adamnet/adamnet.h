@@ -11,7 +11,6 @@
 #ifndef __ADAMNET__
 #define __ADAMNET__
 
-#include "emu.h"
 
 
 

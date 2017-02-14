@@ -24,6 +24,7 @@ Bugs
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/aim65.h"
 #include "softlist.h"
 #include "aim65.lh"
@@ -115,7 +116,7 @@ static INPUT_PORTS_START( aim65 )
 
 	PORT_START("keyboard_6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")         PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")         PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";  +")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)          PORT_CHAR('h')
@@ -134,10 +135,9 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("switches")
-	PORT_DIPNAME(0x08, 0x08, "KB/TTY")
-	PORT_DIPLOCATION("S3:1")
-	PORT_DIPSETTING( 0x00, "TTY")
-	PORT_DIPSETTING( 0x08, "KB")
+	PORT_DIPNAME(0x08, 0x08, "KB/TTY") PORT_DIPLOCATION("S3:1")
+	PORT_DIPSETTING(0x00, "TTY")
+	PORT_DIPSETTING(0x08, "KB")
 INPUT_PORTS_END
 
 
@@ -181,15 +181,15 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds1))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
 	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds2))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
 	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds3))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
 	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds4))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
 	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds5))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -286,4 +286,4 @@ ROM_END
 ***************************************************************************/
 
 /*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_NO_SOUND_HW )
+COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

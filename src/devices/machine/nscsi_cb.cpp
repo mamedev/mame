@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "nscsi_cb.h"
 
 const device_type NSCSI_CB = &device_creator<nscsi_callback_device>;

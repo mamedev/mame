@@ -14,7 +14,6 @@
 #define MCFG_DS2401_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DS2401, 0)
 
-#include "emu.h"
 
 class ds2401_device : public device_t
 {

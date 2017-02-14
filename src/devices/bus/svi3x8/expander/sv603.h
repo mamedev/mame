@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_EXPANDER_SV603_H__
 #define __SVI3X8_EXPANDER_SV603_H__
 
-#include "emu.h"
 #include "expander.h"
 #include "sound/sn76496.h"
 #include "bus/generic/slot.h"

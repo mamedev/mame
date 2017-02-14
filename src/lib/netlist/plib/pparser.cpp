@@ -5,11 +5,11 @@
  *
  */
 
-#include <cstdarg>
-
 #include "pparser.h"
 #include "palloc.h"
 #include "putil.h"
+
+#include <cstdarg>
 
 namespace plib {
 // ----------------------------------------------------------------------------------------

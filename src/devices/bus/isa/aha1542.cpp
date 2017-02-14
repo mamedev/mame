@@ -74,6 +74,7 @@
  * source: http://download.adaptec.com/pdfs/installation_guides/1540cfig.pdf
  */
 
+#include "emu.h"
 #include "aha1542.h"
 #include "cpu/z80/z80.h"
 

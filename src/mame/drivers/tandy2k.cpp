@@ -22,6 +22,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/tandy2k.h"
 #include "machine/pckeybrd.h"
 #include "softlist.h"

@@ -76,13 +76,6 @@ static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scv_io, AS_IO, 8, scv_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(porta_w)
-	AM_RANGE( 0x01, 0x01 ) AM_READ(portb_r)
-	AM_RANGE( 0x02, 0x02 ) AM_READWRITE(portc_r, portc_w)
-ADDRESS_MAP_END
-
-
 static INPUT_PORTS_START( scv )
 	PORT_START( "PA.0" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
@@ -660,7 +653,10 @@ static MACHINE_CONFIG_START( scv, scv_state )
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
-	MCFG_CPU_IO_MAP( scv_io )
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(scv_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(scv_state, portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(scv_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(scv_state, portc_w))
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )

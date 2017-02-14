@@ -31,6 +31,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2scsi.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"

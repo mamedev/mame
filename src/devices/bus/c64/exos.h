@@ -12,7 +12,6 @@
 #define __EXOS__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

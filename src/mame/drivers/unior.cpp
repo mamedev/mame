@@ -80,7 +80,6 @@ private:
 	uint8_t m_4c;
 	uint8_t m_4e;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
@@ -380,10 +379,6 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 void unior_state::machine_reset()
 {
 	m_maincpu->set_state_int(I8085_PC, 0xF800);
-}
-
-void unior_state::video_start()
-{
 }
 
 static MACHINE_CONFIG_START( unior, unior_state )

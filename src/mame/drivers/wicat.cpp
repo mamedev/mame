@@ -16,6 +16,7 @@ Wicat - various systems.
 
 */
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"

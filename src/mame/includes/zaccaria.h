@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#include "emu.h"
 #include "audio/zaccaria.h"
 
 class zaccaria_state : public driver_device

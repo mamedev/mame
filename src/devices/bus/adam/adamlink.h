@@ -11,7 +11,6 @@
 #ifndef __ADAMLINK__
 #define __ADAMLINK__
 
-#include "emu.h"
 #include "exp.h"
 
 

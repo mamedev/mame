@@ -13,7 +13,6 @@
 #ifndef __TF20_H__
 #define __TF20_H__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"

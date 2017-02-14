@@ -9,7 +9,6 @@
 #ifndef MBEE_H_
 #define MBEE_H_
 
-#include "emu.h"
 #include "imagedev/snapquik.h"
 #include "machine/z80pio.h"
 #include "machine/8530scc.h"

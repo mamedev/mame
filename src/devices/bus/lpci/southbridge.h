@@ -5,7 +5,6 @@
 #ifndef __SOUTHBRIDGE_H__
 #define __SOUTHBRIDGE_H__
 
-#include "emu.h"
 
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"

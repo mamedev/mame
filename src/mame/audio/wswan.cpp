@@ -13,6 +13,7 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 **************************************************************************************/
 
+#include "emu.h"
 #include "wswan.h"
 
 

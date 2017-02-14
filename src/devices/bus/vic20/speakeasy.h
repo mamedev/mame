@@ -12,7 +12,6 @@
 #ifndef __VIC20_SPEAKEASY__
 #define __VIC20_SPEAKEASY__
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/votrax.h"
 

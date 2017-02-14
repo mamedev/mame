@@ -14,7 +14,6 @@
 #ifndef __MFMHD__
 #define __MFMHD__
 
-#include "emu.h"
 #include "imagedev/harddriv.h"
 #include "formats/mfm_hd.h"
 

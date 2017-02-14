@@ -15,7 +15,6 @@
 #ifndef ISA_OMTI8621_H_
 #define ISA_OMTI8621_H_
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/pc_fdc.h"
 

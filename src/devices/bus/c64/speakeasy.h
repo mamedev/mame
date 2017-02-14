@@ -11,7 +11,6 @@
 #ifndef __C64_SPEAKEASY__
 #define __C64_SPEAKEASY__
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/votrax.h"
 

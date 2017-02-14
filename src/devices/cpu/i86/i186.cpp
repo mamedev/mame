@@ -3,6 +3,7 @@
 // Peripheral code from rmnimbus driver by Phill Harvey-Smith which is
 // based on the Leland sound driver by Aaron Giles and Paul Leaman
 
+#include "emu.h"
 #include "i186.h"
 #include "debugger.h"
 #include "i86inline.h"

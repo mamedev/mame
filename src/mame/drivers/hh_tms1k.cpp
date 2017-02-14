@@ -131,6 +131,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
 #include "machine/tms1024.h"
 #include "video/hlcd0515.h"

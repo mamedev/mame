@@ -12,8 +12,6 @@ public:
 	void IGS022_handle_command();
 
 protected:
-	virtual void device_config_complete() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

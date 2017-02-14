@@ -12,7 +12,6 @@
 #define __CURRAH_SPEECH_64__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/sp0256.h"
 

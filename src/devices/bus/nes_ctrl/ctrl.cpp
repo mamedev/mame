@@ -40,6 +40,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 // slot devices
 #include "4score.h"

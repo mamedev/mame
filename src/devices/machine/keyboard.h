@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

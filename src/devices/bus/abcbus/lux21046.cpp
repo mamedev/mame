@@ -74,6 +74,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "lux21046.h"
 
 

@@ -25,6 +25,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/tek405x.h"
 #include "softlist.h"
 

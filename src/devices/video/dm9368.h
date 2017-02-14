@@ -22,7 +22,6 @@
 #ifndef __DM9368__
 #define __DM9368__
 
-#include "emu.h"
 
 
 

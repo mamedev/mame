@@ -9,7 +9,6 @@
 #ifndef X68K_SCSIEXT_H_
 #define X68K_SCSIEXT_H_
 
-#include "emu.h"
 #include "machine/mb89352.h"
 #include "x68kexp.h"
 

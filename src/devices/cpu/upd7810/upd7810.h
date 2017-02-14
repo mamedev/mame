@@ -30,18 +30,6 @@ enum
 	UPD7810_LV0, UPD7810_LV1
 };
 
-/* port numbers for PA,PB,PC,PD and PF */
-enum
-{
-	UPD7810_PORTA, UPD7810_PORTB, UPD7810_PORTC, UPD7810_PORTD, UPD7810_PORTF
-};
-
-enum
-{
-	UPD7807_PORTA, UPD7807_PORTB, UPD7807_PORTC, UPD7807_PORTD, UPD7807_PORTF,
-	UPD7807_PORTT
-};
-
 /* IRQ lines */
 #define UPD7810_INTF1       0
 #define UPD7810_INTF2       1
@@ -90,6 +78,52 @@ enum
 	devcb = &upd7810_device::set_an7_func(*device, DEVCB_##_devcb);
 
 
+#define MCFG_UPD7810_PORTA_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pa_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTB_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pb_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTC_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pc_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTD_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pd_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTF_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pf_in_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTA_WRITE_CB(_devcb) \
+	devcb = &upd7810_device::set_pa_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTB_WRITE_CB(_devcb) \
+	devcb = &upd7810_device::set_pb_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTC_WRITE_CB(_devcb) \
+	devcb = &upd7810_device::set_pc_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTD_WRITE_CB(_devcb) \
+	devcb = &upd7810_device::set_pd_out_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_PORTF_WRITE_CB(_devcb) \
+	devcb = &upd7810_device::set_pf_out_cb(*device, DEVCB_##_devcb);
+
+
+#define MCFG_UPD7807_PORTA_READ_CB MCFG_UPD7810_PORTA_READ_CB
+#define MCFG_UPD7807_PORTB_READ_CB MCFG_UPD7810_PORTB_READ_CB
+#define MCFG_UPD7807_PORTC_READ_CB MCFG_UPD7810_PORTC_READ_CB
+#define MCFG_UPD7807_PORTD_READ_CB MCFG_UPD7810_PORTD_READ_CB
+#define MCFG_UPD7807_PORTF_READ_CB MCFG_UPD7810_PORTF_READ_CB
+#define MCFG_UPD7807_PORTA_WRITE_CB MCFG_UPD7810_PORTA_WRITE_CB
+#define MCFG_UPD7807_PORTB_WRITE_CB MCFG_UPD7810_PORTB_WRITE_CB
+#define MCFG_UPD7807_PORTC_WRITE_CB MCFG_UPD7810_PORTC_WRITE_CB
+#define MCFG_UPD7807_PORTD_WRITE_CB MCFG_UPD7810_PORTD_WRITE_CB
+#define MCFG_UPD7807_PORTF_WRITE_CB MCFG_UPD7810_PORTF_WRITE_CB
+
+#define MCFG_UPD7807_PORTT_READ_CB(_devcb) \
+	devcb = &upd7810_device::set_pt_in_cb(*device, DEVCB_##_devcb);
+
+
 class upd7810_device : public cpu_device
 {
 public:
@@ -111,6 +145,25 @@ public:
 	template<class _Object> static devcb_base &set_an5_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_an6_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_pa_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pa_in_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pb_in_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pc_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pc_in_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pd_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pd_in_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pf_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pf_in_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pa_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pa_out_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pb_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pb_out_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pc_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pc_out_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pd_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pd_out_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_pf_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pf_out_cb.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_pt_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pt_in_cb.set_callback(object); }
+
+	DECLARE_WRITE8_MEMBER(pa_w);
+	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_WRITE8_MEMBER(pc_w);
+	DECLARE_WRITE8_MEMBER(pd_w);
+	DECLARE_WRITE8_MEMBER(pf_w);
 
 protected:
 	// flags
@@ -167,7 +220,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -199,6 +252,19 @@ protected:
 	devcb_read8       m_an5_func;
 	devcb_read8       m_an6_func;
 	devcb_read8       m_an7_func;
+
+	devcb_read8       m_pa_in_cb;
+	devcb_read8       m_pb_in_cb;
+	devcb_read8       m_pc_in_cb;
+	devcb_read8       m_pd_in_cb;
+	devcb_read8       m_pf_in_cb;
+	devcb_write8      m_pa_out_cb;
+	devcb_write8      m_pb_out_cb;
+	devcb_write8      m_pc_out_cb;
+	devcb_write8      m_pd_out_cb;
+	devcb_write8      m_pf_out_cb;
+
+	devcb_read8       m_pt_in_cb; // TODO: uPD7807 only
 
 	typedef void (upd7810_device::*opcode_func)();
 
@@ -245,7 +311,6 @@ protected:
 	static const struct opcode_s s_opXX_78c06[256];
 
 	address_space_config m_program_config;
-	address_space_config m_io_config;
 
 	PAIR    m_ppc;    /* previous program counter */
 	PAIR    m_pc;     /* program counter */
@@ -346,7 +411,6 @@ protected:
 	const struct opcode_s *m_op74;
 	address_space *m_program;
 	direct_read_data *m_direct;
-	address_space *m_io;
 	int m_icount;
 
 	uint8_t RP(offs_t port);

@@ -24,6 +24,8 @@ public:
 	pasopia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_p_vram(*this, "vram")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -57,12 +59,11 @@ private:
 	uint8_t m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
-	uint8_t *m_p_vram;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_vram;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -79,14 +80,9 @@ TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
 
-void pasopia_state::video_start()
-{
-}
-
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *m_p_chargen = memregion("chargen")->base();
 	uint8_t chr,gfx,fg=7,bg=0; // colours need to be determined
 	uint16_t mem,x;
 	uint32_t *p = &bitmap.pix32(y);
@@ -148,7 +144,6 @@ INPUT_PORTS_END
 
 void pasopia_state::machine_start()
 {
-	m_p_vram = memregion("vram")->base();
 	m_hblank = 0;
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);

@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "mvc.h"
 
 

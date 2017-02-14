@@ -9,7 +9,6 @@
 #ifndef __VT82C496_H__
 #define __VT82C496_H__
 
-#include "emu.h"
 #include "ram.h"
 
 #define MCFG_VT82C496_ADD(_tag) \

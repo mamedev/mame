@@ -119,6 +119,7 @@ anything in hardware. No cartridge has been found which uses them.
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/arcadia.h"
 #include "softlist.h"
 

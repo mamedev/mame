@@ -26,6 +26,7 @@
 
 */
 
+#include "emu.h"
 #include "stardos.h"
 
 

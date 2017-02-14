@@ -9,7 +9,6 @@
 #ifndef _HLCD0515_H_
 #define _HLCD0515_H_
 
-#include "emu.h"
 
 
 // COL/ROW pins (offset for ROW)

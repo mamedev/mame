@@ -5,7 +5,6 @@
 #ifndef __NORTHBRIDGE_H__
 #define __NORTHBRIDGE_H__
 
-#include "emu.h"
 
 #include "machine/ram.h"
 

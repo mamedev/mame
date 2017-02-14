@@ -8,10 +8,10 @@
 #ifndef PCHRONO_H_
 #define PCHRONO_H_
 
+#include "pconfig.h"
+
 #include <cstdint>
 #include <chrono>
-
-#include "pconfig.h"
 
 namespace plib {
 namespace chrono {

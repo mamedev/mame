@@ -9,7 +9,6 @@
 #ifndef ARCADIA_H_
 #define ARCADIA_H_
 
-#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "audio/arcadia.h"
 

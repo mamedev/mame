@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "mga2064w.h"
 
 const device_type MGA2064W = &device_creator<mga2064w_device>;

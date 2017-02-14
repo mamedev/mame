@@ -15,11 +15,11 @@ class midzeus_state : public driver_device
 public:
 	midzeus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_ram_base(*this, "ram_base"),
-			m_linkram(*this, "linkram"),
-			m_tms32031_control(*this, "tms32031_ctl"),
-			m_zeusbase(*this, "zeusbase") ,
+		m_nvram(*this, "nvram"),
+		m_ram_base(*this, "ram_base"),
+		m_linkram(*this, "linkram"),
+		m_tms32031_control(*this, "tms32031_ctl"),
+		m_zeusbase(*this, "zeusbase") ,
 		m_m48t35(*this, "m48t35"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -53,7 +53,6 @@ public:
 	DECLARE_WRITE32_MEMBER(analog_w);
 	DECLARE_WRITE32_MEMBER(invasn_gun_w);
 	DECLARE_READ32_MEMBER(invasn_gun_r);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_READ32_MEMBER(zeus_r);
 	DECLARE_WRITE32_MEMBER(zeus_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);

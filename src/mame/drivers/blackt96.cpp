@@ -82,7 +82,6 @@ public:
 	required_shared_ptr<uint16_t> m_tilemapram;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
@@ -300,11 +299,6 @@ static GFXDECODE_START( blackt96 )
 GFXDECODE_END
 
 
-READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(blackt96_state::blackt96_soundio_port00_w)
 {
 }
@@ -355,7 +349,6 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port01_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port02_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port02_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(blackt96_state, PIC16C5X_T0_clk_r))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 

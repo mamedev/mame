@@ -7,7 +7,6 @@
 #ifndef __ST0016_CPU__
 #define __ST0016_CPU__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 

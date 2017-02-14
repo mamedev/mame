@@ -11,7 +11,6 @@
 #ifndef __MACH5__
 #define __MACH5__
 
-#include "emu.h"
 #include "exp.h"
 
 

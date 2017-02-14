@@ -66,6 +66,7 @@ TODO:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_ucom4.h"
 #include "video/hlcd0515.h"
 
@@ -76,7 +77,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset

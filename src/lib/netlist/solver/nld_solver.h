@@ -10,9 +10,9 @@
 
 #include <map>
 
-#include "nl_base.h"
-#include "plib/pstream.h"
-#include "solver/nld_matrix_solver.h"
+#include "../nl_base.h"
+#include "../plib/pstream.h"
+#include "nld_matrix_solver.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN

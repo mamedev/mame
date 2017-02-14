@@ -31,7 +31,6 @@
 #ifndef __COMPACT_JOYPORT__
 #define __COMPACT_JOYPORT__
 
-#include "emu.h"
 
 
 //**************************************************************************

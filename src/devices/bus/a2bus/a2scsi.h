@@ -11,7 +11,6 @@
 #ifndef __A2BUS_SCSI__
 #define __A2BUS_SCSI__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/ncr5380n.h"
 

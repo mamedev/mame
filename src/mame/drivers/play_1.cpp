@@ -20,6 +20,7 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 **********************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"

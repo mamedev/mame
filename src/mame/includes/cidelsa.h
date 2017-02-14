@@ -6,7 +6,6 @@
 #define __CIDELSA__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/cdp1869.h"

@@ -11,7 +11,6 @@
 #ifndef __COMX_PL80__
 #define __COMX_PL80__
 
-#include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "bus/centronics/ctronics.h"
 

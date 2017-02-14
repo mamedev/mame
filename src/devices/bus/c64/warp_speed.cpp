@@ -28,6 +28,7 @@
 
 */
 
+#include "emu.h"
 #include "warp_speed.h"
 
 

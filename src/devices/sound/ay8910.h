@@ -5,7 +5,6 @@
 #ifndef __AY8910_H__
 #define __AY8910_H__
 
-#include "emu.h"
 
 /*
 AY-3-8910A: 2 I/O ports

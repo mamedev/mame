@@ -9,7 +9,6 @@
 #ifndef __HUC6270_H_
 #define __HUC6270_H_
 
-#include "emu.h"
 
 #define MCFG_HUC6270_VRAM_SIZE(_size) \
 	huc6270_device::set_vram_size(*device, _size);

@@ -11,7 +11,6 @@
 #ifndef __APRICOT_RAM__
 #define __APRICOT_RAM__
 
-#include "emu.h"
 #include "expansion.h"
 
 

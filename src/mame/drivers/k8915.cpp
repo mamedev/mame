@@ -36,7 +36,6 @@ private:
 	uint8_t m_framecnt;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -92,10 +91,6 @@ DRIVER_INIT_MEMBER(k8915_state,k8915)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
-}
-
-void k8915_state::video_start()
-{
 }
 
 uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

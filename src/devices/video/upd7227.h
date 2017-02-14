@@ -11,7 +11,6 @@
 #ifndef __UPD7227__
 #define __UPD7227__
 
-#include "emu.h"
 
 
 

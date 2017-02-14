@@ -13,7 +13,6 @@
 #ifndef __DMAC_H__
 #define __DMAC_H__
 
-#include "emu.h"
 #include "autoconfig.h"
 
 

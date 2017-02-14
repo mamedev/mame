@@ -8,9 +8,9 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
-#include "nl_base.h"
-#include "nl_errstr.h"
-#include "plib/putil.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_errstr.h"
+#include "netlist/plib/putil.h"
 
 namespace netlist
 {

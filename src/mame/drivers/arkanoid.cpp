@@ -194,27 +194,30 @@ Notes:
           GROUND | 1 A | GROUND
        VIDEO RED | 2 B | VIDEO GROUND
      VIDEO GREEN | 3 C | VIDEO BLUE
-     VIDEO SYNC  | 4 D |
+     VIDEO SYNC  | 4 D | NC
      SOUND OUT + | 5 E | SOUND OUT -
             POST | 6 F | POST
-                 | 7 H |
+              NC | 7 H | NC
      COIN SW (A) | 8 J | COIN SW (B)
   COIN METER (A) | 9 K | COIN METER (B)
 COIN LOCKOUT (A) |10 L | COIN LOCKOUT (B)
       SERVICE SW |11 M | TILT SW
          START 1 |12 N | START 2
-                 |13 P |
-                 |14 R |
+             NC* |13 P | NC*
+             NC* |14 R | NC*
         1P RIGHT |15 S | 2P RIGHT \
-         lP LEFT |16 T | 2P LEFT  / Connect 15/16/S/T to the spinner left/right connections
-                 |17 U |
-                 |18 V |
-                 |19 W |
-                 |20 X |
-   lP SERVE/FIRE |21 Y | 2P SERVE/FIRE
-                 |22 Z |
+         1P LEFT |16 T | 2P LEFT  / Connect 15/16/S/T to the spinner left/right connections
+      [1P RH UP] |17 U | [2P RH UP]
+    [1P RH DOWN] |18 V | [2P RH DOWN]
+   [1P RH RIGHT] |19 W | [2P RH RIGHT]
+    [1P RH LEFT] |20 X | [2P RH LEFT]
+   1P SERVE/FIRE |21 Y | 2P SERVE/FIRE
+       [1P WARP] |22 Z | [2P WARP]
                  |-----|
-
+[] - these are present and readable on arkanoid pcb hardware, but the game never reads or uses these
+* - these NC pins are used for the main joysticks on certain other games
+   (bubble bobble etc) which use the 22 pin taito connector, but are N/C and
+   do not connect anywhere on the arkanoid pcb.
 Note about spinner controller
 -----------------------------
 
@@ -793,16 +796,43 @@ DIP locations verified for:
 /***************************************************************************/
 
 /* Memory Maps */
-
+/*
+Address maps (x = ignored; * = selects address within this range)
+z80 address map:
+a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
+*   *                                                               "Manual" decode logic with ic30 and ic29
+0   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
+0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
+1   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *       R   ROM
+        *   *                                                       74LS139@IC80 side '1'
+1   1   0   0   x   *   *   *   *   *   *   *   *   *   *   *       RW  6116 SRAM
+1   1   0   1                                                       IO AREA
+                                            *   *                   74LS139@IC80 side '2'
+                                            *   *                   74LS155@IC25 both sides 1 and 2
+1   1   0   1   x   x   x   x   x   x   x   0   0   x   x   0       RW  YM2149 BC2 low
+1   1   0   1   x   x   x   x   x   x   x   0   0   x   x   1       RW  YM2149 BC2 high
+1   1   0   1   x   x   x   x   x   x   x   0   1   x   x   x       W   bank/flip/mcu reset register
+1   1   0   1   x   x   x   x   x   x   x   0   1   0   x   x       R   "RH" Joystick bits (unused by game, but present on pcb)
+1   1   0   1   x   x   x   x   x   x   x   0   1   1   x   x       R   "SYSTEM" Start buttons, service buttons, coin inputs and mcu semaphore bits
+1   1   0   1   x   x   x   x   x   x   x   1   0   x   x   x       R   "BUTTONS" Fire buttons for p1 and p2, also unused 'warp' buttons for p1 and p2; D4-D7 are open bus!
+1   1   0   1   x   x   x   x   x   x   x   1   0   x   x   x       W   Watchdog reset. Watchdog is identical to Taito SJ watchdog, counts 128 vblanks
+1   1   0   1   x   x   x   x   x   x   x   1   1   x   x   x       RW  MCU Read and Write latches
+1   1   1   0                                                       VIDEO AREA
+1   1   1   0   *   *   *   *   *   *   *   *   *   *   *   0       RW  2016 SRAM@IC57
+1   1   1   0   *   *   *   *   *   *   *   *   *   *   *   1       RW  2016 SRAM@IC58
+1   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x       OPEN BUS
+              |               |               |
+*/
 static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen, 68705 reset, etc. */
-	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")     /* 2 bits from the 68705 */
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xd018, 0xd018) AM_DEVREADWRITE("mcu", arkanoid_mcu_device_base, data_r, data_w)  /* input from the 68705 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_MIRROR(0x0800)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w) AM_MIRROR(0x0fe6)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r) AM_MIRROR(0x0fe6)
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w) AM_MIRROR(0x0fe7)  /* gfx bank, flip screen, 68705 reset, etc. */
+	AM_RANGE(0xd008, 0xd008) AM_READ_PORT("SYSTEM2") AM_MIRROR(0x0fe3) /* unused p1 and p2 joysticks */
+	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM") AM_MIRROR(0x0fe3) /* start, service, coins, and 2 bits from the 68705 */
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x0fe7)
+	AM_RANGE(0xd018, 0xd018) AM_DEVREADWRITE("mcu", arkanoid_mcu_device_base, data_r, data_w) AM_MIRROR(0x0fe7) /* input from the 68705 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe840, 0xefff) AM_RAM
@@ -970,11 +1000,25 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state, arkanoid_semaphore_input_r, nullptr) // Z80 and MCU Semaphores
 
-	PORT_START("BUTTONS")
+	PORT_START("SYSTEM2") // these are the secondary "RH" joystick ports for P1 and P2; the circuitry to read them is populated on the arkanoid PCB, but the game never actually reads these.
+	/*PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL*/
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS") // button 2 for players 1 and 2 the circuitry is populated to read them, but the game never uses them
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	//PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	//PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MUX")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_input_mux, "P1\0P2")

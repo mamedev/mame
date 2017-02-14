@@ -11,7 +11,6 @@
 #ifndef __A2BUS_ALFAM2__
 #define __A2BUS_ALFAM2__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "sound/sn76496.h"
 

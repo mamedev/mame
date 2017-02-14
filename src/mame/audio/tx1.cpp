@@ -82,15 +82,6 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym2_outputb(0)
 {
 }
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tx1_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -348,16 +339,6 @@ const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void buggyboy_sound_device::device_config_complete()
 {
 }
 

@@ -11,7 +11,6 @@
 #ifndef __NICK__
 #define __NICK__
 
-#include "emu.h"
 #include "machine/rescap.h"
 #include "video/resnet.h"
 

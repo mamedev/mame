@@ -29,6 +29,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/px8.h"
 #include "softlist.h"
 #include "px8.lh"

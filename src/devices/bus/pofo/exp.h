@@ -44,7 +44,6 @@
 #ifndef __PORTFOLIO_EXPANSION_SLOT__
 #define __PORTFOLIO_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

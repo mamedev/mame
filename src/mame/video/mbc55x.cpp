@@ -68,6 +68,7 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 *************************************************************************************************************/
 
+#include "emu.h"
 #include <functional>
 
 #include "includes/mbc55x.h"

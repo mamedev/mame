@@ -78,7 +78,6 @@
 #ifndef __CDP1869__
 #define __CDP1869__
 
-#include "emu.h"
 
 
 

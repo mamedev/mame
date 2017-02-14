@@ -3,6 +3,7 @@
 
 // Analog Devices AD1848, main codec in Windows Sound System adapters
 
+#include "emu.h"
 #include "sound/ad1848.h"
 #include "sound/volt_reg.h"
 

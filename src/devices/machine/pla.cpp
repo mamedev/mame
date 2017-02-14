@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pla.h"
 #include "jedparse.h"
 #include "plaparse.h"

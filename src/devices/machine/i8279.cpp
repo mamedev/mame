@@ -74,6 +74,7 @@ that uses this feature.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "i8279.h"
 
 #define LOG 0

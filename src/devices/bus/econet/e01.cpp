@@ -51,6 +51,7 @@
 
 */
 
+#include "emu.h"
 #include "e01.h"
 #include "bus/scsi/scsihd.h"
 #include "softlist.h"

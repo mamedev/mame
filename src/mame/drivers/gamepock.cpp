@@ -20,13 +20,6 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(gamepock_io, AS_IO, 8, gamepock_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE( port_a_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE( port_b_r, port_b_w )
-	AM_RANGE( 0x02, 0x02 ) AM_READ( port_c_r )
-ADDRESS_MAP_END
-
-
 static INPUT_PORTS_START( gamepock )
 	PORT_START("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -47,7 +40,10 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
-	MCFG_CPU_IO_MAP( gamepock_io)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gamepock_state, port_a_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(gamepock_state, port_b_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gamepock_state, port_b_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(gamepock_state, port_c_r))
 	MCFG_UPD7810_TO(WRITELINE(gamepock_state,gamepock_to_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)

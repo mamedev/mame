@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "e0c6s46.h"
 
 enum

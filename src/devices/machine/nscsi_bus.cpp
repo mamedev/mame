@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "nscsi_bus.h"
 
 const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;

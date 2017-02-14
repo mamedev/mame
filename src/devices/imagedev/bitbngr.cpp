@@ -23,7 +23,8 @@ const device_type BITBANGER = &device_creator<bitbanger_device>;
 
 bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BITBANGER, "Bitbanger", tag, owner, clock, "bitbanger", __FILE__),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this),
+	m_interface(nullptr)
 {
 }
 

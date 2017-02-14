@@ -22,6 +22,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/tiki100.h"
 #include "softlist.h"
 

@@ -7,11 +7,11 @@
 #ifndef NLTIME_H_
 #define NLTIME_H_
 
-#include <cstdint>
-
 #include "nl_config.h"
 #include "plib/ptypes.h"
 #include "plib/pstate.h"
+
+#include <cstdint>
 
 //============================================================
 //  MACROS
@@ -136,7 +136,7 @@ namespace netlist
 namespace plib {
 template<> inline void state_manager_t::save_item(const void *owner, netlist::netlist_time &nlt, const pstring &stname)
 {
-	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), false, true, false), 1, nlt.get_internaltype_ptr());
+	save_state_ptr(owner, stname, datatype_t(sizeof(netlist::netlist_time::internal_type), true, false), 1, nlt.get_internaltype_ptr());
 }
 }
 

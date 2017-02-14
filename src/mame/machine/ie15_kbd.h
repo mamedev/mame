@@ -3,7 +3,6 @@
 #ifndef __IE15_KEYBOARD_H__
 #define __IE15_KEYBOARD_H__
 
-#include "emu.h"
 
 #define IE_KB_ACK   1
 

@@ -10,7 +10,6 @@
 #ifndef __HUC6261_H_
 #define __HUC6261_H_
 
-#include "emu.h"
 #include "video/huc6270.h"
 #include "video/huc6272.h"
 

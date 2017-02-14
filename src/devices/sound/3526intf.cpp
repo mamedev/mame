@@ -18,6 +18,7 @@
 * NOTES
 *
 ******************************************************************************/
+#include "emu.h"
 #include "3526intf.h"
 #include "fmopl.h"
 
@@ -177,15 +178,5 @@ ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, dev
 		m_stream(nullptr),
 		m_chip(nullptr),
 		m_irq_handler(*this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ym3526_device::device_config_complete()
 {
 }

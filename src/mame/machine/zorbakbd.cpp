@@ -9,12 +9,6 @@
  *
  * TODO: the eight "holes" generate control codes, six of them are break, home and the arrows
  *
- * Strangely, the Zorba configures its keyboard UART for 8N2 but this
- * keyboard sends 8N1.  If you type too fast or hold down a key until it
- * repeats, characters will be dropped/corrupted.  It's possible this is
- * a dump of a different CP/M-compatible keyboard, not the one supplied
- * with the Zorba.
- *
  * The Zorba manual describes a keyboard PROM with enough space to map
  * all eight modifier combinations independently, however this keyboard
  * contains no PROMs (just the MCU and demultiplexer), and the internal
@@ -204,7 +198,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT(zorba_keyboard)
 	// MC68705P3S
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz * 1.05) // the 1.05 is a hack to get better sync with the host's USART - something's off in our timings
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz)
 	MCFG_M68705_PORTA_R_CB(READ8(zorba_keyboard_device, mcu_pa_r));
 	MCFG_M68705_PORTB_R_CB(READ8(zorba_keyboard_device, mcu_pb_r));
 	MCFG_M68705_PORTB_W_CB(WRITE8(zorba_keyboard_device, mcu_pb_w));

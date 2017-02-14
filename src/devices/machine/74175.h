@@ -47,7 +47,6 @@
 #ifndef TTL74175_H
 #define TTL74175_H
 
-#include "emu.h"
 
 #define MCFG_74174_Q1_CB(_devcb) \
 	devcb = &ttl741745_device::set_q1_cb(*device, DEVCB_##_devcb);

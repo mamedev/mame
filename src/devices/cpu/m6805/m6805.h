@@ -117,7 +117,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual void execute_set_input(int inputnum, int state) override = 0;
+	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 
@@ -181,8 +181,7 @@ protected:
 	template <bool C> void bhcc();
 	template <bool C> void bpl();
 	template <bool C> void bmc();
-	virtual void bil();
-	virtual void bih();
+	template <bool C> void bil();
 	void bsr();
 
 	template <addr_mode M> void neg();
@@ -260,6 +259,7 @@ protected:
 
 	virtual void interrupt();
 	virtual void interrupt_vector();
+	virtual bool test_il();
 
 	configuration_params const m_params;
 
@@ -296,9 +296,6 @@ class m6805_device : public m6805_base_device
 public:
 	// construction/destruction
 	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 
@@ -313,8 +310,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
-
-	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void interrupt_vector() override;
 };
@@ -334,10 +329,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void interrupt_vector() override;
-
-	// opcodes
-	virtual void bil() override;
-	virtual void bih() override;
+	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
 };
 
 #define M6805_IRQ_LINE      0

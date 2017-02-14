@@ -9,7 +9,6 @@
 #ifndef Z88_H_
 #define Z88_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd65031.h"
 #include "machine/ram.h"

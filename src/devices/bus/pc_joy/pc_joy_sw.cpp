@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 //TODO: determine when to switch modes and add single bit mode
 
+#include "emu.h"
 #include "pc_joy_sw.h"
 
 const device_type PC_MSSW_PAD = &device_creator<pc_mssw_pad_device>;

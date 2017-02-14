@@ -5,7 +5,6 @@
 #ifndef __NUBUS_M2VIDEO_H__
 #define __NUBUS_M2VIDEO_H__
 
-#include "emu.h"
 #include "nubus.h"
 
 //**************************************************************************

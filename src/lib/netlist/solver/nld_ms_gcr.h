@@ -12,12 +12,12 @@
 
 #include <algorithm>
 
-#include "plib/pdynlib.h"
-#include "solver/mat_cr.h"
-#include "solver/nld_ms_direct.h"
-#include "solver/nld_solver.h"
-#include "solver/vector_base.h"
-#include "plib/pstream.h"
+#include "../plib/pdynlib.h"
+#include "mat_cr.h"
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
+#include "vector_base.h"
+#include "../plib/pstream.h"
 
 namespace netlist
 {

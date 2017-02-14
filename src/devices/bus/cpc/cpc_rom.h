@@ -9,7 +9,6 @@
 #ifndef CPC_ROM_H_
 #define CPC_ROM_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 
 /*** ROM image device ***/

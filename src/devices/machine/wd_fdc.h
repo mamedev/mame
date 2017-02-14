@@ -3,7 +3,6 @@
 #ifndef WD_FDC_H
 #define WD_FDC_H
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
 

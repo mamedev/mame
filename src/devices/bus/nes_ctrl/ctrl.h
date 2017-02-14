@@ -15,7 +15,6 @@
 #ifndef __NES_CONTROL_PORT__
 #define __NES_CONTROL_PORT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

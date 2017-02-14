@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
+#include "emu.h"
 #include "pin64.h"
 
 #define CAP_NAME "pin64_%d.cap"

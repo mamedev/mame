@@ -31,6 +31,7 @@ Notes:
 ***********************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/cosmac/cosmac.h"
 #include "cpu/cop400/cop400.h"

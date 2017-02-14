@@ -11,6 +11,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "ec1841.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */

@@ -13,7 +13,6 @@
 #ifndef __CCLIMBER_AUDIO__
 #define __CCLIMBER_AUDIO__
 
-#include "emu.h"
 #include "sound/samples.h"
 //**************************************************************************
 //  GLOBAL VARIABLES

@@ -8,9 +8,10 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
+#include "pstring.h"
+
 #include <vector>
 #include <memory>
-#include "pstring.h"
 
 namespace plib {
 
@@ -25,19 +26,26 @@ T *palloc(Args&&... args)
 }
 
 template<typename T>
-void pfree(T *ptr) { delete ptr; }
+void pfree(T *ptr)
+{
+	delete ptr;
+}
 
 template<typename T>
-inline T* palloc_array(const std::size_t num)
+T* palloc_array(const std::size_t num)
 {
 	return new T[num]();
 }
 
 template<typename T>
-void pfree_array(T *ptr) { delete [] ptr; }
+void pfree_array(T *ptr)
+{
+	delete [] ptr;
+}
 
 template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
+std::unique_ptr<T> make_unique(Args&&... args)
+{
 	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 

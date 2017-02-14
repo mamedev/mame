@@ -42,7 +42,6 @@
 #ifndef MAME_DEVICES_MACHINE_8364_PAULA_H
 #define MAME_DEVICES_MACHINE_8364_PAULA_H
 
-#include "emu.h"
 
 
 //**************************************************************************

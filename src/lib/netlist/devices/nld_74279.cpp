@@ -7,7 +7,7 @@
 
 #include "nlid_truthtable.h"
 #include "nld_74279.h"
-#include "nl_base.h"
+#include "../nl_base.h"
 
 namespace netlist
 {

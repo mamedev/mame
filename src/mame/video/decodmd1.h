@@ -7,7 +7,6 @@
 #ifndef DECODMD1_H_
 #define DECODMD1_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 

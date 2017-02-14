@@ -94,7 +94,7 @@
 #include "pairmtch.lh"
 #include "sag.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -2034,8 +2034,9 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	int m_speaker_volume;
+	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	int m_speaker_volume;
 
 protected:
 	virtual void machine_start() override;
@@ -2050,8 +2051,15 @@ protected:
 #define CDKONG_SPEAKER_MAX 0x10000
 #define CDKONG_SPEAKER_DECAY 50
 
+void cdkong_state::speaker_decay_reset()
+{
+	if (m_r[1] & 8)
+		m_speaker_volume = CDKONG_SPEAKER_MAX;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
+	speaker_decay_reset();
 	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
 	m_speaker_volume /= 2;
 }
@@ -2066,8 +2074,8 @@ void cdkong_state::prepare_display()
 WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
-	if (offset == HMCS40_PORT_R1X && data & 8)
-		m_speaker_volume = CDKONG_SPEAKER_MAX;
+	m_r[offset] = data;
+	speaker_decay_reset();
 
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
@@ -2099,7 +2107,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 void cdkong_state::machine_start()
 {
@@ -4460,7 +4467,7 @@ CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Banda
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )

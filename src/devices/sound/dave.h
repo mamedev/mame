@@ -11,7 +11,6 @@
 #ifndef __DAVE__
 #define __DAVE__
 
-#include "emu.h"
 
 
 

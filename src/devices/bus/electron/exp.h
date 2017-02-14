@@ -88,7 +88,6 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 #ifndef __ELECTRON_EXPANSION_SLOT__
 #define __ELECTRON_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 //**************************************************************************

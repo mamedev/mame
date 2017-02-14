@@ -43,6 +43,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wdxt_gen.h"
 
 

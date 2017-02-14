@@ -13,6 +13,7 @@ real hardware, when run plugged-in to the SMS expansion slot.
 
 **********************************************************************/
 
+#include "emu.h"
 #include "gender.h"
 
 

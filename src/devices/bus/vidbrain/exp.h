@@ -39,7 +39,6 @@
 #ifndef __VIDEOBRAIN_EXPANSION_SLOT__
 #define __VIDEOBRAIN_EXPANSION_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 
