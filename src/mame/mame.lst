@@ -16923,6 +16923,9 @@ whiterus                        // White Russia
 @source:konin.cpp
 konin                           //
 
+@source:konmedal.cpp
+konmedal
+
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
 
