@@ -97,7 +97,8 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0xe000, 0xefff) AM_RAM	// banked 56832 VRAM, method unclear.
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
+	AM_RANGE(0xe800, 0xefff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( konmedal )
