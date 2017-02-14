@@ -47,7 +47,6 @@ WRITE8_MEMBER( trs80_state::trs80m4_88_w )
 
 void trs80_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_size_store = 0xff;
 	m_mode &= 2;
 }

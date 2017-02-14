@@ -29,28 +29,21 @@
 class sb2m600_state : public driver_device
 {
 public:
-	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6502_TAG),
-		m_acia_0(*this, "acia_0"),
-		m_cassette(*this, "cassette"),
-		m_discrete(*this, DISCRETE_TAG),
-		m_ram(*this, RAM_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_io_row4(*this, "ROW4"),
-		m_io_row5(*this, "ROW5"),
-		m_io_row6(*this, "ROW6"),
-		m_io_row7(*this, "ROW7"),
-		m_io_sound(*this, "Sound"),
-		m_io_reset(*this, "Reset"),
-		m_beeper(*this, "beeper")
-	{
-	}
+	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, M6502_TAG)
+		, m_acia_0(*this, "acia_0")
+		, m_cassette(*this, "cassette")
+		, m_discrete(*this, DISCRETE_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_video_ram(*this, "video_ram")
+		, m_color_ram(*this, "color_ram")
+		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "ROW%u", 0)
+		, m_io_sound(*this, "Sound")
+		, m_io_reset(*this, "Reset")
+		, m_beeper(*this, "beeper")
+		{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( keyboard_r );
@@ -80,14 +73,8 @@ protected:
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_video_ram;
 	optional_shared_ptr<uint8_t> m_color_ram;
-	required_ioport m_io_row0;
-	required_ioport m_io_row1;
-	required_ioport m_io_row2;
-	required_ioport m_io_row3;
-	required_ioport m_io_row4;
-	required_ioport m_io_row5;
-	required_ioport m_io_row6;
-	required_ioport m_io_row7;
+	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<8> m_io_keyboard;
 	required_ioport m_io_sound;
 	required_ioport m_io_reset;
 	optional_device<beep_device> m_beeper;
@@ -101,17 +88,15 @@ protected:
 	/* video state */
 	int m_32;
 	int m_coloren;
-	uint8_t *m_p_chargen;
 };
 
 class c1p_state : public sb2m600_state
 {
 public:
-	c1p_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sb2m600_state(mconfig, type, tag),
-		m_beep(*this, "beeper")
-	{
-	}
+	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sb2m600_state(mconfig, type, tag)
+		, m_beep(*this, "beeper")
+	{ }
 
 	required_device<beep_device> m_beep;
 
@@ -125,11 +110,11 @@ public:
 class c1pmf_state : public c1p_state
 {
 public:
-	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag) :
-		c1p_state(mconfig, type, tag),
-		m_floppy0(*this, "floppy0"),
-		m_floppy1(*this, "floppy1")
-	{ }
+	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c1p_state(mconfig, type, tag)
+		, m_floppy0(*this, "floppy0")
+		, m_floppy1(*this, "floppy1")
+		{ }
 
 	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
 	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
@@ -147,10 +132,9 @@ private:
 class uk101_state : public sb2m600_state
 {
 public:
-	uk101_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sb2m600_state(mconfig, type, tag)
-	{
-	}
+	uk101_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sb2m600_state(mconfig, type, tag)
+		{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

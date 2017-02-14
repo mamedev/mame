@@ -758,24 +758,11 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
  *************************************/
 READ8_MEMBER( trs80_state::trs80_keyboard_r )
 {
-	uint8_t result = 0;
+	u8 i, result = 0;
 
-	if (offset & 1)
-		result |= m_io_line0->read();
-	if (offset & 2)
-		result |= m_io_line1->read();
-	if (offset & 4)
-		result |= m_io_line2->read();
-	if (offset & 8)
-		result |= m_io_line3->read();
-	if (offset & 16)
-		result |= m_io_line4->read();
-	if (offset & 32)
-		result |= m_io_line5->read();
-	if (offset & 64)
-		result |= m_io_line6->read();
-	if (offset & 128)
-		result |= m_io_line7->read();
+	for (i = 0; i < 8; i++)
+		if (BIT(offset, i))
+			result |= m_io_keyboard[i]->read();
 
 	return result;
 }

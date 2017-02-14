@@ -270,24 +270,11 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	if (m_io_reset->read())
 		m_maincpu->reset();
 
-	uint8_t data = 0xff;
+	u8 i, data = 0xff;
 
-	if (!BIT(m_keylatch, 0))
-		data &= m_io_row0->read();
-	if (!BIT(m_keylatch, 1))
-		data &= m_io_row1->read();
-	if (!BIT(m_keylatch, 2))
-		data &= m_io_row2->read();
-	if (!BIT(m_keylatch, 3))
-		data &= m_io_row3->read();
-	if (!BIT(m_keylatch, 4))
-		data &= m_io_row4->read();
-	if (!BIT(m_keylatch, 5))
-		data &= m_io_row5->read();
-	if (!BIT(m_keylatch, 6))
-		data &= m_io_row6->read();
-	if (!BIT(m_keylatch, 7))
-		data &= m_io_row7->read();
+	for (i = 0; i < 8; i++)
+		if (!BIT(m_keylatch, i))
+			data &= m_io_keyboard[i]->read();
 
 	return data;
 }

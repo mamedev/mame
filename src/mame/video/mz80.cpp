@@ -34,11 +34,6 @@ const gfx_layout mz80kj_charlayout =
 };
 
 /* Video hardware */
-void mz80_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 uint32_t mz80_state::screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_mz80k_vertical ^= 1;

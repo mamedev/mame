@@ -28,6 +28,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_p_ram(*this, "p_ram")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		{ }
 
 	DECLARE_READ8_MEMBER(mz80k_strobe_r);
@@ -45,22 +46,21 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<pit8253_device> m_pit;
-	required_device<i8255_device> m_ppi;
-	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;
 	uint8_t m_speaker_level;
 	bool m_prev_state;
 	uint8_t m_mz80k_cursor_cnt;
 	uint8_t m_mz80k_keyboard_line;
-	required_shared_ptr<uint8_t> m_p_ram;
-	const uint8_t *m_p_chargen;
-	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
