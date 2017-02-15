@@ -38,7 +38,6 @@
 #ifndef __F3853_H__
 #define __F3853_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

@@ -142,6 +142,7 @@ public:
 		, m_fdc(*this, UPD765_TAG)
 		, m_flop0(*this, UPD765_TAG ":0")
 		, m_flop1(*this, UPD765_TAG ":1")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_PALETTE_INIT(ibm6580);
@@ -182,7 +183,6 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	const uint8_t *m_p_chargen;
 	uint8_t m_p40, m_p50, m_e000, m_kb_data, m_ppi_c;
 	bool m_kb_data_bit, m_kb_strobe;
 	util::fifo<uint8_t, 4> m_kb_fifo;
@@ -208,6 +208,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -839,7 +840,6 @@ PALETTE_INIT_MEMBER( ibm6580_state, ibm6580 )
 void ibm6580_state::machine_start()
 {
 	m_fdc->set_rate(500000);
-	m_p_chargen = memregion("chargen")->base();
 }
 
 void ibm6580_state::machine_reset()

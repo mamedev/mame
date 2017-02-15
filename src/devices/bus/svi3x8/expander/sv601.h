@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_EXPANDER_SV601_H__
 #define __SVI3X8_EXPANDER_SV601_H__
 
-#include "emu.h"
 #include "expander.h"
 #include "bus/svi3x8/slot/slot.h"
 

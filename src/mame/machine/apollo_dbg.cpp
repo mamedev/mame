@@ -10,6 +10,7 @@
 
 #define VERBOSE 1
 
+#include "emu.h"
 #include "includes/apollo.h"
 #include "cpu/m68000/m68kcpu.h"
 

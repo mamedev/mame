@@ -19,8 +19,6 @@ HNZC
 #define OP_HANDLER_BRA(name) template <bool C> void m6805_base_device::name()
 #define OP_HANDLER_MODE(name) template <m6805_base_device::addr_mode M> void m6805_base_device::name()
 
-#define DERIVED_OP_HANDLER(arch, name) void arch##_device::name()
-
 
 OP_HANDLER( illegal )
 {
@@ -92,30 +90,8 @@ OP_HANDLER_BRA( bpl ) { BRANCH( !(CC & NFLAG) ); }
 OP_HANDLER_BRA( bmc ) { BRANCH( !(CC & IFLAG) ); }
 
 // $2e BIL relative ----
-OP_HANDLER( bil )
-{
-	bool const C = true;
-	BRANCH( m_irq_state[M6805_IRQ_LINE] != CLEAR_LINE );
-}
-
-DERIVED_OP_HANDLER( hd63705, bil )
-{
-	bool const C = true;
-	BRANCH( m_nmi_state != CLEAR_LINE );
-}
-
 // $2f BIH relative ----
-OP_HANDLER( bih )
-{
-	bool const C = false;
-	BRANCH( m_irq_state[M6805_IRQ_LINE] != CLEAR_LINE );
-}
-
-DERIVED_OP_HANDLER( hd63705, bih )
-{
-	bool const C = false;
-	BRANCH( m_nmi_state != CLEAR_LINE );
-}
+OP_HANDLER_BRA( bil ) { BRANCH( test_il() ); }
 
 // $30 NEG direct                   -***
 // $60 NEG indexed, 1 byte offset   -***

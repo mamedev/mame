@@ -12,7 +12,6 @@
 #define __DELA_EP256__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

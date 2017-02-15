@@ -15,7 +15,6 @@
 #ifndef __A2232_H__
 #define __A2232_H__
 
-#include "emu.h"
 #include "zorro.h"
 #include "machine/autoconfig.h"
 #include "cpu/m6502/m65ce02.h"

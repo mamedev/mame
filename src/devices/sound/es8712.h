@@ -15,6 +15,8 @@
 	MCFG_DEVICE_ADD(_tag, ES8712, _clock)
 #define MCFG_ES8712_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, ES8712, _clock)
+#define MCFG_ES8712_RESET_HANDLER(_devcb) \
+	devcb = &es8712_device::set_reset_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -30,6 +32,9 @@ class es8712_device : public device_t,
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~es8712_device() { }
+
+	// static configuration
+	template<class _Object> static devcb_base &set_reset_handler(device_t &device, _Object object) { return downcast<es8712_device &>(device).m_reset_handler.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -56,6 +61,8 @@ private:
 private:
 	required_region_ptr<uint8_t> m_rom;
 
+	devcb_write_line m_reset_handler;
+
 	uint8_t m_playing;          /* 1 if we're actively playing */
 
 	uint32_t m_base_offset;     /* pointer to the base memory location */
@@ -67,7 +74,6 @@ private:
 
 	uint32_t m_start;           /* starting address for the next loop */
 	uint32_t m_end;             /* ending address for the next loop */
-	uint8_t  m_repeat;          /* Repeat current sample when 1 */
 
 	int32_t m_bank_offset;
 	sound_stream *m_stream;   /* which stream are we playing on? */

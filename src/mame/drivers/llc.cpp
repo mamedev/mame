@@ -47,6 +47,7 @@
 *******************************************************************************/
 
 
+#include "emu.h"
 #include "machine/keyboard.h"
 #include "includes/llc.h"
 #include "llc1.lh"

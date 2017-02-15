@@ -8,7 +8,7 @@
 #define MAXCNT 15
 
 #include "nld_74161.h"
-#include "nl_base.h"
+#include "../nl_base.h"
 
 namespace netlist
 {

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
+#include "emu.h"
 #include "loopback.h"
 
 const device_type RS232_LOOPBACK = &device_creator<rs232_loopback_device>;

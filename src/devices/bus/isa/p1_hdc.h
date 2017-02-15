@@ -11,7 +11,6 @@
 #ifndef __P1_HDC__
 #define __P1_HDC__
 
-#include "emu.h"
 
 #include "imagedev/harddriv.h"
 #include "isa.h"

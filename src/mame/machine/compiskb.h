@@ -11,7 +11,6 @@
 #ifndef __COMPIS_KEYBOARD__
 #define __COMPIS_KEYBOARD__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/speaker.h"
 

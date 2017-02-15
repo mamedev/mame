@@ -13,7 +13,6 @@
 #ifndef _HP_OPTROM_H_
 #define _HP_OPTROM_H_
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 

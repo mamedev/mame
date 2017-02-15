@@ -13,7 +13,6 @@
 #ifndef __TIRS232__
 #define __TIRS232__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/tms9902.h"
 

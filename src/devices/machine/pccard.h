@@ -5,7 +5,6 @@
 #ifndef __PCCARD_H__
 #define __PCCARD_H__
 
-#include "emu.h"
 
 class pccard_interface
 {

@@ -5,9 +5,9 @@
  *
  */
 
-#include "nl_base.h"
-#include "plib/pstream.h"
-#include "plib/pfmtlog.h"
+#include "../nl_base.h"
+#include "../plib/pstream.h"
+#include "../plib/pfmtlog.h"
 #include "nld_log.h"
 //#include "sound/wavwrite.h"
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "cdu76s.h"
 
 void sony_cdu76s_device::ExecCommand()

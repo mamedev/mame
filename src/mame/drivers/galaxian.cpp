@@ -2441,7 +2441,7 @@ static INPUT_PORTS_START( catacomb )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( omega )
+static INPUT_PORTS_START( omegab )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
@@ -7849,7 +7849,7 @@ ROM_START( catacomb )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-ROM_START( omega )
+ROM_START( omegab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "omega1.bin",   0x0000, 0x0800, CRC(fc2a096b) SHA1(071ff30060a1aa0a47ae6e88140b80caed00fc4e) )
 	ROM_LOAD( "omega2.bin",   0x0800, 0x0800, CRC(ad100357) SHA1(7c5e82c25e65b4a390cf5607f15bf4df407f7f11) )
@@ -11618,7 +11618,7 @@ GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, galax
 GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, galaxian,   ROT270, "Sigma", "Lucky Today",MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, omega,       theend,   galaxian,   omega,      galaxian_state, galaxian,   ROT270, "bootleg?", "Omega", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, galaxian,   ROT270, "bootleg?", "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )

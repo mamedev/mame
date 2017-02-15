@@ -8,7 +8,6 @@
     2011-01-29.
 */
 
-#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
 #include "bus/centronics/ctronics.h"

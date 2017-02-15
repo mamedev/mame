@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "dqbb.h"
 
 

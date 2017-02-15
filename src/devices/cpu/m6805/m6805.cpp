@@ -58,7 +58,7 @@ const m6805_base_device::op_handler_table m6805_base_device::s_hmos_ops =
 	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
 			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
 	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
-			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP(bil),     OP(bih),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
 	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
 			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
 	/* 4 */ OP(nega),    OP(illegal), OP(illegal), OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
@@ -95,7 +95,7 @@ const m6805_base_device::op_handler_table m6805_base_device::s_cmos_ops =
 	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
 			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
 	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
-			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP(bil),     OP(bih),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
 	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
 			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
 	/* 4 */ OP(nega),    OP(illegal), OP(illegal), OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
@@ -132,7 +132,7 @@ const m6805_base_device::op_handler_table m6805_base_device::s_hc_ops =
 	/* 1 */ OP(bset<0>), OP(bclr<0>), OP(bset<1>), OP(bclr<1>), OP(bset<2>), OP(bclr<2>), OP(bset<3>), OP(bclr<3>),
 			OP(bset<4>), OP(bclr<4>), OP(bset<5>), OP(bclr<5>), OP(bset<6>), OP(bclr<6>), OP(bset<7>), OP(bclr<7>),
 	/* 2 */ OP_T(bra),   OP_F(bra),   OP_T(bhi),   OP_F(bhi),   OP_T(bcc),   OP_F(bcc),   OP_T(bne),   OP_F(bne),
-			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP(bil),     OP(bih),
+			OP_T(bhcc),  OP_F(bhcc),  OP_T(bpl),   OP_F(bpl),   OP_T(bmc),   OP_F(bmc),   OP_T(bil),   OP_F(bil),
 	/* 3 */ OP_DI(neg),  OP(illegal), OP(illegal), OP_DI(com),  OP_DI(lsr),  OP(illegal), OP_DI(ror),  OP_DI(asr),
 			OP_DI(lsl),  OP_DI(rol),  OP_DI(dec),  OP(illegal), OP_DI(inc),  OP_DI(tst),  OP(illegal), OP_DI(clr),
 	/* 4 */ OP(nega),    OP(illegal), OP(mul),     OP(coma),    OP(lsra),    OP(illegal), OP(rora),    OP(asra),
@@ -294,7 +294,7 @@ void m6805_base_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_state));
 
-	std::fill(std::begin(m_irq_state), std::end(m_irq_state), 0);
+	std::fill(std::begin(m_irq_state), std::end(m_irq_state), CLEAR_LINE);
 }
 
 void m6805_base_device::device_reset()
@@ -358,6 +358,11 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 }
 
 
+bool m6805_base_device::test_il()
+{
+	return CLEAR_LINE != m_irq_state[M6805_IRQ_LINE];
+}
+
 void m6805_base_device::interrupt_vector()
 {
 	rm16(0xfffa, m_pc);
@@ -370,7 +375,7 @@ void m6805_base_device::interrupt()
 	/* pending_interrupts until the interrupt is taken, no matter what the */
 	/* external IRQ pin does. */
 
-	if ((m_pending_interrupts & (1 << HD63705_INT_NMI)) != 0)
+	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
 	{
 		pushword(m_pc);
 		pushbyte(m_x);
@@ -529,19 +534,16 @@ void m6805_base_device::execute_run()
 	while (m_icount > 0);
 }
 
-
-void m6805_device::execute_set_input(int inputnum, int state)
+void m6805_base_device::execute_set_input(int inputnum, int state)
 {
-	/* Basic 6805 only has one IRQ line */
-	/* See HD63705 specific version     */
-	if (m_irq_state[0] != state)
+	// Basic 6805 only has one IRQ line
+	// See HD63705 specific version
+	if (m_irq_state[inputnum] != state)
 	{
-		m_irq_state[0] = state;
+		m_irq_state[inputnum] = (ASSERT_LINE == state) ? ASSERT_LINE : CLEAR_LINE;
 
-		if (state != CLEAR_LINE)
-		{
-			m_pending_interrupts |= 1 << M6805_IRQ_LINE;
-		}
+		if (CLEAR_LINE != state)
+			m_pending_interrupts |= (1 << inputnum);
 	}
 }
 
@@ -584,32 +586,19 @@ void m68hc05eg_device::device_reset()
 	rm16(0x1ffe, m_pc);
 }
 
-void m68hc05eg_device::execute_set_input(int inputnum, int state)
-{
-	if (m_irq_state[inputnum] != state)
-	{
-		m_irq_state[inputnum] = state;
-
-		if (state != CLEAR_LINE)
-		{
-			m_pending_interrupts |= 1 << inputnum;
-		}
-	}
-}
-
 void m68hc05eg_device::interrupt_vector()
 {
-	if ((m_pending_interrupts & (1 << M68HC05EG_INT_IRQ)) != 0)
+	if (BIT(m_pending_interrupts, M68HC05EG_INT_IRQ))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_IRQ);
 		rm16(0x1ffa, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M68HC05EG_INT_TIMER)) != 0)
+	else if (BIT(m_pending_interrupts, M68HC05EG_INT_TIMER))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_TIMER);
 		rm16(0x1ff8, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M68HC05EG_INT_CPI)) != 0)
+	else if (BIT(m_pending_interrupts, M68HC05EG_INT_CPI))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_CPI);
 		rm16(0x1ff6, m_pc);

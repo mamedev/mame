@@ -71,6 +71,7 @@ public:
 		//, m_sti(*this, "sti")
 		, m_dart(*this, "dart")
 		, m_crtc(*this,"crtc")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER( ts803_port_r );
@@ -90,7 +91,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
 
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<palette_device> m_palette;
 
 private:
 
@@ -100,11 +100,11 @@ private:
 	uint8_t m_sioarr[256];
 	bool m_graphics_mode;
 	bool m_tick;
-	uint8_t *m_p_chargen;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -112,6 +112,7 @@ private:
 	//required_device<z80sti_device> m_sti;
 	required_device<z80dart_device> m_dart;
 	required_device<sy6545_1_device> m_crtc;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(ts803_mem, AS_PROGRAM, 8, ts803_state)
@@ -462,7 +463,6 @@ DRIVER_INIT_MEMBER( ts803_state, ts803 )
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);
 
-	m_p_chargen = memregion("chargen")->base();
 	uint8_t *rom = memregion("roms")->base();
 	membank("bankr0")->configure_entry(0, &rom[0]); // rom
 	membank("bankr0")->configure_entry(1, m_56kram.get()); // ram

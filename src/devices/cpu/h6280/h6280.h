@@ -17,7 +17,6 @@
 #ifndef __H6280_H__
 #define __H6280_H__
 
-#include "emu.h"
 
 #define LAZY_FLAGS  0
 

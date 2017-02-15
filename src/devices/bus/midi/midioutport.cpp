@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "midioutport.h"
 
 const device_type MIDIOUT_PORT = &device_creator<midiout_port_device>;

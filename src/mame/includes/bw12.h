@@ -3,7 +3,6 @@
 #ifndef __BW12__
 #define __BW12__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "formats/bw12_dsk.h"

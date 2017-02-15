@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
+#include "emu.h"
 #include "scsi.h"
 
 SCSI_PORT_DEVICE::SCSI_PORT_DEVICE(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

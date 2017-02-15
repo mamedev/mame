@@ -6,7 +6,6 @@
 #ifndef CAMMU_H_
 #define CAMMU_H_
 
-#include "emu.h"
 
 // the following enables a very crude instruction cache - it has known (future)
 // problems, but speeds up cpu execution quite noticeably in the short term by

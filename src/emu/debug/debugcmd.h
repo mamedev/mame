@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "debugcpu.h"
 #include "debugcon.h"
 

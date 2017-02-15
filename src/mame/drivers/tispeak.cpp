@@ -398,6 +398,7 @@ K28 modules:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
 #include "sound/tms5110.h"
 #include "machine/tms6100.h"

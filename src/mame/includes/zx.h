@@ -9,7 +9,6 @@
 #ifndef ZX_H_
 #define ZX_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

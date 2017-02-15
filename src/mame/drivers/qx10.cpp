@@ -31,6 +31,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "midi_sci.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"

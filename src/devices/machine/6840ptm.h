@@ -13,7 +13,6 @@
 #ifndef __6840PTM_H__
 #define __6840PTM_H__
 
-#include "emu.h"
 
 
 

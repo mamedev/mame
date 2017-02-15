@@ -17,6 +17,7 @@
 
 */
 
+#include "emu.h"
 #include "sid.h"
 
 

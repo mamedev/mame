@@ -9,7 +9,7 @@
 #define NLD_FOURTERM_H_
 
 
-#include "nl_setup.h"
+#include "../nl_setup.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros

@@ -11,7 +11,6 @@
 #ifndef __K033906_H__
 #define __K033906_H__
 
-#include "emu.h"
 #include "video/voodoo.h"
 
 

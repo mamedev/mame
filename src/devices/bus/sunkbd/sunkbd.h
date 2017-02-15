@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 
 #define MCFG_SUNKBD_PORT_ADD(tag, slot_intf, def_slot) \

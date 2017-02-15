@@ -66,6 +66,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/kyocera.h"
 #include "softlist.h"
 

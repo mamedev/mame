@@ -11,7 +11,6 @@
 #ifndef __A2BUS_DISKII__
 #define __A2BUS_DISKII__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/applefdc.h"
 

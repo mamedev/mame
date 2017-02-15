@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
+#include "emu.h"
 #include "ibm6580_fdc.h"
 
 

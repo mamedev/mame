@@ -10,7 +10,6 @@
 
 #define ALTO2_TAG "alto2"
 
-#include "emu.h"
 #include "debugger.h"
 #include "sound/speaker.h"
 #include "machine/diablo_hd.h"

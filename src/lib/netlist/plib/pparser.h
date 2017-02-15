@@ -8,13 +8,12 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
-#include <unordered_map>
-#include <cstdint>
-
 #include "pstring.h"
 #include "plists.h"
-//#include "putil.h"
 #include "pstream.h"
+
+#include <unordered_map>
+#include <cstdint>
 
 namespace plib {
 class ptokenizer : nocopyassignmove

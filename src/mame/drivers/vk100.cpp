@@ -148,6 +148,7 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/beep.h"

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "znmcu.h"
 
 const device_type ZNMCU = &device_creator<znmcu_device>;

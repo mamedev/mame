@@ -3,7 +3,6 @@
 #ifndef __FGA002_H__
 #define __FGA002_H__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h" // The FGA002 is designed for the 68K interrupt PL0-PL2 signalling, however used on Sparc and x86 boards too
 
 #define MCFG_FGA002_ADD(_tag, _clock)   MCFG_DEVICE_ADD(_tag, FGA002, _clock)

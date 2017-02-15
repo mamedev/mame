@@ -23,6 +23,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco12.h"
 #include "bus/coco/coco_t4426.h"
 #include "bus/coco/coco_232.h"

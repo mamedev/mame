@@ -1071,10 +1071,6 @@ deco104_device::deco104_device(const machine_config &mconfig, const char *tag, d
 
 
 
-void deco104_device::device_config_complete()
-{
-}
-
 void deco104_device::device_start()
 {
 	deco_146_base_device::device_start();

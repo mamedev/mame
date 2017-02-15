@@ -5,10 +5,10 @@
  *
  */
 
-#include "solver/nld_solver.h"
+#include "../solver/nld_solver.h"
 
 #include "nlid_twoterm.h"
-#include "nl_factory.h"
+#include "../nl_factory.h"
 
 #include <cmath>
 

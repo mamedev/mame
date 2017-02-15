@@ -5,14 +5,14 @@
  *
  */
 
+#include "pstring.h"
+#include "palloc.h"
+#include "plists.h"
+
 #include <cstring>
 #include <algorithm>
 #include <stack>
 #include <cstdlib>
-
-#include "pstring.h"
-#include "palloc.h"
-#include "plists.h"
 
 template <typename F> pstr_t pstring_t<F>::m_zero(0);
 

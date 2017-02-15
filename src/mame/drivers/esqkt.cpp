@@ -88,6 +88,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/es5510/es5510.h"

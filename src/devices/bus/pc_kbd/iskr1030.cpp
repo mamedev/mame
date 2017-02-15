@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "iskr1030.h"
 
 #define VERBOSE_DBG 1       /* general debug messages */

@@ -1070,6 +1070,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"vtech",
 		"wang",
 		"wavemate",
+		"westinghouse",
 		"xerox",
 		"xussrpc",
 		"yamaha",
@@ -1498,7 +1499,6 @@ files {
 createMESSProjects(_target, _subtarget, "banctec")
 files {
 	MAME_DIR .. "src/mame/drivers/banctec.cpp",
-	MAME_DIR .. "src/mame/includes/banctec.h",
 }
 
 createMESSProjects(_target, _subtarget, "bandai")
@@ -3213,6 +3213,11 @@ files {
 	MAME_DIR .. "src/mame/includes/wangpc.h",
 	MAME_DIR .. "src/mame/machine/wangpckb.cpp",
 	MAME_DIR .. "src/mame/machine/wangpckb.h",
+}
+
+createMESSProjects(_target, _subtarget, "westinghouse")
+files {
+	MAME_DIR .. "src/mame/drivers/testconsole.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wavemate")

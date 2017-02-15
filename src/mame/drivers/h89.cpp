@@ -19,6 +19,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"

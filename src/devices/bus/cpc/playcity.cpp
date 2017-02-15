@@ -10,6 +10,7 @@
    IRQs aren't working currently, the Z80CTC core requires the daisy chain setup to acknowledge IRQs properly, and that can't be used in a slot device currently.
 */
 
+#include "emu.h"
 #include "playcity.h"
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 

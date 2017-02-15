@@ -11,7 +11,6 @@
 #ifndef __NASBUS_AVC_H__
 #define __NASBUS_AVC_H__
 
-#include "emu.h"
 #include "nasbus.h"
 #include "video/mc6845.h"
 

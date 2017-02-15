@@ -9,6 +9,7 @@
 
 */
 
+#include "emu.h"
 #include "tp0320.h"
 #include "debugger.h"
 

@@ -28,6 +28,7 @@ MZ80B
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mz80.h"
 #include "formats/mz_cas.h"
 

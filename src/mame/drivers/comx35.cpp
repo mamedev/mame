@@ -11,6 +11,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/comx35.h"
 #include "formats/imageutl.h"
 #include "softlist.h"

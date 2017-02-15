@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "drawgdi.h"
 #include "rendersw.hxx"
 

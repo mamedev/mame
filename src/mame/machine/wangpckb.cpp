@@ -49,6 +49,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wangpckb.h"
 
 

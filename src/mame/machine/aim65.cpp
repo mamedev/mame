@@ -7,7 +7,11 @@
 ******************************************************************************/
 
 
+#include "emu.h"
 #include "includes/aim65.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /******************************************************************************
@@ -43,63 +47,40 @@
  * PB7: CU (Cursor)
  */
 
-void aim65_state::dl1416_update(dl1416_device *device, int index)
-{
-	device->ce_w(m_pia_a & (0x04 << index));
-	device->wr_w(BIT(m_pia_a, 7));
-	device->cu_w(BIT(m_pia_b, 7));
-	device->data_w(generic_space(), m_pia_a & 0x03, m_pia_b & 0x7f);
-}
-
-void aim65_state::aim65_pia()
-{
-	dl1416_update(m_ds1, 0);
-	dl1416_update(m_ds2, 1);
-	dl1416_update(m_ds3, 2);
-	dl1416_update(m_ds4, 3);
-	dl1416_update(m_ds5, 4);
-}
-
-
 WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
 {
-	m_pia_a = data;
-	aim65_pia();
+	LOG("pia a: a=%u /ce=%u,%u,%u,%u,%u /wr=%u\n",
+			data & 0x03, BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
+	for (std::size_t index = 0; m_ds.size() > index; ++index)
+	{
+		m_ds[index]->wr_w(BIT(data, 7));
+		m_ds[index]->ce_w(BIT(data, 2 + index));
+		m_ds[index]->addr_w(data & 0x03);
+	}
 }
 
 
 WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 {
-	m_pia_b = data;
-	aim65_pia();
+	LOG("pia b: d=%02x /cu=%u\n", data & 0x7f, BIT(data, 7));
+	for (required_device<dl1416_device> &ds : m_ds)
+	{
+		ds->cu_w(BIT(data, 7));
+		ds->data_w(data & 0x7f);
+	}
 }
 
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds1)
+template <unsigned D> WRITE16_MEMBER( aim65_state::aim65_update_ds )
 {
-	output().set_digit_value(0 + (offset ^ 3), data);
+	output().set_digit_value(((D - 1) << 2) | (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds2)
-{
-	output().set_digit_value(4 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( aim65_state::aim65_update_ds3)
-{
-	output().set_digit_value(8 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( aim65_state::aim65_update_ds4)
-{
-	output().set_digit_value(12 + (offset ^ 3), data);
-}
-
-WRITE16_MEMBER( aim65_state::aim65_update_ds5)
-{
-	output().set_digit_value(16 + (offset ^ 3), data);
-}
-
+template WRITE16_MEMBER( aim65_state::aim65_update_ds<1> );
+template WRITE16_MEMBER( aim65_state::aim65_update_ds<2> );
+template WRITE16_MEMBER( aim65_state::aim65_update_ds<3> );
+template WRITE16_MEMBER( aim65_state::aim65_update_ds<4> );
+template WRITE16_MEMBER( aim65_state::aim65_update_ds<5> );
 
 
 /******************************************************************************
@@ -156,6 +137,10 @@ void aim65_state::machine_start()
 	space.install_ram(0x0000, ram->size() - 1, ram->pointer());
 
 	m_pb_save = 0;
+
+	// Register save state
+	save_item(NAME(m_riot_port_a));
+	save_item(NAME(m_pb_save));
 }
 
 

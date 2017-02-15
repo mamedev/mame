@@ -248,15 +248,22 @@ template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b,
 	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 }
 
+template <unsigned B, typename T, typename... U> T bitswap(T val, U... b)
+{
+	static_assert(sizeof...(b) == B, "wrong number of bits");
+	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
+	return bitswap(val, b...);
+}
+
 // explicit versions that check number of bit position arguments
-template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { static_assert(sizeof...(b) == 32U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) { static_assert(sizeof...(b) == 40U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) { static_assert(sizeof...(b) == 48U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) { static_assert(sizeof...(b) == 56U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) { static_assert(sizeof...(b) == 64U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) {  return bitswap<8U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) {  return bitswap<16U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) {  return bitswap<24U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) {  return bitswap<32U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) {  return bitswap<40U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) {  return bitswap<48U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) {  return bitswap<56U>(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) {  return bitswap<64U>(val, b...); }
 
 
 

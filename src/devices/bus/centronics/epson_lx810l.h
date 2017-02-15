@@ -10,7 +10,6 @@
 #ifndef __EPSON_LX810L__
 #define __EPSON_LX810L__
 
-#include "emu.h"
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/e05a30.h"

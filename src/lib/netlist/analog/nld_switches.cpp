@@ -6,8 +6,8 @@
  */
 
 #include "nlid_twoterm.h"
-#include "nl_base.h"
-#include "nl_factory.h"
+#include "../nl_base.h"
+#include "../nl_factory.h"
 
 #define R_OFF   (1.0 / netlist().gmin())
 #define R_ON    0.01

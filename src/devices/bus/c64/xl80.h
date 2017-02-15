@@ -12,7 +12,6 @@
 #define __XL80__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "video/mc6845.h"
 

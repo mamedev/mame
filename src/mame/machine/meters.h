@@ -14,7 +14,6 @@
 #ifndef __METERS_H__
 #define __METERS_H__
 
-#include "emu.h"
 
 
 #define MCFG_METERS_NUMBER(_number) \

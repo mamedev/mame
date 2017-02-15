@@ -528,10 +528,7 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
-		: core_terminal_t(dev, aname, state)
-		{
-		}
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~analog_t();
 
 		const analog_net_t & net() const NL_NOEXCEPT;
@@ -589,9 +586,9 @@ namespace netlist
 			}
 		}
 
-		state_var<nl_double *> m_Idr1; // drive current
-		state_var<nl_double *> m_go1;  // conductance for Voltage from other term
-		state_var<nl_double *> m_gt1;  // conductance for total conductance
+		nl_double *m_Idr1; // drive current
+		nl_double *m_go1;  // conductance for Voltage from other term
+		nl_double *m_gt1;  // conductance for total conductance
 
 	};
 
@@ -603,12 +600,7 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
-			: core_terminal_t(dev, aname, state)
-			, logic_family_t()
-			, m_proxy(nullptr)
-		{
-		}
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
@@ -982,8 +974,8 @@ namespace netlist
 	class param_data_t : public param_str_t
 	{
 	public:
-		param_data_t(device_t &device, const pstring name)
-		: param_str_t(device, name, "") { }
+		param_data_t(device_t &device, const pstring name);
+
 		std::unique_ptr<plib::pistream> stream();
 	protected:
 		virtual void changed() override;
@@ -1095,9 +1087,8 @@ namespace netlist
 	{
 	public:
 
-		template <class C>
-		device_t(C &owner, const pstring &name)
-			: core_device_t(owner, name) { }
+		device_t(netlist_t &owner, const pstring &name);
+		device_t(core_device_t &owner, const pstring &name);
 
 		virtual ~device_t();
 
@@ -1163,10 +1154,9 @@ namespace netlist
 		void on_post_load() override;
 
 	private:
-		struct names_t { char m_buf[64]; };
 		std::size_t m_qsize;
 		std::vector<netlist_time::internal_type> m_times;
-		std::vector<names_t> m_names;
+		std::vector<std::size_t> m_net_ids;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1208,7 +1198,8 @@ namespace netlist
 		void register_dev(plib::owned_ptr<core_device_t> dev);
 		void remove_dev(core_device_t *dev);
 
-		detail::net_t *find_net(const pstring &name);
+		detail::net_t *find_net(const pstring &name) const;
+		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()

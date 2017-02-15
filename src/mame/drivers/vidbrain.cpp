@@ -35,6 +35,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/vidbrain.h"
 #include "machine/rescap.h"
 #include "sound/volt_reg.h"

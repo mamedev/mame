@@ -87,6 +87,7 @@
 // prompt should appear. A command that could be tried is "DIR" that lists
 // the content of floppy disk.
 
+#include "emu.h"
 #include "includes/imds2.h"
 
 // CPU oscillator of IPC board: 8 MHz

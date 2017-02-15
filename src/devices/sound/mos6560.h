@@ -34,7 +34,6 @@
 #ifndef __MOS6560__
 #define __MOS6560__
 
-#include "emu.h"
 
 
 

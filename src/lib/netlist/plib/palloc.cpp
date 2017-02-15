@@ -5,11 +5,11 @@
  *
  */
 
-#include <algorithm>
-
 #include "pconfig.h"
 #include "palloc.h"
 #include "pfmtlog.h"
+
+#include <algorithm>
 
 namespace plib {
 

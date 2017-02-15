@@ -11,7 +11,6 @@
 #ifndef __BW2_RAMCARD__
 #define __BW2_RAMCARD__
 
-#include "emu.h"
 #include "exp.h"
 
 

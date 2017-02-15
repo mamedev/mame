@@ -11,7 +11,6 @@
 #ifndef __ABC80_16KB_RAM_CARD__
 #define __ABC80_16KB_RAM_CARD__
 
-#include "emu.h"
 #include "abcbus.h"
 
 

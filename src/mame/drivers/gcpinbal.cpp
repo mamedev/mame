@@ -537,5 +537,5 @@ ROM_START( gcpinbal )
 ROM_END
 
 
-GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Grand Cross v1.02F", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Grand Cross v1.02F", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ds1386.h"
 #include "machine/timehelp.h"
 

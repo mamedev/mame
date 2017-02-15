@@ -5,6 +5,7 @@
  *
  */
 
+#include "emu.h"
 #include "k573msu.h"
 
 /*

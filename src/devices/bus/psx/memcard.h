@@ -5,7 +5,6 @@
 #ifndef _PSXCARD_
 #define _PSXCARD_
 
-#include "emu.h"
 
 class psx_controller_port_device;
 

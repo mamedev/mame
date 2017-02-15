@@ -11,7 +11,6 @@
 #ifndef __GRIP__
 #define __GRIP__
 
-#include "emu.h"
 #include "ecbbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

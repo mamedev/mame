@@ -52,29 +52,20 @@ class ie15_state : public driver_device,
 	public device_serial_interface
 {
 public:
-	ie15_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		device_serial_interface(mconfig, *this),
-		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper"),
-		m_rs232(*this, "rs232"),
-		m_screen(*this, "screen"),
-		m_io_keyboard(*this, "keyboard")
+	ie15_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, device_serial_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "video")
+		, m_p_chargen(*this, "chargen")
+		, m_beeper(*this, "beeper")
+		, m_rs232(*this, "rs232")
+		, m_screen(*this, "screen")
+		, m_io_keyboard(*this, "keyboard")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	DECLARE_WRITE16_MEMBER( kbd_put );
-
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
-	virtual void rcv_complete() override;
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_addr_lo_w );
@@ -97,22 +88,19 @@ public:
 	DECLARE_READ8_MEMBER( serial_rx_ready_r );
 	DECLARE_READ8_MEMBER( serial_r );
 	DECLARE_WRITE8_MEMBER( serial_speed_w );
-
 	DECLARE_PALETTE_INIT( ie15 );
-
-	static const device_timer_id TIMER_HBLANK = 0;
-
-	void scanline_callback();
-private:
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
+	static const device_timer_id TIMER_HBLANK = 0;
+	void scanline_callback();
 	void update_leds();
 	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;
 
-	const uint8_t *m_p_chargen;
-	uint8_t *m_p_videoram;
 	uint8_t m_long_beep;
 	uint8_t m_kb_control;
 	uint8_t m_kb_data;
@@ -135,8 +123,17 @@ private:
 	int m_vpos;
 	int m_marker_scanline;
 
-protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void rcv_complete() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beeper;
 	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
@@ -489,8 +486,6 @@ void ie15_state::machine_reset()
 
 void ie15_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("video")->base();
 	m_video.ptr1 = m_video.ptr2 = m_latch = 0;
 
 	m_tmpbmp = std::make_unique<uint32_t[]>(IE15_TOTAL_HORZ * IE15_TOTAL_VERT);

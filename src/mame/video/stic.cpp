@@ -924,7 +924,7 @@ WRITE16_MEMBER( stic_device::write )
 		case STIC_CSR + STIC_CSR1:
 		case STIC_CSR + STIC_CSR2:
 		case STIC_CSR + STIC_CSR3:
-			logerror("Setting color_stack[%x] = %x (%x)\n", offset & (STIC_CSRS - 1),data & STIC_CSR_BG, space.device().safe_pc());
+			//logerror("Setting color_stack[%x] = %x (%x)\n", offset & (STIC_CSRS - 1),data & STIC_CSR_BG, space.device().safe_pc());
 			break;
 		// Border Color
 		case STIC_BCR:

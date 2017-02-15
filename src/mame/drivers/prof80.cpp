@@ -25,6 +25,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/prof80.h"
 #include "softlist.h"
 

@@ -383,6 +383,7 @@ I/O is via TTL, very similar to Designer Display
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/fidelbase.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"

@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_cpu6_device : public m6502_device {

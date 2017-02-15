@@ -29,7 +29,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides

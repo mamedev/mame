@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A374399B-B87F-4E0F-9525-6C099600705F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\analog\nld_bjt.cpp" />
+    <ClCompile Include="..\analog\nld_opamps.cpp" />
+    <ClCompile Include="..\analog\nld_switches.cpp" />
+    <ClCompile Include="..\analog\nlid_fourterm.cpp" />
+    <ClCompile Include="..\analog\nlid_twoterm.cpp" />
+    <ClCompile Include="..\devices\net_lib.cpp" />
+    <ClCompile Include="..\devices\nld_2102A.cpp" />
+    <ClCompile Include="..\devices\nld_2716.cpp" />
+    <ClCompile Include="..\devices\nld_4020.cpp" />
+    <ClCompile Include="..\devices\nld_4066.cpp" />
+    <ClCompile Include="..\devices\nld_4316.cpp" />
+    <ClCompile Include="..\devices\nld_74107.cpp" />
+    <ClCompile Include="..\devices\nld_74123.cpp" />
+    <ClCompile Include="..\devices\nld_74153.cpp" />
+    <ClCompile Include="..\devices\nld_74161.cpp" />
+    <ClCompile Include="..\devices\nld_74165.cpp" />
+    <ClCompile Include="..\devices\nld_74166.cpp" />
+    <ClCompile Include="..\devices\nld_74174.cpp" />
+    <ClCompile Include="..\devices\nld_74175.cpp" />
+    <ClCompile Include="..\devices\nld_74192.cpp" />
+    <ClCompile Include="..\devices\nld_74193.cpp" />
+    <ClCompile Include="..\devices\nld_74194.cpp" />
+    <ClCompile Include="..\devices\nld_74279.cpp" />
+    <ClCompile Include="..\devices\nld_74365.cpp" />
+    <ClCompile Include="..\devices\nld_7448.cpp" />
+    <ClCompile Include="..\devices\nld_7450.cpp" />
+    <ClCompile Include="..\devices\nld_7473.cpp" />
+    <ClCompile Include="..\devices\nld_7474.cpp" />
+    <ClCompile Include="..\devices\nld_7475.cpp" />
+    <ClCompile Include="..\devices\nld_7483.cpp" />
+    <ClCompile Include="..\devices\nld_7485.cpp" />
+    <ClCompile Include="..\devices\nld_7490.cpp" />
+    <ClCompile Include="..\devices\nld_7493.cpp" />
+    <ClCompile Include="..\devices\nld_74ls629.cpp" />
+    <ClCompile Include="..\devices\nld_82S115.cpp" />
+    <ClCompile Include="..\devices\nld_82S123.cpp" />
+    <ClCompile Include="..\devices\nld_82S126.cpp" />
+    <ClCompile Include="..\devices\nld_82S16.cpp" />
+    <ClCompile Include="..\devices\nld_9310.cpp" />
+    <ClCompile Include="..\devices\nld_9312.cpp" />
+    <ClCompile Include="..\devices\nld_9316.cpp" />
+    <ClCompile Include="..\devices\nld_9322.cpp" />
+    <ClCompile Include="..\devices\nld_am2847.cpp" />
+    <ClCompile Include="..\devices\nld_dm9334.cpp" />
+    <ClCompile Include="..\devices\nld_legacy.cpp" />
+    <ClCompile Include="..\devices\nld_log.cpp" />
+    <ClCompile Include="..\devices\nld_mm5837.cpp" />
+    <ClCompile Include="..\devices\nld_ne555.cpp" />
+    <ClCompile Include="..\devices\nld_r2r_dac.cpp" />
+    <ClCompile Include="..\devices\nld_system.cpp" />
+    <ClCompile Include="..\devices\nld_tristate.cpp" />
+    <ClCompile Include="..\devices\nlid_proxy.cpp" />
+    <ClCompile Include="..\devices\nlid_truthtable.cpp" />
+    <ClCompile Include="..\macro\nlm_base.cpp" />
+    <ClCompile Include="..\macro\nlm_cd4xxx.cpp" />
+    <ClCompile Include="..\macro\nlm_opamp.cpp" />
+    <ClCompile Include="..\macro\nlm_other.cpp" />
+    <ClCompile Include="..\macro\nlm_ttl74xx.cpp" />
+    <ClCompile Include="..\nl_base.cpp" />
+    <ClCompile Include="..\nl_factory.cpp" />
+    <ClCompile Include="..\nl_parser.cpp" />
+    <ClCompile Include="..\nl_setup.cpp" />
+    <ClCompile Include="..\plib\palloc.cpp" />
+    <ClCompile Include="..\plib\pchrono.cpp" />
+    <ClCompile Include="..\plib\pdynlib.cpp" />
+    <ClCompile Include="..\plib\pexception.cpp" />
+    <ClCompile Include="..\plib\pfmtlog.cpp" />
+    <ClCompile Include="..\plib\pfunction.cpp" />
+    <ClCompile Include="..\plib\pmain.cpp" />
+    <ClCompile Include="..\plib\poptions.cpp" />
+    <ClCompile Include="..\plib\pparser.cpp" />
+    <ClCompile Include="..\plib\pstate.cpp" />
+    <ClCompile Include="..\plib\pstream.cpp" />
+    <ClCompile Include="..\plib\pstring.cpp" />
+    <ClCompile Include="..\plib\putil.cpp" />
+    <ClCompile Include="..\solver\nld_matrix_solver.cpp" />
+    <ClCompile Include="..\solver\nld_solver.cpp" />
+    <ClCompile Include="..\tools\nl_convert.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\analog\nld_bjt.h" />
+    <ClInclude Include="..\analog\nld_fourterm.h" />
+    <ClInclude Include="..\analog\nld_opamps.h" />
+    <ClInclude Include="..\analog\nld_switches.h" />
+    <ClInclude Include="..\analog\nld_twoterm.h" />
+    <ClInclude Include="..\analog\nlid_fourterm.h" />
+    <ClInclude Include="..\analog\nlid_twoterm.h" />
+    <ClInclude Include="..\devices\net_lib.h" />
+    <ClInclude Include="..\devices\nld_2102A.h" />
+    <ClInclude Include="..\devices\nld_2716.h" />
+    <ClInclude Include="..\devices\nld_4020.h" />
+    <ClInclude Include="..\devices\nld_4066.h" />
+    <ClInclude Include="..\devices\nld_4316.h" />
+    <ClInclude Include="..\devices\nld_74107.h" />
+    <ClInclude Include="..\devices\nld_74123.h" />
+    <ClInclude Include="..\devices\nld_74153.h" />
+    <ClInclude Include="..\devices\nld_74161.h" />
+    <ClInclude Include="..\devices\nld_74165.h" />
+    <ClInclude Include="..\devices\nld_74166.h" />
+    <ClInclude Include="..\devices\nld_74174.h" />
+    <ClInclude Include="..\devices\nld_74175.h" />
+    <ClInclude Include="..\devices\nld_74192.h" />
+    <ClInclude Include="..\devices\nld_74193.h" />
+    <ClInclude Include="..\devices\nld_74194.h" />
+    <ClInclude Include="..\devices\nld_74279.h" />
+    <ClInclude Include="..\devices\nld_74365.h" />
+    <ClInclude Include="..\devices\nld_7448.h" />
+    <ClInclude Include="..\devices\nld_7450.h" />
+    <ClInclude Include="..\devices\nld_7473.h" />
+    <ClInclude Include="..\devices\nld_7474.h" />
+    <ClInclude Include="..\devices\nld_7475.h" />
+    <ClInclude Include="..\devices\nld_7483.h" />
+    <ClInclude Include="..\devices\nld_7485.h" />
+    <ClInclude Include="..\devices\nld_7490.h" />
+    <ClInclude Include="..\devices\nld_7493.h" />
+    <ClInclude Include="..\devices\nld_74ls629.h" />
+    <ClInclude Include="..\devices\nld_82S115.h" />
+    <ClInclude Include="..\devices\nld_82S123.h" />
+    <ClInclude Include="..\devices\nld_82S126.h" />
+    <ClInclude Include="..\devices\nld_82S16.h" />
+    <ClInclude Include="..\devices\nld_9310.h" />
+    <ClInclude Include="..\devices\nld_9312.h" />
+    <ClInclude Include="..\devices\nld_9316.h" />
+    <ClInclude Include="..\devices\nld_9322.h" />
+    <ClInclude Include="..\devices\nld_am2847.h" />
+    <ClInclude Include="..\devices\nld_devinc.h" />
+    <ClInclude Include="..\devices\nld_dm9334.h" />
+    <ClInclude Include="..\devices\nld_legacy.h" />
+    <ClInclude Include="..\devices\nld_log.h" />
+    <ClInclude Include="..\devices\nld_mm5837.h" />
+    <ClInclude Include="..\devices\nld_ne555.h" />
+    <ClInclude Include="..\devices\nld_r2r_dac.h" />
+    <ClInclude Include="..\devices\nld_system.h" />
+    <ClInclude Include="..\devices\nld_tristate.h" />
+    <ClInclude Include="..\devices\nlid_cmos.h" />
+    <ClInclude Include="..\devices\nlid_proxy.h" />
+    <ClInclude Include="..\devices\nlid_system.h" />
+    <ClInclude Include="..\devices\nlid_truthtable.h" />
+    <ClInclude Include="..\documentation\primer_1.dox.h" />
+    <ClInclude Include="..\documentation\structure.dox.h" />
+    <ClInclude Include="..\macro\nlm_base.h" />
+    <ClInclude Include="..\macro\nlm_cd4xxx.h" />
+    <ClInclude Include="..\macro\nlm_opamp.h" />
+    <ClInclude Include="..\macro\nlm_other.h" />
+    <ClInclude Include="..\macro\nlm_ttl74xx.h" />
+    <ClInclude Include="..\netlist_types.h" />
+    <ClInclude Include="..\nl_base.h" />
+    <ClInclude Include="..\nl_config.h" />
+    <ClInclude Include="..\nl_dice_compat.h" />
+    <ClInclude Include="..\nl_errstr.h" />
+    <ClInclude Include="..\nl_factory.h" />
+    <ClInclude Include="..\nl_lists.h" />
+    <ClInclude Include="..\nl_parser.h" />
+    <ClInclude Include="..\nl_setup.h" />
+    <ClInclude Include="..\nl_time.h" />
+    <ClInclude Include="..\plib\palloc.h" />
+    <ClInclude Include="..\plib\pchrono.h" />
+    <ClInclude Include="..\plib\pconfig.h" />
+    <ClInclude Include="..\plib\pdynlib.h" />
+    <ClInclude Include="..\plib\pexception.h" />
+    <ClInclude Include="..\plib\pfmtlog.h" />
+    <ClInclude Include="..\plib\pfunction.h" />
+    <ClInclude Include="..\plib\plists.h" />
+    <ClInclude Include="..\plib\pmain.h" />
+    <ClInclude Include="..\plib\poptions.h" />
+    <ClInclude Include="..\plib\pparser.h" />
+    <ClInclude Include="..\plib\ppmf.h" />
+    <ClInclude Include="..\plib\pstate.h" />
+    <ClInclude Include="..\plib\pstream.h" />
+    <ClInclude Include="..\plib\pstring.h" />
+    <ClInclude Include="..\plib\ptypes.h" />
+    <ClInclude Include="..\plib\putil.h" />
+    <ClInclude Include="..\solver\mat_cr.h" />
+    <ClInclude Include="..\solver\nld_matrix_solver.h" />
+    <ClInclude Include="..\solver\nld_ms_direct.h" />
+    <ClInclude Include="..\solver\nld_ms_direct1.h" />
+    <ClInclude Include="..\solver\nld_ms_direct2.h" />
+    <ClInclude Include="..\solver\nld_ms_direct_lu.h" />
+    <ClInclude Include="..\solver\nld_ms_gcr.h" />
+    <ClInclude Include="..\solver\nld_ms_gmres.h" />
+    <ClInclude Include="..\solver\nld_ms_sm.h" />
+    <ClInclude Include="..\solver\nld_ms_sor.h" />
+    <ClInclude Include="..\solver\nld_ms_sor_mat.h" />
+    <ClInclude Include="..\solver\nld_ms_w.h" />
+    <ClInclude Include="..\solver\nld_solver.h" />
+    <ClInclude Include="..\solver\vector_base.h" />
+    <ClInclude Include="..\tools\nl_convert.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

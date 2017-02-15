@@ -161,6 +161,7 @@ NOTES (2016-06-06)
 
 ********************************************************************************/
 
+#include "emu.h"
 #include "includes/sorcerer.h"
 #include "softlist.h"
 

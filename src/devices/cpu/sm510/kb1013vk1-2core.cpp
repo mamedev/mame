@@ -6,6 +6,7 @@
 
 */
 
+#include "emu.h"
 #include "kb1013vk1-2.h"
 #include "debugger.h"
 

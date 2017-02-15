@@ -71,6 +71,7 @@
 
 */
 
+#include "emu.h"
 #include "lux21056.h"
 #include "bus/scsi/s1410.h"
 

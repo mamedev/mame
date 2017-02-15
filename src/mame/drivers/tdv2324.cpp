@@ -100,6 +100,7 @@
 
 
 
+#include "emu.h"
 #include "includes/tdv2324.h"
 #include "softlist.h"
 

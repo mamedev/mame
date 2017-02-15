@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ted Green
+#include "emu.h"
 #include "vrc4373.h"
 
 #define LOG_NILE            (0)

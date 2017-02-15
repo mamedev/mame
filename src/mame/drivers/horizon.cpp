@@ -32,6 +32,7 @@
 
 */
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"

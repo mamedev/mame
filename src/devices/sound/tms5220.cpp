@@ -2207,16 +2207,6 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms5220_device::device_config_complete()
-{
-}
-
 
 const device_type CD2501E = &device_creator<cd2501e_device>;
 

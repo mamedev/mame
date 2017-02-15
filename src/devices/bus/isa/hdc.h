@@ -10,7 +10,6 @@
 #ifndef ISA_HDC_H
 #define ISA_HDC_H
 
-#include "emu.h"
 #include "isa.h"
 #include "imagedev/harddriv.h"
 

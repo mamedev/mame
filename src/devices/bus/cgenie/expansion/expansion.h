@@ -39,7 +39,6 @@
 #ifndef __CGENIE_EXPANSION_H__
 #define __CGENIE_EXPANSION_H__
 
-#include "emu.h"
 
 
 //**************************************************************************

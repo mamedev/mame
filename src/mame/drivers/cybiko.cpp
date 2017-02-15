@@ -18,6 +18,7 @@ ToDo:
 **************************************************************************************/
 
 
+#include "emu.h"
 #include "includes/cybiko.h"
 #include "rendlay.h"
 #include "bus/rs232/rs232.h"

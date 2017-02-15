@@ -8,6 +8,7 @@ This is for common pinball machine coding.
 
 
 
+#include "emu.h"
 #include "genpin.h"
 
 MACHINE_CONFIG_FRAGMENT( genpin_audio )

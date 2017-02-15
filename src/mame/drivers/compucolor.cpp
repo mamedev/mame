@@ -24,6 +24,7 @@
 #define CRT5027_TAG "uf9"
 #define RS232_TAG   "rs232"
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"

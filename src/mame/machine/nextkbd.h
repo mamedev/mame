@@ -3,7 +3,6 @@
 #ifndef __NEXTKBD_H__
 #define __NEXTKBD_H__
 
-#include "emu.h"
 
 #define MCFG_NEXTKBD_INT_CHANGE_CALLBACK(_write) \
 	devcb = &nextkbd_device::set_int_change_wr_callback(*device, DEVCB_##_write);

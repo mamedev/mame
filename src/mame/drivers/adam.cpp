@@ -299,6 +299,7 @@ Mark Gordon
 
 */
 
+#include "emu.h"
 #include "includes/adam.h"
 #include "softlist.h"
 

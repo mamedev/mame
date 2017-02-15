@@ -31,17 +31,19 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
-	required_shared_ptr<uint8_t> m_p_videoram;
-	uint8_t* m_p_chargen;
+	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	bool m_irq;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -216,11 +218,6 @@ INPUT_PORTS_END
 void homez80_state::machine_reset()
 {
 	m_irq = 0;
-}
-
-void homez80_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

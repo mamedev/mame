@@ -4,7 +4,6 @@
 #ifndef _PCD_H_
 #define _PCD_H_
 
-#include "emu.h"
 #include "machine/pic8259.h"
 #include "video/scn2674.h"
 

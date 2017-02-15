@@ -12,7 +12,6 @@
 #define __PS64__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/votrax.h"
 

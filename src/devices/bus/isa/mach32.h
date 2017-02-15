@@ -9,7 +9,6 @@
 #ifndef MACH32_H_
 #define MACH32_H_
 
-#include "emu.h"
 #include "video/pc_vga.h"
 #include "machine/eepromser.h"
 

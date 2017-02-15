@@ -180,6 +180,7 @@ NOTES:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"

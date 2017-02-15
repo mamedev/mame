@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "omti5100.h"
 
 #define OMTI_STATUS_SEEK_FAIL 0x02

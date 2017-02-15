@@ -56,6 +56,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
 #include "machine/tms6100.h"
 

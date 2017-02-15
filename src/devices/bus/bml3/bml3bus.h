@@ -13,7 +13,6 @@
 #ifndef __BML3BUS_H__
 #define __BML3BUS_H__
 
-#include "emu.h"
 
 #define BML3BUS_MAX_SLOTS 6
 

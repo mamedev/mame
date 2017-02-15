@@ -14,7 +14,6 @@
 #ifndef __WSWAN_VIDEO__
 #define __WSWAN_VIDEO__
 
-#include "emu.h"
 
 enum
 {

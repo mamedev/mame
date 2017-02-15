@@ -36,6 +36,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "fd2.h"
 
 

@@ -11,7 +11,6 @@
 #ifndef __WANGPC_MVC__
 #define __WANGPC_MVC__
 
-#include "emu.h"
 #include "wangpc.h"
 #include "video/mc6845.h"
 

@@ -15,6 +15,7 @@
  * TODO
  *   - too long to list
  */
+#include "emu.h"
 #include "interpro_ioga.h"
 
 #define VERBOSE 0

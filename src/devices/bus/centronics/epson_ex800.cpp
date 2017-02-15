@@ -127,6 +127,7 @@ TODO:  - The UPD7810 core is missing analog port emulation
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "epson_ex800.h"
 #include "ex800.lh"
 
@@ -210,17 +211,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( ex800_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( ex800_io, AS_IO, 8, epson_ex800_t )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(porta_r) AM_WRITE(porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(portb_r) AM_WRITE(portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(portc_r) AM_WRITE(portc_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( epson_ex800 )
 //-------------------------------------------------
 
@@ -228,8 +218,12 @@ static MACHINE_CONFIG_FRAGMENT( epson_ex800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ex800_mem)
-	MCFG_CPU_IO_MAP(ex800_io)
-
+	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_ex800_t, porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_ex800_t, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(epson_ex800_t, portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(epson_ex800_t, portb_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(epson_ex800_t, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(epson_ex800_t, portc_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_ex800)
 

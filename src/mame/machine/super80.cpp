@@ -2,6 +2,7 @@
 // copyright-holders:Robbbert
 /* Super80.c written by Robbbert, 2005-2009. See driver source for documentation. */
 
+#include "emu.h"
 #include "includes/super80.h"
 #include "machine/z80bin.h"
 

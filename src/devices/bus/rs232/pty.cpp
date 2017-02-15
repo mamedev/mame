@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
 //
+#include "emu.h"
 #include <stdio.h>
 #include "pty.h"
 

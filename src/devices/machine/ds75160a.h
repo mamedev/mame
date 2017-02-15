@@ -24,7 +24,6 @@
 #ifndef __DS75160A__
 #define __DS75160A__
 
-#include "emu.h"
 
 
 

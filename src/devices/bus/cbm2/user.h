@@ -27,7 +27,6 @@
 #ifndef __CBM2_USER_PORT__
 #define __CBM2_USER_PORT__
 
-#include "emu.h"
 
 
 

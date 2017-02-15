@@ -25,7 +25,7 @@
  * BM    C|                   |  XTAL |    +-----------------------+ | |   |
  *       ||                   | 40MHz |    +-----------------------+ | |P1 |
  *       ||                   +-------+    |     PIT               | | |   |
- * FLMA  C|                   +-------+    |   MC68230P8           | | |   |
+ * FLME  C|                   +-------+    |   MC68230P8           | | |   |
  * EPROM C|                   |  XTAL |    +-----------------------+ | |   |
  * 2WST  C|                   | 32MHz |                              | |   |
  * 4WST  C|                   +-------+                              | |   |
@@ -191,23 +191,17 @@
 #include "machine/clock.h"
 #include "vme_fccpu20.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-#define LOG_INT     0x08
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -456,12 +450,36 @@ void vme_fccpu20_device::device_start()
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("pit")), 0x00ff);
 #endif
-
 }
+
+enum
+{
+	TIMER_ID_BUS_GRANT
+};
 
 void vme_fccpu20_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
+
+	/* We need to delay the static bus grant signal until we have it from the VME interface or MAME supports bus arbitration */
+	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
+	m_arbiter_start->adjust(attotime::from_msec(10), TIMER_ID_BUS_GRANT, attotime::never);
+}
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_ID_BUS_GRANT:
+		m_pit->h1_w(ASSERT_LINE); // Grant bus always
+		break;
+	default:
+		LOG("Unhandled Timer ID %d\n", id);
+		break;
+	}
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
@@ -485,7 +503,7 @@ WRITE_LINE_MEMBER(vme_fccpu20_device::bim_irq_callback)
 
 	bim_irq_state = state;
 	bim_irq_level = m_bim->get_irq_level();
-	LOGINT(" - BIM irq level  %02x\n", bim_irq_level);
+	LOGINT(" - BIM irq level %s\n", bim_irq_level == CLEAR_LINE ? "Cleared" : "Asserted");
 	update_irq_to_maincpu();
 }
 
@@ -541,6 +559,7 @@ READ8_MEMBER (vme_fccpu20_device::pitb_r)
 }
 
 /* VME board ID bit and bus release software settings (output) (ROR, RAT, RATAR, RATBCLR, RORAT, RORRAT */
+/* Bit 4 is bus available */
 READ8_MEMBER (vme_fccpu20_device::pitc_r)
 {
 	uint8_t board_id = 0;

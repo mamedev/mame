@@ -27,6 +27,7 @@
 
 */
 
+#include "emu.h"
 #include "easy_calc_result.h"
 
 

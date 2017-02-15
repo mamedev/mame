@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 

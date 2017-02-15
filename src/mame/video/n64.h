@@ -3,7 +3,6 @@
 #ifndef _VIDEO_N64_H_
 #define _VIDEO_N64_H_
 
-#include "emu.h"
 #include "includes/n64.h"
 #include "video/poly.h"
 #include "pin64.h"

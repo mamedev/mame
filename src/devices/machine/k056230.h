@@ -11,7 +11,6 @@
 #ifndef __K056230_H__
 #define __K056230_H__
 
-#include "emu.h"
 
 
 

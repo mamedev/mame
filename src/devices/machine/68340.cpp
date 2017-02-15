@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 /* 68340 */
 
+#include "emu.h"
 #include "68340.h"
 
 

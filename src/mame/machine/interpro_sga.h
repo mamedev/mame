@@ -6,7 +6,6 @@
 #ifndef INTERPRO_SGA_H_
 #define INTERPRO_SGA_H_
 
-#include "emu.h"
 
 class interpro_sga_device : public device_t
 {

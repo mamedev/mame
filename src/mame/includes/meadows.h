@@ -5,7 +5,6 @@
     Meadows S2650 hardware
 
 *************************************************************************/
-#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"

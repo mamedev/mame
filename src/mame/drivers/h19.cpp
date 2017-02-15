@@ -78,23 +78,22 @@ public:
 	};
 
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_ace(*this, "ins8250"),
-		m_beep(*this, "beeper"),
-		m_p_videoram(*this, "videoram"),
-		m_palette(*this, "palette"),
-		m_mm5740(*this, KBDC_TAG),
-		m_kbdrom(*this, "keyboard"),
-		m_kbspecial(*this, "MODIFIERS")
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_ace(*this, "ins8250")
+		, m_beep(*this, "beeper")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_mm5740(*this, KBDC_TAG)
+		, m_kbdrom(*this, "keyboard")
+		, m_kbspecial(*this, "MODIFIERS")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<ins8250_device> m_ace;
-	required_device<beep_device> m_beep;
+	DECLARE_READ8_MEMBER(h19_80_r);
+	DECLARE_READ8_MEMBER(h19_a0_r);
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	DECLARE_WRITE8_MEMBER(h19_e0_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -104,19 +103,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<palette_device> m_palette;
-	required_device<mm5740_device> m_mm5740;
-	uint8_t *m_p_chargen;
+
+private:
 	uint8_t m_term_data;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	required_device<palette_device> m_palette;
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<ins8250_device> m_ace;
+	required_device<beep_device> m_beep;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<mm5740_device> m_mm5740;
 	required_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
 
 	uint8_t m_transchar;
 	bool m_strobe;
@@ -364,10 +365,6 @@ void h19_state::machine_reset()
 {
 }
 
-void h19_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 WRITE8_MEMBER( h19_state::h19_c0_w )
 {

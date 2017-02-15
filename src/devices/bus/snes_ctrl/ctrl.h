@@ -12,7 +12,6 @@
 #ifndef __SNES_CONTROL_PORT__
 #define __SNES_CONTROL_PORT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

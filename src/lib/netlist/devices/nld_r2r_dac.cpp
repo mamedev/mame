@@ -5,9 +5,9 @@
  *
  */
 
-#include "nl_base.h"
-#include "nl_factory.h"
-#include "analog/nlid_twoterm.h"
+#include "../nl_base.h"
+#include "../nl_factory.h"
+#include "../analog/nlid_twoterm.h"
 
 namespace netlist
 {

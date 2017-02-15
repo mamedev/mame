@@ -3,7 +3,6 @@
 #ifndef ESQVFD_H
 #define ESQVFD_H
 
-#include "emu.h"
 
 #define MCFG_ESQ1x22_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, ESQ1x22, 60)

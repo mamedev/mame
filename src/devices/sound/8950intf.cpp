@@ -18,6 +18,7 @@
 * NOTES
 *
 ******************************************************************************/
+#include "emu.h"
 #include "8950intf.h"
 #include "fmopl.h"
 
@@ -214,15 +215,5 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 		m_io_read_handler(*this),
 		m_io_write_handler(*this),
 		m_region(*this, DEVICE_SELF)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void y8950_device::device_config_complete()
 {
 }

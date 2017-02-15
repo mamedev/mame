@@ -12,7 +12,6 @@
 #ifndef _TMS1KBASE_H_
 #define _TMS1KBASE_H_
 
-#include "emu.h"
 #include "machine/pla.h"
 
 

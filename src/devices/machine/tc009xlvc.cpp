@@ -183,17 +183,6 @@ void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 }
 
 
-void tc0091lvc_device::device_config_complete()
-{
-//  int address_bits = 20;
-
-//  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,  address_bits, 0, *ADDRESS_MAP_NAME(tc0091lvc_map8));
-}
-
-void tc0091lvc_device::device_validity_check(validity_checker &valid) const
-{
-}
-
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
 {
 	int attr = m_vram0[2 * tile_index + 1];
@@ -287,10 +276,6 @@ void tc0091lvc_device::device_start()
 
 	palette_device &palette = m_gfxdecode->palette();
 	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
-}
-
-void tc0091lvc_device::device_reset()
-{
 }
 
 const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const

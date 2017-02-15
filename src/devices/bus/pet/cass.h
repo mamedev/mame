@@ -20,7 +20,6 @@
 #ifndef __PET_DATASSETTE_PORT__
 #define __PET_DATASSETTE_PORT__
 
-#include "emu.h"
 
 
 

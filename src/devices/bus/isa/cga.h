@@ -5,7 +5,6 @@
 #ifndef __ISA_CGA_H__
 #define __ISA_CGA_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "video/mc6845.h"
 

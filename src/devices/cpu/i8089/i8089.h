@@ -11,7 +11,6 @@
 #ifndef __I8089_H__
 #define __I8089_H__
 
-#include "emu.h"
 #include "i8089_channel.h"
 
 

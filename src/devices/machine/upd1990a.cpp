@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "upd1990a.h"
 
 

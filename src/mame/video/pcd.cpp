@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+#include "emu.h"
 #include "pcd.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/mcs48/mcs48.h"

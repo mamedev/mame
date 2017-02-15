@@ -20,6 +20,7 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 
 *****************************************************************************************/
 
+#include "emu.h"
 #include "includes/s11a.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"

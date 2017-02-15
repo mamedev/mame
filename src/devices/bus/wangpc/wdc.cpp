@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wdc.h"
 #include "bus/scsi/scsihd.h"
 

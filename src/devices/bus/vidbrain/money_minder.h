@@ -11,7 +11,6 @@
 #ifndef __VIDEOBRAIN_MONEY_MINDER_CARTRIDGE__
 #define __VIDEOBRAIN_MONEY_MINDER_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 
 

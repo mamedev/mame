@@ -21,6 +21,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "pci9050.h"
 
 const device_type PCI9050 = &device_creator<pci9050_device>;
@@ -71,10 +72,6 @@ void pci9050_device::device_start()
 
 	m_user_input_handler.resolve();
 	m_user_output_handler.resolve();
-}
-
-void pci9050_device::device_config_complete()
-{
 }
 
 void pci9050_device::device_reset()

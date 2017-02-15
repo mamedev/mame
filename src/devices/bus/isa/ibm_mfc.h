@@ -12,7 +12,6 @@
 #define __ISA_IBM_MUSIC_FEATURE_CARD_H__
 
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"

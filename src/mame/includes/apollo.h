@@ -13,7 +13,6 @@
 #ifndef APOLLO_H_
 #define APOLLO_H_
 
-#include "emu.h"
 
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
@@ -377,7 +376,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override ;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -426,9 +425,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 protected:
 	class lut_fifo;
 	class bt458;
@@ -638,9 +637,9 @@ public:
 	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	// internal state
 };

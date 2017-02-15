@@ -11,7 +11,6 @@
 #ifndef __CBM_IEC__
 #define __CBM_IEC__
 
-#include "emu.h"
 
 
 

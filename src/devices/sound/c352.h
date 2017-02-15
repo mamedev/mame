@@ -81,6 +81,8 @@ private:
 
 		uint16_t vol_f;
 		uint16_t vol_r;
+		uint8_t curr_vol[4];
+		
 		uint16_t freq;
 		uint16_t flags;
 
@@ -95,12 +97,12 @@ private:
 	int m_divider;
 
 	c352_voice_t m_c352_v[32];
-	int16_t m_mulaw_table[256];
 
 	uint16_t m_random;
 	uint16_t m_control; // control flags, purpose unknown.
 
 	void fetch_sample(c352_voice_t* v);
+	void ramp_volume(c352_voice_t* v,int ch,uint8_t val);
 
 	unsigned short read_reg16(unsigned long address);
 	void write_reg16(unsigned long address, unsigned short val);

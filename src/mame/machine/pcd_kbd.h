@@ -3,7 +3,6 @@
 #ifndef PCD_KBD_H_
 #define PCD_KBD_H_
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/speaker.h"
 

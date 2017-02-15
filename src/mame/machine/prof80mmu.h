@@ -11,7 +11,6 @@
 #ifndef __PROF80_MMU__
 #define __PROF80_MMU__
 
-#include "emu.h"
 
 
 

@@ -14,7 +14,6 @@
 #ifndef __EF9340_1_H__
 #define __EF9340_1_H__
 
-#include "emu.h"
 
 
 #define MCFG_EF9340_1_ADD(_tag, _clock, _screen_tag) \

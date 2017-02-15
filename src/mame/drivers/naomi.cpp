@@ -4414,10 +4414,7 @@ ROM_START( crakndj2 )
 	ROM_LOAD( "rom4.ic4s",    0x2000000, 0x800000, CRC(e9f35177) SHA1(9f8c13e005737f87ef0a0a32f7f0ec436f7aca3b) )
 	ROM_LOAD( "rom5.ic5s",    0x2800000, 0x800000, CRC(40f3321d) SHA1(a29b532e2acb9c8d27ae3c857ada48b1a7199d77) )
 	ROM_LOAD( "rom6.ic6s",    0x3000000, 0x800000, CRC(6832dd9f) SHA1(753c1fc998ef4522fae3e93b64f8c442d94e3e97) )
-	// note: this fails the ROM test on hardware with the same CRC, so it's not a "bad dump" in the traditional sense.
-	// we need someone with a second cartridge to verify if this is a Sega screwup or simply a damaged chip on this cart.
-	// ROM test passes good with last two zero bytes replaced by 0x09 0x51
-	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, BAD_DUMP CRC(9b59e856) SHA1(7da728695cac132bb0ac59116ca400fff913f966) )
+	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, CRC(be360696) SHA1(8af7dde8d68153802be43121baed4d500b9b7a7f) )
 	ROM_LOAD( "rom8.ic8s",    0x4000000, 0x800000, CRC(9bea71f4) SHA1(fa3734b072404612e29ed96b3bcb8d416fbe86e3) )
 	ROM_LOAD( "rom9.ic9s",    0x4800000, 0x800000, CRC(6029839d) SHA1(04c078e9422bf34a02f0b618a54981cd615da47d) )
 	ROM_LOAD( "rom10.ic10s",  0x5000000, 0x800000, CRC(1ad23110) SHA1(1589f6ca1f82c5397c0daef8563efc550d5eb862) )
@@ -4431,6 +4428,9 @@ ROM_START( crakndj2 )
 	ROM_LOAD( "rom18.ic18s",  0x9000000, 0x800000, CRC(7007c27e) SHA1(a6bfe89421d34542e780c5eae1c9c6d76f93d252) )
 	ROM_LOAD( "rom19.ic19s",  0x9800000, 0x800000, CRC(31f816ba) SHA1(354f8271eef20eb131f83fb9641002cfcd31c8cd) )
 	ROM_LOAD( "rom20.ic20s",  0xa000000, 0x800000, CRC(aabcd580) SHA1(9455e218ab381c7ad5adb2884da39ca7948169d5) )
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD("sflash.ic37", 0x000000, 0x000084, CRC(08f27149) SHA1(3b8d53dcf2c09035b318022906c444cf8504d7fa) )
 
 	// 840-0068    2001     317-0311-COM   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28428247" )

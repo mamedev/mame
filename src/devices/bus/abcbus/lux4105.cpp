@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "lux4105.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/s1410.h"

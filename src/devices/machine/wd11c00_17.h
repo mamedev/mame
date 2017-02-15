@@ -12,7 +12,6 @@
 #define __WD11C00_17__
 
 
-#include "emu.h"
 
 
 

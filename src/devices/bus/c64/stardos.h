@@ -12,7 +12,6 @@
 #define __STARDOS__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/6821pia.h"
 

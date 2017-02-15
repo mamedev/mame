@@ -37,7 +37,7 @@
 #ifndef NLD_9312_H_
 #define NLD_9312_H_
 
-#include "nl_setup.h"
+#include "../nl_setup.h"
 
 #define TTL_9312(name, cA, cB, cC, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7, cSTROBE)     \
 		NET_REGISTER_DEV(TTL_9312, name)    \

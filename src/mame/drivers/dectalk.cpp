@@ -259,6 +259,7 @@ dgc (dg(no!spam)cx@mac.com)
 #undef SERIAL_TO_STDERR
 
 /* Core includes */
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
@@ -455,7 +456,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	machine().device("duartn68681")->reset(); // reset the DUART
+	m_duart->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(0); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.

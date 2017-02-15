@@ -12,7 +12,6 @@
 #ifndef __TMPZ84C011__
 #define __TMPZ84C011__
 
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 

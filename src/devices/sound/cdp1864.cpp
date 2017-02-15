@@ -21,6 +21,7 @@
 
 */
 
+#include "emu.h"
 #include "cdp1864.h"
 
 

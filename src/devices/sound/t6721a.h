@@ -35,7 +35,6 @@
 #ifndef __T6721__
 #define __T6721__
 
-#include "emu.h"
 
 
 

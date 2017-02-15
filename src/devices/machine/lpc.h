@@ -3,7 +3,6 @@
 #ifndef LPC_H
 #define LPC_H
 
-#include "emu.h"
 
 class lpc_device : public device_t {
 public:

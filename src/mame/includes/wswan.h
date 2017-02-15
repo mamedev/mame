@@ -14,7 +14,6 @@
 
 #define INTERNAL_EEPROM_SIZE    1024
 
-#include "emu.h"
 #include "cpu/v30mz/v30mz.h"
 #include "machine/nvram.h"
 #include "audio/wswan.h"

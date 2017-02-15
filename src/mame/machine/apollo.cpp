@@ -28,6 +28,7 @@
  *
  */
 
+#include "emu.h"
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"
@@ -130,7 +131,6 @@ public:
 	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
@@ -143,16 +143,6 @@ const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
 apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void apollo_config_device::device_config_complete()
 {
 }
 

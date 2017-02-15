@@ -33,6 +33,7 @@ store new data and increment the address.
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/vcs80.h"
 #include "vcs80.lh"
 

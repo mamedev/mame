@@ -5,7 +5,6 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
-#include "emu.h"
 #include "machine/spchrom.h"
 
 enum
@@ -92,7 +91,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

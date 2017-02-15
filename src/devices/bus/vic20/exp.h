@@ -36,7 +36,6 @@
 #ifndef __VIC20_EXPANSION_SLOT__
 #define __VIC20_EXPANSION_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 

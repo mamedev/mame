@@ -34,7 +34,6 @@
 #ifndef __I8255__
 #define __I8255__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

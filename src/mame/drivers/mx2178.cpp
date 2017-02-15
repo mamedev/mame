@@ -19,6 +19,7 @@
 
 ***************************************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
@@ -29,12 +30,13 @@
 class mx2178_state : public driver_device
 {
 public:
-	mx2178_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia"),
-		m_palette(*this, "palette")
+	mx2178_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_acia(*this, "acia")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -43,18 +45,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const uint8_t *m_p_chargen;
-	required_shared_ptr<uint8_t> m_p_videoram;
-
-protected:
-	virtual void machine_reset() override;
-
 private:
 	uint8_t m_term_data;
+	virtual void machine_reset() override;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
-public:
-	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
@@ -144,7 +142,6 @@ GFXDECODE_END
 
 void mx2178_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)

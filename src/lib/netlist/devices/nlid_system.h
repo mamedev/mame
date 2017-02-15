@@ -11,10 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include "nl_base.h"
-#include "nl_setup.h"
-#include "analog/nlid_twoterm.h"
-#include "plib/putil.h"
+#include "../nl_base.h"
+#include "../nl_setup.h"
+#include "../analog/nlid_twoterm.h"
+#include "../plib/putil.h"
 
 namespace netlist
 {

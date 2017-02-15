@@ -5,7 +5,6 @@
 #ifndef __DMV_RAM_H__
 #define __DMV_RAM_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 
 //**************************************************************************

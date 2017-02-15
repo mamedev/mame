@@ -11,7 +11,6 @@
 #ifndef __PLA__
 #define __PLA__
 
-#include "emu.h"
 
 
 

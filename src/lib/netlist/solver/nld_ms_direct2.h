@@ -8,8 +8,8 @@
 #ifndef NLD_MS_DIRECT2_H_
 #define NLD_MS_DIRECT2_H_
 
-#include "solver/nld_ms_direct.h"
-#include "solver/nld_solver.h"
+#include "nld_ms_direct.h"
+#include "nld_solver.h"
 
 namespace netlist
 {

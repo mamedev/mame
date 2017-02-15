@@ -7,6 +7,7 @@
  *  Created on: 4/10/2013
  */
 
+#include "emu.h"
 #include "wpcsnd.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

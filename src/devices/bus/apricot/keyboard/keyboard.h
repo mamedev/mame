@@ -32,7 +32,6 @@
 #ifndef __APRICOT_KEYBOARD_H__
 #define __APRICOT_KEYBOARD_H__
 
-#include "emu.h"
 
 
 //**************************************************************************

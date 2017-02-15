@@ -14,7 +14,6 @@
 #ifndef __VTECH_MEMEXP_FLOPPY_H__
 #define __VTECH_MEMEXP_FLOPPY_H__
 
-#include "emu.h"
 #include "memexp.h"
 #include "imagedev/floppy.h"
 

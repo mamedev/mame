@@ -591,6 +591,11 @@ void m68hc05_device::interrupt()
 	}
 }
 
+bool m68hc05_device::test_il()
+{
+	return m_irq_line_state;
+}
+
 void m68hc05_device::burn_cycles(unsigned count)
 {
 	// calculate new timer values (fixed prescaler of four)

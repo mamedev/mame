@@ -18,7 +18,6 @@
 #ifndef __6522VIA_H__
 #define __6522VIA_H__
 
-#include "emu.h"
 
 
 

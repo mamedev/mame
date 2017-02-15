@@ -16,6 +16,7 @@
  *
  */
 
+#include "emu.h"
 #include "3c505.h"
 
 #define VERBOSE 0

@@ -11,7 +11,6 @@
 #ifndef __AUTOCONFIG_H__
 #define __AUTOCONFIG_H__
 
-#include "emu.h"
 
 class amiga_autoconfig
 {

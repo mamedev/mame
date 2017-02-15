@@ -15,7 +15,6 @@ set the data line and then set the clock line.
 #ifndef __PC_KBDC_H__
 #define __PC_KBDC_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

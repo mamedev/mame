@@ -6,7 +6,6 @@
 #ifndef INTERPRO_H_
 #define INTERPRO_H_
 
-#include "emu.h"
 
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"

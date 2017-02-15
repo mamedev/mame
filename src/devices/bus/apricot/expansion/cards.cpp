@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cards.h"
 
 SLOT_INTERFACE_START( apricot_expansion_cards )

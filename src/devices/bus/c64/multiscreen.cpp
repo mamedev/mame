@@ -56,6 +56,7 @@
 
 */
 
+#include "emu.h"
 #include "multiscreen.h"
 
 

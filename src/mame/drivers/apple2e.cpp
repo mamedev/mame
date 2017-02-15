@@ -116,7 +116,6 @@ Address bus A0-A11 is Y0-Y11
 #include "video/apple2.h"
 
 #include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/a2mockingboard.h"

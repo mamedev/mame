@@ -12474,6 +12474,7 @@ fp200                           //
 fp6000                          //
 
 @source:freekick.cpp
+omega							// (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg
@@ -12850,7 +12851,7 @@ mshuttle                        // (c) 1981 Nichibutsu
 mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
-omega                           // bootleg
+omegab                          // bootleg
 omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
 pacmanbl                        // bootleg
@@ -12975,10 +12976,10 @@ galeb                           //
 @source:galgame.cpp
 galgame                         // (c) 1971 Computer Recreations, Inc
 
-//@source:galgames.cpp
-//galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
-//galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
-//galgbios                        // (c) 1998 Creative Electronics & Software (CES)
+@source:galgames.cpp
+galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
+galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
+galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:galivan.cpp
 dangar                          // (c) 1986
@@ -14047,6 +14048,7 @@ diamondpf                       //
 diamondpg                       //
 excalibr                        //
 excalibrf                       //
+excalibrg                       //
 genesisp                        //
 genesispf                       //
 genesispg                       //
@@ -14139,6 +14141,8 @@ venus                           // bootleg
 
 @source:h19.cpp
 h19                             //
+super19                         //
+watz19                          //
 
 @source:h8.cpp
 h8                              //
@@ -14311,7 +14315,12 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+hccbaskb                        // Tiger Electronics
+leboom                          // Lakeside
 maniac                          // Ideal
+melodym                         // GAF
+rockpin                         // Tiger Electronics
+touchme                         // Atari
 
 @source:hh_sm510.cpp
 gnwmndon                        // Nintendo
@@ -16916,6 +16925,9 @@ whiterus                        // White Russia
 
 @source:konin.cpp
 konin                           //
+
+@source:konmedal.cpp
+konmedal
 
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
@@ -20703,6 +20715,7 @@ vf3a                            //
 vf3c                            //
 vf3tb                           // 1997.10 Virtua Fighter 3tb
 von2                            // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
+von2a                           // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
 von254g                         // 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4
 vs2                             // 1997.06 Virtua Striker 2
 vs215                           // 1997.06 Virtua Striker 2
@@ -20729,6 +20742,7 @@ molecula                        //
 
 @source:momoko.cpp
 momoko                          // (c) 1986 Jaleco (Japanese text)
+momokob                         // bootleg
 momokoe                         // (c) 1986 Jaleco (English text)
 
 @source:monacogp.cpp
@@ -28055,6 +28069,7 @@ youkaidk2                       // (c) 1987 (Japan, new version (YD2, Rev B))
 @source:namcos10.cpp
 chocovdr                        // 2002.10 Uchuu Daisakusen : Chocovader Contactee
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
+gamsharaj                       // 2002.08 Gamshara (10021 Ver.A)
 gjspace                         // 2001.12 Gekitoride-Jong Space (10011 Ver.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
@@ -29435,6 +29450,7 @@ osbexec                         // 1982 Osborne Executive
 
 @source:osborne1.cpp
 osborne1                        // 1981 Osborne-1
+osborne1nv                      // 1984 Osborne-1 (Nuevo Video)
 
 @source:osi.cpp
 c1p                             //
@@ -31871,6 +31887,7 @@ route16c                        // (c) 1981 Tehkan/Sun + Centuri license
 routex                          // bootleg
 spacecho                        // bootleg
 spacecho2                       // bootleg
+speakhlp                        // bootleg
 speakres                        // [Sun Electronics]
 speakresb                       // bootleg
 stratvox                        // [1980 Sun Electronics] Taito
@@ -33722,6 +33739,7 @@ simpsons4pa                     // GX072 (c) 1991
 
 @source:sitcom.cpp
 sitcom                          //
+sitcomtmr                       //
 
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
@@ -35346,6 +35364,7 @@ gwinggen                        // (c) 2004 Takumi Corporation
 homura                          // (c) 2005 SKonec Entertainment
 hotgmkmp                        // (c) 2005 XNauts
 kof98um                         // (c) 2008 SNK
+kofxii                          // (c) 2008 SNK Playmore
 raiden3                         // (c) 2005 Seibu Kaihatsu/Moss Ltd
 raiden4                         // (c) 2007 Seibu Kaihatsu/Moss Ltd
 samspsen                        // (c) 2008 SNK Playmore
@@ -35535,6 +35554,9 @@ terracreo                       // (c) 1985
 @source:test_t400.cpp
 test410                         //
 test420                         //
+
+@source:testconsole.cpp
+whousetc                        //
 
 @source:tetrisp2.cpp
 nndmseal                        // (c) 1997 I'Max/Jaleco
@@ -37365,6 +37387,7 @@ defence                         // bootleg
 defender                        // (c) 1980
 defenderb                       // (c) 1980
 defenderg                       // (c) 1980
+defenderj                       // (c) 1980
 defenderw                       // (c) 1980
 defndjeu                        // bootleg
 inferno                         // (c) 1984

@@ -22,16 +22,6 @@ trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void trackfld_audio_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

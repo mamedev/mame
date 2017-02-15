@@ -91,6 +91,7 @@
 
 */
 
+#include "emu.h"
 #include "pdc.h"
 
 

@@ -90,6 +90,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 		, m_ctc1(*this, "ctc1")
 		, m_ctc2(*this, "ctc2")
 		, m_sio(*this, "sio")
@@ -123,25 +125,23 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_device<palette_device> m_palette;
 
 private:
-	uint8_t crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs);
-	uint8_t *m_p_chargen;                 /* character ROM */
-	uint8_t *m_p_videoram;                    /* Video RAM */
-	uint8_t *m_p_attribram;                   /* Attribute RAM */
-	uint8_t m_term_data;
-	uint8_t m_term_status;
+	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
+	u8 m_term_data;
+	u8 m_term_status;
 	uint16_t m_cnt;
 	bool m_c8[8];
 	bool m_cc[8];
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	address_space *m_mem;
 	address_space *m_io;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_ram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80ctc_device> m_ctc2;
 	required_device<z80sio_device> m_sio;
@@ -173,7 +173,7 @@ WRITE8_MEMBER( bigbord2_state::portc0_w )
 
 READ8_MEMBER( bigbord2_state::portc4_r )
 {
-	uint8_t ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
+	u8 ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
 	m_term_status = 0;
 	return ret;
 }
@@ -182,7 +182,7 @@ READ8_MEMBER( bigbord2_state::portc4_r )
 
 READ8_MEMBER( bigbord2_state::portd0_r )
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -436,17 +436,6 @@ static SLOT_INTERFACE_START( bigbord2_floppies )
 SLOT_INTERFACE_END
 
 
-/* Video */
-
-void bigbord2_state::video_start()
-{
-	/* find memory regions */
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("maincpu")->base()+0x6000;
-	m_p_attribram = memregion("maincpu")->base()+0x7000;
-}
-
-
 /* Machine Initialization */
 
 void bigbord2_state::machine_start()
@@ -458,7 +447,7 @@ void bigbord2_state::machine_start()
 
 void bigbord2_state::machine_reset()
 {
-	uint8_t i;
+	u8 i;
 	for (i = 0; i < 8; i++)
 	{
 		m_c8[i] = 0;
@@ -475,10 +464,9 @@ DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
-	uint8_t *RAM = memregion("maincpu")->base();
-	m_bankr->configure_entries(0, 2, &RAM[0x0000], 0x10000);
-	m_bankv->configure_entries(0, 2, &RAM[0x6000], 0x10000);
-	m_banka->configure_entries(0, 2, &RAM[0x7000], 0x10000);
+	m_bankr->configure_entries(0, 2, &m_p_ram[0x0000], 0x10000);
+	m_bankv->configure_entries(0, 2, &m_p_ram[0x6000], 0x10000);
+	m_banka->configure_entries(0, 2, &m_p_ram[0x7000], 0x10000);
 }
 
 
@@ -502,9 +490,9 @@ static GFXDECODE_START( crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
-uint8_t bigbord2_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, uint16_t ac_cnt, bool ac_curs)
+u8 bigbord2_state::crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs)
 {
-	uint8_t gfx = 0;
+	u8 gfx = 0;
 	switch (ac_attr & 3)
 	{
 		case 0: // lores gfx
@@ -558,7 +546,7 @@ uint8_t bigbord2_state::crt8002(uint8_t ac_ra, uint8_t ac_chr, uint8_t ac_attr, 
 MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,attr;
+	u8 chr,gfx,attr;
 	uint16_t mem,x;
 	uint32_t *p = &bitmap.pix32(y);
 	ra &= 15;
@@ -567,8 +555,8 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) & 0x7ff;
-		attr = m_p_attribram[mem];
-		chr = m_p_videoram[mem];
+		attr = m_p_ram[mem + 0x7000];
+		chr = m_p_ram[mem + 0x6000];
 
 		/* process attributes */
 		gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));

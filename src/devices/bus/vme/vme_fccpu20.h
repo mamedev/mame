@@ -4,7 +4,6 @@
 #define VME_FCCPU20_H
 #pragma once
 
-#include "emu.h"
 
 #include "machine/68561mpcc.h"
 #include "machine/68230pit.h"
@@ -77,6 +76,8 @@ private:
 	// Below replaces machine_start and machine_reset from  src/mame/drivers/fccpu20.cpp
 protected:
 	virtual void device_reset() override;
+	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_arbiter_start; // Need a startup delay because it is hooked up to the sense inputs of the PIT
 };
 
 //**************************************************************************

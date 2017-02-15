@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+#include "emu.h"
 #include "nextkbd.h"
 
 const device_type NEXTKBD = &device_creator<nextkbd_device>;

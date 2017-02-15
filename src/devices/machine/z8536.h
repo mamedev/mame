@@ -34,7 +34,6 @@
 #ifndef __Z8536__
 #define __Z8536__
 
-#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 

@@ -6,6 +6,7 @@
  *
  */
 
+#include "emu.h"
 #include "doubler.h"
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 

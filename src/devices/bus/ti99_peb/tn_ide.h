@@ -14,7 +14,6 @@
 #ifndef __TNIDE__
 #define __TNIDE__
 
-#include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/rtc65271.h"
 #include "machine/ram.h"

@@ -24,6 +24,7 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/keyboard.ipp"
 
 

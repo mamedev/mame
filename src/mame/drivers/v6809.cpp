@@ -64,17 +64,19 @@ class v6809_state : public driver_device
 {
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_video_address(0),
-		m_pia0(*this, "pia0"),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_speaker(*this, "speaker"),
-		m_acia0(*this, "acia0"),
-		m_acia1(*this, "acia1"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_video_address(0)
+		, m_pia0(*this, "pia0")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_speaker(*this, "speaker")
+		, m_acia0(*this, "acia0")
+		, m_acia1(*this, "acia1")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -91,11 +93,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	uint8_t *m_p_videoram;
-	const uint8_t *m_p_chargen;
-	uint16_t m_video_address;
-
 private:
+	uint16_t m_video_address;
 	bool m_speaker_en;
 	uint8_t m_video_index;
 	uint8_t m_term_data;
@@ -108,8 +107,9 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -142,8 +142,6 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( v6809_state, v6809)
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
 	m_term_data = 0;
 	m_pia0->cb1_w(1);
 }

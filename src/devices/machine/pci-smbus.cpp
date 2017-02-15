@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "pci-smbus.h"
 
 const device_type SMBUS = &device_creator<smbus_device>;

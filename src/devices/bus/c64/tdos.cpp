@@ -129,6 +129,7 @@ BASIC commands (SYS 32768 to activate)
 
 */
 
+#include "emu.h"
 #include "tdos.h"
 
 

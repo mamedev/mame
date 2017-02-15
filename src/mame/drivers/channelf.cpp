@@ -14,6 +14,7 @@
  *
  ******************************************************************/
 
+#include "emu.h"
 #include "includes/channelf.h"
 #include "softlist.h"
 

@@ -38,7 +38,6 @@
 #ifndef MPCC68561_H
 #define MPCC68561_H
 
-#include "emu.h"
 
 /* Variant ADD macros - use the right one to enable the right feature set! */
 #define MCFG_MPCC68560_ADD(_tag, _clock, _rx, _tx) \
@@ -154,19 +153,23 @@ protected:
 	 */
 	void check_interrupts();
 	void reset_interrupts();
+	void update_interrupts(int source);
 	void trigger_interrupt(int source);
 	enum
 	{
+		INT_TX,			// TX int category, used for update of SR
 		INT_TX_TDRA,    // Tx char available
 		INT_TX_TFC,     // Tx frame complete
 		INT_TX_TUNRN,   // Tx underrun detected
 		INT_TX_TFERR,   // Tx frame error detected
+		INT_RX,			// RX int category, used for update of SR
 		INT_RX_RDA,     // Rx interrupt on Receiver Data Available
 		INT_RX_EOF,     // Rx interrupt on End of frame
 		INT_RX_CPERR,   // Rx interrupt on CRC or Parity error
 		INT_RX_FRERR,   // Rx interrupt on Frame error
 		INT_RX_ROVRN,   // Rx interrupt on Receiver overrun
 		INT_RX_RAB,     // Rx interrupt on Abort/Break
+		INT_SR,			// SR int category, used for update of SR
 		INT_SR_CTS,     // Serial interface interrupt on CTS asserted
 		INT_SR_DSR,     // Serial interface interrupt on DSR asserted
 		INT_SR_DCD,     // Serial interface interrupt on DCD asserted
@@ -181,8 +184,9 @@ protected:
 
 	enum
 	{
-		INT_REQ = 0x01, // Interrupt requested
-		INT_ACK = 0x02  // Interrupt acknowledged
+		INT_NONE = 0x00, // No interrupts 
+		INT_REQ  = 0x01, // Interrupt requested
+		INT_ACK  = 0x02  // Interrupt acknowledged
 	};
 
 	// Variants in the MPCC family
@@ -198,14 +202,15 @@ protected:
 #define SET_TYPE_A ( mpcc_device::TYPE_MPCC68560A | mpcc_device::TYPE_MPCC68561A )
 
 	// State variables
-	int m_variant;
-	int m_rxc;
-	int m_txc;
-	int m_brg_rate;
-	int m_rcv;
-	int m_rxd;
-	int m_tra;
-	int m_int_state[3]; // Three priority levels Rx, Tx and Serial interface
+	uint32_t m_irq;
+	uint32_t m_variant;
+	uint32_t m_rxc;
+	uint32_t m_txc;
+	uint32_t m_brg_rate;
+	uint32_t m_rcv;
+	uint32_t m_rxd;
+	uint32_t m_tra;
+	uint32_t m_int_state[3]; // Three priority levels Rx, Tx and Serial interface
 
 	// Callbacks
 	devcb_write_line    m_out_txd_cb;
@@ -254,7 +259,10 @@ protected:
 	// TODO: investigate if 4 x 16 bit wide FIFO is needed for 16 bit mode
 	util::fifo<uint8_t, 8> m_rx_data_fifo;
 
+	// RIVNR - Rx Interrupt Vector Number Register
 	uint8_t m_rivnr;
+	uint8_t do_rivnr();
+	void do_rivnr(uint8_t data);
 
 	// RIER - Rx Interrupt Enable Register
 	uint8_t m_rier;

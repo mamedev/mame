@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "turbo232.h"
 
 

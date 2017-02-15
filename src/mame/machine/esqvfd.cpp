@@ -5,6 +5,7 @@
     Emulation by R. Belmont
 */
 
+#include "emu.h"
 #include "esqvfd.h"
 #include "esq1by22.lh"
 #include "esq2by40.lh"

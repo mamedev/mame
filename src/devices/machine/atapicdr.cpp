@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "atapicdr.h"
 
 #define SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT 0x3a

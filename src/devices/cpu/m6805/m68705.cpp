@@ -611,7 +611,7 @@ void m68705_device::burn_cycles(unsigned count)
 		unsigned const ps_mask((1 << ps_opt) - 1);
 		unsigned const decrements((count + (m_prescaler & ps_mask)) >> ps_opt);
 
-		if (decrements && (decrements >= m_tdr))
+		if ((m_tdr ? unsigned(m_tdr) : 256U) <= decrements)
 		{
 			LOGTIMER("timer/counter expired%s%s\n", tcr_tir() ? " [overrun]" : "", tcr_tim() ? " [masked]" : "");
 			m_tcr |= 0x80;

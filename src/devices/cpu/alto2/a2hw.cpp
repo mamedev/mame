@@ -5,6 +5,7 @@
  *   Xerox AltoII memory mapped I/O hardware
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 #include "a2roms.h"
 

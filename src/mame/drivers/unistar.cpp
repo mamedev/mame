@@ -18,16 +18,18 @@ class unistar_state : public driver_device
 {
 public:
 	unistar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(unistar);
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	const uint8_t *m_p_chargen;
+
 private:
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -51,7 +53,6 @@ INPUT_PORTS_END
 
 void unistar_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 PALETTE_INIT_MEMBER( unistar_state, unistar )
@@ -59,10 +60,6 @@ PALETTE_INIT_MEMBER( unistar_state, unistar )
 	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
 	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
-}
-
-void unistar_state::video_start()
-{
 }
 
 uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

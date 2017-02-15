@@ -21,7 +21,7 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I../.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
@@ -62,6 +62,8 @@ POBJS := \
 	$(POBJ)/pstate.o \
 	$(POBJ)/pstream.o \
 	$(POBJ)/putil.o \
+
+PMAIN := $(POBJ)/pmain.o
 
 NLOBJS := \
 	$(NLOBJ)/nl_base.o \
@@ -130,7 +132,7 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 
-ALL_OBJS = $(OBJS) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
 
@@ -151,11 +153,11 @@ clean:
 # nltool
 #-------------------------------------------------
 
-nltool: $(OBJ)/prg/nltool.o $(OBJS)
+nltool: $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
+nlwav: $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
@@ -175,7 +177,7 @@ maketree: $(sort $(OBJDIRS))
 .PHONY: clang clang-5 mingw doc
 
 clang:
-		$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -186,7 +188,8 @@ clang-5:
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
 
 mingw:
-	$(MAKE) LDEXTRAFLAGS="-Wl,--subsystem,console" LIBS= MD=@mkdir.exe SHELL=sh.exe
+	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN" \
+		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" LIBS= MD=@mkdir.exe SHELL=sh.exe
 
 #
 # FIXME: Unicode

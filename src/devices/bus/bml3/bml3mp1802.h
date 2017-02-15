@@ -12,7 +12,6 @@
 #ifndef __BML3BUS_MP1802__
 #define __BML3BUS_MP1802__
 
-#include "emu.h"
 #include "bml3bus.h"
 #include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"

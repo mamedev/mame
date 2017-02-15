@@ -10,15 +10,15 @@
 #ifndef NLLISTS_H_
 #define NLLISTS_H_
 
-#include <atomic>
-#include <thread>
-#include <mutex>
-
 #include "nl_config.h"
 #include "netlist_types.h"
 #include "plib/plists.h"
 #include "plib/pchrono.h"
 #include "plib/ptypes.h"
+
+#include <atomic>
+#include <thread>
+#include <mutex>
 
 // ----------------------------------------------------------------------------------------
 // timed queue

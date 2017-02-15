@@ -71,6 +71,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc80kb.h"
 
 

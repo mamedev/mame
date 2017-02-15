@@ -18,6 +18,7 @@
 
 */
 
+#include "emu.h"
 #include "mos6566.h"
 
 

@@ -11,7 +11,6 @@
 #ifndef __VIC1520__
 #define __VIC1520__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 

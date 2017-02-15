@@ -11,7 +11,6 @@
 #ifndef __VTECH_IOEXP_CARTS_H__
 #define __VTECH_IOEXP_CARTS_H__
 
-#include "emu.h"
 
 #include "joystick.h"
 #include "printer.h"

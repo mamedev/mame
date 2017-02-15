@@ -507,14 +507,14 @@ void cli_frontend::listbrothers(const char *gamename)
 	}
 
 	// print the header
-	osd_printf_info("Source file:     Name:            Parent:\n");
+	osd_printf_info("%-20s %-16s %s\n", "Source file:", "Name:", "Parent:");
 
 	// output the entries found
 	drivlist.reset();
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 	}
 }
 
@@ -541,7 +541,7 @@ void cli_frontend::listcrc(const char *gamename)
 					// if we have a CRC, display it
 					uint32_t crc;
 					if (util::hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						osd_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
+						osd_printf_info("%08x %-32s\t%-16s\t%s\n", crc, ROM_GETNAME(rom), device.shortname(), device.name());
 				}
 	}
 }
@@ -568,7 +568,7 @@ void cli_frontend::listroms(const char *gamename)
 			osd_printf_info("\n");
 		first = false;
 		osd_printf_info("ROMs required for driver \"%s\".\n"
-				"Name                    Size Checksum\n", drivlist.driver().name);
+	                	"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
 
 		// iterate through roms
 		for (device_t &device : device_iterator(drivlist.config().root_device()))
@@ -576,19 +576,19 @@ void cli_frontend::listroms(const char *gamename)
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// accumulate the total length of all chunks
-					int length = -1;
+					int64_t length = -1;
 					if (ROMREGION_ISROMDATA(region))
 						length = rom_file_size(rom);
 
 					// start with the name
 					const char *name = ROM_GETNAME(rom);
-					osd_printf_info("%-20s ", name);
+					osd_printf_info("%-32s ", name);
 
 					// output the length next
 					if (length >= 0)
-						osd_printf_info("%7d", length);
+						osd_printf_info("%10u", unsigned(uint64_t(length)));
 					else
-						osd_printf_info("       ");
+						osd_printf_info("%10s", "");
 
 					// output the hash data
 					util::hash_collection hashes(ROM_GETHASHDATA(rom));
@@ -734,8 +734,8 @@ void cli_frontend::listslots(const char *gamename)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
-	printf(" SYSTEM      SLOT NAME    SLOT OPTIONS    SLOT DEVICE NAME     \n");
-	printf("----------  -----------  --------------  ----------------------\n");
+	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
+	printf("%s %s %s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(28,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -746,7 +746,7 @@ void cli_frontend::listslots(const char *gamename)
 		{
 			if (slot.fixed()) continue;
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot.device().tag()+1);
+			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
@@ -758,9 +758,9 @@ void cli_frontend::listslots(const char *gamename)
 					device_t *dev = (*option.second->devtype())(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
 					dev->config_complete();
 					if (first_option) {
-						printf("%-15s %s\n", option.second->name(),dev->name());
+						printf("%-16s %s\n", option.second->name(),dev->name());
 					} else {
-						printf("%-23s   %-15s %s\n", "", option.second->name(),dev->name());
+						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
 					}
 					global_free(dev);
 
@@ -768,7 +768,7 @@ void cli_frontend::listslots(const char *gamename)
 				}
 			}
 			if (first_option)
-				printf("%-15s %s\n", "[none]","No options available");
+				printf("%-16s %s\n", "[none]","No options available");
 			// end the line
 			printf("\n");
 			first = false;
@@ -776,7 +776,7 @@ void cli_frontend::listslots(const char *gamename)
 
 		// if we didn't get any at all, just print a none line
 		if (first)
-			printf("%-13s(none)\n", drivlist.driver().name);
+			printf("%-16s (none)\n", drivlist.driver().name);
 	}
 }
 
@@ -794,8 +794,8 @@ void cli_frontend::listmedia(const char *gamename)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
-	printf(" SYSTEM      MEDIA NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED     \n");
-	printf("----------  --------------------  ------------------------------------\n");
+	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -811,7 +811,7 @@ void cli_frontend::listmedia(const char *gamename)
 			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev.instance_name(), paren_shortname.c_str());
+			printf("%-16s %-16s %-10s ", first ? drivlist.driver().name : "", imagedev.instance_name(), paren_shortname.c_str());
 
 			// get the extensions and print them
 			std::string extensions(imagedev.file_extensions());
@@ -830,7 +830,7 @@ void cli_frontend::listmedia(const char *gamename)
 
 		// if we didn't get any at all, just print a none line
 		if (first)
-			printf("%-13s(none)\n", drivlist.driver().name);
+			printf("%-16s (none)\n", drivlist.driver().name);
 	}
 }
 

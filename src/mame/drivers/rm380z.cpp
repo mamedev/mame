@@ -165,6 +165,7 @@ Module timer tag static_vblank_timer name m_expire.seconds
 */
 
 
+#include "emu.h"
 #include "includes/rm380z.h"
 
 static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)

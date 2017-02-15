@@ -11,7 +11,6 @@
 #ifndef __C64_IEEE488__
 #define __C64_IEEE488__
 
-#include "emu.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/6525tpi.h"
 #include "exp.h"

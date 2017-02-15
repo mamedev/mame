@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "dj2db.h"
 
 

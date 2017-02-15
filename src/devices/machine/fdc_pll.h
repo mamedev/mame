@@ -7,7 +7,6 @@
  * Generic pll class for floppy controllers with analog plls
  */
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 
 class fdc_pll_t {

@@ -38,6 +38,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/mpu401.h"
 #include "bus/midi/midi.h"
 

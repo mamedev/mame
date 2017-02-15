@@ -5,8 +5,8 @@
  *
  */
 
-#include "devices/nlid_cmos.h"
-#include "analog/nlid_twoterm.h"
+#include "nlid_cmos.h"
+#include "../analog/nlid_twoterm.h"
 #include "nld_4066.h"
 
 namespace netlist

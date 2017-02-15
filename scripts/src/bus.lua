@@ -1427,6 +1427,8 @@ if (BUSES["VIC20"]~=null) then
 		MAME_DIR .. "src/devices/bus/vic20/vic1112.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1210.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/vic1210.h",
+		MAME_DIR .. "src/devices/bus/vic20/videopak.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/videopak.h",
 		MAME_DIR .. "src/devices/bus/vic20/speakeasy.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/speakeasy.h",
 		MAME_DIR .. "src/devices/bus/vic20/user.cpp",
@@ -1569,8 +1571,6 @@ if (BUSES["A2BUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/a2bus/a2bus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2bus.h",
-		MAME_DIR .. "src/devices/bus/a2bus/a2lang.cpp",
-		MAME_DIR .. "src/devices/bus/a2bus/a2lang.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2mockingboard.cpp",

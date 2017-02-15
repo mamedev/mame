@@ -11,7 +11,6 @@
 #ifndef __VIC20_FE3__
 #define __VIC20_FE3__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/intelfsh.h"
 

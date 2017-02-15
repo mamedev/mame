@@ -11,6 +11,7 @@
     banks in the upper ROM area (0x80-0xff)
 */
 
+#include "emu.h"
 #include "brunword4.h"
 
 const device_type CPC_BRUNWORD_MK4 = &device_creator<cpc_brunword4_device>;

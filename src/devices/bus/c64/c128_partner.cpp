@@ -28,6 +28,7 @@
 
 */
 
+#include "emu.h"
 #include "c128_partner.h"
 
 

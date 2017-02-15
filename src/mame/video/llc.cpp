@@ -9,13 +9,9 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/llc.h"
 
-
-void llc_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 uint32_t llc_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

@@ -6,11 +6,10 @@
  */
 
 #include "nld_opamps.h"
-#include "nl_base.h"
-#include "nl_errstr.h"
+#include "../nl_base.h"
+#include "../nl_errstr.h"
 #include "nlid_twoterm.h"
 #include "nlid_fourterm.h"
-
 
 #include <cmath>
 

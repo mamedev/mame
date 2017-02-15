@@ -146,7 +146,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (flip_screen())
 		{
 			sx = 288-16 - sx;
-			sy = 224-16 - sy;
+			sy = 224+8-16 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}

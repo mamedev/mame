@@ -11,7 +11,6 @@
 #ifndef LISA_H_
 #define LISA_H_
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"

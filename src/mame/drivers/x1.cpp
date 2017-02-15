@@ -206,6 +206,7 @@
 
 ************************************************************************************************/
 
+#include "emu.h"
 #include "includes/x1.h"
 #include "formats/2d_dsk.h"
 #include "softlist.h"

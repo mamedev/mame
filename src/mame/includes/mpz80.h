@@ -5,7 +5,6 @@
 #ifndef __MPZ80__
 #define __MPZ80__
 
-#include "emu.h"
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"

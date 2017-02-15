@@ -12,7 +12,6 @@
 #define __C64_4KSA__
 
 
-#include "emu.h"
 #include "user.h"
 
 

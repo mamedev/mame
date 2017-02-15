@@ -67,6 +67,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "currah_speech.h"
 
 

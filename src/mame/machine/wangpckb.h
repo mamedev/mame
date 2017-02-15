@@ -12,7 +12,6 @@
 #define __WANGPC_KEYBOARD__
 
 
-#include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/sn76496.h"
 

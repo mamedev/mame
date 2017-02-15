@@ -6,7 +6,6 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 
@@ -41,7 +40,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
