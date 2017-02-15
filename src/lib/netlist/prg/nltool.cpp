@@ -183,49 +183,47 @@ public:
 		}
 	}
 
-	template<typename T>
-	std::vector<T> save_state()
+	std::vector<char> save_state()
 	{
 		state().pre_save();
 		std::size_t size = 0;
 		for (auto const & s : state().save_list())
-			size += ((s->m_dt.size * s->m_count + sizeof(T) - 1) / sizeof(T));
+			size += s->m_dt.size * s->m_count;
 
-		auto buf = std::vector<T>(size);
-		auto p = buf.data();
+		std::vector<char> buf(size);
+		char *p = buf.data();
 
 		for (auto const & s : state().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::memcpy(p, s->m_ptr, sz );
+				std::copy((char *)s->m_ptr, (char *) s->m_ptr + sz, p);
 			else
 				log().fatal("found unsupported save element {1}\n", s->m_name);
-			p += ((sz + sizeof(T) - 1) / sizeof(T));
+			p += sz;
 		}
 		return buf;
 	}
 
-	template<typename T>
-	void load_state(std::vector<T> &buf)
+	void load_state(std::vector<char> &buf)
 	{
 		std::size_t size = 0;
 		for (auto const & s : state().save_list())
-			size += ((s->m_dt.size * s->m_count + sizeof(T) - 1) / sizeof(T));
+			size += s->m_dt.size * s->m_count;
 
 		if (buf.size() != size)
 			throw netlist::nl_exception("Size different during load state.");
 
-		auto p = buf.data();
+		char *p = buf.data();
 
 		for (auto const & s : state().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::memcpy(s->m_ptr, p, sz );
+				std::copy(p, p + sz, (char *) s->m_ptr);
 			else
 				log().fatal("found unsupported save element {1}\n", s->m_name);
-			p += ((sz + sizeof(T) - 1) / sizeof(T));
+			p += sz;
 		}
 		state().post_load();
 		rebuild_lists();
@@ -372,7 +370,7 @@ void tool_app_t::run()
 
 	if (opt_savestate.was_specified())
 	{
-		auto savestate = nt.save_state<char>();
+		auto savestate = nt.save_state();
 		plib::pofilestream strm(opt_savestate());
 		plib::pbinary_writer writer(strm);
 		writer.write(savestate);
