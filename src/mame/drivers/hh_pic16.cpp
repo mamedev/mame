@@ -9,7 +9,7 @@
   serial  device  etc.
 -----------------------------------------------------------
  *020     1650    19??, GI Economega IV TV PPL Tuning System Control
- *024     1655    1979, <unknown> Football (have dump)
+ *024     1655    1979, Toytronic? Football (have dump)
  *033     1655A   1979, Toytronic Football (have dump)
  @036     1655A   1979, Ideal Maniac
  *043     1655A   1979, Calfax/Caprice Pro-Action Baseball (have dump)
@@ -45,6 +45,7 @@
 #include "machine/clock.h"
 #include "sound/speaker.h"
 
+#include "hccbaskb.lh"
 #include "leboom.lh" // clickable
 #include "maniac.lh" // clickable
 #include "melodym.lh" // clickable
@@ -939,7 +940,7 @@ WRITE8_MEMBER(hccbaskb_state::write_b)
 WRITE8_MEMBER(hccbaskb_state::write_c)
 {
 	// C0-C6: led data
-	m_c = data;
+	m_c = ~data;
 	prepare_display();
 }
 
@@ -977,7 +978,7 @@ static MACHINE_CONFIG_START( hccbaskb, hccbaskb_state )
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(hccbaskb_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
+	MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1042,4 +1043,4 @@ CONS( 1979, maniac,    0,        0, maniac,   maniac,   driver_device, 0, "Ideal
 CONS( 1980, leboom,    0,        0, leboom,   leboom,   driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, rockpin,   0,        0, rockpin,  rockpin,  driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
