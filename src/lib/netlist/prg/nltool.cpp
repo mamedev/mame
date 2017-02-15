@@ -26,7 +26,7 @@ public:
 		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header:docheader", "run|convert|listdevices|static|header"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
-		opt_rfolders(*this, "r", "rom",                     "where to look for files"),
+		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_version(*this,  "",  "version",                 "display version and exit"),
@@ -37,6 +37,8 @@ public:
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
+		opt_loadstate(*this,"",  "loadstate",	"",			"load state from file and continue from there"),
+		opt_savestate(*this,"",  "savestate",	"",			"save state to file at end of run"),
 		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        "spice",    "spice:eagle:rinf", "type of file to be converted: spice,eagle,rinf"),
 
@@ -61,6 +63,8 @@ public:
 	plib::option_double opt_ttr;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
+	plib::option_str    opt_loadstate;
+	plib::option_str    opt_savestate;
 	plib::option_group  opt_grp4;
 	plib::option_str_limit opt_type;
 	plib::option_example opt_ex1;
@@ -179,15 +183,16 @@ public:
 		}
 	}
 
-	void save_state()
+	template<typename T>
+	std::vector<T> save_state()
 	{
 		state().pre_save();
 		std::size_t size = 0;
 		for (auto const & s : state().save_list())
-			size += ((s->m_dt.size * s->m_count + sizeof(unsigned) - 1) / sizeof(unsigned));
+			size += ((s->m_dt.size * s->m_count + sizeof(T) - 1) / sizeof(T));
 
-		auto buf = plib::palloc_array<unsigned>(size);
-		auto p = buf;
+		auto buf = std::vector<T>(size);
+		auto p = buf.data();
 
 		for (auto const & s : state().save_list())
 		{
@@ -196,8 +201,34 @@ public:
 				std::memcpy(p, s->m_ptr, sz );
 			else
 				log().fatal("found unsupported save element {1}\n", s->m_name);
-			p += ((sz + sizeof(unsigned) - 1) / sizeof(unsigned));
+			p += ((sz + sizeof(T) - 1) / sizeof(T));
 		}
+		return buf;
+	}
+
+	template<typename T>
+	void load_state(std::vector<T> &buf)
+	{
+		std::size_t size = 0;
+		for (auto const & s : state().save_list())
+			size += ((s->m_dt.size * s->m_count + sizeof(T) - 1) / sizeof(T));
+
+		if (buf.size() != size)
+			throw netlist::nl_exception("Size different during load state.");
+
+		auto p = buf.data();
+
+		for (auto const & s : state().save_list())
+		{
+			std::size_t sz = s->m_dt.size * s->m_count;
+			if (s->m_dt.is_float || s->m_dt.is_integral)
+				std::memcpy(s->m_ptr, p, sz );
+			else
+				log().fatal("found unsupported save element {1}\n", s->m_name);
+			p += ((sz + sizeof(T) - 1) / sizeof(T));
+		}
+		state().post_load();
+		rebuild_lists();
 	}
 
 protected:
@@ -295,33 +326,65 @@ void tool_app_t::run()
 
 	std::vector<input_t> inps = read_input(nt.setup(), opt_inp());
 
-	double ttr = opt_ttr();
+	netlist::netlist_time ttr = netlist::netlist_time::from_double(opt_ttr());
 	t.stop();
 
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
-	pout("runnning ...\n");
 
 	t.reset();
 	t.start();
 
-	unsigned pos = 0;
-	netlist::netlist_time nlt = netlist::netlist_time::zero();
+	// FIXME: error handling
+	if (opt_loadstate.was_specified())
+	{
+		plib::pifilestream strm(opt_loadstate());
+		plib::pbinary_reader reader(strm);
+		std::vector<char> loadstate;
+		reader.read(loadstate);
+		nt.load_state(loadstate);
+		pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
+	}
 
-	while (pos < inps.size() && inps[pos].m_time < netlist::netlist_time::from_double(ttr))
+	unsigned pos = 0;
+	netlist::netlist_time nlt = nt.time();
+
+
+	while (pos < inps.size()
+			&& inps[pos].m_time < ttr
+			&& inps[pos].m_time >= nlt)
 	{
 		nt.process_queue(inps[pos].m_time - nlt);
 		inps[pos].setparam();
 		nlt = inps[pos].m_time;
 		pos++;
 	}
-	nt.process_queue(netlist::netlist_time::from_double(ttr) - nlt);
-	nt.save_state();
+
+	pout("runnning ...\n");
+
+	if (ttr > nlt)
+		nt.process_queue(ttr - nlt);
+	else
+	{
+		pout("end time {1:.6f} less than saved time {2:.6f}\n",
+				ttr.as_double(), nlt.as_double());
+		ttr = nlt;
+	}
+
+	if (opt_savestate.was_specified())
+	{
+		auto savestate = nt.save_state<char>();
+		plib::pofilestream strm(opt_savestate());
+		plib::pbinary_writer writer(strm);
+		writer.write(savestate);
+	}
 	nt.stop();
 
 	t.stop();
 
 	double emutime = t.as_seconds();
-	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n", ttr, emutime, ttr/emutime*100.0);
+	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
+			(ttr - nlt).as_double(), emutime,
+			(ttr - nlt).as_double() / emutime * 100.0);
 }
 
 void tool_app_t::static_compile()
