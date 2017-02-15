@@ -8,23 +8,29 @@
 
   serial  device  etc.
 -----------------------------------------------------------
+ *020     1650    19??, GI Economega IV TV PPL Tuning System Control
  *024     1655    1979, <unknown> Football (have dump)
  *033     1655A   1979, Toytronic Football (have dump)
  @036     1655A   1979, Ideal Maniac
  *043     1655A   1979, Calfax/Caprice Pro-Action Baseball (have dump)
- *051     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (have dump)
+ *051     1655A   1979, U.S. Games Basketball/Tandy Electronic Basketball (have dump)
  @053     1655A   1979, Atari Touch Me
  @061     1655A   1980, Lakeside Le Boom
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
  *144     1650A   1980, U.S. Games Football/Tandy 2-Player Football (model 60-2156) (have dump)
- *192     1650    19??, (a phone dialer, have dump)
- *255     1655    19??, (a talking clock, have dump)
+ *192     1650    19??, <unknown> phone dialer (have dump)
+ *255     1655    19??, <unknown> talking clock (have dump)
+ *518     1650A   19??, GI Teleview Control Chip (features differ per program)
+ *519     1650A   19??, "
+ *532     1650A   19??, "
+ *533     1650A   19??, "
+ *536     1650    1982, GI Teleview Autodialer/Terminal Identifier
 
   inconsistent:
 
- *<none>  1655A   1979, U.S. Games Basketball/Tandy Electronic Basketball (have dump)
+ @<none>  1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -760,7 +766,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tiger Electronics Rocket Pinball (model 7-460)
-  * PIC1655A-110, 69-11397
+  * PIC1650A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
   
   known releases:
@@ -876,6 +882,115 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tiger Electronics Half Court Computer Basketball (model 7-470)
+  * PIC1655A(no serial), 69-11557
+  * 2 7seg LEDs + 26 other LEDs, 1-bit sound
+  
+  known releases:
+  - Hong Kong: Half Court Computer Basketball
+  - USA: Electronic Basketball (model 49-65453), distributed by Sears
+
+***************************************************************************/
+
+class hccbaskb_state : public hh_pic16_state
+{
+public:
+	hccbaskb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+void hccbaskb_state::prepare_display()
+{
+	// B5,B6 are 7segs
+	set_display_segmask(0x60, 0x7f);
+	display_matrix(7, 7, m_c, m_b);
+}
+
+READ8_MEMBER(hccbaskb_state::read_a)
+{
+	// A2: skill switch, A3: multiplexed inputs
+	return m_inp_matrix[5]->read() | read_inputs(5) | 3;
+}
+
+WRITE8_MEMBER(hccbaskb_state::write_b)
+{
+	// B0: RTCC pin
+	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
+	
+	// B0-B4: input mux
+	m_inp_mux = ~data & 0x1f;
+
+	// B7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// B0-B6: led select
+	m_b = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(hccbaskb_state::write_c)
+{
+	// C0-C6: led data
+	m_c = data;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( hccbaskb )
+	PORT_START("IN.0") // B0 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+
+	PORT_START("IN.1") // B1 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.2") // B2 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.3") // B3 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.4") // B4 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("IN.5") // port A2
+	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( hccbaskb, hccbaskb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=15K, C=47pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(hccbaskb_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(hccbaskb_state, write_b))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(hccbaskb_state, write_c))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -910,14 +1025,21 @@ ROM_START( rockpin )
 ROM_END
 
 
+ROM_START( hccbaskb )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "69-11557", 0x0000, 0x0400, CRC(56e81079) SHA1(1933f87f82c4c53f953534dba7757c9afc52d5bc) )
+ROM_END
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE INPUT    INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, touchme,   0,        0, touchme, touchme, driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, melodym,   0,        0, melodym, melodym, driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,        0, maniac,  maniac,  driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, touchme,   0,        0, touchme,  touchme,  driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,        0, leboom,  leboom,  driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, melodym,   0,        0, melodym,  melodym,  driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, rockpin,   0,        0, rockpin, rockpin, driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, maniac,    0,        0, maniac,   maniac,   driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1980, leboom,    0,        0, leboom,   leboom,   driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1979, rockpin,   0,        0, rockpin,  rockpin,  driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
