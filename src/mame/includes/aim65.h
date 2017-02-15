@@ -43,6 +43,10 @@ public:
 		, m_z24(*this, "z24")
 		, m_z25(*this, "z25")
 		, m_z26(*this, "z26")
+		, m_z12(*this, "z12")
+		, m_z13(*this, "z13")
+		, m_z14(*this, "z14")
+		, m_z15(*this, "z15")
 		, m_ram(*this, RAM_TAG)
 		, m_ds(*this, "ds%u", 1)
 	{
@@ -60,6 +64,10 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z26_load) { return load_cart(image, m_z26, "z26"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z12_load) { return load_cart(image, m_z12, "z12"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z13_load) { return load_cart(image, m_z13, "z13"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
 protected:
 	virtual void machine_start() override;
@@ -75,6 +83,10 @@ protected:
 	required_device<generic_slot_device> m_z24;
 	required_device<generic_slot_device> m_z25;
 	required_device<generic_slot_device> m_z26;
+	required_device<generic_slot_device> m_z12;
+	required_device<generic_slot_device> m_z13;
+	required_device<generic_slot_device> m_z14;
+	required_device<generic_slot_device> m_z15;
 	required_device<ram_device> m_ram;
 	required_device_array<dl1416_device, 5> m_ds;
 };
