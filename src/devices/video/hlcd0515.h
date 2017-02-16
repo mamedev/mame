@@ -17,7 +17,7 @@
 
 // DATA OUT pin, don't use on HLCD0569
 #define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
-	devcb = hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
+	devcb = &hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
 
 
 // pinout reference
