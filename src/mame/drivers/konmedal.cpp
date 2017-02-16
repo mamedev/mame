@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
- Unknown medal game
+ Tsukande Toru Chicchi (つかんでとるちっち)
  (c) 1995 Konami
  Driver by R. Belmont
 
@@ -119,8 +119,16 @@ READ8_MEMBER(konmedal_state::magic_r)
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 	int codebits = *code;
+	int bs;
+	int bankshifts[4] = { 0, 4, 8, 12 };
+	int mode, data, bank;
+	
+	m_k056832->read_avac(&mode, &data);
+	
 	*color = (codebits >> 12) & 0xf;
-	*code = (codebits & 0xfff);
+	bs = (codebits & 0xc00) >> 10;
+	bank = (data >> bankshifts[bs]) & 0xf;
+	*code = (codebits & 0x3ff) | (bank << 10);
 }
 
 void konmedal_state::video_start()
@@ -133,12 +141,8 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
+	// game only draws on this layer, apparently
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-
-	// force "A" layer over top of everything
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -160,6 +164,7 @@ PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_k056832->mark_plane_dirty(3);
 }
 
 WRITE8_MEMBER(konmedal_state::bankswitch_w)
@@ -233,7 +238,7 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-ROM_START( konmedal )   // US version UAE
+ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) ) 
 
@@ -254,4 +259,4 @@ ROM_START( konmedal )   // US version UAE
 	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) ) 
 ROM_END
 
-GAME( 1995, konmedal, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Unknown Medal Game", MACHINE_NOT_WORKING)
+GAME( 1995, tsukande, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

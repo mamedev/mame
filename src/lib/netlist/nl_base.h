@@ -132,7 +132,10 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
+#define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
+
 #define NETLIB_UPDATE_TERMINALSI() public: virtual void update_terminals() override
+#define NETLIB_HANDLERI(name) private: virtual void name() NL_NOEXCEPT
 #define NETLIB_UPDATEI() protected: virtual void update() NL_NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
 #define NETLIB_RESETI() protected: virtual void reset() override
@@ -142,7 +145,10 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_SUB(chip) nld_ ## chip
 #define NETLIB_SUBXX(ns, chip) std::unique_ptr< ns :: nld_ ## chip >
 
-#define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
+#define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name(void) NL_NOEXCEPT
+#define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
+
+// FIXME: NETLIB_PARENT_UPDATE should disappear
 #define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
@@ -469,7 +475,8 @@ namespace netlist
 	 * All terminals are derived from this class.
 	 *
 	 */
-	class detail::core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
+	class detail::core_terminal_t : public device_object_t,
+									public plib::linkedlist_t<core_terminal_t>::element_t
 	{
 	public:
 
@@ -484,7 +491,8 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
+		core_terminal_t(core_device_t &dev, const pstring &aname,
+				const state_e state, nldelegate delegate = nldelegate());
 		virtual ~core_terminal_t();
 
 		/*! The object type.
@@ -600,7 +608,8 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const state_e state);
+		logic_t(core_device_t &dev, const pstring &aname,
+				const state_e state, nldelegate delegate = nldelegate());
 		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
@@ -623,7 +632,8 @@ namespace netlist
 	class logic_input_t : public logic_t
 	{
 	public:
-		logic_input_t(core_device_t &dev, const pstring &aname);
+		logic_input_t(core_device_t &dev, const pstring &aname,
+				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
 		netlist_sig_t Q() const NL_NOEXCEPT;

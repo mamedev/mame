@@ -13,6 +13,8 @@
 #include <cstdarg>
 #include <algorithm>
 
+//* FIXME: remove cstring, replace with pstring */
+
 namespace plib {
 
 plog_dispatch_intf::~plog_dispatch_intf()
@@ -28,7 +30,7 @@ pfmt::pfmt(const pstring fmt)
 		m_allocated = 2 * l;
 		m_str = palloc_array<char>(2 * l);
 	}
-	memcpy(m_str, fmt.c_str(), l);
+	std::copy(fmt.c_str(), fmt.c_str() + l, m_str);
 }
 
 pfmt::~pfmt()
@@ -116,15 +118,16 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 			while (new_size > m_allocated)
 				m_allocated *= 2;
 			char *np = palloc_array<char>(m_allocated);
-			memcpy(np, m_str, old_alloc);
+			std::copy(m_str, m_str + old_alloc, np);
 			p = np + (p - m_str);
 			if (m_str != m_str_buf)
 				pfree_array(m_str);
 			m_str = np;
 		}
 		// Make room
-		memmove(p+nl, p+sl, strlen(p) + 1 - sl);
-		memcpy(p, buf, nl);
+		//memmove(p+nl, p+sl, strlen(p) + 1 - sl);
+		std::copy_backward(p + sl, p + strlen(p) + 1, p + nl + strlen(p) + 1 - sl);
+		std::copy(buf, buf + nl, p);
 	}
 	va_end(ap);
 }

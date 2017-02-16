@@ -228,6 +228,7 @@ namespace plib {
 
 		template<typename MemberFunctionType, typename O>
 		pmfp(MemberFunctionType mftp, O *object)
+		: pmfp_base<R, Targs...>()
 		{
 			this->set(mftp, object);
 		}

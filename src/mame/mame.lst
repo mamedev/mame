@@ -1436,7 +1436,7 @@ incasunu
 indrema5                       // (c) 1998
 jungjuic
 kgalah
-kgbird							// (c) 1994
+kgbirdmk5                       // (c) 1994
 koalamnt                        // (c) 2001
 kookabuk
 locoloot
@@ -16931,7 +16931,7 @@ whiterus                        // White Russia
 konin                           //
 
 @source:konmedal.cpp
-konmedal
+tsukande
 
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
