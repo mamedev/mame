@@ -27,7 +27,6 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 		MAME_DIR .. "src/devices/cpu/drcuml.h",
 		MAME_DIR .. "src/devices/cpu/uml.cpp",
 		MAME_DIR .. "src/devices/cpu/uml.h",
-		MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.h",
 		MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
@@ -931,7 +930,7 @@ if (CPUS["I86"]~=null) then
 	}
 end
 
-if (CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 end
 
@@ -949,10 +948,6 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
 	}
-end
-
-if (CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 end
 
 --------------------------------------------------

@@ -848,6 +848,8 @@ function createProjects_mame_arcade(_target, _subtarget)
 
 createMAMEProjects(_target, _subtarget, "shared")
 files {
+	MAME_DIR .. "src/mame/machine/meters.cpp",
+	MAME_DIR .. "src/mame/machine/meters.h",
 	MAME_DIR .. "src/mame/machine/nmk112.cpp",
 	MAME_DIR .. "src/mame/machine/nmk112.h",
 	MAME_DIR .. "src/mame/machine/pcshare.cpp",
@@ -858,6 +860,8 @@ files {
 	MAME_DIR .. "src/mame/machine/ticket.h",
 	MAME_DIR .. "src/mame/video/avgdvg.cpp",
 	MAME_DIR .. "src/mame/video/avgdvg.h",
+	MAME_DIR .. "src/mame/video/awpvid.cpp",
+	MAME_DIR .. "src/mame/video/awpvid.h",
 	MAME_DIR .. "src/mame/audio/dcs.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.h",
 	MAME_DIR .. "src/mame/audio/decobsmt.cpp",
@@ -1266,10 +1270,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mpu4misc.hxx",
 	MAME_DIR .. "src/mame/drivers/mpu5.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu5.hxx",
-	MAME_DIR .. "src/mame/video/awpvid.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.h",
-	MAME_DIR .. "src/mame/machine/meters.cpp",
-	MAME_DIR .. "src/mame/machine/meters.h",
 }
 
 createMAMEProjects(_target, _subtarget, "bfm")
@@ -2088,10 +2088,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/jpmimpctsw.cpp",
 	MAME_DIR .. "src/mame/drivers/pluto5.cpp",
 	MAME_DIR .. "src/mame/drivers/jpmsys7.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.h",
-	MAME_DIR .. "src/mame/machine/meters.cpp",
-	MAME_DIR .. "src/mame/machine/meters.h",
 }
 
 createMAMEProjects(_target, _subtarget, "kaneko")

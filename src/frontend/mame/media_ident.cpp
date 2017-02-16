@@ -220,7 +220,7 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 	while (m_drivlist.next())
 	{
 		// iterate over devices, regions and files within the region
-		for (device_t &device : device_iterator(m_drivlist.config().root_device()))
+		for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
 		{
 			if (shortnames.insert(device.shortname()).second)
 			{
@@ -245,7 +245,7 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 		}
 
 		// next iterate over softlists
-		for (software_list_device &swlistdev : software_list_device_iterator(m_drivlist.config().root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(m_drivlist.config()->root_device()))
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
