@@ -100,14 +100,14 @@
 		<bezel element="disk_orange2"><bounds x="9.5" y="39.5" width="2" height="2" /></bezel>
 
 		<bezel element="text_l1"><bounds x="8" y="10.5" width="8" height="2" /></bezel>
+		<bezel element="static_black"><bounds x="6.75" y="12.75" width="10" height="2.75" /></bezel>
 		<bezel element="text_l2"><bounds x="5" y="15.5" width="14" height="2" /></bezel>
 
-		<bezel element="static_black"><bounds x="6.75" y="12.75" width="10" height="2.75" /></bezel>
+	<!-- leds -->
+
 		<bezel name="digit2" element="digit"><bounds x="9.5" y="13" width="1.5" height="2.25" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="11" y="13" width="1.5" height="2.25" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="12.5" y="13" width="1.5" height="2.25" /></bezel>
-
-	<!-- leds -->
 
 		<bezel name="3.0" element="led"><bounds x="4"  y="20" width="1" height="1" /></bezel>
 		<bezel name="4.0" element="led"><bounds x="7"  y="20" width="1" height="1" /></bezel>

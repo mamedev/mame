@@ -19,7 +19,7 @@
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
- *144     1650A   1980, U.S. Games Football/Tandy 2-Player Football (model 60-2156) (have dump)
+ *144     1650A   1980, U.S. Games Football/Tandy 2-Player Football (have dump)
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
@@ -37,6 +37,7 @@
 
   TODO:
   - leboom discrete sound for volume decay (simulated for now)
+  - ttfball/ttfballa: discrete sound part, for volume gating?
 
 ***************************************************************************/
 
@@ -1205,5 +1206,5 @@ CONS( 1980, leboom,    0,        0, leboom,   leboom,   driver_device, 0, "Lakes
 CONS( 1979, rockpin,   0,        0, rockpin,  rockpin,  driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, ttfball,   0,        0, ttfball,  ttfball,  driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ttfballa,  ttfball,  0, ttfball,  ttfballa, driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ttfball,   0,        0, ttfball,  ttfball,  driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1979, ttfballa,  ttfball,  0, ttfball,  ttfballa, driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
