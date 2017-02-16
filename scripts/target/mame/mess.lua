@@ -805,6 +805,7 @@ FORMATS["M5_DSK"] = true
 FORMATS["MBEE_CAS"] = true
 FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
+FORMATS["MS0515_DSK"] = true
 FORMATS["MSX_DSK"] = true
 FORMATS["MZ_CAS"] = true
 FORMATS["NANOS_DSK"] = true
