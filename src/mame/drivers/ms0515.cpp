@@ -107,7 +107,7 @@ public:
 
 private:
 	uint8_t *m_video_ram;
-	uint8_t m_sysrega, m_sysregb, m_sysregc;
+	uint8_t m_sysrega, m_sysregc;
 	uint16_t m_bankreg, m_haltreg;
 	uint16_t m_irqs;
 	int m_blink;
