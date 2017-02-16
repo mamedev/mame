@@ -687,7 +687,8 @@ core_device_t::~core_device_t()
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
 {
-	term.m_delegate.set(&core_device_t::update, this);
+	if (!term.m_delegate.is_set())
+		term.m_delegate.set(&core_device_t::update, this);
 }
 
 plib::plog_base<NL_DEBUG> &core_device_t::log()
@@ -957,14 +958,14 @@ analog_net_t::~analog_net_t()
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state)
+detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
+		const state_e state, nldelegate delegate)
 : device_object_t(dev, dev.name() + "." + aname)
 , plib::linkedlist_t<core_terminal_t>::element_t()
+, m_delegate(delegate)
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
 {
-	//m_delegate.set(&core_device_t::update, &dev);
-	//m_delegate.set(&core_device_t::update_dev, &dev);
 }
 
 detail::core_terminal_t::~core_terminal_t()
@@ -998,8 +999,9 @@ analog_t::~analog_t()
 {
 }
 
-logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state)
-	: core_terminal_t(dev, aname, state)
+logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state,
+		nldelegate delegate)
+	: core_terminal_t(dev, aname, state, delegate)
 	, logic_family_t()
 	, m_proxy(nullptr)
 {
@@ -1119,8 +1121,9 @@ void analog_output_t::initial(const nl_double val)
 // logic_input_t
 // -----------------------------------------------------------------------------
 
-logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
-		: logic_t(dev, aname, STATE_INP_ACTIVE)
+logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname,
+		nldelegate delegate)
+		: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 {
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
