@@ -145,29 +145,31 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 	// iterate over our info (will cause a parse if needed)
 	for (const software_info &swinfo : get_info())
 	{
-		const software_part &part = swinfo.parts().front();
-		if ((interface == nullptr || part.matches_interface(interface)) && is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
+		for (const software_part &swpart : swinfo.parts())
 		{
-			// pick the best match between driver name and description
-			int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
-			int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
-			int curpenalty = std::min(longpenalty, shortpenalty);
-
-			// insert into the sorted table of matches
-			for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
+			if ((interface == nullptr || swpart.matches_interface(interface)) && is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 			{
-				// stop if we're worse than the current entry
-				if (curpenalty >= penalty[matchnum])
-					break;
+				// pick the best match between driver name and description
+				int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
+				int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
+				int curpenalty = std::min(longpenalty, shortpenalty);
 
-				// as long as this isn't the last entry, bump this one down
-				if (matchnum < matches - 1)
+				// insert into the sorted table of matches
+				for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
 				{
-					penalty[matchnum + 1] = penalty[matchnum];
-					list[matchnum + 1] = list[matchnum];
+					// stop if we're worse than the current entry
+					if (curpenalty >= penalty[matchnum])
+						break;
+
+					// as long as this isn't the last entry, bump this one down
+					if (matchnum < matches - 1)
+					{
+						penalty[matchnum + 1] = penalty[matchnum];
+						list[matchnum + 1] = list[matchnum];
+					}
+					list[matchnum] = &swinfo;
+					penalty[matchnum] = curpenalty;
 				}
-				list[matchnum] = &swinfo;
-				penalty[matchnum] = curpenalty;
 			}
 		}
 	}

@@ -682,7 +682,7 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 
 READ8_MEMBER( k056832_device::konmedal_rom_r )
 {
-	uint32_t addr = ((m_regs[0x1a] | (m_regs[0x1b]>>4)) * 0x800) + offset;
+	uint32_t addr = ((m_regs[0x1b] << 7) | ((m_regs[0x1a] & 0xc) * 0x800)) + offset;
 		
 	return m_rombase[addr];
 }

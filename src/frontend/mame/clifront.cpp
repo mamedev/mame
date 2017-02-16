@@ -457,7 +457,7 @@ void cli_frontend::listclones(const char *gamename)
 		if (original_count == 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 		else
-			osd_printf_info("Found %d matches for '%s' but none were clones\n", drivlist.count(), gamename);
+			osd_printf_info("Found %lu matches for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename);
 		return;
 	}
 
@@ -534,7 +534,7 @@ void cli_frontend::listcrc(const char *gamename)
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
 	{
-		for (device_t &device : device_iterator(drivlist.config().root_device()))
+		for (device_t &device : device_iterator(drivlist.config()->root_device()))
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
@@ -571,7 +571,7 @@ void cli_frontend::listroms(const char *gamename)
 	                	"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
 
 		// iterate through roms
-		for (device_t &device : device_iterator(drivlist.config().root_device()))
+		for (device_t &device : device_iterator(drivlist.config()->root_device()))
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
@@ -625,7 +625,7 @@ void cli_frontend::listsamples(const char *gamename)
 	while (drivlist.next())
 	{
 		// see if we have samples
-		samples_device_iterator iter(drivlist.config().root_device());
+		samples_device_iterator iter(drivlist.config()->root_device());
 		if (iter.count() == 0)
 			continue;
 
@@ -670,7 +670,7 @@ void cli_frontend::listdevices(const char *gamename)
 
 		// build a list of devices
 		std::vector<device_t *> device_list;
-		for (device_t &device : device_iterator(drivlist.config().root_device()))
+		for (device_t &device : device_iterator(drivlist.config()->root_device()))
 			device_list.push_back(&device);
 
 		// sort them by tag
@@ -742,7 +742,7 @@ void cli_frontend::listslots(const char *gamename)
 	{
 		// iterate
 		bool first = true;
-		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config().root_device()))
+		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
 			// output the line, up to the list of extensions
@@ -755,7 +755,7 @@ void cli_frontend::listslots(const char *gamename)
 			{
 				if (option.second->selectable())
 				{
-					device_t *dev = (*option.second->devtype())(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
+					device_t *dev = (*option.second->devtype())(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
 					dev->config_complete();
 					if (first_option) {
 						printf("%-16s %s\n", option.second->name(),dev->name());
@@ -802,7 +802,7 @@ void cli_frontend::listmedia(const char *gamename)
 	{
 		// iterate
 		bool first = true;
-		for (const device_image_interface &imagedev : image_interface_iterator(drivlist.config().root_device()))
+		for (const device_image_interface &imagedev : image_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (!imagedev.user_loadable())
 				continue;
@@ -872,8 +872,8 @@ void cli_frontend::verifyroms(const char *gamename)
 		std::unordered_set<std::string> device_map;
 		while (dummy_drivlist.next())
 		{
-			machine_config &config = dummy_drivlist.config();
-			for (device_t &dev : device_iterator(config.root_device()))
+			std::shared_ptr<machine_config> const &config = dummy_drivlist.config();
+			for (device_t &dev : device_iterator(config->root_device()))
 			{
 				if (dev.owner() != nullptr && (*(dev.shortname()) != 0) && dev.rom_region() != nullptr && (device_map.insert(dev.shortname()).second)) {
 					if (core_strwildcmp(gamename, dev.shortname()) == 0)
@@ -892,13 +892,13 @@ void cli_frontend::verifyroms(const char *gamename)
 				}
 			}
 
-			for (const device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+			for (const device_slot_interface &slot : slot_interface_iterator(config->root_device()))
 			{
 				for (auto &option : slot.option_list())
 				{
 					std::string temptag("_");
 					temptag.append(option.second->name());
-					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.c_str(), option.second->devtype(), 0);
+					device_t *dev = config->device_add(&config->root_device(), temptag.c_str(), option.second->devtype(), 0);
 
 					// notify this device and all its subdevices that they are now configured
 					for (device_t &device : device_iterator(*dev))
@@ -952,7 +952,7 @@ void cli_frontend::verifyroms(const char *gamename)
 						}
 					}
 
-					const_cast<machine_config &>(config).device_remove(&config.root_device(), temptag.c_str());
+					config->device_remove(&config->root_device(), temptag.c_str());
 				}
 			}
 		}
@@ -1236,7 +1236,7 @@ void cli_frontend::listsoftware(const char *gamename)
 
 	while (drivlist.next())
 	{
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 			if (list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
@@ -1279,7 +1279,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 	{
 		matched++;
 
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
 			{
@@ -1339,7 +1339,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
 	{
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 				if (!swlistdev.get_info().empty())
 				{
@@ -1372,7 +1372,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 
 	while (drivlist.next())
 	{
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config().root_device()))
+		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 		{
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{

@@ -1436,6 +1436,7 @@ incasunu
 indrema5                       // (c) 1998
 jungjuic
 kgalah
+kgbird							// (c) 1994
 koalamnt                        // (c) 2001
 kookabuk
 locoloot
@@ -1490,6 +1491,7 @@ swhr2
 swhr2u                        // (c) 1998
 swhr2v                        // (c) 1995
 topbana
+toutango						// (c) 1998
 trstrove
 tritreat
 trojhors
@@ -14321,6 +14323,8 @@ maniac                          // Ideal
 melodym                         // GAF
 rockpin                         // Tiger Electronics
 touchme                         // Atari
+ttfball                         // Toytronic
+ttfballa                        // Toytronic
 
 @source:hh_sm510.cpp
 gnwmndon                        // Nintendo

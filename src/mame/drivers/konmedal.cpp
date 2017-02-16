@@ -3,7 +3,7 @@
 /***************************************************************************
 
  Unknown medal game
- (c) 19?? Konami
+ (c) 1995 Konami
  Driver by R. Belmont
 
 Rundown of PCB:
@@ -14,6 +14,11 @@ Konami Custom chips:
 053252 (timing/interrupt controller?)
 054156 (tilemaps)
 054157 (tilemaps)
+
+Inputs:
+
+ c702 bit 5 = medal 3 error
+ c703 bit 5 = medal 4 error
 
 ***************************************************************************/
 
@@ -48,6 +53,10 @@ public:
 	READ8_MEMBER(magic_r);
 	WRITE8_MEMBER(bankswitch_w);
 	WRITE8_MEMBER(control2_w);
+	READ8_MEMBER(inputs_r)
+	{
+		return 0xff;
+	}
 
 private:
 	u8 m_control, m_control2;
@@ -63,6 +72,7 @@ public:
 
 WRITE8_MEMBER(konmedal_state::control2_w)
 {
+	//printf("%02x to control2\n", data);
 	m_control2 = data;
 }
 
@@ -72,7 +82,7 @@ READ8_MEMBER(konmedal_state::vram_r)
 	{
 		if (offset & 1)
 		{
-			return m_k056832->ram_attr_lo_r(space, offset>>1);
+			return m_k056832->ram_code_hi_r(space, offset>>1);
 		}
 		else
 		{
@@ -81,7 +91,6 @@ READ8_MEMBER(konmedal_state::vram_r)
 	}
 	else if (m_control == 0)	// ROM readback
 	{
-//		printf("offset %x\n", offset);
 		return m_k056832->konmedal_rom_r(space, offset);		
 	}
 	
@@ -90,12 +99,15 @@ READ8_MEMBER(konmedal_state::vram_r)
 	
 WRITE8_MEMBER(konmedal_state::vram_w)
 {
+	// there are (very few) writes above F000 in some screens.
+	// bug?  debug?  this?  who knows.
+
 	if (offset & 1)
 	{
-		m_k056832->ram_attr_lo_w(space, offset>>1, data);
+		m_k056832->ram_code_hi_w(space, offset>>1, data);
 		return;
 	}
-		
+	
 	m_k056832->ram_code_lo_w(space, offset>>1, data);
 }
 
@@ -106,8 +118,9 @@ READ8_MEMBER(konmedal_state::magic_r)
 	
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
-//	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
-	*color = 0; //((*color & 0x3c) << 2);
+	int codebits = *code;
+	*color = (codebits >> 12) & 0xf;
+	*code = (codebits & 0xfff);
 }
 
 void konmedal_state::video_start()
@@ -121,11 +134,11 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	screen.priority().fill(0, cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
 
 	// force "A" layer over top of everything
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -146,8 +159,7 @@ PALETTE_INIT_MEMBER(konmedal_state, konmedal)
                                                              
 INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 {
-//	if (m_k056832->is_irq_enabled(0))
-//		device.execute().set_input_line(Z80_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(konmedal_state::bankswitch_w)
@@ -166,6 +178,7 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc500, 0xc500) AM_NOP	// read to reset watchdog
+	AM_RANGE(0xc702, 0xc703) AM_READ(inputs_r)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
@@ -173,6 +186,7 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( konmedal )
+
 INPUT_PORTS_END
 
 void konmedal_state::machine_start()
@@ -197,7 +211,7 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(96, 416-1, 16, 240-1)
+	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -240,4 +254,4 @@ ROM_START( konmedal )   // US version UAE
 	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) ) 
 ROM_END
 
-GAME( 19??, konmedal, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Unknown Medal Game", MACHINE_NOT_WORKING)
+GAME( 1995, konmedal, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Unknown Medal Game", MACHINE_NOT_WORKING)

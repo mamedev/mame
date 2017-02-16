@@ -133,6 +133,16 @@ void aim65_state::machine_start()
 	if (m_z26->exists())
 		space.install_read_handler(0xb000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z26));
 
+	// Init PROM/ROM module sockets
+	if (m_z12->exists())
+		space.install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z12));
+	if (m_z13->exists())
+		space.install_read_handler(0x5000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z13));
+	if (m_z14->exists())
+		space.install_read_handler(0x6000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z14));
+	if (m_z15->exists())
+		space.install_read_handler(0x7000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z15));
+
 	// Init RAM
 	space.install_ram(0x0000, ram->size() - 1, ram->pointer());
 
