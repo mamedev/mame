@@ -4207,7 +4207,7 @@ GAMEL( 2000, incasunu,  incasun,  aristmk5_usa, aristmk5_usa, aristmk5_state, ar
 GAMEL( 1998, indrema5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628/1,    B - 15/12/98
 GAMEL( 1996, jungjuic,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",         MACHINE_FLAGS, layout_aristmk5 )  // 566/3, F - 06/03/96
 GAMEL( 1995, kgalah,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 613/6, A - 21/07/95
-GAMEL( 1994, kgbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT) ",               MACHINE_FLAGS, layout_aristmk5 )  // 540/3, D - 10/10/94
+GAMEL( 1994, kgbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 540/3, D - 10/10/94
 GAMEL( 1998, kookabuk,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 661, A - 03/04/98
 GAMEL( 1997, locoloot,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 599/2, C - 17/06/97
 GAMEL( 1998, locolootnz,locoloot, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",            MACHINE_FLAGS, layout_aristmk5 )  // MV4064, A - 8/7/98
@@ -4244,7 +4244,7 @@ GAMEL( 1997, qnileb,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1997, qnilec,    qnile,    aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",        MACHINE_FLAGS, layout_aristmk5 )  // 602/4,    B - 13/05/97
 GAMEL( 1997, qnileu,    qnile,    aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",       MACHINE_FLAGS, layout_aristmk5_us )  // MV4091,   B - 13/05/97
 GAMEL( 1999, qnilemax,  aristmk5, aristmk5_touch,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Maximillions (0401072V, NSW/ACT)", MACHINE_FLAGS, layout_aristmk5 )  // 602/4, D - 18/06/99
-GAMEL( 1994, qtbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT) ",             MACHINE_FLAGS, layout_aristmk5 )  //  581, A - 27/10/94
+GAMEL( 1994, qtbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Q.T. Bird (0500009V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  //  581, A - 27/10/94
 GAMEL( 2000, rainwrce,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Rainbow Warriors - Cash Express (0101332V, NSW/ACT)",  MACHINE_FLAGS, layout_aristmk5 )  // 655, B - 02/03/00
 GAMEL( 1998, reelrock,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0100779V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628,      A - 13/07/98
 GAMEL( 1997, retrsam,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Return of the Samurai (0400549V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 608, A - 17/04/97
@@ -4266,7 +4266,7 @@ GAMEL( 1996, wamazonv,  wamazon,  aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1996, wildbill,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Bill (0100297V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 543/8, C - 15/08/96
 GAMEL( 1996, wcougar,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (0100167V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 569/9, B - 27/2/96
 GAMEL( 1997, wcougaru,  wcougar,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Cougar (NHG0296-04, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 569/8,    D - 19/05/97
-GAMEL( 1996, wizways,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT) ",              MACHINE_FLAGS, layout_aristmk5 )  // 598/3, A - 04/11/96
+GAMEL( 1996, wizways,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wizard Ways (0200396V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 598/3, A - 04/11/96
 GAMEL( 1997, wnpost,    aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Winning Post (RHG0418-04, US)",       MACHINE_FLAGS, layout_aristmk5_us )  // 541/2, G - 11/02/97
 GAMEL( 1999, wthing,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0101158V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 608/4, B - 14/12/99
 GAMEL( 1999, wtiger,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",      MACHINE_FLAGS, layout_aristmk5 )  // 638/1,    B - 08/07/99
