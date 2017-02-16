@@ -65,7 +65,7 @@ void wd177x_format::build_sector_description(const format &f, uint8_t *sectdata,
 					cur_offset += f.sector_base_size ? f.sector_base_size : f.per_sector_size[j];
 			sectors[i].data = sectdata + cur_offset;
 			sectors[i].size = f.sector_base_size ? f.sector_base_size : f.per_sector_size[i];
-			sectors[i].sector_id = i + f.per_sector_id[0];
+			sectors[i].sector_id = f.per_sector_id[i];
 		}
 	} else {
 		int cur_offset = 0;

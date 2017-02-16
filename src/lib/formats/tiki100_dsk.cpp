@@ -6,8 +6,6 @@
 
     TIKI 100 disk image format
 
-    NOTE: existing sector dump images are interleaved
-
 *********************************************************************/
 
 #include <assert.h>
@@ -56,7 +54,7 @@ const tiki100_format::format tiki100_format::formats[] = {
 	// 89xff
 	{   //  90K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 18, 40, 1, 128, {}, 1, { 1,10,6,15,11,2,16,7,3,12,8,17,13,4,12,9,5,14 }, 20, 11, 7
+		4000, 18, 40, 1, 128, {}, -1, { 1,10,6,15,11,2,16,7,3,12,8,17,13,4,12,9,5,14 }, 20, 11, 7
 	},
 
 	// track description
@@ -73,12 +71,12 @@ const tiki100_format::format tiki100_format::formats[] = {
 	// 275x4e
 	{   //  200K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 10, 40, 1, 512, {}, 1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
+		2000, 10, 40, 1, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
 
 	{   //  360K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 9, 40, 2, 512, {}, 1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
+		2000, 9, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
 
 	// track description
@@ -95,7 +93,7 @@ const tiki100_format::format tiki100_format::formats[] = {
 	// 275x4e
 	{   //  400K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 10, 40, 2, 512, {}, 1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
+		2000, 10, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
 
 	// track description
@@ -112,7 +110,7 @@ const tiki100_format::format tiki100_format::formats[] = {
 	// 275x4e
 	{   //  800K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
-		2000, 10, 80, 2, 512, {}, 1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
+		2000, 10, 80, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
 
 	{}
