@@ -681,11 +681,14 @@ class inp_header
 public:
 	// parameters
 	static constexpr unsigned MAJVERSION = 3;
-	static constexpr unsigned MINVERSION = 0;
+	static constexpr unsigned MINVERSION = 1;
 
 	bool read(emu_file &f)
 	{
-		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+		bool ret = f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+		if(get_minversion() < 1)
+			f.seek(-4,SEEK_CUR);  // adjust for smaller v3.0 header
+		return ret;
 	}
 	bool write(emu_file &f) const
 	{
@@ -718,11 +721,17 @@ public:
 	}
 	std::string get_sysname() const
 	{
-		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
+		if(get_minversion() < 1)
+			return get_string<OFFS_SYSNAME, OFFS_APPDESC - 4>();  // v3.0 INPs have maximum 12 character shortnames
+		else
+			return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
 	}
 	std::string get_appdesc() const
 	{
-		return get_string<OFFS_APPDESC, OFFS_END>();
+		if(get_minversion() < 1)
+			return get_string<OFFS_APPDESC - 4, OFFS_END - 4>();
+		else
+			return get_string<OFFS_APPDESC, OFFS_END>();
 	}
 
 	void set_magic()
@@ -773,9 +782,9 @@ private:
 	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
 	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
 																// 0x02 bytes reserved
-	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
-	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
-	static constexpr std::size_t    OFFS_END         = 0x40;
+	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x10 bytes (ASCII)
+	static constexpr std::size_t    OFFS_APPDESC     = 0x24;    // 0x20 bytes (ASCII)
+	static constexpr std::size_t    OFFS_END         = 0x44;
 
 	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
 
