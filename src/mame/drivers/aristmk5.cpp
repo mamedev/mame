@@ -3519,7 +3519,7 @@ ROM_START( qtbird )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( kgbird )
+ROM_START( kgbirdmk5 )
 	ARISTOCRAT_MK5_BIOS
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -4207,7 +4207,7 @@ GAMEL( 2000, incasunu,  incasun,  aristmk5_usa, aristmk5_usa, aristmk5_state, ar
 GAMEL( 1998, indrema5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",          MACHINE_FLAGS, layout_aristmk5 )  // 628/1,    B - 15/12/98
 GAMEL( 1996, jungjuic,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",         MACHINE_FLAGS, layout_aristmk5 )  // 566/3, F - 06/03/96
 GAMEL( 1995, kgalah,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 613/6, A - 21/07/95
-GAMEL( 1994, kgbird,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 540/3, D - 10/10/94
+GAMEL( 1994, kgbirdmk5, aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "K.G. Bird (0200024V, NSW/ACT)",               MACHINE_FLAGS, layout_aristmk5 )  // 540/3, D - 10/10/94
 GAMEL( 1998, kookabuk,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Kooka Bucks (0100677V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 661, A - 03/04/98
 GAMEL( 1997, locoloot,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 599/2, C - 17/06/97
 GAMEL( 1998, locolootnz,locoloot, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",            MACHINE_FLAGS, layout_aristmk5 )  // MV4064, A - 8/7/98
