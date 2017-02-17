@@ -403,6 +403,18 @@
 		</part>
 	</software>
 
+	<software name="spellmstr">
+		<description>Spell-Master</description>
+		<year>1988</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="128krom"/>
+			<dataarea name="rom" size="131072">
+				<rom name="spellmaster.epr" size="131072" crc="ad0c407d" sha1="1e9d302989e8e98e963f99ce1ea5a634ed1c466e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ugrom">
 		<description>Z88 User Group ROM</description>
 		<year>1989</year>
