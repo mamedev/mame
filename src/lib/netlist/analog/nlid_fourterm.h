@@ -136,7 +136,6 @@ namespace netlist {
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
-		, m_gfac(1.0)
 		{
 			m_gfac = NL_FCONST(1.0) / m_RI();
 		}
@@ -145,8 +144,6 @@ namespace netlist {
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
-
-		nl_double m_gfac;
 	};
 
 

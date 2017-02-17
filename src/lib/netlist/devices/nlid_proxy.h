@@ -35,12 +35,6 @@ namespace netlist
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
-		const logic_family_desc_t *m_logic_family;
-
-		virtual const logic_family_desc_t &logic_family() const
-		{
-			return *m_logic_family;
-		}
 
 	private:
 		logic_t *m_term_proxied;

@@ -197,7 +197,8 @@ public:
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::copy((char *)s->m_ptr, (char *) s->m_ptr + sz, p);
+				std::copy(static_cast<char *>(s->m_ptr),
+						static_cast<char *>(s->m_ptr) + sz, p);
 			else
 				log().fatal("found unsupported save element {1}\n", s->m_name);
 			p += sz;
@@ -220,7 +221,7 @@ public:
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::copy(p, p + sz, (char *) s->m_ptr);
+				std::copy(p, p + sz, static_cast<char *>(s->m_ptr));
 			else
 				log().fatal("found unsupported save element {1}\n", s->m_name);
 			p += sz;

@@ -69,7 +69,7 @@ namespace netlist
 		logic_output_t m_QC;
 		logic_output_t m_QD;
 
-		state_var_u8 m_reset;
+		state_var<netlist_sig_t> m_reset;
 		state_var_u8 m_a;
 		state_var_u8 m_bcd;
 	};
