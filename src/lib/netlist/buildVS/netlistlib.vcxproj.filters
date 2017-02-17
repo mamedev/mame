@@ -186,9 +186,6 @@
     <ClCompile Include="..\devices\nld_7473.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_74279.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_4066.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -226,9 +223,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_7474.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_9312.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_82S126.cpp">
@@ -434,9 +428,6 @@
     <ClInclude Include="..\devices\nlid_proxy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_74279.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nld_log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -468,9 +459,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_7474.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_9312.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_74194.h">

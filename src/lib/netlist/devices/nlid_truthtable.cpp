@@ -69,6 +69,8 @@ namespace netlist
 		size_t m_size;
 	};
 
+	static const uint_least64_t one64 = static_cast<uint_least64_t>(1);
+
 	struct truthtable_desc_t
 	{
 		truthtable_desc_t(unsigned NO, unsigned NI, bool *initialized,
@@ -159,7 +161,7 @@ namespace netlist
 				connect(m_Q[i], m_I[idx]);
 				// disable ignore for this inputs altogether.
 				// FIXME: This shouldn't be necessary
-				disabled_ignore |= (1<<idx);
+				disabled_ignore |= (one64 << idx);
 			}
 		}
 
@@ -236,7 +238,7 @@ uint_least64_t truthtable_desc_t::set_bits(uint_least64_t v, uint_least64_t b)
 uint_least64_t truthtable_desc_t::get_ignored_simple(uint_least64_t i)
 {
 	uint_least64_t m_enable = 0;
-	for (size_t j=0; j<m_size; j++)
+	for (uint_least64_t j=0; j<m_size; j++)
 	{
 		if (m_outs[j] != m_outs[i])
 		{
@@ -250,24 +252,24 @@ uint_least64_t truthtable_desc_t::get_ignored_extended(uint_least64_t state)
 {
 	// Determine all inputs which may be ignored ...
 	uint_least64_t ignore = 0;
-	for (unsigned j=0; j<m_NI; j++)
+	for (std::size_t j=0; j<m_NI; j++)
 	{
-		if (m_outs[state] == m_outs[state ^ (1 << j)])
-			ignore |= (1<<j);
+		if (m_outs[state] == m_outs[state ^ (one64 << j)])
+			ignore |= (one64 << j);
 	}
 	/* Check all permutations of ign
 	 * We have to remove those where the ignored inputs
 	 * may change the output
 	 */
-	uint_least64_t bits = (1<<count_bits(ignore));
+	uint_least64_t bits = (one64 << count_bits(ignore));
 	std::vector<bool> t(bits);
 
 	for (size_t j=1; j<bits; j++)
 	{
 		uint_least64_t tign = set_bits(ignore, j);
 		t[j] = 0;
-		uint_least64_t bitsk=(1<<count_bits(tign));
-		for (size_t k=0; k<bitsk; k++)
+		uint_least64_t bitsk=(one64 << count_bits(tign));
+		for (uint_least64_t k=0; k<bitsk; k++)
 		{
 			uint_least64_t b=set_bits(tign, k);
 			if (m_outs[state] != m_outs[(state & ~tign) | b])
@@ -377,7 +379,7 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 		{
 			pstring outs = out[j].trim();
 			if (outs.equals("1"))
-				val = val | (1 << j);
+				val = val | (one64 << j);
 			else
 				nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
 			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(times[j].trim().as_long()));
@@ -399,7 +401,7 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 	// determine ignore
 	std::vector<uint_least64_t> ign(m_size, all_set);
 
-	for (size_t i=0; i<m_size; i++)
+	for (uint_least64_t i=0; i<m_size; i++)
 	{
 		if (ign[i] == all_set)
 		{
@@ -415,7 +417,7 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 
 				ign[i] = tign;
 				/* don't need to recalculate similar ones */
-				uint_least64_t bitsk=(1<<count_bits(tign));
+				uint_least64_t bitsk=(one64 << count_bits(tign));
 				for (uint_least64_t k=0; k<bitsk; k++)
 				{
 					uint_least64_t b=set_bits(tign, k);

@@ -88,6 +88,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -127,7 +128,6 @@
     <ClCompile Include="..\devices\nld_74192.cpp" />
     <ClCompile Include="..\devices\nld_74193.cpp" />
     <ClCompile Include="..\devices\nld_74194.cpp" />
-    <ClCompile Include="..\devices\nld_74279.cpp" />
     <ClCompile Include="..\devices\nld_74365.cpp" />
     <ClCompile Include="..\devices\nld_7448.cpp" />
     <ClCompile Include="..\devices\nld_7450.cpp" />
@@ -144,7 +144,6 @@
     <ClCompile Include="..\devices\nld_82S126.cpp" />
     <ClCompile Include="..\devices\nld_82S16.cpp" />
     <ClCompile Include="..\devices\nld_9310.cpp" />
-    <ClCompile Include="..\devices\nld_9312.cpp" />
     <ClCompile Include="..\devices\nld_9316.cpp" />
     <ClCompile Include="..\devices\nld_9322.cpp" />
     <ClCompile Include="..\devices\nld_am2847.cpp" />
@@ -209,7 +208,6 @@
     <ClInclude Include="..\devices\nld_74192.h" />
     <ClInclude Include="..\devices\nld_74193.h" />
     <ClInclude Include="..\devices\nld_74194.h" />
-    <ClInclude Include="..\devices\nld_74279.h" />
     <ClInclude Include="..\devices\nld_74365.h" />
     <ClInclude Include="..\devices\nld_7448.h" />
     <ClInclude Include="..\devices\nld_7450.h" />
@@ -226,7 +224,6 @@
     <ClInclude Include="..\devices\nld_82S126.h" />
     <ClInclude Include="..\devices\nld_82S16.h" />
     <ClInclude Include="..\devices\nld_9310.h" />
-    <ClInclude Include="..\devices\nld_9312.h" />
     <ClInclude Include="..\devices\nld_9316.h" />
     <ClInclude Include="..\devices\nld_9322.h" />
     <ClInclude Include="..\devices\nld_am2847.h" />
