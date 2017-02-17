@@ -135,8 +135,8 @@ class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
-	netlist_tool_t(const pstring &aname)
-	: netlist::netlist_t(aname)
+	netlist_tool_t(tool_app_t &app, const pstring &aname)
+	: netlist::netlist_t(aname), m_app(app)
 	{
 	}
 
@@ -235,13 +235,14 @@ protected:
 	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
+	tool_app_t &m_app;
 };
 
 void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
 {
 	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
 	// FIXME: ...
-	//pout("{}", err);
+	m_app.pout("{}", err);
 	if (l == plib::plog_level::FATAL)
 		throw netlist::nl_exception(err);
 }
@@ -309,7 +310,7 @@ void tool_app_t::run()
 	plib::chrono::timer<plib::chrono::system_ticks> t;
 	t.start();
 
-	netlist_tool_t nt("netlist");
+	netlist_tool_t nt(*this, "netlist");
 	//plib::perftime_t<plib::exact_ticks> t;
 
 	nt.init();
@@ -388,7 +389,7 @@ void tool_app_t::run()
 
 void tool_app_t::static_compile()
 {
-	netlist_tool_t nt("netlist");
+	netlist_tool_t nt(*this, "netlist");
 
 	nt.init();
 
@@ -473,7 +474,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 
 void tool_app_t::create_header()
 {
-	netlist_tool_t nt("netlist");
+	netlist_tool_t nt(*this, "netlist");
 
 	nt.init();
 
@@ -518,7 +519,7 @@ void tool_app_t::create_header()
 
 void tool_app_t::create_docheader()
 {
-	netlist_tool_t nt("netlist");
+	netlist_tool_t nt(*this, "netlist");
 
 	nt.init();
 
@@ -569,7 +570,7 @@ void tool_app_t::create_docheader()
 
 void tool_app_t::listdevices()
 {
-	netlist_tool_t nt("netlist");
+	netlist_tool_t nt(*this, "netlist");
 	nt.init();
 	if (!opt_verb())
 		nt.log().verbose.set_enabled(false);
