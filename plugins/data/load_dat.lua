@@ -49,7 +49,12 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	stmt:finalize()
 
-	if not dbver then
+	if not fh and dbver then
+		-- data in database but missing file, just use what we have
+		return read, dbver
+	elseif not fh then
+		return nil
+	elseif not dbver then
 		db:exec("CREATE TABLE \"" .. file .. [[_idx" (
 				type VARCHAR NOT NULL,
 				val VARCHAR NOT NULL,
@@ -57,11 +62,6 @@ function datfile.open(file, vertag, fixupcb)
 				data INTEGER NOT NULL)]])
 		db:exec("CREATE TABLE \"" .. file .. "\" (data CLOB NOT NULL)")
 		db:exec("CREATE INDEX \"typeval_" .. file .. "\" ON \"" .. file .. "_idx\"(type, val)")
-	elseif not fh then
-		-- data in database but missing file, just use what we have
-		return read, dbver
-	elseif not fh and not dbver then
-		return nil
 	end
 
 	if vertag then
