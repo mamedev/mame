@@ -10,16 +10,18 @@
 -----------------------------------------------------------
  *020     1650    19??, GI Economega IV TV PPL Tuning System Control
  @024     1655    1979, Toytronic? Football
- @033     1655A   1979, Toytronic Football
+ @033     1655A   1979, Toytronic Football (newer)
  @036     1655A   1979, Ideal Maniac
- *043     1655A   1979, Calfax/Caprice Pro-Action Baseball (have dump)
+ *043     1655A   1979, Caprice Pro-Action Baseball (have dump)
  *051     1655A   1979, U.S. Games Basketball/Tandy Electronic Basketball (have dump)
  @053     1655A   1979, Atari Touch Me
+ @0??     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (custom label)
  @061     1655A   1980, Lakeside Le Boom
+ *081     1655A   19??, Ramtex Space Invaders/Block Buster
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
- *133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
- *144     1650A   1980, U.S. Games Football/Tandy 2-Player Football (have dump)
+ *133     1650A   1981, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
+ *144     1650A   1981, U.S. Games Football/Tandy 2-Player Football (have dump)
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
@@ -27,10 +29,6 @@
  *532     1650A   19??, "
  *533     1650A   19??, "
  *536     1650    1982, GI Teleview Autodialer/Terminal Identifier
-
-  inconsistent:
-
- @<none>  1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -617,8 +615,9 @@ MACHINE_CONFIG_END
   * 1 led, 1-bit sound with RC circuit for volume decay
   
   This is a tabletop timebomb defusion game. It's shaped like an aerial bomb,
-  and starts 'ticking' when the player opens the keypad door. To begin, select
-  the game mode, rows(keypad size), and fuse duration.
+  colored black on USA version, yellow on dual-language Canadian version.
+  The game starts 'ticking' when the player opens the keypad door. To begin,
+  select the game mode, rows(keypad size), and fuse duration.
   
   Game modes as described on the box:
   1: Eliminate the buttons one by one in the order set out by the computer. Press
@@ -996,7 +995,7 @@ MACHINE_CONFIG_END
 
   Toytronic Football
   * PIC1655-024 or PIC1655A-033
-  * 4511 7seg decoder, 7 7seg LEDs + 27 other LEDs, 1-bit sound
+  * 4511 7seg BCD decoder, 7 7seg LEDs + 27 other LEDs, 1-bit sound
   
   Hello and welcome to another Mattel Football clone, there are so many of these.
   The PIC1655-024 one came from an unbranded handheld, but comparison suggests
@@ -1045,7 +1044,7 @@ WRITE8_MEMBER(ttfball_state::write_b)
 	// B0,B1,B3,B7: input mux low
 	m_inp_mux = (m_inp_mux & 0x10) | (~data & 3) | (~data >> 1 & 4) | (~data >> 4 & 8);
 
-	// B0-B7: led select
+	// B0-B7: led select (see above)
 	m_b = data;
 	prepare_display();
 }
@@ -1058,7 +1057,7 @@ WRITE8_MEMBER(ttfball_state::write_c)
 	// C7: input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
 
-	// C0-C7: led data/select, 4511
+	// C0-C7: led data/select (see above)
 	m_c = data;
 	prepare_display();
 }

@@ -586,14 +586,13 @@ MACHINE_CONFIG_END
 
   LJN I Took a Lickin' From a Chicken
   * COP421 MCU label ~/005 COP421-NJC/N
-  * 11 leds, 1-bit sound, motor to a rubber chicken with a pulley in the middle
+  * 11 leds, 1-bit sound, motor to a chicken on a spring
   
   This toy includes 4 games: Tic Tac Toe, Chicken Sez, and Total Recall I/II.
 
   known releases:
-  - USA: I Took a Lickin' From a Chicken (KMart Corporation/LJN?)
-  - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」,
-    distributed by Bandai
+  - USA: I Took a Lickin' From a Chicken
+  - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, distributed by Bandai
 
 ***************************************************************************/
 

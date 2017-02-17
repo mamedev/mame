@@ -63,6 +63,8 @@
 
   35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
   42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
+  
+ *89      HD44801C  1985, CXG Advanced Portachess
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
