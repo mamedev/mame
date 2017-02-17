@@ -1,6 +1,14 @@
 local sql = require("lsqlite3")
 local datfile = {}
-local db = sql.open(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():match("([^;]+)")) .. "/history.db")
+local db
+do
+	local dbpath = lfs.env_replace(mame_manager:ui():options().entries.historypath:value():match("([^;]+)"))
+	db = sql.open(dbpath .. "/history.db")
+	if not db then
+		lfs.mkdir(dbpath)
+		db = sql.open(dbpath .. "/history.db")
+	end
+end
 if db then
 	local found = false
 	db:exec("select * from sqllite_master where name = version", function() found = true return 0 end)

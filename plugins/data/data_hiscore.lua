@@ -545,7 +545,7 @@ function dat.check(set, softlist)
 		return script
 	end
 
-	if #env == 0 then
+	if not env.open then
 		function env.open(file, size)
 			if file == ".hi" then
 				local path = "hi"
