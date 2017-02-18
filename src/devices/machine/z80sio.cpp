@@ -54,38 +54,40 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_GENERAL 0x001
-#define LOG_SETUP   0x002
-#define LOG_PRINTF  0x004
-#define LOG_READ    0x008
-#define LOG_INT     0x010
-#define LOG_TX      0x020
-#define LOG_RCV     0x040
-#define LOG_CTS     0x080
-#define LOG_DCD     0x100
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_READ    (1U <<  2)
+#define LOG_INT     (1U <<  3)
+#define LOG_CMD     (1U <<  4)
+#define LOG_TX      (1U <<  5)
+#define LOG_RCV     (1U <<  6)
+#define LOG_CTS     (1U <<  7)
+#define LOG_DCD     (1U <<  8)
+#define LOG_SYNC    (1U <<  9)
+#define LOG_BIT     (1U <<  10)
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_READ|LOG_SETUP|LOG_INT|LOG_TX|LOG_RCV)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,    __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,     __VA_ARGS__)
-#define LOGTX(...)    LOGMASK(LOG_TX,      __VA_ARGS__)
-#define LOGRCV(...)   LOGMASK(LOG_RCV,     __VA_ARGS__)
-#define LOGCTS(...)   LOGMASK(LOG_CTS,     __VA_ARGS__)
-#define LOGDCD(...)   LOGMASK(LOG_DCD,     __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,    __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGCMD(...)   LOGMASKED(LOG_CMD,     __VA_ARGS__)
+#define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
+#define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
+#define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
+#define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
+#define LOGBIT(...)   LOGMASKED(LOG_BIT,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
+#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
+#define LLFORMAT "%lld"
 #endif
 
 #define CHANA_TAG   "cha"
@@ -99,6 +101,7 @@
 const device_type Z80SIO = &device_creator<z80sio_device>;
 const device_type Z80SIO_CHANNEL = &device_creator<z80sio_channel>;
 const device_type UPD7201N = &device_creator<upd7201N_device>; // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+const device_type I8274N = &device_creator<i8274N_device>; // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
 
 //-------------------------------------------------
 //  device_mconfig_additions -
@@ -184,6 +187,9 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 
 upd7201N_device::upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80sio_device(mconfig, UPD7201N, "UPD 7201", tag, owner, clock, TYPE_UPD7201, "upd7201", __FILE__){ }
+
+i8274N_device::i8274N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_device(mconfig, I8274N, "i8274", tag, owner, clock, TYPE_I8274, "i8274", __FILE__){ }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -283,13 +289,14 @@ int z80sio_device::z80daisy_irq_ack()
 			m_chanA->m_rr0 &= ~z80sio_channel::RR0_INTERRUPT_PENDING;
 			check_interrupts();
 
-			//LOG("%s %s \n",FUNCNAME, tag(), m_chanB->m_rr2);
+			LOGINT("%s %s %02x\n",FUNCNAME, tag(), m_chanB->m_rr2);
 
 			return m_chanB->m_rr2;
 		}
 	}
 
-	//logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+	LOGINT("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+	logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 
 	return m_chanB->m_rr2;
 }
@@ -358,7 +365,6 @@ void z80sio_device::trigger_interrupt(int index, int state)
 
 	LOGINT("%s %s \n",FUNCNAME, tag());
 
-#if 0
 	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
 	{
 		int prio_level = 0;
@@ -399,14 +405,13 @@ void z80sio_device::trigger_interrupt(int index, int state)
 	}
 	else
 	{
-#endif
 		priority = (index << 2) | state;
 		if (m_chanB->m_wr1 & z80sio_channel::WR1_STATUS_VECTOR)
 		{
 			// status affects vector
 			vector = (m_chanB->m_wr2 & 0xf1) | (!index << 3) | (state << 1);
 		}
-//  }
+	}
 	// update vector register
 	m_chanB->m_rr2 = vector;
 
@@ -618,7 +623,7 @@ void z80sio_channel::tra_callback()
 {
 	if (!(m_wr5 & WR5_TX_ENABLE))
 	{
-		LOG("%s() \"%s \"Channel %c transmit mark 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGBIT("%s() \"%s \"Channel %c transmit mark 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		// transmit mark
 		if (m_index == z80sio_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(1);
@@ -627,7 +632,7 @@ void z80sio_channel::tra_callback()
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
-		LOG("%s() \"%s \"Channel %c send break 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGBIT("%s() \"%s \"Channel %c send break 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		// transmit break
 		if (m_index == z80sio_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(0);
@@ -638,7 +643,7 @@ void z80sio_channel::tra_callback()
 	{
 		int db = transmit_register_get_data_bit();
 
-		LOG("%s() \"%s \"Channel %c transmit data bit %d m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, db, m_wr5);
+		LOGBIT("%s() \"%s \"Channel %c transmit data bit %d m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, db, m_wr5);
 		// transmit data
 		if (m_index == z80sio_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(db);
@@ -647,7 +652,7 @@ void z80sio_channel::tra_callback()
 	}
 	else
 	{
-		LOG("%s() \"%s \"Channel %c Failed to transmit m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGBIT("%s() \"%s \"Channel %c Failed to transmit m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		logerror("%s \"%s \"Channel %c Failed to transmit\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
 	}
 }
@@ -661,7 +666,7 @@ void z80sio_channel::tra_complete()
 	LOG("%s %s\n",FUNCNAME, tag());
 	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK) && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
 	{
-		LOG("%s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5);
+		LOGTX("%s() \"%s \"Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_tx_data, m_wr5);
 
 		transmit_register_setup(m_tx_data);
 
@@ -673,7 +678,7 @@ void z80sio_channel::tra_complete()
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
-		LOG("%s() \"%s \"Channel %c Transmit Break 0 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s() \"%s \"Channel %c Transmit Break 0 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		// transmit break
 		if (m_index == z80sio_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(0);
@@ -682,7 +687,7 @@ void z80sio_channel::tra_complete()
 	}
 	else
 	{
-		LOG("%s() \"%s \"Channel %c Transmit Mark 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s() \"%s \"Channel %c Transmit Mark 1 m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		// transmit mark
 		if (m_index == z80sio_device::CHANNEL_A)
 			m_uart->m_out_txda_cb(1);
@@ -693,7 +698,7 @@ void z80sio_channel::tra_complete()
 	// if transmit buffer is empty
 	if (m_rr0 & RR0_TX_BUFFER_EMPTY)
 	{
-		LOG("%s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_wr5);
 		// then all characters have been sent
 		m_rr1 |= RR1_ALL_SENT;
 
@@ -711,13 +716,13 @@ void z80sio_channel::rcv_callback()
 {
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
-		LOG("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd);
+		LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd);
 		receive_register_update_bit(m_rxd);
 	}
 #if 0
 	else
 	{
-		LOG("%s() \"%s \"Channel %c Received Data Bit but receiver is disabled\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
+		LOGBIT("%s() \"%s \"Channel %c Received Data Bit but receiver is disabled\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
 		logerror("Z80SIO %s() \"%s \"Channel %c Received data dit but receiver is disabled\n", __func__, m_owner->tag(), 'A' + m_index);
 	}
 #endif
@@ -733,7 +738,7 @@ void z80sio_channel::rcv_complete()
 
 	receive_register_extract();
 	data = get_received_char();
-	LOG("%s() \"%s \"Channel %c Received Data %02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, data);
+	LOGRCV("%s() \"%s \"Channel %c Received Data %02x\n", FUNCNAME, m_owner->tag(), 'A' + m_index, data);
 	receive_data(data);
 }
 
@@ -863,7 +868,7 @@ int z80sio_channel::get_tx_word_length()
  * Break/Abort latch. */
 uint8_t z80sio_channel::do_sioreg_rr0()
 {
-	LOG("%s %s\n",FUNCNAME, tag());
+	LOGR("%s %s\n",FUNCNAME, tag());
 	return m_rr0;
 }
 /*
@@ -871,7 +876,7 @@ uint8_t z80sio_channel::do_sioreg_rr0()
  * codes for the I-Field in the SDLC Receive Mode. */
 uint8_t z80sio_channel::do_sioreg_rr1()
 {
-	LOG("%s %s\n",FUNCNAME, tag());
+	LOGR("%s %s\n",FUNCNAME, tag());
 	return m_rr1;
 }
 /*
@@ -884,7 +889,7 @@ no interrupts are pending, the vector is modified with V3 = 0, V2 = 1, and
 V1 = 1. This register is read only through Channel B. */
 uint8_t z80sio_channel::do_sioreg_rr2()
 {
-	LOG("%s %s\n",FUNCNAME, tag());
+	LOGR("%s %s\n",FUNCNAME, tag());
 	// channel B only
 	return m_index == z80sio_device::CHANNEL_B ? m_rr2 : 0;
 }
@@ -916,6 +921,8 @@ uint8_t z80sio_channel::control_read()
 		LOG("%s %s unsupported register:%02x\n",FUNCNAME, tag(), reg);
 	}
 
+	LOGR(" * %s %c Reg %02x -> %02x - %s\n", tag(), 'A' + m_index, reg, data, std::array<char const *, 3>
+		 {{"RR0 status register", "RR1 - Special Receive Conditions", "RR2 - Interrupt Vector"}}[reg]);
 	return data;
 }
 
@@ -946,6 +953,9 @@ void z80sio_channel::do_sioreg_wr0_resets(uint8_t data)
 void z80sio_channel::do_sioreg_wr0(uint8_t data)
 {
 	m_wr0 = data;
+
+	if ((data & WR0_COMMAND_MASK) != WR0_NULL)
+		LOGSETUP(" * %s %c Reg %02x <- %02x \n", m_owner->tag(), 'A' + m_index, 0, data);
 	switch (data & WR0_COMMAND_MASK)
 	{
 	case WR0_NULL:
@@ -1088,7 +1098,8 @@ void z80sio_channel::control_write(uint8_t data)
 
 	if (reg != 0)
 	{
-		LOGSETUP(" * %s %c Reg %02x <- %02x \n", m_owner->tag(), 'A' + m_index, reg, data);
+		LOGSETUP(" * %s %c Reg %02x <- %02x - %s\n", tag(), 'A' + m_index, reg, data, std::array<char const *, 8>
+			 {{"WR0", "WR1", "WR2", "WR3 - Async Rx setup", "WR4 - Async Clock, Parity and stop bits", "WR5 - Async Tx setup", "WR6", "WR7"}}[reg]);
 		// mask out register index
 		m_wr0 &= ~WR0_REGISTER_MASK;
 	}
@@ -1151,7 +1162,7 @@ void z80sio_channel::data_write(uint8_t data)
 
 	if ((m_wr5 & WR5_TX_ENABLE) && is_transmit_register_empty())
 	{
-		LOG("Z80SIO \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data);
+		LOGTX("Z80SIO \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data);
 
 		transmit_register_setup(m_tx_data);
 
@@ -1163,7 +1174,7 @@ void z80sio_channel::data_write(uint8_t data)
 	}
 	else
 	{
-		LOG("  Transmitter %s, data byte dropped\n", m_wr5 & WR5_TX_ENABLE ? "not enabled" : "not emptied");
+		LOGTX("  Transmitter %s, data byte dropped\n", m_wr5 & WR5_TX_ENABLE ? "not enabled" : "not emptied");
 		m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
 	}
 
@@ -1176,7 +1187,7 @@ void z80sio_channel::data_write(uint8_t data)
 //-------------------------------------------------
 void z80sio_channel::receive_data(uint8_t data)
 {
-	LOG("%s(%02x) %s:%c\n",FUNCNAME, data, tag(), 'A' + m_index);
+	LOGRCV("%s(%02x) %s:%c\n",FUNCNAME, data, tag(), 'A' + m_index);
 
 	if (m_rx_fifo == 2)
 	{

@@ -72,6 +72,10 @@
 	MCFG_DEVICE_ADD(_tag, UPD7201N, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
+#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
+	MCFG_DEVICE_ADD(_tag, I8274N, _clock) \
+	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
+
 /* Generic macros */
 #define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
@@ -496,7 +500,8 @@ protected:
 	enum
 	{
 		TYPE_Z80SIO     = 0x001,
-		TYPE_UPD7201    = 0x002
+		TYPE_UPD7201    = 0x002,
+		TYPE_I8274      = 0x004
 	};
 
 	enum
@@ -542,9 +547,16 @@ public :
 	upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class i8274N_device : public z80sio_device
+{
+public :
+	i8274N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
 extern const device_type Z80SIO;
 extern const device_type Z80SIO_CHANNEL;
 extern const device_type UPD7201N;
+extern const device_type I8274N;
 
 #endif
