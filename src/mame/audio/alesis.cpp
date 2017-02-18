@@ -74,6 +74,7 @@ void alesis_dm3ag_device::device_reset()
 	m_cur_sample = 0;
 	m_shift = 0;
 	memset(m_cmd, 0, sizeof(m_cmd));
+	m_dac->write(0x8000);
 }
 
 //-------------------------------------------------
@@ -116,7 +117,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 			sample = m_samples[m_cur_sample++];
 		}
 
-		m_dac->write(sample << m_shift);
+		m_dac->write(0x8000 - (sample << m_shift));
 	}
 }
 
