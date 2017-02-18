@@ -78,7 +78,7 @@ public:
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
 
-	pos_type read(void *buf, const unsigned n)
+	pos_type read(void *buf, const pos_type n)
 	{
 		return vread(buf, n);
 	}

@@ -31,6 +31,7 @@ namespace netlist
 {
 	namespace devices
 	{
+
 	template<unsigned bits>
 	struct need_bytes_for_bits
 	{
@@ -38,7 +39,7 @@ namespace netlist
 			bits <= 8       ?  1 :
 			bits <= 16      ?  2 :
 			bits <= 32      ?  4 :
-								8
+							   8
 		};
 	};
 
@@ -47,91 +48,6 @@ namespace netlist
 	template<> struct uint_for_size<2> { typedef uint_least16_t type; };
 	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
 	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
-
-	struct packed_int
-	{
-		template<typename C>
-		packed_int(C *data)
-		: m_data(data)
-		, m_size(sizeof(C))
-		{}
-
-		void set(const size_t pos, const uint_least64_t val)
-		{
-			switch (m_size)
-			{
-				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = static_cast<uint_least8_t>(val); break;
-				case 2: static_cast<uint_least16_t *>(m_data)[pos] = static_cast<uint_least16_t>(val); break;
-				case 4: static_cast<uint_least32_t *>(m_data)[pos] = static_cast<uint_least32_t>(val); break;
-				case 8: static_cast<uint_least64_t *>(m_data)[pos] = static_cast<uint_least64_t>(val); break;
-				default: { }
-			}
-		}
-
-		uint_least64_t operator[] (size_t pos) const
-		{
-			switch (m_size)
-			{
-				case 1: return static_cast<uint_least8_t  *>(m_data)[pos]; break;
-				case 2: return static_cast<uint_least16_t *>(m_data)[pos]; break;
-				case 4: return static_cast<uint_least32_t *>(m_data)[pos]; break;
-				case 8: return static_cast<uint_least64_t *>(m_data)[pos]; break;
-				default:
-					return 0; //should never happen
-			}
-		}
-
-		uint_least64_t adjust(uint_least64_t val) const
-		{
-			switch (m_size)
-			{
-				case 1: return static_cast<uint_least8_t >(val); break;
-				case 2: return static_cast<uint_least16_t>(val); break;
-				case 4: return static_cast<uint_least32_t>(val); break;
-				case 8: return static_cast<uint_least64_t>(val); break;
-				default:
-					return 0; //should never happen
-			}
-		}
-	private:
-		void *m_data;
-		size_t m_size;
-	};
-
-	struct truthtable_desc_t
-	{
-		truthtable_desc_t(unsigned NO, unsigned NI, bool *initialized,
-				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
-		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
-			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
-			m_num_bits(m_NI),
-			m_size(1 << (m_num_bits))
-		{
-		}
-
-		void setup(const std::vector<pstring> &desc, uint_least64_t disabled_ignore);
-
-	private:
-		void help(unsigned cur, std::vector<pstring> list,
-				uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
-		static unsigned count_bits(uint_least64_t v);
-		static uint_least64_t set_bits(uint_least64_t v, uint_least64_t b);
-		uint_least64_t get_ignored_simple(uint_least64_t i);
-		uint_least64_t get_ignored_extended(uint_least64_t i);
-
-		unsigned m_NO;
-		unsigned m_NI;
-		bool *m_initialized;
-		packed_int m_outs;
-		uint_least8_t  *m_timing;
-		netlist_time *m_timing_nt;
-
-		/* additional values */
-
-		const std::size_t m_num_bits;
-		const std::size_t m_size;
-
-	};
 
 	template<unsigned m_NI, unsigned m_NO>
 	NETLIB_OBJECT(truthtable_t)
@@ -156,20 +72,7 @@ namespace netlist
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-				truthtable_t *ttp, const pstring *desc)
-		: device_t(owner, name)
-		, m_fam(*this, fam)
-		, m_ign(*this, "m_ign", 0)
-		, m_active(*this, "m_active", 1)
-		, m_ttp(ttp)
-		{
-			while (*desc != "" )
-				{
-					m_desc.push_back(*desc);
-					desc++;
-				}
-			init();
-		}
+				truthtable_t *ttp, const pstring *desc);
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
@@ -184,62 +87,7 @@ namespace netlist
 			init();
 		}
 
-		void init()
-		{
-			set_hint_deactivate(true);
-
-			pstring header = m_desc[0];
-
-			std::vector<pstring> io(plib::psplit(header,"|"));
-			// checks
-			nl_assert_always(io.size() == 2, "too many '|'");
-			std::vector<pstring> inout(plib::psplit(io[0], ","));
-			nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-			std::vector<pstring> out(plib::psplit(io[1], ","));
-			nl_assert_always(out.size() == m_NO, "output count wrong");
-
-			for (std::size_t i=0; i < m_NI; i++)
-			{
-				inout[i] = inout[i].trim();
-				m_I.emplace(i, *this, inout[i]);
-			}
-			for (std::size_t i=0; i < m_NO; i++)
-			{
-				out[i] = out[i].trim();
-				m_Q.emplace(i, *this, out[i]);
-			}
-			// Connect output "Q" to input "_Q" if this exists
-			// This enables timed state without having explicit state ....
-			uint_least64_t disabled_ignore = 0;
-			for (std::size_t i=0; i < m_NO; i++)
-			{
-				pstring tmp = "_" + out[i];
-				const std::size_t idx = plib::container::indexof(inout, tmp);
-				if (idx != plib::container::npos)
-				{
-					connect(m_Q[i], m_I[idx]);
-					// disable ignore for this inputs altogether.
-					// FIXME: This shouldn't be necessary
-					disabled_ignore |= (1<<idx);
-				}
-			}
-
-			m_ign = 0;
-
-			truthtable_desc_t desc(m_NO, m_NI, &m_ttp->m_initialized,
-					packed_int(m_ttp->m_outs),
-					m_ttp->m_timing, m_ttp->m_timing_nt);
-
-			desc.setup(m_desc, disabled_ignore * 0);
-	#if 0
-			printf("%s\n", name().c_str());
-			for (int j=0; j < m_size; j++)
-				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
-						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
-			for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
-				printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-	#endif
-		}
+		void init();
 
 		NETLIB_RESETI()
 		{

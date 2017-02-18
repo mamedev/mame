@@ -80,7 +80,7 @@ int pstring_t<F>::pcmp(const pstring_t &right) const
 		ri++;
 		si++;
 	}
-	int ret = (si == this->end() ? 0 : *si - *ri);
+	int ret = (si == this->end() ? 0 : static_cast<int>(*si) - static_cast<int>(*ri));
 	if (ret == 0)
 	{
 		if (this->blen() > right.blen())
@@ -97,8 +97,8 @@ void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 {
 	pstr_t *n = salloc(size * sizeof(mem_t));
 	if (size > 0)
-		n->copy_from((char *)from, size);
-	*((mem_t *) n->str() + size) = 0;
+		n->copy_from(static_cast<const char *>(from), size);
+	*(static_cast<mem_t *>(n->str()) + size) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
 }
@@ -357,7 +357,7 @@ void pstringbuffer::pcat(const void *m, std::size_t l)
 {
 	const std::size_t nl = m_len + l + 1;
 	resize(nl);
-	std::copy((char *) m, (char *) m + l, m_ptr + m_len);
+	std::copy(static_cast<const char *>(m), static_cast<const char *>(m) + l, m_ptr + m_len);
 	m_len += l;
 	*(m_ptr + m_len) = 0;
 }

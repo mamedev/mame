@@ -49,7 +49,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="2.01" right="21.99" top="6.01" bottom="49.99" />
+		<bounds left="2.01" right="21.99" top="10.25" bottom="49.99" />
 
 	<!-- bezel -->
 

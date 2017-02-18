@@ -285,6 +285,7 @@ DAC_GENERATOR(AD7541, ad7541_device, dac_word_interface, dac_code_binary<12>, da
 DAC_GENERATOR(AM6012, am6012_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AM6012", "am6012")
 DAC_GENERATOR(DAC08, dac08_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC08", "dac08")
 DAC_GENERATOR(DAC0800, dac0800_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC0800", "dac0800")
+DAC_GENERATOR(DAC0832, dac0832_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC0832", "dac0832") // should be double-buffered?
 DAC_GENERATOR(DAC1200, dac1200_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "DAC1200", "dac1200")
 DAC_GENERATOR(MC1408, mc1408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC1408", "mc1408")
 DAC_GENERATOR(MC3408, mc3408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC3408", "mc3408")

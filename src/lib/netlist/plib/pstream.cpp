@@ -277,7 +277,7 @@ pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
 
 	if (ret > 0)
 	{
-		std::copy(m_mem + m_pos, m_mem + m_pos + ret, (char *) buf);
+		std::copy(m_mem + m_pos, m_mem + m_pos + ret, static_cast<char *>(buf));
 		m_pos += ret;
 	}
 
@@ -334,7 +334,7 @@ void pomemstream::vwrite(const void *buf, const pos_type n)
 		pfree_array(o);
 	}
 
-	std::copy((char *) buf, (char *) buf + n, m_mem + m_pos);
+	std::copy(static_cast<const char *>(buf), static_cast<const char *>(buf) + n, m_mem + m_pos);
 	m_pos += n;
 	m_size = std::max(m_pos, m_size);
 }
