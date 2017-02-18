@@ -29,7 +29,8 @@
 // ----------------------------------------------------------------------------------------
 
 /*! netlist_sig_t is the type used for logic signals. */
-using netlist_sig_t = std::uint32_t;
+//using netlist_sig_t = std::uint32_t;
+using netlist_sig_t = std::uint8_t;
 
 //============================================================
 //  MACROS / New Syntax

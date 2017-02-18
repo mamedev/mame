@@ -23,7 +23,7 @@
 		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
-		static const pstring m_desc[];                                         \
+		static std::vector<pstring> m_desc;                                         \
 	}
 
 
@@ -49,15 +49,18 @@ namespace netlist
 	template<> struct uint_for_size<4> { typedef uint_least32_t type; };
 	template<> struct uint_for_size<8> { typedef uint_least64_t type; };
 
-	template<unsigned m_NI, unsigned m_NO>
+	template<std::size_t m_NI, std::size_t m_NO>
 	NETLIB_OBJECT(truthtable_t)
 	{
 	private:
 		detail::family_setter_t m_fam;
 	public:
 
-		static constexpr int m_num_bits = m_NI;
-		static constexpr int m_size = (1 << (m_num_bits));
+		typedef typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type type_t;
+
+		static constexpr std::size_t m_num_bits = m_NI;
+		static constexpr std::size_t m_size = (1 << (m_num_bits));
+		static constexpr type_t m_outmask = ((1 << m_NO) - 1);
 
 		struct truthtable_t
 		{
@@ -65,14 +68,10 @@ namespace netlist
 			: m_initialized(false)
 			{}
 			bool m_initialized;
-			typename uint_for_size<need_bytes_for_bits<m_NO + m_NI>::value>::type m_outs[m_size];
+			type_t m_outs[m_size];
 			uint_least8_t m_timing[m_size * m_NO];
 			netlist_time m_timing_nt[16];
 		};
-
-		template <class C>
-		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-				truthtable_t *ttp, const pstring *desc);
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
@@ -83,11 +82,10 @@ namespace netlist
 		, m_active(*this, "m_active", 1)
 		, m_ttp(ttp)
 		{
-			m_desc = desc;
-			init();
+			init(desc);
 		}
 
-		void init();
+		void init(const std::vector<pstring> &desc);
 
 		NETLIB_RESETI()
 		{
@@ -105,7 +103,6 @@ namespace netlist
 			process<true>();
 		}
 
-	public:
 		void inc_active() NL_NOEXCEPT override
 		{
 			if (m_NI > 1)
@@ -132,8 +129,6 @@ namespace netlist
 				}
 		}
 
-		//logic_input_t m_I[m_NI];
-		//logic_output_t m_Q[m_NO];
 		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
 		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
 
@@ -146,69 +141,78 @@ namespace netlist
 		{
 			netlist_time mt = netlist_time::zero();
 
-			uint_least64_t state = 0;
+			type_t nstate = 0;
 			if (m_NI > 1)
 			{
-				auto ign = m_ign;
+				type_t ign = m_ign;
 				if (!doOUT)
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
 						m_I[i].activate();
-						state |= (m_I[i]() << i);
+						nstate |= (m_I[i]() << i);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
-					for (std::size_t i = 0; i < m_NI; ign >>= 1, i++)
+					for (std::size_t i = 0; i < m_NI; i++)
 					{
 						if ((ign & 1))
 							m_I[i].activate();
-						state |= (m_I[i]() << i);
+						nstate |= (m_I[i]() << i);
+						ign >>= 1;
 					}
 			}
 			else
 			{
 				if (!doOUT)
-					for (std::size_t i = 0; i < m_NI; i++)
-					{
-						state |= (m_I[i]() << i);
-						mt = std::max(this->m_I[i].net().time(), mt);
-					}
+				{
+					nstate |= m_I[0]();
+					mt = std::max(this->m_I[0].net().time(), mt);
+				}
 				else
-					for (std::size_t i = 0; i < m_NI; i++)
-						state |= (m_I[i]() << i);
+					nstate |= m_I[0]();
 			}
-			auto nstate = state;
 
-			const auto outstate = m_ttp->m_outs[nstate];
-			const auto out = outstate & ((1 << m_NO) - 1);
+			const type_t outstate = m_ttp->m_outs[nstate];
+			type_t out = outstate & m_outmask;
 
 			m_ign = outstate >> m_NO;
 
-			const auto timebase = nstate * m_NO;
+			const std::size_t timebase = nstate * m_NO;
 
 			if (doOUT)
 			{
-				for (std::size_t i = 0; i < m_NO; i++)
-					m_Q[i].push((out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
+				auto *t = &m_ttp->m_timing[timebase];
+				for (std::size_t i = 0; i < m_NO; ++i)
+				{
+					m_Q[i].push(out & 1, m_ttp->m_timing_nt[*t]);
+					++t;
+					out >>= 1;
+				}
 			}
 			else
-				for (std::size_t i = 0; i < m_NO; i++)
-					m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
+			{
+				auto *t = &m_ttp->m_timing[timebase];
+				for (std::size_t i = 0; i < m_NO; ++i)
+				{
+					m_Q[i].net().set_Q_time(out & 1, mt + m_ttp->m_timing_nt[*t]);
+					++t;
+					out >>= 1;
+				}
+			}
 
 			if (m_NI > 1)
 			{
-				auto ign(m_ign);
-				for (std::size_t i = 0; ign != 0; ign >>= 1, i++)
+				type_t ign(m_ign);
+				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
 					if (ign & 1)
-						m_I[i].inactivate();
+						I->inactivate();
 			}
 		}
 
 		/* FIXME: check width */
-		state_var_u32       m_ign;
+		state_var<type_t>   m_ign;
 		state_var_s32       m_active;
 		truthtable_t *      m_ttp;
-		std::vector<pstring> m_desc;
 	};
 
 	class netlist_base_factory_truthtable_t : public factory::element_t
