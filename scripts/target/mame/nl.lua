@@ -124,6 +124,10 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 
+	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.h",
+
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
