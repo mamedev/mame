@@ -2923,7 +2923,7 @@ ROM_START( janbari )
 	ROM_LOAD( "9.10h", 0x300000, 0x80000, CRC(a8ef5bf5) SHA1(13f3431270d5b8970a7795efa9ea710652d0c502) )
 ROM_END
 
-ROM_START( mjanbari )
+ROM_START( mjanbari ) // Medal Series No. 136N, according to dip sheet
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "11.7ca", 0x00000,  0x10000, CRC(1edde2ef) SHA1(fe0c23971cc25c8e2898ac697ce5111fda482f41) )
 
