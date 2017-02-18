@@ -166,6 +166,7 @@ function env.frombcd(val)
 end
 
 function env.basechar(bytes, base)
+	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented\n")
 	if base == "32" then
 	elseif base == "40" then
 	end
@@ -176,9 +177,10 @@ function env.charset_conv(bytes, charset)
 	if type(charset) == "string" then
 		local chartype, offset, delta = charset:match("CS_(%w*)%[?(%-?%d?%d?),?(%d?%d?)%]?")
 		if chartype == "NUMBER" then
-
+		
 		end
-		return
+		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
+		return bytes
 	end
 	for num, char in ipairs(bytes) do
 		char = string.byte(char)
@@ -231,7 +233,7 @@ function dat.check(set, softlist)
 		local table
 		datpath = file:fullpath():gsub(".zip", "/")
 		local data = file:read(file:size())
-		data = data:match("<hi2txt>(.*)</ *hi2txt>")
+		data = data:match("<hi2txt.->(.*)</ *hi2txt>")
 		local function get_tags(str, parent)
 			local arr = {}
 			while str ~= "" do
@@ -408,12 +410,13 @@ function dat.check(set, softlist)
 			for num, form in ipairs(xml.format) do
 				local param = {}
 				format[#format + 1] = "['" .. form["id"] .. "'] = "
-				--[[if form["input-as-subcolumns-input"] then
-				format[#format + 1] = "input_as_subcolumns_input = '" .. form["input-as-subcolumns-input"] .. "',"
-				end]]--
+				if form["input-as-subcolumns-input"] then
+					--format[#format + 1] = "input_as_subcolumns_input = '" .. form["input-as-subcolumns-input"] .. "',"
+					emu.print_verbose("data_hiscore: input-as-subcolumns-input unimplemented\n")
+				end
 				format[#format + 1] = "function(val, param) "
 				if form["formatter"] then
-					format[#format + 1] = "function tempform(val) "
+					format[#format + 1] = "local function tempform(val) "
 				end
 				if form["apply-to"]  == "char" then
 					format[#format + 1] = "val = val:gsub('(.)', function(val) "
