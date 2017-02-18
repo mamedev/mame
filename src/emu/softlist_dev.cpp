@@ -379,7 +379,7 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 		{
 			// mount only if not already mounted
 			const char *option = mconfig.options().value(image.brief_instance_name());
-			if (*option == '\0' && !image.filename() && image.part_entry() == nullptr)
+			if (*option == '\0' && !image.filename())
 				return &image;
 		}
 	}
