@@ -277,6 +277,9 @@ void core_options::add_entry(const char *name, const char *description, uint32_t
 				return;
 			}
 		}
+
+		// need to call value_changed() with initial value
+		value_changed(newentry->name(), newentry->value());
 	}
 
 	// add us to the list and maps
@@ -835,6 +838,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 
 	// set the data
 	curentry.set_value(data.c_str(), priority);
+	value_changed(curentry.name(), data);
 	return true;
 }
 
