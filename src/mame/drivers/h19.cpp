@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk taken from schematics
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
