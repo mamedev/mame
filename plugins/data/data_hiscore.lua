@@ -177,7 +177,7 @@ function env.charset_conv(bytes, charset)
 	if type(charset) == "string" then
 		local chartype, offset, delta = charset:match("CS_(%w*)%[?(%-?%d?%d?),?(%d?%d?)%]?")
 		if chartype == "NUMBER" then
-		
+
 		end
 		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
 		return bytes
@@ -285,7 +285,7 @@ function dat.check(set, softlist)
 	local function parse_table(xml)
 		local total_size = 0
 		local s = { "local data = open('" .. xml.structure[1].file .. "', size)\nlocal offset = 1\nlocal arr = {}",
-			    "local elem, bytes, offset, value, lastindex, output"}
+				"local elem, bytes, offset, value, lastindex, output"}
 		local fparam = {}
 		if xml.bitmask then
 			local bitmask = "local bitmask = {"

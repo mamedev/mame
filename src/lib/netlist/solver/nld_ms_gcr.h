@@ -341,7 +341,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 			gtot_t += gt[i];
 			RHS_t += Idr[i];
 		}
-		
+
 		for (std::size_t i = railstart; i < term_count; i++)
 			RHS_t += go[i] * *other_cur_analog[i];
 

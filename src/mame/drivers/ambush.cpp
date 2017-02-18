@@ -6,31 +6,31 @@
 
     © 1983 Tecfri
 
-	PCB connector pinout
+    PCB connector pinout
 
-	              +5V   1  A  GND
-	              +5V   2  B  GND
-	+12V Coin Counter   3  C  +12V Coin Counter
-	      1P Button 1   4  D  1P Up
-	      1P Button 2   5  E  1P Down
-	      2P Button 1   6  F  1P Left
-	      2P Button 2   7  G  1P Right
-	         2P Start   8  H  2P Up
-	         1P Start   9  I  2P Down
-	           Coin 2  10  J  2P Left
-	           Coin 1  11  K  2P Right
-	             Blue  12  L  Counter
-	              Red  13  M  Counter
-	            Green  14  N  Counter
-	             Sync  15  O  Speaker Right
-	             +12V  16  P  Speaker Left
-	         Speaker-  17  Q  +5V
-	        Video GND  18  R  +5V
+                  +5V   1  A  GND
+                  +5V   2  B  GND
+    +12V Coin Counter   3  C  +12V Coin Counter
+          1P Button 1   4  D  1P Up
+          1P Button 2   5  E  1P Down
+          2P Button 1   6  F  1P Left
+          2P Button 2   7  G  1P Right
+             2P Start   8  H  2P Up
+             1P Start   9  I  2P Down
+               Coin 2  10  J  2P Left
+               Coin 1  11  K  2P Right
+                 Blue  12  L  Counter
+                  Red  13  M  Counter
+                Green  14  N  Counter
+                 Sync  15  O  Speaker Right
+                 +12V  16  P  Speaker Left
+             Speaker-  17  Q  +5V
+            Video GND  18  R  +5V
 
-	The bootlegs are running on a kind of extended hardware. It has
-	double the amount of work RAM, an updated graphics system to
-	accommodate the bootlegged games and the AY8912s were changed to
-	AY8910s.
+    The bootlegs are running on a kind of extended hardware. It has
+    double the amount of work RAM, an updated graphics system to
+    accommodate the bootlegged games and the AY8912s were changed to
+    AY8910s.
 
     TODO:
     - Verify actual Z80 and AY891x clock speeds from PCB (XTAL confirmed)
@@ -81,7 +81,7 @@ protected:
 	required_shared_ptr<uint8_t> m_scroll_ram;
 
 	tilemap_t *m_char_tilemap;
-	uint8_t	m_color_bank;
+	uint8_t m_color_bank;
 };
 
 class ambush_state : public ambush_base_state
@@ -528,7 +528,7 @@ uint32_t mariobl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		int code = ((m_sprite_ram[offs + 1] & 0x40) << 1) | (m_sprite_ram[offs + 2] & 0x7f);
 		int color = (m_color_bank << 4) | (m_sprite_ram[offs + 1] & 0x0f);
 
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,	code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 
 	return 0;

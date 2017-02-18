@@ -1493,7 +1493,7 @@ swhr2
 swhr2u                        // (c) 1998
 swhr2v                        // (c) 1995
 topbana
-toutango						// (c) 1998
+toutango                        // (c) 1998
 trstrove
 tritreat
 trojhors
@@ -2585,7 +2585,7 @@ bldwolfj                        // (c) 1988 Data East Corporation (Japan)
 
 @source:battlex.cpp
 battlex                         // (c) 1982 Omori E. Co., Ltd.
-dodgeman						//
+dodgeman                        //
 
 @source:battlnts.cpp
 battlnts                        // GX777 (c) 1987
@@ -12478,7 +12478,7 @@ fp200                           //
 fp6000                          //
 
 @source:freekick.cpp
-omega							// (c) 1986 Nihon System
+omega                           // (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg

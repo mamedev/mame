@@ -45,9 +45,9 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
 	required_device<ymz280b_device> m_ymz;
-	
+
 	DECLARE_PALETTE_INIT(konmedal);
-	
+
 	READ8_MEMBER(vram_r);
 	WRITE8_MEMBER(vram_w);
 	READ8_MEMBER(magic_r);
@@ -89,14 +89,14 @@ READ8_MEMBER(konmedal_state::vram_r)
 			return m_k056832->ram_code_lo_r(space, offset>>1);
 		}
 	}
-	else if (m_control == 0)	// ROM readback
+	else if (m_control == 0)    // ROM readback
 	{
-		return m_k056832->konmedal_rom_r(space, offset);		
+		return m_k056832->konmedal_rom_r(space, offset);
 	}
-	
+
 	return 0;
 }
-	
+
 WRITE8_MEMBER(konmedal_state::vram_w)
 {
 	// there are (very few) writes above F000 in some screens.
@@ -107,24 +107,24 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 		m_k056832->ram_code_hi_w(space, offset>>1, data);
 		return;
 	}
-	
+
 	m_k056832->ram_code_lo_w(space, offset>>1, data);
 }
 
 READ8_MEMBER(konmedal_state::magic_r)
 {
-	return 0xc1;	// checked at 60f before reading a page of the VROM
+	return 0xc1;    // checked at 60f before reading a page of the VROM
 }
-	
+
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 	int codebits = *code;
 	int bs;
 	int bankshifts[4] = { 0, 4, 8, 12 };
 	int mode, data, bank;
-	
+
 	m_k056832->read_avac(&mode, &data);
-	
+
 	*color = (codebits >> 12) & 0xf;
 	bs = (codebits & 0xc00) >> 10;
 	bank = (data >> bankshifts[bs]) & 0xf;
@@ -137,7 +137,7 @@ void konmedal_state::video_start()
 
 uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	bitmap.fill(m_back_colorbase, cliprect);
+//  bitmap.fill(m_back_colorbase, cliprect);
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
@@ -146,7 +146,7 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 
 	return 0;
 }
-                    
+
 PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 {
 	int i;
@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 			PROM[0x200+i]<<4);
 	}
 }
-                                                             
+
 INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
@@ -177,12 +177,12 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM	// work RAM?
+	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
 	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
 	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP	// read to reset watchdog
+	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
 	AM_RANGE(0xc702, 0xc703) AM_READ(inputs_r)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
@@ -240,23 +240,23 @@ MACHINE_CONFIG_END
 
 ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) ) 
+	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
-	ROM_LOAD32_BYTE( "441-a03.4l",   0x000002, 0x020000, CRC(8adf3304) SHA1(1c8312c76cd626978ff5b3896fb5a5b34be72988) ) 
-	ROM_LOAD32_BYTE( "441-a04.4m",   0x000003, 0x020000, CRC(038e0c67) SHA1(2b8640bfad7026a2d86fb6498aff4d7a9cb0b700) ) 
-	ROM_LOAD32_BYTE( "441-a05.4p",   0x000000, 0x020000, CRC(937c4740) SHA1(155c869b9321d62df115435d7c855f9be4278e45) ) 
-	ROM_LOAD32_BYTE( "441-a06.4p",   0x000001, 0x020000, CRC(947a8c45) SHA1(16e3dceb304266bbd2bddc2cec832ebff04e4c71) ) 
+	ROM_LOAD32_BYTE( "441-a03.4l",   0x000002, 0x020000, CRC(8adf3304) SHA1(1c8312c76cd626978ff5b3896fb5a5b34be72988) )
+	ROM_LOAD32_BYTE( "441-a04.4m",   0x000003, 0x020000, CRC(038e0c67) SHA1(2b8640bfad7026a2d86fb6498aff4d7a9cb0b700) )
+	ROM_LOAD32_BYTE( "441-a05.4p",   0x000000, 0x020000, CRC(937c4740) SHA1(155c869b9321d62df115435d7c855f9be4278e45) )
+	ROM_LOAD32_BYTE( "441-a06.4p",   0x000001, 0x020000, CRC(947a8c45) SHA1(16e3dceb304266bbd2bddc2cec832ebff04e4c71) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) ) 
-	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) ) 
-	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) ) 
-	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) ) 
+	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
 
-	ROM_REGION( 0x100000, "ymz", 0 ) 
-	ROM_LOAD( "441a11.10d",   0x000000, 0x080000, CRC(e60a7495) SHA1(76963324e818974bc5209e7122282ba4d73fda93) ) 
-	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) ) 
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "441a11.10d",   0x000000, 0x080000, CRC(e60a7495) SHA1(76963324e818974bc5209e7122282ba4d73fda93) )
+	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) )
 ROM_END
 
 GAME( 1995, tsukande, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

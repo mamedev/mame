@@ -1242,7 +1242,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1269,7 +1269,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1297,7 +1297,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1346,7 +1346,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1395,7 +1395,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1448,7 +1448,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1501,7 +1501,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1576,7 +1576,7 @@ void n64_rdp::disassemble(char* buffer)
 			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
 			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
 			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
-			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])   	  / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
 			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
 			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
 			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
@@ -1861,7 +1861,7 @@ void n64_rdp::compute_cvg_flip(extent_t* spans, int32_t* majorx, int32_t* minorx
 	}
 }
 
-#define SIGN(x, numb)	(((x) & ((1 << numb) - 1)) | -((x) & (1 << (numb - 1))))
+#define SIGN(x, numb)   (((x) & ((1 << numb) - 1)) | -((x) & (1 << (numb - 1))))
 
 void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 {

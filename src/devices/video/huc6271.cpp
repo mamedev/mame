@@ -70,9 +70,9 @@ const address_space_config *huc6271_device::memory_space_config(address_spacenum
 {
 	switch(spacenum)
 	{
-//		case AS_PROGRAM: 	return &m_program_space_config;
-		case AS_DATA: 		return &m_data_space_config;
-		default: 			return nullptr;
+//      case AS_PROGRAM:    return &m_program_space_config;
+		case AS_DATA:       return &m_data_space_config;
+		default:            return nullptr;
 	}
 }
 

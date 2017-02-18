@@ -275,7 +275,7 @@ static MACHINE_CONFIG_FRAGMENT (fccpu20)
 	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
 	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int1_w))
 
-	/* Additional MPCC sits on FLME boards like SRAM-22, 
+	/* Additional MPCC sits on FLME boards like SRAM-22,
 	   TODO: install MPCC2/MPCC3 in FLME slot device */
 	// MPCC2
 	MCFG_MPCC68561_ADD ("mpcc2", CLOCK32 / 4, 0, 0)
@@ -306,49 +306,49 @@ static MACHINE_CONFIG_FRAGMENT (fccpu20)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, cts_w))
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21S Part No.1 01 041 - 68020 CPU board + FPU 68881 at 12.5 MHz, 512 KB RAM 
+// SYS68K/CPU-21S Part No.1 01 041 - 68020 CPU board + FPU 68881 at 12.5 MHz, 512 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21s, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK50 / 4)
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21 Part No.1 01 001 - 68020 CPU board (CPU-20) + FPU 68881 at 16.7 MHz, 512 KB RAM 
+// SYS68K/CPU-21 Part No.1 01 001 - 68020 CPU board (CPU-20) + FPU 68881 at 16.7 MHz, 512 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK50 / 3)
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21A Part No.1 01 011 - 68020 CPU board + FPU 68881 at 20 MHz, 512 KB RAM 
+// SYS68K/CPU-21A Part No.1 01 011 - 68020 CPU board + FPU 68881 at 20 MHz, 512 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21a, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK40 / 2)
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21YA Part No.1 01 061 - 68020 CPU board + FPU 68881 at 20 MHz, 2048 KB RAM 
+// SYS68K/CPU-21YA Part No.1 01 061 - 68020 CPU board + FPU 68881 at 20 MHz, 2048 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21ya, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK40 / 2)
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21B Part No.1 01 021 - 68020 CPU board + FPU 68881 at 25 MHz, 512 KB RAM 
+// SYS68K/CPU-21B Part No.1 01 021 - 68020 CPU board + FPU 68881 at 25 MHz, 512 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21b, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK50 / 2)
 MACHINE_CONFIG_END
 
-// SYS68K/CPU-21YB Part No.1 01 071 - 68020 CPU board + FPU 68881 at 25 MHz, 2048 KB RAM 
+// SYS68K/CPU-21YB Part No.1 01 071 - 68020 CPU board + FPU 68881 at 25 MHz, 2048 KB RAM
 static MACHINE_CONFIG_DERIVED( fccpu21yb, fccpu20 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK( CLOCK50 / 2)
 MACHINE_CONFIG_END
 
-machine_config_constructor vme_fccpu20_device::device_mconfig_additions() const 
+machine_config_constructor vme_fccpu20_device::device_mconfig_additions() const
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
 
 	switch (m_board_id)
 	{
-	case cpu20:	  return MACHINE_CONFIG_NAME( fccpu20   ); break;
+	case cpu20:   return MACHINE_CONFIG_NAME( fccpu20   ); break;
 	case cpu21a:  return MACHINE_CONFIG_NAME( fccpu21a  ); break;
 	case cpu21ya: return MACHINE_CONFIG_NAME( fccpu21ya ); break;
 	case cpu21b:  return MACHINE_CONFIG_NAME( fccpu21b  ); break;
@@ -366,7 +366,7 @@ machine_config_constructor vme_fccpu20_device::device_mconfig_additions() const
 //**************************************************************************
 vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, fc_board_t board_id) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	, device_vme_card_interface(mconfig, *this) 
+	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu (*this, "maincpu")
 	, m_pit (*this, "pit")
 	, m_bim  (*this, "bim")
@@ -435,7 +435,7 @@ void vme_fccpu20_device::device_start()
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
-	//	save_item(NAME(m_board_id)); // TODO: Save this "non base type" item
+	//  save_item(NAME(m_board_id)); // TODO: Save this "non base type" item
 
 	/* TODO: setup this RAM from (not yet) optional SRAM-2x board and also support 2MB versions */
 	//m_maincpu->space(AS_PROGRAM).install_ram(0x80000, m_ram->size() + 0x7ffff, m_ram->pointer());
@@ -568,15 +568,15 @@ READ8_MEMBER (vme_fccpu20_device::pitc_r)
 
 	switch (m_board_id)
 	{
-	case cpu20: 
-		board_id = CPU20; 
+	case cpu20:
+		board_id = CPU20;
 		break;
 	case cpu21a:
 	case cpu21ya:
 	case cpu21b:
 	case cpu21yb:
 	case cpu21s:
-	case cpu21: 
+	case cpu21:
 		board_id = CPU21;
 		break;
 	default: logerror("Attempt to set unknown board type %02x, defaulting to CPU20\n", board_id);
@@ -603,13 +603,13 @@ ROM_END
 #define rom_fccpu21b       rom_fccpu20
 #define rom_fccpu21yb      rom_fccpu20
 
-const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const 
+const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const
 {
-	LOG("%s\n", FUNCNAME); 
+	LOG("%s\n", FUNCNAME);
 
 	switch (m_board_id)
 	{
-	case cpu20:	  return ROM_NAME( fccpu20   ); break;
+	case cpu20:   return ROM_NAME( fccpu20   ); break;
 	case cpu21a:  return ROM_NAME( fccpu21a  ); break;
 	case cpu21ya: return ROM_NAME( fccpu21ya ); break;
 	case cpu21b:  return ROM_NAME( fccpu21b  ); break;
@@ -617,7 +617,7 @@ const tiny_rom_entry *vme_fccpu20_device::device_rom_region() const
 	case cpu21s:  return ROM_NAME( fccpu21s  ); break;
 	case cpu21:   return ROM_NAME( fccpu21   ); break;
 	default: logerror("Attempt to get rom set for unknown board type %02x, defaulting to CPU20\n", m_board_id);
-		return ROM_NAME( fccpu20 ); 
+		return ROM_NAME( fccpu20 );
 	}
 }
 

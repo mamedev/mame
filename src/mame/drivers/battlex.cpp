@@ -180,11 +180,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dodgeman )
 	PORT_INCLUDE( battlex )
-	
+
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) 
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_DERIVED( dodgeman, battlex )
 	MCFG_CPU_IO_MAP(dodgeman_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
-	
+
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10MHz/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -302,7 +302,7 @@ ROM_START( battlex )
 	ROM_LOAD( "p-rom6.1",    0x5000, 0x1000, CRC(6923f601) SHA1(e6c33cbd8d8679299d7b2c568d56f96ed3073971) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_ERASE00 ) // filled in later
-	
+
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "1a_f.6f",     0x0000, 0x1000, CRC(2b69287a) SHA1(30c0edaec44118b95ec390bd41c1bd49a2802451) )
 	ROM_LOAD( "1a_h.6h",     0x1000, 0x1000, CRC(9f4c3bdd) SHA1(e921ecafefe54c033d05d9cd289808e971ac7940) )
@@ -317,25 +317,25 @@ ROM_END
 
 ROM_START( dodgeman )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "dg0.7f",       0x0000, 0x001000, CRC(1219b5db) SHA1(e4050a5e52f7b125f317b6e2ef615774c81cf679) )
-    ROM_LOAD( "dg1.5f",       0x1000, 0x001000, CRC(fff9a086) SHA1(e4e528789d07755cf999054c191e242ea3ebe55f) )
-    ROM_LOAD( "dg2.4f",       0x2000, 0x001000, CRC(2ca9ac99) SHA1(7fe81626ab2b5c01189fbb578999157863fcc29f) )
-    ROM_LOAD( "dg3.3f",       0x3000, 0x001000, CRC(55a51c0e) SHA1(a5b253f096e1fe85ee391ad2aa0373809a3b48c2) )
-    ROM_LOAD( "dg4.2f",       0x4000, 0x001000, CRC(14169361) SHA1(86d3cd1fa0aa4f21029daea2eba99bdaa34372e8) )
-    ROM_LOAD( "dg5.1f",       0x5000, 0x001000, CRC(8f83ae2f) SHA1(daad41b61ba3d55531021d444bbe4acfc275cfc9) )
-	
+	ROM_LOAD( "dg0.7f",       0x0000, 0x001000, CRC(1219b5db) SHA1(e4050a5e52f7b125f317b6e2ef615774c81cf679) )
+	ROM_LOAD( "dg1.5f",       0x1000, 0x001000, CRC(fff9a086) SHA1(e4e528789d07755cf999054c191e242ea3ebe55f) )
+	ROM_LOAD( "dg2.4f",       0x2000, 0x001000, CRC(2ca9ac99) SHA1(7fe81626ab2b5c01189fbb578999157863fcc29f) )
+	ROM_LOAD( "dg3.3f",       0x3000, 0x001000, CRC(55a51c0e) SHA1(a5b253f096e1fe85ee391ad2aa0373809a3b48c2) )
+	ROM_LOAD( "dg4.2f",       0x4000, 0x001000, CRC(14169361) SHA1(86d3cd1fa0aa4f21029daea2eba99bdaa34372e8) )
+	ROM_LOAD( "dg5.1f",       0x5000, 0x001000, CRC(8f83ae2f) SHA1(daad41b61ba3d55531021d444bbe4acfc275cfc9) )
+
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 ) // filled in later
-	
+
 	ROM_REGION( 0x6000, "gfx2", ROMREGION_ERASE00 )
-    ROM_LOAD( "f.6f",         0x0000, 0x002000, CRC(dfaaf4c8) SHA1(1e09f1d72e7e5e6782d73ae60bca7982fc04df0e) )
-    ROM_LOAD( "h.6h",         0x2000, 0x002000, CRC(e2525ffe) SHA1(a17b608b4089014be381b26f16597b83d4a66ebd) )
-    ROM_LOAD( "j.6j",         0x4000, 0x002000, CRC(2731ee46) SHA1(15b9350e19f31b1cea99deb9935543777644e6a8) )
+	ROM_LOAD( "f.6f",         0x0000, 0x002000, CRC(dfaaf4c8) SHA1(1e09f1d72e7e5e6782d73ae60bca7982fc04df0e) )
+	ROM_LOAD( "h.6h",         0x2000, 0x002000, CRC(e2525ffe) SHA1(a17b608b4089014be381b26f16597b83d4a66ebd) )
+	ROM_LOAD( "j.6j",         0x4000, 0x002000, CRC(2731ee46) SHA1(15b9350e19f31b1cea99deb9935543777644e6a8) )
 
 	ROM_REGION( 0x2000, "user1", 0 )                // gfx1 1bpp gfxdata
 	ROM_LOAD( "d.6d",         0x0000, 0x002000, CRC(451c1c3a) SHA1(214f775e242f7f29ac799cdd554708acddd1e34f) )
-	
+
 	ROM_REGION( 0x2000, "user2", 0 )                // gfx1 colormask, bad?
-    ROM_LOAD( "e.6e",         0x0000, 0x002000, CRC(c9a515df) SHA1(5232d2d1bd02b89cb651d817995daf33469f0e2f) )	
+	ROM_LOAD( "e.6e",         0x0000, 0x002000, CRC(c9a515df) SHA1(5232d2d1bd02b89cb651d817995daf33469f0e2f) )
 ROM_END
 
 
@@ -353,7 +353,7 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
 	int tile_size = memregion("gfx1")->bytes() / 24;
 	int tile_shift = (tile_size / 512) + 11;
 	int tile, line, bit;
-	
+
 	/* convert gfx data from 1bpp + color block mask to straight 3bpp */
 	for (tile = 0; tile < tile_size; tile++)
 	{

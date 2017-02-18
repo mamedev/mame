@@ -91,19 +91,19 @@ class cpu20_state : public driver_device
 {
 public:
 cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device (mconfig, type, tag) 
+		: driver_device (mconfig, type, tag)
 	{
 	}
 	virtual void machine_start () override { LOGSETUP("%s\n", FUNCNAME); }
-//	virtual void machine_reset () override;
+//  virtual void machine_reset () override;
 
-	DECLARE_DRIVER_INIT(cpu20)		{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21s)		{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21)		{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21a)		{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21ya)	{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21b)		{ LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21yb)	{ LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu20)      { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21s)     { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21)      { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21a)     { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21ya)    { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21b)     { LOGSETUP("%s\n", FUNCNAME); }
+	DECLARE_DRIVER_INIT(cpu21yb)    { LOGSETUP("%s\n", FUNCNAME); }
 };
 
 /* Input ports */
@@ -179,16 +179,16 @@ MACHINE_CONFIG_END
 ROM_START(fccpu20sbc)   ROM_END
 
 /* Boards supported by same rom set, need to do like this to avoid need for multi named rom sets */
-#define rom_fccpu21ssbc		rom_fccpu20sbc
-#define rom_fccpu21sbc		rom_fccpu20sbc
-#define rom_fccpu21asbc		rom_fccpu20sbc
-#define rom_fccpu21yasbc	rom_fccpu20sbc
-#define rom_fccpu21bsbc		rom_fccpu20sbc
-#define rom_fccpu21ybsbc	rom_fccpu20sbc
+#define rom_fccpu21ssbc     rom_fccpu20sbc
+#define rom_fccpu21sbc      rom_fccpu20sbc
+#define rom_fccpu21asbc     rom_fccpu20sbc
+#define rom_fccpu21yasbc    rom_fccpu20sbc
+#define rom_fccpu21bsbc     rom_fccpu20sbc
+#define rom_fccpu21ybsbc    rom_fccpu20sbc
 
 /* Driver */
 /*    YEAR  NAME          PARENT    COMPAT MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1986, fccpu20sbc,    0,          0,  cpu20,          cpu20,    driver_device, 0,  	     "Force Computers Gmbh",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1986, fccpu20sbc,    0,          0,  cpu20,          cpu20,    driver_device, 0,           "Force Computers Gmbh",   "SYS68K/CPU-20",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 COMP (1986, fccpu21ssbc,   fccpu20sbc, 0,  cpu21s,         cpu20,    cpu20_state,   cpu21s,      "Force Computers Gmbh",   "SYS68K/CPU-21S",       MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 COMP (1986, fccpu21sbc,    fccpu20sbc, 0,  cpu21,          cpu20,    cpu20_state,   cpu21,       "Force Computers Gmbh",   "SYS68K/CPU-21",        MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 COMP (1986, fccpu21asbc,   fccpu20sbc, 0,  cpu21a,         cpu20,    cpu20_state,   cpu21a,      "Force Computers Gmbh",   "SYS68K/CPU-21A",       MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

@@ -744,7 +744,7 @@ project "bx"
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 	}
-	
+
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
@@ -768,13 +768,13 @@ project "bx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
-	
+
 	configuration { }
-	
+
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
 	}
-	
+
 	files {
 		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
 		MAME_DIR .. "3rdparty/bx/src/crt.cpp",

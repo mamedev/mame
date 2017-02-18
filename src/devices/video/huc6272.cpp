@@ -4,9 +4,9 @@
 
     Hudson/NEC HuC6272 "King" device
 
-	TODO:
-	- Use NSCSI instead of legacy one!
-	
+    TODO:
+    - Use NSCSI instead of legacy one!
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -99,9 +99,9 @@ const address_space_config *huc6272_device::memory_space_config(address_spacenum
 {
 	switch(spacenum)
 	{
-		case AS_PROGRAM: 	return &m_program_space_config;
-		case AS_DATA: 		return &m_data_space_config;
-		default: 			return nullptr;
+		case AS_PROGRAM:    return &m_program_space_config;
+		case AS_DATA:       return &m_data_space_config;
+		default:            return nullptr;
 	}
 }
 
@@ -169,13 +169,13 @@ READ32_MEMBER( huc6272_device::read )
 			case 0x00: // SCSI data in
 				res = m_scsi_data_in->read() & 0xff;
 				break;
-			
+
 			case 0x05: // SCSI bus status
 				res = m_scsi_ctrl_in->read() & 0xff;
 				res|= (m_scsi_data_in->read() << 8);
 				break;
-			
-			
+
+
 			/*
 			x--- ---- ---- ---- ----
 			*/
@@ -207,7 +207,7 @@ WRITE32_MEMBER( huc6272_device::write )
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;
 	else
-	{		
+	{
 		switch(m_register)
 		{
 			case 0x00: // SCSI data out
@@ -219,9 +219,9 @@ WRITE32_MEMBER( huc6272_device::write )
 				m_scsibus->write_sel(BIT(data, 2));
 				m_scsibus->write_ack(BIT(data, 4));
 				m_scsibus->write_rst(BIT(data, 7));
-				
+
 				break;
-			
+
 			case 0x02: // SCSI mode
 				break;
 
@@ -230,12 +230,12 @@ WRITE32_MEMBER( huc6272_device::write )
 				m_scsibus->write_cd(BIT(data, 1));
 				m_scsibus->write_msg(BIT(data, 2));
 				break;
-				
+
 			case 0x05: // SCSI bus status
 				// bits 7-0: SCSI DMA trigger?
 				m_scsi_data_out->write((data >> 8) & 0xff);
 				break;
-			
+
 			case 0x06: // SCSI input data
 			case 0x07: // SCSI DMA trigger
 			case 0x08: // SCSI subcode
@@ -260,7 +260,7 @@ WRITE32_MEMBER( huc6272_device::write )
 
 			case 0x0e: // KRAM write data
 				// TODO: handle non-dword cases?
-				write_dword((m_kram_addr_w)|(m_kram_page_w<<18),data); 
+				write_dword((m_kram_addr_w)|(m_kram_page_w<<18),data);
 				m_kram_addr_w += (m_kram_inc_w & 0x200) ? ((m_kram_inc_w & 0x1ff) - 0x200) : (m_kram_inc_w & 0x1ff);
 				break;
 
@@ -308,7 +308,7 @@ WRITE32_MEMBER( huc6272_device::write )
 
 				// TODO: rotation enable
 				break;
-				
+
 			case 0x13:
 				m_micro_prg.index = data & 0xf;
 				break;
@@ -323,9 +323,9 @@ WRITE32_MEMBER( huc6272_device::write )
 				m_micro_prg.ctrl = data & 1;
 
 				break;
-			
+
 			// case 0x16: wrap-around enable
-			
+
 			// BAT and CG address setters
 			case 0x20: m_bg[0].bat_address = data * 1024;  break;
 			case 0x21: m_bg[0].cg_address = data * 1024;   break;
@@ -339,8 +339,8 @@ WRITE32_MEMBER( huc6272_device::write )
 			case 0x29: m_bg[3].cg_address = data * 1024;   break;
 
 			// Height & Width setters
-			case 0x2c: 
-			case 0x2d: 
+			case 0x2c:
+			case 0x2d:
 			case 0x2e:
 			case 0x2f:
 			{
@@ -354,7 +354,7 @@ WRITE32_MEMBER( huc6272_device::write )
 				}
 				break;
 			}
-			
+
 			// X & Y scroll values
 			case 0x30:
 			case 0x31:
@@ -373,7 +373,7 @@ WRITE32_MEMBER( huc6272_device::write )
 					m_bg[reg_offs].xscroll = data & 0xffff;
 				break;
 			}
-			
+
 			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_FRAGMENT( king_scsi_intf )
 	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
 
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)	
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

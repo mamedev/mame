@@ -122,7 +122,7 @@ void interpro_ioga_device::device_reset()
   Timers
 ******************************************************************************/
 READ32_MEMBER(interpro_ioga_device::timer1_r)
-{ 
+{
 	uint32_t result = m_timer1_count & IOGA_TIMER1_VMASK;
 
 	// set the start bit if the timer is currently enabled
@@ -143,7 +143,7 @@ READ32_MEMBER(interpro_ioga_device::timer3_r)
 	else if (m_timer[3]->param())
 		result |= IOGA_TIMER3_EXPIRED;
 
-	return result; 
+	return result;
 }
 
 void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_id id)
@@ -245,10 +245,10 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		// TODO: figure out what indicates dma write (memory -> device)
 		// TODO: implement multiple dma channels
 		// TODO: virtual memory?
-	
+
 		if (!m_dma_channel[param].dma_active)
 		{
-			LOG_DMA("dma: transfer started, channel = %d, control 0x%08x, real address 0x%08x count 0x%08x\n", 
+			LOG_DMA("dma: transfer started, channel = %d, control 0x%08x, real address 0x%08x count 0x%08x\n",
 				param, m_dma_channel[param].control, m_dma_channel[param].real_address, m_dma_channel[param].transfer_count);
 			m_dma_channel[param].dma_active = true;
 		}
@@ -271,7 +271,7 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		// if there are no more bytes remaining, terminate the transfer
 		if (m_dma_channel[param].transfer_count == 0)
 		{
-			LOG_DMA("dma: transfer stopped, control 0x%08x, real address 0x%08x count 0x%08x\n", 
+			LOG_DMA("dma: transfer stopped, control 0x%08x, real address 0x%08x count 0x%08x\n",
 				m_dma_channel[param].control, m_dma_channel[param].fdc_real_address, m_dma_channel[param].transfer_count);
 
 			if (param == IOGA_DMA_FLOPPY)
@@ -434,10 +434,10 @@ IRQ_CALLBACK_MEMBER(interpro_ioga_device::inta_cb)
 		case IOGA_INTERRUPT_INTERNAL:
 			return m_int_vector[m_irq_current] & 0xff;
 
-		case IOGA_INTERRUPT_SOFT_LO: 
+		case IOGA_INTERRUPT_SOFT_LO:
 			return 0x8f + m_irq_current * 0x10;
 
-		case IOGA_INTERRUPT_SOFT_HI: 
+		case IOGA_INTERRUPT_SOFT_HI:
 			return m_softint_vector[m_irq_current] & 0xff;
 		}
 		break;
@@ -572,7 +572,7 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 }
 
 WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
-{ 
+{
 	// save the existing value
 	uint8_t previous = m_nmictrl;
 
@@ -614,9 +614,9 @@ void interpro_ioga_device::drq(int state, int channel)
 /*
 0x94: error address reg: expect 0x7f200000 after bus error (from dma virtual address)
 0x98: error cycle type: expect 0x52f0 (after failed dma?)
-		0x5331 - forced berr with nmi/interrupts disabled?
-		0xc2f0
-		0x62f0
+        0x5331 - forced berr with nmi/interrupts disabled?
+        0xc2f0
+        0x62f0
 */
 // TODO: 7.0266 - forced BERR not working
 

@@ -568,7 +568,7 @@ void cli_frontend::listroms(const char *gamename)
 			osd_printf_info("\n");
 		first = false;
 		osd_printf_info("ROMs required for driver \"%s\".\n"
-	                	"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
+						"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
 
 		// iterate through roms
 		for (device_t &device : device_iterator(drivlist.config()->root_device()))

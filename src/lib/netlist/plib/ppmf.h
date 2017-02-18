@@ -30,10 +30,10 @@
  *
  *  Benchmarks for ./nltool -c run -f src/mame/machine/nl_pong.cpp -t 10 -n pong_fast
  *
- *  NL_PMF_TYPE_INTERNAL:       215%	215%
- *  NL_PMF_TYPE_GNUC_PMF:       163%	196%
- *  NL_PMF_TYPE_GNUC_PMF_CONV:  215%	215%
- *  NL_PMF_TYPE_VIRTUAL:        213%	209%
+ *  NL_PMF_TYPE_INTERNAL:       215%    215%
+ *  NL_PMF_TYPE_GNUC_PMF:       163%    196%
+ *  NL_PMF_TYPE_GNUC_PMF_CONV:  215%    215%
+ *  NL_PMF_TYPE_VIRTUAL:        213%    209%
  *
  *  The whole exercise was done to avoid virtual calls. In prior versions of
  *  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
@@ -136,9 +136,9 @@ namespace plib {
 													//    if odd, it's the byte offset into the vtable
 		int                     m_this_delta;       // delta to apply to the 'this' pointer
 
-		int                     m_dummy1;			// only used for visual studio x64
+		int                     m_dummy1;           // only used for visual studio x64
 		int                     m_dummy2;
-		int						m_size;
+		int                     m_size;
 	};
 #endif
 
@@ -181,7 +181,7 @@ namespace plib {
 	private:
 		generic_function m_func;
 #if 0 && defined(_MSC_VER)
-		int dummy[4]; 
+		int dummy[4];
 #endif
 	};
 

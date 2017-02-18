@@ -23,7 +23,7 @@
    timer init, reset, read changed
 
   2017-Feb-15 Edstrom
-   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching 
+   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
    on correct flanks and leading and trailing flanks added + logging.
  */
 
@@ -426,11 +426,11 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				{
 					shift_in(); // close latch
 
-					// Shift in also on the last flanks 
+					// Shift in also on the last flanks
 					if (m_shift_counter == 0)
 					{
-					    m_shift_state = SHIFTER_FINISH;
-					    m_shift_timer->adjust(clocks_to_attotime(1));
+						m_shift_state = SHIFTER_FINISH;
+						m_shift_timer->adjust(clocks_to_attotime(1));
 					}
 				}
 			}
@@ -714,7 +714,7 @@ READ8_MEMBER( via6522_device::read )
 		break;
 	}
 	LOGR(" * %s Reg %02x -> %02x - %s\n", tag(), offset, val, std::array<char const *, 16>
-	     {{"IRB", "IRA", "DDRB", "DDRA", "T1CL","T1CH","T1LL","T1LH","T2CL","T2CH","SR","ACR","PCR","IFR","IER","IRA (nh)"}}[offset]);
+		 {{"IRB", "IRA", "DDRB", "DDRA", "T1CL","T1CH","T1LL","T1LH","T2CL","T2CH","SR","ACR","PCR","IFR","IER","IRA (nh)"}}[offset]);
 
 	return val;
 }
@@ -1073,7 +1073,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 		}
 		else // shift is not controlled by m_pcr
 		{
-			if (!state && SO_EXT_CONTROL(m_acr)) 
+			if (!state && SO_EXT_CONTROL(m_acr))
 			{
 				shift_out();
 			}

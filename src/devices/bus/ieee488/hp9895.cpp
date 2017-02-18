@@ -2,55 +2,55 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-	hp9895.cpp
+    hp9895.cpp
 
-	HP9895 floppy disk drive
+    HP9895 floppy disk drive
 
-	Phew, this one was tough!
+    Phew, this one was tough!
 
-	This is a dual 8" floppy disk drive that interfaces through
-	HPIB/IEEE-488 bus. It implements the so-called "Amigo" command
-	set.
+    This is a dual 8" floppy disk drive that interfaces through
+    HPIB/IEEE-488 bus. It implements the so-called "Amigo" command
+    set.
 
-	Its main components are:
-	* A Z80A CPU @ 4 MHz with 8 kB of firmware ROM and 1 kB of
-	  static RAM
-	* A HP PHI chip that interfaces CPU to HPIB bus
-	* A disk controller implemented with a lot of discrete TTLs
-	* 2 MPI 8" disk drives
+    Its main components are:
+    * A Z80A CPU @ 4 MHz with 8 kB of firmware ROM and 1 kB of
+      static RAM
+    * A HP PHI chip that interfaces CPU to HPIB bus
+    * A disk controller implemented with a lot of discrete TTLs
+    * 2 MPI 8" disk drives
 
-	Data I/O with the disk is carried out through 2 shift registers,
-	one for data bits (@ 0x60 address) and one for clock bits (@ 0x61
-	address). CPU is stalled by setting WAIT/ to 0 whenever it accesses
-	the data register and the hw is not ready for the byte. Once
-	the next byte boundary is reached (the SDOK signal activates) the
-	CPU is released and either the data byte is read from shift register
-	or written into it. At the same time clock shift register is
-	copied into clock register when reading or viceversa when writing.
+    Data I/O with the disk is carried out through 2 shift registers,
+    one for data bits (@ 0x60 address) and one for clock bits (@ 0x61
+    address). CPU is stalled by setting WAIT/ to 0 whenever it accesses
+    the data register and the hw is not ready for the byte. Once
+    the next byte boundary is reached (the SDOK signal activates) the
+    CPU is released and either the data byte is read from shift register
+    or written into it. At the same time clock shift register is
+    copied into clock register when reading or viceversa when writing.
 
-	The 9895 drive can operate in 2 modes: HP/High density or IBM/low
-	density. This table summarizes the differences between the modes.
-	See also page 2-12 of service manual.
+    The 9895 drive can operate in 2 modes: HP/High density or IBM/low
+    density. This table summarizes the differences between the modes.
+    See also page 2-12 of service manual.
 
-	| Characteristic | HP mode  | IBM mode  |
-	|----------------+----------+-----------|
-	| Bit cell size  | 2 µs     | 4 µs      |
-	| Modulation     | MMFM     | FM        |
-	| Bit order      | LS first | MS first  |
-	| Sync bytes     | 4x FF    | 6x 00     |
-	| Formatted size | 1155 kB  | 250.25 kB |
+    | Characteristic | HP mode  | IBM mode  |
+    |----------------+----------+-----------|
+    | Bit cell size  | 2 µs     | 4 µs      |
+    | Modulation     | MMFM     | FM        |
+    | Bit order      | LS first | MS first  |
+    | Sync bytes     | 4x FF    | 6x 00     |
+    | Formatted size | 1155 kB  | 250.25 kB |
 
-	Reference manual:
-	HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
+    Reference manual:
+    HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
 
-	Reference manual for the floppy drives:
-	Magnetic Peripherals, inc., feb 83, 9406-4 Flexible Disk Drive
-	Hardware Maintenance Manual
+    Reference manual for the floppy drives:
+    Magnetic Peripherals, inc., feb 83, 9406-4 Flexible Disk Drive
+    Hardware Maintenance Manual
 
-	TODO/Issues:
-	* floppy_image_device sometimes reports the wrong state for wpt
-	  signal
-	* IBM mode hasn't been tested yet
+    TODO/Issues:
+    * floppy_image_device sometimes reports the wrong state for wpt
+      signal
+    * IBM mode hasn't been tested yet
 
 *********************************************************************/
 
@@ -69,51 +69,51 @@
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 // Bits in RESET register
-#define REG_RESET_TIMEOUT_START_BIT	0	// Start TIMEOUT oneshot (1)
-#define REG_RESET_OVERUN_CLEAR_BIT	1	// Clear OVERUN (sic) (1)
-#define REG_RESET_PROGRES_BIT		3	// PROGRES (1)
+#define REG_RESET_TIMEOUT_START_BIT 0   // Start TIMEOUT oneshot (1)
+#define REG_RESET_OVERUN_CLEAR_BIT  1   // Clear OVERUN (sic) (1)
+#define REG_RESET_PROGRES_BIT       3   // PROGRES (1)
 
 // Bits in CNTL register
-#define REG_CNTL_READON_BIT			1	// Enable reading (1)
-#define REG_CNTL_WRITON_BIT			2	// Enable writing (1)
-#define REG_CNTL_WRITDRV_BIT		3	// Enable writing to floppy (1)
-#define REG_CNTL_CRCOUT_BIT			4	// Enable output of CRC word (1)
-#define REG_CNTL_CRCON_BIT			5	// Enable updating of CRC word (1) or preset CRC to 0xffff (0)
+#define REG_CNTL_READON_BIT         1   // Enable reading (1)
+#define REG_CNTL_WRITON_BIT         2   // Enable writing (1)
+#define REG_CNTL_WRITDRV_BIT        3   // Enable writing to floppy (1)
+#define REG_CNTL_CRCOUT_BIT         4   // Enable output of CRC word (1)
+#define REG_CNTL_CRCON_BIT          5   // Enable updating of CRC word (1) or preset CRC to 0xffff (0)
 
 // Bits in DRV register
-#define REG_DRV_STEP_BIT			0	// Step pulse to drive (1)
-#define REG_DRV_MOVEIN_BIT			1	// Move heads inward (1)
-#define REG_DRV_MGNENA_BIT			2	// Enable checking of bit cell margins (1)
-#define REG_DRV_IN_USE_BIT			3	// "In use" signal to drive (1)
-#define REG_DRV_LOWCURR_BIT			4	// Reduce write current in inner tracks (1)
-#define REG_DRV_HEADSEL_BIT			7	// Head selection (1 = Head 1)
+#define REG_DRV_STEP_BIT            0   // Step pulse to drive (1)
+#define REG_DRV_MOVEIN_BIT          1   // Move heads inward (1)
+#define REG_DRV_MGNENA_BIT          2   // Enable checking of bit cell margins (1)
+#define REG_DRV_IN_USE_BIT          3   // "In use" signal to drive (1)
+#define REG_DRV_LOWCURR_BIT         4   // Reduce write current in inner tracks (1)
+#define REG_DRV_HEADSEL_BIT         7   // Head selection (1 = Head 1)
 
 // Bits in XV register
-#define REG_XV_DRIVE3_BIT			0	// Select drive #3 (1)
-#define REG_XV_DRIVE2_BIT			1	// Select drive #2 (1)
-#define REG_XV_DRIVE1_BIT			2	// Select drive #1 (1)
-#define REG_XV_DRIVE0_BIT			3	// Select drive #0 (1)
-#define REG_XV_HIDEN_BIT			4	// Select HP/High density mode (1) or IBM/Low density mode (0)
-#define REG_XV_PRECMP_BIT			5	// Enable pre-compensation
+#define REG_XV_DRIVE3_BIT           0   // Select drive #3 (1)
+#define REG_XV_DRIVE2_BIT           1   // Select drive #2 (1)
+#define REG_XV_DRIVE1_BIT           2   // Select drive #1 (1)
+#define REG_XV_DRIVE0_BIT           3   // Select drive #0 (1)
+#define REG_XV_HIDEN_BIT            4   // Select HP/High density mode (1) or IBM/Low density mode (0)
+#define REG_XV_PRECMP_BIT           5   // Enable pre-compensation
 
 // Bits in DRIVSTAT register
-#define REG_DRIVSTAT_INDEX_BIT		0	// Index pulse from drive (1)
-#define REG_DRIVSTAT_DISCHNG_BIT	1	// Disk changed (1)
-#define REG_DRIVSTAT_TRACK0_BIT		2	// Heads on track #0 (1)
-#define REG_DRIVSTAT_WRPROT_BIT		3	// Disk is write-protected (1)
-#define REG_DRIVSTAT_READY_BIT		4	// Disk is ready (1)
-#define REG_DRIVSTAT_CRCERR_BIT		5	// Error in CRC (1)
-#define REG_DRIVSTAT_OVERUN_BIT		6	// I/O overrun between disk and CPU (1)
-#define REG_DRIVSTAT_TWOSIDE_BIT	7	// 2-sided disk (1)
+#define REG_DRIVSTAT_INDEX_BIT      0   // Index pulse from drive (1)
+#define REG_DRIVSTAT_DISCHNG_BIT    1   // Disk changed (1)
+#define REG_DRIVSTAT_TRACK0_BIT     2   // Heads on track #0 (1)
+#define REG_DRIVSTAT_WRPROT_BIT     3   // Disk is write-protected (1)
+#define REG_DRIVSTAT_READY_BIT      4   // Disk is ready (1)
+#define REG_DRIVSTAT_CRCERR_BIT     5   // Error in CRC (1)
+#define REG_DRIVSTAT_OVERUN_BIT     6   // I/O overrun between disk and CPU (1)
+#define REG_DRIVSTAT_TWOSIDE_BIT    7   // 2-sided disk (1)
 
 // Bits in SWITCHES(2) registers
-#define REG_SWITCHES_HPIB_ADDR_SHIFT	0	// LSB of HPIB address
-#define REG_SWITCHES_HPIB_ADDR_MASK		7	// Mask of HPIB address
-#define REG_SWITCHES_W_TEST_BIT		3	// "W" test push-button (1)
-#define REG_SWITCHES_S_TEST_BIT		4	// "S" test push-button (1)
-#define REG_SWITCHES_LOOP_BIT		5	// Test loop option (1)
-#define REG_SWITCHES_TIMEOUT_BIT	6	// TIMEOUT (1)
-#define REG_SWITCHES_AMDT_BIT		7	// Address mark detected (1)
+#define REG_SWITCHES_HPIB_ADDR_SHIFT    0   // LSB of HPIB address
+#define REG_SWITCHES_HPIB_ADDR_MASK     7   // Mask of HPIB address
+#define REG_SWITCHES_W_TEST_BIT     3   // "W" test push-button (1)
+#define REG_SWITCHES_S_TEST_BIT     4   // "S" test push-button (1)
+#define REG_SWITCHES_LOOP_BIT       5   // Test loop option (1)
+#define REG_SWITCHES_TIMEOUT_BIT    6   // TIMEOUT (1)
+#define REG_SWITCHES_AMDT_BIT       7   // Address mark detected (1)
 
 // Timers
 enum {
@@ -123,11 +123,11 @@ enum {
 };
 
 // Timings
-#define TIMEOUT_MSEC		450		// Timeout duration (ms)
-#define HPMODE_BIT_FREQ		500000	// HP-mode bit frequency (Hz)
-#define IBMMODE_BIT_FREQ	250000	// IBM-mode bit frequency (Hz)
+#define TIMEOUT_MSEC        450     // Timeout duration (ms)
+#define HPMODE_BIT_FREQ     500000  // HP-mode bit frequency (Hz)
+#define IBMMODE_BIT_FREQ    250000  // IBM-mode bit frequency (Hz)
 
-#define MIN_SYNC_BITS		29		// Number of bits to synchronize
+#define MIN_SYNC_BITS       29      // Number of bits to synchronize
 
 // device type definition
 const device_type HP9895 = &device_creator<hp9895_device>;
@@ -225,7 +225,7 @@ void hp9895_device::device_reset()
 	m_data_sr = 0;
 	m_wr_context = 0;
 	m_had_transition = false;
-	m_lckup = true;	// Because READON = 0
+	m_lckup = true; // Because READON = 0
 	m_amdt = false;
 	m_sync_cnt = 0;
 	m_hiden = false;
@@ -819,11 +819,11 @@ void hp9895_device::write_bit(bool data_bit , bool clock_bit)
 	if (m_hiden) {
 		// **** HP mode ****
 		// m_wr_context delays data bits by 2 bit cells
-		// Bit	Content
+		// Bit  Content
 		// ============
-		// 2	Data @ t-2
-		// 1	Data @ t-1
-		// 0	Data @ t
+		// 2    Data @ t-2
+		// 1    Data @ t-1
+		// 0    Data @ t
 		m_wr_context = (m_wr_context << 1) | data_bit;
 		data_bit = BIT(m_wr_context , 2);
 		clock_bit = !data_bit && (clock_bit || !m_had_transition);

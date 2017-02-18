@@ -209,10 +209,10 @@ private:
 	uint8_t m_shift_counter;
 	enum m_shift_state_t
 	{
-	    SHIFTER_IDLE,
-	    SHIFTER_SHIFT,
-	    SHIFTER_FINISH,
-	    SHIFTER_IRQ
+		SHIFTER_IDLE,
+		SHIFTER_SHIFT,
+		SHIFTER_FINISH,
+		SHIFTER_IRQ
 	};
 	m_shift_state_t m_shift_state;
 };

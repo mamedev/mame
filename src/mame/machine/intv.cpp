@@ -52,21 +52,21 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 struct tape_drive_state_type
 {
 	/* read state */
-	int read_data;			/* 0x4000 */
-	int ready;				/* 0x4001 */
-	int leader_detect;		/* 0x4002 */
-	int tape_missing;		/* 0x4003 */
-	int playing;			/* 0x4004 */
-	int no_data;			/* 0x4005 */
+	int read_data;          /* 0x4000 */
+	int ready;              /* 0x4001 */
+	int leader_detect;      /* 0x4002 */
+	int tape_missing;       /* 0x4003 */
+	int playing;            /* 0x4004 */
+	int no_data;            /* 0x4005 */
 
 	/* write state */
-	int motor_state;		/* 0x4020-0x4022 */
-	int writing;			/* 0x4023 */
-	int audio_b_mute;		/* 0x4024 */
-	int audio_a_mute;		/* 0x4025 */
-	int channel_select;		/* 0x4026 */
-	int erase;				/* 0x4027 */
-	int write_data;			/* 0x4040 */
+	int motor_state;        /* 0x4020-0x4022 */
+	int writing;            /* 0x4023 */
+	int audio_b_mute;       /* 0x4024 */
+	int audio_a_mute;       /* 0x4025 */
+	int channel_select;     /* 0x4026 */
+	int erase;              /* 0x4027 */
+	int write_data;         /* 0x4040 */
 
 	/* bit_counter */
 	int bit_counter;
@@ -74,8 +74,8 @@ struct tape_drive_state_type
 
 //static const char *const tape_motor_mode_desc[8] =
 //{
-//	"IDLE", "IDLE", "IDLE", "IDLE",
-//	"EJECT", "PLAY/RECORD", "REWIND", "FF"
+//  "IDLE", "IDLE", "IDLE", "IDLE",
+//  "EJECT", "PLAY/RECORD", "REWIND", "FF"
 //};
 
 
@@ -213,7 +213,7 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 		case 0x026:
 			// "Tape Drive Control: Mode"
 			// If read mode:
-			//	0=Read Channel B Data, 1 = Read Channel A Data
+			//  0=Read Channel B Data, 1 = Read Channel A Data
 			// If write mode:
 			//  0=Write Channel B data, 1 = Record Channel B Audio
 			tape_drive.channel_select = (data & 1);
@@ -441,16 +441,16 @@ READ8_MEMBER( intv_state::intvkbd_periph_r )
 			if (m_printer_no_paper)
 				value |= 0x10;
 			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,value);
-			
-			// After one query of busy, 
+
+			// After one query of busy,
 			// next time the state is not_busy
-			if (!m_printer_not_busy) 
+			if (!m_printer_not_busy)
 				m_printer_not_busy = true;
-				
+
 			return value;
 		break;
 		case 0x07:
-		
+
 		default:
 			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,0xff);
 			return 0xff;
@@ -558,12 +558,12 @@ void intv_state::machine_reset()
 
 	/* Set initial PC */
 	m_maincpu->set_state_int(CP1610_R7, 0x1000);
-	
+
 	if (m_is_keybd)
 	{
-		m_printer_not_busy = true;			// printer state
-		m_printer_no_paper = false;			// printer state
-		m_printer_not_busy_enable = false;	// printer interface state
+		m_printer_not_busy = true;          // printer state
+		m_printer_no_paper = false;         // printer state
+		m_printer_not_busy_enable = false;  // printer interface state
 	}
 }
 

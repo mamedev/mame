@@ -220,8 +220,8 @@ void pin64_block_t::write(FILE* file) {
 
 uint32_t pin64_block_t::size() {
 	return sizeof(uint32_t) // data CRC32
-	     + sizeof(uint32_t) // data size
-	     + m_data.size();   // data
+		 + sizeof(uint32_t) // data size
+		 + m_data.size();   // data
 }
 
 
@@ -367,11 +367,11 @@ size_t pin64_t::size() {
 
 size_t pin64_t::header_size() {
 	return sizeof(uint8_t) * 8  // "PIN64CAP"
-	       + sizeof(uint32_t)   // total file size
-	       + sizeof(uint32_t)   // start of block directory data
-	       + sizeof(uint32_t)   // start of command-list directory data
-	       + sizeof(uint32_t)   // start of blocks
-	       + sizeof(uint32_t);  // start of commands
+		   + sizeof(uint32_t)   // total file size
+		   + sizeof(uint32_t)   // start of block directory data
+		   + sizeof(uint32_t)   // start of command-list directory data
+		   + sizeof(uint32_t)   // start of blocks
+		   + sizeof(uint32_t);  // start of commands
 }
 
 size_t pin64_t::block_directory_size() {

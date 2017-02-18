@@ -37,8 +37,8 @@ public:
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
-		opt_loadstate(*this,"",  "loadstate",	"",			"load state from file and continue from there"),
-		opt_savestate(*this,"",  "savestate",	"",			"save state to file at end of run"),
+		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
+		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
 		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        "spice",    "spice:eagle:rinf", "type of file to be converted: spice,eagle,rinf"),
 

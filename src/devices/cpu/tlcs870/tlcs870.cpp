@@ -4,11 +4,11 @@
 
     Toshiba TLCS-870 Series MCUs
 
-	The TLCS-870/X expands on this instruction set using the same base encoding.
+    The TLCS-870/X expands on this instruction set using the same base encoding.
 
-	The TLCS-870/C appears to have a completely different encoding.
+    The TLCS-870/C appears to have a completely different encoding.
 
-	loosely baesd on the tlcs90 core by Luca Elia
+    loosely baesd on the tlcs90 core by Luca Elia
 
 *************************************************************************************************************/
 
@@ -157,13 +157,13 @@ static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 	// 0x33 reserved
 	AM_RANGE(0x0034, 0x0034) AM_WRITE(wdtcr1_w) // WDT control
 	AM_RANGE(0x0035, 0x0035) AM_WRITE(wdtcr2_w) //
-	
+
 	AM_RANGE(0x0036, 0x0036) AM_READWRITE(tbtcr_r, tbtcr_w) // TBT / TG / DVO control
 	AM_RANGE(0x0037, 0x0037) AM_READWRITE(eintcr_r, eintcr_w) // External interrupt control
-	
+
 	AM_RANGE(0x0038, 0x0038) AM_READWRITE(syscr1_r, syscr1_w) // System Control
 	AM_RANGE(0x0039, 0x0039) AM_READWRITE(syscr2_r, syscr2_w) //
-	
+
 	AM_RANGE(0x003a, 0x003a) AM_READWRITE(eir_l_r, eir_l_w) // Interrupt enable register
 	AM_RANGE(0x003b, 0x003b) AM_READWRITE(eir_h_r, eir_h_w) //
 
@@ -221,7 +221,7 @@ void tlcs870_device::decode()
 
 	uint8_t b0;
 	uint8_t b1;
-	
+
 	int tmppc = m_addr;
 
 	b0 = READ8();
@@ -475,7 +475,7 @@ void tlcs870_device::decode()
 		break;
 
 
-	case 0x26:		
+	case 0x26:
 		// LD (x),(y)  // Flags / Cycles  1Z-- / 5
 		m_op = LD;
 		m_flagsaffected |= FLAG_J | FLAG_Z;
@@ -672,8 +672,8 @@ void tlcs870_device::decode()
 		m_param1 = 0; // A
 
 		m_param2_type = REG_8BIT;
-		m_param2 = b0 & 0x7;	
-		
+		m_param2 = b0 & 0x7;
+
 		break;
 
 	case 0x58:
@@ -692,7 +692,7 @@ void tlcs870_device::decode()
 		m_param2 = 0; // A
 
 		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;	
+		m_param1 = b0 & 0x7;
 		break;
 
 	case 0x60:
@@ -733,7 +733,7 @@ void tlcs870_device::decode()
 	case 0x77:
 		// (ALU OP) A,n
 		m_op = (b0 & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
 
@@ -752,7 +752,7 @@ void tlcs870_device::decode()
 	case 0x7f:
 		// (ALU OP) A,(x)
 		m_op = (b0 & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = 0; // A
 
@@ -963,7 +963,7 @@ void tlcs870_device::decode()
 
 	case 0xf0: // 1111 0000 xxxx xxxx 0101 0rrr
 		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7); 
+		m_param1_type = ADDR_IN_BASE+(b0&0x7);
 		m_param1 = READ8();
 		decode_dest(b0);
 		break;
@@ -971,14 +971,14 @@ void tlcs870_device::decode()
 	case 0xf2: // 1111 001p 0101 0rrr
 	case 0xf3: // 1111 001p 0101 0rrr
 		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7); 
+		m_param1_type = ADDR_IN_BASE+(b0&0x7);
 		decode_dest(b0);
 		break;
 
 
 	case 0xf4: // 1111 0100 dddd dddd 0101 0rrr
 		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7); 
+		m_param1_type = ADDR_IN_BASE+(b0&0x7);
 		m_param1 = READ8();
 		decode_dest(b0);
 		break;
@@ -986,7 +986,7 @@ void tlcs870_device::decode()
 	case 0xf6: // 1110 0110 0101 0rrr
 	case 0xf7: // 1111 0111 0101 0rrr
 		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7); 
+		m_param1_type = ADDR_IN_BASE+(b0&0x7);
 		decode_dest(b0);
 		break;
 
@@ -1008,7 +1008,7 @@ void tlcs870_device::decode()
 
 		m_param1_type = STACKPOINTER;
 		//m_param1 = 0;
-		
+
 		m_param2_type = ABSOLUTE_VAL_16;
 		m_param2 = READ16();
 
@@ -1028,7 +1028,7 @@ void tlcs870_device::decode()
 
 		break;
 	}
-	
+
 	break;
 
 	case 0xfc:
@@ -1069,7 +1069,7 @@ void tlcs870_device::decode()
 void tlcs870_device::decode_register_prefix(uint8_t b0)
 {
 	uint8_t bx;
-	
+
 	bx = READ8();
 
 	switch (bx)
@@ -1081,7 +1081,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x01:
 		// SWAP g
 		m_op = SWAP;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 		break;
@@ -1089,7 +1089,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x02:
 		// MUL ggG, ggL
 		m_op = MUL;
-		
+
 		m_param1_type = REG_16BIT; // odd syntax
 		m_param1 = b0 & 0x3;
 		break;
@@ -1099,7 +1099,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		m_op = DIV;
 		m_param1_type = REG_16BIT;
 		m_param1 = b0 & 3;
-	
+
 		m_param2_type = REG_8BIT;
 		m_param2 = 2; // C
 
@@ -1143,7 +1143,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x0a:
 		// DAA g
 		m_op = DAA;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1152,7 +1152,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x0b:
 		// DAS g
 		m_op = DAS;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1170,7 +1170,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x13:
 		// XCH rr,gg
 		m_op = XCH;
-		
+
 		m_param1_type = REG_16BIT;
 		m_param1 = bx & 0x3;
 
@@ -1203,7 +1203,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x1c:
 		// SHLC g
 		m_op = SHLC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1212,7 +1212,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x1d:
 		// SHRC g
 		m_op = SHRC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1221,7 +1221,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x1e:
 		// ROLC g
 		m_op = ROLC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1230,7 +1230,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x1f:
 		// RORC g
 		m_op = RORC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1264,7 +1264,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x37:
 		// (ALU OP) WA,gg
 		m_op = (bx & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_16BIT;
 		m_param1 = 0;
 
@@ -1285,7 +1285,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x3f:
 		// (ALU OP) gg,mn
 		m_op = (bx & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_16BIT;
 		m_param1 = b0 & 0x3;
 
@@ -1304,7 +1304,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x47:
 		// SET g.b
 		m_op = SET;
-		
+
 		m_param1_type = REG_8BIT | BITPOS;
 		m_param1 = b0 & 0x7;
 		m_bitpos = bx & 0x7;
@@ -1322,7 +1322,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x4f:
 		// CLR g.b
 		m_op = CLR;
-		
+
 		m_param1_type = REG_8BIT | BITPOS;
 		m_param1 = b0 & 0x7;
 		m_bitpos = bx & 0x7;
@@ -1368,7 +1368,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x67:
 		// (ALU OP) A,g
 		m_op = (bx & 0x7)+ALU_ADDC;
-		
+
 		m_param2_type = REG_8BIT;
 		m_param2 = b0 & 0x7;
 
@@ -1386,7 +1386,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x6f:
 		// (ALU OP) g,A
 		m_op = (bx & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1404,7 +1404,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 	case 0x77:
 		// (ALU OP) g,n
 		m_op = (bx & 0x7)+ALU_ADDC;
-		
+
 		m_param1_type = REG_8BIT;
 		m_param1 = b0 & 0x7;
 
@@ -1484,7 +1484,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		break;
 
 	case 0x9a:
-	case 0x9b: 
+	case 0x9b:
 		// LD (pp).g,CF
 		m_op = LD;  // Flags / Cycles  1--- / 5
 		m_flagsaffected |= FLAG_J;
@@ -1663,7 +1663,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		// b0 & 4 would be invalid?
 
 		m_param1_type = STACKPOINTER;
-	//	m_param1 = 0;
+	//  m_param1 = 0;
 
 		break;
 
@@ -1671,13 +1671,13 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 		// LD gg,SP
 		m_op = LD;  // Flags / Cycles  1--- / 3
 		m_flagsaffected |= FLAG_J;
-	
+
 		m_param1_type = REG_16BIT;
 		m_param1 = b0 & 3;
 		// b0 & 4 would be invalid?
 
 		m_param2_type = STACKPOINTER;
-	//	m_param2 = 0;
+	//  m_param2 = 0;
 		break;
 
 	case 0xfc:
@@ -1716,7 +1716,7 @@ void tlcs870_device::decode_register_prefix(uint8_t b0)
 void tlcs870_device::decode_source(int type, uint16_t val)
 {
 	uint8_t bx;
-	
+
 	bx = READ8();
 
 	switch (bx)
@@ -1824,7 +1824,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 
 		m_param1_type = ADDR_IN_HL;
 		//m_param1 = 0;
-		
+
 		m_param2_type = type;
 		m_param2 = val;
 		break;
@@ -1884,7 +1884,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0x47:
 		// SET (src).b
 		m_op = SET;
-		
+
 		m_param1_type = type | BITPOS;
 		m_param1 = val;
 		m_bitpos = bx & 0x7;
@@ -1900,7 +1900,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0x4f:
 		// CLR (src).b
 		m_op = CLR;
-		
+
 		m_param1_type = type | BITPOS;
 		m_param1 = val;
 		m_bitpos = bx & 0x7;
@@ -2091,7 +2091,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 	case 0xc7:
 		// CPL (src).b
 		m_op = CPL;
-		
+
 		m_param1_type = type | BITPOS;
 		m_param1 = val;
 		m_bitpos = bx & 0x7;
@@ -2219,7 +2219,7 @@ void tlcs870_device::decode_source(int type, uint16_t val)
 void tlcs870_device::decode_dest(uint8_t b0)
 {
 	uint8_t bx;
-	
+
 	bx = READ8();
 
 	switch (bx)
@@ -2239,7 +2239,7 @@ void tlcs870_device::decode_dest(uint8_t b0)
 		m_param2 = bx&0x3;
 		break;
 
-	case 0x2c: 
+	case 0x2c:
 		// LD (dst),n   // (dst) can only be (DE), (HL+), (-HL), or (HL+d)  because (x) and (HL) are redundant encodings?
 		m_op = LD;  // Flags / Cycles  1--- / x
 		m_flagsaffected |= FLAG_J;
@@ -2421,7 +2421,7 @@ void tlcs870_device::set_dest_val(uint16_t param_type, uint16_t param_val, uint1
 		case (STACKPOINTER):
 			m_sp.d = dest_val;
 			break;
-		}				
+		}
 	}
 	else
 	{
@@ -2669,13 +2669,13 @@ void tlcs870_device::execute_run()
 			break;
 		/*
 		case DI:
-			break;
+		    break;
 		*/
 		case DIV:
 			break;
 		/*
 		case EI:
-			break;
+		    break;
 		*/
 		case INC:
 		{
@@ -2730,7 +2730,7 @@ void tlcs870_device::execute_run()
 		}
 		/*
 		case J:
-			break;
+		    break;
 		*/
 		case JP:
 		case JR:
@@ -2798,7 +2798,7 @@ void tlcs870_device::execute_run()
 					else
 					{
 						fatalerror("8-bit jump destination?");
-						//	val = RM8(addr);
+						//  val = RM8(addr);
 					}
 				}
 				else
@@ -2808,7 +2808,7 @@ void tlcs870_device::execute_run()
 
 				m_pc.d = val;
 			}
-			
+
 			SET_JF;
 
 			break;
@@ -2819,13 +2819,13 @@ void tlcs870_device::execute_run()
 			{
 				// bit operations, including the 'TEST' style bit instruction
 				uint8_t bit = 0;
-				
+
 				if (m_param2_type == CARRYFLAG)
 				{
 					bit = IS_CF;
 
 					setbit_param(m_param1_type,m_param1,bit, false);
-				
+
 					// for this type of operation ( LD *.b, CF ) the Jump Flag always ends up being 1
 					SET_JF;
 
@@ -2910,8 +2910,8 @@ void tlcs870_device::execute_run()
 			break;
 		case RORD:
 			break;
-		
-		
+
+
 		case SET:
 			if ((m_param1_type & BITPOS))
 			{
@@ -2938,15 +2938,15 @@ void tlcs870_device::execute_run()
 
 				if (m_param1_type & ADDR_IN_BASE)
 				{
-					addr = get_addr(m_param1_type,m_param1);
-					if (m_param1_type & IS16BIT)
-						WM16(addr, val);
-					else
-						WM8(addr, val);
+				    addr = get_addr(m_param1_type,m_param1);
+				    if (m_param1_type & IS16BIT)
+				        WM16(addr, val);
+				    else
+				        WM8(addr, val);
 				}
 				else
 				{
-					set_dest_val(m_param1_type,m_param1, val);
+				    set_dest_val(m_param1_type,m_param1, val);
 				}
 				*/
 
@@ -2964,7 +2964,7 @@ void tlcs870_device::execute_run()
 			break;
 		/*
 		case TEST:
-			break;
+		    break;
 		*/
 		case XCH:
 			break;
@@ -3088,7 +3088,7 @@ void tlcs870_device::state_import(const device_state_entry &entry)
 		case DEBUGGER_REG_A:
 			set_reg8(REG_A, m_debugger_temp);
 			break;
-		
+
 		case DEBUGGER_REG_W:
 			set_reg8(REG_W, m_debugger_temp);
 			break;
@@ -3194,7 +3194,7 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 
 void tlcs870_device::device_start()
 {
-//	int i, p;
+//  int i, p;
 	m_sp.d = 0x0000;
 	m_F = 0;
 
@@ -3231,7 +3231,7 @@ void tlcs870_device::state_string_export(const device_state_entry &entry, std::s
 
 	switch (entry.index())
 	{
-		
+
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%c%c",
 				F & 0x80 ? 'J':'.',
@@ -3241,5 +3241,5 @@ void tlcs870_device::state_string_export(const device_state_entry &entry, std::s
 			);
 			break;
 	}
-	
+
 }

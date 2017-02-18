@@ -22,15 +22,15 @@ Notes:
 
 - 4 known game carts where produced, these are:
 
-	Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
+    Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
                 Twenty One Thunder Plus, Power Pairs, Prism Poker Plus & Have A Cow
-	Star Pak 2: Pac-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
-	Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
-	Star Pak 4: Berzerk, Neon Nightmare, Battle Checkers, Orbit, Deep Sea Shadow, Star Tiger & Orbit Freefall
+    Star Pak 2: Pac-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
+    Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
+    Star Pak 4: Berzerk, Neon Nightmare, Battle Checkers, Orbit, Deep Sea Shadow, Star Tiger & Orbit Freefall
 
 - Allegedly there is a hard lock that SP1 and the PAC-MAN games (on SP2) cannot play together. Was a licensing issue with Namco.
   The system checks for cartridges on power up by querying the PIC parts. If the system sees SP1 & SP2 it disables SP2.
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -55,7 +55,7 @@ class galgames_slot_device;
 
 // CART declaration
 
-class galgames_cart_device :	public device_t,
+class galgames_cart_device :    public device_t,
 								public device_rom_interface
 {
 public:
@@ -63,11 +63,11 @@ public:
 	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	static void static_set_cart(device_t &device, uint8_t cart)	{ downcast<galgames_cart_device &>(device).m_cart = cart; }
-	static void static_set_pic_bits(device_t &device, int clk, int in, int out, int dis)	{ downcast<galgames_cart_device &>(device).set_pic_bits(clk, in, out, dis); }
+	static void static_set_cart(device_t &device, uint8_t cart) { downcast<galgames_cart_device &>(device).m_cart = cart; }
+	static void static_set_pic_bits(device_t &device, int clk, int in, int out, int dis)    { downcast<galgames_cart_device &>(device).set_pic_bits(clk, in, out, dis); }
 
 	// ROM
-	DECLARE_READ16_MEMBER(rom_r)	{ return read_word(offset*2); }
+	DECLARE_READ16_MEMBER(rom_r)    { return read_word(offset*2); }
 
 	// EEPROM
 	DECLARE_READ8_MEMBER(eeprom_r);
@@ -133,7 +133,7 @@ static MACHINE_CONFIG_FRAGMENT( bios )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_bios_cart_device :	public galgames_cart_device
+class galgames_bios_cart_device :   public galgames_cart_device
 {
 public:
 	// construction/destruction
@@ -163,7 +163,7 @@ static MACHINE_CONFIG_FRAGMENT( starpak2 )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_starpak2_cart_device :	public galgames_cart_device
+class galgames_starpak2_cart_device :   public galgames_cart_device
 {
 public:
 	// construction/destruction
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_FRAGMENT( starpak3 )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_starpak3_cart_device :	public galgames_cart_device
+class galgames_starpak3_cart_device :   public galgames_cart_device
 {
 public:
 	// construction/destruction
@@ -224,7 +224,7 @@ const device_type GALGAMES_STARPAK3_CART = &device_creator<galgames_starpak3_car
 
 // SLOT declaration
 
-class galgames_slot_device :	public device_t,
+class galgames_slot_device :    public device_t,
 								public device_memory_interface
 {
 public:
@@ -233,8 +233,8 @@ public:
 
 	DECLARE_ADDRESS_MAP(slot_map, 16);
 
-	DECLARE_READ16_MEMBER(read)		{ return m_space->read_word(offset * 2, mem_mask); }
-	DECLARE_WRITE16_MEMBER(write)	{ m_space->write_word(offset * 2, data, mem_mask); }
+	DECLARE_READ16_MEMBER(read)     { return m_space->read_word(offset * 2, mem_mask); }
+	DECLARE_WRITE16_MEMBER(write)   { m_space->write_word(offset * 2, data, mem_mask); }
 
 	// SLOT
 	DECLARE_WRITE8_MEMBER(cart_sel_w);
@@ -322,7 +322,7 @@ void galgames_cart_device::set_pic_reset_line(int state)
 	if (!m_pic)
 		return;
 
-//	logerror("reset line = %x\n", state);
+//  logerror("reset line = %x\n", state);
 
 	if (!m_pic->input_state(INPUT_LINE_RESET) && state)
 		pic_comm_reset();
@@ -332,17 +332,17 @@ void galgames_cart_device::set_pic_reset_line(int state)
 
 void galgames_cart_device::log_cart_comm(const char *text, uint8_t data)
 {
-//	logerror("%s: comm %-10s %02x - data:%02x bit:%02x rdy:%x clk:%02x\n", machine().describe_context(),
-//		text, data, m_pic_data, m_pic_data_bit, m_pic_data_rdy, m_pic_data_clk	);
+//  logerror("%s: comm %-10s %02x - data:%02x bit:%02x rdy:%x clk:%02x\n", machine().describe_context(),
+//      text, data, m_pic_data, m_pic_data_bit, m_pic_data_rdy, m_pic_data_clk  );
 
-//	logerror("%s: comm %-10s %02x\n", machine().describe_context(), text, data );
+//  logerror("%s: comm %-10s %02x\n", machine().describe_context(), text, data );
 }
 
 void galgames_cart_device::pic_comm_reset()
 {
 	m_pic_iobits = m_pic_data = m_pic_data_rdy = m_pic_data_clk = 0;
 	m_pic_data_bit = 0xff;
-//	logerror("%s: comm reset\n", machine().describe_context());
+//  logerror("%s: comm reset\n", machine().describe_context());
 }
 
 // External PIC status and data interface
@@ -367,34 +367,34 @@ WRITE8_MEMBER(galgames_cart_device::pic_data_w)
 {
 	if (is_selected())
 	{
-		m_pic_data		=	data;
-		m_pic_data_rdy	=	1;
-		m_pic_data_bit	=	0xff;
-		m_pic_data_clk	=	0;
+		m_pic_data      =   data;
+		m_pic_data_rdy  =   1;
+		m_pic_data_bit  =   0xff;
+		m_pic_data_clk  =   0;
 		log_cart_comm("EXT WRITE", data);
 	}
 }
 
 /*
 galgame2:
-	bit 0 = cleared at boot (never touched again)
-	bit 1 = PIC waits for it to become 0 before reading (or to become 1 when another byte is expected)
-	bit 2 = data out
-	bit 3   unused
-	bit 4 = data in
-	bit 5 = clock
-	bit 6   n.c.
-	bit 7   n.c.
+    bit 0 = cleared at boot (never touched again)
+    bit 1 = PIC waits for it to become 0 before reading (or to become 1 when another byte is expected)
+    bit 2 = data out
+    bit 3   unused
+    bit 4 = data in
+    bit 5 = clock
+    bit 6   n.c.
+    bit 7   n.c.
 
 galgame3:
-	bit 0 = clock
-	bit 1   unused
-	bit 2 = data in
-	bit 3 = data out
-	bit 4 = PIC waits for it to become 0 before reading (or to become 1 when another byte is expected)
-	bit 5 = 0
-	bit 6 = 1
-	bit 7   unused
+    bit 0 = clock
+    bit 1   unused
+    bit 2 = data in
+    bit 3 = data out
+    bit 4 = PIC waits for it to become 0 before reading (or to become 1 when another byte is expected)
+    bit 5 = 0
+    bit 6 = 1
+    bit 7   unused
 */
 void galgames_cart_device::set_pic_bits(int clk, int in, int out, int dis)
 {
@@ -476,7 +476,7 @@ READ8_MEMBER(galgames_cart_device::int_pic_data_r)
 		m_pic_iobits = (m_pic_iobits & (~m_pic_in_mask)) | (bit_in ? m_pic_in_mask : 0);
 	}
 
-//	log_cart_comm("PIC READ", m_pic_iobits);
+//  log_cart_comm("PIC READ", m_pic_iobits);
 
 	return m_pic_iobits;
 }
@@ -485,13 +485,13 @@ WRITE8_MEMBER(galgames_cart_device::int_pic_data_w)
 {
 	m_pic_iobits = (m_pic_iobits & (~m_pic_out_mask)) | (data & m_pic_out_mask);
 
-//	log_cart_comm("PIC WRITE", data);
+//  log_cart_comm("PIC WRITE", data);
 }
 
 /*
 galgame3, port A:
-	bit 2 = bank lsb
-	bit 3 = bank msb
+    bit 2 = bank lsb
+    bit 3 = bank msb
 */
 WRITE8_MEMBER(galgames_cart_device::int_pic_bank_w)
 {
@@ -576,8 +576,8 @@ void galgames_slot_device::device_reset()
 
 void galgames_slot_device::set_cart(int cart)
 {
-//	if (m_cart != cart)
-//		logerror("%s: cart sel = %02x\n", machine().describe_context(), cart);
+//  if (m_cart != cart)
+//      logerror("%s: cart sel = %02x\n", machine().describe_context(), cart);
 
 	m_cart = cart;
 }
@@ -595,15 +595,15 @@ WRITE8_MEMBER(galgames_slot_device::cart_sel_w)
 
 	switch( data )
 	{
-		case 0x07:	// 7 resets all
+		case 0x07:  // 7 resets all
 			reset_eeproms_except(-1);
 			break;
 
-		case 0x00:	// cart 0 (motherboard)
-		case 0x01:	// cart 1
-		case 0x02:	// cart 2
-		case 0x03:	// cart 3
-		case 0x04:	// cart 4
+		case 0x00:  // cart 0 (motherboard)
+		case 0x01:  // cart 1
+		case 0x02:  // cart 2
+		case 0x03:  // cart 3
+		case 0x04:  // cart 4
 			set_cart(data);
 			reset_eeproms_except(data);
 			break;
@@ -627,7 +627,7 @@ WRITE8_MEMBER(galgames_slot_device::ram_sel_w)
 	if ((data & 0xf7) == 0x05)
 	{
 		m_is_ram_active = true;
-//		logerror("%s: romram bank = %02x\n", machine().describe_context(), data);
+//      logerror("%s: romram bank = %02x\n", machine().describe_context(), data);
 	}
 }
 
@@ -739,7 +739,7 @@ protected:
 
 WRITE_LINE_MEMBER(galgames_state::blitter_irq_callback)
 {
-//	logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
+//  logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
 	m_maincpu->set_input_line(2, state);
 }
 
@@ -819,7 +819,7 @@ WRITE16_MEMBER(galgames_state::outputs_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x0004);
 	}
 
-//	popmessage("OUT %02X", data & mem_mask);
+//  popmessage("OUT %02X", data & mem_mask);
 }
 
 // FPGA

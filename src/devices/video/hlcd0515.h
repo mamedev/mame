@@ -46,7 +46,7 @@
      GND 20 |___________| 21 COL12
 
     HLCD 0569 doesn't have DATA OUT, instead it has what seems like OSC OUT on pin 34.
-    
+
     OSC is tied to a capacitor, the result frequency is 50000 * cap(in uF), eg. 0.01uF cap = 500Hz.
     Internally, this is divided by 2, and by number of rows to get display refresh frequency.
 */
@@ -75,7 +75,7 @@ protected:
 	void clock_data(int col);
 
 	u8 m_colmax;    // number of column pins
-	
+
 	int m_cs;       // input pin state
 	int m_clock;    // "
 	int m_data;     // "

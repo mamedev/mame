@@ -278,13 +278,13 @@ u16 hh_pic16_state::read_inputs(int columns)
   Atari Touch Me
   * PIC1655A-053
   * 2 7seg LEDs + 4 other LEDs, 1-bit sound
-  
+
   This is the handheld version of the 1974 arcade game.
-  
+
   known revisions:
   - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC1655A-053
   - Model BH-100 C013150 Rev 6 Atari 1979: AMI C10745 (custom ASIC)
-  
+
 ***************************************************************************/
 
 class touchme_state : public hh_pic16_state
@@ -324,12 +324,12 @@ WRITE8_MEMBER(touchme_state::write_b)
 {
 	// B0-B2: input mux
 	m_inp_mux = data & 7;
-	
+
 	// B0,B1: digit select
 	// B3-B6: leds
 	m_b = data;
 	prepare_display();
-	
+
 	// B7: speaker lead 1
 	update_speaker();
 }
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( touchme, touchme_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(touchme_state, write_b))
 	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(touchme_state, write_c))
-	
+
 	MCFG_DEVICE_ADD("clock", CLOCK, 300000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_END
   GAF Melody Madness
   * PIC1655A-094
   * 2 lamps under tube, 1-bit sound
-  
+
   Melody Madness is a tabletop music memory game, shaped like a jukebox.
   It can also be played as a simple electronic piano.
 
@@ -438,7 +438,7 @@ WRITE8_MEMBER(melodym_state::write_c)
 	// C6: both lamps
 	m_display_wait = 2;
 	display_matrix(1, 1, ~data >> 6 & 1, 1);
-	
+
 	// C7: speaker out
 	m_speaker->level_w(~data >> 7 & 1);
 }
@@ -516,7 +516,7 @@ MACHINE_CONFIG_END
   Ideal Maniac, by Ralph Baer
   * PIC1655A-036
   * 2 7seg LEDs, 1-bit sound
-  
+
   Maniac is a reflex game for 2-4 players. There are 4 challenges:
   1: Musical Maniac: Press the button as soon as the music stops.
   2: Sounds Abound: Count the number of tones in the song, then press the button
@@ -561,7 +561,7 @@ WRITE8_MEMBER(maniac_state::write_b)
 	// B0-B6: left 7seg
 	m_b = data;
 	prepare_display();
-	
+
 	// B7: speaker lead 1
 	update_speaker();
 }
@@ -616,12 +616,12 @@ MACHINE_CONFIG_END
   Lakeside Le Boom
   * PIC1655A-061
   * 1 led, 1-bit sound with RC circuit for volume decay
-  
+
   This is a tabletop timebomb defusion game. It's shaped like an aerial bomb,
   colored black on USA version, yellow on dual-language Canadian version.
   The game starts 'ticking' when the player opens the keypad door. To begin,
   select the game mode, rows(keypad size), and fuse duration.
-  
+
   Game modes as described on the box:
   1: Eliminate the buttons one by one in the order set out by the computer. Press
      one twice and you'll be sorry!
@@ -631,7 +631,7 @@ MACHINE_CONFIG_END
      on your 5th turn. Listen to the clues and you'll do fine.
   4: The computer picks a secret combination. Find it first by listening to the
      clues. Find the right order and you'll get it to fizzle out.
-  
+
 ***************************************************************************/
 
 class leboom_state : public hh_pic16_state
@@ -773,7 +773,7 @@ MACHINE_CONFIG_END
   Tandy Electronic Basketball (model 60-2146)
   * PIC1655A-51
   * 2 7seg LEDs + 21 other LEDs, 1-bit sound
-  
+
   The ROM is nearly identical to hccbaskb, the shell/overlay is the same as
   U.S. Games/Tandy Trick Shot Basketball.
 
@@ -811,7 +811,7 @@ WRITE8_MEMBER(tbaskb_state::write_b)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
-	
+
 	// B0-B4: input mux
 	m_inp_mux = ~data & 0x1f;
 
@@ -882,12 +882,12 @@ MACHINE_CONFIG_END
   Tiger Electronics Rocket Pinball (model 7-460)
   * PIC1650A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
-  
+
   known releases:
   - Hong Kong: Rocket Pinball
   - USA(1): Rocket Pinball (model 60-2140), distributed by Tandy
   - USA(2): Cosmic Pinball (model 49-65456), distributed by Sears
-  
+
 ***************************************************************************/
 
 class rockpin_state : public hh_pic16_state
@@ -911,7 +911,7 @@ void rockpin_state::prepare_display()
 	// 3 7seg leds from ports A and B
 	set_display_segmask(7, 0x7f);
 	display_matrix(7, 3, m_b, m_a, false);
-	
+
 	// 44 leds from ports C and D
 	for (int y = 0; y < 6; y++)
 		m_display_state[y+3] = (m_d >> y & 1) ? m_c : 0;
@@ -924,7 +924,7 @@ WRITE8_MEMBER(rockpin_state::write_a)
 {
 	// A3,A4: speaker out
 	m_speaker->level_w(data >> 3 & 3);
-	
+
 	// A0-A2: select digit
 	m_a = ~data & 7;
 	prepare_display();
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( rockpin, rockpin_state )
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(rockpin_state, write_c))
 	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(rockpin_state, write_d))
-	
+
 	MCFG_DEVICE_ADD("clock", CLOCK, 500000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
@@ -999,7 +999,7 @@ MACHINE_CONFIG_END
   Tiger Electronics Half Court Computer Basketball (model 7-470)
   * PIC1655A(no serial), 69-11557
   * 2 7seg LEDs + 26 other LEDs, 1-bit sound
-  
+
   known releases:
   - Hong Kong: Half Court Computer Basketball
   - USA: Electronic Basketball (model 49-65453), distributed by Sears
@@ -1038,7 +1038,7 @@ WRITE8_MEMBER(hccbaskb_state::write_b)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
-	
+
 	// B0-B4: input mux
 	m_inp_mux = ~data & 0x1f;
 
@@ -1113,7 +1113,7 @@ MACHINE_CONFIG_END
   (no brand) Football (set 2)
   * PIC1655-024
   * rest same as above, 1 less button
-  
+
   Hello and welcome to another Mattel Football clone, there are so many of these.
   The PIC1655-024 one came from an unbranded handheld, but comparison suggests
   that it's the 'prequel' of PIC1655A-033.
@@ -1142,7 +1142,7 @@ void ttfball_state::prepare_display()
 	// C5: select digits or led matrix
 	const u8 _4511_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0,0,0,0,0,0 };
 	u16 led_data = (m_c & 0x20) ? (_4511_map[m_c & 0xf] | (~m_c << 3 & 0x80)) : (~m_c << 8 & 0x700);
-	
+
 	set_display_segmask(0x7f, 0xff);
 	display_matrix(11, 9, led_data, m_b | (m_c << 1 & 0x100));
 }
@@ -1157,7 +1157,7 @@ WRITE8_MEMBER(ttfball_state::write_b)
 {
 	// B0: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
-	
+
 	// B0,B1,B3,B7: input mux low
 	m_inp_mux = (m_inp_mux & 0x10) | (~data & 3) | (~data >> 1 & 4) | (~data >> 4 & 8);
 
@@ -1170,7 +1170,7 @@ WRITE8_MEMBER(ttfball_state::write_c)
 {
 	// C6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
-	
+
 	// C7: input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
 

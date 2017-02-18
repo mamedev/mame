@@ -391,8 +391,8 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable, uint_least
 
 		/*
 		 * FIXME: evaluation of outputs should be done in parseline to
-		 * 	enable the use of inputs for output values, i.e. "I1" or "~I1"
-		 * 	in addition to "0" and "1".
+		 *  enable the use of inputs for output values, i.e. "I1" or "~I1"
+		 *  in addition to "0" and "1".
 		 */
 		for (unsigned j=0; j<m_NO; j++)
 		{

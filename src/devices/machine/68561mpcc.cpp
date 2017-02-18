@@ -704,7 +704,7 @@ void mpcc_device::check_interrupts()
 	}
 
 	// update IRQ line
-	// If we are not serving any interrupt we need to check for a new interrupt or 
+	// If we are not serving any interrupt we need to check for a new interrupt or
 	//   otherwise the IRQ line is asserted already and we need to do nothing
 	if ((state & INT_ACK) == 0)
 	{
