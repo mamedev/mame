@@ -5160,7 +5160,7 @@ GAME( 1996, jdreddb,   jdredd,   jdredd,      jdredd,   driver_device, 0, ROT0, 
 
 /* Tecmo */
 GAME( 1997, coh1002m,  0,        coh1002m,    zn,       driver_device, 0, ROT0, "Tecmo", "TPS", MACHINE_IS_BIOS_ROOT )
-GAME( 1997, glpracr2,  coh1002m, coh1002m,    zn,       driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, glpracr2,  coh1002m, coh1002m,    zn,       driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (Export)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, glpracr2j, glpracr2, coh1002m,    zn,       driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, glpracr2l, glpracr2, coh1002ml,   zn,       driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 Link HW (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, doapp,     coh1002m, coh1002m,    zn,       driver_device, 0, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
