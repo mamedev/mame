@@ -57,7 +57,7 @@ bool mame_options::add_slot_options(emu_options &options, const software_part *s
 		if (swpart != nullptr)
 		{
 			std::string featurename = std::string(name).append("_default");
-			const char *value = swpart->feature(featurename.c_str());
+			const char *value = swpart->feature(featurename);
 			if (value != nullptr && (*value == '\0' || slot.option(value) != nullptr))
 			{
 				// set priority above INIs but below actual command line
