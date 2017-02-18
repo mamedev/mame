@@ -208,8 +208,6 @@ bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv
 		result = options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options.options_count());
 
-	options.update_cached_options();
-
 	return result;
 }
 
@@ -224,7 +222,6 @@ bool mame_options::parse_command_line(emu_options &options, int argc, char *argv
 	// parse as normal
 	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	bool result = parse_slot_devices(options,argc, argv, error_string);
-	options.update_cached_options();
 	return result;
 }
 
@@ -306,8 +303,6 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 
 	// Re-evaluate slot options after loading ini files
 	update_slot_options(options);
-
-	options.update_cached_options();
 }
 
 
