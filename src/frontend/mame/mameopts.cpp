@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mameopts.c
+    mameopts.cpp
 
     Options file and command line management.
 
@@ -14,6 +14,7 @@
 #include "softlist_dev.h"
 
 #include <ctype.h>
+#include <stack>
 
 int mame_options::m_slot_options = 0;
 int mame_options::m_device_options = 0;
@@ -184,27 +185,23 @@ void mame_options::remove_device_options(emu_options &options)
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name, const char *value, const software_part *swpart)
+bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string)
 {
 	// an initial parse to capture the initial set of values
 	bool result;
 
-	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-
 	// keep adding slot options until we stop seeing new stuff
-	while (add_slot_options(options,swpart))
+	while (add_slot_options(options))
 		options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	// add device options and reparse
 	add_device_options(options);
-	if (name != nullptr && options.exists(name))
-		options.set_value(name, value, OPTION_PRIORITY_SUBCMD, error_string);
 	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
 	int num;
 	do {
 		num = options.options_count();
-		update_slot_options(options,swpart);
+		update_slot_options(options);
 		result = options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options.options_count());
 
@@ -219,10 +216,127 @@ bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv
 
 bool mame_options::parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string)
 {
-	// parse as normal
+	// parse the command line
 	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	bool result = parse_slot_devices(options,argc, argv, error_string);
-	return result;
+
+	// identify any options as a result of softlists 
+	auto softlist_opts = evaluate_initial_softlist_options(options);
+	if (!softlist_opts.empty())
+	{
+		// this is gross - this is why I consider this a prelinary solution; will work with
+		// Vas to decide what downstream refactoring is appropriate when the approach is validated
+		char **new_argv = (char **)alloca(sizeof(char *) * (argc + softlist_opts.size() * 2));
+		memcpy(new_argv, argv, sizeof(char *) * argc);
+		for (size_t i = 0; i < softlist_opts.size(); i++)
+		{
+			new_argv[argc + i * 2 + 0] = (char *) softlist_opts[i].first.c_str();
+			new_argv[argc + i * 2 + 1] = (char *)softlist_opts[i].second.c_str();
+		}
+
+		argc += softlist_opts.size() * 2;
+		argv = new_argv;
+	}
+
+	return parse_slot_devices(options, argc, argv, error_string);
+}
+
+
+//-------------------------------------------------
+//  evaluate_initial_softlist_options
+//-------------------------------------------------
+
+std::vector<std::pair<std::string, std::string> > mame_options::evaluate_initial_softlist_options(emu_options &options)
+{
+	std::vector<std::pair<std::string, std::string> > results;
+
+	// load software specified at the command line (if any of course)
+	std::string software_identifier = options.software_name();
+	if (!software_identifier.empty())
+	{
+		// we have software; first identify the proper game_driver
+		const game_driver *system = mame_options::system(options);
+		if (system == nullptr && *(options.system_name()) != 0)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", options.system_name());
+
+		// and set up a configuration
+		machine_config config(*system, options);
+		software_list_device_iterator iter(config.root_device());
+		if (iter.count() == 0)
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", options.software_name());
+
+		// and finally set up the stack
+		std::stack<std::string> software_identifier_stack;
+		software_identifier_stack.push(software_identifier);
+
+		// we need to keep evaluating softlist identifiers until the stack is empty
+		while(!software_identifier_stack.empty())
+		{
+			// pop the identifier
+			software_identifier = std::move(software_identifier_stack.top());
+			software_identifier_stack.pop();
+
+			// and parse it
+			std::string list_name, software_name;
+			auto colon_pos = software_identifier.find_first_of(':');
+			if (colon_pos != std::string::npos)
+			{
+				list_name = software_identifier.substr(0, colon_pos);
+				software_name = software_identifier.substr(colon_pos + 1);
+			}
+			else
+			{
+				software_name = software_identifier;
+			}
+
+			// loop through all softlist devices, and try to find one capable of handling the requested software
+			bool found = false;
+			bool compatible = false;
+			for (software_list_device &swlistdev : iter)
+			{
+				if (list_name.empty() || (list_name == swlistdev.list_name()))
+				{
+					const software_info *swinfo = swlistdev.find(software_name);
+					if (swinfo != nullptr)
+					{
+						// loop through all parts
+						for (const software_part &swpart : swinfo->parts())
+						{
+							// only load compatible software this way
+							if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+							{
+								device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
+								if (image != nullptr)
+								{
+									// we've resolved this software
+									std::string val = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
+									results.emplace_back(std::string("-") + image->instance_name(), val);
+
+									// is something else required?
+									const char *requirement = swpart.feature("requirement");
+									if (requirement)
+										software_identifier_stack.push(requirement);
+								}
+								compatible = true;
+							}
+							found = true;
+						}
+					}
+				}
+				if (compatible)
+					break;
+			}
+
+			if (!compatible)
+			{
+				software_list_device::display_matches(config, nullptr, software_name);
+				if (!found)
+					throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
+				else
+					throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", software_name.c_str(), options.system_name());
+			}
+		}
+	}
+	return results;
 }
 
 
