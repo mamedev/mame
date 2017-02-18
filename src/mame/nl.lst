@@ -60,6 +60,9 @@ popeyeu                         // (c) 1982
 popeyef                         // (c) 1982
 popeyebl                        // bootleg
 
+@source:prodigy.cpp
+prodigy                        // ACI Destiny Prodigy, 1981
+
 /******************************************************************************/
 
 /* Do not use CPUs */

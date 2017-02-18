@@ -37,7 +37,7 @@
  *        setting param USE_DEACTIVATE for the device.
  */
 
-#define USE_TRUTHTABLE_7448 (1)
+#define USE_TRUTHTABLE_7448 (0)
 
 // How many times do we try to resolve links (connections)
 #define NL_MAX_LINK_RESOLVE_LOOPS	(100)
