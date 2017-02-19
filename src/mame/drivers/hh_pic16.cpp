@@ -35,7 +35,7 @@
 
   TODO:
   - leboom discrete sound for volume decay (simulated for now)
-  - ttfball/ttfballa: discrete sound part, for volume gating?
+  - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg
     of the other? Or are they both made by the same subcontractor?
 

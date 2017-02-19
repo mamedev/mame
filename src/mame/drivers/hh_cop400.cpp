@@ -593,6 +593,7 @@ MACHINE_CONFIG_END
   known releases:
   - USA: I Took a Lickin' From a Chicken
   - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, distributed by Bandai
+    (not sure if it's the same ROM, or just licensed the outer shell)
 
 ***************************************************************************/
 
