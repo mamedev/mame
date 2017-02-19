@@ -612,13 +612,13 @@ static NETLIST_START(TTL_74279_DIP)
 	DUMMY_INPUT(GND)
 	DUMMY_INPUT(VCC)
 
-	DIPPINS(	/*     +--------------+		*/
-		s1.R,	/*  1R |1     ++    16| VCC */ VCC.I,
+	DIPPINS(    /*     +--------------+     */
+		s1.R,   /*  1R |1     ++    16| VCC */ VCC.I,
 		s1.S1,  /* 1S1 |2           15| 4S  */ s4.S,
 		s1.S2,  /* 1S2 |3           14| 4R  */ s4.R,
 		s1.Q,   /*  1Q |4    74279  13| 4Q  */ s4.Q,
 		s2.R,   /*  2R |5           12| 3S2 */ s3.S2,
-		s2.S,	/*  2S |6           11| 3S1 */ s3.S1,
+		s2.S,   /*  2S |6           11| 3S1 */ s3.S1,
 		s2.Q,   /*  2Q |7           10| 3R  */ s3.R,
 		GND.I,  /* GND |8            9| 3Q  */ s3.Q
 				/*     +--------------+     */
@@ -668,16 +668,16 @@ static NETLIST_START(DM9312_DIP)
 	DUMMY_INPUT(GND)
 	DUMMY_INPUT(VCC)
 
-DIPPINS(		/*	   +--------------+		*/
-		s.D0,	/*  D0 |1     ++    16| VCC */ VCC.I,
-		s.D1,	/*  D1 |2           15| Y	*/ s.Y,
-		s.D2,	/*  D2 |3           14| YQ	*/ s.YQ,
-		s.D3,	/*  D3 |4    9312   13| C	*/ s.C,
-		s.D4,	/*  D4 |5           12| B	*/ s.B,
-		s.D5,	/*  D5 |6           11| A	*/ s.A,
-		s.D6,	/*  D6 |7           10| G   */ s.G, //Strobe
-		GND.I,	/* GND |8            9| D7	*/ s.D7
-			 	/*     +--------------+ 	*/
+DIPPINS(        /*     +--------------+     */
+		s.D0,   /*  D0 |1     ++    16| VCC */ VCC.I,
+		s.D1,   /*  D1 |2           15| Y   */ s.Y,
+		s.D2,   /*  D2 |3           14| YQ  */ s.YQ,
+		s.D3,   /*  D3 |4    9312   13| C   */ s.C,
+		s.D4,   /*  D4 |5           12| B   */ s.B,
+		s.D5,   /*  D5 |6           11| A   */ s.A,
+		s.D6,   /*  D6 |7           10| G   */ s.G, //Strobe
+		GND.I,  /* GND |8            9| D7  */ s.D7
+				/*     +--------------+     */
 	)
 NETLIST_END()
 

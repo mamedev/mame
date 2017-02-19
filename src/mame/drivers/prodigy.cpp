@@ -39,7 +39,7 @@
  shifted into the 74164 by clock from VIA CB1 and data from CB2.
 
   Behind the BCD display we find the following supporting circuit
- 
+
                                                                4x7 segment BCD display
                                       +---+       +-----+          +---+---+---+---+
 +-----------------+            CB1    |74 |==/4/=>|2x   |==/8/====>| 0   1   2   3 |
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER(prodigy_state::irq_handler)
 */
 WRITE8_MEMBER( prodigy_state::via_pb_w ) // Needs to trace which port decides what digit
 {
-    LOGBCD("%s: %02x ANODE %02x\n", FUNCNAME, data, data & 0x03);
+	LOGBCD("%s: %02x ANODE %02x\n", FUNCNAME, data, data & 0x03);
 	m_74145->write( data & 0x0f ); // Write PB0-PB3 to the 74145
 }
 

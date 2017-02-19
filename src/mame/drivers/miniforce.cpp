@@ -174,7 +174,7 @@ SLOT_INTERFACE_END
  * Machine configuration
  */
 MACHINE_CONFIG_START (miniforce, miniforce_state)
-//	MCFG_CPU_PROGRAM_MAP (miniforce_mem)
+//  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, miniforce_vme_cards, "fccpu21")
 	MCFG_VME_SLOT_ADD ("vme", 2, miniforce_vme_cards, nullptr)

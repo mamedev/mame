@@ -1096,6 +1096,8 @@ ambush                          // (c) 1983
 ambushh                         // (c) 1983
 ambushj                         // (c) 1983 Nippon Amuse license
 ambushv                         // (c) 1983 Volt Electronics license
+dkong3abl                       // bootleg
+mariobl                         // bootleg
 
 @source:amerihok.cpp
 amerihok                        //
@@ -1491,7 +1493,7 @@ swhr2
 swhr2u                        // (c) 1998
 swhr2v                        // (c) 1995
 topbana
-toutango						// (c) 1998
+toutango                        // (c) 1998
 trstrove
 tritreat
 trojhors
@@ -2583,7 +2585,7 @@ bldwolfj                        // (c) 1988 Data East Corporation (Japan)
 
 @source:battlex.cpp
 battlex                         // (c) 1982 Omori E. Co., Ltd.
-dodgeman						//
+dodgeman                        //
 
 @source:battlnts.cpp
 battlnts                        // GX777 (c) 1987
@@ -12476,7 +12478,7 @@ fp200                           //
 fp6000                          //
 
 @source:freekick.cpp
-omega							// (c) 1986 Nihon System
+omega                           // (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg
@@ -17812,9 +17814,7 @@ wanted                          // (c) 1984 Sigma Ent. Inc.
 marinedt                        // MG  (c) 1981 Taito Corporation
 
 @source:mario.cpp
-dkong3abl                       //
 mario                           // (c) 1983 Nintendo of America
-mariobl                         // bootleg
 marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 marioo                          // (c) 1983 Nintendo of America
@@ -35370,6 +35370,7 @@ gwinggen                        // (c) 2004 Takumi Corporation
 homura                          // (c) 2005 SKonec Entertainment
 hotgmkmp                        // (c) 2005 XNauts
 kof98um                         // (c) 2008 SNK
+kofskyst                        // (c) 2008 Moss / SNK Playmore
 kofxii                          // (c) 2008 SNK Playmore
 raiden3                         // (c) 2005 Seibu Kaihatsu/Moss Ltd
 raiden4                         // (c) 2007 Seibu Kaihatsu/Moss Ltd

@@ -17,6 +17,7 @@
 --------------------------------------------------
 
 CPUS["Z80"] = true
+CPUS["M6502"] = true
 CPUS["M6800"] = true
 CPUS["M6803"] = true
 CPUS["M6809"] = true
@@ -64,6 +65,9 @@ MACHINES["GEN_LATCH"] = true
 MACHINES["AY31015"] = true
 MACHINES["KB3600"] = true
 MACHINES["COM8116"] = true
+
+MACHINES["TTL74145"] = true
+MACHINES["6522VIA"] = true
 
 --MACHINES["6821PIA"] = true
 --MACHINES["TTL74148"] = true

@@ -151,7 +151,7 @@ protected:
 
 WRITE_LINE_MEMBER(tmaster_state::blitter_irq_callback)
 {
-//	logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
+//  logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
 	m_maincpu->set_input_line(2, state);
 }
 

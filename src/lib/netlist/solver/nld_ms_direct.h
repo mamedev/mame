@@ -19,7 +19,7 @@
  * going forward in case we implement cuda solvers in the future.
  */
 #define NL_USE_DYNAMIC_ALLOCATION (0)
-#define TEST_PARALLEL (0	)
+#define TEST_PARALLEL (0    )
 
 #if TEST_PARALLEL
 #include <thread>

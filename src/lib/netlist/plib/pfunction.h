@@ -50,7 +50,7 @@ namespace plib {
 		 *
 		 * @param inputs Vector of input variables, e.g. {"A","B"}
 		 * @param expr infix or postfix expression. default is infix, postrix
-		 * 			to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
+		 *          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
 		 */
 		void compile(const std::vector<pstring> &inputs, const pstring expr);
 

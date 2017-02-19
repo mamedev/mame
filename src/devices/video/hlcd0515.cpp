@@ -3,7 +3,7 @@
 /*
 
   Hughes HLCD 0515/0569 LCD Driver
-  
+
   0515: 25 columns(also size of buffer/ram)
   0569: 24 columns, no DATA OUT pin, display blank has no effect
 
@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 
 		else
 			clock_data(m_count - 5);
-		
+
 		if (m_count < (m_colmax + 5))
 			m_count++;
 	}
@@ -195,7 +195,7 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
 		// transfer to ram
 		if (~m_control & 1)
 			m_ram[m_rowsel] = m_buffer;
-		
+
 		m_count = 0;
 		m_control = 0;
 	}

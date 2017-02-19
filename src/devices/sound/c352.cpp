@@ -126,9 +126,9 @@ void c352_device::fetch_sample(c352_voice_t* v)
 
 void c352_device::ramp_volume(c352_voice_t* v,int ch,uint8_t val)
 {
-    int16_t vol_delta = v->curr_vol[ch] - val;
-    if(vol_delta != 0)
-        v->curr_vol[ch] += (vol_delta>0) ? -1 : 1;
+	int16_t vol_delta = v->curr_vol[ch] - val;
+	if(vol_delta != 0)
+		v->curr_vol[ch] += (vol_delta>0) ? -1 : 1;
 }
 
 void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -162,7 +162,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				{
 					fetch_sample(v);
 				}
-								
+
 				if((next_counter^v->counter) & 0x18000)
 				{
 					ramp_volume(v,0,v->vol_f>>8);
@@ -170,7 +170,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					ramp_volume(v,2,v->vol_r>>8);
 					ramp_volume(v,3,v->vol_r&0xff);
 				}
-				
+
 				v->counter = next_counter&0xffff;
 
 				s = v->sample;
@@ -263,7 +263,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 
 				m_c352_v[i].flags |= C352_FLG_BUSY;
 				m_c352_v[i].flags &= ~(C352_FLG_KEYON|C352_FLG_LOOPHIST);
-				
+
 				m_c352_v[i].curr_vol[0] = m_c352_v[i].curr_vol[1] = 0;
 				m_c352_v[i].curr_vol[2] = m_c352_v[i].curr_vol[3] = 0;
 			}
@@ -288,7 +288,7 @@ void c352_device::device_clock_changed()
 void c352_device::device_start()
 {
 	int i;
-	
+
 	m_sample_rate_base = clock() / m_divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);

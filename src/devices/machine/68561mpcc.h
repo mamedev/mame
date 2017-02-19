@@ -157,19 +157,19 @@ protected:
 	void trigger_interrupt(int source);
 	enum
 	{
-		INT_TX,			// TX int category, used for update of SR
+		INT_TX,         // TX int category, used for update of SR
 		INT_TX_TDRA,    // Tx char available
 		INT_TX_TFC,     // Tx frame complete
 		INT_TX_TUNRN,   // Tx underrun detected
 		INT_TX_TFERR,   // Tx frame error detected
-		INT_RX,			// RX int category, used for update of SR
+		INT_RX,         // RX int category, used for update of SR
 		INT_RX_RDA,     // Rx interrupt on Receiver Data Available
 		INT_RX_EOF,     // Rx interrupt on End of frame
 		INT_RX_CPERR,   // Rx interrupt on CRC or Parity error
 		INT_RX_FRERR,   // Rx interrupt on Frame error
 		INT_RX_ROVRN,   // Rx interrupt on Receiver overrun
 		INT_RX_RAB,     // Rx interrupt on Abort/Break
-		INT_SR,			// SR int category, used for update of SR
+		INT_SR,         // SR int category, used for update of SR
 		INT_SR_CTS,     // Serial interface interrupt on CTS asserted
 		INT_SR_DSR,     // Serial interface interrupt on DSR asserted
 		INT_SR_DCD,     // Serial interface interrupt on DCD asserted
@@ -184,7 +184,7 @@ protected:
 
 	enum
 	{
-		INT_NONE = 0x00, // No interrupts 
+		INT_NONE = 0x00, // No interrupts
 		INT_REQ  = 0x01, // Interrupt requested
 		INT_ACK  = 0x02  // Interrupt acknowledged
 	};

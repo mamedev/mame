@@ -273,7 +273,7 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 
 void tms9927_device::recompute_parameters(bool postload)
 {
-    attoseconds_t refresh;
+	attoseconds_t refresh;
 	rectangle visarea;
 
 	if (m_reset)
@@ -309,10 +309,10 @@ void tms9927_device::recompute_parameters(bool postload)
 	/* update */
 	if (!m_valid_config)
 		return;
-	
+
 	/* create a visible area */
-	visarea.set(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1, 
-	            0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
+	visarea.set(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1,
+				0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
 
 	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 

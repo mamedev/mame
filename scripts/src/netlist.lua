@@ -14,16 +14,16 @@ project "netlist"
 	kind (LIBTYPE)
 
   if _OPTIONS["targetos"]=="windows" then
-    configuration { "mingw* or vs*" }
-      defines {
-        "UNICODE",
-        "_UNICODE",
-        "_WIN32_WINNT=0x0501",
-        "WIN32_LEAN_AND_MEAN",
-        "NOMINMAX",
-      }
+	configuration { "mingw* or vs*" }
+	  defines {
+		"UNICODE",
+		"_UNICODE",
+		"_WIN32_WINNT=0x0501",
+		"WIN32_LEAN_AND_MEAN",
+		"NOMINMAX",
+	  }
   end
-  
+
 	addprojectflags()
 
 	defines {
@@ -62,13 +62,13 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
-    MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
-    MAME_DIR .. "src/lib/netlist/plib/pmain.h",
+	MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
+	MAME_DIR .. "src/lib/netlist/plib/pmain.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.h",
-    MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
+	MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
@@ -86,11 +86,11 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.h",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.h",
-    MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",
+	MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_switches.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_switches.h",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_twoterm.cpp",
-    MAME_DIR .. "src/lib/netlist/analog/nlid_twoterm.h",
+	MAME_DIR .. "src/lib/netlist/analog/nlid_twoterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_twoterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.h",

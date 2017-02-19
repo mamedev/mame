@@ -21,7 +21,7 @@
 
 #define MCFG_TMS9927_OVERSCAN(_left, _right, _top, _bottom) \
 	tms9927_device::set_overscan(*device, _left, _right, _top, _bottom);
-	
+
 class tms9927_device : public device_t,
 						public device_video_interface
 {
@@ -41,7 +41,7 @@ public:
 			dev.m_overscan_top = top;
 			dev.m_overscan_bottom = bottom;
 	}
-		
+
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
 
@@ -72,7 +72,7 @@ private:
 	uint16_t  m_overscan_right;
 	uint16_t  m_overscan_top;
 	uint16_t  m_overscan_bottom;
-	
+
 	// internal state
 	optional_region_ptr<uint8_t> m_selfload;
 
@@ -81,13 +81,13 @@ private:
 	uint8_t   m_reg[9];
 	uint8_t   m_start_datarow;
 	uint8_t   m_reset;
-	
+
 	/* derived state; no need to save */
 	uint8_t   m_valid_config;
 	uint16_t  m_total_hpix, m_total_vpix;
 	uint16_t  m_visible_hpix, m_visible_vpix;
 
-	
+
 	int m_vsyn;
 
 	emu_timer *m_vsync_timer;

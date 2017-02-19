@@ -194,7 +194,7 @@ private:
 	uint8_t m_cycles;
 
 	uint32_t  m_addr;
-	
+
 	uint16_t m_F;
 
 	/* CPU registers */

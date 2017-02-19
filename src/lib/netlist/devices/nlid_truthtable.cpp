@@ -10,31 +10,101 @@
 #include "../nl_setup.h"
 #include "../plib/palloc.h"
 
+#include <bitset>
+
 namespace netlist
 {
 	namespace devices
 	{
 
 	// ----------------------------------------------------------------------------------------
-	// Truthtable description ....
+	// int compatible bitset ....
 	// ----------------------------------------------------------------------------------------
+
+	template <typename T>
+	struct sbitset
+	{
+		typedef T type;
+
+		sbitset() : m_bs(0) { }
+		sbitset(T v) : m_bs(v) { }
+
+		sbitset &set() { *this = all_bits(); return *this; }
+		sbitset &set(const std::size_t bit) { m_bs |= (static_cast<T>(1) << bit); return *this; }
+		sbitset &reset() { *this = no_bits(); return *this; }
+		sbitset &reset(const std::size_t bit) { m_bs &= ~(static_cast<T>(1) << bit); return *this; }
+
+		sbitset invert() const { return sbitset(~m_bs); }
+		std::size_t count()
+		{
+			std::size_t ret = 0;
+			for (T v = m_bs; v != 0; v = v >> 1)
+			{
+				ret += (v & 1);
+			}
+			return ret;
+		}
+		constexpr bool test(const std::size_t bit) const { return ((m_bs >> bit) & 1) == 1; }
+
+		operator T&() { return m_bs; }
+		operator const T&() const { return m_bs; }
+		constexpr T as_uint() const { return m_bs; }
+
+		constexpr bool all() const { return *this == all_bits(); }
+
+		/*
+		 * And all bits set with compressed bits from b
+		 *
+		 * Example: b = {b3,b2,b1,b0}
+		 *          v = {v7, 0, v5, 0, v3, v2, 0, 0}
+		 * Returns {v7 & b3, 0, v5 & b2, 0, v3 & b1, v2 & b0, 0, 0}
+		 */
+
+		sbitset expand_and(sbitset b) const
+		{
+			sbitset ret;
+			T v( m_bs);
+
+			for (size_t i = 0; v != 0; v = v >> 1, ++i)
+			{
+				if (v & 1)
+				{
+					if (b.test(0))
+						ret.set(i);
+					b = b >> 1;
+				}
+			}
+			return ret;
+		}
+
+		static constexpr sbitset all_bits() { return sbitset(~static_cast<T>(0)); }
+		static constexpr sbitset no_bits() { return sbitset(static_cast<T>(0)); }
+	private:
+		T m_bs;
+	};
+	// ----------------------------------------------------------------------------------------
+	// Truthtable parsing ....
+	// ----------------------------------------------------------------------------------------
+
+	//static const uint_least64_t all_set = ~(static_cast<uint_least64_t>(0));
+
+	using tt_bitset = sbitset<uint_least64_t>;
 
 	struct packed_int
 	{
-		template<typename C>
-		packed_int(C *data)
+		packed_int(void *data, std::size_t bits)
 		: m_data(data)
-		, m_size(sizeof(C))
+		, m_size(bits)
 		{}
 
 		void set(const size_t pos, const uint_least64_t val)
 		{
 			switch (m_size)
 			{
-				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = static_cast<uint_least8_t>(val); break;
-				case 2: static_cast<uint_least16_t *>(m_data)[pos] = static_cast<uint_least16_t>(val); break;
-				case 4: static_cast<uint_least32_t *>(m_data)[pos] = static_cast<uint_least32_t>(val); break;
-				case 8: static_cast<uint_least64_t *>(m_data)[pos] = static_cast<uint_least64_t>(val); break;
+				case 8: static_cast<uint_least8_t  *>(m_data)[pos] = static_cast<uint_least8_t>(val); break;
+				case 16: static_cast<uint_least16_t *>(m_data)[pos] = static_cast<uint_least16_t>(val); break;
+				case 32: static_cast<uint_least32_t *>(m_data)[pos] = static_cast<uint_least32_t>(val); break;
+				case 64: static_cast<uint_least64_t *>(m_data)[pos] = static_cast<uint_least64_t>(val); break;
 				default: { }
 			}
 		}
@@ -43,37 +113,25 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: return static_cast<uint_least8_t  *>(m_data)[pos];
-				case 2: return static_cast<uint_least16_t *>(m_data)[pos];
-				case 4: return static_cast<uint_least32_t *>(m_data)[pos];
-				case 8: return static_cast<uint_least64_t *>(m_data)[pos];
+				case 8: return static_cast<uint_least8_t  *>(m_data)[pos];
+				case 16: return static_cast<uint_least16_t *>(m_data)[pos];
+				case 32: return static_cast<uint_least32_t *>(m_data)[pos];
+				case 64: return static_cast<uint_least64_t *>(m_data)[pos];
 				default:
 					return 0; //should never happen
 			}
 		}
 
-		uint_least64_t adjust(uint_least64_t val) const
-		{
-			switch (m_size)
-			{
-				case 1: return static_cast<uint_least8_t >(val);
-				case 2: return static_cast<uint_least16_t>(val);
-				case 4: return static_cast<uint_least32_t>(val);
-				case 8: return static_cast<uint_least64_t>(val);
-				default:
-					return 0; //should never happen
-			}
-		}
+		uint_least64_t mask() const { return (static_cast<uint_least64_t>(1) << m_size) - 1; }
+
 	private:
 		void *m_data;
 		size_t m_size;
 	};
 
-	static const uint_least64_t one64 = static_cast<uint_least64_t>(1);
-
-	struct truthtable_desc_t
+	struct truthtable_parser
 	{
-		truthtable_desc_t(unsigned NO, unsigned NI, bool *initialized,
+		truthtable_parser(unsigned NO, unsigned NI, bool *initialized,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
 			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
@@ -82,15 +140,13 @@ namespace netlist
 		{
 		}
 
-		void setup(const std::vector<pstring> &desc, uint_least64_t disabled_ignore);
+		void parse(const std::vector<pstring> &desc, uint_least64_t disabled_ignore);
 
 	private:
-		void help(unsigned cur, std::vector<pstring> list,
-				uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
-		static unsigned count_bits(uint_least64_t v);
-		static uint_least64_t set_bits(uint_least64_t v, uint_least64_t b);
-		uint_least64_t get_ignored_simple(uint_least64_t i);
-		uint_least64_t get_ignored_extended(uint_least64_t i);
+		void parseline(unsigned cur, std::vector<pstring> list,
+				tt_bitset state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
+
+		tt_bitset calculate_ignored_inputs(tt_bitset i);
 
 		unsigned m_NO;
 		unsigned m_NI;
@@ -106,30 +162,16 @@ namespace netlist
 
 	};
 
-	template<unsigned m_NI, unsigned m_NO>
-	template <class C>
-	nld_truthtable_t<m_NI, m_NO>::nld_truthtable_t(C &owner, const pstring &name, const logic_family_desc_t *fam,
-			truthtable_t *ttp, const pstring *desc)
-	: device_t(owner, name)
-	, m_fam(*this, fam)
-	, m_ign(*this, "m_ign", 0)
-	, m_active(*this, "m_active", 1)
-	, m_ttp(ttp)
-	{
-		while (*desc != "" )
-			{
-				m_desc.push_back(*desc);
-				desc++;
-			}
-		init();
-	}
+	// ----------------------------------------------------------------------------------------
+	// Truthtable class ....
+	// ----------------------------------------------------------------------------------------
 
-	template<unsigned m_NI, unsigned m_NO>
-	void NETLIB_NAME(truthtable_t)<m_NI, m_NO>::init()
+	template<std::size_t m_NI, std::size_t m_NO>
+	void NETLIB_NAME(truthtable_t)<m_NI, m_NO>::init(const std::vector<pstring> &desc)
 	{
 		set_hint_deactivate(true);
 
-		pstring header = m_desc[0];
+		pstring header = desc[0];
 
 		std::vector<pstring> io(plib::psplit(header,"|"));
 		// checks
@@ -151,7 +193,7 @@ namespace netlist
 		}
 		// Connect output "Q" to input "_Q" if this exists
 		// This enables timed state without having explicit state ....
-		uint_least64_t disabled_ignore = 0;
+		tt_bitset disabled_ignore = 0;
 		for (std::size_t i=0; i < m_NO; i++)
 		{
 			pstring tmp = "_" + out[i];
@@ -159,19 +201,19 @@ namespace netlist
 			if (idx != plib::container::npos)
 			{
 				connect(m_Q[i], m_I[idx]);
-				// disable ignore for this inputs altogether.
+				// disable ignore for theses inputs altogether.
 				// FIXME: This shouldn't be necessary
-				disabled_ignore |= (one64 << idx);
+				disabled_ignore.set(idx);
 			}
 		}
 
 		m_ign = 0;
 
-		truthtable_desc_t desc(m_NO, m_NI, &m_ttp->m_initialized,
-				packed_int(m_ttp->m_outs),
+		truthtable_parser desc_s(m_NO, m_NI, &m_ttp->m_initialized,
+				packed_int(m_ttp->m_outs, sizeof(m_ttp->m_outs[0]) * 8),
 				m_ttp->m_timing, m_ttp->m_timing_nt);
 
-		desc.setup(m_desc, disabled_ignore * 0);
+		desc_s.parse(desc, disabled_ignore * 0);
 #if 0
 		printf("%s\n", name().c_str());
 		for (int j=0; j < m_size; j++)
@@ -181,11 +223,6 @@ namespace netlist
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
 	}
-
-	// ----------------------------------------------------------------------------------------
-	// Truthtable class ....
-	// ----------------------------------------------------------------------------------------
-
 
 	// ----------------------------------------------------------------------------------------
 	// Truthtable factory ....
@@ -209,96 +246,71 @@ namespace netlist
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
 	};
 
-	static const uint_least64_t all_set = ~(static_cast<uint_least64_t>(0));
-
-unsigned truthtable_desc_t::count_bits(uint_least64_t v)
-{
-	unsigned ret = 0;
-	for (; v != 0; v = v >> 1)
+	tt_bitset truthtable_parser::calculate_ignored_inputs(tt_bitset state)
 	{
-		ret += (v & 1);
-	}
-	return ret;
-}
-
-uint_least64_t truthtable_desc_t::set_bits(uint_least64_t v, uint_least64_t b)
-{
-	uint_least64_t ret = 0;
-	for (size_t i = 0; v != 0; v = v >> 1, ++i)
-	{
-		if (v & 1)
+		// Determine all inputs which may be ignored ...
+		tt_bitset ignore = 0;
+		for (std::size_t j=0; j<m_NI; j++)
 		{
-			ret |= ((b&1)<<i);
-			b = b >> 1;
+			// if changing the input directly doesn't change outputs we can ignore
+			if (m_outs[state] == m_outs[tt_bitset(state).set(j)])
+				ignore.set(j);
 		}
-	}
-	return ret;
-}
 
-uint_least64_t truthtable_desc_t::get_ignored_simple(uint_least64_t i)
-{
-	uint_least64_t m_enable = 0;
-	for (uint_least64_t j=0; j<m_size; j++)
-	{
-		if (m_outs[j] != m_outs[i])
+		/* Check all permutations of ign
+		 * We have to remove those where the ignored inputs
+		 * may change the output
+		 */
+
+		tt_bitset bits = tt_bitset().set(ignore.count());
+
+		std::vector<bool> t(bits);
+
+		// loop over all combinations of bits set in ignore
+		for (uint_least64_t  j=1; j < bits; j++)
 		{
-			m_enable |= (i ^ j);
-		}
-	}
-	return m_enable ^ (m_size - 1);
-}
+			tt_bitset tign = ignore.expand_and(j);
+			t[j] = false;
+			tt_bitset bitsk = tt_bitset().set(tign.count());
 
-uint_least64_t truthtable_desc_t::get_ignored_extended(uint_least64_t state)
-{
-	// Determine all inputs which may be ignored ...
-	uint_least64_t ignore = 0;
-	for (std::size_t j=0; j<m_NI; j++)
-	{
-		if (m_outs[state] == m_outs[state ^ (one64 << j)])
-			ignore |= (one64 << j);
-	}
-	/* Check all permutations of ign
-	 * We have to remove those where the ignored inputs
-	 * may change the output
-	 */
-	uint_least64_t bits = (one64 << count_bits(ignore));
-	std::vector<bool> t(bits);
+			// now loop over all combinations of the bits set currently set
 
-	for (size_t j=1; j<bits; j++)
-	{
-		uint_least64_t tign = set_bits(ignore, j);
-		t[j] = 0;
-		uint_least64_t bitsk=(one64 << count_bits(tign));
-		for (uint_least64_t k=0; k<bitsk; k++)
-		{
-			uint_least64_t b=set_bits(tign, k);
-			if (m_outs[state] != m_outs[(state & ~tign) | b])
+			for (uint_least64_t k=0; k < bitsk; k++)
 			{
-				t[j] = 1;
-				break;
+				tt_bitset b = tign.expand_and(k);
+				// will any of the inputs ignored change the output if changed?
+				if (m_outs[state] != m_outs[(state & tign.invert()) | b])
+				{
+					t[j] = true;
+					break;
+				}
 			}
 		}
-	}
-	size_t jb=0;
-	size_t jm=0;
-	for (size_t j=1; j<bits; j++)
-	{
-		size_t nb = count_bits(j);
-		if ((t[j] == 0) && (nb>jb))
+
+		/* find the ignore mask without potential for change with the most bits */
+
+		size_t jb=0;
+		tt_bitset jm=0;
+
+		for (uint_least64_t j=1; j<bits; j++)
 		{
-			jb = nb;
-			jm = j;
+			tt_bitset bj(j);
+			size_t nb = bj.count();
+			if ((t[j] == false) && (nb>jb))
+			{
+				jb = nb;
+				jm = bj;
+			}
 		}
+		return ignore.expand_and(jm);
 	}
-	return set_bits(ignore, jm);
-}
 
 // ----------------------------------------------------------------------------------------
-// desc
+// parseline
 // ----------------------------------------------------------------------------------------
 
-void truthtable_desc_t::help(unsigned cur, std::vector<pstring> list,
-		uint_least64_t state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
+void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
+		tt_bitset state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 {
 	pstring elem = list[cur].trim();
 	uint_least64_t start = 0;
@@ -323,26 +335,28 @@ void truthtable_desc_t::help(unsigned cur, std::vector<pstring> list,
 		nl_assert_always(false, "unknown input value (not 0, 1, or X)");
 	for (uint_least64_t i = start; i <= end; i++)
 	{
-		const uint_least64_t nstate = state | (i << cur);
+		tt_bitset nstate = state;
+		if (i==1)
+			nstate.set(cur);
 
 		if (cur < m_num_bits - 1)
 		{
-			help(cur + 1, list, nstate, val, timing_index);
+			parseline(cur + 1, list, nstate, val, timing_index);
 		}
 		else
 		{
 			// cutoff previous inputs and outputs for ignore
-			if (m_outs[nstate] != m_outs.adjust(all_set) &&  m_outs[nstate] != val)
+			if (m_outs[nstate] != m_outs.mask() &&  m_outs[nstate] != val)
 				nl_exception(plib::pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
-						.x(nstate,"04")(m_outs[nstate])(val) );
+						.x(nstate.as_uint(),"04")(m_outs[nstate])(val) );
 			m_outs.set(nstate, val);
-			for (unsigned j=0; j<m_NO; j++)
+			for (std::size_t j=0; j<m_NO; j++)
 				m_timing[nstate * m_NO + j] = timing_index[j];
 		}
 	}
 }
 
-void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least64_t disabled_ignore)
+void truthtable_parser::parse(const std::vector<pstring> &truthtable, uint_least64_t disabled_ignore)
 {
 	unsigned line = 0;
 
@@ -355,7 +369,7 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 	line++;
 
 	for (unsigned j=0; j < m_size; j++)
-		m_outs.set(j, all_set);
+		m_outs.set(j, tt_bitset::all_bits());
 
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero();
@@ -372,14 +386,19 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 		std::vector<pstring> times(plib::psplit(io[2], ","));
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
-		uint_least64_t val = 0;
+		tt_bitset val = 0;
 		std::vector<uint_least8_t> tindex;
 
+		/*
+		 * FIXME: evaluation of outputs should be done in parseline to
+		 *  enable the use of inputs for output values, i.e. "I1" or "~I1"
+		 *  in addition to "0" and "1".
+		 */
 		for (unsigned j=0; j<m_NO; j++)
 		{
 			pstring outs = out[j].trim();
 			if (outs.equals("1"))
-				val = val | (one64 << j);
+				val.set(j);
 			else
 				nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
 			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(times[j].trim().as_long()));
@@ -390,7 +409,7 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 			tindex.push_back(k); //[j] = k;
 		}
 
-		help(0, inout, 0 , val, tindex);
+		parseline(0, inout, 0 , val, tindex);
 		if (line < truthtable.size())
 			ttline = truthtable[line];
 		else
@@ -398,37 +417,34 @@ void truthtable_desc_t::setup(const std::vector<pstring> &truthtable, uint_least
 		line++;
 	}
 
-	// determine ignore
-	std::vector<uint_least64_t> ign(m_size, all_set);
+	// determine ignore mask by looping over all input combinations
+	std::vector<tt_bitset> ign(m_size);
+	for (tt_bitset &x : ign)
+		x.set();
 
-	for (uint_least64_t i=0; i<m_size; i++)
+	for (uint_least64_t i=0; i < m_size; i++)
 	{
-		if (ign[i] == all_set)
+		if (ign[i].all()) // not yet visited
 		{
-			uint_least64_t tign;
-			if ((0))
-			{
-				tign = get_ignored_simple(i);
-				ign[i] = tign;
-			}
-			else
-			{
-				tign = get_ignored_extended(i);
+			tt_bitset tign = calculate_ignored_inputs(i);
 
-				ign[i] = tign;
-				/* don't need to recalculate similar ones */
-				uint_least64_t bitsk=(one64 << count_bits(tign));
-				for (uint_least64_t k=0; k<bitsk; k++)
-				{
-					uint_least64_t b=set_bits(tign, k);
-					ign[(i & ~tign) | b] = tign;
-				}
+			ign[i] = tign;
+
+			/* don't need to recalculate similar ones */
+
+			tt_bitset bitsk;
+			bitsk.set(tign.count());
+
+			for (uint_least64_t k=0; k < bitsk; k++)
+			{
+				tt_bitset b = tign.expand_and(k);
+				ign[(i & tign.invert()) | b] = tign;
 			}
 		}
 	}
 	for (size_t i=0; i<m_size; i++)
 	{
-		if (m_outs[i] == m_outs.adjust(all_set))
+		if (m_outs[i] == m_outs.mask())
 			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
 		m_outs.set(i, m_outs[i] | ((ign[i] & ~disabled_ignore)  << m_NO));;
 	}
@@ -452,7 +468,8 @@ netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
 		ret = plib::palloc<xtype>(desc.name, desc.classname, desc.def_param, s); } break
 
 #define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
-					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s)
+					ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
+					ENTRYY(n, 7, s); ENTRYY(n, 8, s)
 
 void tt_factory_create(setup_t &setup, tt_desc &desc, const pstring &sourcefile)
 {

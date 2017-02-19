@@ -36,7 +36,7 @@
     0xA - <Passes> dies if 600000-7fffff doesn't mirror 400000-5fffff ?
     0x8 - <Passes> SRAM test 000000-000FFF (2e3616-2e3654)
     0x0 - <runs off into weeds> not sure... (2e2fd0... 2db764 is the end of the 'clear ram 41d53f down to 400000' loop...)
- 
+
     If one of the self tests fails, the uppermost bit will oscillate (c000 4000 c000 4000 etc) forever
 
 ******************************************************************************/
@@ -267,7 +267,7 @@ WRITE16_MEMBER(lwriter_state::bankedarea_w)
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !space.debugger_access()) {	logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
+		if ((offset > 0x7ff) && !space.debugger_access()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
@@ -341,9 +341,9 @@ WRITE_LINE_MEMBER(lwriter_state::via_int_w)
 /*
 WRITE_LINE_MEMBER(lwriter_state::scc_int)
 {
-	logerror(" SCC: INT output set to %d!\n", state);
-	//m_via->set_input_line(VIA_CA1, state ? ASSERT_LINE : CLEAR_LINE);
-	m_via->write_ca1(state);
+    logerror(" SCC: INT output set to %d!\n", state);
+    //m_via->set_input_line(VIA_CA1, state ? ASSERT_LINE : CLEAR_LINE);
+    m_via->write_ca1(state);
 }*/
 
 #define CPU_CLK (XTAL_22_3210MHz / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7

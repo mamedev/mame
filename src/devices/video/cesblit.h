@@ -19,7 +19,7 @@
 	MCFG_DEVICE_ADD(_tag, CESBLIT, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen)
 
-#define MCFG_CESBLIT_MAP	MCFG_DEVICE_PROGRAM_MAP
+#define MCFG_CESBLIT_MAP    MCFG_DEVICE_PROGRAM_MAP
 
 #define MCFG_CESBLIT_COMPUTE_ADDR(_compute_addr) \
 	cesblit_device::static_set_compute_addr(*device, _compute_addr);
@@ -33,7 +33,7 @@
 
 // ======================> cesblit_device
 
-class cesblit_device :	public device_t,
+class cesblit_device :  public device_t,
 						public device_video_interface,
 						public device_memory_interface
 {
@@ -44,7 +44,7 @@ public:
 	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	void set_compute_addr(compute_addr_t compute_addr)	{ m_compute_addr = compute_addr; }
+	void set_compute_addr(compute_addr_t compute_addr)  { m_compute_addr = compute_addr; }
 	static void static_set_compute_addr(device_t &device, compute_addr_t compute_addr) { downcast<cesblit_device &>(device).set_compute_addr(compute_addr); }
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<cesblit_device &>(device).m_blit_irq_cb.set_callback(object); }
 
@@ -65,7 +65,7 @@ protected:
 	address_space_config m_space_config;
 	address_space *m_space;
 
-	devcb_write_line m_blit_irq_cb;	// blit finished irq
+	devcb_write_line m_blit_irq_cb; // blit finished irq
 
 	bitmap_ind16 m_bitmap[2][2];
 	uint16_t m_regs[0x12/2];

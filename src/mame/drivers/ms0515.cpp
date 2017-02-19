@@ -2,23 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Sergey Svishchev
 /***************************************************************************
 
-	Elektronika MS 0515
+    Elektronika MS 0515
 
-	To do:
-	- softlist
-	- sound
-	- 512K memory expansion
-	- ?? refresh rate change
-	- ?? parallel printer
-	- ?? cassette (only with Version A firmware)
-	- ?? port 177770
+    To do:
+    - softlist
+    - sound
+    - 512K memory expansion
+    - ?? refresh rate change
+    - ?? parallel printer
+    - ?? cassette (only with Version A firmware)
+    - ?? port 177770
 
-	Docs:
-	- http://www.tis.kz/docs/MC-0515/mc0515-ed.rar schematics etc.
-	- http://www.tis.kz/docs/MC-0515/mc0515-to.rar user manual
-	- http://www.tis.kz/docs/MC-0515/hc4-to.rar technical manual
-	- http://www.tis.kz/docs/MC-0515/mc0515-po.rar diag manual
-	- http://www.tis.kz/docs/MC-0515/mc0515-osa.rar OS manual
+    Docs:
+    - http://www.tis.kz/docs/MC-0515/mc0515-ed.rar schematics etc.
+    - http://www.tis.kz/docs/MC-0515/mc0515-to.rar user manual
+    - http://www.tis.kz/docs/MC-0515/hc4-to.rar technical manual
+    - http://www.tis.kz/docs/MC-0515/mc0515-po.rar diag manual
+    - http://www.tis.kz/docs/MC-0515/mc0515-osa.rar OS manual
 
 ****************************************************************************/
 
@@ -137,10 +137,10 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 	AM_RANGE(0177520, 0177527) AM_DEVWRITE8("pit8253", pit8253_device, write, 0x00ff)
 
 	AM_RANGE(0177540, 0177547) AM_NOP
-//	AM_RANGE(0177540, 0177541)
-//	AM_RANGE(0177542, 0177543)
-//	AM_RANGE(0177544, 0177545)  // i8255 for MS-7007 Keyboard
-//	AM_RANGE(0177546, 0177547)
+//  AM_RANGE(0177540, 0177541)
+//  AM_RANGE(0177542, 0177543)
+//  AM_RANGE(0177544, 0177545)  // i8255 for MS-7007 Keyboard
+//  AM_RANGE(0177546, 0177547)
 
 	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
 
@@ -160,13 +160,13 @@ ADDRESS_MAP_END
 /*
  * (page 15-16)
  *
- * 6-0	RAM banking
- * 7	VRAM access enable
- * 8	vblank IRQ line (1 -- assert)
- * 9	timer IRQ enable (1 -- enable)
+ * 6-0  RAM banking
+ * 7    VRAM access enable
+ * 8    vblank IRQ line (1 -- assert)
+ * 9    timer IRQ enable (1 -- enable)
  * 11-10 VRAM banking
- * 12	parallel port STROBE signal
- * 13	parallel port ... signal
+ * 12   parallel port STROBE signal
+ * 13   parallel port ... signal
  * 14-15 unused
  */
 WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
@@ -412,7 +412,7 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 
 void ms0515_state::screen_eof(screen_device &screen, bool state)
 {
-//	irq2_w(state ? ASSERT_LINE : CLEAR_LINE);
+//  irq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 	if (BIT(m_bankreg, 9))
 		irq11_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -497,7 +497,7 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 
 static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, XTAL_4MHz)	// actual CPU is T11 clone, KR1807VM1
+	MCFG_CPU_ADD("maincpu", T11, XTAL_4MHz) // actual CPU is T11 clone, KR1807VM1
 	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
@@ -534,8 +534,8 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_dsr))
 
-//	MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ms0515_state, write_line_clock))
+//  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
+//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ms0515_state, write_line_clock))
 
 	// serial connection to MS7004 keyboard
 	MCFG_DEVICE_ADD("i8251kbd", I8251, 0)
@@ -552,11 +552,11 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_2MHz)
-//	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_keyboard_clock))
+//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_keyboard_clock))
 	MCFG_PIT8253_CLK1(XTAL_2MHz)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ms0515_state, write_line_clock))
 	MCFG_PIT8253_CLK2(XTAL_2MHz)
-//	MCFG_PIT8253_OUT2_HANDLER(WRITELINE())
+//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE())
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

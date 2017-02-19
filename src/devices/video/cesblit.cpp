@@ -117,7 +117,7 @@ WRITE16_MEMBER(cesblit_device::regs_w)
 
 	switch (offset)
 	{
-//		case 0x00/2:	// bit 15: FPGA programming serial in (lsb first)
+//      case 0x00/2:    // bit 15: FPGA programming serial in (lsb first)
 
 		case 0x10/2:
 			if (!m_blit_irq_cb.isnull() && !BIT(olddata, 3) && BIT(newdata, 3))

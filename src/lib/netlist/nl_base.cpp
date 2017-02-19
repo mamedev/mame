@@ -504,14 +504,14 @@ void netlist_t::reset()
 					//x->update_dev();
 		}
 		break;
-		case 1:		// brute force backward
+		case 1:     // brute force backward
 		{
 			std::size_t i = m_devices.size();
 			while (i>0)
 				m_devices[--i]->update_dev();
 		}
 		break;
-		case 2: 	// brute force forward
+		case 2:     // brute force forward
 		{
 			for (std::size_t i = 0; i < m_devices.size(); i++)
 				m_devices[i]->update_dev();

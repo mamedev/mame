@@ -3523,11 +3523,11 @@ ROM_START( kgbirdmk5 )
 	ARISTOCRAT_MK5_BIOS
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "0200024v.u7",  0x000000, 0x080000, CRC(90aefddc) SHA1(610b850c1d3e882c4df9e0a09a056b0c97341a19) ) 
-	ROM_LOAD32_WORD( "0200024v.u11", 0x000002, 0x080000, CRC(52791ad8) SHA1(6e4cf553b355f03ef69ef3c4e2816bbd0cbe6599) ) 
-	ROM_LOAD32_WORD( "0200024v.u8",  0x100000, 0x080000, CRC(c0477ae3) SHA1(5005944b8b28553dd959192d614be7f1b6228a30) ) 
-	ROM_LOAD32_WORD( "0200024v.u12", 0x100002, 0x080000, CRC(df176c5a) SHA1(dcaecdefb7c880b9425a6445dbed969968fe3d1c) ) 
-	
+	ROM_LOAD32_WORD( "0200024v.u7",  0x000000, 0x080000, CRC(90aefddc) SHA1(610b850c1d3e882c4df9e0a09a056b0c97341a19) )
+	ROM_LOAD32_WORD( "0200024v.u11", 0x000002, 0x080000, CRC(52791ad8) SHA1(6e4cf553b355f03ef69ef3c4e2816bbd0cbe6599) )
+	ROM_LOAD32_WORD( "0200024v.u8",  0x100000, 0x080000, CRC(c0477ae3) SHA1(5005944b8b28553dd959192d614be7f1b6228a30) )
+	ROM_LOAD32_WORD( "0200024v.u12", 0x100002, 0x080000, CRC(df176c5a) SHA1(dcaecdefb7c880b9425a6445dbed969968fe3d1c) )
+
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
@@ -3562,17 +3562,17 @@ ROM_END
 
 ROM_START( toutango )
 	ARISTOCRAT_MK5_BIOS
-	
+
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "0100782v.u7",  0x000000, 0x080000, CRC(4c70120f) SHA1(e43b39c31c14d16ebf962d8dd201a882df74f595) ) 
-	ROM_LOAD32_WORD( "0100782v.u11", 0x000002, 0x080000, CRC(18519789) SHA1(95385207be6e44746b5e78aa5622afb5258419b2) ) 
-	ROM_LOAD32_WORD( "0100782v.u8",  0x100000, 0x080000, CRC(bf358a6f) SHA1(3ae3bcd486f9c6f5f2a799ed3e4f7b177a59465b) ) 
-	ROM_LOAD32_WORD( "0100782v.u12", 0x100002, 0x080000, CRC(fd366efa) SHA1(22a372f5efe43b9320199b7534e9b3a39b582e4a) ) 
-	ROM_LOAD32_WORD( "0100782v.u9",  0x200000, 0x080000, CRC(bc35aed0) SHA1(7ab25c3207c2be43cfefabe4d4bb0a98bc8e5aea) ) 
-	ROM_LOAD32_WORD( "0100782v.u13", 0x200002, 0x080000, CRC(f8a67a69) SHA1(b1a28047cb4572ae15359c30f71cafa4bd70658c) ) 
-	ROM_LOAD32_WORD( "0100782v.u10", 0x300000, 0x080000, CRC(e6528de7) SHA1(b3aa1937f0b673ba2cfa68acc7cb540ebefc66d4) ) 
-	ROM_LOAD32_WORD( "0100782v.u14", 0x300002, 0x080000, CRC(69f2acde) SHA1(cda52548e675a06677a2d9fee89b33f9abb96f64) ) 
-	
+	ROM_LOAD32_WORD( "0100782v.u7",  0x000000, 0x080000, CRC(4c70120f) SHA1(e43b39c31c14d16ebf962d8dd201a882df74f595) )
+	ROM_LOAD32_WORD( "0100782v.u11", 0x000002, 0x080000, CRC(18519789) SHA1(95385207be6e44746b5e78aa5622afb5258419b2) )
+	ROM_LOAD32_WORD( "0100782v.u8",  0x100000, 0x080000, CRC(bf358a6f) SHA1(3ae3bcd486f9c6f5f2a799ed3e4f7b177a59465b) )
+	ROM_LOAD32_WORD( "0100782v.u12", 0x100002, 0x080000, CRC(fd366efa) SHA1(22a372f5efe43b9320199b7534e9b3a39b582e4a) )
+	ROM_LOAD32_WORD( "0100782v.u9",  0x200000, 0x080000, CRC(bc35aed0) SHA1(7ab25c3207c2be43cfefabe4d4bb0a98bc8e5aea) )
+	ROM_LOAD32_WORD( "0100782v.u13", 0x200002, 0x080000, CRC(f8a67a69) SHA1(b1a28047cb4572ae15359c30f71cafa4bd70658c) )
+	ROM_LOAD32_WORD( "0100782v.u10", 0x300000, 0x080000, CRC(e6528de7) SHA1(b3aa1937f0b673ba2cfa68acc7cb540ebefc66d4) )
+	ROM_LOAD32_WORD( "0100782v.u14", 0x300002, 0x080000, CRC(69f2acde) SHA1(cda52548e675a06677a2d9fee89b33f9abb96f64) )
+
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
@@ -4233,7 +4233,7 @@ GAMEL( 1997, pengpay,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1996, pengpaya,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/4, C - 12/11/96
 GAMEL( 1997, pengpayb,  pengpay,  aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 586/3(a), D - 03/06/97
 GAMEL( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // 586/7(b)  B - 14/07/97
-GAMEL( 1998, petshop,	aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 618/1, A - 17/04/98
+GAMEL( 1998, petshop,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 618/1, A - 17/04/98
 GAMEL( 1995, phantpay,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",             MACHINE_FLAGS, layout_aristmk5 )  // 570/1, E - 12/09/95
 GAMEL( 1998, penpir2,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pirate II (0100869V, Victoria)",             MACHINE_FLAGS, layout_aristmk5 )  // 619/3, A - 17/12/98
 GAMEL( 1996, przfight,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",              MACHINE_FLAGS, layout_aristmk5 )  // 578/4, B - 08/08/96

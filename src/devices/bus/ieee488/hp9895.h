@@ -92,20 +92,20 @@ private:
 	floppy_image_device *m_current_drive;
 	unsigned m_current_drive_idx;
 	bool m_dskchg[ 2 ];
-	uint16_t m_crc;	// U77
+	uint16_t m_crc; // U77
 	bool m_crcerr_syn;
 	bool m_overrun;
 	bool m_accdata;
 	bool m_timeout;
-	uint8_t m_cntl_reg;	// U31
-	uint8_t m_clock_sr;	// U22 & U4
-	uint8_t m_clock_reg;	// U23 & U5
-	uint8_t m_data_sr;	// U24 & U6
+	uint8_t m_cntl_reg; // U31
+	uint8_t m_clock_sr; // U22 & U4
+	uint8_t m_clock_reg;    // U23 & U5
+	uint8_t m_data_sr;  // U24 & U6
 	uint8_t m_wr_context;
 	bool m_had_transition;
 	bool m_lckup;
 	bool m_amdt;
-	uint8_t m_sync_cnt;	// U28 & U73
+	uint8_t m_sync_cnt; // U28 & U73
 	bool m_hiden;
 	bool m_mgnena;
 

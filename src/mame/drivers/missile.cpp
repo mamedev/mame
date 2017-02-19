@@ -739,7 +739,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 		output().set_led_value(0, ~data & 0x02);
 		m_ctrld = data & 1;
 	}
-	
+
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
 		m_palette->set_pen_color(offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
@@ -852,7 +852,7 @@ WRITE8_MEMBER(missile_state::bootleg_w)
 		output().set_led_value(0, ~data & 0x02);
 		m_ctrld = data & 1;
 	}
-	
+
 	/* watchdog */
 	else if (offset >= 0x4900 && offset < 0x4a00)
 		m_watchdog->watchdog_reset();
@@ -917,7 +917,7 @@ READ8_MEMBER(missile_state::bootleg_r)
 	/* IN2 */
 	else if (offset >= 0x4b00 && offset < 0x4c00) // seems ok
 		result = m_r10->read();
-	
+
 
 	/* anything else */
 	else
@@ -1335,27 +1335,27 @@ ROM_END
 
 /*
 CPUs
-QTY 	Type 	clock 	position 	function
-1x 	6502 		2B 	8-bit Microprocessor - main
-1x 	LM380 		12B 	Audio Amplifier - sound
-1x 	oscillator 	10.000 	6C 	
+QTY     Type    clock   position    function
+1x  6502        2B  8-bit Microprocessor - main
+1x  LM380       12B     Audio Amplifier - sound
+1x  oscillator  10.000  6C
 
 ROMs
-QTY 	Type 	position 	status
-2x 	F2708 	10C, 10E 	dumped
-6x 	MCM2716C 	1-6 	dumped
-1x 	DM74S288N 	6L 	dumped
+QTY     Type    position    status
+2x  F2708   10C, 10E    dumped
+6x  MCM2716C    1-6     dumped
+1x  DM74S288N   6L  dumped
 
 RAMs
-QTY 	Type 	position
-8x 	TMS4116 	4F,4H,4J,4K,4L,4M,4N,4P
-1x 	74S189N 	7L
+QTY     Type    position
+8x  TMS4116     4F,4H,4J,4K,4L,4M,4N,4P
+1x  74S189N     7L
 
 Others
 
 1x 22x2 edge connector
 1x trimmer (volume)(12E)
-2x 8x2 switches DIP(8R,10R) 
+2x 8x2 switches DIP(8R,10R)
 */
 
 ROM_START( missilea )

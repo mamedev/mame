@@ -518,11 +518,11 @@ files {
 
 configuration { "mingw*" }
   linkoptions{
-    "-municode",
+	"-municode",
   }
 configuration { "vs*" }
   flags {
-    "Unicode",
+	"Unicode",
   }
 
 configuration { "mingw*" or "vs*" }
@@ -562,11 +562,11 @@ files {
 
 configuration { "mingw*" }
   linkoptions{
-    "-municode",
+	"-municode",
   }
 configuration { "vs*" }
   flags {
-    "Unicode",
+	"Unicode",
   }
 
 configuration { "mingw*" or "vs*" }

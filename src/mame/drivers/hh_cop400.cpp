@@ -587,7 +587,7 @@ MACHINE_CONFIG_END
   LJN I Took a Lickin' From a Chicken
   * COP421 MCU label ~/005 COP421-NJC/N
   * 11 leds, 1-bit sound, motor to a chicken on a spring
-  
+
   This toy includes 4 games: Tic Tac Toe, Chicken Sez, and Total Recall I/II.
 
   known releases:
@@ -1082,7 +1082,7 @@ MACHINE_CONFIG_END
   Milton Bradley Plus One
   * COP410L MCU in 8-pin DIP, label ~/029 MM 57405 (die label COP410L/B NNE)
   * orientation sensor(4 directions), 1-bit sound
-  
+
   This is a board game, each player needs to rotate a triangular pyramid
   shaped piece the same as the previous player, plus 1.
 

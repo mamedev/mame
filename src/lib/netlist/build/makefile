@@ -93,6 +93,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
 	$(NLOBJ)/devices/nld_74161.o \
+	$(NLOBJ)/devices/nld_74164.o \
 	$(NLOBJ)/devices/nld_74165.o \
 	$(NLOBJ)/devices/nld_74166.o \
 	$(NLOBJ)/devices/nld_74174.o \
@@ -180,7 +181,7 @@ clang:
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
-# 
+#
 # Mostly done: -Wno-weak-vtables -Wno-cast-align
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994

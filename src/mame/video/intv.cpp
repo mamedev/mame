@@ -25,7 +25,7 @@ uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &
 		uint8_t *videoram = m_videoram;
 		int xoffset = STIC_OVERSCAN_LEFT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE;
 		int yoffset = STIC_OVERSCAN_TOP_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE;
-		
+
 		rectangle cursor_rect;
 		m_crtc->cursor_bounds(cursor_rect);
 		int cursor_col = cursor_rect.min_x / 8;

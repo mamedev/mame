@@ -95,7 +95,7 @@ private:
 	 * |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
 	 * |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
 	 * |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
-	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |	 */
+	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |    */
 
 	class bjt_model_t : public param_model_t
 	{

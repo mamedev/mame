@@ -15,7 +15,7 @@ enum clipper_registers
 	CLIPPER_F0, CLIPPER_F1, CLIPPER_F2, CLIPPER_F3, CLIPPER_F4, CLIPPER_F5, CLIPPER_F6, CLIPPER_F7,
 	CLIPPER_F8, CLIPPER_F9, CLIPPER_F10, CLIPPER_F11, CLIPPER_F12, CLIPPER_F13, CLIPPER_F14, CLIPPER_F15,
 
-	CLIPPER_PSW, 
+	CLIPPER_PSW,
 	CLIPPER_SSW,
 	CLIPPER_PC,
 };
@@ -71,7 +71,7 @@ enum clipper_psw
 	PSW_EFI = 0x00002000, // enable floating invalid operation trap
 	PSW_EFT = 0x00004000, // enable floating trap
 	PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
-                          // unused (3 bits)
+						  // unused (3 bits)
 	PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
 	PSW_BIG = 0x00400000, // c400 - big endian (hardware)
 	PSW_T   = 0x00800000, // trace trap
@@ -85,7 +85,7 @@ enum clipper_ssw
 	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
 	SSW_EI  = 0x00000100, // enable interrupts
 	SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
-                          // unused (5 bits)
+						  // unused (5 bits)
 	SSW_FRD = 0x00400000, // floating registers dirty
 	SSW_TP  = 0x00800000, // trace trap pending
 	SSW_ECM = 0x01000000, // enabled corrected memory error

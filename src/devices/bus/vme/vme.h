@@ -131,7 +131,7 @@ extern const device_type VME;
 
 class vme_card_interface;
 
-class vme_device : public device_t, 
+class vme_device : public device_t,
 	public device_memory_interface
 {
 public:
@@ -172,13 +172,13 @@ public:
 	enum vme_amod_t
 	{   // Defined and User Defined Address Modifier Values (long bnames from VME standard text. please use short)
 		AMOD_EXTENDED_NON_PRIV_DATA = 0x09, //A32 SC (Single Cycle)
-		A32_SC 						= 0x09, //A32 SC (Single Cycle)
+		A32_SC                      = 0x09, //A32 SC (Single Cycle)
 		AMOD_EXTENDED_NON_PRIV_PRG  = 0x0A,
 		AMOD_EXTENDED_NON_PRIV_BLK  = 0x0B,
 		AMOD_EXTENDED_SUPERVIS_DATA = 0x0D,
 		AMOD_EXTENDED_SUPERVIS_PRG  = 0x0E,
 		AMOD_EXTENDED_SUPERVIS_BLK  = 0x0F,
-		AMOD_USER_DEFINED_FIRST     = 0x10, 
+		AMOD_USER_DEFINED_FIRST     = 0x10,
 		AMOD_USER_DEFINED_LAST      = 0x1F,
 		AMOD_SHORT_NON_PRIV_ACCESS  = 0x29, //A16 SC
 		A16_SC                      = 0x29, //A16 SC
@@ -192,7 +192,7 @@ public:
 		AMOD_STANDARD_SUPERVIS_BLK  = 0x3F
 	};
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask);
-	//	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	//  void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
 
@@ -240,11 +240,11 @@ public:
 };
 
 #define MCFG_VME_SLOT_ADD(_tag, _slotnbr, _slot_intf,_def_slot)            \
-	{ 	std::string stag = "slot" + std::to_string(_slotnbr); 	           \
-		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);					       \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);	       \
+	{   std::string stag = "slot" + std::to_string(_slotnbr);              \
+		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);                        \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);          \
 		vme_slot_device::static_set_vme_slot(*device, _tag, stag.c_str()); \
-		vme_slot_device::static_update_vme_chains(*device, _slotnbr); 	   \
+		vme_slot_device::static_update_vme_chains(*device, _slotnbr);      \
 	}
 
 #define MCFG_VME_SLOT_REMOVE(_tag)        \
