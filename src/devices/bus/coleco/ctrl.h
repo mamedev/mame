@@ -14,7 +14,6 @@
 #ifndef __COLECOVISION_CONTROL_PORT__
 #define __COLECOVISION_CONTROL_PORT__
 
-#include "emu.h"
 
 
 

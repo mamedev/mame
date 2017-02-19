@@ -37,7 +37,6 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -61,10 +60,6 @@ INPUT_PORTS_END
 
 
 void vta2000_state::machine_reset()
-{
-}
-
-void vta2000_state::video_start()
 {
 }
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "i82439tx.h"
 
 const device_type I82439TX_NEW = &device_creator<i82439tx_host_device>;

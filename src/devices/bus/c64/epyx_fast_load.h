@@ -12,7 +12,6 @@
 #define __EPYX_FAST_LOAD__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

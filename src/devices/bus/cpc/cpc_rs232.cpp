@@ -6,6 +6,7 @@
  *  Created on: 22/04/2014
  */
 
+#include "emu.h"
 #include "cpc_rs232.h"
 
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);

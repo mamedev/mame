@@ -5,7 +5,6 @@
 #ifndef __YMF278B_H__
 #define __YMF278B_H__
 
-#include "emu.h"
 
 #define YMF278B_STD_CLOCK (33868800)            /* standard clock for OPL4 */
 

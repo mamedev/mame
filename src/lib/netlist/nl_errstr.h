@@ -18,7 +18,7 @@
 #define MF_1_UNKNOWN_PARAM_TYPE                 "Can not determine param_type for {1}"
 #define MF_2_ERROR_CONNECTING_1_TO_2            "Error connecting {1} to {2}"
 #define MF_0_NO_SOLVER                          "No solver found for this netlist although analog elements are present"
-#define MF_1_HND_VAL_NOT_SUPPORTED				"HINT_NO_DEACTIVATE value not supported: <{1}>"
+#define MF_1_HND_VAL_NOT_SUPPORTED              "HINT_NO_DEACTIVATE value not supported: <{1}>"
 
 // nl_factory.cpp
 

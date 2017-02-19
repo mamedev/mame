@@ -48,7 +48,6 @@
 #ifndef __PORTFOLIO_MEMORY_CARD_SLOT__
 #define __PORTFOLIO_MEMORY_CARD_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 

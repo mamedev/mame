@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "at45dbxx.h"
 
 #define LOG_LEVEL  1

@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "includes/aim65.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 /******************************************************************************
  Interrupt handling
@@ -46,17 +49,20 @@
 
 WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
 {
+	LOG("pia a: a=%u /ce=%u,%u,%u,%u,%u /wr=%u\n",
+			data & 0x03, BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 	for (std::size_t index = 0; m_ds.size() > index; ++index)
 	{
-		m_ds[index]->addr_w(data & 0x03);
-		m_ds[index]->ce_w(BIT(data, 2 + index));
 		m_ds[index]->wr_w(BIT(data, 7));
+		m_ds[index]->ce_w(BIT(data, 2 + index));
+		m_ds[index]->addr_w(data & 0x03);
 	}
 }
 
 
 WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 {
+	LOG("pia b: d=%02x /cu=%u\n", data & 0x7f, BIT(data, 7));
 	for (required_device<dl1416_device> &ds : m_ds)
 	{
 		ds->cu_w(BIT(data, 7));
@@ -126,6 +132,16 @@ void aim65_state::machine_start()
 		space.install_read_handler(0xc000, 0xcfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z25));
 	if (m_z26->exists())
 		space.install_read_handler(0xb000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z26));
+
+	// Init PROM/ROM module sockets
+	if (m_z12->exists())
+		space.install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z12));
+	if (m_z13->exists())
+		space.install_read_handler(0x5000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z13));
+	if (m_z14->exists())
+		space.install_read_handler(0x6000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z14));
+	if (m_z15->exists())
+		space.install_read_handler(0x7000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z15));
 
 	// Init RAM
 	space.install_ram(0x0000, ram->size() - 1, ram->pointer());

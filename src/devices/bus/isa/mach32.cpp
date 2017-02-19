@@ -9,6 +9,7 @@
  *  Created on: 16/05/2014
  */
 
+#include "emu.h"
 #include "mach32.h"
 
 const device_type ATIMACH32 = &device_creator<mach32_device>;

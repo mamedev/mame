@@ -38,6 +38,7 @@
 */
 
 
+#include "emu.h"
 #include "hardbox.h"
 
 

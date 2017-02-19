@@ -44,6 +44,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "clm.h"
 
 

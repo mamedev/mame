@@ -28,7 +28,6 @@
 #ifndef __MOS6581__
 #define __MOS6581__
 
-#include "emu.h"
 
 
 

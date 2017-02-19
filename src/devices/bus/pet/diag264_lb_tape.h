@@ -11,7 +11,6 @@
 #ifndef __DIAG264_CASSETTE_LOOPBACK__
 #define __DIAG264_CASSETTE_LOOPBACK__
 
-#include "emu.h"
 #include "cass.h"
 
 

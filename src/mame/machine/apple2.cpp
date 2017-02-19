@@ -56,7 +56,7 @@ void apple2_state::langcard_touch(offs_t offset)
 
 	//logerror("language card bankswitch read, offset: $c08%0x\n", offset);
 
-	// determine which flags to change 
+	// determine which flags to change
 	mask = VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2;
 	val = 0;
 
@@ -374,21 +374,21 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 
 		offset &= 0x7F;
 		slot = offset / 0x10;
-		
+
 		if (slot == 0)
 		{
 			langcard_touch(offset);
 			return 0;
 		}
-		
-		/* now identify the device */
-        slotdevice = m_a2bus->get_a2bus_card(slot);
 
-        /* and if we can, read from the slot */
-        if (slotdevice != nullptr)
-        {
-        	return slotdevice->read_c0nx(space, offset % 0x10);
-        }
+		/* now identify the device */
+		slotdevice = m_a2bus->get_a2bus_card(slot);
+
+		/* and if we can, read from the slot */
+		if (slotdevice != nullptr)
+		{
+			return slotdevice->read_c0nx(space, offset % 0x10);
+		}
 	}
 
 	return 0;

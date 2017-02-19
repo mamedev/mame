@@ -633,7 +633,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x03) unk, maybe IO
-//	AM_RANGE(0x00, 0x00)  AM_READ_PORT("DSW1")
+//  AM_RANGE(0x00, 0x00)  AM_READ_PORT("DSW1")
 //  AM_RANGE(0x01, 0x01)  AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02)  AM_READ_PORT("IN0")
 //  AM_RANGE(0x08, 0x0b) unk, maybe IO
@@ -662,7 +662,7 @@ ADDRESS_MAP_END
   02D9: C9            ret
 
   0338: DB 02         in   a,($02) --> poll IN0
-  033A: E6 40         and  $40 ------> check for IN0-7 if active. 
+  033A: E6 40         and  $40 ------> check for IN0-7 if active.
   033C: 28 02         jr   z,$0340 --> to continue the program.
   033E: AF            xor  a
   033F: C9            ret

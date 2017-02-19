@@ -33,14 +33,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(c10);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -80,10 +78,6 @@ void c10_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(4), TIMER_RESET);
-}
-
-void c10_state::video_start()
-{
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

@@ -11,7 +11,6 @@
 #ifndef __C8280__
 #define __C8280__
 
-#include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/c8280_dsk.h"

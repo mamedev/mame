@@ -280,7 +280,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		for (ch = 0; ch < 2; ch++)
 		{
-			/* update the state of the noise generator 
+			/* update the state of the noise generator
 			 * polynomial is x^18 + x^11 + x (i.e. 0x20400) and is a plain XOR, initial state is probably all 1s
 			 * see http://www.vogons.org/viewtopic.php?f=9&t=51695 */
 			m_noise[ch].counter -= m_noise[ch].freq;

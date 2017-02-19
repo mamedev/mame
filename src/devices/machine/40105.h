@@ -22,7 +22,6 @@
 #ifndef __CMOS_40105__
 #define __CMOS_40105__
 
-#include "emu.h"
 #include <queue>
 
 

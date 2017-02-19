@@ -24,7 +24,6 @@
 #ifndef __MOS6529__
 #define __MOS6529__
 
-#include "emu.h"
 
 
 

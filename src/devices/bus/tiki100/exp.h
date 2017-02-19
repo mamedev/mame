@@ -14,7 +14,6 @@
 #ifndef __TIKI100_BUS__
 #define __TIKI100_BUS__
 
-#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 

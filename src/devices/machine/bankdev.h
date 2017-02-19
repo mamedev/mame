@@ -5,7 +5,6 @@
 #ifndef __BANKDEV_H__
 #define __BANKDEV_H__
 
-#include "emu.h"
 
 #define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
 	address_map_bank_device::set_endianness(*device, _endianness);

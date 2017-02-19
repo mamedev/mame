@@ -11,7 +11,6 @@
 #ifndef __COMX_PRN__
 #define __COMX_PRN__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"

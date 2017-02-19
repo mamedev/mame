@@ -22,7 +22,6 @@
 #ifndef __PCD3311__
 #define __PCD3311__
 
-#include "emu.h"
 
 
 

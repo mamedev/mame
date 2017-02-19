@@ -11,7 +11,6 @@
 #ifndef NETLIST_H
 #define NETLIST_H
 
-#include "emu.h"
 
 #include "netlist/nl_time.h"
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "clock.h"
 
 const device_type CLOCK = &device_creator<clock_device>;

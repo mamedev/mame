@@ -7,6 +7,7 @@
  *
  */
 
+#include "emu.h"
 #include "sio.h"
 
 #define VERBOSE_LEVEL ( 0 )

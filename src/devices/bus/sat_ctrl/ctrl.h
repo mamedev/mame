@@ -12,7 +12,6 @@
 #ifndef __SATURN_CONTROL_PORT__
 #define __SATURN_CONTROL_PORT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

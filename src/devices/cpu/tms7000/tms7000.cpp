@@ -17,6 +17,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "tms7000.h"
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.

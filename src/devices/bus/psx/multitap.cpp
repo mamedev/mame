@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 // psx multitap emulation
 
+#include "emu.h"
 #include "multitap.h"
 
 const device_type PSX_MULTITAP = &device_creator<psx_multitap_device>;

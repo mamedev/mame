@@ -11,7 +11,6 @@
 #ifndef __ISA_CARDS_H__
 #define __ISA_CARDS_H__
 
-#include "emu.h"
 
 // video
 #include "mda.h"

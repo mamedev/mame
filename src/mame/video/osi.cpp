@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
+#include "emu.h"
 #include "includes/osi.h"
 
 /* Palette Initialization */
@@ -25,7 +26,6 @@ PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 
 void sb2m600_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 	uint16_t addr;
 
 	/* randomize video memory contents */

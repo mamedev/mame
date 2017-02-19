@@ -57,7 +57,6 @@
 #ifndef TTL74161_H
 #define TTL74161_H
 
-#include "emu.h"
 
 #define MCFG_7416x_QA_CB(_devcb) \
 	devcb = &ttl7416x_device::set_qa_cb(*device, DEVCB_##_devcb);

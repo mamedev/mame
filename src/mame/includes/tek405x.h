@@ -5,7 +5,6 @@
 #ifndef __TEK405X__
 #define __TEK405X__
 
-#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/ram.h"
 #include "machine/6821pia.h"

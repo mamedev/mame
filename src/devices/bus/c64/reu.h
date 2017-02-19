@@ -12,7 +12,6 @@
 #define __REU__
 
 
-#include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "exp.h"

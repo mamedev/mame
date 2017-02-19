@@ -46,6 +46,7 @@ Connections
 
 */
 
+#include "emu.h"
 #include "2joysnd.h"
 #include "sound/volt_reg.h"
 

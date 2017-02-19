@@ -19,6 +19,7 @@
 
 */
 
+#include "emu.h"
 #include "upd3301.h"
 
 

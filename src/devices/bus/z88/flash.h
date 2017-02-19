@@ -5,7 +5,6 @@
 #ifndef __Z88_FLASH_H__
 #define __Z88_FLASH_H__
 
-#include "emu.h"
 #include "z88.h"
 #include "machine/intelfsh.h"
 

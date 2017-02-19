@@ -3,6 +3,7 @@
 
 // HMCS40 opcode handlers
 
+#include "emu.h"
 #include "hmcs40.h"
 
 

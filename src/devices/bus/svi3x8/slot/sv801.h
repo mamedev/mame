@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_SLOT_SV801_H__
 #define __SVI3X8_SLOT_SV801_H__
 
-#include "emu.h"
 #include "slot.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"

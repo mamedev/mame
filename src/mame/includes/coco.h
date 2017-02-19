@@ -14,7 +14,6 @@
 #define __COCO__
 
 
-#include "emu.h"
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
 #include "machine/6821pia.h"

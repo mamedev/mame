@@ -23,7 +23,6 @@
 #ifndef __PC1512_MOUSE_PORT__
 #define __PC1512_MOUSE_PORT__
 
-#include "emu.h"
 
 
 

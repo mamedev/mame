@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "dectalk.h"
 #include "sound/volt_reg.h"
 

@@ -4,6 +4,7 @@
     Williams System 11c
 */
 
+#include "emu.h"
 #include "includes/s11c.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"

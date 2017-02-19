@@ -3,7 +3,6 @@
 #ifndef NSCSI_CB_H
 #define NSCSI_CB_H
 
-#include "emu.h"
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NSCSICB_RST_HANDLER(_line) \

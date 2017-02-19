@@ -62,6 +62,8 @@ public:
 		, m_exp_0c(*this, "exp0c")
 		, m_exp_0d(*this, "exp0d")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_p_pcgram(*this, "pcg")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
@@ -84,15 +86,13 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
+
 private:
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
-	uint8_t *m_p_pcgram;
-	const uint8_t *m_p_chargen;
 	uint8_t m_control_bits;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	void pegasus_decrypt_rom(uint8_t *ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -104,6 +104,8 @@ private:
 	required_device<generic_slot_device> m_exp_0c;
 	required_device<generic_slot_device> m_exp_0d;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_pcgram;
 	required_ioport_array<8> m_io_keyboard;
 };
 
@@ -286,11 +288,6 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("{ }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 INPUT_PORTS_END
 
-void pegasus_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 static const uint8_t mcm6571a_shift[] =
 {
 	0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
@@ -452,8 +449,6 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 
 void pegasus_state::machine_start()
 {
-	m_p_pcgram = memregion("pcg")->base();
-
 	if (m_exp_00->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
 	if (m_exp_01->exists())

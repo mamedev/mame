@@ -548,6 +548,7 @@ MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
 --MACHINES["TTL74157"] = true
 MACHINES["TTL74161"] = true
+MACHINES["TTL74164"] = true
 MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL7474"] = true
@@ -805,6 +806,7 @@ FORMATS["M5_DSK"] = true
 FORMATS["MBEE_CAS"] = true
 FORMATS["MFM_HD"] = true
 FORMATS["MM_DSK"] = true
+FORMATS["MS0515_DSK"] = true
 FORMATS["MSX_DSK"] = true
 FORMATS["MZ_CAS"] = true
 FORMATS["NANOS_DSK"] = true
@@ -2529,6 +2531,8 @@ files {
 createMESSProjects(_target, _subtarget, "prodigy")
 files {
 	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.h",
 }
 
 createMESSProjects(_target, _subtarget, "psion")

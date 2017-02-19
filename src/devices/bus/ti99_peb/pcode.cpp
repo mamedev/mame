@@ -72,6 +72,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "pcode.h"
 
 #define PCODE_GROM_TAG "pcode_grom"

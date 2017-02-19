@@ -11,7 +11,6 @@
 #ifndef __ABC99__
 #define __ABC99__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "abckb.h"
 #include "sound/speaker.h"

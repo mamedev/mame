@@ -28,7 +28,6 @@
 #ifndef __SAA5050__
 #define __SAA5050__
 
-#include "emu.h"
 
 
 

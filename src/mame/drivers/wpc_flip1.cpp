@@ -3,6 +3,7 @@
 
 /* Williams WPC Fliptronics I */
 
+#include "emu.h"
 #include "includes/wpc_flip1.h"
 
 

@@ -12,7 +12,6 @@
 #define __FUN_PLAY__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

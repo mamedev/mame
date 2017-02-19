@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"

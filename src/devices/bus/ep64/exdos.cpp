@@ -45,6 +45,7 @@ This PCB plugs into the external expansion connector on the right side of the ma
 
 */
 
+#include "emu.h"
 #include "exdos.h"
 
 

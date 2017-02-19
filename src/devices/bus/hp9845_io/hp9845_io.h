@@ -13,7 +13,6 @@
 #ifndef _HP9845_IO_H_
 #define _HP9845_IO_H_
 
-#include "emu.h"
 
 #define MCFG_HP9845_IO_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, HP9845_IO_SLOT, 0) \

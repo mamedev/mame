@@ -10,7 +10,6 @@
 #ifndef ISA_FDC_H
 #define ISA_FDC_H
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/upd765.h"
 

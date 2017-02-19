@@ -24,6 +24,7 @@ ToDO:
 ************************************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
 #include "gts80.lh"

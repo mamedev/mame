@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE	1
+	#define NL_PROHIBIT_BASEH_INCLUDE   1
 	#include "netlist/devices/net_lib.h"
 #endif
 

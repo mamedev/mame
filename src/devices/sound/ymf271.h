@@ -5,7 +5,6 @@
 #ifndef __YMF271_H__
 #define __YMF271_H__
 
-#include "emu.h"
 
 #define MCFG_YMF271_IRQ_HANDLER(_devcb) \
 	devcb = &ymf271_device::set_irq_handler(*device, DEVCB_##_devcb);

@@ -3,7 +3,6 @@
 #ifndef __JVS13551_H__
 #define __JVS13551_H__
 
-#include "emu.h"
 #include "machine/jvsdev.h"
 
 #define MCFG_SEGA_837_13551_DEVICE_ADD(_tag, _host, tilt, d0, d1, a0, a1, a2, a3, a4, a5, a6, a7, out) \

@@ -9,7 +9,6 @@
 #ifndef MC80_H_
 #define MC80_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"

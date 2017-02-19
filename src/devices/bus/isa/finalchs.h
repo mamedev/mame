@@ -5,7 +5,6 @@
 #ifndef __ISA_FINALCHS_H__
 #define __ISA_FINALCHS_H__
 
-#include "emu.h"
 #include "isa.h"
 
 //**************************************************************************

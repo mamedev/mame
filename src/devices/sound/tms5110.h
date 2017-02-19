@@ -5,7 +5,6 @@
 #ifndef __TMS5110_H__
 #define __TMS5110_H__
 
-#include "emu.h"
 
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
 #undef PERFECT_INTERPOLATION_HACK

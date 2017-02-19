@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "machine/tms1024.h"
 
 

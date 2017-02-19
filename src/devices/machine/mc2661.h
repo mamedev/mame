@@ -28,7 +28,6 @@
 #ifndef __MC2661__
 #define __MC2661__
 
-#include "emu.h"
 
 
 

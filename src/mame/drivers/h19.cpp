@@ -106,7 +106,6 @@ private:
 	uint8_t m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -343,10 +342,6 @@ INPUT_PORTS_END
 
 
 void h19_state::machine_reset()
-{
-}
-
-void h19_state::video_start()
 {
 }
 

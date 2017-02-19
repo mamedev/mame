@@ -8,6 +8,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/newbrain.h"
 #include "rendlay.h"
 

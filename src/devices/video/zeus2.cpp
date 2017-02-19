@@ -5,6 +5,7 @@
     Midway Zeus2 Video
 
 **************************************************************************/
+#include "emu.h"
 #include "zeus2.h"
 
 #define LOG_REGS         1

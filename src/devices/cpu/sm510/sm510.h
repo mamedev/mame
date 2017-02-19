@@ -9,7 +9,6 @@
 #ifndef _SM510_H_
 #define _SM510_H_
 
-#include "emu.h"
 
 
 // I/O ports setup

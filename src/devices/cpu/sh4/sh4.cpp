@@ -2780,7 +2780,7 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz == 0)	{  /* SZ = 0 */
+	if (m_fpu_sz == 0)  {  /* SZ = 0 */
 #ifdef LSB_FIRST
 		n ^= m_fpu_pr;
 		m ^= m_fpu_pr;

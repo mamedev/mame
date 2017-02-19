@@ -29,6 +29,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/exp85.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"

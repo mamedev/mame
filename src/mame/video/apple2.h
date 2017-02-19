@@ -9,7 +9,6 @@
 #ifndef __A2_VIDEO__
 #define __A2_VIDEO__
 
-#include "emu.h"
 
 class a2_video_device :
 	public device_t

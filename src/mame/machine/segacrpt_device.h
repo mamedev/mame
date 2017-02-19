@@ -23,7 +23,6 @@
 	segacrpt_z80_device::set_banksize(*device, _banksize);
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 
 // base class

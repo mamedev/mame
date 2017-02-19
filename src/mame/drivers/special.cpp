@@ -9,6 +9,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/special.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"

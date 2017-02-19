@@ -13,7 +13,6 @@
 #ifndef __ANTIC_H__
 #define __ANTIC_H__
 
-#include "emu.h"
 #include "video/gtia.h"
 
 

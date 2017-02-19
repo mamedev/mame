@@ -11,7 +11,6 @@
 #ifndef __ABC_MEMORY_CARD__
 #define __ABC_MEMORY_CARD__
 
-#include "emu.h"
 #include "abcbus.h"
 
 

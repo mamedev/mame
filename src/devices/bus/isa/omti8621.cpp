@@ -16,6 +16,7 @@
 
 static int verbose = VERBOSE;
 
+#include "emu.h"
 #include "omti8621.h"
 #include "image.h"
 #include "formats/pc_dsk.h"

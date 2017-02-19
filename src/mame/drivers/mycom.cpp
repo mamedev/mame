@@ -69,15 +69,16 @@ public:
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_audio(*this, "sn1")
-		, m_rtc(*this, "rtc"),
-		m_palette(*this, "palette")
-	{ }
+		, m_rtc(*this, "rtc")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
@@ -94,10 +95,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	uint8_t *m_p_videoram;
-	uint8_t *m_p_chargen;
-	uint8_t m_0a;
+
 private:
+	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;
@@ -106,30 +106,23 @@ private:
 	uint8_t *m_p_ram;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
 	required_device<cassette_image_device> m_cass;
-	required_device<wave_device> m_wave;
 	required_device<mc6845_device> m_crtc;
 	required_device<fd1771_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
-
-void mycom_state::video_start()
-{
-	m_p_videoram = memregion("vram")->base();
-	m_p_chargen = memregion("chargen")->base();
-}
 
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {

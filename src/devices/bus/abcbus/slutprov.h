@@ -5,7 +5,6 @@
 #ifndef __ABC_SLUTPROV__
 #define __ABC_SLUTPROV__
 
-#include "emu.h"
 #include "abcbus.h"
 
 

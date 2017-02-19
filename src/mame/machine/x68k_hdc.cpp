@@ -17,6 +17,7 @@
 
 */
 
+#include "emu.h"
 #include "x68k_hdc.h"
 #include "imagedev/harddriv.h"
 #include "image.h"

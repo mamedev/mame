@@ -11,7 +11,6 @@
 #ifndef __HPC101__
 #define __HPC101__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"

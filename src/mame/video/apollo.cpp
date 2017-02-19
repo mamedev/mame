@@ -15,6 +15,7 @@
 
 #define VERBOSE 0
 
+#include "emu.h"
 #include "includes/apollo.h"
 #include "rendlay.h"
 #include "apollo.lh"

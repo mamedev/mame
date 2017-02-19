@@ -11,7 +11,6 @@
 #ifndef __KIM1__
 #define __KIM1__
 
-#include "emu.h"
 #include "softlist.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530.h"

@@ -88,7 +88,7 @@ project("mametests")
 		MAME_DIR .. "src/emu/video/rgbvmx.cpp",
 		MAME_DIR .. "src/emu/video/rgbvmx.h",
 	}
-	
+
 	files {
 		MAME_DIR .. "tests/main.cpp",
 		MAME_DIR .. "tests/lib/util/corestr.cpp",

@@ -11,7 +11,6 @@
 #ifndef __ramdacDEV_H__
 #define __ramdacDEV_H__
 
-#include "emu.h"
 
 class tc0091lvc_device : public device_t,
 							public device_memory_interface

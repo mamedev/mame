@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "pci-apic.h"
 
 const device_type APIC = &device_creator<apic_device>;

@@ -84,6 +84,7 @@
                       = Shift(c[n-1, 6])^Shift(c[n-1, 7])
 */
 
+#include "emu.h"
 #include "cat702.h"
 
 const device_type CAT702 = &device_creator<cat702_device>;

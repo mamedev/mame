@@ -5,7 +5,6 @@
 #ifndef __NEXT__
 #define __NEXT__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"

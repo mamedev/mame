@@ -6,6 +6,7 @@
 */
 
 
+#include "emu.h"
 #include "decocpu6.h"
 
 deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -189,6 +189,7 @@ C64 SERIAL BUS
     5)  Tei minimum must be 80us for external device to be a listener.
 */
 
+#include "emu.h"
 #include "cbmiec.h"
 
 

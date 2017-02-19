@@ -17,7 +17,6 @@
 #ifndef DEVICES_BUS_AMIGA_KEYBOARD_H
 #define DEVICES_BUS_AMIGA_KEYBOARD_H
 
-#include "emu.h"
 
 
 //**************************************************************************

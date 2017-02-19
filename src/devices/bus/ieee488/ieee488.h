@@ -12,7 +12,6 @@
 #ifndef __IEEE488__
 #define __IEEE488__
 
-#include "emu.h"
 
 
 

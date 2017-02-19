@@ -1,6 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Barry Rodewald
 
+#include "emu.h"
 #include "includes/x1.h"
 
 

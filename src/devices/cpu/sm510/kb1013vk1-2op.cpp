@@ -3,6 +3,7 @@
 
 // KB1013VK1-2 opcode handlers
 
+#include "emu.h"
 #include "kb1013vk1-2.h"
 
 

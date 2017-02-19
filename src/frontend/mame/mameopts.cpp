@@ -57,7 +57,7 @@ bool mame_options::add_slot_options(emu_options &options, const software_part *s
 		if (swpart != nullptr)
 		{
 			std::string featurename = std::string(name).append("_default");
-			const char *value = swpart->feature(featurename.c_str());
+			const char *value = swpart->feature(featurename);
 			if (value != nullptr && (*value == '\0' || slot.option(value) != nullptr))
 			{
 				// set priority above INIs but below actual command line
@@ -82,10 +82,6 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 	if (cursystem == nullptr)
 		return;
 	machine_config config(*cursystem, options);
-
-	// preopen all images (this allows slots to be assigned for all required software)
-	for (device_image_interface &image : image_interface_iterator(config.root_device()))
-		image.open_image_file(options);
 
 	// iterate through all slot devices
 	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))

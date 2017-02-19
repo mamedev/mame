@@ -11,7 +11,6 @@
 #ifndef __P1_FDC__
 #define __P1_FDC__
 
-#include "emu.h"
 
 #include "imagedev/flopdrv.h"
 #include "isa.h"

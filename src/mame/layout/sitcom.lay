@@ -40,7 +40,7 @@
 			<bounds left="34" top="60" right="341" bottom="160" />
 		</bezel>
 		<bezel name="sod_led" element="a_led">
-			<bounds left="46" right="56" top="90" bottom="100" />
+			<bounds left="46" top="90" right="56" bottom="100" />
 		</bezel>
 
 		<!-- DL1414 left -->

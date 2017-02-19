@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 // TODO: dump 8049 mcu; key repeat; LEDs
 
+#include "emu.h"
 #include "machine/qx10kbd.h"
 
 #include "machine/keyboard.ipp"

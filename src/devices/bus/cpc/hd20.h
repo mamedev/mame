@@ -14,7 +14,6 @@
 #ifndef HD20_H_
 #define HD20_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "bus/isa/hdc.h"
 

@@ -11,7 +11,6 @@
 #ifndef __COLECO_HAND_CONTROLLER__
 #define __COLECO_HAND_CONTROLLER__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

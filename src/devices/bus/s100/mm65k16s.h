@@ -11,7 +11,6 @@
 #ifndef __S100_MM65K16S__
 #define __S100_MM65K16S__
 
-#include "emu.h"
 #include "s100.h"
 
 

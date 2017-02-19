@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "hp_optrom.h"
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"

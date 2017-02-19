@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "i82875p.h"
 
 const device_type I82875P_HOST     = &device_creator<i82875p_host_device>;

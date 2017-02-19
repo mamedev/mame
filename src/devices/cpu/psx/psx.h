@@ -12,7 +12,6 @@
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
-#include "emu.h"
 #include "machine/ram.h"
 #include "dma.h"
 #include "gte.h"

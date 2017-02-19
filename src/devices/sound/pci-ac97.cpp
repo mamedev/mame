@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "pci-ac97.h"
 
 const device_type AC97 = &device_creator<ac97_device>;

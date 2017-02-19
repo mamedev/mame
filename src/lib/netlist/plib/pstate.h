@@ -25,15 +25,14 @@ public:
 
 	struct datatype_t
 	{
-		datatype_t(std::size_t bsize, bool bptr, bool bintegral, bool bfloat)
-		: size(bsize), is_ptr(bptr), is_integral(bintegral), is_float(bfloat), is_custom(false)
+		datatype_t(std::size_t bsize, bool bintegral, bool bfloat)
+		: size(bsize), is_integral(bintegral), is_float(bfloat), is_custom(false)
 		{}
 		explicit datatype_t(bool bcustom)
-		: size(0), is_ptr(false), is_integral(false), is_float(false), is_custom(bcustom)
+		: size(0), is_integral(false), is_float(false), is_custom(bcustom)
 		{}
 
 		const std::size_t size;
-		const bool is_ptr;
 		const bool is_integral;
 		const bool is_float;
 		const bool is_custom;
@@ -43,15 +42,8 @@ public:
 	{
 		static inline const datatype_t f()
 		{
-			return datatype_t(sizeof(T), false, plib::is_integral<T>::value || std::is_enum<T>::value,
-					std::is_floating_point<T>::value); }
-	};
-
-	template<typename T> struct datatype_f<T *>
-	{
-		static inline const datatype_t f()
-		{
-			return datatype_t(sizeof(T), true, plib::is_integral<T>::value || std::is_enum<T>::value,
+			return datatype_t(sizeof(T),
+					plib::is_integral<T>::value || std::is_enum<T>::value,
 					std::is_floating_point<T>::value);
 		}
 	};
@@ -88,15 +80,6 @@ public:
 		callback_t *        m_callback;
 		const std::size_t   m_count;
 		void *              m_ptr;
-
-		template<typename T>
-		T *resolved()
-		{
-			if (m_dt.is_ptr)
-				return *static_cast<T **>(m_ptr);
-			else
-				return static_cast<T *>(m_ptr);
-		}
 	};
 
 	state_manager_t();
@@ -135,6 +118,8 @@ protected:
 
 private:
 	entry_t::list_t m_save;
+	entry_t::list_t m_custom;
+
 };
 
 template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);

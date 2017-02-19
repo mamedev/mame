@@ -65,7 +65,6 @@ private:
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
@@ -127,10 +126,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
 void z9001_state::machine_reset()
 {
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
-}
-
-void z9001_state::video_start()
-{
 }
 
 uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

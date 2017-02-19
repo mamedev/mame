@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
 {
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused
-	
+
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(battlex_state::get_dodgeman_bg_tile_info)
 {
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x03)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0c) >> 2; // high bits unused
-	
+
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 

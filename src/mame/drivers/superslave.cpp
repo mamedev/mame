@@ -20,6 +20,7 @@ Oxx,yy          = Out port
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/superslave.h"
 
 

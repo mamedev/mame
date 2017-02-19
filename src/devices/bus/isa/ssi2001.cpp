@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 // Innovation SSI-2001
 
+#include "emu.h"
 #include "ssi2001.h"
 
 const device_type ISA8_SSI2001 = &device_creator<ssi2001_device>;

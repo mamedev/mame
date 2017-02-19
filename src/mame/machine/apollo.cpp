@@ -28,6 +28,7 @@
  *
  */
 
+#include "emu.h"
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"
@@ -78,7 +79,7 @@ INPUT_PORTS_START( apollo_config )
 	PORT_START( "apollo_config" )
 		PORT_CONFNAME(APOLLO_CONF_SERVICE_MODE, 0x00, "Normal/Service" )
 		PORT_CONFSETTING(0x00, "Service" )
-		PORT_CONFSETTING(APOLLO_CONF_SERVICE_MODE, "Normal " )
+		PORT_CONFSETTING(APOLLO_CONF_SERVICE_MODE, "Normal" )
 
 		PORT_CONFNAME(APOLLO_CONF_DISPLAY, APOLLO_CONF_8_PLANES, "Graphics Controller")
 		PORT_CONFSETTING(APOLLO_CONF_8_PLANES, "8-Plane Color")

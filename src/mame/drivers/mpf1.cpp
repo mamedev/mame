@@ -48,6 +48,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/mpf1.h"
 #include "mpf1.lh"
 #include "mpf1b.lh"

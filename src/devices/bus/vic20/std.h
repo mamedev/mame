@@ -11,7 +11,6 @@
 #ifndef __VIC20_STD__
 #define __VIC20_STD__
 
-#include "emu.h"
 #include "exp.h"
 
 

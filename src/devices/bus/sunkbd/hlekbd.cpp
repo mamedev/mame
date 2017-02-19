@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+#include "emu.h"
 #include "hlekbd.h"
 
 #include "machine/keyboard.ipp"

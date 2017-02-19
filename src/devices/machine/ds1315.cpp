@@ -21,6 +21,7 @@
     of the magic 64 bit pattern (see read above).
     **************************************************************************************/
 
+#include "emu.h"
 #include "ds1315.h"
 #include "coreutil.h"
 

@@ -9,7 +9,6 @@
 #ifndef _HH_TMS1K_H_
 #define _HH_TMS1K_H_
 
-#include "emu.h"
 #include "cpu/tms1000/tms1000.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"

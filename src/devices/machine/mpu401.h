@@ -5,7 +5,6 @@
 #ifndef __MPU401_H__
 #define __MPU401_H__
 
-#include "emu.h"
 #include "cpu/m6800/m6800.h"
 
 #define MCFG_MPU401_ADD(_tag, _irqf ) \

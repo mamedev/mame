@@ -11,7 +11,6 @@
 #ifndef __APRICOT_KEYBOARD_HLE_H__
 #define __APRICOT_KEYBOARD_HLE_H__
 
-#include "emu.h"
 #include "keyboard.h"
 #include "machine/keyboard.h"
 #include "machine/msm5832.h"

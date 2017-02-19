@@ -375,7 +375,7 @@ u8 decrypt(u8 val, u8 key, bool opcode)
 u8 mc8123_decrypt(offs_t addr, u8 val, u8 const *key, bool opcode)
 {
 	// pick the translation table from bits fd57 of the address
-	offs_t const tbl_num = bitswap(addr,15,14,13,12,11,10,8,6,4,2,1,0);
+	offs_t const tbl_num = bitswap<12>(addr,15,14,13,12,11,10,8,6,4,2,1,0);
 
 	return decrypt(val, key[tbl_num | (opcode ? 0x0000 : 0x1000)], opcode);
 }

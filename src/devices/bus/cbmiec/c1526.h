@@ -11,7 +11,6 @@
 #ifndef __C1526__
 #define __C1526__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6504.h"

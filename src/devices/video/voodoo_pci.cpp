@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ted Green
+#include "emu.h"
 #include "voodoo_pci.h"
 
 int voodoo_pci_device::m_type = 0;

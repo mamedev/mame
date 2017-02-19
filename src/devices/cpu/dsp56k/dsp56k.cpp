@@ -31,6 +31,7 @@
     - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
+#include "emu.h"
 #include "opcode.h"
 
 #include "emu.h"

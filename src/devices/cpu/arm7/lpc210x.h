@@ -6,7 +6,6 @@
 #ifndef __LPC2103__
 #define __LPC2103__
 
-#include "emu.h"
 #include "arm7.h"
 #include "arm7core.h"
 

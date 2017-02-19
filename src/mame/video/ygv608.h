@@ -313,7 +313,7 @@ private:
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
-	
+
 	uint8_t m_namcond1_gfxbank;
 
 	tilemap_t *m_tilemap_A_cache_8[3];

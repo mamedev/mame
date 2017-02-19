@@ -59,7 +59,6 @@
 #ifndef __C64H156__
 #define __C64H156__
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "ds128x.h"
 
 /// TODO: Only DV2/DV1/DV0 == 0/1/0 is supported as the chip only has a 15 stage divider and not 22.

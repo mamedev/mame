@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "lpc-rtc.h"
 
 const device_type LPC_RTC = &device_creator<lpc_rtc_device>;

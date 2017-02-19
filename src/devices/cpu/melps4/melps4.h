@@ -9,7 +9,6 @@
 #ifndef _MELPS4_H_
 #define _MELPS4_H_
 
-#include "emu.h"
 
 
 // I/O ports setup

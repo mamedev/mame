@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "consolewininfo.h"
 
 #include "debugviewinfo.h"

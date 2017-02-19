@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "superpet.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"

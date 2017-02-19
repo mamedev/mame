@@ -327,7 +327,6 @@ public:
 	void decode_anteater_gfx();
 	void decode_losttomb_gfx();
 	void decode_superbon();
-	void unmap_galaxian_sound(offs_t base);
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);

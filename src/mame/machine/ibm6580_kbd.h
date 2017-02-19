@@ -3,7 +3,6 @@
 #ifndef DWKBD_H_
 #define DWKBD_H_
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 #define MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(_devcb) \

@@ -81,8 +81,8 @@ private:
 
 	// input line state
 	bool m_wr_in;
-	bool m_ce_in;
-	uint8_t m_addr_in;
+	bool m_ce_in, m_ce_latch;
+	uint8_t m_addr_in, m_addr_latch;
 	uint8_t m_data_in;
 };
 

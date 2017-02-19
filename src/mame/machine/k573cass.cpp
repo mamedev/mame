@@ -5,6 +5,7 @@
  *
  */
 
+#include "emu.h"
 #include "k573cass.h"
 
 // class konami573_cassette_interface

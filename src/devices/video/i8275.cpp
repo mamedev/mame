@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "i8275.h"
 
 

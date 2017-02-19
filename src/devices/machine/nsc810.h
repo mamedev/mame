@@ -9,7 +9,6 @@
 #ifndef NSC810_H_
 #define NSC810_H_
 
-#include "emu.h"
 
 class nsc810_device :  public device_t
 {

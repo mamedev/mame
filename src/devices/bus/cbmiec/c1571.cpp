@@ -19,6 +19,7 @@
 
 */
 
+#include "emu.h"
 #include "c1571.h"
 
 

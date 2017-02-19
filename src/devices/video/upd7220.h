@@ -34,7 +34,6 @@
 #ifndef __UPD7220__
 #define __UPD7220__
 
-#include "emu.h"
 
 
 

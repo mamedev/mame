@@ -5,7 +5,6 @@
 #ifndef __LINFLASH_H__
 #define __LINFLASH_H__
 
-#include "emu.h"
 #include "intelfsh.h"
 #include "machine/pccard.h"
 

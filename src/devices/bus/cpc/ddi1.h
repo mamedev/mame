@@ -11,7 +11,6 @@
 #ifndef CPC_DDI1_H_
 #define CPC_DDI1_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "machine/upd765.h"
 

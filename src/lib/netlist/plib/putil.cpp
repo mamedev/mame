@@ -5,10 +5,10 @@
 #include "ptypes.h"
 #include "plists.h"
 
-#include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include <initializer_list>
+#include <cstring>
 
 namespace plib
 {
@@ -75,7 +75,7 @@ namespace plib
 			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
-				if (std::memcmp(onstrl[j].c_str(), &(str.c_str()[i]), onstrl[j].blen())==0)
+				if (std::equal(onstrl[j].c_str(), onstrl[j].c_str() + onstrl[j].blen(), &(str.c_str()[i])))
 				{
 					p = j;
 					break;

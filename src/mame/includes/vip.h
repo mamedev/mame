@@ -5,7 +5,6 @@
 #ifndef __VIP__
 #define __VIP__
 
-#include "emu.h"
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"
 #include "cpu/cosmac/cosmac.h"

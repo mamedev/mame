@@ -13,7 +13,6 @@
 #ifndef __ATADEV_H__
 #define __ATADEV_H__
 
-#include "emu.h"
 
 // ======================> ata_device_interface
 

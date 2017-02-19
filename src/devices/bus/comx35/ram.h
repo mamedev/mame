@@ -11,7 +11,6 @@
 #ifndef __COMX_RAM__
 #define __COMX_RAM__
 
-#include "emu.h"
 #include "exp.h"
 
 

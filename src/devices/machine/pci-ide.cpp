@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ted Green
+#include "emu.h"
 #include "pci-ide.h"
 
 const device_type IDE_PCI = &device_creator<ide_pci_device>;

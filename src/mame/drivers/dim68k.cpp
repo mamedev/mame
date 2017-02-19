@@ -45,12 +45,14 @@ class dim68k_state : public driver_device
 {
 public:
 	dim68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_speaker(*this, "speaker"),
-		m_ram(*this, "ram"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_speaker(*this, "speaker")
+		, m_ram(*this, "ram")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
@@ -67,17 +69,18 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	const uint8_t *m_p_chargen;
+
+private:
 	bool m_speaker_bit;
-	uint8_t m_video_control;
-	uint8_t m_term_data;
+	u8 m_video_control;
+	u8 m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -212,27 +215,22 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	uint8_t* ROM = memregion("bootrom")->base();
+	u8* ROM = memregion("bootrom")->base();
 
-	memcpy((uint8_t*)m_ram.target(), ROM, 0x2000);
+	memcpy((u8*)m_ram.target(), ROM, 0x2000);
 
 	m_maincpu->reset();
-}
-
-void dim68k_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,x,xx,inv;
+	u8 chr,gfx,x,xx,inv;
 	uint16_t chr16=0x2020; // set to spaces if screen is off
 	uint32_t *p = &bitmap.pix32(y);
-	uint8_t screen_on = ~m_video_control & 4;
-	uint8_t dot8 = ~m_video_control & 40;
+	u8 screen_on = ~m_video_control & 4;
+	u8 dot8 = ~m_video_control & 40;
 
 	// need to divide everything in half to cater for 16-bit reads
 	x_count /= 2;

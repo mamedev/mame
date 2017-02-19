@@ -12,59 +12,66 @@ namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(7493ff)
-	{
-		NETLIB_CONSTRUCTOR(7493ff)
-		, m_I(*this, "CLK")
-		, m_Q(*this, "Q")
-		, m_reset(*this, "m_reset", 0)
-		, m_state(*this, "m_state", 0)
-		{
-		}
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-
-	public:
-		logic_input_t m_I;
-		logic_output_t m_Q;
-
-		state_var<netlist_sig_t> m_reset;
-		state_var<netlist_sig_t> m_state;
-	};
+	static constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
+	static constexpr netlist_time out_delay2 = NLTIME_FROM_NS(36);
+	static constexpr netlist_time out_delay3 = NLTIME_FROM_NS(54);
 
 	NETLIB_OBJECT(7493)
 	{
 		NETLIB_CONSTRUCTOR(7493)
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
-		, A(*this, "A")
-		, B(*this, "B")
-		, C(*this, "C")
-		, D(*this, "D")
+		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(7493, updA))
+		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(7493, updB))
+		, m_QA(*this, "QA")
+		, m_QB(*this, "QB")
+		, m_QC(*this, "QC")
+		, m_QD(*this, "QD")
+		, m_reset(*this, "_m_reset", 0)
+		, m_a(*this, "_m_a", 0)
+		, m_bcd(*this, "_m_b", 0)
 		{
-			register_subalias("CLKA", A.m_I);
-			register_subalias("CLKB", B.m_I);
-
-			register_subalias("QA", A.m_Q);
-			register_subalias("QB", B.m_Q);
-			register_subalias("QC", C.m_Q);
-			register_subalias("QD", D.m_Q);
-
-			connect(C.m_I, B.m_Q);
-			connect(D.m_I, C.m_Q);
 		}
 
-		NETLIB_RESETI() { }
+		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
+		NETLIB_HANDLERI(updA)
+		{
+			if (m_reset)
+			{
+				m_a ^= 1;
+				m_QA.push(m_a, out_delay);
+			}
+		}
+
+		NETLIB_HANDLERI(updB)
+		{
+			if (m_reset)
+			{
+				m_bcd = (m_bcd + 1) & 0x07;
+				m_QB.push(m_bcd & 1, out_delay);
+				m_QC.push((m_bcd >> 1) & 1, out_delay2);
+				m_QD.push((m_bcd >> 2) & 1, out_delay3);
+			}
+		}
+
+	private:
 		logic_input_t m_R1;
 		logic_input_t m_R2;
 
-		NETLIB_SUB(7493ff) A;
-		NETLIB_SUB(7493ff) B;
-		NETLIB_SUB(7493ff) C;
-		NETLIB_SUB(7493ff) D;
+		logic_input_t m_CLKA;
+		logic_input_t m_CLKB;
+
+		logic_output_t m_QA;
+		logic_output_t m_QB;
+		logic_output_t m_QC;
+		logic_output_t m_QD;
+
+		state_var<netlist_sig_t> m_reset;
+		state_var_u8 m_a;
+		state_var_u8 m_bcd;
 	};
 
 	NETLIB_OBJECT_DERIVED(7493_dip, 7493)
@@ -72,8 +79,8 @@ namespace netlist
 		NETLIB_CONSTRUCTOR_DERIVED(7493_dip, 7493)
 		{
 			register_subalias("1", "CLKB");
-			register_subalias("2", m_R1);
-			register_subalias("3", m_R2);
+			register_subalias("2", "R1");
+			register_subalias("3", "R2");
 
 			// register_subalias("4", ); --> NC
 			// register_subalias("5", ); --> VCC
@@ -90,43 +97,32 @@ namespace netlist
 		}
 	};
 
-	NETLIB_RESET(7493ff)
+	NETLIB_RESET(7493)
 	{
 		m_reset = 1;
-		m_state = 0;
-		m_I.set_state(logic_t::STATE_INP_HL);
-	}
-
-	NETLIB_UPDATE(7493ff)
-	{
-		static constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
-		if (m_reset)
-		{
-			m_state ^= 1;
-			m_Q.push(m_state, out_delay);
-		}
+		m_a = m_bcd = 0;
+		m_CLKA.set_state(logic_t::STATE_INP_HL);
+		m_CLKB.set_state(logic_t::STATE_INP_HL);
 	}
 
 	NETLIB_UPDATE(7493)
 	{
-		const netlist_sig_t r = m_R1() & m_R2();
+		m_reset = (m_R1() & m_R2()) ^ 1;
 
-		if (r)
+		if (m_reset)
 		{
-			A.m_I.inactivate();
-			B.m_I.inactivate();
-			A.m_Q.push(0, NLTIME_FROM_NS(40));
-			B.m_Q.push(0, NLTIME_FROM_NS(40));
-			C.m_Q.push(0, NLTIME_FROM_NS(40));
-			D.m_Q.push(0, NLTIME_FROM_NS(40));
-			A.m_reset = B.m_reset = C.m_reset = D.m_reset = 0;
-			A.m_state = B.m_state = C.m_state = D.m_state = 0;
+			m_CLKA.activate_hl();
+			m_CLKB.activate_hl();
 		}
 		else
 		{
-			A.m_I.activate_hl();
-			B.m_I.activate_hl();
-			A.m_reset = B.m_reset = C.m_reset = D.m_reset = 1;
+			m_CLKA.inactivate();
+			m_CLKB.inactivate();
+			m_QA.push(0, NLTIME_FROM_NS(40));
+			m_QB.push(0, NLTIME_FROM_NS(40));
+			m_QC.push(0, NLTIME_FROM_NS(40));
+			m_QD.push(0, NLTIME_FROM_NS(40));
+			m_a = m_bcd = 0;
 		}
 	}
 

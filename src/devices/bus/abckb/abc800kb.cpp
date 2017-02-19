@@ -68,6 +68,7 @@ XR22-050-3B Pinout
 
 */
 
+#include "emu.h"
 #include "abc800kb.h"
 
 

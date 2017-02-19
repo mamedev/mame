@@ -18,6 +18,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
 
 // internal artwork

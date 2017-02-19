@@ -23,7 +23,6 @@
 #ifndef MAME_DEVICES_MACHINE_74153_H
 #define MAME_DEVICES_MACHINE_74153_H
 
-#include "emu.h"
 
 
 //**************************************************************************

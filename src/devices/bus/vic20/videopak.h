@@ -13,7 +13,6 @@
 #define __VIC20_VIDEO_PAK__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "video/mc6845.h"
 

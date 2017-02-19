@@ -37,6 +37,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"

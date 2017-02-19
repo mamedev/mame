@@ -28,6 +28,10 @@ template <class C, std::size_t N>
 class uninitialised_array_t
 {
 public:
+
+	typedef C* iterator;
+	typedef const C* const_iterator;
+
 	uninitialised_array_t()
 	{
 	}
@@ -38,7 +42,7 @@ public:
 			(*this)[i].~C();
 	}
 
-	size_t size() { return N; }
+	size_t size() const { return N; }
 
 	C& operator[](const std::size_t &index) noexcept
 	{
@@ -56,6 +60,15 @@ public:
 		// allocate on buffer
 		new (&m_buf[index]) C(std::forward<Args>(args)...);
 	}
+
+	iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+	iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+
+	iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+	iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+
+	const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+	const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
 
 protected:
 

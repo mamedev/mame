@@ -5,7 +5,6 @@
 #ifndef __COCO_PAK_H__
 #define __COCO_PAK_H__
 
-#include "emu.h"
 #include "cococart.h"
 
 //**************************************************************************

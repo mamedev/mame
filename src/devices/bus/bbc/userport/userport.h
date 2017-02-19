@@ -30,7 +30,6 @@
 #ifndef __BBC_USERPORT_SLOT__
 #define __BBC_USERPORT_SLOT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

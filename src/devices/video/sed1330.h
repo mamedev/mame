@@ -11,7 +11,6 @@
 #ifndef __SED1330__
 #define __SED1330__
 
-#include "emu.h"
 
 
 

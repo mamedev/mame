@@ -23,6 +23,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/pc8001.h"
 
 /* Read/Write Handlers */

@@ -189,7 +189,9 @@ dl1414_device::dl1414_device(
 	, m_cursor_state{ false, false, false, false }
 	, m_wr_in(true)
 	, m_ce_in(true)
+	, m_ce_latch(true)
 	, m_addr_in(0x00)
+	, m_addr_latch(0x00)
 	, m_data_in(0x00)
 {
 }
@@ -221,13 +223,17 @@ void dl1414_device::device_start()
 	save_item(NAME(m_cursor_state));
 	save_item(NAME(m_wr_in));
 	save_item(NAME(m_ce_in));
+	save_item(NAME(m_ce_latch));
 	save_item(NAME(m_addr_in));
+	save_item(NAME(m_addr_latch));
 	save_item(NAME(m_data_in));
 
 	// set initial state for input lines
 	m_wr_in = true;
 	m_ce_in = true;
+	m_ce_latch = true;
 	m_addr_in = 0x00;
+	m_addr_latch = 0x00;
 	m_data_in = 0x00;
 
 	// randomise internal RAM
@@ -272,8 +278,16 @@ WRITE_LINE_MEMBER( dl1414_device::wr_w )
 	if (bool(state) != m_wr_in)
 	{
 		m_wr_in = bool(state);
-		if (!m_ce_in && m_wr_in)
-			bus_w(machine().dummy_space(), m_addr_in, m_data_in, 0x7f);
+		if (m_wr_in)
+		{
+			if (!m_ce_latch)
+				bus_w(machine().dummy_space(), m_addr_latch, m_data_in, 0x7f);
+		}
+		else
+		{
+			m_ce_latch = m_ce_in;
+			m_addr_latch = m_addr_in;
+		}
 	}
 }
 

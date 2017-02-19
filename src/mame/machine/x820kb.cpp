@@ -40,6 +40,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "x820kb.h"
 
 

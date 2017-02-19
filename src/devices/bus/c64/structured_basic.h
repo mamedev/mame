@@ -12,7 +12,6 @@
 #define __STRUCTURED_BASIC__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

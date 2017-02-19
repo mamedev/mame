@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "kb3600.h"
 
 

@@ -43,6 +43,7 @@ The manual is not that clear, there's a lot we don't know, this *seems* to work.
 ***********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"

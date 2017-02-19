@@ -11,7 +11,6 @@
 #ifndef __EP64_EXDOS__
 #define __EP64_EXDOS__
 
-#include "emu.h"
 #include "exp.h"
 #include "formats/ep64_dsk.h"
 #include "machine/wd_fdc.h"

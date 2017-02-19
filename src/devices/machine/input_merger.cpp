@@ -9,6 +9,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "input_merger.h"
 
 #include <algorithm>

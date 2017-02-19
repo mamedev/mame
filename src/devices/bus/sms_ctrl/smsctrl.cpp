@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "smsctrl.h"
 // slot devices
 #include "joypad.h"

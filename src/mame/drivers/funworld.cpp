@@ -5499,7 +5499,7 @@ ROM_END
 
 
   The encrypted CPU:
-  
+
   It's a DIP40 custom IC. It has inside a PLCC28 IC and 3 dies:
 
   The PLCC28 chip is a CY7C291A (prom replacement)

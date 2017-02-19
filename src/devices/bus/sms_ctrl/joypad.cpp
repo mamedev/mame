@@ -21,6 +21,7 @@ Release data from the Sega Retro project:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joypad.h"
 
 

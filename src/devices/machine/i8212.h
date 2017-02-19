@@ -26,7 +26,6 @@
 #ifndef __I8212__
 #define __I8212__
 
-#include "emu.h"
 
 
 

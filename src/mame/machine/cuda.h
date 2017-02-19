@@ -5,7 +5,6 @@
 #ifndef __CUDA_H__
 #define __CUDA_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

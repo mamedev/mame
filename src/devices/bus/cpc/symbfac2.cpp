@@ -17,6 +17,7 @@
  *    - mouse controls still need some work
  */
 
+#include "emu.h"
 #include "symbfac2.h"
 
 

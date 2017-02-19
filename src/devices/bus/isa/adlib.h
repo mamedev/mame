@@ -5,7 +5,6 @@
 #ifndef __ISA_ADLIB_H__
 #define __ISA_ADLIB_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "sound/3812intf.h"
 

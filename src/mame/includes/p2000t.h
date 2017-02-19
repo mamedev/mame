@@ -9,7 +9,6 @@
 #ifndef P2000T_H_
 #define P2000T_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 #include "video/saa5050.h"

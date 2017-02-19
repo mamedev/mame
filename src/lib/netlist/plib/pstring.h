@@ -31,6 +31,7 @@ struct pstr_t
 	std::size_t len() const  { return m_len; }
 	void inc() { m_ref_count++; }
 	bool dec_and_check() { --m_ref_count; return m_ref_count == 0; }
+	void copy_from(const char *p, std::size_t n) { std::copy(p, p + n, str()); }
 private:
 	int m_ref_count;
 	std::size_t m_len;
@@ -184,8 +185,6 @@ private:
 	}
 
 	int pcmp(const pstring_t &right) const;
-
-	int pcmp(const mem_t *right) const;
 
 	void pcopy(const mem_t *from, std::size_t size);
 

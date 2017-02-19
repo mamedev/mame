@@ -11,7 +11,6 @@
 #ifndef __C128_PARTNER__
 #define __C128_PARTNER__
 
-#include "emu.h"
 #include "bus/c64/exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
 

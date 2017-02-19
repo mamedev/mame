@@ -12,7 +12,6 @@ DEC VT Terminal video emulation
 #ifndef __VT_VIDEO__
 #define __VT_VIDEO__
 
-#include "emu.h"
 
 class vt100_video_device : public device_t,
 	public device_video_interface

@@ -12,6 +12,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "corvfdc02.h"
 #include "formats/concept_dsk.h"
 

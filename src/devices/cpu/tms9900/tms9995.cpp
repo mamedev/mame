@@ -89,6 +89,7 @@
      Michael Zapf, June 2012
 */
 
+#include "emu.h"
 #include "tms9995.h"
 
 #define NOPRG -1

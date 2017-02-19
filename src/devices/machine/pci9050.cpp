@@ -21,6 +21,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "pci9050.h"
 
 const device_type PCI9050 = &device_creator<pci9050_device>;

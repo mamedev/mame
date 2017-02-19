@@ -48,7 +48,6 @@
 #ifndef CPCEXP_H_
 #define CPCEXP_H_
 
-#include "emu.h"
 
 //**************************************************************************
 //  CONSTANTS

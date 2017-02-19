@@ -11,7 +11,6 @@
 #ifndef __D9060__
 #define __D9060__
 
-#include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"

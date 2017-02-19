@@ -24,6 +24,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
 #include "softlist.h"

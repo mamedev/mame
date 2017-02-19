@@ -5,7 +5,6 @@
 #ifndef __3812INTF_H__
 #define __3812INTF_H__
 
-#include "emu.h"
 
 #define MCFG_YM3812_IRQ_HANDLER(_devcb) \
 	devcb = &ym3812_device::set_irq_handler(*device, DEVCB_##_devcb);

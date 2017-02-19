@@ -9,7 +9,6 @@
 #ifndef _AMIS2000_H_
 #define _AMIS2000_H_
 
-#include "emu.h"
 
 
 // generic input pins (4 bits each)

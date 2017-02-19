@@ -118,6 +118,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/meadows.h"
 #include "sound/volt_reg.h"
 #include "deadeye.lh"

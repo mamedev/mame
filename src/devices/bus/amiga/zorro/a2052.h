@@ -13,7 +13,6 @@
 #ifndef __A2052_H__
 #define __A2052_H__
 
-#include "emu.h"
 #include "zorro.h"
 #include "machine/autoconfig.h"
 

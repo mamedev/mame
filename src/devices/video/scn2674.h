@@ -3,7 +3,6 @@
 #ifndef SCN2674_H
 #define SCN2674_H
 
-#include "emu.h"
 
 #define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
 	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \

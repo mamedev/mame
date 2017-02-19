@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "includes/thomson.h"
 #include "machine/wd_fdc.h"
 

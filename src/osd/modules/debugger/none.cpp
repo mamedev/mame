@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 

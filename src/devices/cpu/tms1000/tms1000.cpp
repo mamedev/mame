@@ -6,6 +6,7 @@
 
 */
 
+#include "emu.h"
 #include "tms1000.h"
 #include "debugger.h"
 

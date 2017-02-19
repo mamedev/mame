@@ -18,6 +18,7 @@
 
 */
 
+#include "emu.h"
 #include "saa5050.h"
 
 

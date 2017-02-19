@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,Carl
+#include "emu.h"
 #include "null_modem.h"
 
 null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

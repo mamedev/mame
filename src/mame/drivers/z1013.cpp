@@ -79,7 +79,6 @@ private:
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -222,10 +221,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( z1013 )
 INPUT_PORTS_END
 
-
-void z1013_state::video_start()
-{
-}
 
 uint32_t z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

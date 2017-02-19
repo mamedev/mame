@@ -68,7 +68,7 @@ private:
 	uint16_t m_kram_inc_r,m_kram_inc_w;
 	uint8_t m_kram_page_r,m_kram_page_w;
 	uint32_t m_page_setting;
-	
+
 	struct{
 		uint32_t bat_address;
 		uint32_t cg_address;
@@ -79,22 +79,22 @@ private:
 		uint16_t yscroll;
 		uint8_t priority;
 	}m_bg[4];
-	
+
 	struct{
 		uint32_t bat_address;
 		uint32_t cg_address;
 		uint16_t height;
 		uint16_t width;
 	}m_bg0sub;
-	
+
 	struct{
 		uint8_t index;
 		uint8_t ctrl;
 	}m_micro_prg;
-	
+
 	const address_space_config      m_program_space_config;
 	const address_space_config      m_data_space_config;
-	required_shared_ptr<uint16_t> 	m_microprg_ram;
+	required_shared_ptr<uint16_t>   m_microprg_ram;
 	required_shared_ptr<uint32_t>   m_kram_page0;
 	required_shared_ptr<uint32_t>   m_kram_page1;
 	required_device<SCSI_PORT_DEVICE> m_scsibus;
@@ -104,7 +104,7 @@ private:
 
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
-	
+
 	uint32_t read_dword(offs_t address);
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);

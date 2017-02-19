@@ -33,7 +33,6 @@
 #ifndef TTL7400_H
 #define TTL7400_H
 
-#include "emu.h"
 
 #define MCFG_7400_Y1_CB(_devcb) \
 	devcb = &ttl7400_device::set_y1_cb(*device, DEVCB_##_devcb);

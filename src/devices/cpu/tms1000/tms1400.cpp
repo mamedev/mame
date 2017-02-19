@@ -9,6 +9,7 @@
 
 */
 
+#include "emu.h"
 #include "tms1400.h"
 #include "debugger.h"
 

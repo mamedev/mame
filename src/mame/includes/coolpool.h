@@ -2,7 +2,6 @@
 // copyright-holders:Aaron Giles,Nicola Salmoria
 #define NVRAM_UNLOCK_SEQ_LEN 10
 
-#include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 

@@ -8,6 +8,7 @@
     the serial keyboard which may not be desirable.
 */
 
+#include "emu.h"
 #include "ngen_kb.h"
 
 ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)

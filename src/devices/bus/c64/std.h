@@ -12,7 +12,6 @@
 #define __C64_STANDARD_CARTRIDGE__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

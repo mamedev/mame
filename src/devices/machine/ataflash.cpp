@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "ataflash.h"
 
 const device_type ATA_FLASH_PCCARD = &device_creator<ata_flash_pccard_device>;

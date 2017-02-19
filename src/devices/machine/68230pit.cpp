@@ -21,6 +21,7 @@
 *  - Add appropriate buffering for each submode
 **********************************************************************/
 
+#include "emu.h"
 #include "68230pit.h"
 
 #define LOG_GENERAL 0x01

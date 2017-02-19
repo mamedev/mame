@@ -11,7 +11,6 @@
 #ifndef __TMS7000_H__
 #define __TMS7000_H__
 
-#include "emu.h"
 #include "debugger.h"
 
 

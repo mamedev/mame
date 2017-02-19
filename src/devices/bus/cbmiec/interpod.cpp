@@ -57,6 +57,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "interpod.h"
 
 

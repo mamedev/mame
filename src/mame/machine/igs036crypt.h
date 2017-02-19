@@ -3,7 +3,6 @@
 #ifndef _IGS036CRYPT_H_
 #define _IGS036CRYPT_H_
 
-#include "emu.h"
 
 class igs036_decryptor
 {
