@@ -197,7 +197,7 @@ cli_frontend::~cli_frontend()
 void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char **argv,std::string &option_errors)
 {
 	// load software specified at the command line (if any of course)
-	std::string software_name = m_options.software_name();
+	const std::string software_name = m_options.software_name();
 	if (!software_name.empty())
 	{
 		const game_driver *system = mame_options::system(m_options);
