@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_7493.c
+ * nld_7493.cpp
  *
  */
 
@@ -34,6 +34,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
@@ -57,7 +58,6 @@ namespace netlist
 			}
 		}
 
-	private:
 		logic_input_t m_R1;
 		logic_input_t m_R2;
 
@@ -70,7 +70,7 @@ namespace netlist
 		logic_output_t m_QD;
 
 		state_var<netlist_sig_t> m_reset;
-		state_var_u8 m_a;
+		state_var<netlist_sig_t> m_a;
 		state_var_u8 m_bcd;
 	};
 
@@ -118,10 +118,10 @@ namespace netlist
 		{
 			m_CLKA.inactivate();
 			m_CLKB.inactivate();
-			m_QA.push(0, NLTIME_FROM_NS(40));
-			m_QB.push(0, NLTIME_FROM_NS(40));
-			m_QC.push(0, NLTIME_FROM_NS(40));
-			m_QD.push(0, NLTIME_FROM_NS(40));
+			m_QA.push_force(0, NLTIME_FROM_NS(40));
+			m_QB.push_force(0, NLTIME_FROM_NS(40));
+			m_QC.push_force(0, NLTIME_FROM_NS(40));
+			m_QD.push_force(0, NLTIME_FROM_NS(40));
 			m_a = m_bcd = 0;
 		}
 	}

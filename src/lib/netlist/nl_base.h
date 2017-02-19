@@ -698,7 +698,7 @@ namespace netlist
 
 		void reset();
 
-		void toggle_new_Q() NL_NOEXCEPT             { m_new_Q ^= 1;   }
+		void toggle_new_Q() NL_NOEXCEPT              { m_new_Q ^= 1;   }
 		void force_queue_execution() NL_NOEXCEPT    { m_new_Q = (m_cur_Q ^ 1);   }
 
 		void push_to_queue(const netlist_time delay) NL_NOEXCEPT;
@@ -707,7 +707,7 @@ namespace netlist
 
 		void update_devs() NL_NOEXCEPT;
 
-		const netlist_time time() const NL_NOEXCEPT { return m_time; }
+		netlist_time time() const NL_NOEXCEPT { return m_time; }
 		void set_time(const netlist_time ntime) NL_NOEXCEPT { m_time = ntime; }
 
 		bool isRailNet() const { return !(m_railterminal == nullptr); }
@@ -760,9 +760,17 @@ namespace netlist
 		netlist_sig_t new_Q() const NL_NOEXCEPT { return m_new_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
-		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
-			if (newQ != m_new_Q)
+			if (newQ != m_new_Q )
+			{
+				m_new_Q = newQ;
+				push_to_queue(delay);
+			}
+		}
+		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+		{
+			if (newQ != m_new_Q || is_queued())
 			{
 				m_new_Q = newQ;
 				push_to_queue(delay);
@@ -826,7 +834,17 @@ namespace netlist
 
 		void push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
-			m_my_net.set_Q(newQ, delay); // take the shortcut
+			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
+		}
+
+		void push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+		{
+			m_my_net.set_Q_and_push_force(newQ, delay); // take the shortcut
+		}
+
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
+		{
+			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}
 
 	private:
@@ -1374,8 +1392,10 @@ namespace netlist
 
 	inline void detail::net_t::push_to_queue(const netlist_time delay) NL_NOEXCEPT
 	{
-		if (!is_queued() && (num_cons() != 0))
+		if ((num_cons() != 0))
 		{
+			if (is_queued())
+				netlist().queue().remove(this);
 			m_time = netlist().time() + delay;
 			m_in_queue = (m_active > 0);     /* queued ? */
 			if (m_in_queue)
@@ -1383,6 +1403,7 @@ namespace netlist
 		}
 	}
 
+	// FIXME: this could be removed after testing
 	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if (is_queued())
