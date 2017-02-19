@@ -18,22 +18,15 @@ class hp9845_base_state : public driver_device
 public:
 	hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_reset() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
-	void vblank_w(screen_device &screen, bool state);
-
-	void set_graphic_mode(bool graphic);
 	DECLARE_READ16_MEMBER(graphic_r);
 	DECLARE_WRITE16_MEMBER(graphic_w);
 	attotime time_to_gv_mem_availability(void) const;
-	void advance_gv_fsm(bool ds , bool trigger);
 	void update_graphic_bits(void);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -76,16 +69,16 @@ protected:
 	required_device<ram_device> m_ram;
 
 	void setup_ram_block(unsigned block , unsigned offset);
-	void set_video_mar(uint16_t mar);
-	void video_fill_buff(bool buff_idx);
-	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
-	void graphic_video_render(unsigned video_scanline);
+
+	virtual uint16_t graphic_r5_r(void) = 0;
+	virtual void     graphic_r5_w(uint16_t data) = 0;
+	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
 
 	// Character generator
-	const uint8_t *m_chargen;
+	required_region_ptr<uint8_t> m_chargen;
 
 	// Optional character generator
-	const uint8_t *m_optional_chargen;
+	optional_region_ptr<uint8_t> m_optional_chargen;
 
 	// Text mode video I/F
 	typedef struct {
@@ -100,7 +93,6 @@ protected:
 	bool m_video_load_mar;
 	bool m_video_first_mar;
 	bool m_video_byte_idx;
-	uint8_t m_video_attr;
 	bool m_video_buff_idx;
 	bool m_video_blanked;
 	video_buffer_t m_video_buff[ 2 ];
@@ -125,13 +117,7 @@ protected:
 	uint8_t m_gv_cmd; // U65 (GC)
 	uint16_t m_gv_data_w;     // U29, U45, U28 & U44 (GC)
 	uint16_t m_gv_data_r;     // U59 & U60 (GC)
-	uint16_t m_gv_io_counter; // U1, U2, U14 & U15 (GC)
 	uint16_t m_gv_cursor_w;   // U38 & U39 (GS)
-	uint16_t m_gv_cursor_x;   // U31 & U23 (GS)
-	uint16_t m_gv_cursor_y;   // U15 & U8 (GS)
-	bool m_gv_cursor_gc;    // U8 (GS)
-	bool m_gv_cursor_fs;    // U8 (GS)
-	std::vector<uint16_t> m_graphic_mem;
 
 	// Interrupt handling
 	uint8_t m_irl_pending;
