@@ -252,11 +252,8 @@ int cli_frontend::execute(int argc, char **argv)
 
 	try
 	{
-		// first parse options to be able to get software from it
 		std::string option_errors;
-		mame_options::parse_command_line(m_options,argc, argv, option_errors);
-
-		mame_options::parse_standard_inis(m_options,option_errors);
+		mame_options::parse_standard_inis(m_options, option_errors);
 
 		load_translation(m_options);
 
