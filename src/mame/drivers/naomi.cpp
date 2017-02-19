@@ -6651,11 +6651,11 @@ ROM_START( kick4csh )
 	// 837-14438 SH I/O BD
 	// IC1    - Hitachi/Renesas SH4 SoC
 	// IC2    - Xilinx Spartan XC2S50 PQ208AMS0341 FPGA
+	// IC3    - Xilinx 17S50APC Spartan-II Family OTP Configuration PROM, stamped 6372A
 	// IC4,5  - Toshiba TC59S6432CFT-10  512K x4 banks x32bit SDRAM
 	// IC6    - Macronix MX29LV160ATTC-90 16Mbit Flash ROM
 	// IC7    - ST M68AF127BL55MC6 1Mbit (128K x8) SRAM
 	// IC9    - NS USBN9604-28M USB Node Controller
-	// IC??   - Xilinx 17S50APC Spartan-II Family OTP Configuration PROM, stamped 6372A
 	// OSC1   - 33.3333 MHz
 	// OSC2   - 32.0000 MHz
 	// OCS3   - 24.0000 MHz
@@ -6664,8 +6664,9 @@ ROM_START( kick4csh )
 	// LED1-5 - LEDs
 	// LED6,7 - 7seg LEDs
 	// BT1    - Panasonic CR2032 battery
-	ROM_REGION(0x200000, "hopper_board", 0)
+	ROM_REGION(0x220000, "hopper_board", 0)
 	ROM_LOAD( "fpr-24150.ic6",   0x0000000, 0x200000, CRC(3845c34c) SHA1(027b17bac64482ee152773d5fab30fcbc6e2bcb7) )	// SH4 code
+	ROM_LOAD( "6372a.ic3",       0x0200000, 0x020000, CRC(f30839ad) SHA1(ea1a32c4da1ed9745300bcdd7964a7c0964e3221) )	// FPGA config
 
 	// 840-0140    2004     317-0397-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "820857c9" )
