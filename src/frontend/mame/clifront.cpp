@@ -196,22 +196,26 @@ cli_frontend::~cli_frontend()
 
 void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char **argv,std::string &option_errors)
 {
-	if (*(m_options.software_name()) != 0)
+	// load software specified at the command line (if any of course)
+	const std::string software_name = m_options.software_name();
+	if (!software_name.empty())
 	{
 		const game_driver *system = mame_options::system(m_options);
 		if (system == nullptr && *(m_options.system_name()) != 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
+		// sanity check - lets fail quickly if this system doesn't have any softlists
 		machine_config config(*system, m_options);
 		software_list_device_iterator iter(config.root_device());
 		if (iter.count() == 0)
-			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_name.c_str());
 
+		// loop through all softlist devices, and try to find one capable of handling the requested software
 		bool found = false;
 		bool compatible = false;
 		for (software_list_device &swlistdev : iter)
 		{
-			const software_info *swinfo = swlistdev.find(m_options.software_name());
+			const software_info *swinfo = swlistdev.find(software_name);
 			if (swinfo != nullptr)
 			{
 				// loop through all parts
@@ -223,7 +227,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 						device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
 						if (image != nullptr)
 						{
-							std::string val = string_format("%s:%s:%s", swlistdev.list_name(), m_options.software_name(), swpart.name());
+							std::string val = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
 
 							// call this in order to set slot devices according to mounting
 							mame_options::parse_slot_devices(m_options, argc, argv, option_errors, image->instance_name(), val.c_str(), &swpart);
@@ -239,11 +243,11 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 		}
 		if (!compatible)
 		{
-			software_list_device::display_matches(config, nullptr, m_options.software_name());
+			software_list_device::display_matches(config, nullptr, software_name);
 			if (!found)
 				throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
 			else
-				throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", m_options.software_name(), m_options.system_name());
+				throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", software_name.c_str(), m_options.system_name());
 		}
 	}
 	// parse the command line, adding any system-specific options
