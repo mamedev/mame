@@ -83,9 +83,11 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 		return;
 	machine_config config(*cursystem, options);
 
-	// preopen all images (this allows slots to be assigned for all required software)
+	// preopen all readable images (this allows slots to be assigned for all required software)
 	for (device_image_interface &image : image_interface_iterator(config.root_device()))
-		image.open_image_file(options);
+		// ignore serial and parallel ports as opening and closing these prematurely may have unwanted consequences
+		if (image.is_readable() && image.image_type() != IO_SERIAL && image.image_type() != IO_PARALLEL)
+			image.open_image_file(options);
 
 	// iterate through all slot devices
 	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
