@@ -119,8 +119,8 @@
     electronically (mpla is usually the default, opla is often custom)
   - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-  - some of the games rely on the fact that faster/longer strobed leds appear
-    brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
+  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
+    eg. tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
   - 7in1ss: in 2-player mode, game select and skill select can be configured

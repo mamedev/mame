@@ -34,6 +34,9 @@
 
 
   TODO:
+  - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
+  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
+    eg. hccbaskb(player led), ..
   - leboom discrete sound for volume decay (simulated for now)
   - ttfball: discrete sound part, for volume gating?
   - what's the relation between hccbaskb and tbaskb? Is one the bootleg
@@ -930,7 +933,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tbaskb, tbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=18K, C=47pF
+	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=18K, C=47pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(tbaskb_state, read_a))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(tbaskb_state, write_b))
 	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
@@ -1039,7 +1042,7 @@ static const s16 rockpin_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 static MACHINE_CONFIG_START( rockpin, rockpin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1650, 500000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_CPU_ADD("maincpu", PIC1650, 450000) // approximation - RC osc. R=47K, C=47pF
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(rockpin_state, write_a))
 	MCFG_PIC16C5x_READ_B_CB(CONSTANT(0xff))
@@ -1049,7 +1052,7 @@ static MACHINE_CONFIG_START( rockpin, rockpin_state )
 	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(rockpin_state, write_d))
 
-	MCFG_DEVICE_ADD("clock", CLOCK, 500000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_DEVICE_ADD("clock", CLOCK, 450000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
@@ -1157,7 +1160,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( hccbaskb, hccbaskb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=15K, C=47pF
+	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=15K, C=47pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(hccbaskb_state, read_a))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(hccbaskb_state, write_b))
 	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
