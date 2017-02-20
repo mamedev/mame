@@ -967,7 +967,6 @@ bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
 	plib::putf8_writer owrt(ostrm);
 
 	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-
 	plib::pimemstream istrm2(ostrm);
 	plib::putf8_reader reader2(istrm2);
 	return parser_t(reader2, *this).parse(name);

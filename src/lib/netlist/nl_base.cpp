@@ -513,8 +513,8 @@ void netlist_t::reset()
 		break;
 		case 2:     // brute force forward
 		{
-			for (std::size_t i = 0; i < m_devices.size(); i++)
-				m_devices[i]->update_dev();
+			for (auto &d : m_devices)
+				d->update_dev();
 		}
 		break;
 	}
@@ -527,7 +527,7 @@ void netlist_t::reset()
 }
 
 
-void netlist_t::process_queue(const netlist_time &delta)
+void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 {
 	netlist_time stop(m_time + delta);
 
@@ -782,7 +782,7 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, m_cur_Q (*this, "m_cur_Q", 0)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_active(*this, "m_active", 0)
-	, m_in_queue(*this, "m_in_queue", 2)
+	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
 	, m_railterminal(mr)
 {
@@ -795,23 +795,23 @@ detail::net_t::~net_t()
 
 void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
-	m_active++;
+	++m_active;
 	m_list_active.push_front(&term);
 	nl_assert(m_active <= static_cast<int>(num_cons()));
 	if (m_active == 1)
 	{
 		railterminal().device().do_inc_active();
-		if (m_in_queue == 0)
+		if (m_in_queue == QS_DELAYED_DUE_TO_INACTIVE)
 		{
 			if (m_time > netlist().time())
 			{
-				m_in_queue = 1;     /* pending */
+				m_in_queue = QS_QUEUED;     /* pending */
 				netlist().queue().push(queue_t::entry_t(m_time, this));
 			}
 			else
 			{
+				m_in_queue = QS_DELIVERED;
 				m_cur_Q = m_new_Q;
-				m_in_queue = 2;
 			}
 		}
 	}
@@ -856,7 +856,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	const auto mask = masks[ (m_cur_Q << 1) | m_new_Q ];
 
 	m_cur_Q = m_new_Q;
-	m_in_queue = 2; /* mark as taken ... */
+	m_in_queue = QS_DELIVERED; /* mark as taken ... */
 
 	for (auto & p : m_list_active)
 	{
@@ -870,7 +870,7 @@ void detail::net_t::reset()
 {
 	m_time = netlist_time::zero();
 	m_active = 0;
-	m_in_queue = 2;
+	m_in_queue = QS_DELIVERED;
 
 	m_new_Q = 0;
 	m_cur_Q = 0;
@@ -892,7 +892,7 @@ void detail::net_t::reset()
 
 void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
-	for (auto t : m_core_terms)
+	for (auto &t : m_core_terms)
 		if (t == &terminal)
 			netlist().log().fatal(MF_2_NET_1_DUPLICATE_TERMINAL_2, name(),
 					t->name());

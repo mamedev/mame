@@ -27,11 +27,6 @@ public:
 
 	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
 
-	explicit pstream(const unsigned flags) : m_flags(flags)
-	{
-	}
-	virtual ~pstream();
-
 	bool seekable() const { return ((m_flags & FLAG_SEEKABLE) != 0); }
 
 	void seek(const pos_type n)
@@ -45,6 +40,11 @@ public:
 	}
 
 protected:
+	explicit pstream(const unsigned flags) : m_flags(flags)
+	{
+	}
+	virtual ~pstream();
+
 	virtual void vseek(const pos_type n) = 0;
 	virtual pos_type vtell() = 0;
 

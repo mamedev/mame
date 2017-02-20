@@ -55,7 +55,7 @@ namespace factory {
 		const pstring &param_desc() const { return m_def_param; }
 		const pstring &sourcefile() const { return m_sourcefile; }
 
-	protected:
+	private:
 		pstring m_name;                             /* device name */
 		pstring m_classname;                        /* device class name */
 		pstring m_def_param;                        /* default parameter */

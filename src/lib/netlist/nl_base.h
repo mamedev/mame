@@ -329,7 +329,7 @@ namespace netlist
 		operator T & () NL_NOEXCEPT { return m_value; }
 		//! Return const value of state variable.
 		constexpr operator const T & () const NL_NOEXCEPT { return m_value; }
-		T * ptr() { return &m_value; }
+		T * ptr() NL_NOEXCEPT { return &m_value; }
 		constexpr T * ptr() const  NL_NOEXCEPT{ return &m_value; }
 	private:
 		T m_value;
@@ -417,8 +417,8 @@ namespace netlist
 	{
 		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
 
-		netlist_t & netlist() { return m_netlist; }
-		const netlist_t & netlist() const { return m_netlist; }
+		netlist_t & netlist() NL_NOEXCEPT { return m_netlist; }
+		const netlist_t & netlist() const NL_NOEXCEPT { return m_netlist; }
 
 	protected:
 		~netlist_ref() {} // prohibit polymorphic destruction
@@ -554,19 +554,19 @@ namespace netlist
 		terminal_t(core_device_t &dev, const pstring &aname);
 		virtual ~terminal_t();
 
-		nl_double operator ()() const;
+		nl_double operator ()() const  NL_NOEXCEPT;
 
-		void set(const nl_double G)
+		void set(const nl_double G) NL_NOEXCEPT
 		{
 			set(G,G, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT)
+		void set(const nl_double GO, const nl_double GT) NL_NOEXCEPT
 		{
 			set(GO, GT, 0.0);
 		}
 
-		void set(const nl_double GO, const nl_double GT, const nl_double I)
+		void set(const nl_double GO, const nl_double GT, const nl_double I) NL_NOEXCEPT
 		{
 			set_ptr(m_Idr1, I);
 			set_ptr(m_go1, GO);
@@ -576,7 +576,7 @@ namespace netlist
 		void solve_now();
 		void schedule_solve_after(const netlist_time &after);
 
-		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr)
+		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) NL_NOEXCEPT
 		{
 			m_gt1 = gt;
 			m_go1 = go;
@@ -586,7 +586,7 @@ namespace netlist
 		terminal_t *m_otherterm;
 
 	private:
-		void set_ptr(nl_double *ptr, const nl_double val)
+		void set_ptr(nl_double *ptr, const nl_double val) NL_NOEXCEPT
 		{
 			if (ptr != nullptr && *ptr != val)
 			{
@@ -644,10 +644,10 @@ namespace netlist
 			return Q();
 		}
 
-		void inactivate();
-		void activate();
-		void activate_hl();
-		void activate_lh();
+		void inactivate() NL_NOEXCEPT;
+		void activate() NL_NOEXCEPT;
+		void activate_hl() NL_NOEXCEPT;
+		void activate_lh() NL_NOEXCEPT;
 
 	};
 
@@ -693,6 +693,13 @@ namespace netlist
 	{
 	public:
 
+		enum queue_status
+		{
+			QS_DELAYED_DUE_TO_INACTIVE = 0,
+			QS_QUEUED,
+			QS_DELIVERED
+		};
+
 		net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 		virtual ~net_t();
 
@@ -707,7 +714,7 @@ namespace netlist
 		}
 
 		void push_to_queue(const netlist_time delay) NL_NOEXCEPT;
-		bool is_queued() const NL_NOEXCEPT { return m_in_queue == 1; }
+		bool is_queued() const NL_NOEXCEPT { return m_in_queue == QS_QUEUED; }
 
 		void update_devs() NL_NOEXCEPT;
 
@@ -741,7 +748,7 @@ namespace netlist
 
 		state_var<netlist_time>  m_time;
 		state_var_s32            m_active;
-		state_var_u8             m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 		state_var<nl_double>     m_cur_Analog;
 
@@ -785,7 +792,7 @@ namespace netlist
 		{
 			if (newQ != m_new_Q)
 			{
-				m_in_queue = 0;
+				m_in_queue = QS_DELAYED_DUE_TO_INACTIVE;
 				m_time = at;
 			}
 			m_cur_Q = m_new_Q = newQ;
@@ -910,7 +917,7 @@ namespace netlist
 	{
 	public:
 		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
-		std::uint8_t * operator()() const { return m_param; }
+		std::uint8_t * operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
 		std::uint8_t* m_param;
@@ -920,7 +927,7 @@ namespace netlist
 	{
 	public:
 		param_logic_t(device_t &device, const pstring name, const bool val);
-		bool operator()() const { return m_param; }
+		bool operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
 		bool m_param;
@@ -930,7 +937,7 @@ namespace netlist
 	{
 	public:
 		param_int_t(device_t &device, const pstring name, const int val);
-		int operator()() const { return m_param; }
+		int operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
 		int m_param;
@@ -940,7 +947,7 @@ namespace netlist
 	{
 	public:
 		param_double_t(device_t &device, const pstring name, const double val);
-		double operator()() const { return m_param; }
+		double operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
 		double m_param;
@@ -952,8 +959,8 @@ namespace netlist
 		param_str_t(device_t &device, const pstring name, const pstring val);
 		virtual ~param_str_t();
 
-		const pstring operator()() const { return Value(); }
-		void setTo(const pstring &param)
+		const pstring operator()() const NL_NOEXCEPT { return Value(); }
+		void setTo(const pstring &param) NL_NOEXCEPT
 		{
 			if (m_param != param)
 			{
@@ -964,7 +971,7 @@ namespace netlist
 		}
 	protected:
 		virtual void changed();
-		pstring Value() const { return m_param; }
+		pstring Value() const NL_NOEXCEPT { return m_param; }
 	private:
 		pstring m_param;
 	};
@@ -1205,13 +1212,13 @@ namespace netlist
 
 		/* run functions */
 
-		const netlist_time time() const { return m_time; }
-		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
+		const netlist_time time() const NL_NOEXCEPT { return m_time; }
+		devices::NETLIB_NAME(solver) *solver() const NL_NOEXCEPT { return m_solver; }
 
 		/* never use this in constructors! */
 		nl_double gmin() const;
 
-		void process_queue(const netlist_time &delta);
+		void process_queue(const netlist_time &delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() { m_queue.retime(nullptr, m_time); }
 
 		/* Control functions */
@@ -1220,12 +1227,12 @@ namespace netlist
 		void stop();
 		void reset();
 
-		const detail::queue_t &queue() const { return m_queue; }
-		detail::queue_t &queue() { return m_queue; }
+		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
+		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
 
 		/* netlist build functions */
 
-		setup_t &setup() { return *m_setup; }
+		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
 
 		void register_dev(plib::owned_ptr<core_device_t> dev);
 		void remove_dev(core_device_t *dev);
@@ -1358,7 +1365,7 @@ namespace netlist
 			device.netlist().log().warning("Rom {1} not found", Value());
 	}
 
-	inline void logic_input_t::inactivate()
+	inline void logic_input_t::inactivate() NL_NOEXCEPT
 	{
 		if (!is_state(STATE_INP_PASSIVE))
 		{
@@ -1367,7 +1374,7 @@ namespace netlist
 		}
 	}
 
-	inline void logic_input_t::activate()
+	inline void logic_input_t::activate() NL_NOEXCEPT
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
@@ -1376,7 +1383,7 @@ namespace netlist
 		}
 	}
 
-	inline void logic_input_t::activate_hl()
+	inline void logic_input_t::activate_hl() NL_NOEXCEPT
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
@@ -1385,7 +1392,7 @@ namespace netlist
 		}
 	}
 
-	inline void logic_input_t::activate_lh()
+	inline void logic_input_t::activate_lh() NL_NOEXCEPT
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
@@ -1401,8 +1408,8 @@ namespace netlist
 			if (is_queued())
 				netlist().queue().remove(this);
 			m_time = netlist().time() + delay;
-			m_in_queue = (m_active > 0);     /* queued ? */
-			if (m_in_queue)
+			m_in_queue = (m_active > 0) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
+			if (m_in_queue == QS_QUEUED)
 				netlist().queue().push(queue_t::entry_t(m_time, this));
 		}
 	}
@@ -1417,7 +1424,7 @@ namespace netlist
 		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
 
-	inline nl_double terminal_t::operator ()() const { return net().Q_Analog(); }
+	inline nl_double terminal_t::operator ()() const NL_NOEXCEPT { return net().Q_Analog(); }
 
 	inline logic_net_t & logic_t::net() NL_NOEXCEPT
 	{
