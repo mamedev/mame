@@ -90,6 +90,13 @@
 #define I_CU	0xf0	// graphics cursor intensity
 #define I_LP	0xff	// light pen cursor intensity
 
+// Palette indexes (for monochromatic screens)
+#define PEN_BLACK	0	// Black
+#define PEN_GRAPHIC	1	// Graphics
+#define PEN_ALPHA	2	// Text
+#define PEN_CURSOR	3	// Graphic cursor
+#define PEN_LP		4	// Light pen cursor
+
 #define T15_PA                  15
 
 #define KEY_SCAN_OSCILLATOR     327680
@@ -716,6 +723,12 @@ void hp9845b_state::machine_start()
 	hp9845_base_state::machine_start();
 
 	m_graphic_mem.resize(GVIDEO_MEM_SIZE);
+
+	// initialize palette
+	m_palette->set_pen_color(PEN_BLACK  , 0x00, 0x00, 0x00);	// black
+	m_palette->set_pen_color(PEN_GRAPHIC, 0x00, I_GR, 0x00);	// graphics
+	m_palette->set_pen_color(PEN_ALPHA  , 0x00, I_AL, 0x00);	// alpha
+	m_palette->set_pen_color(PEN_CURSOR , 0x00, I_CU, 0x00);	// graphics cursor
 }
 
 void hp9845b_state::machine_reset()
@@ -862,7 +875,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 	if (m_video_blanked) {
 		// Blank scanline
 		for (unsigned i = 0; i < VIDEO_HBSTART; i++) {
-			m_bitmap.pix32(video_scanline , i) = pen[ 0 ];
+			m_bitmap.pix32(video_scanline , i) = pen[ PEN_BLACK ];
 		}
 	} else {
 		bool cursor_line = line_in_row == 12;
@@ -895,7 +908,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 			for (unsigned j = 0; j < 9; j++) {
 				bool pixel = (pixels & (1U << j)) != 0;
 
-				m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? 1 : 0 ];
+				m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? PEN_ALPHA : PEN_BLACK ];
 			}
 		}
 	}
@@ -930,10 +943,10 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 			unsigned pixel;
 			if (blink && ((xw && yc) || (yw && xc && m_gv_cursor_gc))) {
 				// Cursor
-				pixel = 2;
+				pixel = PEN_CURSOR;
 			} else {
 				// Normal pixel
-				pixel = (word & mask) != 0;
+				pixel = (word & mask) != 0 ? PEN_GRAPHIC : PEN_BLACK;
 			}
 			m_bitmap.pix32(video_scanline - GVIDEO_VBEND , x++) = pen[ pixel ];
 		}
@@ -1284,7 +1297,7 @@ static MACHINE_CONFIG_START(hp9845b, hp9845b_state)
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_hp9845b)
