@@ -109,8 +109,11 @@ ac00      sound port 4
 
 Notes:
 ------
+- All inputs are read through the TMS1025N2LC at D8 (low 4 bits) and F8
+  (high 4 bits). Pins 11-16, 18 and 27-34 of both devices are linked to the
+  edge connector, though several of these input lines are typically unused.
 - idsoccer seems to run on a modified version of this board which allows for
-  more sprite tiles, it also has a MSM5205 chip for sample playback.
+  more sprite tiles; it also has an extra sound board for ADPCM playback.
 
 TODO:
 -----
@@ -229,12 +232,7 @@ static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_SELECT(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
-	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc000, 0xc007) AM_SELECT(0x0080) AM_READWRITE(inputs_flipscreen_r, flipscreen_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -275,12 +273,7 @@ static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("sn3", sn76489a_device, write)
 	AM_RANGE(0xac00, 0xac00) AM_DEVWRITE("sn4", sn76489a_device, write)
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_SELECT(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
-	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc000, 0xc007) AM_SELECT(0x0080) AM_READWRITE(inputs_flipscreen_r, flipscreen_w)
 	AM_RANGE(0xe000, 0xe008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
 ADDRESS_MAP_END
 
@@ -296,22 +289,6 @@ static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( idsoccer_map2, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
-	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_SELECT(0x0080) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(flipscreen_w)
-	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -598,6 +575,20 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
+	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT1, IOPORT("DSW2"))
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT2, IOPORT("DSW1"))
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT3, IOPORT("JOYS"))
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT5, IOPORT("BUTTONS"))
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT7, IOPORT("SYSTEM"))
+
+	MCFG_DEVICE_ADD("inp2", TMS1025, 0)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT1, IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT2, IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT3, IOPORT("JOYS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT5, IOPORT("BUTTONS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT7, IOPORT("SYSTEM")) MCFG_DEVCB_RSHIFT(4)
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -657,8 +648,11 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
 
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(idsoccer_map2)
+	MCFG_DEVICE_MODIFY("inp1")
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT4, IOPORT("JOYS_RIGHT"))
+
+	MCFG_DEVICE_MODIFY("inp2")
+	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)

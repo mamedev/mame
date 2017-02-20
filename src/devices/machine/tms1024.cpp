@@ -25,15 +25,15 @@ const device_type TMS1025 = &device_creator<tms1025_device>;
 //  constructor
 //-------------------------------------------------
 
-tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TMS1024, "TMS1024 I/O Expander", tag, owner, clock, "tms1024", __FILE__), m_h(0), m_s(0), m_std(0),
-	m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_write_port5(*this), m_write_port6(*this), m_write_port7(*this)
+tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_h(0), m_s(0), m_std(0),
+	m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
-tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_h(0), m_s(0), m_std(0),
-	m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_write_port5(*this), m_write_port6(*this), m_write_port7(*this)
+tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tms1024_device(mconfig, TMS1024, "TMS1024 I/O Expander", tag, owner, clock, "tms1024", __FILE__)
 {
 }
 
@@ -51,13 +51,10 @@ tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, d
 void tms1024_device::device_start()
 {
 	// resolve callbacks (there is no port 0)
-	m_write_port1.resolve_safe(); m_write_port[0] = &m_write_port1;
-	m_write_port2.resolve_safe(); m_write_port[1] = &m_write_port2;
-	m_write_port3.resolve_safe(); m_write_port[2] = &m_write_port3;
-	m_write_port4.resolve_safe(); m_write_port[3] = &m_write_port4;
-	m_write_port5.resolve_safe(); m_write_port[4] = &m_write_port5;
-	m_write_port6.resolve_safe(); m_write_port[5] = &m_write_port6;
-	m_write_port7.resolve_safe(); m_write_port[6] = &m_write_port7;
+	for (devcb_read8 &cb : m_read_port)
+		cb.resolve_safe(0);
+	for (devcb_write8 &cb : m_write_port)
+		cb.resolve_safe();
 
 	// zerofill
 	m_h = 0;
@@ -105,8 +102,17 @@ WRITE_LINE_MEMBER(tms1024_device::write_std)
 	if (state && !m_std)
 	{
 		if (m_s != 0)
-			(*m_write_port[m_s-1])((offs_t)(m_s-1), m_h);
+			(m_write_port[m_s-1])((offs_t)(m_s-1), m_h);
 	}
 
 	m_std = state;
+}
+
+READ8_MEMBER(tms1024_device::read_h)
+{
+	// TODO: which pin enables read?
+	if (m_s != 0)
+		m_h = (m_read_port[m_s-1])((offs_t)(m_s-1)) & 0xf;
+
+	return m_h;
 }
