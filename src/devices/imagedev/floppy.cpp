@@ -658,7 +658,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != cyl)
 			{
-				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				if (TRACE_STEP) logerror("track %d\n", cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
@@ -706,7 +706,7 @@ void floppy_image_device::seek_phase_w(int phases)
 	subcyl = next_pos & 3;
 
 	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("%s: track %d.%d\n", tag(), cyl, subcyl);
+		logerror("track %d.%d\n", cyl, subcyl);
 
 	/* Update disk detection if applicable */
 	if (exists() && !dskchg_writable)

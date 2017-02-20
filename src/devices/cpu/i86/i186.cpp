@@ -271,7 +271,7 @@ void i80186_cpu_device::execute_run()
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
+					logerror("%06x: bound %04x high %04x low %04x tmp\n", pc(), high, low, tmp);
 				}
 				break;
 
@@ -342,7 +342,7 @@ void i80186_cpu_device::execute_run()
 					m_sregs[DS] = m_src;
 					break;
 				default:
-					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+					logerror("%06x: Mov Sreg - Invalid register\n", pc());
 					m_ip = m_prev_ip;
 					interrupt(6);
 					break;
@@ -538,7 +538,7 @@ void i80186_cpu_device::execute_run()
 				if(!common_op(op))
 				{
 					m_icount -= 10; // UD fault timing?
-					logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
+					logerror("%06x: Invalid Opcode %02x\n", pc(), op);
 					m_ip = m_prev_ip;
 					interrupt(6); // 80186 has #UD
 					break;
