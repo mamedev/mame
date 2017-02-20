@@ -12,7 +12,7 @@
  @024     1655    1979, Toytronic? Football
  @033     1655A   1979, Toytronic Football (newer)
  @036     1655A   1979, Ideal Maniac
- *043     1655A   1979, Caprice Pro-Action Baseball (have dump)
+ @043     1655A   1979, Caprice Pro-Action Baseball
  @051     1655A   1979, Tandy Electronic Basketball
  @053     1655A   1979, Atari Touch Me
  @0??     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (custom label)
@@ -20,8 +20,8 @@
  *081     1655A   19??, Ramtex Space Invaders/Block Buster
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
- *133     1650A   1981, U.S. Games Programmable Baseball/Tandy 2-Player Baseball (have dump)
- *144     1650A   1981, U.S. Games Football/Tandy 2-Player Football (have dump)
+ @133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball
+ @144     1650A   1980, U.S. Games Football/Tandy 2-Player Football
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
@@ -389,6 +389,78 @@ static MACHINE_CONFIG_START( touchme, touchme_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, touchme_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Caprice Pro-Action Baseball (manufactured by Calfax)
+  * PIC1655A-043
+  * x
+
+***************************************************************************/
+
+class pabball_state : public hh_pic16_state
+{
+public:
+	pabball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+void pabball_state::prepare_display()
+{
+}
+
+READ8_MEMBER(pabball_state::read_a)
+{
+	return 0xf;
+}
+
+WRITE8_MEMBER(pabball_state::write_b)
+{
+}
+
+WRITE8_MEMBER(pabball_state::write_c)
+{
+}
+
+
+// config
+
+static INPUT_PORTS_START( pabball )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( pabball, pabball_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=18K, C=27pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(pabball_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(pabball_state, write_b))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(pabball_state, write_c))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_pabball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1258,6 +1330,158 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  U.S. Games Programmable Baseball
+  * PIC1650A-133
+  * x
+
+  known releases:
+  - USA(1): Half Court Computer Basketball
+  - USA(2): 2-Player Baseball (model 60-2157), distributed by Tandy
+
+***************************************************************************/
+
+class uspbball_state : public hh_pic16_state
+{
+public:
+	uspbball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+void uspbball_state::prepare_display()
+{
+}
+
+READ8_MEMBER(uspbball_state::read_a)
+{
+	return 0xf;
+}
+
+WRITE8_MEMBER(uspbball_state::write_b)
+{
+}
+
+WRITE8_MEMBER(uspbball_state::write_c)
+{
+}
+
+
+// config
+
+static INPUT_PORTS_START( uspbball )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( uspbball, uspbball_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=22K, C=47pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(uspbball_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(uspbball_state, write_b))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(uspbball_state, write_c))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_uspbball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  U.S. Games Football
+  * PIC1650A-144
+  * x
+
+  known releases:
+  - USA(1): Football
+  - USA(2): 2-Player Baseball (model 60-2157), distributed by Tandy
+
+***************************************************************************/
+
+class usfball_state : public hh_pic16_state
+{
+public:
+	usfball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_b);
+	DECLARE_WRITE8_MEMBER(write_c);
+};
+
+// handlers
+
+void usfball_state::prepare_display()
+{
+}
+
+READ8_MEMBER(usfball_state::read_a)
+{
+	return 0xf;
+}
+
+WRITE8_MEMBER(usfball_state::write_b)
+{
+}
+
+WRITE8_MEMBER(usfball_state::write_c)
+{
+}
+
+
+// config
+
+static INPUT_PORTS_START( usfball )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( usfball, usfball_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=39K, C=75pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(usfball_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(usfball_state, write_b))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(usfball_state, write_c))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_usfball)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -1265,6 +1489,12 @@ MACHINE_CONFIG_END
 ROM_START( touchme )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
+ROM_END
+
+
+ROM_START( pabball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
 ROM_END
 
 
@@ -1315,9 +1545,23 @@ ROM_START( ttfballa )
 ROM_END
 
 
+ROM_START( uspbball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic1650a-133", 0x0000, 0x0400, CRC(479e98be) SHA1(67437177b059dfa6e01940da26daf997cec96ead) )
+ROM_END
+
+
+ROM_START( usfball )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic1650a-144", 0x0000, 0x0400, CRC(ef3677c9) SHA1(33f89c79e7e090710681dffe09eddaf66b5cb794) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, touchme,   0,        0, touchme,  touchme,  driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1979, pabball,   0,        0, pabball,  pabball,  driver_device, 0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1980, melodym,   0,        0, melodym,  melodym,  driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
@@ -1331,4 +1575,7 @@ CONS( 1979, rockpin,   0,        0, rockpin,  rockpin,  driver_device, 0, "Tiger
 CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, ttfball,   0,        0, ttfball,  ttfball,  driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball,  0, ttfball,  ttfballa, driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1979, ttfballa,  ttfball,  0, ttfball,  ttfballa, driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1980, uspbball,  0,        0, uspbball, uspbball, driver_device, 0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, usfball,   0,        0, usfball,  usfball,  driver_device, 0, "U.S. Games", "Football (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

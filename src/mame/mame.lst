@@ -14325,11 +14325,14 @@ hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
 melodym                         // GAF
+pabball                         // Caprice
 rockpin                         // Tiger Electronics
 tbaskb                          // Tandy Radio Shack
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
+usfball                         // US Games
+uspbball                        // US Games
 
 @source:hh_sm510.cpp
 gnwmndon                        // Nintendo
