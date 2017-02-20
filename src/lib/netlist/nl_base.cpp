@@ -845,7 +845,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	const unsigned masks[4] =
+	const uint8_t masks[4] =
 	{
 		0,
 		core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE,
@@ -853,7 +853,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 		0
 	};
 
-	const unsigned mask = masks[ (m_cur_Q << 1) | m_new_Q ];
+	const auto mask = masks[ (m_cur_Q << 1) | m_new_Q ];
 
 	m_cur_Q = m_new_Q;
 	m_in_queue = 2; /* mark as taken ... */
@@ -1029,19 +1029,17 @@ terminal_t::~terminal_t()
 {
 }
 
-void terminal_t::schedule_solve()
+void terminal_t::solve_now()
 {
 	// Nets may belong to railnets which do not have a solver attached
-	// FIXME: Enforce that all terminals get connected?
 	if (this->has_net())
 		if (net().solver() != nullptr)
 			net().solver()->update_forced();
 }
 
-void terminal_t::schedule_after(const netlist_time &after)
+void terminal_t::schedule_solve_after(const netlist_time &after)
 {
 	// Nets may belong to railnets which do not have a solver attached
-	// FIXME: Enforce that all terminals get connected?
 	if (this->has_net())
 		if (net().solver() != nullptr)
 			net().solver()->update_after(after);

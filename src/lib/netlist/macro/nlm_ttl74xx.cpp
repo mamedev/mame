@@ -476,7 +476,7 @@ NETLIST_END()
  *
  *  Naming conventions follow National Semiconductor datasheet
  *
- *  FIXME: Same as 7400, but drains higher output currents.
+ *  NOTE: Same as 7400, but drains higher output currents.
  *         Netlist currently does not model over currents (should it ever?)
  */
 

@@ -573,8 +573,8 @@ namespace netlist
 			set_ptr(m_gt1, GT);
 		}
 
-		void schedule_solve();
-		void schedule_after(const netlist_time &after);
+		void solve_now();
+		void schedule_solve_after(const netlist_time &after);
 
 		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr)
 		{
@@ -698,11 +698,15 @@ namespace netlist
 
 		void reset();
 
-		void toggle_new_Q() NL_NOEXCEPT              { m_new_Q ^= 1;   }
-		void force_queue_execution() NL_NOEXCEPT    { m_new_Q = (m_cur_Q ^ 1);   }
+		void toggle_new_Q() NL_NOEXCEPT { m_new_Q = (m_cur_Q ^ 1);   }
+
+		void toggle_and_push_to_queue(const netlist_time delay) NL_NOEXCEPT
+		{
+			toggle_new_Q();
+			push_to_queue(delay);
+		}
 
 		void push_to_queue(const netlist_time delay) NL_NOEXCEPT;
-		void reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT;
 		bool is_queued() const NL_NOEXCEPT { return m_in_queue == 1; }
 
 		void update_devs() NL_NOEXCEPT;
@@ -1403,18 +1407,6 @@ namespace netlist
 		}
 	}
 
-	// FIXME: this could be removed after testing
-	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT
-	{
-		if (is_queued())
-			netlist().queue().remove(this);
-
-		m_time = netlist().time() + delay;
-		m_in_queue = (m_active > 0);     /* queued ? */
-		if (m_in_queue)
-			netlist().queue().push(queue_t::entry_t(m_time, this));
-	}
-
 	inline const analog_net_t & analog_t::net() const NL_NOEXCEPT
 	{
 		return static_cast<const analog_net_t &>(core_terminal_t::net());
@@ -1452,8 +1444,7 @@ namespace netlist
 		if (newQ != m_my_net.Q_Analog())
 		{
 			m_my_net.set_Q_Analog(newQ);
-			m_my_net.toggle_new_Q();
-			m_my_net.push_to_queue(NLTIME_FROM_NS(1));
+			m_my_net.toggle_and_push_to_queue(NLTIME_FROM_NS(1));
 		}
 	}
 

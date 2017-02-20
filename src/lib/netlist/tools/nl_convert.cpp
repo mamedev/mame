@@ -228,7 +228,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M({1})", 1.0e-3 },
 		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"??",  "CAP_U({1})", 1.0e-6 }, /* FIXME */
+		{"μ",  "CAP_U({1})",  1.0e-6 },
 		{"N",   "CAP_N({1})", 1.0e-9 },
 		{"pF",  "CAP_P({1})", 1.0e-12},
 		{"P",   "CAP_P({1})", 1.0e-12},

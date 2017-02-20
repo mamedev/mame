@@ -960,7 +960,8 @@ netlist_mame_cpu_device_t::netlist_mame_cpu_device_t(const machine_config &mconf
 		device_state_interface(mconfig, *this),
 		device_disasm_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 12) // Interface is needed to keep debugger happy
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 12), // Interface is needed to keep debugger happy
+		m_genPC(0)
 {
 }
 
@@ -1055,7 +1056,12 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
 
 netlist_mame_sound_device_t::netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist Sound Device", tag, owner, clock, "netlist_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_out{nullptr},
+		m_in(nullptr),
+		m_stream(nullptr),
+		m_num_inputs(0),
+		m_num_outputs(0)
 {
 }
 
