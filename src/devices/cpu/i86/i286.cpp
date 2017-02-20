@@ -1412,7 +1412,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
+					logerror("%06x: bound %04x high %04x low %04x tmp\n", pc(), high, low, tmp);
 				}
 				break;
 
@@ -1489,7 +1489,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					m_modrm = fetch();
 					if((m_modrm & 0x38) > 0x18)
 					{
-						logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+						logerror("%06x: Mov Sreg - Invalid register\n", pc());
 						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
@@ -1513,7 +1513,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							data_descriptor(DS, m_src);
 							break;
 						default:
-							logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+							logerror("%06x: Mov Sreg - Invalid register\n", pc());
 							throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					break;
@@ -1776,7 +1776,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xf0: // i_lock
 					if(PM && (CPL > m_IOPL))
 						throw TRAP(FAULT_GP, 0);
-					logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
+					logerror("%06x: Warning - BUSLOCK\n", pc());
 					m_no_interrupt = 1;
 					CLK(NOP);
 					break;
@@ -1853,7 +1853,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							CLKM(PUSH_R16,PUSH_M16);
 							break;
 						default:
-							logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
+							logerror("%06x: FF Pre with unimplemented mod\n", pc());
 							throw TRAP(FAULT_UD,(uint16_t)-1);
 						}
 					}
@@ -1889,7 +1889,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if(!common_op(op))
 					{
 						m_icount -= 10; // UD fault timing?
-						logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
+						logerror("%06x: Invalid Opcode %02x\n", pc(), op);
 						m_ip = m_prev_ip;
 						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
