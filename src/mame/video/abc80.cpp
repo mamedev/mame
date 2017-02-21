@@ -101,15 +101,15 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 
 			if (l < 3) r0 = 0; else if (l < 7) r1 = 0; else r2 = 0;
 
-			int c0 = BIT(videoram_data, 0) | r0;
-			int c1 = BIT(videoram_data, 1) | r0;
-			int c2 = BIT(videoram_data, 2) | r1;
-			int c3 = BIT(videoram_data, 3) | r1;
-			int c4 = BIT(videoram_data, 4) | r2;
-			int c5 = BIT(videoram_data, 6) | r2;
+			int c0 = BIT(videoram_data, 0) || r0;
+			int c1 = BIT(videoram_data, 1) || r0;
+			int c2 = BIT(videoram_data, 2) || r1;
+			int c3 = BIT(videoram_data, 3) || r1;
+			int c4 = BIT(videoram_data, 4) || r2;
+			int c5 = BIT(videoram_data, 6) || r2;
 
-			if (!(c0 & c2 & c4)) data |= 0xe0;
-			if (!(c1 & c3 & c5)) data |= 0x1c;
+			if (c0 && c2 && c4) data |= 0xe0;
+			if (c1 && c3 && c5) data |= 0x1c;
 		}
 		else
 		{
