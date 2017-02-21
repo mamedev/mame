@@ -62,6 +62,8 @@ Address   Description
 // Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 
+#define MM5740_CLOCK (XTAL_12_288MHz / 12 / 8)
+
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
@@ -550,7 +552,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
 
-	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, 0)
+	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
 	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))
 	MCFG_MM5740_MATRIX_X2(IOPORT("X2"))
 	MCFG_MM5740_MATRIX_X3(IOPORT("X3"))

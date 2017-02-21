@@ -10,15 +10,6 @@
 #include "mm5740.h"
 
 #include <algorithm>
-/*
-
-    TODO:
-
-    - scan timer clock frequency
-    - more accurate emulation of real chip
-
-*/
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -30,6 +21,66 @@ const device_type MM5740 = &device_creator<mm5740_device>;
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+/*
+static ADDRESS_MAP_START( mm5740_map, AS_PROGRAM, 8, mm5740_device )
+        ADDRESS_MAP_GLOBAL_MASK(0x1c2)
+        AM_RANGE(0x000, 0x1c2) AM_ROM AM_REGION("mm5740aac", 0)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_START( mm5740_map, mm5740_device )
+        MCFG_CPU_IO_MAP(mm5740_map)
+MACHINE_CONFIG_END
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+*/
+ROM_START( mm5740aac )
+        ROM_REGION(0x000, "mm5740aac", 0)
+        ROM_LOAD("mm5740aac.ic1", 0x000, 0x1c2, CRC(1fce44d9) SHA1(3acf913e27041134565cc707540b8fb7924a363d))
+ROM_END
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *mm5740_device::device_rom_region() const
+{
+        return ROM_NAME( mm5740aac );
+}
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( i80130 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( mm5740 )
+        //MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NOOP)
+
+        //MCFG_DEVICE_ADD("pit", PIT8254, 0)
+        //MCFG_PIT8253_CLK0(0)
+        //MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i80130_device, systick_w))
+        //MCFG_PIT8253_CLK1(0)
+        //MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i80130_device, delay_w))
+        //MCFG_PIT8253_CLK2(0)
+        //MCFG_PIT8253_OUT2_HANDLER(WRITELINE(i80130_device, baud_w))
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor mm5740_device::device_mconfig_additions() const
+{
+        return MACHINE_CONFIG_NAME( mm5740 );
+}
+
 
 //-------------------------------------------------
 //  mm5740_device - constructor
@@ -44,7 +95,6 @@ mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, dev
 {
 	std::fill_n(m_x_mask, 9, 0);
 }
-
 
 const uint16_t mm5740_device::mm5740AAC_Unshift_mapping[9][10] = {
 	{
@@ -478,7 +528,7 @@ void mm5740_device::device_start()
 	// TODO - implement a clock input for the chip.
 	// allocate timers
 	m_scan_timer = timer_alloc();
-	m_scan_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// state saving
 	save_item(NAME(m_b));
@@ -506,6 +556,12 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 		uint16_t data = m_read_x[x]() ^ 0x3ff;
 
+		if ((data ^ m_x_mask[x]) == 0)
+		{
+			// bail early if nothing has changed.
+			continue;
+		}
+
 		for (int y = 0; y < 10; y++)
 		{
 
@@ -514,7 +570,16 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				bool shifted = m_read_shift();
 				bool ctrl    = m_read_control();
 
+#if 0
+				uint8_t offset = y*10 + x;
+				uint8_t *rom = mm5740_map;  ??? no idea what to do here
+				uint16_t common = (uint16_t) rom[offset];
+				offset += ((shift ? 1: 0) + (ctrl ? 2: 0)) * 90;
+				uint8_t uniq = rom[offset];
+				uint16_t b = ((common & 0x10) << 4) | ((uniq & 0x0f) << 4) | (common & 0x0f)
+#else
 				uint16_t b;
+
 				if (shifted)
 				{
 					if (ctrl)
@@ -538,6 +603,7 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					}
 
 				}
+#endif
 				ako = 1;
 				b ^= 0x1ff;
 
@@ -563,6 +629,7 @@ void mm5740_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	if (!ako)
 	{
+		m_write_data_ready(CLEAR_LINE);
 		m_b = -1;
 	}
 }
