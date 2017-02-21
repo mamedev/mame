@@ -6,6 +6,7 @@
 		<description>ABCDemo</description>
 		<year>2015</year>
 		<publisher>Genesis Project</publisher>
+		<info name="usage" value="RUN CAS:" />
 
 		<part name="cass1" interface="abc80_cass">
 			<dataarea name="cass" size="10793090">
