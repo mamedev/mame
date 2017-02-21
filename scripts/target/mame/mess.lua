@@ -911,6 +911,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"comx",
 		"concept",
 		"conitec",
+		"cxg",
 		"cybiko",
 		"dai",
 		"ddr",
@@ -1690,6 +1691,11 @@ files {
 	MAME_DIR .. "src/mame/includes/prof80.h",
 	MAME_DIR .. "src/mame/machine/prof80mmu.cpp",
 	MAME_DIR .. "src/mame/machine/prof80mmu.h",
+}
+
+createMESSProjects(_target, _subtarget, "cxg")
+files {
+	MAME_DIR .. "src/mame/drivers/cxgz80.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")

@@ -10488,6 +10488,9 @@ spacefrt                        // (c) 1981 Century
 superbik                        // (c) 1983 Century
 wallst                          // (c) 1982 Century
 
+@source:cxgz80.cpp
+ch2001                          //
+
 @source:cxhumax.cpp
 hxhdci2k                        //
 
