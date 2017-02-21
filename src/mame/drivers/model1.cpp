@@ -183,7 +183,7 @@ Notes:
       315-5546A     - Lattice GAL16V8A (DIP20)
       315-5571      - Fujitsu MB86233 Geometrizer (IC57/IC58, QFP160)                   \
       315-5572      - Fujitsu MB86233 Geometrizer (different code) (IC60/IC66, QFP160)  / According to test mode, these chips are the TGPs
-      COPRO         - Fujitsu MB86233 (QFP160) Coprocessor, differs depending on game:
+      COPRO         - Fujitsu MB86233 Coprocessor (QFP160), differs depending on game:
           315-5573      - Virtua Racing, Virtua Formula (original for above board part number)
           315-5711      - Wing War, Star Wars Arcade, Netmerc
           315-5724      - Virtua Fighter
