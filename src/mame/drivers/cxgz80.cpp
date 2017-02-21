@@ -39,6 +39,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
+		m_speaker_off_timer(*this, "speaker_off"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -47,8 +48,9 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	optional_device<dac_bit_interface> m_dac;
-	optional_ioport_array<8> m_inp_matrix;
+	required_device<dac_bit_interface> m_dac;
+	required_device<timer_device> m_speaker_off_timer;
+	optional_ioport_array<10> m_inp_matrix; // max 10
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
@@ -76,7 +78,10 @@ public:
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Chess 2001
-	//x
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off_callback);
+	DECLARE_WRITE8_MEMBER(ch2001_speaker_on_w);
+	DECLARE_WRITE8_MEMBER(ch2001_leds_w);
+	DECLARE_READ8_MEMBER(ch2001_input_r);
 
 protected:
 	virtual void machine_start() override;
@@ -236,6 +241,37 @@ u16 cxgz80_state::read_inputs(int columns)
 
 // TTL
 
+TIMER_DEVICE_CALLBACK_MEMBER(cxgz80_state::speaker_off_callback)
+{
+	m_dac->write(0);
+}
+
+WRITE8_MEMBER(cxgz80_state::ch2001_speaker_on_w)
+{
+	// 74ls109 clock pulse to speaker
+	m_dac->write(1);
+	m_speaker_off_timer->adjust(attotime::from_usec(200)); // not accurate
+}
+
+WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
+{
+	// d0-d7: 74ls273 (WR to CLK)
+	// 74ls273 Q1-Q4: 74ls145 A-D
+	// 74ls145 0-9: input mux/led select
+	m_inp_mux = 1 << (data & 0xf) & 0x3ff;
+	
+	// 74ls273 Q5-Q8: MC14028 A-D
+	// MC14028 Q0-Q7: led data, Q8,Q9: N/C
+	u8 led_data = 1 << (data >> 4 & 0xf) & 0xff;
+	display_matrix(8, 10, led_data, m_inp_mux);
+}
+
+READ8_MEMBER(cxgz80_state::ch2001_input_r)
+{
+	// d0-d7: multiplexed inputs
+	return read_inputs(10);
+}
+
 
 
 /******************************************************************************
@@ -247,6 +283,8 @@ u16 cxgz80_state::read_inputs(int columns)
 static ADDRESS_MAP_START( ch2001_map, AS_PROGRAM, 8, cxgz80_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x3800) AM_RAM
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READWRITE(ch2001_input_r, ch2001_leds_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_WRITE(ch2001_speaker_on_w)
 ADDRESS_MAP_END
 
 
@@ -340,6 +378,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ch2001 )
 	PORT_INCLUDE( cb_magnets )
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Black")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("White")
+
+	PORT_START("IN.9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Set Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Take Back")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Forward")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hint")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Move")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Sound")
 INPUT_PORTS_END
 
 
@@ -356,6 +414,8 @@ static MACHINE_CONFIG_START( ch2001, cxgz80_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", cxgz80_state, irq_on, attotime::from_hz(484)) // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(484) - attotime::from_nsec(18300)) // active for 18.3us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", cxgz80_state, irq_off, attotime::from_hz(484))
+
+	MCFG_TIMER_DRIVER_ADD("speaker_off", cxgz80_state, speaker_off_callback)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", cxgz80_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_cxg_chess2001)
