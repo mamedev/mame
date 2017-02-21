@@ -1161,8 +1161,9 @@ key matrix is shown in below
 Guru's Readme
 -------------
 
-Atomis Wave (codename SYSTEM X) system overview
-Sammy/SEGA, 2002
+Sammy Atomiswave (codename SYSTEM X) system overview
+(high likely) developed by SI Electroncs Ltd, former Sammy subsidiary
+released April 2003
 
 The Atomiswave System is basically just a Sega Dreamcast using ROM carts.
 
