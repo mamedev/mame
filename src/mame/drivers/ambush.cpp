@@ -53,10 +53,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class ambush_base_state : public driver_device
+class ambush_state : public driver_device
 {
 public:
-	ambush_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	ambush_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_video_ram(*this, "video_ram"),
@@ -67,12 +67,30 @@ public:
 		m_color_bank(0)
 	{ }
 
+	DECLARE_PALETTE_INIT(ambush);
+	DECLARE_PALETTE_INIT(mario);
+	DECLARE_PALETTE_INIT(dkong3);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(ambush_char_tile_info);
+	TILE_GET_INFO_MEMBER(mariobl_char_tile_info);
+	TILE_GET_INFO_MEMBER(dkong3abl_char_tile_info);
+
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(scroll_ram_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(color_bank_w);
 
-protected:
-	virtual void machine_start() override;
+	DECLARE_MACHINE_START(ambush);
+	DECLARE_MACHINE_START(mariobl);
+	DECLARE_MACHINE_START(dkong3abl);
+
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	DECLARE_WRITE8_MEMBER(unk_w);
+
+private:
+	void register_save_states();
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -82,52 +100,6 @@ protected:
 
 	tilemap_t *m_char_tilemap;
 	uint8_t m_color_bank;
-};
-
-class ambush_state : public ambush_base_state
-{
-public:
-	ambush_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ambush_base_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_PALETTE_INIT(ambush);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(char_tile_info);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-
-protected:
-	virtual void machine_start() override;
-};
-
-class mariobl_state : public ambush_base_state
-{
-public:
-	mariobl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ambush_base_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_PALETTE_INIT(mario);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(mario_char_tile_info);
-
-protected:
-	virtual void machine_start() override;
-};
-
-class dkong3abl_state : public mariobl_state
-{
-public:
-	dkong3abl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mariobl_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_PALETTE_INIT(dkong3);
-	TILE_GET_INFO_MEMBER(dkong3_char_tile_info);
-
-protected:
-	virtual void machine_start() override;
 };
 
 
@@ -152,7 +124,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(coin_counter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_base_state )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -160,7 +132,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_base_state )
 	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, mariobl_state )
+static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -346,7 +318,7 @@ PALETTE_INIT_MEMBER( ambush_state, ambush )
 	}
 }
 
-PALETTE_INIT_MEMBER( mariobl_state, mario )
+PALETTE_INIT_MEMBER( ambush_state, mario )
 {
 	const uint8_t *color_prom = memregion("colors")->base();
 
@@ -375,7 +347,7 @@ PALETTE_INIT_MEMBER( mariobl_state, mario )
 	}
 }
 
-PALETTE_INIT_MEMBER( dkong3abl_state, dkong3 )
+PALETTE_INIT_MEMBER( ambush_state, dkong3 )
 {
 	const uint8_t *color_prom = memregion("colors")->base();
 
@@ -490,7 +462,7 @@ uint32_t ambush_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint32_t mariobl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ambush_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -539,13 +511,13 @@ WRITE8_MEMBER( ambush_state::flip_screen_w )
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER( ambush_base_state::scroll_ram_w )
+WRITE8_MEMBER( ambush_state::scroll_ram_w )
 {
 	m_scroll_ram[offset] = data;
 	m_char_tilemap->set_scrolly(offset, data + 1);
 }
 
-WRITE8_MEMBER( ambush_base_state::color_bank_w )
+WRITE8_MEMBER( ambush_state::color_bank_w )
 {
 	m_color_bank = data & 0x03;
 }
@@ -597,7 +569,7 @@ static GFXDECODE_START( dkong3abl )
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER( ambush_state::char_tile_info )
+TILE_GET_INFO_MEMBER( ambush_state::ambush_char_tile_info )
 {
 	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
@@ -613,7 +585,7 @@ TILE_GET_INFO_MEMBER( ambush_state::char_tile_info )
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER( mariobl_state::mario_char_tile_info )
+TILE_GET_INFO_MEMBER( ambush_state::mariobl_char_tile_info )
 {
 	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
@@ -625,7 +597,7 @@ TILE_GET_INFO_MEMBER( mariobl_state::mario_char_tile_info )
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER( dkong3abl_state::dkong3_char_tile_info )
+TILE_GET_INFO_MEMBER( ambush_state::dkong3abl_char_tile_info )
 {
 	uint8_t attr = m_attribute_ram[((tile_index >> 2) & 0xe0) | (tile_index & 0x1f)];
 
@@ -643,42 +615,41 @@ TILE_GET_INFO_MEMBER( dkong3abl_state::dkong3_char_tile_info )
 //  MACHINE EMULATION
 //**************************************************************************
 
-void ambush_base_state::machine_start()
+void ambush_state::register_save_states()
 {
-	// register for save states
 	save_item(NAME(m_color_bank));
 }
 
-void ambush_state::machine_start()
+MACHINE_START_MEMBER( ambush_state, ambush )
 {
-	ambush_base_state::machine_start();
+	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::ambush_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 	m_char_tilemap->set_scroll_cols(32);
 }
 
-void mariobl_state::machine_start()
+MACHINE_START_MEMBER( ambush_state, mariobl )
 {
-	ambush_base_state::machine_start();
+	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mariobl_state::mario_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::mariobl_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 	m_gfxdecode->gfx(0)->set_granularity(8);
 }
 
-void dkong3abl_state::machine_start()
+MACHINE_START_MEMBER( ambush_state, dkong3abl )
 {
-	ambush_base_state::machine_start();
+	register_save_states();
 
 	// create character tilemap
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dkong3abl_state::dkong3_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ambush_state::dkong3abl_char_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_char_tilemap->set_transparent_pen(0);
 }
 
-WRITE8_MEMBER( ambush_base_state::coin_counter_w )
+WRITE8_MEMBER( ambush_state::coin_counter_w )
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -694,34 +665,29 @@ WRITE8_MEMBER( ambush_state::unk_w )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ambush_base, ambush_base_state )
+static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_base_state, irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 256)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED_CLASS( ambush, ambush_base, ambush_state )
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ambush)
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
@@ -731,32 +697,36 @@ static MACHINE_CONFIG_DERIVED_CLASS( ambush, ambush_base, ambush_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( mariobl, ambush_base, mariobl_state )
+static MACHINE_CONFIG_DERIVED( mariobl, ambush )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mariobl_state, screen_update)
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mariobl)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", mariobl)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(mariobl_state, mario)
+	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( dkong3abl, mariobl, dkong3abl_state )
+static MACHINE_CONFIG_DERIVED( dkong3abl, mariobl )
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(dkong3abl_state, dkong3)
+	MCFG_PALETTE_INIT_OWNER(ambush_state, dkong3)
 MACHINE_CONFIG_END
 
 
