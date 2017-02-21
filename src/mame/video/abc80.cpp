@@ -160,7 +160,7 @@ void abc80_state::video_start()
 	
 	// start timers
 	m_scanline_timer = timer_alloc(TIMER_ID_SCANLINE);
-	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+	m_scanline_timer->adjust(m_screen->time_until_pos(0, ABC80_HBEND), 0, m_screen->scan_period());
 
 	m_blink_timer = timer_alloc(TIMER_ID_BLINK);
 	m_blink_timer->adjust(attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16), 0, attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16));

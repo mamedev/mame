@@ -25,7 +25,7 @@
 #include "sound/wave.h"
 
 #define ABC80_HTOTAL    384
-#define ABC80_HBEND     35
+#define ABC80_HBEND     30
 #define ABC80_HBSTART   384
 #define ABC80_VTOTAL    313
 #define ABC80_VBEND     15
