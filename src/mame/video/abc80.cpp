@@ -52,7 +52,6 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 	for (int sx = 0; sx < 64; sx++)
 	{
 		uint8_t hsync_data = m_hsync_prom->base()[sx];
-		if (!y) logerror("y %u sx %u HSYNC %u HV %u RE %u RR %u\n",y,sx,BIT(hsync_data,0),BIT(hsync_data,1),BIT(hsync_data,2),BIT(hsync_data,3));
 		int dh = (hsync_data & ABC80_K5_DH) ? 1 : 0;
 		uint8_t data = 0;
 
