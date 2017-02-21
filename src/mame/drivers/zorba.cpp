@@ -394,14 +394,12 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 
 READ8_MEMBER(zorba_state::memory_read_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 WRITE8_MEMBER(zorba_state::memory_write_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 READ8_MEMBER(zorba_state::io_read_byte)

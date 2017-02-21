@@ -5,9 +5,41 @@
  *
  * The keyboard MCU handles scanning the matrix and converting key down/
  * up events to high-level characters for the host computer.  The DIP
- * switches are only read on startup.
+ * switches are only read on startup.  The row select outputs are
+ * decoded by a 74159 so only one row can be driven at a time.
  *
- * TODO: the eight "holes" generate control codes, six of them are break, home and the arrows
+ * The keyboard has an unpopulated PCB location for the DIP switches,
+ * but they're unpopulated so all the switches are always off unless you
+ * add them or solder in wire links.  The keyclick/bell beeper also
+ * appears to be unpopulated.  The 300 Baud option is probably to allow
+ * the MCU program to be used with other CP/M systems (e.g. Kaypro
+ * expects this Baud rate).
+ *
+ * In addition to the asynchronous serial output, the program supports
+ * synchronous output.  If enabled with DIP switches, characters are
+ * sent out MSB first on PB2.  PB3 is pulsed low for each bit, and PB4
+ * is pulsed low after sending a complete byte.  PB2 only changes while
+ * PB3 and PB4 are both high; PB4 is pulsed after the pulse on PB3 for
+ * the final bit.  There are no delays - data is sent as fast as
+ * possible.  Characters are still sent on the asynchronous serial
+ * output when synchronous output is enabled.
+ *
+ * The keyboard understands a very simple single-byte command format.
+ * - If the MSB of the command is set, it will run one of the diagnostic
+ *   modes, depending on the three LSBs (same options provided by the
+ *   three low DIP switches), and the rest of the command processing is
+ *   skipped.
+ * - If bit 6 of the command is set, it will spin until it receives a
+ *   command with bit 6 clear (diagnostic mode commands are ignored
+ *   while in this state).
+ * - Bit 5 controls the keyboard bell (active high).
+ * - If the /INT pin is tied high, bits 0 and 1 control the Shift Lock
+ *   and Caps Lock LEDs, respectively.  Note that only the LEDs are
+ *   affected, not the keyboard's shift/caps lock state.  If /INT is
+ *   tied low, these bits are ignored.
+ * - Bits 4, 3 and 2 control PB4, PB3 and PB2 (setting the bit pulls the
+ *   output low).  This is presumably used to set the state of the
+ *   F17/F18/F19 LEDs when synchronous output is not being used.
  *
  * The Zorba manual describes a keyboard PROM with enough space to map
  * all eight modifier combinations independently, however this keyboard
@@ -16,19 +48,27 @@
  * (caps lock is computed off the normal table by checking for letter
  * characters).
  *
+ * The host sets the keyboard USART to 1200 8N2.  The MCU generates
+ * serial timings off timer interrupts.  Receive synchronisation is
+ * acquired at four times the Baud rate (4800Hz or 1200Hz).
+ *
  *       0         1         2         3         4         5         6         7
  *  0    F1        F13       3 #       KP8       i I       s S       KP2       , <
  *  1    F2        F14       4 $       KP9       o O       d D       KP3       . >
- *  2    F3        F15       5 %                 p P       f F                 / ?
- *  3    F4        F16       6 ^                 [ {       g G                 KP0
+ *  2    F3        F15       5 %       break     p P       f F       up        / ?
+ *  3    F4        F16       6 ^       home      [ {       g G       down      KP0
  *  4    F5        F17       7 &       tab       ] }       h H       shift     KP.
- *  5    F6        F18       8 *       q Q       KP4       j J       z Z
- *  6    F7        F19       9 (       w W       KP5       k K       x X
+ *  5    F6        F18       8 *       q Q       KP4       j J       z Z       left
+ *  6    F7        F19       9 (       w W       KP5       k K       x X       right
  *  7    F8        ~         0 )       e E       KP6       l L       c C       space
  *  8    F9        \ |       - _       r R       s-lock    ; :       v V       newline
  *  9    F10       ESC       = +       t T       ctrl      ' "       b B       KP-
  * 10    F11       1 !       del       y Y       c-lock    return    n N
  * 11    F12       2 @       KP7       u U       a A       KP1       m M
+ *
+ * TODO: The two "holes" generate control characters, possibly soft
+ * capslock and shiftlock codes to be used when /INT is tied high.  They
+ * don't correspond to physical keys on the Zorba keyboard.
  */
 #include "emu.h"
 #include "zorbakbd.h"
@@ -63,20 +103,20 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3")           PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F3))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F15")          PORT_CODE(KEYCODE_F15)        PORT_CHAR(UCHAR_MAMEKEY(F15))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b9
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_PAUSE)      PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b3
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("ROW3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4")           PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F16")          PORT_CODE(KEYCODE_F16)        PORT_CHAR(UCHAR_MAMEKEY(F16))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b7
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOME")         PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b4
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 0")         PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 
 	PORT_START("ROW4")
@@ -97,7 +137,7 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 4")         PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START("ROW6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7")           PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))
@@ -107,7 +147,7 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 5")         PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // b6
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("ROW7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F8")           PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))
@@ -147,7 +187,7 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK")    PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // e0
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // e0/e2/e3
 
 	PORT_START("ROW11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F12")          PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))
@@ -157,7 +197,7 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 1")         PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // e1
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // e1/e3/e4
 
 	PORT_START("ROW12")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED   ) // scanned but the tables are too small so it would post garbage
@@ -169,7 +209,7 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED   ) // scanned but the tables are too small so it would post garbage
 
 	PORT_START("ROW15")
-	PORT_DIPNAME( 0x07, 0x07, "Diagnostic Mode" )
+	PORT_DIPNAME( 0x07, 0x07, "Diagnostic Mode" )       PORT_DIPLOCATION("DIP:1,2,3")
 	PORT_DIPSETTING(    0x07, "0 (Normal)" )
 	PORT_DIPSETTING(    0x06, "1 (Dump Tables)" )
 	PORT_DIPSETTING(    0x05, "2 (Report Revision)" )
@@ -178,21 +218,21 @@ INPUT_PORTS_START(zorba_keyboard)
 	PORT_DIPSETTING(    0x02, "5 (Output Test)" )
 	PORT_DIPSETTING(    0x01, "6 (Normal)" )
 	PORT_DIPSETTING(    0x00, "7 (Dump Tables)" )
-	PORT_DIPNAME( 0x08, 0x08, "Key Repeat" )
+	PORT_DIPNAME( 0x08, 0x08, "Key Repeat" )            PORT_DIPLOCATION("DIP:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(On) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
-	PORT_DIPNAME( 0x10, 0x10, "Baud Rate" )
+	PORT_DIPNAME( 0x10, 0x10, "Baud Rate" )             PORT_DIPLOCATION("DIP:5")
 	PORT_DIPSETTING(    0x10, "1200" )
 	PORT_DIPSETTING(    0x00, "300" )
-	PORT_DIPNAME( 0x20, 0x20, "Key Click" )
+	PORT_DIPNAME( 0x20, 0x20, "Key Click" )             PORT_DIPLOCATION("DIP:6")
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )
+	PORT_DIPNAME( 0x40, 0x40, "Synchronous Output" )    PORT_DIPLOCATION("DIP:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Key Repeat Delay/Rate" ) PORT_DIPLOCATION("DIP:8")
+	PORT_DIPSETTING(    0x80, "0.75s/15cps" )
+	PORT_DIPSETTING(    0x00, "0.5s/21cps" )
 INPUT_PORTS_END
 
 
