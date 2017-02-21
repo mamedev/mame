@@ -253,7 +253,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
+	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)
 	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
 	MCFG_PATINHO_BUTTONS_READ_CB(READ16(patinho_feio_state, buttons_r))
 
