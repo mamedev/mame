@@ -243,6 +243,9 @@
     <ClCompile Include="..\devices\nld_7475.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\devices\nld_74164.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">
@@ -558,6 +561,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_74175.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\nld_74164.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

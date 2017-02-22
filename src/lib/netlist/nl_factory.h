@@ -87,12 +87,12 @@ namespace factory {
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
-				const pstring &def_param)
+			const pstring &def_param)
 		{
 			register_device(std::unique_ptr<element_t>(plib::palloc<device_element_t<device_class>>(name, classname, def_param)));
 		}
 
-		void register_device(std::unique_ptr<element_t> factory);
+		void register_device(std::unique_ptr<element_t> &&factory);
 
 		element_t * factory_by_name(const pstring &devname);
 
