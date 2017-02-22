@@ -99,7 +99,7 @@ int test_ctr()
 
 namespace cast
 {
-	template <typename genType>
+	template<typename genType>
 	int entry()
 	{
 		int Error = 0;
@@ -132,6 +132,20 @@ namespace cast
 	}
 }//namespace cast
 
+int test_size()
+{
+	int Error = 0;
+
+	Error += 16 == sizeof(glm::mat2x2) ? 0 : 1;
+	Error += 32 == sizeof(glm::dmat2x2) ? 0 : 1;
+	Error += glm::mat2x2().length() == 2 ? 0 : 1;
+	Error += glm::dmat2x2().length() == 2 ? 0 : 1;
+	Error += glm::mat2x2::length() == 2 ? 0 : 1;
+	Error += glm::dmat2x2::length() == 2 ? 0 : 1;
+
+	return Error;
+}
+
 int main()
 {
 	int Error(0);
@@ -140,6 +154,7 @@ int main()
 	Error += test_ctr();
 	Error += test_operators();
 	Error += test_inverse();
+	Error += test_size();
 
 	return Error;
 }

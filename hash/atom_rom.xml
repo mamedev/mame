@@ -7,7 +7,7 @@
   - axr2 (APP Laboratories)
 
 -->
-<softwarelist name="atom_cart" description="Acorn Atom Utility ROMs">
+<softwarelist name="atom_rom" description="Acorn Atom Utility ROMs">
 
 	<software name="ace20">
 		<description>ACE-2.0</description>

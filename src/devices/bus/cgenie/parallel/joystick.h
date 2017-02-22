@@ -11,7 +11,6 @@
 #ifndef __CGENIE_PARALLEL_JOYSTICK_H__
 #define __CGENIE_PARALLEL_JOYSTICK_H__
 
-#include "emu.h"
 #include "parallel.h"
 
 

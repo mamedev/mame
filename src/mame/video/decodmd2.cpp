@@ -8,6 +8,7 @@
  *    68B45 CRTC
  */
 
+#include "emu.h"
 #include "decodmd2.h"
 #include "rendlay.h"
 

@@ -11,7 +11,6 @@
 #ifndef __CBM2_24K_CARTRIDGE__
 #define __CBM2_24K_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 
 

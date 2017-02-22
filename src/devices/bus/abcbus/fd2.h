@@ -11,7 +11,6 @@
 #ifndef __ABC_FD2__
 #define __ABC_FD2__
 
-#include "emu.h"
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

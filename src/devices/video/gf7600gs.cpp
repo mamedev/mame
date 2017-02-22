@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "gf7600gs.h"
 
 const device_type GEFORCE_7600GS = &device_creator<geforce_7600gs_device>;

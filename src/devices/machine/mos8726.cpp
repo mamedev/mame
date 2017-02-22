@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "mos8726.h"
 
 

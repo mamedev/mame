@@ -5,7 +5,6 @@
 #ifndef __PDS_SEDISPLAY_H__
 #define __PDS_SEDISPLAY_H__
 
-#include "emu.h"
 #include "macpds.h"
 
 //**************************************************************************

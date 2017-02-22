@@ -12,7 +12,6 @@
 #define __SILVERROCK__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

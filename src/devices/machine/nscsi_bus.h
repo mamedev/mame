@@ -3,7 +3,6 @@
 #ifndef __NSCSI_BUS_H__
 #define __NSCSI_BUS_H__
 
-#include "emu.h"
 
 #define MCFG_NSCSI_BUS_ADD(_tag)        \
 	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)

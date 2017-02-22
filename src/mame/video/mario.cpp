@@ -107,11 +107,6 @@ WRITE8_MEMBER(mario_state::mario_scroll_w)
 	m_gfx_scroll = data + 17;
 }
 
-WRITE8_MEMBER(mario_state::mariobl_scroll_w)
-{
-	m_gfx_scroll = data;
-}
-
 WRITE8_MEMBER(mario_state::mario_flip_w)
 {
 	if (m_flip != (data & 0x01))
@@ -155,7 +150,7 @@ void mario_state::video_start()
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int is_bootleg)
+void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
 	 * The schematics have the same logic for sprite buffering.
@@ -164,70 +159,42 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	int start, end, inc;
 
-	if (!is_bootleg)
-	{
-		start = 0;
-		end = m_spriteram.bytes();
-		inc = 4;
-	}
-	else
-	{
-		start = m_spriteram.bytes()-4;
-		end = -4;
-		inc = -4;
-	}
+	start = 0;
+	end = m_spriteram.bytes();
+	inc = 4;
 
 	offs = start;
 
 	while (offs != end)
 	{
-		if (is_bootleg || m_spriteram[offs])
+		if (m_spriteram[offs])
 		{
 			int x, y;
 			int code, color, flipx, flipy;
 
-			if (!is_bootleg)
+			// from schematics ....
+			y = (m_spriteram[offs + 0] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+			x = m_spriteram[offs + 3];
+			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
+			y = 240 - y; /* logical screen position */
+
+			y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+			x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+
+			code = m_spriteram[offs + 2];
+			color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
+			flipx = (m_spriteram[offs + 1] & 0x80);
+			flipy = (m_spriteram[offs + 1] & 0x40);
+
+			if (m_flip)
 			{
-				// from schematics ....
-				y = (m_spriteram[offs + 0] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-				x = m_spriteram[offs + 3];
-				// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
-				y = 240 - y; /* logical screen position */
-
-				y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-				x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-
-				code = m_spriteram[offs + 2];
-				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
-				flipx = (m_spriteram[offs + 1] & 0x80);
-				flipy = (m_spriteram[offs + 1] & 0x40);
-
-				if (m_flip)
-				{
-					y -= 14;
-					x -= 7;
-				}
-				else
-				{
-					y += 1;
-					x -= 8;
-				}
+				y -= 14;
+				x -= 7;
 			}
 			else
 			{
-				y = (m_spriteram[offs + 3] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-				x = m_spriteram[offs + 0];
-				y = 240 - y; /* logical screen position */
-
-			//  y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-			//  x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-
-				code = (m_spriteram[offs + 2] & 0x7f) | ((m_spriteram[offs + 1] & 0x40) << 1); // upper tile bit is where the flipy bit goes on mario
-				color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
-				flipx = (m_spriteram[offs + 1] & 0x80);
-				flipy = (m_spriteram[offs + 2] & 0x80); // and the flipy bit is where the upper tile bit is on mario
-
-				y += -7;
+				y += 1;
+				x -= 8;
 			}
 
 			if (m_flip)
@@ -252,7 +219,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	}
 }
 
-uint32_t mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mario_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int t;
 
@@ -264,27 +231,9 @@ uint32_t mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &
 	}
 
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	return 0;
-}
+	draw_sprites(bitmap, cliprect);
 
-uint32_t mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 0);
-	return 0;
-}
-
-uint32_t mario_state::screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// not sure
-	m_palette_bank = m_gfx_bank; // might be the 'attr' ram
-	machine().tilemap().mark_all_dirty();
-
-
-	screen_update_common(screen, bitmap, cliprect);
-	draw_sprites(bitmap, cliprect, 1);
 	return 0;
 }

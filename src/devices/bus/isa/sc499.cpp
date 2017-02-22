@@ -14,6 +14,7 @@
  *
  */
 
+#include "emu.h"
 #include "sc499.h"
 #include "formats/ioprocs.h"
 

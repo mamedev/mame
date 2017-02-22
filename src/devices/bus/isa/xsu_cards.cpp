@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "isa_cards.h"
 #include "xsu_cards.h"
 

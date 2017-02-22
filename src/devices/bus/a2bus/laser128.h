@@ -11,7 +11,6 @@
 #ifndef __A2BUS_LASER128__
 #define __A2BUS_LASER128__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

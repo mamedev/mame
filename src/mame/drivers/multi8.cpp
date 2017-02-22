@@ -26,17 +26,14 @@ class multi8_state : public driver_device
 {
 public:
 	multi8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi(*this, "ppi8255_0"),
-	m_crtc(*this, "crtc"),
-	m_beeper(*this, "beeper")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_ppi(*this, "ppi8255_0")
+		, m_crtc(*this, "crtc")
+		, m_beeper(*this, "beeper")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi;
-	required_device<mc6845_device> m_crtc;
-	required_device<beep_device> m_beeper;
 	DECLARE_WRITE8_MEMBER(multi8_6845_w);
 	DECLARE_READ8_MEMBER(key_input_r);
 	DECLARE_READ8_MEMBER(key_status_r);
@@ -50,10 +47,15 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
+	DECLARE_READ8_MEMBER(ay8912_0_r);
+	DECLARE_READ8_MEMBER(ay8912_1_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	uint32_t screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
 	uint8_t *m_p_kanji;
-	uint8_t *m_p_chargen;
 	uint8_t m_mcu_init;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;
@@ -64,14 +66,15 @@ public:
 	uint8_t m_pen_clut[8];
 	uint8_t m_bw_mode;
 	uint16_t m_knj_addr;
-	DECLARE_READ8_MEMBER(ay8912_0_r);
-	DECLARE_READ8_MEMBER(ay8912_1_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,uint8_t pen,uint8_t width);
+	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<i8255_device> m_ppi;
+	required_device<mc6845_device> m_crtc;
+	required_device<beep_device> m_beeper;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -100,7 +103,6 @@ void multi8_state::video_start()
 
 	m_vram_bank = 8;
 	m_bw_mode = 0;
-	m_p_chargen = memregion("chargen")->base();
 }
 
 void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,uint8_t pen,uint8_t width)

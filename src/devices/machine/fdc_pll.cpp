@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "fdc_pll.h"
 
 std::string fdc_pll_t::tts(attotime t)
@@ -23,11 +24,16 @@ void fdc_pll_t::set_clock(const attotime &_period)
 
 void fdc_pll_t::reset(const attotime &when)
 {
+	read_reset(when);
+	write_position = 0;
+	write_start_time = attotime::never;
+}
+
+void fdc_pll_t::read_reset(const attotime &when)
+{
 	ctime = when;
 	phase_adjust = attotime::zero;
 	freq_hist = 0;
-	write_position = 0;
-	write_start_time = attotime::never;
 }
 
 void fdc_pll_t::start_writing(const attotime &tm)
@@ -57,6 +63,11 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const att
 {
 	attotime edge = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 
+	return feed_read_data(tm , edge , limit);
+}
+
+int fdc_pll_t::feed_read_data(attotime &tm, const attotime& edge, const attotime &limit)
+{
 	attotime next = ctime + period + phase_adjust;
 
 #if 0
@@ -70,7 +81,7 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const att
 	ctime = next;
 	tm = next;
 
-	if(edge.is_never() || edge >= next) {
+	if(edge.is_never() || edge > next) {
 		// No transition in the window means 0 and pll in free run mode
 		phase_adjust = attotime::zero;
 		return 0;

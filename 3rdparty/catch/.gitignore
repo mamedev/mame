@@ -14,9 +14,15 @@ Breakpoints.xcbkptlist
 projects/VS2010/TestCatch/_UpgradeReport_Files/
 projects/VS2010/TestCatch/TestCatch/TestCatch.vcxproj.filters
 projects/VisualStudio/TestCatch/UpgradeLog.XML
+projects/CMake/.idea
+projects/CMake/cmake-build-debug
 UpgradeLog.XML
 Resources/DWARF
-projects/XCode/iOSTest/Build
+projects/Generated
 *.pyc
 DerivedData
 *.xccheckout
+Build
+.idea
+cmake-build-debug
+cmake-build-release

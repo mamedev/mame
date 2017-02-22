@@ -8,12 +8,10 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
+#include "pstring.h"
+
 #include <vector>
 #include <memory>
-#include <utility>
-
-#include "pconfig.h"
-#include "pstring.h"
 
 namespace plib {
 
@@ -28,19 +26,26 @@ T *palloc(Args&&... args)
 }
 
 template<typename T>
-void pfree(T *ptr) { delete ptr; }
+void pfree(T *ptr)
+{
+	delete ptr;
+}
 
 template<typename T>
-inline T* palloc_array(std::size_t num)
+T* palloc_array(const std::size_t num)
 {
 	return new T[num]();
 }
 
 template<typename T>
-void pfree_array(T *ptr) { delete [] ptr; }
+void pfree_array(T *ptr)
+{
+	delete [] ptr;
+}
 
 template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
+std::unique_ptr<T> make_unique(Args&&... args)
+{
 	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
@@ -147,12 +152,18 @@ private:
 	};
 
 	size_t new_block();
+	size_t mininfosize();
 
 	struct info
 	{
 		info() : m_block(0) { }
 		size_t m_block;
 	};
+
+	size_t m_min_alloc;
+	size_t m_min_align;
+
+	std::vector<block> m_blocks;
 
 public:
 	mempool(size_t min_alloc, size_t min_align);
@@ -161,10 +172,6 @@ public:
 	void *alloc(size_t size);
 	void free(void *ptr);
 
-	size_t m_min_alloc;
-	size_t m_min_align;
-
-	std::vector<block> m_blocks;
 };
 
 }

@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -91,7 +92,7 @@ int test_log()
 
 int main()
 {
-	int Error(0);
+	int Error = 0;
 
 	Error += test_log();
 	Error += test_rotation();

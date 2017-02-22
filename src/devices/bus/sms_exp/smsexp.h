@@ -14,7 +14,6 @@
 #ifndef __SMS_EXPANSION_SLOT__
 #define __SMS_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

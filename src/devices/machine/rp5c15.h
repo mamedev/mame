@@ -23,7 +23,6 @@
 #ifndef __RP5C15__
 #define __RP5C15__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

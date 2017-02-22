@@ -41,6 +41,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/mpz80.h"
 #include "softlist.h"
 

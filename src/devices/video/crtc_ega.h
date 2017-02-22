@@ -9,7 +9,6 @@
 #ifndef __CRTC_EGA__
 #define __CRTC_EGA__
 
-#include "emu.h"
 
 /* callback definitions */
 typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> crtc_ega_begin_update_delegate;

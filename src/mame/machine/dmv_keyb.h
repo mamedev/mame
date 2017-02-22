@@ -12,7 +12,6 @@
 #define __DMV_KEYBOARD__
 
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

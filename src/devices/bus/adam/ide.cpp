@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "ide.h"
 #include "bus/centronics/ctronics.h"
 

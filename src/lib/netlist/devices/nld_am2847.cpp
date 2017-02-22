@@ -6,6 +6,7 @@
  */
 
 #include "nld_am2847.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -20,6 +21,8 @@ namespace netlist
 		, m_OUT(*this, "OUT")
 		{
 		}
+
+		NETLIB_UPDATEI();
 
 	public:
 		void shift();
@@ -106,6 +109,11 @@ namespace netlist
 			m_D.shift();
 		}
 		m_last_CP = m_CP();
+	}
+
+	NETLIB_UPDATE(Am2847_shifter)
+	{
+		/* do nothing */
 	}
 
 	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))

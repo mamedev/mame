@@ -11,6 +11,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sblaster.h"
 #include "machine/pic8259.h"
 #include "sound/speaker.h"

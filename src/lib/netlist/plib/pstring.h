@@ -7,11 +7,8 @@
 #ifndef PSTRING_H_
 #define PSTRING_H_
 
-#include <cstdarg>
-#include <cstddef>
 #include <iterator>
-
-#include "pconfig.h"
+#include <exception>
 
 // ----------------------------------------------------------------------------------------
 // pstring: immutable strings ...
@@ -22,26 +19,24 @@
 
 struct pstr_t
 {
-	//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-	pstr_t(const std::size_t alen)
-	{
-		init(alen);
-	}
+	pstr_t(const std::size_t alen) { init(alen); }
 	void init(const std::size_t alen)
 	{
-			m_ref_count = 1;
-			m_len = alen;
-			m_str[0] = 0;
+		m_ref_count = 1;
+		m_len = alen;
+		m_str[0] = 0;
 	}
 	char *str() { return &m_str[0]; }
 	unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
 	std::size_t len() const  { return m_len; }
-	int m_ref_count;
+	void inc() { m_ref_count++; }
+	bool dec_and_check() { --m_ref_count; return m_ref_count == 0; }
+	void copy_from(const char *p, std::size_t n) { std::copy(p, p + n, str()); }
 private:
+	int m_ref_count;
 	std::size_t m_len;
 	char m_str[1];
 };
-
 
 template <typename F>
 struct pstring_t
@@ -75,7 +70,8 @@ public:
 	pstring_t(C (&string)[N]) : m_ptr(&m_zero) {
 		static_assert(std::is_same<C, const mem_t>::value, "pstring constructor only accepts const mem_t");
 		static_assert(N>0,"pstring from array of length 0");
-		//static_assert(string[N-1] == 0, "pstring constructor parameter not a string literal");
+		if (string[N-1] != 0)
+			throw std::exception();
 		init(string);
 	}
 
@@ -170,13 +166,6 @@ public:
 
 	const pstring_t ucase() const;
 
-	// FIXME: do something with encoding
-	// FIXME: belongs into derived class
-	// This is only used in state saving to support "owners" whose name() function
-	// returns char*.
-	static pstring_t from_utf8(const mem_t *c) { return pstring_t(c, UTF8); }
-	static pstring_t from_utf8(const pstring_t &c) { return c; }
-
 	static void resetmem();
 
 protected:
@@ -185,19 +174,17 @@ protected:
 private:
 	void init(const mem_t *string)
 	{
-		m_ptr->m_ref_count++;
+		m_ptr->inc();
 		if (string != nullptr && *string != 0)
 			pcopy(string);
 	}
 	void init(const pstring_t &string)
 	{
-		m_ptr->m_ref_count++;
+		m_ptr->inc();
 		pcopy(string);
 	}
 
 	int pcmp(const pstring_t &right) const;
-
-	int pcmp(const mem_t *right) const;
 
 	void pcopy(const mem_t *from, std::size_t size);
 
@@ -206,7 +193,7 @@ private:
 	{
 		sfree(m_ptr);
 		m_ptr = from.m_ptr;
-		m_ptr->m_ref_count++;
+		m_ptr->inc();
 	}
 	void pcat(const mem_t *s);
 	void pcat(const pstring_t &s);
@@ -216,8 +203,6 @@ private:
 
 	static pstr_t m_zero;
 };
-
-template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 struct pu8_traits
 {

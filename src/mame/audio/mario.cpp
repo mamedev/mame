@@ -419,8 +419,6 @@ void mario_state::sound_start()
 {
 	device_t *audiocpu = machine().device("audiocpu");
 
-	if (!audiocpu) return;
-
 #if USE_8039
 	uint8_t *SND = memregion("audiocpu")->base();
 
@@ -442,8 +440,6 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-	if (!m_audiocpu) return;
-
 	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039

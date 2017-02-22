@@ -11,7 +11,6 @@
 #ifndef __A2EAUX_EXT80COL__
 #define __A2EAUX_EXT80COL__
 
-#include "emu.h"
 #include "a2eauxslot.h"
 
 //**************************************************************************

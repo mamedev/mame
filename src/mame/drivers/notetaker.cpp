@@ -75,6 +75,7 @@ DONE:
   - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addresses
 */
 
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/ay31015.h"
 #include "machine/pic8259.h"

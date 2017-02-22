@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/tms1024.h"
 #include "video/mc6845.h"
 #include "sound/msm5205.h"
 
@@ -19,6 +20,8 @@ public:
 		m_cpu3(*this, "cpu3"),
 		m_crtc(*this, "crtc"),
 		m_msm(*this, "msm"),
+		m_inp1(*this, "inp1"),
+		m_inp2(*this, "inp2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -32,6 +35,8 @@ public:
 	required_device<cpu_device> m_cpu3;
 	required_device<h46505_device> m_crtc;
 	optional_device<msm5205_device> m_msm;
+	required_device<tms1025_device> m_inp1;
+	required_device<tms1025_device> m_inp2;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -60,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(docastle_nmitrigger_w);
 	DECLARE_WRITE8_MEMBER(docastle_videoram_w);
 	DECLARE_WRITE8_MEMBER(docastle_colorram_w);
-	DECLARE_READ8_MEMBER(flipscreen_r);
+	DECLARE_READ8_MEMBER(inputs_flipscreen_r);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);

@@ -13,7 +13,6 @@
 #ifndef __DS2404_H__
 #define __DS2404_H__
 
-#include "emu.h"
 
 
 

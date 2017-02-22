@@ -529,7 +529,7 @@ void pic16c62x_device::btfss()
 {
 	if ((GET_REGFILE(ADDR) & bit_set[POS]) == bit_set[POS])
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -539,7 +539,7 @@ void pic16c62x_device::btfsc()
 {
 	if ((GET_REGFILE(ADDR) & bit_set[POS]) == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -593,7 +593,7 @@ void pic16c62x_device::decfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -619,7 +619,7 @@ void pic16c62x_device::incfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0)
 	{
-		m_PC++ ;
+		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1;     /* Add NOP cycles */
 	}
@@ -744,8 +744,8 @@ void pic16c62x_device::tris()
 {
 	switch(m_opcode.b.l & 0x7)
 	{
-		case 05:    STORE_REGFILE(0x85, m_W); break;
-		case 06:    STORE_REGFILE(0x86, m_W); break;
+		case 5:     STORE_REGFILE(0x85, m_W); break;
+		case 6:     STORE_REGFILE(0x86, m_W); break;
 		default:    illegal(); break;
 	}
 }
@@ -817,11 +817,11 @@ const pic16c62x_device::pic16c62x_instruction pic16c62x_device::s_instructiontab
 
 void pic16c62x_device::build_opcode_table(void)
 {
-int instr,mask,bits;
-int a;
+	int instr,mask,bits;
+	int a;
 
 	// defaults
-	for ( a = 0; a < 16384; a++)
+	for ( a = 0; a < 0x4000; a++)
 	{
 		m_opcode_table[a].cycles = 0;
 		m_opcode_table[a].function = &pic16c62x_device::illegal;
@@ -849,7 +849,7 @@ int a;
 					break;
 			}
 		}
-		for ( a = 0; a < 16384; a++)
+		for ( a = 0; a < 0x4000; a++)
 		{
 			if (((a & mask) == bits) && (m_opcode_table[a].cycles == 0))
 			{
@@ -882,12 +882,6 @@ void pic16c62x_device::device_start()
 	save_item(NAME(m_ALU));
 	save_item(NAME(m_OPTION));
 	save_item(NAME(m_PCLATH));
-	save_item(NAME(TMR0));
-	save_item(NAME(PCL));
-	save_item(NAME(STATUS));
-	save_item(NAME(FSR));
-	save_item(NAME(PORTA));
-	save_item(NAME(PORTB));
 	save_item(NAME(m_TRISA));
 	save_item(NAME(m_TRISB));
 	save_item(NAME(m_old_T0));
@@ -895,14 +889,7 @@ void pic16c62x_device::device_start()
 	save_item(NAME(m_picRAMmask));
 	save_item(NAME(m_WDT));
 	save_item(NAME(m_prescaler));
-	save_item(NAME(m_STACK[0]));
-	save_item(NAME(m_STACK[1]));
-	save_item(NAME(m_STACK[2]));
-	save_item(NAME(m_STACK[3]));
-	save_item(NAME(m_STACK[4]));
-	save_item(NAME(m_STACK[5]));
-	save_item(NAME(m_STACK[6]));
-	save_item(NAME(m_STACK[7]));
+	save_item(NAME(m_STACK));
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PREVPC));
 	save_item(NAME(m_CONFIG));
@@ -1143,8 +1130,8 @@ void pic16c62x_device::execute_run()
 			m_PC++;
 			PCL++;
 
-			m_inst_cycles = m_opcode_table[m_opcode.w.l & 16383].cycles;
-			(this->*m_opcode_table[m_opcode.w.l & 16383].function)();
+			m_inst_cycles = m_opcode_table[m_opcode.w.l & 0x3fff].cycles;
+			(this->*m_opcode_table[m_opcode.w.l & 0x3fff].function)();
 
 			if (T0CS) {                     /* Count mode */
 				T0_in = S_T0_IN;

@@ -1340,10 +1340,6 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device
 	m_external_addrswap[9] = 9;
 }
 
-void deco_146_base_device::device_config_complete()
-{
-}
-
 
 
 uint16_t deco_146_base_device::port_dummy_cb(int unused)

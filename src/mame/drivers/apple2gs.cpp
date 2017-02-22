@@ -60,7 +60,6 @@
 #include "machine/ram.h"
 
 #include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
@@ -376,7 +375,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NOOP)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)

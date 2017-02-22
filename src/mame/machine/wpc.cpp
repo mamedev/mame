@@ -6,6 +6,7 @@
  *  Created on: 7/10/2013
  */
 
+#include "emu.h"
 #include "wpc.h"
 
 #define LOG_WPC (0)

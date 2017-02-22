@@ -12,7 +12,6 @@
 #define __C64_SW8K__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

@@ -47,7 +47,6 @@
 #ifndef __QL_EXPANSION_SLOT__
 #define __QL_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

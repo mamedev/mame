@@ -29,6 +29,7 @@
 
 */
 
+#include "emu.h"
 #include "sw8k.h"
 
 

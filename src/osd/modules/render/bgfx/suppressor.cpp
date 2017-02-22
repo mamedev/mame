@@ -7,6 +7,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "suppressor.h"
 
 #include "slider.h"

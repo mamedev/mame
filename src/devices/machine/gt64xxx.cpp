@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Aaron Giles, Ted Green
+#include "emu.h"
 #include "gt64xxx.h"
 
 /*************************************

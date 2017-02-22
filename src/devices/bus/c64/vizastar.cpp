@@ -26,6 +26,7 @@
 
 */
 
+#include "emu.h"
 #include "vizastar.h"
 
 

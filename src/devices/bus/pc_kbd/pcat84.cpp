@@ -24,6 +24,7 @@
 
 */
 
+#include "emu.h"
 #include "pcat84.h"
 
 

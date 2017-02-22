@@ -39,6 +39,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "tn_usbsm.h"
 
 #define STRATA_TAG "strata"

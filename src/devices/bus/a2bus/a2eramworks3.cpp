@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "a2eramworks3.h"
 
 

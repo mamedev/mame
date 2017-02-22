@@ -8,6 +8,7 @@
 
 #import "debugview.h"
 
+#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 

@@ -13,6 +13,7 @@
  *   - printer option (type 3b)
  */
 
+#include "emu.h"
 #include "decopincpu.h"
 
 const device_type DECOCPU1 = &device_creator<decocpu_type1_device>;

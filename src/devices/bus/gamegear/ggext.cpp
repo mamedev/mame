@@ -7,6 +7,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ggext.h"
 // slot devices
 #include "smsctrladp.h"

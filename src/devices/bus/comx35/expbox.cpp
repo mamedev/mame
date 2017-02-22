@@ -46,6 +46,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "expbox.h"
 
 

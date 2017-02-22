@@ -13,7 +13,6 @@
 #ifndef __ISA_SIDE116_H__
 #define __ISA_SIDE116_H__
 
-#include "emu.h"
 #include "machine/ataintf.h"
 #include "isa.h"
 

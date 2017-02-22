@@ -26,18 +26,18 @@ namespace Catch {
     {}
 
     std::ostream& operator << ( std::ostream& os, Version const& version ) {
-        os  << version.majorVersion << "."
-            << version.minorVersion << "."
+        os  << version.majorVersion << '.'
+            << version.minorVersion << '.'
             << version.patchNumber;
 
         if( !version.branchName.empty() ) {
-            os  << "-" << version.branchName
-                << "." << version.buildNumber;
+            os  << '-' << version.branchName
+                << '.' << version.buildNumber;
         }
         return os;
     }
 
-    Version libraryVersion( 1, 5, 8, "", 0 );
+    Version libraryVersion( 1, 7, 0, "", 0 );
 
 }
 

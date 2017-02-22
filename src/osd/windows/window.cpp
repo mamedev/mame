@@ -53,9 +53,6 @@ using namespace Windows::UI::Core;
 #define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
 #define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
 
-#undef min
-#undef max
-
 //============================================================
 //  PARAMETERS
 //============================================================

@@ -413,6 +413,7 @@ galaxia.cpp
 galaxian.cpp
 galaxold.cpp
 galgame.cpp
+galgames.cpp
 galivan.cpp
 galpani2.cpp
 galpani3.cpp
@@ -591,6 +592,7 @@ konamigv.cpp
 konamigx.cpp
 konamim2.cpp
 konendev.cpp
+konmedal.cpp
 kontest.cpp
 kopunch.cpp
 ksayakyu.cpp

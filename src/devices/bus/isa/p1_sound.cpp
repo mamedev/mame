@@ -11,6 +11,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "p1_sound.h"
 #include "sound/volt_reg.h"
 

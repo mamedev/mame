@@ -51,6 +51,7 @@
    Michael Zapf, 2012
 */
 
+#include "emu.h"
 #include "tms9980a.h"
 
 /*

@@ -11,7 +11,6 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "bus/a2bus/a2bus.h"
@@ -286,6 +285,7 @@ public:
 
 	void apple2_refresh_delegates();
 	int apple2_pressed_specialkey(uint8_t key);
+	void langcard_touch(offs_t offset);
 
 	read8_delegate read_delegates_master[4];
 	write8_delegate write_delegates_master[3];

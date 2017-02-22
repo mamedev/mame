@@ -2,13 +2,13 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-	Amiga Keyboard Interface
+    Amiga Keyboard Interface
 
-	Serial data and reset control
+    Serial data and reset control
 
-	- KDAT (serial data)
-	- KCLK (serial clock)
-	- KRST (reset output)
+    - KDAT (serial data)
+    - KCLK (serial clock)
+    - KRST (reset output)
 
 ***************************************************************************/
 
@@ -17,7 +17,6 @@
 #ifndef DEVICES_BUS_AMIGA_KEYBOARD_H
 #define DEVICES_BUS_AMIGA_KEYBOARD_H
 
-#include "emu.h"
 
 
 //**************************************************************************
@@ -93,7 +92,7 @@ public:
 	device_amiga_keyboard_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_amiga_keyboard_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) {};
+	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) = 0;
 
 protected:
 	amiga_keyboard_bus_device *m_host;

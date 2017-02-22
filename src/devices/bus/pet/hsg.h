@@ -11,7 +11,6 @@
 #ifndef __CBM8000_HSG__
 #define __CBM8000_HSG__
 
-#include "emu.h"
 #include "exp.h"
 #include "video/ef9365.h"
 

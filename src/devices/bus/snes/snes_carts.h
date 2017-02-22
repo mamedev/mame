@@ -11,7 +11,6 @@
 #ifndef __SNES_CARTS_H__
 #define __SNES_CARTS_H__
 
-#include "emu.h"
 
 #include "rom.h"
 #include "rom21.h"

@@ -5,20 +5,17 @@
  *
  */
 
-#include <cstdio>
-
 #include "plib/palloc.h"
 #include "plib/putil.h"
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
 #include "nl_factory.h"
-#include "devices/net_lib.h"
-#include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
 #include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
+#include "devices/nlid_truthtable.h"
 
 // ----------------------------------------------------------------------------------------
 // setup_t
@@ -32,7 +29,7 @@ setup_t::setup_t(netlist_t &netlist)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	initialize_factory(m_factory);
+	devices::initialize_factory(m_factory);
 }
 
 setup_t::~setup_t()
@@ -123,7 +120,7 @@ void setup_t::register_alias(const pstring &alias, const pstring &out)
 
 void setup_t::register_dippins_arr(const pstring &terms)
 {
-	plib::pstring_vector_t list(terms,", ");
+	std::vector<pstring> list(plib::psplit(terms,", "));
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal(MF_1_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1,
 				build_fqn(""));
@@ -135,20 +132,17 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	}
 }
 
-pstring setup_t::objtype_as_str(detail::device_object_t &in) const
+pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 {
 	switch (in.type())
 	{
-		case terminal_t::TERMINAL:
+		case detail::terminal_type::TERMINAL:
 			return pstring("TERMINAL");
-		case terminal_t::INPUT:
+		case detail::terminal_type::INPUT:
 			return pstring("INPUT");
-		case terminal_t::OUTPUT:
+		case detail::terminal_type::OUTPUT:
 			return pstring("OUTPUT");
-		case terminal_t::PARAM:
-			return pstring("PARAM");
 	}
-	// FIXME: noreturn
 	log().fatal(MF_1_UNKNOWN_OBJECT_TYPE_1, static_cast<unsigned>(in.type()));
 	return pstring("Error");
 }
@@ -199,14 +193,14 @@ void setup_t::register_param(pstring name, param_t &param)
 void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
-		log().fatal(MF_2_ADDING_1_2_TO_TERMINAL_LIST, objtype_as_str(term),
+		log().fatal(MF_2_ADDING_1_2_TO_TERMINAL_LIST, termtype_as_str(term),
 				term.name());
-	log().debug("{1} {2}\n", objtype_as_str(term), term.name());
+	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
 void setup_t::register_link_arr(const pstring &terms)
 {
-	plib::pstring_vector_t list(terms,", ");
+	std::vector<pstring> list(plib::psplit(terms,", "));
 	if (list.size() < 2)
 		log().fatal(MF_2_NET_C_NEEDS_AT_LEAST_2_TERMINAL);
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -340,12 +334,12 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 }
 
 detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		detail::device_object_t::type_t atype, bool required)
+		detail::terminal_type atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret == m_terminals.end() && atype == detail::device_object_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == detail::terminal_type::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		ret = m_terminals.find(tname + ".Q");
@@ -381,12 +375,11 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
 }
 
-// FIXME avoid dynamic cast here
 devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
-	logic_output_t &out_cast = dynamic_cast<logic_output_t &>(out);
+	logic_output_t &out_cast = static_cast<logic_output_t &>(out);
 	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
 	if (proxy == nullptr)
@@ -440,7 +433,6 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 
 		auto ret = new_proxy.get();
 
-#if 1
 		/* connect all existing terminals to new net */
 
 		if (inp.has_net())
@@ -455,13 +447,6 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 			inp.net().m_core_terms.clear(); // clear the list
 		}
 		ret->out().net().add_terminal(inp);
-#else
-		if (inp.has_net())
-			//fatalerror("logic inputs can only belong to one net!\n");
-			merge_nets(ret->out().net(), inp.net());
-		else
-			ret->out().net().add_terminal(inp);
-#endif
 		netlist().register_dev(std::move(new_proxy));
 		return ret;
 	}
@@ -615,7 +600,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 		{
 			for (auto & t : t1.net().m_core_terms)
 			{
-				if (t->is_type(detail::core_terminal_t::TERMINAL))
+				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -630,7 +615,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 		{
 			for (auto & t : t2.net().m_core_terms)
 			{
-				if (t->is_type(detail::core_terminal_t::TERMINAL))
+				if (t->is_type(detail::terminal_type::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -649,39 +634,39 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	detail::core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::INPUT))
+	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			log().fatal(MF_1_INPUT_1_ALREADY_CONNECTED, t2.name());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			log().fatal(MF_1_INPUT_1_ALREADY_CONNECTED, t1.name());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::INPUT))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::terminal_type::TERMINAL) && t2.is_type(detail::terminal_type::TERMINAL))
 	{
 		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::INPUT))
+	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -699,8 +684,8 @@ void setup_t::resolve_inputs()
 	 * We therefore first park connecting inputs and retry
 	 * after all other terminals were connected.
 	 */
-	int tries = 100;
-	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
+	int tries = NL_MAX_LINK_RESOLVE_LOOPS;
+	while (m_links.size() > 0 && tries >  0)
 	{
 
 		for (auto li = m_links.begin(); li != m_links.end(); )
@@ -759,19 +744,6 @@ void setup_t::resolve_inputs()
 	if (errstr != "")
 		log().fatal("{1}", errstr);
 
-
-	log().verbose("looking for two terms connected to rail nets ...");
-	for (auto & t : netlist().get_device_list<analog::NETLIB_NAME(twoterm)>())
-	{
-		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
-		{
-			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
-				t->name(), t->m_N.net().name(), t->m_P.net().name());
-			t->m_N.net().remove_terminal(t->m_N);
-			t->m_P.net().remove_terminal(t->m_P);
-			netlist().remove_dev(t);
-		}
-	}
 }
 
 void setup_t::start_devices()
@@ -781,7 +753,7 @@ void setup_t::start_devices()
 	if (env != "")
 	{
 		log().debug("Creating dynamic logs ...");
-		plib::pstring_vector_t loglist(env, ":");
+		std::vector<pstring> loglist(plib::psplit(env, ":"));
 		for (pstring ll : loglist)
 		{
 			pstring name = "log_" + ll;
@@ -807,7 +779,7 @@ const plib::plog_base<NL_DEBUG> &setup_t::log() const
 // Model
 // ----------------------------------------------------------------------------------------
 
-static pstring model_string(model_map_t &map)
+static pstring model_string(detail::model_map_t &map)
 {
 	pstring ret = map["COREMODEL"] + "(";
 	for (auto & i : map)
@@ -816,7 +788,7 @@ static pstring model_string(model_map_t &map)
 	return ret + ")";
 }
 
-void setup_t::model_parse(const pstring &model_in, model_map_t &map)
+void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 {
 	pstring model = model_in;
 	pstring::iterator pos(nullptr);
@@ -852,7 +824,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	// FIMXE: Not optimal
 	remainder = remainder.left(remainder.begin() + (remainder.len() - 1));
 
-	plib::pstring_vector_t pairs(remainder," ", true);
+	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
 	{
 		auto pose = pe.find("=");
@@ -862,7 +834,7 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	}
 }
 
-const pstring setup_t::model_value_str(model_map_t &map, const pstring &entity)
+const pstring setup_t::model_value_str(detail::model_map_t &map, const pstring &entity)
 {
 	pstring ret;
 
@@ -877,7 +849,7 @@ const pstring setup_t::model_value_str(model_map_t &map, const pstring &entity)
 	return ret;
 }
 
-nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
+nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 {
 	pstring tmp = model_value_str(map, entity);
 
@@ -924,7 +896,7 @@ plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
-	model_map_t map;
+	detail::model_map_t map;
 	model_parse(model, map);
 
 	if (model_value_str(map, "TYPE") == "TTL")
@@ -995,7 +967,6 @@ bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
 	plib::putf8_writer owrt(ostrm);
 
 	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-
 	plib::pimemstream istrm2(ostrm);
 	plib::putf8_reader reader2(istrm2);
 	return parser_t(reader2, *this).parse(name);

@@ -18,6 +18,7 @@ ToDo:
 
 *****************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"

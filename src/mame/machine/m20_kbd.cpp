@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Vas Crabb
 
+#include "emu.h"
 #include "machine/m20_kbd.h"
 
 #include "machine/keyboard.ipp"

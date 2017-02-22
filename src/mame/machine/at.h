@@ -3,7 +3,6 @@
 #ifndef _AT_H_
 #define _AT_H_
 
-#include "emu.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

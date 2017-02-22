@@ -13,7 +13,6 @@
 
 #include "debugbaseinfo.h"
 
-#include "emu.h"
 
 
 class debugwin_info : protected debugbase_info

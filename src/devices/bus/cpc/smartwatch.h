@@ -12,7 +12,6 @@
 #ifndef SMARTWATCH_H_
 #define SMARTWATCH_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "machine/ds1315.h"
 

@@ -30,6 +30,7 @@
 
 */
 
+#include "emu.h"
 #include "vw64.h"
 
 

@@ -15,7 +15,6 @@
 #ifndef __GBA_LCD_H__
 #define __GBA_LCD_H__
 
-#include "emu.h"
 
 
 

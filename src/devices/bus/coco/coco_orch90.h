@@ -5,7 +5,6 @@
 #ifndef __COCO_ORCH90_H__
 #define __COCO_ORCH90_H__
 
-#include "emu.h"
 #include "sound/dac.h"
 #include "cococart.h"
 

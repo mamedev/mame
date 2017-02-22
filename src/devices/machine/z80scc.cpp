@@ -71,6 +71,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
    x/p = Features that has been implemented  n/a = features that will not
 ***************************************************************************/
 
+#include "emu.h"
 #include "z80scc.h"
 
 

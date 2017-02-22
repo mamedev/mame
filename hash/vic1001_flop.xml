@@ -58,4 +58,30 @@
 		</part>
 	</software>
 
+	<software name="speakez">
+		<description>SpeakEasy</description>
+		<year>1983</year>
+		<publisher>Personal Peripheral Products</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="vic1001_cart:speakez"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="speakeasy.d64" size="174848" crc="bfd060ca" sha1="d2c5b5c2b6c5ef01891e3256a4aad8ec2bbbbfe5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="data20dm">
+		<description>Data 20 Display Manager</description>
+		<year>1982</year>
+		<publisher>Data 20 Corporation</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="vic1001_cart:data20dm"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="data20.d64" size="174848" crc="06664680" sha1="1586afa380272d333801992c829707e26f81c455" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

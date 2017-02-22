@@ -5,17 +5,15 @@
  *
  */
 
-#include <cstring>
-//FIXME:: pstring should be locale free
-#include <cctype>
-#include <cstdlib>
-#include <cstdio>
-#include <algorithm>
-#include <stack>
-
 #include "pstring.h"
 #include "palloc.h"
 #include "plists.h"
+
+#include <algorithm>
+#include <stack>
+#include <cstdlib>
+
+template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 template<typename F>
 pstring_t<F>::~pstring_t()
@@ -24,15 +22,25 @@ pstring_t<F>::~pstring_t()
 		sfree(m_ptr);
 }
 
+template <typename T>
+std::size_t strlen_mem(const T *s)
+{
+	std::size_t len(0);
+	while (*s++)
+		++len;
+	return len;
+}
+
+
 template<typename F>
 void pstring_t<F>::pcat(const mem_t *s)
 {
-	std::size_t slen = strlen(s);
+	std::size_t slen = strlen_mem(s);
 	pstr_t *n = salloc(m_ptr->len() + slen);
 	if (m_ptr->len() > 0)
-		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
+		n->copy_from(m_ptr->str(), m_ptr->len());
 	if (slen > 0)
-		std::memcpy(n->str() + m_ptr->len(), s, slen);
+		std::copy(s, s + slen, n->str() + m_ptr->len());
 	*(n->str() + n->len()) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
@@ -44,9 +52,9 @@ void pstring_t<F>::pcat(const pstring_t &s)
 	std::size_t slen = s.blen();
 	pstr_t *n = salloc(m_ptr->len() + slen);
 	if (m_ptr->len() > 0)
-		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
+		n->copy_from(m_ptr->str(), m_ptr->len());
 	if (slen > 0)
-		std::memcpy(n->str() + m_ptr->len(), s.c_str(), slen);
+		std::copy(s.c_str(), s.c_str() + slen, n->str() + m_ptr->len());
 	*(n->str() + n->len()) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
@@ -65,7 +73,14 @@ int pstring_t<F>::pcmp(const pstring_t &right) const
 		else
 			return -1;
 	}
-	int ret = memcmp(m_ptr->str(), right.c_str(), l);
+	auto si = this->begin();
+	auto ri = right.begin();
+	while (si != this->end() && *si == *ri)
+	{
+		ri++;
+		si++;
+	}
+	int ret = (si == this->end() ? 0 : static_cast<int>(*si) - static_cast<int>(*ri));
 	if (ret == 0)
 	{
 		if (this->blen() > right.blen())
@@ -80,10 +95,10 @@ int pstring_t<F>::pcmp(const pstring_t &right) const
 template<typename F>
 void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 {
-	pstr_t *n = salloc(size);
+	pstr_t *n = salloc(size * sizeof(mem_t));
 	if (size > 0)
-		std::memcpy(n->str(), from, size);
-	*(n->str() + size) = 0;
+		n->copy_from(static_cast<const char *>(from), size);
+	*(static_cast<mem_t *>(n->str()) + size) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
 }
@@ -229,7 +244,7 @@ const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const size_type cnt) 
 template<typename F>
 void pstring_t<F>::pcopy(const mem_t *from)
 {
-	pcopy(from, strlen(from));
+	pcopy(from, strlen_mem(from));
 }
 
 template<typename F>
@@ -240,7 +255,7 @@ double pstring_t<F>::as_double(bool *error) const
 
 	if (error != nullptr)
 		*error = false;
-	ret = strtod(c_str(), &e);
+	ret = std::strtod(c_str(), &e);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -256,9 +271,9 @@ long pstring_t<F>::as_long(bool *error) const
 	if (error != nullptr)
 		*error = false;
 	if (startsWith("0x"))
-		ret = strtol(substr(2).c_str(), &e, 16);
+		ret = std::strtol(substr(2).c_str(), &e, 16);
 	else
-		ret = strtol(c_str(), &e, 10);
+		ret = std::strtol(c_str(), &e, 10);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -271,7 +286,7 @@ bool pstring_t<F>::startsWith(const pstring_t &arg) const
 	if (arg.blen() > blen())
 		return false;
 	else
-		return (memcmp(arg.c_str(), c_str(), arg.blen()) == 0);
+		return std::equal(arg.c_str(), arg.c_str() + arg.blen(), c_str());
 }
 
 template<typename F>
@@ -280,13 +295,7 @@ bool pstring_t<F>::endsWith(const pstring_t &arg) const
 	if (arg.blen() > blen())
 		return false;
 	else
-		return (memcmp(c_str()+this->blen()-arg.blen(), arg.c_str(), arg.blen()) == 0);
-}
-
-template<typename F>
-int pstring_t<F>::pcmp(const mem_t *right) const
-{
-	return std::strcmp(m_ptr->str(), right);
+		return std::equal(arg.c_str(), arg.c_str() + arg.blen(), c_str()+this->blen()-arg.blen());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -315,7 +324,7 @@ void pstringbuffer::resize(const std::size_t size)
 		while (m_size < size)
 			m_size *= 2;
 		char *new_buf = plib::palloc_array<char>(m_size);
-		std::memcpy(new_buf, m_ptr, m_len + 1);
+		std::copy(m_ptr, m_ptr + m_len + 1, new_buf);
 		plib::pfree_array(m_ptr);
 		m_ptr = new_buf;
 	}
@@ -323,24 +332,24 @@ void pstringbuffer::resize(const std::size_t size)
 
 void pstringbuffer::pcopy(const char *from)
 {
-	std::size_t nl = strlen(from) + 1;
+	std::size_t nl = strlen_mem(from) + 1;
 	resize(nl);
-	std::memcpy(m_ptr, from, nl);
+	std::copy(from, from + nl, m_ptr);
 }
 
 void pstringbuffer::pcopy(const pstring &from)
 {
 	std::size_t nl = from.blen() + 1;
 	resize(nl);
-	std::memcpy(m_ptr, from.c_str(), nl);
+	std::copy(from.c_str(), from.c_str() + nl, m_ptr);
 }
 
 void pstringbuffer::pcat(const char *s)
 {
-	const std::size_t slen = std::strlen(s);
+	const std::size_t slen = strlen_mem(s);
 	const std::size_t nl = m_len + slen + 1;
 	resize(nl);
-	std::memcpy(m_ptr + m_len, s, slen + 1);
+	std::copy(s, s + slen + 1, m_ptr + m_len);
 	m_len += slen;
 }
 
@@ -348,7 +357,7 @@ void pstringbuffer::pcat(const void *m, std::size_t l)
 {
 	const std::size_t nl = m_len + l + 1;
 	resize(nl);
-	std::memcpy(m_ptr + m_len, m, l);
+	std::copy(static_cast<const char *>(m), static_cast<const char *>(m) + l, m_ptr + m_len);
 	m_len += l;
 	*(m_ptr + m_len) = 0;
 }
@@ -358,7 +367,7 @@ void pstringbuffer::pcat(const pstring &s)
 	const std::size_t slen = s.blen();
 	const std::size_t nl = m_len + slen + 1;
 	resize(nl);
-	std::memcpy(m_ptr + m_len, s.c_str(), slen);
+	std::copy(s.c_str(), s.c_str() + slen, m_ptr + m_len);
 	m_len += slen;
 	m_ptr[m_len] = 0;
 }
@@ -416,16 +425,19 @@ static inline std::size_t countleadbits(std::size_t x)
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	if (s != nullptr)
 	{
-		if (stk != nullptr)
+		bool b = s->dec_and_check();
+		if ( b && s != &m_zero)
 		{
-			size_type sn= ((32 - countleadbits(s->len())) + 1) / 2;
-			stk[sn].push(s);
+			if (stk != nullptr)
+			{
+				size_type sn= ((32 - countleadbits(s->len())) + 1) / 2;
+				stk[sn].push(s);
+			}
+			else
+				plib::pfree_array(reinterpret_cast<char *>(s));
 		}
-		else
-			plib::pfree_array(reinterpret_cast<char *>(s));
 	}
 }
 
@@ -472,8 +484,8 @@ void pstring_t<F>::resetmem()
 template<typename F>
 void pstring_t<F>::sfree(pstr_t *s)
 {
-	s->m_ref_count--;
-	if (s->m_ref_count == 0 && s != &m_zero)
+	bool b = s->dec_and_check();
+	if ( b && s != &m_zero)
 	{
 		plib::pfree_array(((char *)s));
 	}

@@ -11,7 +11,6 @@
 #ifndef BEBOX_H_
 #define BEBOX_H_
 
-#include "emu.h"
 #include "machine/53c810.h"
 #include "machine/am9517a.h"
 #include "machine/idectrl.h"

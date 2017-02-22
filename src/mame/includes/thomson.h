@@ -11,7 +11,6 @@
 #ifndef _THOMSON_H_
 #define _THOMSON_H_
 
-#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"

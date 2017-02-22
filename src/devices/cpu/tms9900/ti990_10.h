@@ -8,7 +8,6 @@
 #ifndef __TI990_10_H__
 #define __TI990_10_H__
 
-#include "emu.h"
 #include "debugger.h"
 #include "tms99com.h"
 

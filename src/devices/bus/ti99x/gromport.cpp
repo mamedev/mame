@@ -104,6 +104,7 @@
     a customized OS.
 
 ***************************************************************************/
+#include "emu.h"
 #include "gromport.h"
 #include "emuopts.h"
 #include "image.h"

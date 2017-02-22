@@ -40,6 +40,7 @@
 
 */
 
+#include "emu.h"
 #include "victor9k_fdc.h"
 
 

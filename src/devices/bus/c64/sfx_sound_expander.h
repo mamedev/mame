@@ -11,7 +11,6 @@
 #ifndef __SFX_SOUND_EXPANDER__
 #define __SFX_SOUND_EXPANDER__
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/3526intf.h"
 

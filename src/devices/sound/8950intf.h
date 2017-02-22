@@ -5,7 +5,6 @@
 #ifndef __8950INTF_H__
 #define __8950INTF_H__
 
-#include "emu.h"
 
 #define MCFG_Y8950_IRQ_HANDLER(_devcb) \
 	devcb = &y8950_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -53,7 +52,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;

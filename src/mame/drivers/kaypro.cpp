@@ -41,6 +41,7 @@
 
 **************************************************************************************************/
 
+#include "emu.h"
 #include "includes/kaypro.h"
 #include "machine/kay_kbd.h"
 #include "formats/kaypro_dsk.h"

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+#include "emu.h"
 #include "teleprinter.h"
 
 static const uint8_t teleprinter_font[128*8] =

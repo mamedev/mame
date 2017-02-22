@@ -11,7 +11,6 @@
 #ifndef _WSWAN_SND_H_
 #define _WSWAN_SND_H_
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -36,10 +36,6 @@ The startup screen varies across each company:
 - Modular Micros: "ZORBA" graphical logo with "MODULAR MICROS, INC." below in normal text
 - Gemini: "GEMINI ZORBA" graphical logo
 
-Strangely, the Zorba configures its keyboard UART for 8N2 but the keyboard we're emulating sends 8N1.
-If you type too fast or hold down a key until it repeats, characters will be dropped/corrupted.  It's
-possible we have a dump of a different CP/M-compatible keyboard, not the one supplied with the Zorba.
-
 Status:
 - Boots up, and the keyboard works
 
@@ -259,7 +255,6 @@ MACHINE_CONFIG_START( zorba, zorba_state )
 	// J6 TTL-level serial keyboard
 	MCFG_DEVICE_ADD("keyboard", ZORBA_KEYBOARD, 0)
 	MCFG_ZORBA_KEYBOARD_RXD_CB(DEVWRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_QUANTUM_PERFECT_CPU("keyboard:mcu")
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "zorba")
 MACHINE_CONFIG_END
@@ -399,14 +394,12 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 
 READ8_MEMBER(zorba_state::memory_read_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 WRITE8_MEMBER(zorba_state::memory_write_byte)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 READ8_MEMBER(zorba_state::io_read_byte)

@@ -6,7 +6,6 @@
 #ifndef __ISA_PGC_H__
 #define __ISA_PGC_H__
 
-#include "emu.h"
 
 #include "cpu/i86/i86.h"
 #include "isa.h"

@@ -5,7 +5,6 @@
 #ifndef __KM035_H__
 #define __KM035_H__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/beep.h"
 

@@ -6,8 +6,9 @@
  *
  */
 
+#include "emu.h"
 #include "doubler.h"
-#include "includes/amstrad.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

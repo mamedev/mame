@@ -4,6 +4,7 @@
 //
 // TODO: UART is connected to MIDI port
 
+#include "emu.h"
 #include "stereo_fx.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

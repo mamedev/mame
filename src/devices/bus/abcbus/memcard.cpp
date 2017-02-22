@@ -54,6 +54,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "memcard.h"
 
 

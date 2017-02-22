@@ -5,7 +5,6 @@
 #ifndef __ISA_EGA_H__
 #define __ISA_EGA_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "video/crtc_ega.h"
 

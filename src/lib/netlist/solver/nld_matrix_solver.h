@@ -8,8 +8,9 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
-#include "nl_base.h"
-#include "nl_errstr.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_errstr.h"
+#include "netlist/plib/putil.h"
 
 namespace netlist
 {
@@ -33,10 +34,8 @@ namespace netlist
 	};
 
 
-class terms_for_net_t
+class terms_for_net_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(terms_for_net_t)
-
 public:
 	terms_for_net_t();
 
@@ -44,14 +43,14 @@ public:
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() { return m_terms.size(); }
+	inline std::size_t count() const { return m_terms.size(); }
 
 	inline terminal_t **terms() { return m_terms.data(); }
 	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
 	inline nl_double *gt() { return m_gt.data(); }
 	inline nl_double *go() { return m_go.data(); }
 	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double **connected_net_V() { return m_connected_net_V.data(); }
+	inline nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
 
 	void set_pointers();
 
@@ -114,7 +113,11 @@ public:
 
 	void solve_base();
 
+	/* after every call to solve, update inputs must be called.
+	 * this can be done as well as a batch to ease parallel processing.
+	 */
 	const netlist_time solve();
+	void update_inputs();
 
 	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
 	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
@@ -122,8 +125,7 @@ public:
 	void update_forced();
 	void update_after(const netlist_time &after)
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(after);
+		m_Q_sync.net().toggle_and_push_to_queue(after);
 	}
 
 	/* netdevice functions */
@@ -135,9 +137,9 @@ public:
 
 	virtual void log_stats();
 
-	virtual void create_solver_code(plib::putf8_fmt_writer &strm)
+	virtual std::pair<pstring, pstring> create_solver_code()
 	{
-		strm.writeline(plib::pfmt("/* {1} doesn't support static compile */"));
+		return std::pair<pstring, pstring>("", plib::pfmt("/* {1} doesn't support static compile */"));
 	}
 
 protected:
@@ -161,7 +163,7 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	std::vector<terms_for_net_t *> m_terms;
+	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
@@ -189,31 +191,30 @@ private:
 
 	void step(const netlist_time &delta);
 
-	void update_inputs();
-
 	const eSortType m_sort;
 };
 
 template <typename T>
 T matrix_solver_t::delta(const T * RESTRICT V)
 {
-	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
 	 * and thus belong into a different calculation. This applies to all solvers.
 	 */
 
-	std::size_t iN = this->m_terms.size();
+	const std::size_t iN = this->m_terms.size();
 	T cerr = 0;
-	for (unsigned i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->m_cur_Analog)));
+	for (std::size_t i = 0; i < iN; i++)
+		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->Q_Analog())));
 	return cerr;
 }
 
 template <typename T>
 void matrix_solver_t::store(const T * RESTRICT V)
 {
-	for (std::size_t i = 0, iN=m_terms.size(); i < iN; i++)
-		this->m_nets[i]->m_cur_Analog = V[i];
+	const std::size_t iN = this->m_terms.size();
+	for (std::size_t i = 0; i < iN; i++)
+		this->m_nets[i]->set_Q_Analog(V[i]);
 }
 
 template <typename T>
@@ -223,26 +224,28 @@ void matrix_solver_t::build_LE_A()
 
 	T &child = static_cast<T &>(*this);
 
-	const unsigned iN = child.N();
-	for (unsigned k = 0; k < iN; k++)
+	const std::size_t iN = child.N();
+	for (std::size_t k = 0; k < iN; k++)
 	{
-		for (unsigned i=0; i < iN; i++)
+		terms_for_net_t *terms = m_terms[k].get();
+
+		for (std::size_t i=0; i < iN; i++)
 			child.A(k,i) = 0.0;
 
-		const std::size_t terms_count = m_terms[k]->count();
-		const std::size_t railstart =  m_terms[k]->m_railstart;
-		const nl_double * RESTRICT gt = m_terms[k]->gt();
+		const std::size_t terms_count = terms->count();
+		const std::size_t railstart =  terms->m_railstart;
+		const nl_double * const RESTRICT gt = terms->gt();
 
 		{
 			nl_double akk  = 0.0;
-			for (unsigned i = 0; i < terms_count; i++)
+			for (std::size_t i = 0; i < terms_count; i++)
 				akk += gt[i];
 
 			child.A(k,k) = akk;
 		}
 
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
+		const nl_double * const RESTRICT go = terms->go();
+		int * RESTRICT net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			child.A(k,net_other[i]) -= go[i];
@@ -255,15 +258,15 @@ void matrix_solver_t::build_LE_RHS()
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
 	T &child = static_cast<T &>(*this);
 
-	const unsigned iN = child.N();
-	for (unsigned k = 0; k < iN; k++)
+	const std::size_t iN = child.N();
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
 
 		const std::size_t terms_count = m_terms[k]->count();
-		const nl_double * RESTRICT go = m_terms[k]->go();
-		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
+		const nl_double * const RESTRICT go = m_terms[k]->go();
+		const nl_double * const RESTRICT Idr = m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)

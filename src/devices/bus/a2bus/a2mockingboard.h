@@ -11,7 +11,6 @@
 #ifndef __A2BUS_MOCKINGBOARD__
 #define __A2BUS_MOCKINGBOARD__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"

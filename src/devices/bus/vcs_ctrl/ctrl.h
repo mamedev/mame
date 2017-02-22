@@ -14,7 +14,6 @@
 #ifndef __VCS_CONTROL_PORT__
 #define __VCS_CONTROL_PORT__
 
-#include "emu.h"
 
 
 

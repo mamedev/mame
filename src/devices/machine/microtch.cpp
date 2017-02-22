@@ -11,6 +11,7 @@
 
 */
 
+#include "emu.h"
 #include "microtch.h"
 
 #define LOG 0

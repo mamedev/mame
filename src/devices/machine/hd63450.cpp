@@ -6,6 +6,7 @@
     Largely based on documentation of the Sharp X68000
 */
 
+#include "emu.h"
 #include "hd63450.h"
 
 const device_type HD63450 = &device_creator<hd63450_device>;

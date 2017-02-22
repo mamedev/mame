@@ -5,7 +5,6 @@
 #ifndef __COSMICOS__
 #define __COSMICOS__
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"

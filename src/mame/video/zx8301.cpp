@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "zx8301.h"
 
 

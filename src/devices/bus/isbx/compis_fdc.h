@@ -11,7 +11,6 @@
 #ifndef __COMPIS_FDC__
 #define __COMPIS_FDC__
 
-#include "emu.h"
 #include "isbx.h"
 #include "formats/cpis_dsk.h"
 #include "machine/upd765.h"

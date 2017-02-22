@@ -27,7 +27,6 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 		MAME_DIR .. "src/devices/cpu/drcuml.h",
 		MAME_DIR .. "src/devices/cpu/uml.cpp",
 		MAME_DIR .. "src/devices/cpu/uml.h",
-		MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.h",
 		MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
@@ -931,7 +930,7 @@ if (CPUS["I86"]~=null) then
 	}
 end
 
-if (CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 end
 
@@ -949,10 +948,6 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
 	}
-end
-
-if (CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1339,6 +1334,8 @@ if (CPUS["M6805"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 	}
 end
 
@@ -2120,6 +2117,18 @@ if (CPUS["TLCS90"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/tlcs90/tlcs90.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs90/tlcs90.h",
+	}
+end
+
+--------------------------------------------------
+-- Toshiba TLCS-870 Series
+--@src/devices/cpu/tlcs870/tlcs870.h,CPUS["TLCS870"] = true
+--------------------------------------------------
+
+if (CPUS["TLCS870"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs870/tlcs870.h",
 	}
 end
 

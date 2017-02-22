@@ -37,6 +37,7 @@
     MZ, Aug 2015
 */
 
+#include "emu.h"
 #include "at29x.h"
 
 #define TRACE_PRG 0

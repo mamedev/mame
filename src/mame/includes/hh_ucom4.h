@@ -9,8 +9,6 @@
 #ifndef _HH_UCOM4_H_
 #define _HH_UCOM4_H_
 
-
-#include "emu.h"
 #include "rendlay.h"
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"

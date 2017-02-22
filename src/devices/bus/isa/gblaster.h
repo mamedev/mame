@@ -5,7 +5,6 @@
 #ifndef __ISA_GAME_BLASTER_H__
 #define __ISA_GAME_BLASTER_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "sound/saa1099.h"
 

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 
+#include "emu.h"
 #include "includes/kaypro.h"
 
 
@@ -307,6 +308,5 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_videoram_w )
 
 VIDEO_START_MEMBER(kaypro_state,kaypro)
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("roms")->base()+0x3000;
 }

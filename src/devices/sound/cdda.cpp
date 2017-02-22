@@ -238,13 +238,3 @@ cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_
 		device_sound_interface(mconfig, *this)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdda_device::device_config_complete()
-{
-}

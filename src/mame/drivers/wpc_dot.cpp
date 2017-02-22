@@ -3,6 +3,7 @@
 
 /* Williams WPC Dot Matrix */
 
+#include "emu.h"
 #include "includes/wpc_dot.h"
 
 

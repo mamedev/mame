@@ -13,7 +13,6 @@
 #ifndef __I8243_H__
 #define __I8243_H__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

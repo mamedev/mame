@@ -222,6 +222,7 @@ collisions, one is for sprite/sprite collisions.
 */
 
 
+#include "emu.h"
 #include "includes/arcadia.h"
 
 static const uint8_t chars[0x40][8]={

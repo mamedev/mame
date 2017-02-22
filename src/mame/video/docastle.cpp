@@ -75,15 +75,17 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::flipscreen_r)
+READ8_MEMBER(docastle_state::inputs_flipscreen_r)
 {
-	flip_screen_set(offset);
-	return (offset ? 1 : 0); // is this really needed?
+	flip_screen_set(BIT(offset, 7));
+	m_inp1->write_s(space, 0, offset & 7);
+	m_inp2->write_s(space, 0, offset & 7);
+	return (m_inp2->read_h(space, 0) << 4) | m_inp1->read_h(space, 0);
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(offset);
+	flip_screen_set(BIT(offset, 7));
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)

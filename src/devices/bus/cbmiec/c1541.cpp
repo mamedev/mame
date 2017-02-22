@@ -136,6 +136,7 @@
 
 */
 
+#include "emu.h"
 #include "c1541.h"
 #include "bus/centronics/ctronics.h"
 

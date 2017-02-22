@@ -11,7 +11,6 @@
 #ifndef __VP700__
 #define __VP700__
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/cdp1863.h"
 

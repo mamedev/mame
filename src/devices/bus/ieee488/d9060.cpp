@@ -27,6 +27,7 @@
 
 */
 
+#include "emu.h"
 #include "d9060.h"
 #include "bus/scsi/d9060hd.h"
 

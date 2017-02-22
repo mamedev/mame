@@ -16,36 +16,48 @@
 #ifndef __PIC16C5X_H__
 #define __PIC16C5X_H__
 
+// input lines
+enum
+{
+	PIC16C5x_RTCC = 0
+};
+
+// in the mid-90s RTCC was renamed to T0CKI
+#define PIC16C5x_T0CKI PIC16C5x_RTCC
+
 
 // i/o ports
 enum
 {
 	PIC16C5x_PORTA = 0,
 	PIC16C5x_PORTB,
-	PIC16C5x_PORTC
+	PIC16C5x_PORTC,
+	PIC16C5x_PORTD
 };
 
-// port a, 4 bits, 2-way
+// port a, 4 or 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_A_CB(_devcb) \
-	pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
-	pic16c5x_device::set_write_a_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_a_callback(*device, DEVCB_##_devcb);
 
 // port b, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_B_CB(_devcb) \
-	pic16c5x_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_b_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_B_CB(_devcb) \
-	pic16c5x_device::set_write_b_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_b_callback(*device, DEVCB_##_devcb);
 
 // port c, 8 bits, 2-way
 #define MCFG_PIC16C5x_READ_C_CB(_devcb) \
-	pic16c5x_device::set_read_c_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_read_c_callback(*device, DEVCB_##_devcb);
 #define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
-	pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
+	devcb = &pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
 
-// T0 pin (readline)
-#define MCFG_PIC16C5x_T0_CB(_devcb) \
-	pic16c5x_device::set_t0_callback(*device, DEVCB_##_devcb);
+// port d, 8 bits, 2-way
+#define MCFG_PIC16C5x_READ_D_CB(_devcb) \
+	devcb = &pic16c5x_device::set_read_d_callback(*device, DEVCB_##_devcb);
+#define MCFG_PIC16C5x_WRITE_D_CB(_devcb) \
+	devcb = &pic16c5x_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 // CONFIG register
 #define MCFG_PIC16C5x_SET_CONFIG(_data) \
@@ -59,6 +71,9 @@ extern const device_type PIC16C56;
 extern const device_type PIC16C57;
 extern const device_type PIC16C58;
 
+extern const device_type PIC1650;
+extern const device_type PIC1655;
+
 
 class pic16c5x_device : public cpu_device
 {
@@ -70,12 +85,12 @@ public:
 	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_c.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_d.set_callback(object); }
 
 	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(object); }
-
-	template<class _Object> static devcb_base &set_t0_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_t0.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_d.set_callback(object); }
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
@@ -107,6 +122,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
+	virtual void execute_set_input(int line, int state) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
@@ -149,7 +165,8 @@ private:
 	int     m_picmodel;
 	int     m_delay_timer;
 	uint16_t  m_temp_config;
-	uint8_t   m_old_T0;
+	int     m_rtcc;
+	bool    m_count_pending;
 	int8_t    m_old_data;
 	uint8_t   m_picRAMmask;
 	int     m_inst_cycles;
@@ -162,10 +179,11 @@ private:
 	devcb_read8 m_read_a;
 	devcb_read8 m_read_b;
 	devcb_read8 m_read_c;
+	devcb_read8 m_read_d;
 	devcb_write8 m_write_a;
 	devcb_write8 m_write_b;
 	devcb_write8 m_write_c;
-	devcb_read_line m_read_t0;
+	devcb_write8 m_write_d;
 
 	// For debugger
 	int m_debugger_temp;
@@ -229,7 +247,6 @@ private:
 	void pic16c5x_soft_reset();
 	void pic16c5x_update_watchdog(int counts);
 	void pic16c5x_update_timer(int counts);
-
 };
 
 
@@ -270,6 +287,22 @@ class pic16c58_device : public pic16c5x_device
 public:
 	// construction/destruction
 	pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class pic1650_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class pic1655_device : public pic16c5x_device
+{
+public:
+	// construction/destruction
+	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #endif  /* __PIC16C5X_H__ */

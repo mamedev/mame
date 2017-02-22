@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
+#include "emu.h"
 #include "includes/atarist.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"

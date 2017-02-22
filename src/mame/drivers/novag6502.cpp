@@ -13,6 +13,8 @@
     TODO:
     - cforteb emulation (was initially sforteba romset)
     - verify supercon IRQ and beeper frequency
+    - sforte irq active time (21.5us is too long)
+    - sforte/sexpert led handling is correct?
     - printer port
 
 ******************************************************************************
@@ -50,6 +52,7 @@ instead of magnet sensors.
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/novagbase.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
@@ -211,17 +214,6 @@ void novagbase_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
-}
-
-void novagbase_state::set_display_segmask(u32 digits, u32 mask)
-{
-	// set a segment mask per selected digit, but leave unselected ones alone
-	for (int i = 0; i < 0x20; i++)
-	{
-		if (digits & 1)
-			m_display_segmask[i] = mask;
-		digits >>= 1;
-	}
 }
 
 void novagbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
@@ -838,6 +830,8 @@ static MACHINE_CONFIG_DERIVED( sforte, sexpert )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
+	MCFG_TIMER_MODIFY("irq_on")
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(15)) // active for ?us
 
 	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END

@@ -11,7 +11,6 @@
 #ifndef __ABC1600_MOVER__
 #define __ABC1600_MOVER__
 
-#include "emu.h"
 #include "video/mc6845.h"
 
 

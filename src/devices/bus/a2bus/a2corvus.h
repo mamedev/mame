@@ -12,7 +12,6 @@
 #ifndef __A2BUS_CORVUS__
 #define __A2BUS_CORVUS__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/corvushd.h"
 

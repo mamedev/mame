@@ -9,7 +9,6 @@
 #ifndef __UPD1771_H__
 #define __UPD1771_H__
 
-#include "emu.h"
 
 #define MAX_PACKET_SIZE 0x8000
 

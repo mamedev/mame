@@ -11,7 +11,6 @@
 #ifndef __VTECH_MEMEXP_RTTY_H__
 #define __VTECH_MEMEXP_RTTY_H__
 
-#include "emu.h"
 #include "memexp.h"
 
 

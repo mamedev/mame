@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 /* PAD emulation */
 
+#include "emu.h"
 #include "ctlrport.h"
 #include "analogue.h"
 #include "multitap.h"

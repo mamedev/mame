@@ -88,14 +88,14 @@ static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_IMPORT_FROM(main_map)
 
 	AM_RANGE(0x060000, 0x060007) AM_READ(mcu_comm_r)
-	AM_RANGE(0x060000, 0x060003) AM_WRITE(mcu_comm_w)
+	AM_RANGE(0x060000, 0x060003) AM_WRITE(pushman_mcu_comm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, bballs_state )
+static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x60000, 0x60007) AM_READ(bballs_68705_r)
-	AM_RANGE(0x60000, 0x60003) AM_WRITE(bballs_68705_w)
+	AM_RANGE(0x60000, 0x60007) AM_READ(mcu_comm_r)
+	AM_RANGE(0x60000, 0x60001) AM_WRITE(bballs_mcu_comm_w)
 	// are these mirror addresses or does this PCB have a different addressing?
 	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)
@@ -704,23 +704,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(pushman, f1dream_comad, pushman_state)
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(bballs_state, bballs)
-{
-	m_mcu_semaphore = false;
-	m_mcu_latch = 0x0400;
-}
-
-void bballs_state::machine_start()
-{
-	save_item(NAME(m_mcu_semaphore));
-	save_item(NAME(m_mcu_latch));
-}
-
-static MACHINE_CONFIG_DERIVED_CLASS(bballs, f1dream_comad, bballs_state)
+static MACHINE_CONFIG_DERIVED(bballs, pushman)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(bballs_state, bballs)
 MACHINE_CONFIG_END
 
 
@@ -1123,8 +1109,8 @@ ROM_START( bballs )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bb13.n4", 0x00000, 0x08000, CRC(1ef78175) SHA1(2e7dcbab3a572c2a6bb67a36ba283a5faeb14a88) )
 
-	ROM_REGION( 0x01000, "cpu2", 0 )
-	ROM_LOAD( "68705.uc",  0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x01000, "mcu", 0 ) /* using dump from bballsa set */
+	ROM_LOAD( "mc68705r3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "bb1.g20",  0x00000, 0x08000, CRC(b62dbcb8) SHA1(121613f6d2bcd226e71d4ae71830b9b0d15c2331) )
@@ -1156,8 +1142,8 @@ ROM_START( bballsa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "13.ic216", 0x00000, 0x08000, CRC(1ef78175) SHA1(2e7dcbab3a572c2a6bb67a36ba283a5faeb14a88) )
 
-	ROM_REGION( 0x01000, "cpu2", 0 )
-	ROM_LOAD( "68705.uc",  0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x01000, "mcu", 0 )
+	ROM_LOAD( "mc68705r3.bin",  0x00000, 0x01000, CRC(4b37b853) SHA1(c95b7b1dcc6f4730fd08535001e2f02b34ea14c2) )
 
 	ROM_REGION( 0x10000, "text", 0 )
 	ROM_LOAD( "1.ic130",  0x00000, 0x08000, CRC(67672444) SHA1(f1d4681999d44e8d3cbf26b8a9c05f50573e0df6) )

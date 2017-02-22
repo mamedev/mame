@@ -23,6 +23,7 @@
     **** This is WORK IN PROGRESS ****
 */
 
+#include "emu.h"
 #include "ti990_10.h"
 
 /*

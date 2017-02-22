@@ -6,12 +6,11 @@
  */
 
 #include <algorithm>
-#include <cstdio>
 #include <cmath>
 #include <unordered_map>
 #include "nl_convert.h"
-#include "plib/palloc.h"
-#include "plib/putil.h"
+#include "../plib/palloc.h"
+#include "../plib/putil.h"
 
 /* FIXME: temporarily defined here - should be in a file */
 /* FIXME: family logic in netlist is convoluted, create
@@ -49,7 +48,7 @@ static lib_map_t read_lib_map(const pstring lm)
 	pstring line;
 	while (reader.readline(line))
 	{
-		plib::pstring_vector_t split(line, ",");
+		std::vector<pstring> split(plib::psplit(line, ","));
 		m[split[0].trim()] = { split[1].trim(), split[2].trim() };
 	}
 	return m;
@@ -229,7 +228,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M({1})", 1.0e-3 },
 		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"??",  "CAP_U({1})", 1.0e-6 }, /* FIXME */
+		{"μ",  "CAP_U({1})",  1.0e-6 },
 		{"N",   "CAP_N({1})", 1.0e-9 },
 		{"pF",  "CAP_P({1})", 1.0e-12},
 		{"P",   "CAP_P({1})", 1.0e-12},
@@ -243,7 +242,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	plib::pstring_vector_t spnl(contents, "\n");
+	std::vector<pstring> spnl(plib::psplit(contents, "\n"));
 
 	// Add gnd net
 
@@ -275,7 +274,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		plib::pstring_vector_t tt(line, " ", true);
+		std::vector<pstring> tt(plib::psplit(line, " ", true));
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
@@ -314,7 +313,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				plib::pstring_vector_t m(model,"{");
+				std::vector<pstring> m(plib::psplit(model,"{"));
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)

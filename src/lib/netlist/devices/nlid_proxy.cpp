@@ -5,9 +5,8 @@
  *
  */
 
-//#include <memory>
 #include "nlid_proxy.h"
-#include "solver/nld_solver.h"
+#include "../solver/nld_solver.h"
 //#include "plib/pstream.h"
 //#include "plib/pfmtlog.h"
 //#include "nld_log.h"
@@ -65,12 +64,12 @@ namespace netlist
 	{
 		nl_assert(m_logic_family != nullptr);
 		// FIXME: Variable supply voltage!
-		double supply_V = logic_family().fixed_V();
+		double supply_V = logic_family()->fixed_V();
 		if (supply_V == 0.0) supply_V = 5.0;
 
-		if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
+		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
 			out().push(1, NLTIME_FROM_NS(1));
-		else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
+		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(0.0, supply_V))
 			out().push(0, NLTIME_FROM_NS(1));
 		else
 		{
@@ -113,9 +112,9 @@ namespace netlist
 		{
 			pstring devname = out_proxied->device().name();
 			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
-					detail::device_object_t::type_t::INPUT, false);
+					detail::terminal_type::INPUT, false);
 			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
-					detail::device_object_t::type_t::INPUT, false);
+					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{
 				/* alternative logic */
@@ -128,7 +127,7 @@ namespace netlist
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 #if (0)
 		printf("%s %s\n", out_proxied->name().c_str(), out_proxied->device().name().c_str());
-		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::type_t::OUTPUT, false);
+		auto x = netlist().setup().find_terminal(out_proxied->name(), detail::device_object_t::terminal_type::OUTPUT, false);
 		if (x) printf("==> %s\n", x->name().c_str());
 #endif
 	}
@@ -137,15 +136,15 @@ namespace netlist
 	void nld_d_to_a_proxy::reset()
 	{
 		// FIXME: Variable voltage
-		double supply_V = logic_family().fixed_V();
+		double supply_V = logic_family()->fixed_V();
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		//m_Q.initial(0.0);
 		m_last_state = -1;
 		m_RV.do_reset();
 		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set(NL_FCONST(1.0) / logic_family().R_low(),
-				logic_family().low_V(0.0, supply_V), 0.0);
+		m_RV.set(NL_FCONST(1.0) / logic_family()->R_low(),
+				logic_family()->low_V(0.0, supply_V), 0.0);
 	}
 
 	NETLIB_UPDATE(d_to_a_proxy)
@@ -154,11 +153,11 @@ namespace netlist
 		if (state != m_last_state)
 		{
 			// FIXME: Variable voltage
-			double supply_V = logic_family().fixed_V();
+			double supply_V = logic_family()->fixed_V();
 			if (supply_V == 0.0) supply_V = 5.0;
 			m_last_state = state;
-			const nl_double R = state ? logic_family().R_high() : logic_family().R_low();
-			const nl_double V = state ? logic_family().high_V(0.0, supply_V) : logic_family().low_V(0.0, supply_V);
+			const nl_double R = state ? logic_family()->R_high() : logic_family()->R_low();
+			const nl_double V = state ? logic_family()->high_V(0.0, supply_V) : logic_family()->low_V(0.0, supply_V);
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
@@ -166,7 +165,7 @@ namespace netlist
 				m_RV.update_dev();
 			}
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
+			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 		}
 	}
 

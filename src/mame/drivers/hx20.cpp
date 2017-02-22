@@ -26,6 +26,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/hx20.h"
 #include "softlist.h"
 

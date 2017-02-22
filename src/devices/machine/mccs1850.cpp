@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "mccs1850.h"
 
 

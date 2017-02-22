@@ -11,6 +11,7 @@
 
 
 
+#include "emu.h"
 #include "includes/special.h"
 
 

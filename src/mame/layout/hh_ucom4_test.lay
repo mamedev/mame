@@ -5,11 +5,9 @@
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
-	<element name="led" defstate="2">
-		<disk state="0"><color red="0.06" green="0.2" blue="0.06" /></disk>
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk state="1"><color red="0.3" green="1.0" blue="0.3" /></disk>
-
-		<disk state="2"><color red="0" green="0" blue="0" /></disk>
 	</element>
 
 
@@ -550,7 +548,6 @@
 		<bezel name="15.29" element="led"><bounds x="30" y="58" width="1" height="1" /></bezel>
 		<bezel name="15.30" element="led"><bounds x="30" y="60" width="1" height="1" /></bezel>
 		<bezel name="15.31" element="led"><bounds x="30" y="62" width="1" height="1" /></bezel>
-
 
 	</view>
 </mamelayout>

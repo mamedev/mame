@@ -150,6 +150,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_s(*this, "uart_s")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_iop_arrows(*this, "ARROWS")
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_s1(*this, "S1")
@@ -183,10 +184,8 @@ private:
 	uint8_t m_sol20_fa;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint8_t m_sol20_fc;
 	uint8_t m_sol20_fe;
-	const uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
@@ -197,6 +196,7 @@ private:
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;
 	required_ioport m_iop_s1;
@@ -624,11 +624,6 @@ DRIVER_INIT_MEMBER(sol20_state,sol20)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
-}
-
-void sol20_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

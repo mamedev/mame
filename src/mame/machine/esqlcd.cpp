@@ -4,6 +4,7 @@
     Ensoniq LCD dotmatrix Displays
     derived by Parduz from the VFD Emulation by R. Belmont
 */
+#include "emu.h"
 #include "esqlcd.h"
 #include "esq2by16.lh"
 

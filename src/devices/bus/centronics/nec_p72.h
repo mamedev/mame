@@ -6,7 +6,6 @@
 #ifndef __NEC_P72__
 #define __NEC_P72__
 
-#include "emu.h"
 #include "ctronics.h"
 #include "cpu/nec/nec.h"
 

@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "pcxt83.h"
 
 

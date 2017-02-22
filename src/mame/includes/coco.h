@@ -14,7 +14,6 @@
 #define __COCO__
 
 
-#include "emu.h"
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
 #include "machine/6821pia.h"
@@ -32,7 +31,6 @@
 //**************************************************************************
 
 INPUT_PORTS_EXTERN( coco_analog_control );
-INPUT_PORTS_EXTERN( coco_cart_autostart );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 
@@ -58,7 +56,6 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 // inputs
 #define CTRL_SEL_TAG                "ctrl_sel"
 #define HIRES_INTF_TAG              "hires_intf"
-#define CART_AUTOSTART_TAG          "cart_autostart"
 #define BECKERPORT_TAG              "beckerport"
 #define JOYSTICK_RX_TAG             "joystick_rx"
 #define JOYSTICK_RY_TAG             "joystick_ry"

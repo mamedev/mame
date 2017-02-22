@@ -5,14 +5,14 @@
  *
  */
 
+#include  "nlid_truthtable.h"
 #include "nld_7448.h"
-#include "nld_truthtable.h"
 
 namespace netlist
 {
 	namespace devices
 	{
-	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
+	#if (USE_TRUTHTABLE_7448)
 
 	NETLIB_TRUTHTABLE(7448, 7, 7);
 
@@ -78,9 +78,9 @@ namespace netlist
 	#endif
 
 
-	#if (USE_TRUTHTABLE_7448 && USE_TRUTHTABLE)
+	#if (USE_TRUTHTABLE_7448)
 	nld_7448::truthtable_t nld_7448::m_ttbl;
-	const pstring nld_7448::m_desc[] = {
+	std::vector<pstring> nld_7448::m_desc = {
 			" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g",
 
 			"  1,  1,  1,   0,  0,  0,  0 | 1, 1, 1, 1, 1, 1, 0|100,100,100,100,100,100,100",

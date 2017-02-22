@@ -256,7 +256,7 @@ void i8086_cpu_device::execute_run()
 				if(!common_op(op))
 				{
 					m_icount -= 10;
-					logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
+					logerror("%06x: Invalid Opcode %02x\n", pc(), op);
 					break;
 				}
 				break;
@@ -1884,7 +1884,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			m_modrm = fetch();
 			GetRMByte();
 			CLK(NOP);
-			logerror("%s: %06x: Unimplemented floating point escape %02x%02x\n", tag(), pc(), op, m_modrm);
+			logerror("%06x: Unimplemented floating point escape %02x%02x\n", pc(), op, m_modrm);
 			break;
 
 
@@ -2051,7 +2051,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xf0: // i_lock
 		case 0xf1: // 0xf1 is 0xf0; verified on real CPU
-			logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
+			logerror("%06x: Warning - BUSLOCK\n", pc());
 			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
@@ -2076,7 +2076,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && !ZF && m_icount>0);   m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%s: %06x: REPNE invalid\n", tag(), pc());
+					logerror("%06x: REPNE invalid\n", pc());
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2109,7 +2109,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 				case 0xae:  CLK(OVERRIDE); if (c) do { i_scasb(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				case 0xaf:  CLK(OVERRIDE); if (c) do { i_scasw(); c--; } while (c>0 && ZF && m_icount>0);    m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 				default:
-					logerror("%s: %06x: REPE invalid\n", tag(), pc());
+					logerror("%06x: REPE invalid\n", pc());
 					// Decrement IP so the normal instruction will be executed next
 					m_ip--;
 					invalid = true;
@@ -2369,7 +2369,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(INCDEC_R8,INCDEC_M8);
 					break;
 				default:
-					logerror("%s: %06x: FE Pre with unimplemented mod\n", tag(), pc());
+					logerror("%06x: FE Pre with unimplemented mod\n", pc());
 					break;
 				}
 			}
@@ -2425,7 +2425,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
-					logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
+					logerror("%06x: FF Pre with unimplemented mod\n", pc());
 					break;
 				}
 			}

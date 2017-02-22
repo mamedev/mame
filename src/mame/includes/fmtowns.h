@@ -4,7 +4,6 @@
 #define FMTOWNS_H_
 
 
-#include "emu.h"
 #include "cpu/i386/i386.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"

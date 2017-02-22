@@ -5,6 +5,7 @@
  *   Xerox AltoII memory interface
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 #define PUT_EVEN(dword,word)            X_WRBITS(dword,32, 0,15,word)

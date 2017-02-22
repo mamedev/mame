@@ -5,7 +5,6 @@
 #ifndef __BULLET__
 #define __BULLET__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"

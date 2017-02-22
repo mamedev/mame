@@ -34,19 +34,19 @@ enum
 
 /* STATUS changed callback */
 #define MCFG_I8085A_STATUS(_devcb) \
-	i8085a_cpu_device::set_out_status_func(*device, DEVCB_##_devcb);
+	devcb = &i8085a_cpu_device::set_out_status_func(*device, DEVCB_##_devcb);
 
 /* INTE changed callback */
 #define MCFG_I8085A_INTE(_devcb) \
-	i8085a_cpu_device::set_out_inte_func(*device, DEVCB_##_devcb);
+	devcb = &i8085a_cpu_device::set_out_inte_func(*device, DEVCB_##_devcb);
 
 /* SID changed callback (8085A only) */
 #define MCFG_I8085A_SID(_devcb) \
-	i8085a_cpu_device::set_in_sid_func(*device, DEVCB_##_devcb);
+	devcb = &i8085a_cpu_device::set_in_sid_func(*device, DEVCB_##_devcb);
 
 /* SOD changed callback (8085A only) */
 #define MCFG_I8085A_SOD(_devcb) \
-	i8085a_cpu_device::set_out_sod_func(*device, DEVCB_##_devcb);
+	devcb = &i8085a_cpu_device::set_out_sod_func(*device, DEVCB_##_devcb);
 
 
 class i8085a_cpu_device :  public cpu_device

@@ -35,7 +35,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
 		, m_p_videoram(*this, "videoram")
-		, m_p_ram(*this, "p_ram")
+		, m_p_ram(*this, "ram")
+		, m_p_chargen(*this, "chargen")
 		{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -46,13 +47,12 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 
 private:
-	required_device<cpu_device> m_maincpu;
 	uint8_t m_term_data;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_ram;
-	const uint8_t *m_p_chargen;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 #endif

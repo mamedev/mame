@@ -11,7 +11,6 @@
 #ifndef __ECONET__
 #define __ECONET__
 
-#include "emu.h"
 
 
 

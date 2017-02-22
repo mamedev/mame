@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "hd64610.h"
 #include "coreutil.h"
 

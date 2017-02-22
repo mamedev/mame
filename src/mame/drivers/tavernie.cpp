@@ -48,6 +48,7 @@ Z - more scan lines per row (cursor is bigger)
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -65,17 +66,18 @@ Z - more scan lines per row (cursor is bigger)
 class tavernie_state : public driver_device
 {
 public:
-	tavernie_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_cass(*this, "cassette"),
-		m_pia_ivg(*this, "pia_ivg"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_beep(*this, "beeper"),
-		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia"),
-		m_palette(*this, "palette")
+	tavernie_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_cass(*this, "cassette")
+		, m_pia_ivg(*this, "pia_ivg")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_beep(*this, "beeper")
+		, m_maincpu(*this, "maincpu")
+		, m_acia(*this, "acia")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -92,12 +94,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const uint8_t *m_p_chargen;
-	optional_shared_ptr<uint8_t> m_p_videoram;
-
 private:
 	uint8_t m_term_data;
 	uint8_t m_pa;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	optional_device<pia6821_device> m_pia_ivg;
 	optional_device<fd1795_t> m_fdc;
@@ -105,8 +105,8 @@ private:
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
-public:
 	optional_device<palette_device> m_palette;
+	optional_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -176,7 +176,6 @@ MACHINE_RESET_MEMBER( tavernie_state, cpu09)
 
 MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_beep->set_state(1);
 	m_term_data = 0;
 	m_pia_ivg->cb1_w(1);

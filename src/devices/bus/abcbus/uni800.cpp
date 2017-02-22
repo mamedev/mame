@@ -31,6 +31,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "uni800.h"
 
 

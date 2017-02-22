@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "am2847.h"
 
 const device_type AM2847 = &device_creator<am2847_device>;

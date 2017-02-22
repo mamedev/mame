@@ -102,12 +102,31 @@ Get either the global table or the Lua registry as a :doc:`sol::table<table>`, w
 
 
 .. code-block:: cpp
-	:caption: function: Lua set_panic
+	:caption: function: set_panic
 	:name: set-panic
 
 	void set_panic(lua_CFunction panic);
 
 Overrides the panic function Lua calls when something unrecoverable or unexpected happens in the Lua VM. Must be a function of the that matches the ``int(lua_State*)`` function signature.
+
+
+.. code-block:: cpp
+	:caption: function: memory_used
+	:name: memory-used
+
+	std::size_t memory_used() const;
+
+Returns the amount of memory used *in bytes* by the Lua State.
+
+
+.. code-block:: cpp
+	:caption: function: collect_garbage
+	:name: collect-garbage
+
+	void collect_garbage();
+
+Attempts to run the garbage collector. Note that this is subject to the same rules as the Lua API's collect_garbage function: memory may or may not be freed, depending on dangling references or other things, so make sure you don't have tables or other stack-referencing items currently alive or referenced that you want to be collected.
+
 
 .. code-block:: cpp
 	:caption: function: make a table

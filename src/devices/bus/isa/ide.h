@@ -5,7 +5,6 @@
 #ifndef __ISA_IDE_H__
 #define __ISA_IDE_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/idectrl.h"
 

@@ -5,7 +5,6 @@
 #ifndef __ISA_SVGA_CIRRUS_H__
 #define __ISA_SVGA_CIRRUS_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "video/clgd542x.h"
 

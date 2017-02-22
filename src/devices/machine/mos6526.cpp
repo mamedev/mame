@@ -22,6 +22,7 @@
 
 */
 
+#include "emu.h"
 #include "mos6526.h"
 
 

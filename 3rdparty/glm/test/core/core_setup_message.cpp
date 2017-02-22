@@ -10,17 +10,17 @@ int test_compiler()
 	{
 		switch(GLM_COMPILER)
 		{
-		case GLM_COMPILER_VC2010:
-			std::printf("GLM_COMPILER_VC2010\n");
+		case GLM_COMPILER_VC12:
+			std::printf("Visual C++ 12 - 2013\n");
 			break;
-		case GLM_COMPILER_VC2012:
-			std::printf("GLM_COMPILER_VC2012\n");
+		case GLM_COMPILER_VC14:
+			std::printf("Visual C++ 14 - 2015\n");
 			break;
-		case GLM_COMPILER_VC2013:
-			std::printf("GLM_COMPILER_VC2013\n");
+		case GLM_COMPILER_VC15:
+			std::printf("Visual C++ 15 - 2017\n");
 			break;
-		case GLM_COMPILER_VC2015:
-			std::printf("GLM_COMPILER_VC2015\n");
+		case GLM_COMPILER_VC16:
+			std::printf("Visual C++ 16 - 20XX\n");
 			break;
 		default:
 			std::printf("Visual C++ version not detected\n");
@@ -32,59 +32,29 @@ int test_compiler()
 	{
 		switch(GLM_COMPILER)
 		{
-		case GLM_COMPILER_GCC44:
-			std::printf("GLM_COMPILER_GCC44\n");
-			break;
-		case GLM_COMPILER_GCC45:
-			std::printf("GLM_COMPILER_GCC45\n");
-			break;
 		case GLM_COMPILER_GCC46:
-			std::printf("GLM_COMPILER_GCC46\n");
+			std::printf("GCC 4.6\n");
 			break;
 		case GLM_COMPILER_GCC47:
-			std::printf("GLM_COMPILER_GCC47\n");
+			std::printf("GCC 4.7\n");
 			break;
 		case GLM_COMPILER_GCC48:
-			std::printf("GLM_COMPILER_GCC48\n");
+			std::printf("GCC 4.8\n");
 			break;
 		case GLM_COMPILER_GCC49:
-			std::printf("GLM_COMPILER_GCC49\n");
+			std::printf("GCC 4.9\n");
 			break;
-		case GLM_COMPILER_GCC50:
-			std::printf("GLM_COMPILER_GCC50\n");
+		case GLM_COMPILER_GCC5:
+			std::printf("GCC 5\n");
 			break;
-		case GLM_COMPILER_GCC51:
-			std::printf("GLM_COMPILER_GCC51\n");
+		case GLM_COMPILER_GCC6:
+			std::printf("GCC 6\n");
 			break;
-		case GLM_COMPILER_GCC52:
-			std::printf("GLM_COMPILER_GCC52\n");
+		case GLM_COMPILER_GCC7:
+			std::printf("GCC 7\n");
 			break;
-		case GLM_COMPILER_GCC53:
-			std::printf("GLM_COMPILER_GCC53\n");
-			break;
-		case GLM_COMPILER_GCC54:
-			std::printf("GLM_COMPILER_GCC54\n");
-			break;
-		case GLM_COMPILER_GCC60:
-			std::printf("GLM_COMPILER_GCC60\n");
-			break;
-		case GLM_COMPILER_GCC61:
-			std::printf("GLM_COMPILER_GCC61\n");
-			break;
-		case GLM_COMPILER_GCC62:
-			std::printf("GLM_COMPILER_GCC62\n");
-			break;
-		case GLM_COMPILER_GCC70:
-			std::printf("GLM_COMPILER_GCC70\n");
-			break;
-		case GLM_COMPILER_GCC71:
-			std::printf("GLM_COMPILER_GCC71\n");
-			break;
-		case GLM_COMPILER_GCC72:
-			std::printf("GLM_COMPILER_GCC72\n");
-			break;
-		case GLM_COMPILER_GCC80:
-			std::printf("GLM_COMPILER_GCC80\n");
+		case GLM_COMPILER_GCC8:
+			std::printf("GCC 8\n");
 			break;
 		default:
 			std::printf("GCC version not detected\n");
@@ -94,35 +64,38 @@ int test_compiler()
 	}
 	else if(GLM_COMPILER & GLM_COMPILER_CUDA)
 	{
-		std::printf("GLM_COMPILER_CUDA\n");
+		std::printf("CUDA\n");
 	}
 	else if(GLM_COMPILER & GLM_COMPILER_CLANG)
 	{
 		switch(GLM_COMPILER)
 		{
-		case GLM_COMPILER_CLANG32:
-			std::printf("GLM_COMPILER_CLANG32\n");
-			break;
-		case GLM_COMPILER_CLANG33:
-			std::printf("GLM_COMPILER_CLANG33\n");
-			break;
 		case GLM_COMPILER_CLANG34:
-			std::printf("GLM_COMPILER_CLANG34\n");
+			std::printf("Clang 3.4\n");
 			break;
 		case GLM_COMPILER_CLANG35:
-			std::printf("GLM_COMPILER_CLANG35\n");
+			std::printf("Clang 3.5\n");
 			break;
 		case GLM_COMPILER_CLANG36:
-			std::printf("GLM_COMPILER_CLANG36\n");
+			std::printf("Clang 3.6\n");
 			break;
 		case GLM_COMPILER_CLANG37:
-			std::printf("GLM_COMPILER_CLANG37\n");
+			std::printf("Clang 3.7\n");
 			break;
 		case GLM_COMPILER_CLANG38:
-			std::printf("GLM_COMPILER_CLANG38\n");
+			std::printf("Clang 3.8\n");
 			break;
 		case GLM_COMPILER_CLANG39:
-			std::printf("GLM_COMPILER_CLANG39\n");
+			std::printf("Clang 3.9\n");
+			break;
+		case GLM_COMPILER_CLANG40:
+			std::printf("Clang 4.0\n");
+			break;
+		case GLM_COMPILER_CLANG41:
+			std::printf("Clang 4.1\n");
+			break;
+		case GLM_COMPILER_CLANG42:
+			std::printf("Clang 4.2\n");
 			break;
 		default:
 			std::printf("LLVM version not detected\n");
@@ -133,23 +106,17 @@ int test_compiler()
 	{
 		switch(GLM_COMPILER)
 		{
-		case GLM_COMPILER_INTEL12:
-			std::printf("GLM_COMPILER_INTEL12\n");
-			break;
-		case GLM_COMPILER_INTEL12_1:
-			std::printf("GLM_COMPILER_INTEL12_1\n");
-			break;
-		case GLM_COMPILER_INTEL13:
-			std::printf("GLM_COMPILER_INTEL13\n");
-			break;
 		case GLM_COMPILER_INTEL14:
-			std::printf("GLM_COMPILER_INTEL14\n");
+			std::printf("ICC 14 - 2013 SP1\n");
 			break;
 		case GLM_COMPILER_INTEL15:
-			std::printf("GLM_COMPILER_INTEL15\n");
+			std::printf("ICC 15 - 2015\n");
 			break;
 		case GLM_COMPILER_INTEL16:
-			std::printf("GLM_COMPILER_INTEL16\n");
+			std::printf("ICC 16 - 2017\n");
+			break;
+		case GLM_COMPILER_INTEL17:
+			std::printf("ICC 17 - 20XX\n");
 			break;
 		default:
 			std::printf("Intel compiler version not detected\n");
@@ -214,7 +181,7 @@ int test_instruction_set()
 
 int test_cpp_version()
 {
-	std::printf("__cplusplus: %lld\n", __cplusplus);
+	std::printf("__cplusplus: %d\n", static_cast<int>(__cplusplus));
 	
 	return 0;
 }
@@ -229,19 +196,19 @@ int test_operators()
 	return (S && !R) ? 0 : 1;
 }
 
-template <typename T>
+template<typename T>
 struct vec
 {
 
 };
 
-template <template <typename> class C, typename T>
+template<template<typename> class C, typename T>
 struct Class
 {
 
 };
 
-template <typename T>
+template<typename T>
 struct Class<vec, T>
 {
 

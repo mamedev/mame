@@ -13,7 +13,6 @@
 #ifndef SC499_H_
 #define SC499_H_
 
-#include "emu.h"
 #include "bus/isa/isa.h"
 #include "softlist_dev.h"
 

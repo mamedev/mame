@@ -9,6 +9,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "miracle.h"
 
 #define MIRACLE_MIDI_WAITING 0

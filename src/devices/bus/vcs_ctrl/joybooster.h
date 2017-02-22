@@ -12,7 +12,6 @@
 #ifndef __VCS_JOYSTICKBOOSTER__
 #define __VCS_JOYSTICKBOOSTER__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

@@ -2,20 +2,20 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-	Amiga 500 Keyboard
+    Amiga 500 Keyboard
 
-	Assembly part numbers:
+    Assembly part numbers:
 
-	- 312502-01  U.S./Canada
-	- 312502-02  Germany/Austria
-	- 312502-03  France/Belgium
-	- 312502-04  Italy
-	- 312502-05  Sweden/Finland
-	- 312502-06  Spain
-	- 312502-07  Denmark
-	- 312502-08  Switzerland
-	- 312502-09  Norway
-	- 312502-12  UK
+    - 312502-01  U.S./Canada
+    - 312502-02  Germany/Austria
+    - 312502-03  France/Belgium
+    - 312502-04  Italy
+    - 312502-05  Sweden/Finland
+    - 312502-06  Spain
+    - 312502-07  Denmark
+    - 312502-08  Switzerland
+    - 312502-09  Norway
+    - 312502-12  UK
 
     Amiga 1000 (for reference, to be moved):
 
@@ -32,25 +32,34 @@
 
 #pragma once
 
-#include "emu.h"
 #include "keyboard.h"
 #include "cpu/m6502/m6502.h"
 
+
+// device type definition
+extern const device_type A500_KBD_US;
+extern const device_type A500_KBD_DE;
+extern const device_type A500_KBD_FR;
+extern const device_type A500_KBD_IT;
+extern const device_type A500_KBD_SE;
+extern const device_type A500_KBD_ES;
+extern const device_type A500_KBD_DK;
+extern const device_type A500_KBD_CH;
+extern const device_type A500_KBD_NO;
+extern const device_type A500_KBD_GB;
+
+
+namespace bus { namespace amiga { namespace keyboard {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> a500_kbd_us_device
+// ======================> a500_kbd_device
 
-class a500_kbd_us_device : public device_t, public device_amiga_keyboard_interface
+class a500_kbd_device : public device_t, public device_amiga_keyboard_interface
 {
 public:
-	// construction/destruction
-	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner,	uint32_t clock,
-		device_type type, const char *name, const char *shortname);
-
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
@@ -71,10 +80,19 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(check_reset);
 
 protected:
+	a500_kbd_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			device_type type,
+			const char *name,
+			const char *shortname,
+			const char *file);
+
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -103,14 +121,14 @@ private:
 
 	required_device<m6502_device> m_mpu;
 	required_ioport m_special;
-	required_ioport_array<7> m_row_d;
-	required_ioport_array<8> m_row_c;
+	required_ioport_array<15> m_rows;
 
 	emu_timer *m_timer;
 	emu_timer *m_watchdog;
 	emu_timer *m_reset;
 
-	int m_kdat;
+	int m_host_kdat;
+	int m_mpu_kdat;
 	int m_kclk;
 
 	uint8_t m_port_c;
@@ -120,9 +138,20 @@ private:
 	uint8_t m_control;
 };
 
+// ======================> a500_kbd_us_device
+
+class a500_kbd_us_device : public a500_kbd_device
+{
+public:
+	a500_kbd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
 // ======================> a500_kbd_de_device
 
-class a500_kbd_de_device : public a500_kbd_us_device
+class a500_kbd_de_device : public a500_kbd_device
 {
 public:
 	a500_kbd_de_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -131,8 +160,94 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-// device type definition
-extern const device_type A500_KBD_US;
-extern const device_type A500_KBD_DE;
+// ======================> a500_kbd_fr_device
+
+class a500_kbd_fr_device : public a500_kbd_device
+{
+public:
+	a500_kbd_fr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_it_device
+
+class a500_kbd_it_device : public a500_kbd_device
+{
+public:
+	a500_kbd_it_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_se_device
+
+class a500_kbd_se_device : public a500_kbd_device
+{
+public:
+	a500_kbd_se_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_es_device
+
+class a500_kbd_es_device : public a500_kbd_device
+{
+public:
+	a500_kbd_es_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_dk_device
+
+class a500_kbd_dk_device : public a500_kbd_device
+{
+public:
+	a500_kbd_dk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_ch_device
+
+class a500_kbd_ch_device : public a500_kbd_device
+{
+public:
+	a500_kbd_ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_no_device
+
+class a500_kbd_no_device : public a500_kbd_device
+{
+public:
+	a500_kbd_no_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// ======================> a500_kbd_gb_device
+
+class a500_kbd_gb_device : public a500_kbd_device
+{
+public:
+	a500_kbd_gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+} } } // namespace bus::amiga::keyboard
 
 #endif // DEVICES_BUS_AMIGA_KEYBOARD_A500_H

@@ -314,17 +314,18 @@ const char_info charinfo[] =
 //-------------------------------------------------
 
 natural_keyboard::natural_keyboard(running_machine &machine)
-	: m_machine(machine),
-		m_in_use(false),
-		m_bufbegin(0),
-		m_bufend(0),
-		m_status_keydown(false),
-		m_last_cr(false),
-		m_timer(nullptr),
-		m_current_rate(attotime::zero),
-		m_queue_chars(),
-		m_accept_char(),
-		m_charqueue_empty()
+	: m_machine(machine)
+	, m_in_use(false)
+	, m_bufbegin(0)
+	, m_bufend(0)
+	, m_fieldnum(0)
+	, m_status_keydown(false)
+	, m_last_cr(false)
+	, m_timer(nullptr)
+	, m_current_rate(attotime::zero)
+	, m_queue_chars()
+	, m_accept_char()
+	, m_charqueue_empty()
 {
 	// try building a list of keycodes; if none are available, don't bother
 	build_codes(machine.ioport());
@@ -571,48 +572,68 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 
 void natural_keyboard::build_codes(ioport_manager &manager)
 {
-	// iterate over shift keys
-	ioport_field *shift[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN] = { nullptr };
-	for (int curshift = 0; curshift <= ARRAY_LENGTH(shift); curshift++)
-		if (curshift == 0 || shift[curshift - 1] != nullptr)
+	// find all shfit keys
+	unsigned mask = 0;
+	ioport_field *shift[SHIFT_COUNT];
+	std::fill(std::begin(shift), std::end(shift), nullptr);
+	for (auto const &port : manager.ports())
+	{
+		for (ioport_field &field : port.second->fields())
+		{
+			if (field.type() == IPT_KEYBOARD)
+			{
+				char32_t const code = field.keyboard_code(0);
+				if ((code >= UCHAR_SHIFT_BEGIN) && (code <= UCHAR_SHIFT_END))
+				{
+					mask |= 1U << (code - UCHAR_SHIFT_BEGIN);
+					shift[code - UCHAR_SHIFT_BEGIN] = &field;
+				}
+			}
+		}
+	}
 
-			// iterate over ports and fields
-			for (auto &port : manager.ports())
-				for (ioport_field &field : port.second->fields())
-					if (field.type() == IPT_KEYBOARD)
+	// iterate over ports and fields
+	for (auto const &port : manager.ports())
+	{
+		for (ioport_field &field : port.second->fields())
+		{
+			if (field.type() == IPT_KEYBOARD)
+			{
+				// iterate over all shift states
+				for (unsigned curshift = 0; curshift < SHIFT_STATES; ++curshift)
+				{
+					if (!(curshift & ~mask))
 					{
-						// fetch the code, ignoring 0
-						char32_t code = field.keyboard_code(curshift);
-						if (code == 0)
-							continue;
-
-						// is this a shifter key?
-						if (code >= UCHAR_SHIFT_BEGIN && code <= UCHAR_SHIFT_END)
-							shift[code - UCHAR_SHIFT_BEGIN] = &field;
-
-						// not a shifter key; record normally
-						else
+						// fetch the code, ignoring 0 and shiters
+						char32_t const code = field.keyboard_code(curshift);
+						if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
 						{
 							keycode_map_entry newcode;
-							if (curshift == 0)
-							{
-								newcode.field[0] = &field;
-								newcode.field[1] = nullptr;
-							}
-							else
-							{
-								newcode.field[0] = shift[curshift - 1];
-								newcode.field[1] = &field;
-							}
 							newcode.ch = code;
-							m_keycode_map.push_back(newcode);
+							std::fill(std::begin(newcode.field), std::end(newcode.field), nullptr);
+
+							unsigned fieldnum = 0;
+							for (unsigned i = 0, bits = curshift; (i < SHIFT_COUNT) && bits; ++i, bits >>= 1)
+							{
+								if (BIT(bits, 0))
+									newcode.field[fieldnum++] = shift[i];
+							}
+
+							assert(fieldnum < ARRAY_LENGTH(newcode.field));
+							newcode.field[fieldnum] = &field;
+							m_keycode_map.push_back(std::move(newcode));
 
 							if (LOG_NATURAL_KEYBOARD)
 							{
-								machine().logerror("natural_keyboard: code=%i (%s) port=%p field.name='%s'\n", int(code), unicode_to_string(code).c_str(), (void *)&port, field.name());
+								machine().logerror("natural_keyboard: code=%u (%s) port=%p field.name='%s'\n",
+										code, unicode_to_string(code), (void *)&port, field.name());
 							}
 						}
 					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -692,7 +713,8 @@ void natural_keyboard::internal_post(char32_t ch)
 	if (empty())
 	{
 		m_timer->adjust(choose_delay(ch));
-		m_status_keydown = 0;
+		m_fieldnum = 0;
+		m_status_keydown = false;
 	}
 
 	// add to the buffer, resizing if necessary
@@ -710,9 +732,9 @@ void natural_keyboard::internal_post(char32_t ch)
 
 void natural_keyboard::timer(void *ptr, int param)
 {
-	// the driver has a queue_chars handler
 	if (!m_queue_chars.isnull())
 	{
+		// the driver has a queue_chars handler
 		while (!empty() && m_queue_chars(&m_buffer[m_bufbegin], 1))
 		{
 			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
@@ -720,36 +742,46 @@ void natural_keyboard::timer(void *ptr, int param)
 				break;
 		}
 	}
-
-	// the driver does not have a queue_chars handler
 	else
 	{
-		// loop through this character's component codes
-		const bool new_keydown = !m_status_keydown;
-		const keycode_map_entry *const code = find_code(m_buffer[m_bufbegin]);
-		if (code != nullptr)
-		{
-			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field); fieldnum++)
-			{
-				ioport_field *const field = code->field[fieldnum];
-				if (field == nullptr)
-					break;
+		// the driver does not have a queue_chars handler
 
-				// special handling for toggle fields
-				if (field->live().toggle)
+		// loop through this character's component codes
+		const keycode_map_entry *const code = find_code(m_buffer[m_bufbegin]);
+		bool advance;
+		if (code)
+		{
+			do
+			{
+				assert(m_fieldnum < ARRAY_LENGTH(code->field));
+
+				ioport_field *const field = code->field[m_fieldnum];
+				if (field)
 				{
-					if (new_keydown)
+					// special handling for toggle fields
+					if (!field->live().toggle)
+						field->set_value(!m_status_keydown);
+					else if (!m_status_keydown)
 						field->set_value(!field->digital_value());
 				}
-				else
-					field->set_value(new_keydown);
 			}
+			while (code->field[m_fieldnum] && (++m_fieldnum < ARRAY_LENGTH(code->field)) && m_status_keydown);
+			advance = (m_fieldnum >= ARRAY_LENGTH(code->field)) || !code->field[m_fieldnum];
+		}
+		else
+		{
+			advance = true;
 		}
 
-		// proceed to next character when keydown expires
-		if (!new_keydown)
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
-		m_status_keydown = new_keydown;
+		if (advance)
+		{
+			m_fieldnum = 0;
+			m_status_keydown = !m_status_keydown;
+
+			// proceed to next character when keydown expires
+			if (!m_status_keydown)
+				m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
+		}
 	}
 
 	// need to make sure timerproc is called again if buffer not empty

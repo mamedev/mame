@@ -20,6 +20,7 @@
  *   - bus errors
  */
 
+#include "emu.h"
 #include "cammu.h"
 
 #define VERBOSE 0

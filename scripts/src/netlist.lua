@@ -13,18 +13,25 @@ project "netlist"
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
-	addprojectflags()
+  if _OPTIONS["targetos"]=="windows" then
+	configuration { "mingw* or vs*" }
+	  defines {
+		"UNICODE",
+		"_UNICODE",
+		"_WIN32_WINNT=0x0501",
+		"WIN32_LEAN_AND_MEAN",
+		"NOMINMAX",
+	  }
+  end
 
+	addprojectflags()
 
 	defines {
 		"__STDC_CONSTANT_MACROS",
 	}
 
 	includedirs {
-		MAME_DIR .. "src/lib/netlist",
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/lib/util",
-	--      ext_includedir("expat"),
+		MAME_DIR .. "src/lib",
 	}
 
 	files {
@@ -55,10 +62,13 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
+	MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
+	MAME_DIR .. "src/lib/netlist/plib/pmain.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.h",
+	MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
@@ -74,11 +84,13 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/tools/nl_convert.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.h",
-		MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.cpp",
-		MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",
+		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.cpp",
+		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.h",
+	MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_switches.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_switches.h",
-		MAME_DIR .. "src/lib/netlist/analog/nld_twoterm.cpp",
+		MAME_DIR .. "src/lib/netlist/analog/nlid_twoterm.cpp",
+	MAME_DIR .. "src/lib/netlist/analog/nlid_twoterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_twoterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_opamps.h",
@@ -133,6 +145,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_74153.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74161.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74161.h",
+		MAME_DIR .. "src/lib/netlist/devices/nld_74164.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_74164.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74165.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74165.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74166.cpp",
@@ -147,8 +161,6 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_74193.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74194.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74194.h",
-		MAME_DIR .. "src/lib/netlist/devices/nld_74279.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_74279.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74365.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74365.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_74ls629.cpp",
@@ -163,8 +175,6 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_82S126.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9310.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9310.h",
-		MAME_DIR .. "src/lib/netlist/devices/nld_9312.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_9312.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9316.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9316.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_9322.cpp",
@@ -189,8 +199,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_log.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_system.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_system.h",
-		MAME_DIR .. "src/lib/netlist/devices/nld_truthtable.cpp",
-		MAME_DIR .. "src/lib/netlist/devices/nld_truthtable.h",
+		MAME_DIR .. "src/lib/netlist/devices/nlid_truthtable.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nlid_truthtable.h",
 		MAME_DIR .. "src/lib/netlist/devices/nlid_cmos.h",
 		MAME_DIR .. "src/lib/netlist/devices/nlid_system.h",
 		MAME_DIR .. "src/lib/netlist/devices/nlid_proxy.cpp",

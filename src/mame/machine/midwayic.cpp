@@ -221,12 +221,6 @@ void midway_serial_pic_emu_device::device_start()
 }
 
 
-READ_LINE_MEMBER(midway_serial_pic_emu_device::PIC16C5X_T0_clk_r)
-{
-//  printf("%s: PIC16C5X_T0_clk_r\n", machine().describe_context());
-	return 0;
-}
-
 READ8_MEMBER(midway_serial_pic_emu_device::read_a)
 {
 //  printf("%s: read_a\n", space.machine().describe_context());
@@ -269,7 +263,6 @@ static MACHINE_CONFIG_FRAGMENT( midway_pic )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(midway_serial_pic_emu_device, write_b))
 	MCFG_PIC16C5x_READ_C_CB(READ8(midway_serial_pic_emu_device, read_c))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(midway_serial_pic_emu_device, write_c))
-	MCFG_PIC16C5x_T0_CB(READLINE(midway_serial_pic_emu_device, PIC16C5X_T0_clk_r))
 MACHINE_CONFIG_END
 
 machine_config_constructor midway_serial_pic_emu_device::device_mconfig_additions() const

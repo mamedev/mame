@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "sun_kbd.h"
 
 

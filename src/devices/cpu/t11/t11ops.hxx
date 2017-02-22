@@ -271,8 +271,8 @@ void t11_device::halt(uint16_t op)
 	m_icount -= 48;
 	PUSH(PSW);
 	PUSH(PC);
-	PC = RWORD(0x04);
-	PSW = RWORD(0x06);
+	PC = m_initial_pc + 4;
+	PSW = 0340;
 	t11_check_irqs();
 }
 

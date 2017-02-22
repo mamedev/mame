@@ -7,6 +7,7 @@
  **********************************************************************/
 
 
+#include "emu.h"
 #include "carts.h"
 
 SLOT_INTERFACE_START(generic_plain_slot)

@@ -27,7 +27,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;

@@ -5,7 +5,6 @@
     for Cyrillic characters).
 
     To do:
-    - receive data from host (not used by KSM but used by other boards)
     - connect LEDs and speaker
 */
 
@@ -27,7 +26,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MS7004_CPU_TAG   "i8048"
+#define MS7004_CPU_TAG   "i8035"
 #define MS7004_SPK_TAG   "beeper"
 
 
@@ -46,7 +45,11 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ms7004_map, AS_IO, 8, ms7004_device )
+static ADDRESS_MAP_START( ms7004_map, AS_PROGRAM, 8, ms7004_device )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ms7004_iomap, AS_IO, 8, ms7004_device )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
@@ -58,8 +61,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( ms7004 )
-	MCFG_CPU_ADD(MS7004_CPU_TAG, I8048, XTAL_4_608MHz)
-	MCFG_CPU_IO_MAP(ms7004_map)
+	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL_4_608MHz)
+	MCFG_CPU_PROGRAM_MAP(ms7004_map)
+	MCFG_CPU_IO_MAP(ms7004_iomap)
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(ms7004_device, i8243_port_w))
 
@@ -388,7 +392,7 @@ void ms7004_device::device_reset()
 
 WRITE_LINE_MEMBER( ms7004_device::write_rxd )
 {
-	DBG_LOG(1,0,("write_rxd %d\n", state));
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 //-------------------------------------------------

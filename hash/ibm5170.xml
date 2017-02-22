@@ -4233,6 +4233,23 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="bmenace">
+		<description>Bio Menace</description>
+		<year>1993</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bio Menace (USA) (v.1.1) (Disk 1).img" size="1474560" crc="16e5328e" sha1="2ffc1ea203c085c9f19feda4241984c4fb594d98" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bio Menace (USA) (v.1.1) (Disk 2).img" size="1474560" crc="33d83897" sha1="7ef3a391ce171c344ec50a5968d50b5754e512cb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boppin">
 		<description>Boppin' (Super Ultimate, v1.1)</description>
 		<year>1994</year>
@@ -4418,6 +4435,18 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmo">
+		<description>Cosmo's Cosmic Adventure - Forbidden Planet</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="1.20" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Cosmo's Cosmic Adventure - Forbidden Planet (USA) (v1.2).img" size="1474560" crc="67739228" sha1="cdb091162699b8f6bff8aff3bd1358781945fc36" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4715,13 +4744,25 @@ Missing files come here
 	<software name="duke">
 		<!-- Dumped via Kryoflux, all tracks show as modified - most likely not professionally duplicated -->
 		<!-- from a registered version ordered circa 2004 -->
-		<description>Duke Nukum (V 2.0)</description>
+		<description>Duke Nukum (V 2.0, 3.5" HD)</description>
 		<year>1991</year>
 		<publisher>Apogee Software</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="duke nukum.img" size="1474560" crc="3332d232" sha1="306b2802adbdbfe6655679c01a187582a05255ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dukea" cloneof="duke">
+		<description>Duke Nukum (V 2.0, 3.5" DD)</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Duke Nukum (USA) (v2.0).img" size="737280" crc="0bd0cfbb" sha1="1eafbba8e90558a4e4090524a2696b7611b40be8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4758,11 +4799,111 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="dune2">
+		<description>Dune II - The Battle for Arrakis</description>
+		<year>1993</year>
+		<publisher>Westwood Studios</publisher>
+		<info name="version" value="1.07" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II (USA, Europe) (3.5'') (Disk 1).img" size="1474560" crc="7c92c98b" sha1="6bc5772718d3a6f3654638dbccf4c73d1ae12034" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II (USA, Europe) (3.5'') (Disk 2).img" size="1474560" crc="e6c6e1e3" sha1="71881f48bc46f4e6f401c342ce717e01dc62b9f3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II (USA, Europe) (3.5'') (Disk 3).img" size="1474560" crc="e0fc633a" sha1="c2085cac2df9d6f237bfe0c682bda4ec7bab2ca1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dune II (USA, Europe) (3.5'') (Disk 4).img" size="1474560" crc="ce7a9528" sha1="955f517874554891b7ddd69c267c099659affd97" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin1">
+		<description>Epic Pinball Pack 1 (v2.1)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 1 (USA) (v2.1).img" size="1474560" crc="eeb45c4e" sha1="2c35b14979d2806edf00e7ad3439c5573d84a90f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin1a" cloneof="epicpin1">
+		<description>Epic Pinball Pack 1 (v2.0)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 1 (USA) (v2.0).img" size="1474560" crc="646549bf" sha1="b1965039080a8f1e0c56d145fe5f98d08cd83031" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin2">
+		<description>Epic Pinball Pack 2 (v2.1)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 2 (USA) (v2.1).img" size="1474560" crc="e095f2b3" sha1="cf1f5c4d7095669d36dfecbdf529813d812eb071" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin2a" cloneof="epicpin2">
+		<description>Epic Pinball Pack 2 (v2.0)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 2 (USA) (v2.0).img" size="1474560" crc="fc6a88f0" sha1="037f29270b05f27523e51948a2b0c68b5b7c99b3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin3">
+		<description>Epic Pinball Pack 3 (v2.1)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 3 (USA) (v2.1).img" size="1474560" crc="45315f64" sha1="0f6988c313254654c34ed2f129a137f5bf9ad821" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpin3a" cloneof="epicpin3">
+		<description>Epic Pinball Pack 3 (v2.0)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Epic Pinball Pack 3 (USA) (v2.0).img" size="1474560" crc="5ef63fbb" sha1="0cbb22c76186c53fdb4203705c4c166aa28248c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epicpina">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Epic Pinball: Special ACER Edition</description>
 		<year>1994</year>
 		<publisher>Epic MegaGames/Acer</publisher>
+		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="epicpin disk1.img" size="1474560" crc="d56f9411" sha1="d5d5a12d56e9bda23f8f3aad2ed6bc5fb328d923" offset="0" />
@@ -4927,6 +5068,29 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="jjungle">
+		<description>Jill of the Jungle (3.5")</description>
+		<year>1992</year>
+		<publisher>Epic MegaGames</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (3.5'').img" size="1474560" crc="8f43ef3d" sha1="cbd71a856b62d1b751db3399755d693b54e0a8bc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jjungle525" cloneof="jjungle">
+		<description>Jill of the Jungle (5.25")</description>
+		<year>1992</year>
+		<publisher>Epic MegaGames</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (5.25'').img" size="1228800" crc="323b0332" sha1="dd3dc2df11745e4858dfee1025f42d98e6970b4e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kilo1">
 		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
 		<year>1994</year>
@@ -4977,6 +5141,57 @@ Missing files come here
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="f2a89364" sha1="54bae8483683e631cb0dc15fba208c1719a4b2bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stryker">
+		<description>Major Stryker</description>
+		<year>1993</year>
+		<publisher>Apogee Software</publisher>
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Major Stryker (USA) (v1.4).img" size="1474560" crc="f4b03f34" sha1="62038142fb4e235596cced179c03b4c79756b8e3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moo">
+		<description>Master of Orion</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Orion (USA, Europe) (Disk 1).img" size="1474560" crc="9ce39e98" sha1="0aede9f73222cc2b4426cd2eb79f91ba8c4583f3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Orion (USA, Europe) (Disk 2).img" size="1474560" crc="36b3c49c" sha1="70945d9c3988056d4763d912d7615b632737f23d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Orion (USA, Europe) (Disk 3).img" size="1474560" crc="d64fcfdf" sha1="f36cd65dab67aa432a0225515a6ff5426b1cf442" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Master of Orion (USA, Europe) (Disk 4).img" size="1474560" crc="810a54c5" sha1="00c8c02ae734380421072da24232d395ab0dce84" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathresc">
+		<description>Math Rescue</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Karen Crowther" />
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Math Rescue (USA) (v2.0).img" size="1474560" crc="b263c87a" sha1="7db955501ce06709be73d9742fa9da6d247706b5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5060,8 +5275,34 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="raptor12">
-		<description>Raptor - Call of the Shadows</description>
+	<software name="ppersia2">
+		<description>Prince of Persia 2 - The Shadow &amp; the Flame</description>
+		<year>1993</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 1).img" size="1474560" crc="6d27f6de" sha1="1a2ceb2ec3a5da788b85f887ba5aa1cf9b36f9c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 2).img" size="1474560" crc="33cce22a" sha1="d3f209d983e127ee441da34ac86b6d4108dbbad8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 3).img" size="1474560" crc="e16b92e4" sha1="2a7867645727462228143cb2b5d26792945c50c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 4).img" size="1474560" crc="f5366618" sha1="00d33bef46d8435665fce0727271376ac2b43f2e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raptor">
+		<description>Raptor - Call of the Shadows (v1.2)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
 		<info name="version" value="1.2" />
@@ -5078,6 +5319,22 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="05443ceb" sha1="3b8bd610d90677a830f9b4e297e4a89343cb86a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raptorsw" cloneof="raptor">
+		<description>Raptor - Call of the Shadows (v1.1, Shareware, Euro poWer pack)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Raptor - Call of the Shadows (Europe) (Shareware v1.1) (Disk 1).img" size="1474560" crc="30b61263" sha1="7f85139261d828c660934f97c371537e51f8eccd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Raptor - Call of the Shadows (Europe) (Shareware v1.1) (Disk 2).img" size="1474560" crc="d20af54f" sha1="efcfa13d0c787647338b21b2e78185bb75aa1b54" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5471,6 +5728,27 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="ufoeu">
+		<description>UFO - Enemy Unknown</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="UFO - Enemy Unknown (Europe) (Disk 1).img" size="1474560" crc="5eaa25eb" sha1="fc40d21299238bfad9e5884f58507d7237c44517" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="UFO - Enemy Unknown (Europe) (Disk 2).img" size="1474560" crc="94ca2aa4" sha1="b6689f071cba25ba5f0837704b0989fb2e3aa9f0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="UFO - Enemy Unknown (Europe) (Disk 3).img" size="1474560" crc="b809f0d2" sha1="c391ef6ddb9ff80764a5f86eaa6ade2582d3fa5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultdoom">
 		<description>The Ultimate DOOM</description>
 		<year>1995</year>
@@ -5538,6 +5816,19 @@ Missing files come here
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="disk 4.img" size="1228800" crc="caf1057e" sha1="bff9d7c21675da1197cbcf039823982e69d9c6c0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordresc">
+		<description>Word Rescue</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Karen Crowther" />
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Word Rescue (USA) (v2.0).img" size="1474560" crc="0d3b9f45" sha1="162640737e6b9617245e04f1eefb6c36238b7a85" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5660,6 +5951,32 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xcomtftd">
+		<description>X-COM - Terror from the Deep</description>
+		<year>1995</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="X-COM - Terror from the Deep (Europe) (Disk 1).img" size="1474560" crc="9b146602" sha1="754cd93f6ff43858673b34226454fad0820b3352" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="X-COM - Terror from the Deep (Europe) (Disk 2).img" size="1474560" crc="0ee3d086" sha1="7f620c5b743736887dbd054e86ee29b25f9a31c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="X-COM - Terror from the Deep (Europe) (Disk 3).img" size="1474560" crc="b3657025" sha1="16079028ef5b6902d88bcd8485e7d5efcf417617" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="X-COM - Terror from the Deep (Europe) (Disk 4).img" size="1474560" crc="9a0c4b32" sha1="f896427120ff68cf560d295c5d898172f669f87a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

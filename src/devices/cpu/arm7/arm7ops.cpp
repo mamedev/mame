@@ -378,9 +378,14 @@ void arm7_cpu_device::HandleCoProcDT(uint32_t insn)
 		SetRegister(rn, ornv);
 }
 
-void arm7_cpu_device::HandleBranch(uint32_t insn)
+void arm7_cpu_device::HandleBranch(uint32_t insn, bool h_bit)
 {
 	uint32_t off = (insn & INSN_BRANCH) << 2;
+	if (h_bit)
+	{
+		// H goes to bit1
+		off |= (insn & 0x01000000) >> 23;
+	}
 
 	/* Save PC into LR if this is a branch with link */
 	if (insn & INSN_BL)
@@ -1519,13 +1524,104 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 } /* HandleMemBlock */
 
 
-const arm7_cpu_device::arm7ops_ophandler arm7_cpu_device::ops_handler[0x10] =
+const arm7_cpu_device::arm7ops_ophandler arm7_cpu_device::ops_handler[0x20] =
 {
 	&arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123,
 	&arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567,
 	&arm7_cpu_device::arm7ops_89,   &arm7_cpu_device::arm7ops_89,   &arm7_cpu_device::arm7ops_ab,   &arm7_cpu_device::arm7ops_ab,
 	&arm7_cpu_device::arm7ops_cd,   &arm7_cpu_device::arm7ops_cd,   &arm7_cpu_device::arm7ops_e,    &arm7_cpu_device::arm7ops_f,
+	&arm7_cpu_device::arm9ops_undef,&arm7_cpu_device::arm9ops_1,    &arm7_cpu_device::arm9ops_undef,&arm7_cpu_device::arm9ops_undef,
+	&arm7_cpu_device::arm9ops_undef,&arm7_cpu_device::arm9ops_57,   &arm7_cpu_device::arm9ops_undef,&arm7_cpu_device::arm9ops_57,
+	&arm7_cpu_device::arm9ops_89,   &arm7_cpu_device::arm9ops_89,   &arm7_cpu_device::arm9ops_ab,   &arm7_cpu_device::arm9ops_ab,
+	&arm7_cpu_device::arm9ops_c,    &arm7_cpu_device::arm9ops_undef,&arm7_cpu_device::arm9ops_e,    &arm7_cpu_device::arm9ops_undef,
 };
+
+void arm7_cpu_device::arm9ops_undef(uint32_t insn)
+{
+	// unsupported instruction
+	LOG(("ARM7: Instruction %08X unsupported\n", insn));
+}
+
+void arm7_cpu_device::arm9ops_1(uint32_t insn)
+{
+	/* Change processor state (CPS) */
+	if ((insn & 0x00f10020) == 0x00000000)
+	{
+		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
+	}
+	else if ((insn & 0x00ff00f0) == 0x00010000) /* set endianness (SETEND) */
+	{
+		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
+	}
+	else
+	{
+		arm9ops_undef(insn);
+	}
+}
+
+void arm7_cpu_device::arm9ops_57(uint32_t insn)
+{
+	/* Cache Preload (PLD) */
+	if ((insn & 0x0070f000) == 0x0050f000)
+	{
+		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
+	}
+	else
+	{
+		arm9ops_undef(insn);
+	}
+}
+
+void arm7_cpu_device::arm9ops_89(uint32_t insn)
+{
+	/* Save Return State (SRS) */
+	if ((insn & 0x005f0f00) == 0x004d0500)
+	{
+		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
+	}
+	else if ((insn & 0x00500f00) == 0x00100a00) /* Return From Exception (RFE) */
+	{
+		// unsupported (armv6 onwards only)
+		arm9ops_undef(insn);
+	}
+	else
+	{
+		arm9ops_undef(insn);
+	}
+}
+
+void arm7_cpu_device::arm9ops_ab(uint32_t insn)
+{
+	// BLX
+	HandleBranch(insn, true);
+	set_cpsr(GET_CPSR|T_MASK);
+}
+
+void arm7_cpu_device::arm9ops_c(uint32_t insn)
+{
+	/* Additional coprocessor double register transfer */
+	if ((insn & 0x00e00000) == 0x00400000)
+	{
+		// unsupported
+		arm9ops_undef(insn);
+	}
+	else
+	{
+		arm9ops_undef(insn);
+	}
+}
+
+void arm7_cpu_device::arm9ops_e(uint32_t insn)
+{
+	/* Additional coprocessor register transfer */
+	// unsupported
+	arm9ops_undef(insn);
+}
+
 
 void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 {
@@ -1824,7 +1920,7 @@ void arm7_cpu_device::arm7ops_ab(uint32_t insn) /* Branch or Branch & Link */
 {
 //case 0xa:
 //case 0xb:
-	HandleBranch(insn);
+	HandleBranch(insn, false);
 //  break;
 }
 

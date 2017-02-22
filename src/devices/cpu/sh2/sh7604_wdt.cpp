@@ -47,6 +47,12 @@ sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *
 }
 
 
+const address_space_config *sh7604_wdt_device::memory_space_config(address_spacenum spacenum) const
+{
+	return &m_space_config;
+}
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

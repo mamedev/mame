@@ -7,6 +7,7 @@
  *      Author: bsr
  */
 
+#include "emu.h"
 #include "s11c_bg.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

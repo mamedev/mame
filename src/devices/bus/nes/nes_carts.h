@@ -11,7 +11,6 @@
 #ifndef __NES_CARTS_H__
 #define __NES_CARTS_H__
 
-#include "emu.h"
 
 // official PCBs
 #include "nxrom.h"

@@ -12,7 +12,6 @@
 #define __SMS_LIGHT_PHASER__
 
 
-#include "emu.h"
 #include "smsctrl.h"
 
 

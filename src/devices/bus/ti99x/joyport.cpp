@@ -35,6 +35,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "joyport.h"
 #include "handset.h"
 #include "mecmouse.h"

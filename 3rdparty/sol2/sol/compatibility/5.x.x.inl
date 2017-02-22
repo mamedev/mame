@@ -309,7 +309,7 @@ inline int luaL_fileresult(lua_State *L, int stat, const char *fname) {
     }
     else {
         char buf[1024];
-#ifdef __GLIBC__
+#if defined(__GLIBC__) || defined(_POSIX_VERSION)
         strerror_r(en, buf, 1024);
 #else
         strerror_s(buf, 1024, en);

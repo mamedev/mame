@@ -11,7 +11,6 @@
 #ifndef __TDOS__
 #define __TDOS__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/mc6852.h"
 

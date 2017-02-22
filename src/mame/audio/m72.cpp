@@ -43,6 +43,7 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "m72.h"
 
 
@@ -57,16 +58,6 @@ m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *ta
 	, m_samples_size(0)
 	, m_dac(*this, "^dac")
 	, m_soundlatch(*this, "^soundlatch")
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void m72_audio_device::device_config_complete()
 {
 }
 

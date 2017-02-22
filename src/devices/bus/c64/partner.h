@@ -11,7 +11,6 @@
 #ifndef __PARTNER__
 #define __PARTNER__
 
-#include "emu.h"
 #include "exp.h"
 
 

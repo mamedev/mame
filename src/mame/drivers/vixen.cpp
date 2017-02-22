@@ -53,6 +53,7 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "includes/vixen.h"
 #include "softlist.h"
 

@@ -277,6 +277,9 @@ void core_options::add_entry(const char *name, const char *description, uint32_t
 				return;
 			}
 		}
+
+		// need to call value_changed() with initial value
+		value_changed(newentry->name(), newentry->value());
 	}
 
 	// add us to the list and maps
@@ -458,6 +461,42 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 		validate_and_set_data(*curentry->second, optiondata, priority, error_string);
 	}
 	return true;
+}
+
+
+//-------------------------------------------------
+//	find_within_command_line - finds a specific
+//	value from within a command line
+//-------------------------------------------------
+
+const char *core_options::find_within_command_line(int argc, char **argv, const char *optionname)
+{
+	// find this entry within the options (it is illegal to call this with a non-existant option
+	// so we assert if not present)
+	auto curentry = m_entrymap.find(optionname);
+	assert(curentry != m_entrymap.end());
+
+	// build a vector with potential targets
+	std::vector<std::string> targets;
+	const char *potential_target;
+	int index = 0;
+	while ((potential_target = curentry->second->name(index++)) != nullptr)
+	{
+		// not supporting unadorned options for now
+		targets.push_back(std::string("-") + potential_target);
+	}
+
+	// find each of the targets in the argv array
+	for (int i = 1; i < argc - 1; i++)
+	{
+		auto const iter = std::find_if(
+			targets.begin(),
+			targets.end(),
+			[argv, i](const std::string &targ) { return targ == argv[i]; });
+		if (iter != targets.end())
+			return argv[i + 1];
+	}
+	return nullptr;
 }
 
 
@@ -835,6 +874,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 
 	// set the data
 	curentry.set_value(data.c_str(), priority);
+	value_changed(curentry.name(), data);
 	return true;
 }
 

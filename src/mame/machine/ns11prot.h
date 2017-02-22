@@ -5,7 +5,6 @@
  *
  */
 
-#include "emu.h"
 
 class ns11_keycus_device : public device_t
 {

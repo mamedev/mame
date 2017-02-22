@@ -11,11 +11,12 @@ Star Wars Arcade (C) Sega, 1994
 Virtua Fighter   (C) Sega, 1993
 Virtua Racing    (C) Sega, 1992
 Wing War         (C) Sega, 1994
+Tecwar/Netmerc   (C) Sega and Virtuality, 1993
 
 The Sega Model 1 system comprises several PCB's....
 CPU PCB   - This is the main PCB. It holds the main CPU, some surface-mounted ROMs and the 3D co-processors
-            (manufactured by Fujitsu and known as 'TGP'). The PCB is the same for all Model 1 games, but some
-            games are not swappable due to a different internal 3D co-processor program.
+            (manufactured by Fujitsu and known as 'TGP'). There are three different PCB variants, with
+            different internal 3D co-processor programs depending on game.
 Video PCB - There is only one known revision of this PCB so any game can use this PCB. It contains a very large
             quantity of RAM, some surface-mounted ROMs and some custom Sega video chips. The RGB and Sync is also
             outputted from this PCB. The horizontal sync is 24kHz and requires a medium resolution (24kHz) monitor.
@@ -144,8 +145,8 @@ MODEL-1 CPU BOARD 837-8886171-6298C (C) SEGA 1992
 |       |-----------|     3771                   |-----------|                                                                    |
 |       |           |                            |           |                                                                    |
 |       | SEGA      |                            | SEGA      |                                                           D71051   |
-|       | 315-5572  |                            | 315-5573  |                  |-----------|                                     |
-|       |           |                            |           |                  |           |     M5M5178     OPR-14743.45        |
+|       | 315-5572  |                            | COPRO     |                  |-----------|                                     |
+|       |           |                            |(see notes)|                  |           |     M5M5178     OPR-14743.45        |
 |       |           |                            |           |                  | SEGA      |     M5M5178                         |
 |       |-----------|                            |-----------|                  | 315-5464  |     M5M5178     OPR-14742.44        |
 |                                                                               |           |     M5M5178                         |
@@ -180,9 +181,12 @@ Notes:
       *1            - Unpopulated position for Fujitsu MB8421
       D70615GD-16   - NEC uPD70615GD-16-S V60 CPU, running at 16.000MHz (QFP120, clock 32 / 2)
       315-5546A     - Lattice GAL16V8A (DIP20)
-      315-5571      - Sega Custom (IC57/IC58, QFP160)  \
-      315-5572      - Sega Custom (IC60/IC66, QFP160)  / According to test mode, these chips are the TGPs
-      315-5573      - Sega Custom (QFP160)
+      315-5571      - Fujitsu MB86233 Geometrizer (IC57/IC58, QFP160)                   \
+      315-5572      - Fujitsu MB86233 Geometrizer (different code) (IC60/IC66, QFP160)  / According to test mode, these chips are the TGPs
+      COPRO         - Fujitsu MB86233 Coprocessor (QFP160), differs depending on game:
+          315-5573      - Virtua Racing, Virtua Formula (original for above board part number)
+          315-5711      - Wing War, Star Wars Arcade, Netmerc
+          315-5724      - Virtua Fighter
       315-5463      - Sega Custom (QFP160)
       315-5464      - Sega Custom (QFP160)
       315-5465      - Sega Custom (QFP100)

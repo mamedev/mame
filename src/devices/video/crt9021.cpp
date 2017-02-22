@@ -33,6 +33,7 @@
 
 */
 
+#include "emu.h"
 #include "crt9021.h"
 
 

@@ -12,7 +12,6 @@
 #ifndef __PSXGPU_H__
 #define __PSXGPU_H__
 
-#include "emu.h"
 
 #define MCFG_PSX_GPU_VBLANK_HANDLER(_devcb) \
 	devcb = &psxgpu_device::set_vblank_handler(*device, DEVCB_##_devcb);

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "modules.h"
 
 SLOT_INTERFACE_START( svi_expander_modules )

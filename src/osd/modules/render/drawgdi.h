@@ -15,7 +15,6 @@
 #include <windows.h>
 
 // MAME headers
-#include "emu.h"
 
 // MAMEOS headers
 #include "window.h"

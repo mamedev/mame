@@ -13,7 +13,6 @@
 #ifndef __ACIA6850_H__
 #define __ACIA6850_H__
 
-#include "emu.h"
 
 #define MCFG_ACIA6850_TXD_HANDLER(_devcb) \
 	devcb = &acia6850_device::set_txd_handler(*device, DEVCB_##_devcb);

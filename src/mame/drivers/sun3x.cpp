@@ -129,6 +129,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timekpr.h"
 #include "machine/z80scc.h"

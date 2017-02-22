@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "midiinport.h"
 
 const device_type MIDIIN_PORT = &device_creator<midiin_port_device>;

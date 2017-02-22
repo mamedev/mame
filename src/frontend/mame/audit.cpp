@@ -48,7 +48,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 // temporary hack until romload is update: get the driver path and support it for
 // all searches
-const char *driverpath = m_enumerator.config().root_device().searchpath();
+const char *driverpath = m_enumerator.config()->root_device().searchpath();
 
 	std::size_t found = 0;
 	std::size_t required = 0;
@@ -56,7 +56,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 	std::size_t shared_required = 0;
 
 	// iterate over devices and regions
-	for (device_t &device : device_iterator(m_enumerator.config().root_device()))
+	for (device_t &device : device_iterator(m_enumerator.config()->root_device()))
 	{
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = device.searchpath();
@@ -199,7 +199,7 @@ media_auditor::summary media_auditor::audit_samples()
 	std::size_t found = 0;
 
 	// iterate over sample entries
-	for (samples_device &device : samples_device_iterator(m_enumerator.config().root_device()))
+	for (samples_device &device : samples_device_iterator(m_enumerator.config()->root_device()))
 	{
 		// by default we just search using the driver name
 		std::string searchpath(m_enumerator.driver().name);
@@ -507,7 +507,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 		// iterate up the parent chain
 		for (auto drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex >= 0; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
 		{
-			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex).root_device()))
+			for (device_t &scandevice : device_iterator(m_enumerator.config(drvindex)->root_device()))
 			{
 				for (const rom_entry *region = rom_first_region(scandevice); region; region = rom_next_region(region))
 				{

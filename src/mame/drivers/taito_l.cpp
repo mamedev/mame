@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznic_map)
 
-	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL_13_33056MHz / 4) /* clock is complete guess */
+	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL_3MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, puzznic)
 MACHINE_CONFIG_END
@@ -2291,11 +2291,26 @@ ROM_START( puzznic )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
+	ROM_LOAD( "c20-01.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "c20-07.ic10", 0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
 	ROM_LOAD16_BYTE( "c20-06.ic9",  0x00001, 0x10000, CRC(ac85a9c5) SHA1(2d72dae86a191ccdac9648980aca832fb9886544) )
+
+	ROM_REGION( 0x0800, "pals", 0 )
+	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
+ROM_END
+
+ROM_START( puzznicu )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "c20-10.ic11", 0x00000, 0x20000, CRC(3522d2e5) SHA1(2428663d1d71f2920c69cd2cd907f0750c22af77) )
+
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
+	ROM_LOAD( "c20-01.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
+	ROM_LOAD16_BYTE( "c20-02.ic9",   0x00001, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
 
 	ROM_REGION( 0x0800, "pals", 0 )
 	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
@@ -2306,7 +2321,7 @@ ROM_START( puzznicj )
 	ROM_LOAD( "c20-04.ic11",  0x00000, 0x20000, CRC(a4150b6c) SHA1(27719b8993735532cd59f4ed5693ff3143ee2336) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
+	ROM_LOAD( "c20-01.ic4", 0x0000, 0x0800, CRC(085f68b4) SHA1(2dbc7e2c015220dc59ee1f1208540744e5b9b7cc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
@@ -2555,6 +2570,7 @@ GAME( 1989, plottingu, plotting, plotting,  plottingu, driver_device,     0,    
 GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
 GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
 GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
 GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )

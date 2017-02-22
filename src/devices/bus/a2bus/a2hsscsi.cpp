@@ -38,8 +38,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2hsscsi.h"
-#include "includes/apple2.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 

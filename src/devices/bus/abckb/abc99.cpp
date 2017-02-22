@@ -52,6 +52,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc99.h"
 
 

@@ -36,6 +36,7 @@ ToDo:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"

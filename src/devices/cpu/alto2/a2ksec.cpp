@@ -5,6 +5,7 @@
  *   Xerox AltoII disk sector task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 //! f1_ksec_block early: block the disk sector task

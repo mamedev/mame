@@ -22,6 +22,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/ut88.h"
 #include "formats/rk_cas.h"
 #include "softlist.h"

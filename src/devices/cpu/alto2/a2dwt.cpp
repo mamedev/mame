@@ -5,6 +5,7 @@
  *   Xerox AltoII display word task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 /*

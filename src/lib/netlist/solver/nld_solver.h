@@ -8,25 +8,15 @@
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
 
-#include "nl_setup.h"
-#include "nl_base.h"
-#include "plib/pstream.h"
-#include "solver/nld_matrix_solver.h"
+#include <map>
+
+#include "../nl_base.h"
+#include "../plib/pstream.h"
+#include "nld_matrix_solver.h"
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
 
-// ----------------------------------------------------------------------------------------
-// Macros
-// ----------------------------------------------------------------------------------------
-
-#ifndef NL_AUTO_DEVICES
-
-#define SOLVER(name, freq)                                                 \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
-
-#endif
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
@@ -79,7 +69,7 @@ NETLIB_OBJECT(solver)
 
 	inline nl_double gmin() { return m_gmin(); }
 
-	void create_solver_code(plib::postream &strm);
+	void create_solver_code(std::map<pstring, pstring> &mp);
 
 	NETLIB_UPDATEI();
 	NETLIB_RESETI();
@@ -110,8 +100,8 @@ private:
 
 	solver_parameters_t m_params;
 
-	template <int m_N, int storage_N>
-	std::unique_ptr<matrix_solver_t> create_solver(unsigned size, bool use_specific);
+	template <std::size_t m_N, std::size_t storage_N>
+	std::unique_ptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
 };
 
 	} //namespace devices

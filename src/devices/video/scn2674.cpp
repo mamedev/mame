@@ -4,6 +4,7 @@
     SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
 */
 
+#include "emu.h"
 #include "scn2674.h"
 
 #define S674VERBOSE 0

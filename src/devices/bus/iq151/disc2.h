@@ -5,7 +5,6 @@
 #ifndef __IQ151_DISC2_H__
 #define __IQ151_DISC2_H__
 
-#include "emu.h"
 #include "iq151.h"
 #include "machine/upd765.h"
 

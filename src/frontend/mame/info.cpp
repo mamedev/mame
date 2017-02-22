@@ -246,10 +246,10 @@ void info_xml_creator::output_one()
 		return;
 
 	// allocate input ports
-	machine_config &config = m_drivlist.config();
+	std::shared_ptr<machine_config> config = m_drivlist.config();
 	ioport_list portlist;
 	std::string errors;
-	device_iterator iter(config.root_device());
+	device_iterator iter(config->root_device());
 	for (device_t &device : iter)
 		portlist.append(device, errors);
 
@@ -326,20 +326,20 @@ void info_xml_creator::output_one()
 
 	// now print various additional information
 	output_bios();
-	output_rom(m_drivlist.config().root_device());
+	output_rom(config->root_device());
 	output_device_roms();
-	output_sample(m_drivlist.config().root_device());
-	output_chips(m_drivlist.config().root_device(), "");
-	output_display(m_drivlist.config().root_device(), "");
-	output_sound(m_drivlist.config().root_device());
+	output_sample(config->root_device());
+	output_chips(config->root_device(), "");
+	output_display(config->root_device(), "");
+	output_sound(config->root_device());
 	output_input(portlist);
 	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
 	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
 	output_ports(portlist);
 	output_adjusters(portlist);
 	output_driver();
-	output_images(m_drivlist.config().root_device(), "");
-	output_slots(m_drivlist.config().root_device(), "");
+	output_images(config->root_device(), "");
+	output_slots(config->root_device(), "");
 	output_software_list();
 	output_ramoptions();
 
@@ -426,7 +426,7 @@ void info_xml_creator::output_devices()
 	while (m_drivlist.next())
 	{
 		// first, run through devices with roms which belongs to the default configuration
-		for (device_t &device : device_iterator(m_drivlist.config().root_device()))
+		for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
 		{
 			if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0]!='\0')
 			{
@@ -436,13 +436,13 @@ void info_xml_creator::output_devices()
 		}
 
 		// then, run through slot devices
-		for (const device_slot_interface &slot : slot_interface_iterator(m_drivlist.config().root_device()))
+		for (const device_slot_interface &slot : slot_interface_iterator(m_drivlist.config()->root_device()))
 		{
 			for (auto &option : slot.option_list())
 			{
 				std::string temptag("_");
 				temptag.append(option.second->name());
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option.second->devtype(), 0);
+				device_t *dev = m_drivlist.config()->device_add(&m_drivlist.config()->root_device(), temptag.c_str(), option.second->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
 				for (device_t &device : device_iterator(*dev))
@@ -462,7 +462,7 @@ void info_xml_creator::output_devices()
 					}
 				}
 
-				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.c_str());
+				m_drivlist.config()->device_remove(&m_drivlist.config()->root_device(), temptag.c_str());
 			}
 		}
 	}
@@ -476,7 +476,7 @@ void info_xml_creator::output_devices()
 
 void info_xml_creator::output_device_roms()
 {
-	for (device_t &device : device_iterator(m_drivlist.config().root_device()))
+	for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
 		if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0] != '\0')
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
 }
@@ -490,7 +490,7 @@ void info_xml_creator::output_device_roms()
 void info_xml_creator::output_sampleof()
 {
 	// iterate over sample devices
-	for (samples_device &device : samples_device_iterator(m_drivlist.config().root_device()))
+	for (samples_device &device : samples_device_iterator(m_drivlist.config()->root_device()))
 	{
 		samples_iterator sampiter(device);
 		if (sampiter.altbasename() != nullptr)
@@ -572,7 +572,7 @@ void info_xml_creator::output_rom(device_t &device)
 				util::hash_collection hashes(ROM_GETHASHDATA(rom));
 				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 					merge_name = get_merge_name(hashes);
-				if (&device != &m_drivlist.config().root_device())
+				if (&device != &m_drivlist.config()->root_device())
 					merge_name = nullptr;
 				// scan for a BIOS name
 				bios_name[0] = 0;
@@ -1534,7 +1534,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			{
 				if (option.second->selectable())
 				{
-					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option.second->devtype(), 0);
+					device_t *dev = m_drivlist.config()->device_add(&m_drivlist.config()->root_device(), "dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
@@ -1544,7 +1544,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 					if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
-					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
+					m_drivlist.config()->device_remove(&m_drivlist.config()->root_device(), "dummy");
 				}
 			}
 
@@ -1561,7 +1561,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_software_list()
 {
-	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config().root_device()))
+	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config()->root_device()))
 	{
 		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name().c_str());
 		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
@@ -1580,7 +1580,7 @@ void info_xml_creator::output_software_list()
 
 void info_xml_creator::output_ramoptions()
 {
-	for (const ram_device &ram : ram_device_iterator(m_drivlist.config().root_device()))
+	for (const ram_device &ram : ram_device_iterator(m_drivlist.config()->root_device()))
 	{
 		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram.default_size());
 
@@ -1612,7 +1612,7 @@ const char *info_xml_creator::get_merge_name(const util::hash_collection &romhas
 	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
-		device_t *device = &m_drivlist.config(clone_of, m_lookup_options).root_device();
+		device_t *device = &m_drivlist.config(clone_of, m_lookup_options)->root_device();
 		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
 			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
 			{

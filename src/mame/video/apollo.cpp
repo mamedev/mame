@@ -15,6 +15,7 @@
 
 #define VERBOSE 0
 
+#include "emu.h"
 #include "includes/apollo.h"
 #include "rendlay.h"
 #include "apollo.lh"
@@ -1737,16 +1738,6 @@ apollo_graphics_15i::~apollo_graphics_15i()
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void apollo_graphics_15i::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -1901,16 +1892,6 @@ apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig,
 		const char *tag, device_t *owner, uint32_t clock) :
 	apollo_graphics_15i(mconfig, tag, owner, clock, APOLLO_MONO19I,
 			"Apollo 19\" Monochrome Screen", "apollo_graphics_19i", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void apollo_graphics_19i::device_config_complete()
 {
 }
 

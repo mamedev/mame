@@ -25,7 +25,6 @@
 #ifndef MAGICSOUND_H_
 #define MAGICSOUND_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/dmadac.h"
 #include "sound/dac.h"

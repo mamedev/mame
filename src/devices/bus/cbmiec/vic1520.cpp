@@ -35,6 +35,7 @@ PD6 Y MOTOR COM C
 PD7 Y MOTOR COM D
 */
 
+#include "emu.h"
 #include "vic1520.h"
 
 

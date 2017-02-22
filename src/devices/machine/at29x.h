@@ -10,7 +10,6 @@
 #ifndef __AT29X__
 #define __AT29X__
 
-#include "emu.h"
 
 extern const device_type AT29C020;
 extern const device_type AT29C040;

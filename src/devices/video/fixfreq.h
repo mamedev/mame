@@ -14,7 +14,6 @@
 #ifndef FIXFREQ_H
 #define FIXFREQ_H
 
-#include "emu.h"
 #include "machine/netlist.h"
 
 #define FIXFREQ_INTERFACE(name) \

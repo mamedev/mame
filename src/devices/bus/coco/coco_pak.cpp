@@ -10,9 +10,9 @@
 
 #include "emu.h"
 #include "coco_pak.h"
-#include "includes/coco.h"
 
 #define CARTSLOT_TAG            "cart"
+#define CART_AUTOSTART_TAG      "cart_autostart"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -25,6 +25,19 @@ ROM_START( coco_pak )
 	ROM_REGION(0x8000, CARTSLOT_TAG, ROMREGION_ERASE00)
 	// this region is filled by cococart_slot_device::call_load()
 ROM_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( coco_cart_autostart )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( coco_cart_autostart )
+	PORT_START(CART_AUTOSTART_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Cart Auto-Start" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -42,14 +55,14 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, ":" CART_AUTOSTART_TAG)
+		m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
 coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
 		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, ":" CART_AUTOSTART_TAG)
+		m_autostart(*this, CART_AUTOSTART_TAG)
 	{
 }
 
@@ -71,6 +84,15 @@ void coco_pak_device::device_start()
 machine_config_constructor coco_pak_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( coco_pak );
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_pak_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_cart_autostart );
 }
 
 //-------------------------------------------------

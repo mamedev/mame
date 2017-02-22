@@ -83,9 +83,17 @@ project("mametests")
 	}
 
 	files {
+		MAME_DIR .. "src/emu/video/rgbsse.cpp",
+		MAME_DIR .. "src/emu/video/rgbsse.h",
+		MAME_DIR .. "src/emu/video/rgbvmx.cpp",
+		MAME_DIR .. "src/emu/video/rgbvmx.h",
+	}
+
+	files {
 		MAME_DIR .. "tests/main.cpp",
 		MAME_DIR .. "tests/lib/util/corestr.cpp",
 		MAME_DIR .. "tests/lib/util/options.cpp",
 		MAME_DIR .. "tests/emu/attotime.cpp",
+		MAME_DIR .. "tests/emu/video/rgbutil.cpp",
 	}
 

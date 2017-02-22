@@ -11,7 +11,6 @@
 #ifndef __TURBO_KONTROLLER__
 #define __TURBO_KONTROLLER__
 
-#include "emu.h"
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

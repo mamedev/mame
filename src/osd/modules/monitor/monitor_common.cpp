@@ -5,6 +5,7 @@
 *
 */
 
+#include "emu.h"
 #include <algorithm>
 
 #include "monitor_common.h"

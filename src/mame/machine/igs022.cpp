@@ -17,14 +17,6 @@ igs022_device::igs022_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void igs022_device::device_config_complete()
-{
-}
-
-void igs022_device::device_validity_check(validity_checker &valid) const
-{
-}
-
 void igs022_device::device_start()
 {
 	// Reset  stuff

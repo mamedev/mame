@@ -10,7 +10,6 @@
 #ifndef __K573MSU_H__
 #define __K573MSU_H__
 
-#include "emu.h"
 
 extern const device_type KONAMI_573_MULTI_SESSION_UNIT;
 

@@ -5,7 +5,6 @@
 #define __CRVISION__
 
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"

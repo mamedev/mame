@@ -11,7 +11,6 @@
 #ifndef __PORTFOLIO_ROM_CARD__
 #define __PORTFOLIO_ROM_CARD__
 
-#include "emu.h"
 #include "ccm.h"
 
 

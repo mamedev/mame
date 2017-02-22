@@ -40,6 +40,7 @@
 
 */
 
+#include "emu.h"
 #include "ps64.h"
 
 

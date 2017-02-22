@@ -123,6 +123,7 @@ from Brett Selwood and Andrew Davies.
 
 *******************************************************************************/
 
+#include "emu.h"
 #include "includes/mbee.h"
 #include "formats/mbee_cas.h"
 

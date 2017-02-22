@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
+	devcb = &lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device

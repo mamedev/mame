@@ -81,6 +81,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/tmc600.h"
 
 /* Read/Write Handlers */

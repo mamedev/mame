@@ -97,7 +97,6 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
 uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	uint16_t tile_sets = 0;
 	uint8_t layer[3];
 
 #ifdef MAME_DEBUG
@@ -120,16 +119,12 @@ uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_in
 	}
 #endif
 
-	m_scrollx[0] =  m_ioc_ram[0x14 / 2];
-	m_scrolly[0] =  m_ioc_ram[0x16 / 2];
-	m_scrollx[1] =  m_ioc_ram[0x18 / 2];
-	m_scrolly[1] =  m_ioc_ram[0x1a / 2];
-	m_scrollx[2] =  m_ioc_ram[0x1c / 2];
-	m_scrolly[2] =  m_ioc_ram[0x1e / 2];
-
-	tile_sets = m_ioc_ram[0x88 / 2];
-	m_bg0_gfxset = (tile_sets & 0x400) ? 0x1000 : 0;
-	m_bg1_gfxset = (tile_sets & 0x800) ? 0x1000 : 0;
+	m_scrollx[0] = m_d80010_ram[0x4 / 2];
+	m_scrolly[0] = m_d80010_ram[0x6 / 2];
+	m_scrollx[1] = m_d80010_ram[0x8 / 2];
+	m_scrolly[1] = m_d80010_ram[0xa / 2];
+	m_scrollx[2] = m_d80010_ram[0xc / 2];
+	m_scrolly[2] = m_d80010_ram[0xe / 2];
 
 	for (i = 0; i < 3; i++)
 	{
@@ -160,7 +155,7 @@ uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_in
 #endif
 	m_tilemap[layer[2]]->draw(screen, bitmap, cliprect, 0, 4);
 
-	int sprpri = (m_ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
+	int sprpri = (m_d80060_ram[0x8 / 2] & 0x8800) ? 0 : 1;
 	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect, m_gfxdecode, 16, sprpri);
 
 #if 0

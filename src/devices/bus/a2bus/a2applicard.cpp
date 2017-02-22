@@ -11,8 +11,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2applicard.h"
-#include "includes/apple2.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 

@@ -6,8 +6,8 @@
  */
 
 #include "nld_mm5837.h"
-#include <solver/nld_matrix_solver.h>
-#include "analog/nld_twoterm.h"
+#include "../solver/nld_matrix_solver.h"
+#include "../analog/nlid_twoterm.h"
 
 #define R_LOW (1000.0)
 #define R_HIGH (1000.0)
@@ -109,7 +109,7 @@ namespace netlist
 			if (m_is_timestep)
 				m_RV.update_dev();
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
+			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 		}
 
 	}

@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "c2040fdc.h"
 
 

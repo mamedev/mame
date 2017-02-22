@@ -3,7 +3,6 @@
 #ifndef __ATARI_MARIA__
 #define __ATARI_MARIA__
 
-#include "emu.h"
 
 // ======================> atari_maria_device
 

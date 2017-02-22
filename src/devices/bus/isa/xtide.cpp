@@ -53,6 +53,7 @@ Device Control (out)        14              7
 
 
 
+#include "emu.h"
 #include "xtide.h"
 
 

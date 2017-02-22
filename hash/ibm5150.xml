@@ -8,33 +8,23 @@ Compiled by K1W1 and Telanus
 
 Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went down.
 
- - Aces High
- - Amnesia
- - Astro-Dodge
  - Attack On Altair
  - Beneath Apple Manor
  - Borrowed Time / Time to Die
- - Boulder Dash
- - Bruce Lee
- - BurgerTime*
  - Chess88*
  - Climber 5
  - Decision in the Desert
  - Destroyer
  - Dunjonquest: Morloc's Tower
- - Earthly Delights
- - Executive Suite
  - Floppy Frenzy*
  - Forbidden Castle
  - Forbidden Quest
- - Frederick Forsyth's The Fourth Protocol
  - FriendlyWare PC Introductory Set
  - Full Count Baseball
  - Galactic Gladiators
  - Harrier Combat Simulator
  - High Stakes
  - Holy Grail, The
- - Ikari Warriors II: Victory Road
  - Infidel*
  - International Hockey
  - James Bond 007: Goldfinger*
@@ -46,8 +36,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
  - Moon Bugs*
  - Night Stalker
  - PC Pool*
- - PSI-5 Trading Company
- - Rasterscan
  - Rescue at Rigel
  - Sherlock Holmes: Another Bow
  - Snack Attack II
@@ -86,6 +74,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="1502177.img" size="163840" crc="baa2ed6e" sha1="3633c9b344db7b091e82502464be1fc331cdbc14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceshigh">
+		<description>Aces High (Wizball, Top Gun, World Series Baseball, Arkanoid)</description>
+		<year>1988</year>
+		<publisher>Ocean Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "356888">
+				<rom name="aceshigh.td0" size="356888" crc="1c00e329" sha1="3824becc12b8180ba4214eb868d5cd06953b0373" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,6 +136,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="alley cat.img" size="184320" crc="23228e10" sha1="c4e1b163b14fbffe3bef97816d5b7db142c593f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amnesia">
+		<description>Amnesia</description>
+		<year>1986</year>
+		<publisher>Thomas M. Disch and Cognetics Corporation</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="amnesia.img" size="737280" crc="bb109c06" sha1="02bf9aaeea08144d34e81e93c554ddbb1c026743" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,6 +205,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="51215">
 				<rom name="archon.td0" size="51215" crc="faa51229" sha1="b5cd00279d93ceceba11fc8921947d2c50785d20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_size=79648 -->
+	<software name="astrodod" supported="no">
+		<description>Astro-Dodge</description>
+		<year>1982</year>
+		<publisher>Digital Marketing Corporation</publisher>
+		<info name="developer" value="Dave Gangola" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "65769">
+				<rom name="astrodod.td0" size="65769" crc="12e49778" sha1="6c7ca2c16dd4b9c946dbceb8c11c159e68a2dd29" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +348,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bdash">
-		<description>Boulderdash I &amp; II</description>
+		<description>Boulder Dash</description>
+		<year>1984</year>
+		<publisher>First Star Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "163840">
+				<rom name="bdash.img" size="163840" crc="c7135383" sha1="c757abf12b8b90d1f4b9e5a60cc3a043d0bdd3e9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash12" supported="no">
+		<description>Boulder Dash I &amp; II</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="First Star Software" />
@@ -337,15 +371,27 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="bdasha" cloneof="bdash">
-		<description>Boulderdash I &amp; II (Alt)</description>
+	<software name="bdash12a" cloneof="bdash12">
+		<description>Boulder Dash I &amp; II (Alt) [cr]</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="First Star Software" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="CCC &amp; DHC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="boulderdash i &amp; ii (alt).img" size="327680" crc="f16bb596" sha1="1888b78c03c945d61f512a3e5b54b2f195b6fedf" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brucelee">
+		<description>Bruce Lee</description>
+		<year>1984</year>
+		<publisher>Datasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="brucelee.img" size="184320" crc="34ba9abf" sha1="7727128eb7e1677087479ffd6c215ca76ec19420" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -370,6 +416,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="buggy ranger.img" size="368640" crc="95b5a5c5" sha1="0ffb81bb2f3cbaccddb8b52f066a45f607639e2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fatal error: Incorrect layout on track 17 head 0, expected_size=100000, current_size=139488 -->
+	<software name="burgtime" supported="no">
+		<description>BurgerTime</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "48162">
+				<rom name="burgtime.td0" size="48162" crc="06c48d7d" sha1="af0462cbebba513a9a2538a41c098af599cf7fd1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,6 +683,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="dunzhin">
+		<description>Dunzhin: Warrior of Ras Volume I</description>
+		<year>1982</year>
+		<publisher>Computer Applications Unlimited</publisher>
+		<info name="developer" value="Intelligent Statement" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "107367">
+				<rom name="dunzhin.td0" size="107367" crc="f5607f9d" sha1="9e9d73f521cb45c35b85e3c5af923a6aba809c03" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunzhina" cloneof="dunzhin">
 		<description>Dunzhin: Warrior of Ras Volume I [cr]</description>
 		<year>1982</year>
 		<publisher>Computer Applications Unlimited</publisher>
@@ -638,6 +709,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="earthly">
+		<description>Earthly Delights</description>
+		<year>1986</year>
+		<publisher>Roger Webster/Dan'l Leviton</publisher>
+		<info name="version" value="1.6" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "155712">
+				<rom name="earthly.td0" size="155712" crc="2d478c13" sha1="1387df6e1675129f4779a9a99e3e0898100bb252" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="enchantr">
 		<description>Enchanter</description>
 		<year>1983</year>
@@ -646,6 +729,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="enchanter.img" size="163840" crc="13d252cc" sha1="aa5185f9e667a5076a1977524fb8894fc9e66868" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="execst">
+		<description>Executive Suite</description>
+		<year>1982</year>
+		<publisher>Armonk Corporation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "179849">
+				<rom name="execst.td0" size="179849" crc="93b16f5f" sha1="9092bdb3fe82547b2a0d60eb57c28e5887d1ba70" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -730,6 +824,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="freddy hardest.img" size="368640" crc="16d0e37a" sha1="fb6bed4ecf3ee34e697aa928a4f17ec994a439cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thprot">
+		<description>Frederick Forsyth's The Fourth Protocol [cr]</description>
+		<year>1987</year>
+		<publisher>Ariolasoft UK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "163840">
+				<rom name="4thprot.img" size="163840" crc="dadc4006" sha1="81ebd2b64bbf8c1d18a6b156d846d2d89b9ad4e2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -921,7 +1026,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="hhmack">
+	<software name="hhmack" supported="no">
 	<!-- Might be Bad -->
 		<description>Hard Hat Mack</description>
 		<year>1984</year>
@@ -1549,7 +1654,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="packpc">
 		<description>Pack PC Opera Soft</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Opera Soft</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1605,6 +1710,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psi5">
+		<description>PSI-5 Trading Company</description>
+		<year>1986</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="psi5.img" size="368640" crc="5a1638ed" sha1="9057b27929e3e919a2480ba0732dda83f0ede8d6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2182,8 +2298,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="victroad">
-		<description>Victory Road</description>
-		<year>1986</year>
+		<description>Victory Road: Ikari Warriors Part II</description>
+		<year>1987</year>
 		<publisher>Data East</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3323,6 +3439,223 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="minix11">
+		<description>MINIX 1.1</description>
+		<year>1987</year>
+		<publisher>Prentice-Hall</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1: Boot Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk1" size="368640" crc="7f5c61fe" sha1="2531c6c573eb56d92c3b99dbad324caba730e886" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2: Root File System" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk2" size="368640" crc="121d18b9" sha1="e2c5cd11fd1d42b4b21768043fd4f636939109a6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3: /usr" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk3" size="368640" crc="389fb615" sha1="5722850db458322418263cedf56e1985c3c51c1f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4: /user" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk4" size="368640" crc="c7fb0027" sha1="32413d17965b0904ba168cbd87230dd8e882a319" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5: Kernel, H and Include Sources" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk5" size="368640" crc="7bf54285" sha1="705a30d5009bd7d5917282790c5083b6cfd32008" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6: FS and Lib Sources" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk6" size="368640" crc="8760066e" sha1="9cba22cfa7096daa0761ee92b31e9b9a7e316105" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7: MM and Tools Sources" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk7" size="368640" crc="561b3416" sha1="ceb310d574b10e493db9519a88f774c6c305244b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8: Commands Sources" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk8" size="368640" crc="0867b611" sha1="5e40bfce134532ae8229fc33582dfabe80eed012" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These are archive disks created by Warren Toomey, by hand-patching Minix 1.1
+with the USENET diffs for 1.2 posted by Andy Tanenbaum. As such, this is not
+an official version of Minix 1.2 from Prentice-Hall. -->
+	<software name="minix12">
+		<description>MINIX 1.2</description>
+		<year>1988</year>
+		<publisher>Prentice-Hall</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 08: Recompiled Boot Disk (includes ST328R driver)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk08" size="368640" crc="2daa6c22" sha1="763f0f2a29e0c41f8a86a34c8ad38ab9dabd5733" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 01: /usr/bin" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk01" size="368640" crc="458579ad" sha1="19c2f383edaac5f6b5c4509f2815e3a3360de94b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 02: /usr/bin, /usr/src/commands" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk02" size="368640" crc="f30df5ad" sha1="0801b967428152931fc246304aab099ab54fd59f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 03: /usr/src/commands, /usr/src/lib" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk03" size="368640" crc="8d19b4b9" sha1="655d87370a52a88f7a1e4a254ff28863b5fc6ec4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 04: /usr/src/fs, /usr/src/h, /usr/include" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk04" size="368640" crc="adc91360" sha1="8d7a3eb13d13a0d79b2c9a10e281487997eedce2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 05: /usr/src/kernel" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk05" size="368640" crc="a922b05b" sha1="3d57dc57fd5db03de9bc5bf729c8cf35955574d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 06: /usr/src/mm, /usr/lib" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk06" size="368640" crc="4e3ba957" sha1="c3210b14d6ebdee517898de1f3c01360c677eb54" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 07: /usr/src/tools" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk07" size="368640" crc="e9689468" sha1="4000876f400570628ead851df7cd023511bfddd4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 09: Root File Structure (mounts /dev/fd0)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk09" size="368640" crc="9bdf1ff0" sha1="45b2e8816061d79e90bb28a07457694655050452" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10: /user/test" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk10" size="368640" crc="e41e5341" sha1="51088a733b7d976ec819cacec71232396585235a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These are archive disks created by Warren Toomey, by hand-patching Minix 1.2
+with the USENET diffs for 1.3 posted by Andy Tanenbaum. As such, this is not
+an official version of Minix 1.3 from Prentice-Hall. -->
+	<software name="minix13">
+		<description>MINIX 1.3</description>
+		<year>1989</year>
+		<publisher>Prentice-Hall</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 01: Boot Disk (ST238R Driver)" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.01" size="368640" crc="4270dba9" sha1="2557ad330c64b3efd98072da9176c086ec43ca36" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 02: Root File Structure" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.02" size="368640" crc="a5107cf0" sha1="f97d9df2a3f7524c41b8a592a1b234288416dbeb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 03: /usr/bin/[a-f]" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.03" size="368640" crc="4dcab586" sha1="8d1d4f9fb13c7eb3ac532b76ba6b0f89d9fd5e36" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 04: /usr/bin/[g-t]" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.04" size="368640" crc="5e047a06" sha1="f86013d4488ac1591a714c0772ec0ac34b071693" offset="0"/>
+			</dataarea>
+		</part>
+<!-- Note: The image for disk 5 has a bad 512-byte block at offset 311808, which
+has been replaced with an all-zero block. -->
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 05: /usr/bin/[t-z]" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.05" size="368640" crc="9b754c0f" sha1="912399e8edd9e4349a6e35c155cce774601fb840" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 06: /usr/minix/commands/bin/[a-t]" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.06" size="368640" crc="c44c2be5" sha1="ed38f48175a3ca39eb433c915bff394dda723620" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 07: /usr/minix/commands/bin/[t-z], dis88, make, mined, /usr/doc" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.07" size="368640" crc="c4ac2d8c" sha1="71ae1013471538da85c1f1a3dad84a74afc2d668" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 08: fs, kernel" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.08" size="368640" crc="2149b5ca" sha1="2220c0538927052d0ea989b3a1af47a8abcbff06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 09: /usr/tools, /usr/include, mm" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.09" size="368640" crc="2cdd2573" sha1="13b18f14b34d6881cd087f58144363a5ffe4d6f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10: /usr/minix/lib, /usr/test" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.10" size="368640" crc="14de88a5" sha1="391de4317050a2a6ce51d3f3f63ada139c200aec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11: /usr/lib, 6th August 1989" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.11" size="368640" crc="0871be33" sha1="17b5a6f87506f9eaec3ebf5a410316507a57c04a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12: /usr/local/bin, 6th August 1989" />
+			<dataarea name="flop" size = "368640">
+				<rom name="floppy_disk.12" size="368640" crc="140f60ee" sha1="7fd1777d5a86c8dce4305c3d7d9e7ce755a7581e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minix15d">
+		<description>MINIX 1.5 (IBM demo disk)</description>
+		<year>1991</year>
+		<publisher>Prentice-Hall</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="demo_dsk.ibm" size="368640" crc="b01cad18" sha1="8579c8727a7ba747ed2c75af48c4354ef532d07c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos211">
 		<description>AT&amp;T Personal Computer 6300 DOS Release 2.0 (MS-DOS 2.11)</description>
 		<year>1984</year>
@@ -3973,6 +4306,22 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="wendin">
+		<description>Wendin Multiuser DOS 2.11</description>
+		<year>1987</year>
+		<publisher>Wendin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk1.img" size="368640" crc="8cd185d0" sha1="8467e09982742399ca0de467523abffbe33ac022" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk2.img" size="368640" crc="20ab7f99" sha1="295ed18e15eb1316eb430fb622bffced5d8292bb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xenix86">
 		<description>SCO XENIX System V release 2.1.3 for i8086</description>
 		<year>1986</year>
@@ -4090,7 +4439,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="688atsub">
-		<description>688 Attack Sub</description>
+		<description>688 Attack Sub (5.25")</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="688 Attack Sub Disk 1.bin" size="368640" crc="f1d4028c" sha1="7abb8494617da27dbe2e002fc2077405aa7298ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="688 Attack Sub Disk 2.bin" size="368640" crc="9f45960b" sha1="b8f133de7942df15e034a5b8f345a01f1affe1a5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="688atsub35" cloneof="688atsub">
+		<description>688 Attack Sub (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4303,6 +4668,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="bublbobl">
+		<description>Bubble Bobble</description>
+		<year>1989</year>
+		<publisher>Taito America</publisher>
+		<info name="developer" value="Nova Logic" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bubble Bobble (USA) (Disk 1).img" size="368640" crc="1dad38e6" sha1="6b2f5f9655ed5002dfd72b33b2cfb857c432752a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bubble Bobble (USA) (Disk 2).img" size="368640" crc="26d72672" sha1="de10177bd95e576dcc00e90e73ad181bd97f5577" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="budokan">
 		<description>Budokan - The Martial Spirit</description>
 		<year>1989</year>
@@ -4314,10 +4696,40 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="crtoonrs">
+		<description>Cartooners</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners Program Disk.bin" size="368640" crc="5efe9b1c" sha1="38acb1d43b786cc01cf0e602121628e96b8240bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Art Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners Art Disk.bin" size="368640" crc="34d92806" sha1="d156cd9c08cb968be698ba0bebbc6e156d4362c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crtnspac">
+		<description>Cartooners in Space</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="Add-on disk for Cartooners" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Cartooners In Space.bin" size="368640" crc="e7246370" sha1="3e9a1c70ab677b8d0c48853f7d10ccf09b6dc7e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="caveugh">
 		<description>Caveman Ugh-Lympics</description>
 		<year>1988</year>
-		<publisher>Electronic Arts, Inc.</publisher>
+		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Dynamix, Inc." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -4439,6 +4851,72 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Demon's Tomb - The Awakening [1989] [Virgin Mastertronic] [5.25] [2 of 2].img" size="368640" crc="5bce4b3f" sha1="c4b3c19fc60e4cf99bbf1a0ec2f52830f55d1536" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon">
+		<description>Double Dragon (5.25")</description>
+		<year>1988</year>
+		<publisher>Arcadia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon (World) (5.25'') (Disk 1).img" size="368640" crc="35bcf889" sha1="1bf43db289dceb544cd3ebbdc5d95159a20ba089" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon (World) (5.25'') (Disk 2).img" size="368640" crc="4428f9b8" sha1="4b5e413a99aa7ed43d0d1ad7f70afcf8386d85b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon35" cloneof="ddragon">
+		<description>Double Dragon (3.5")</description>
+		<year>1988</year>
+		<publisher>Arcadia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Double Dragon (World) (3.5'').img" size="737280" crc="8627a3a9" sha1="02e9a8aeaa60416e9661ac8d1e162599d99b7fc8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon2">
+		<description>Double Dragon II - The Revenge</description>
+		<year>1989</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="developer" value="Binary Design" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon II - The Revenge (World) (5.25'') (Disk 1).img" size="368640" crc="63c06bbf" sha1="239937ac0ed7907c4a0e12587316c56c66933ea5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon II - The Revenge (World) (5.25'') (Disk 2).img" size="368640" crc="810712bb" sha1="4188e5acbd1c37d4718fee7f26e9debbf04e9a96" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon II - The Revenge (World) (5.25'') (Disk 3).img" size="368640" crc="bdfe685a" sha1="076f827a949cd2480f7ab996ed3defa0c580edf3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon3">
+		<description>Double Dragon III - The Rosetta Stone</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="usage" value="VGA required" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon III - The Rosetta Stone (World) (5.25'') (Disk 1).img" size="368640" crc="00df1c23" sha1="4dac479867367f9b91936cd6d3b42e2f8197b126" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Double Dragon III - The Rosetta Stone (World) (5.25'') (Disk 2).img" size="368640" crc="fb5a97a4" sha1="a46b44548145024479a5889482e88446d4b25f9e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4701,6 +5179,64 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="infocom">
+		<description>The Lost Treasures of Infocom</description>
+		<year>1991</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 1).img" size="737280" crc="a492f4fd" sha1="939ca3d32761b7293cf7d3219603568a1647df46" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 2).img" size="737280" crc="7ee8846b" sha1="7bc3ed5dede7cdc9cf25b4ed82deb415a84cd197" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 3).img" size="737280" crc="7bef3a8f" sha1="b9372196640db8a6f1fd294d384c1408a6a1c9c0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 4).img" size="737280" crc="7a129d8d" sha1="7c0b07f1dfedb03cb8ddab679a5246eb2780d5bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom, The (USA) (Disk 5).img" size="737280" crc="ef482956" sha1="79570daae5786ceacffd16698512c7ae9b036b1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infocom2">
+		<description>The Lost Treasures of Infocom II</description>
+		<year>1992</year>
+		<publisher>Infocom</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 1).img" size="737280" crc="596566c7" sha1="e01a35d006435c1f70d17b3f25496c6b64b846bd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 2).img" size="737280" crc="ef055a56" sha1="a41b1947b604e60ae8db82f27e70cf84844982f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 3).img" size="737280" crc="658fb10e" sha1="4fd25943edb3d2fde097fb782320325e1608ce6d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lost Treasures of Infocom II, The (USA) (Disk 4).img" size="737280" crc="5cf5d235" sha1="e5b8756f2de8140ae5475fe5843c0c28dcf7574b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lurkingh">
 		<description>The Lurking Horror</description>
 		<year>1987</year>
@@ -4708,6 +5244,55 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="The Lurking Horror [1987] [5.25] [1 of 1].img" size="368640" crc="4dbd2ab2" sha1="175a7890f776f93c1b7ef6f0a3bc8afc4b634cc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman">
+		<description>Mega Man</description>
+		<year>1990</year>
+		<publisher>Capcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man (USA).img" size="368640" crc="1d82bd43" sha1="39f02096d6c9b20cf19bdc3542f3129f2e464bc2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman3">
+		<description>Mega Man III (5.25")</description>
+		<year>1992</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man 3 (USA) (v1.2) (5.25'') (Disk 1).img" size="368640" crc="c179fcd5" sha1="69d396c08f2401f650b012d6f2636a9c9fe9781e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Mega Man 3 (USA) (v1.2) (5.25'') (Disk 2).img" size="368640" crc="08605dac" sha1="e39671b35d36b3ab3661ca880e3ea19815c34c6a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman3_35" cloneof="megaman3">
+		<description>Mega Man III (3.5")</description>
+		<year>1992</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mega Man 3 (USA) (v1.2) (3.5'').img" size="737280" crc="9f40613b" sha1="f196af28dd74526294b4a790de76e81bbffc4c81" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgear">
+		<description>Metal Gear</description>
+		<year>1990</year>
+		<publisher>Ultra Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Metal Gear (USA) (5.25'').img" size="368640" crc="837e245f" sha1="367f55a67525d4afd7a2eca9ff2f2239d07e75ea" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4725,6 +5310,44 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ppersia">
+		<description>Prince of Persia (5.25", v1.3)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia (World) (v1.3) (5.25'') (Disk 1).img" size="368640" crc="0cdb1b44" sha1="c795ac4c7290a25982f18f23cb1efbd2a33d324d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia (World) (v1.3) (5.25'') (Disk 2).img" size="368640" crc="15b13749" sha1="196b1f4b7334f54f2228234aa1aae4aeef92f3c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia35" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.3)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia (World) (v1.3) (3.5'').img" size="737280" crc="62336557" sha1="adb0b10899baa7cb0e53b612e12e6ae7ac929400" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiaa" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia (World) (v1.1) (Hit Squad).img" size="737280" crc="0c386185" sha1="b194505c710acd1da5aeea34415b1ae5bb4979dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_size=103360 -->
 	<software name="purplesa" supported="no">
 		<description>Purple Saturn Day</description>
@@ -4738,6 +5361,36 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "339570">
 				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop">
+		<description>RoboCop</description>
+		<year>1989</year>
+		<publisher>Data East</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 1).img" size="368640" crc="e835c199" sha1="9209b03a25ac6b0b56ad97e5dd07bb253a4d9396" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 2).img" size="368640" crc="eaa03d9a" sha1="250ed513f84de58ed7724a1cddcae40989922963" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 3).img" size="368640" crc="1d2f1444" sha1="2cfb47a07ec8067f1bb52d19d44a4c34fd6aa8ec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size = "368640">
+				<rom name="RoboCop (USA) (Disk 4).img" size="368640" crc="64190df0" sha1="48c8faafebaa4bf6c089e7aefb817241f9e4f0b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4795,6 +5448,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "347616">
 				<rom name="Starflight 2 - Trade Routes Of The Cloud Nebula [1989] [5.25] [2 of 2].td0" size="347616" crc="ca35b501" sha1="bcd941785a84b5fb36b23077a7c41686ed2cb188" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflg2a" cloneof="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (Alt)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight 2 Disk 1.bin" size="368640" crc="223da6ee" sha1="e3ee6eefe9f6b6109e6723691db496d7944130b7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight 2 Disk 2.bin" size="368640" crc="be83f4cb" sha1="04f4450fd1aad9558e882d925b96ebb1397b9d46" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4905,6 +5575,22 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="World Class Leader Board [1988] [Access Software] [5.25] [1 of 1].img" size="368640" crc="73172ed6" sha1="08fdd895bcaace7ec060fb82a4461871603c9816" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanygolf">
+		<description>Zany Golf</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Zany Golf Program Disk 1.bin" size="368640" crc="cd607615" sha1="f1c61f4a88628c855c4f766055b892cc6f51f7f0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Zany Golf Program Disk 2.bin" size="368640" crc="a8cddc3d" sha1="1302026fe22d921dc4513330d33bc16566b583b8" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

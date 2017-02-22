@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2midi.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"

@@ -132,6 +132,7 @@ craft.cpp
 crvision.cpp
 ct486.cpp
 cvicny.cpp
+cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
 czk80.cpp
@@ -603,6 +604,7 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 test_t400.cpp
+testconsole.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp

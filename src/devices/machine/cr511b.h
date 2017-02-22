@@ -35,7 +35,6 @@
 #ifndef __CR511B_H__
 #define __CR511B_H__
 
-#include "emu.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 

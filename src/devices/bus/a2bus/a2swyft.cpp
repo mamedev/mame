@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "a2swyft.h"
 
 

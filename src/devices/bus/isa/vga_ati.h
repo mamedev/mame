@@ -12,7 +12,6 @@
 #ifndef ISA_VGA_ATI_H_
 #define ISA_VGA_ATI_H_
 
-#include "emu.h"
 #include "isa.h"
 #include "video/pc_vga.h"
 #include "mach32.h"

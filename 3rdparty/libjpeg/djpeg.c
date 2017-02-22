@@ -2,7 +2,7 @@
  * djpeg.c
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
- * Modified 2009 by Guido Vollbeding.
+ * Modified 2009-2015 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -102,6 +102,7 @@ usage (void)
   fprintf(stderr, "  -colors N      Reduce image to no more than N colors\n");
   fprintf(stderr, "  -fast          Fast, low-quality processing\n");
   fprintf(stderr, "  -grayscale     Force grayscale output\n");
+  fprintf(stderr, "  -rgb           Force RGB output\n");
 #ifdef IDCT_SCALING_SUPPORTED
   fprintf(stderr, "  -scale M/N     Scale output image by fraction M/N, eg, 1/8\n");
 #endif
@@ -264,6 +265,10 @@ parse_switches (j_decompress_ptr cinfo, int argc, char **argv,
       /* Force monochrome output. */
       cinfo->out_color_space = JCS_GRAYSCALE;
 
+    } else if (keymatch(arg, "rgb", 3)) {
+      /* Force RGB output. */
+      cinfo->out_color_space = JCS_RGB;
+
     } else if (keymatch(arg, "map", 3)) {
       /* Quantize to a color map taken from an input file. */
       if (++argn >= argc)	/* advance to next argument */
@@ -298,7 +303,7 @@ parse_switches (j_decompress_ptr cinfo, int argc, char **argv,
       cinfo->mem->max_memory_to_use = lval * 1000L;
 
     } else if (keymatch(arg, "nosmooth", 3)) {
-      /* Suppress fancy upsampling */
+      /* Suppress fancy upsampling. */
       cinfo->do_fancy_upsampling = FALSE;
 
     } else if (keymatch(arg, "onepass", 3)) {
@@ -327,7 +332,7 @@ parse_switches (j_decompress_ptr cinfo, int argc, char **argv,
       /* Scale the output image by a fraction M/N. */
       if (++argn >= argc)	/* advance to next argument */
 	usage();
-      if (sscanf(argv[argn], "%d/%d",
+      if (sscanf(argv[argn], "%u/%u",
 		 &cinfo->scale_num, &cinfo->scale_denom) < 1)
 	usage();
 

@@ -7,7 +7,6 @@
 #ifndef __HDC92X4_H__
 #define __HDC92X4_H__
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "imagedev/mfmhd.h"
 #include "fdc_pll.h"

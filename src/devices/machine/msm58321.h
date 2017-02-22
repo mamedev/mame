@@ -36,7 +36,6 @@
 #ifndef __MSM58321__
 #define __MSM58321__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

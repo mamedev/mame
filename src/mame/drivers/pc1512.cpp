@@ -92,6 +92,7 @@ PC1640-HD20: Amstrad 40095 (Alps DRMD20A12A), Tandon TM-262 [-chs 615,4,17 -ss 5
 PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 */
 
+#include "emu.h"
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"

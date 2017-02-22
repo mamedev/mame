@@ -46,7 +46,7 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd_isplat(uint32_t _a)
 	{
-		const __m256i splat          = _mm256_set1_epi32(_a);
+		const __m256i splat        = _mm256_set1_epi32(_a);
 		const simd256_avx_t result = _mm256_castsi256_ps(splat);
 
 		return result;
@@ -55,7 +55,7 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd_itof(simd256_avx_t _a)
 	{
-		const __m256i  itof          = _mm256_castps_si256(_a);
+		const __m256i  itof        = _mm256_castps_si256(_a);
 		const simd256_avx_t result = _mm256_cvtepi32_ps(itof);
 
 		return result;
@@ -64,7 +64,7 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd_ftoi(simd256_avx_t _a)
 	{
-		const __m256i ftoi           = _mm256_cvtps_epi32(_a);
+		const __m256i ftoi         = _mm256_cvtps_epi32(_a);
 		const simd256_avx_t result = _mm256_castsi256_ps(ftoi);
 
 		return result;

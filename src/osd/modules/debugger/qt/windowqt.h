@@ -5,7 +5,6 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include "emu.h"
 #include "config.h"
 #include "debugger.h"
 

@@ -18,7 +18,6 @@
 #define CYBIKO_H_
 
 /* Core includes */
-#include "emu.h"
 #include "sound/speaker.h"
 
 /* Components */

@@ -31,7 +31,8 @@ namespace plib {
 	}
 
 	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
-	: option_base(parent, help), m_short(ashort), m_long(along),  m_has_argument(has_argument)
+	: option_base(parent, help), m_short(ashort), m_long(along),
+	  m_has_argument(has_argument), m_specified(false)
 	{
 	}
 
@@ -39,13 +40,13 @@ namespace plib {
 	{
 	}
 
-	int option_str::parse(pstring argument)
+	int option_str::parse(const pstring &argument)
 	{
 		m_val = argument;
 		return 0;
 	}
 
-	int option_str_limit::parse(pstring argument)
+	int option_str_limit::parse(const pstring &argument)
 	{
 		if (plib::container::contains(m_limit, argument))
 		{
@@ -56,20 +57,27 @@ namespace plib {
 			return 1;
 	}
 
-	int option_bool::parse(ATTR_UNUSED pstring argument)
+	int option_bool::parse(const pstring &argument)
 	{
 		m_val = true;
 		return 0;
 	}
 
-	int option_double::parse(pstring argument)
+	int option_double::parse(const pstring &argument)
 	{
 		bool err = false;
 		m_val = argument.as_double(&err);
 		return (err ? 1 : 0);
 	}
 
-	int option_vec::parse(pstring argument)
+	int option_long::parse(const pstring &argument)
+	{
+		bool err = false;
+		m_val = argument.as_long(&err);
+		return (err ? 1 : 0);
+	}
+
+	int option_vec::parse(const pstring &argument)
 	{
 		bool err = false;
 		m_val.push_back(argument);
@@ -113,7 +121,7 @@ namespace plib {
 
 			if (arg.startsWith("--"))
 			{
-				auto v = pstring_vector_t(arg.substr(2),"=");
+				auto v = psplit(arg.substr(2),"=");
 				opt = getopt_long(v[0]);
 				has_equal_arg = (v.size() > 1);
 				if (has_equal_arg)
@@ -142,13 +150,13 @@ namespace plib {
 			{
 				if (has_equal_arg)
 				{
-					if (opt->parse(opt_arg) != 0)
+					if (opt->do_parse(opt_arg) != 0)
 						return i;
 				}
 				else
 				{
 					i++; // FIXME: are there more arguments?
-					if (opt->parse(pstring(argv[i], pstring::UTF8)) != 0)
+					if (opt->do_parse(pstring(argv[i], pstring::UTF8)) != 0)
 						return i - 1;
 				}
 			}
@@ -156,7 +164,7 @@ namespace plib {
 			{
 				if (has_equal_arg)
 					return i;
-				opt->parse("");
+				opt->do_parse("");
 			}
 			i++;
 		}
@@ -166,13 +174,13 @@ namespace plib {
 	pstring options::split_paragraphs(pstring text, unsigned width, unsigned indent,
 			unsigned firstline_indent)
 	{
-		auto paragraphs = pstring_vector_t(text,"\n");
+		auto paragraphs = psplit(text,"\n");
 		pstring ret("");
 
 		for (auto &p : paragraphs)
 		{
 			pstring line = pstring("").rpad(" ", firstline_indent);
-			for (auto &s : pstring_vector_t(p, " "))
+			for (auto &s : psplit(p, " "))
 			{
 				if (line.len() + s.len() > width)
 				{
@@ -278,3 +286,4 @@ namespace plib {
 	}
 
 } // namespace plib
+

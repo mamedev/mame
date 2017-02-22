@@ -25,6 +25,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/next.h"
 #include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"

@@ -20,6 +20,7 @@
 
 */
 
+#include "emu.h"
 #include "ucom4.h"
 #include "debugger.h"
 

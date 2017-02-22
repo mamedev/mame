@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
+#include "emu.h"
 #include "dsjoy.h"
 
 const device_type DEMPA_SHINBUNSHA_JOYSTICK = &device_creator<dempa_shinbunsha_joystick_device>;

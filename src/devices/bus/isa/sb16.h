@@ -4,7 +4,6 @@
 #ifndef __SB16__
 #define __SB16__
 
-#include "emu.h"
 #include "isa.h"
 #include "sound/dac.h"
 #include "bus/pc_joy/pc_joy.h"

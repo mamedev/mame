@@ -64,6 +64,8 @@
   35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
   42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
+ *89      HD44801C  1985, CXG Advanced Portachess
+
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
@@ -94,7 +96,7 @@
 #include "pairmtch.lh"
 #include "sag.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -698,7 +700,6 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
 
 	/* basic machine hardware */
@@ -944,7 +945,6 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( msthawk, msthawk_state )
 
 	/* basic machine hardware */
@@ -1066,7 +1066,6 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
 
 	/* basic machine hardware */
@@ -1182,7 +1181,6 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 {
 	update_int0();
 }
-
 
 static MACHINE_CONFIG_START( zackman, zackman_state )
 
@@ -1311,7 +1309,6 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( bpengo, bpengo_state )
 
 	/* basic machine hardware */
@@ -1436,7 +1433,6 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 {
 	update_int0();
 }
-
 
 static MACHINE_CONFIG_START( bbtime, bbtime_state )
 
@@ -2025,6 +2021,7 @@ MACHINE_CONFIG_END
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
+  * RC circuit for speaker volume decay
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
 ***************************************************************************/
@@ -2040,8 +2037,9 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	int m_speaker_volume;
+	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
 
 protected:
 	virtual void machine_start() override;
@@ -2049,19 +2047,20 @@ protected:
 
 // handlers
 
-// Sound is controlled by two pins: D3 for pitch, and R13 for on/off. When turned
-// off, it does not mute instantly, but volume slowly decays. Until we emulate it
-// with discrete audio, this crude simulation will do.
+void cdkong_state::speaker_decay_reset()
+{
+	if (m_r[1] & 8)
+		m_speaker_volume = 1.0;
 
-#define CDKONG_SPEAKER_MAX 0x10000
-#define CDKONG_SPEAKER_DECAY 50
+	m_speaker->set_output_gain(0, m_speaker_volume);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
-	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
-	m_speaker_volume /= 2;
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_decay_reset();
+	m_speaker_volume /= 1.015;
 }
-
 
 void cdkong_state::prepare_display()
 {
@@ -2072,8 +2071,8 @@ void cdkong_state::prepare_display()
 WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
-	if (offset == HMCS40_PORT_R1X && data & 8)
-		m_speaker_volume = CDKONG_SPEAKER_MAX;
+	m_r[offset] = data;
+	speaker_decay_reset();
 
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
@@ -2105,7 +2104,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 void cdkong_state::machine_start()
 {
@@ -2142,7 +2140,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
 
 
@@ -2154,6 +2152,7 @@ MACHINE_CONFIG_END
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
+  * discrete sound (when alien attacks)
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
   Select game mode on start:
@@ -2247,7 +2246,6 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
 	prepare_display();
 }
-
 
 static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
 
@@ -2988,7 +2986,6 @@ INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
 	update_int();
 }
 
-
 void eturtles_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
@@ -3360,7 +3357,6 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-
 static MACHINE_CONFIG_START( gckong, gckong_state )
 
 	/* basic machine hardware */
@@ -3479,7 +3475,6 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 {
 	update_int1();
 }
-
 
 static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
 
@@ -3856,7 +3851,6 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-
 static MACHINE_CONFIG_START( kingman, kingman_state )
 
 	/* basic machine hardware */
@@ -3977,7 +3971,6 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 {
 	update_int1();
 }
-
 
 static MACHINE_CONFIG_START( tmtron, tmtron_state )
 
@@ -4472,7 +4465,7 @@ CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Banda
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )

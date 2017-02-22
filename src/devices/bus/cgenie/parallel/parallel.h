@@ -24,7 +24,6 @@
 #ifndef __CGENIE_PARALLEL_H__
 #define __CGENIE_PARALLEL_H__
 
-#include "emu.h"
 
 
 //**************************************************************************

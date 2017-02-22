@@ -11,7 +11,6 @@
 #ifndef __ABC1600_MAC__
 #define __ABC1600_MAC__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 

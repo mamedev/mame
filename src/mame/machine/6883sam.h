@@ -13,7 +13,6 @@
 #ifndef __6883SAM__
 #define __6883SAM__
 
-#include "emu.h"
 
 #define MCFG_SAM6883_ADD(_tag, _clock, _cputag, _cpuspace) \
 	MCFG_DEVICE_ADD(_tag, SAM6883, _clock) \

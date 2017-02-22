@@ -380,6 +380,7 @@ end
 	end
 	links {
 		"bgfx",
+		"bx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
 

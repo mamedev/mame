@@ -12,7 +12,6 @@
 #define __VICTOR9K_KEYBOARD__
 
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

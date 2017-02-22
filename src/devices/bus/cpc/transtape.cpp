@@ -8,8 +8,9 @@
  * Further info at - http://cpcwiki.eu/index.php/Transtape
  */
 
+#include "emu.h"
 #include "transtape.h"
-#include "includes/amstrad.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

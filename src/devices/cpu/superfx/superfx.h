@@ -87,7 +87,7 @@ enum
 
 
 #define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
+	devcb = &superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
 
 
 class superfx_device :  public cpu_device

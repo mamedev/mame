@@ -71,6 +71,7 @@
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=5IVFEVL4oAg -->
 	<software name="abcdemo">
 		<description>ABCDemo</description>
 		<year>2015</year>
@@ -79,7 +80,21 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="genesisproject_abcdemo.dsk" size="163840" crc="667459a0" sha1="ade6420c75a27840f5308fb588ba381ec5f527ea" offset="0" />
+				<rom name="genesisproject_abcdemo.dsk" size="163840" crc="29059d3c" sha1="55b38436a2d3cfe1caf8e35e44775402a1511eec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=0EzeMt2F-kU -->
+	<software name="hiresinv">
+		<description>Hires Invasion</description>
+		<year>2017</year>
+		<publisher>Genesis Project</publisher>
+		<info name="usage" value="RUN&quot;HIRESINV&quot;" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="hiresinv.dsk" size="163840" crc="b811b980" sha1="805b4369085120662769f5a3d11b0e66ffbbfb76" offset="0" />
 			</dataarea>
 		</part>
 	</software>

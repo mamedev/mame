@@ -54,6 +54,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "vdg")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_cass(*this, "cassette")
 		, m_cart(*this, "cartslot")
 		, m_uart(*this, "uart")
@@ -74,8 +75,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-
-	uint8_t *m_p_chargen;
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
@@ -103,6 +102,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<i8251_device> m_uart;
@@ -479,7 +479,6 @@ void fc100_state::machine_start()
 
 void fc100_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 0;
 	m_cassold = 0;

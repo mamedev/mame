@@ -8,7 +8,6 @@ TODO:
     Add support for the remaining block types:
         case 0x15:  Direct Recording
         case 0x18:  CSW Recording
-        case 0x19:  Generalized Data Block
         case 0x21:  Group Start
         case 0x22:  Group End
         case 0x23:  Jump To Block
@@ -31,7 +30,7 @@ Notes:
 TZX format specification lists
 8064 pulses for a header block and 3220 for a data block
 
-but the documentaiton on worldofspectrum lists
+but the documentation on worldofspectrum lists
 8063 pulses for a header block and 3223 for a data block
 
 see http://www.worldofspectrum.org/faq/reference/48kreference.htm#TapeDataStructure
@@ -315,7 +314,6 @@ static int tzx_handle_direct(int16_t **buffer, const uint8_t *bytes, int pause, 
 
 			tzx_output_wave(buffer, samples);
 			size += samples;
-
 		}
 	}
 
@@ -341,8 +339,6 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 	const uint8_t *cursymb = symtable + (2 * maxp + 1)*symbol;
 
 	uint8_t starttype = cursymb[0];
-
-//  printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
 
 	switch (starttype)
 	{
@@ -371,7 +367,6 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 	for (int i = 0; i < maxp; i++)
 	{
 		uint16_t pulse_length = cursymb[1 + (i*2)] | (cursymb[2 + (i*2)] << 8);
-	//  printf("pulse_length %04x\n", pulse_length);
 
 		// shorter lists can be terminated with a pulse_length of 0
 		if (pulse_length != 0)
@@ -380,7 +375,6 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 			tzx_output_wave(buffer, samples);
 			size += samples;
 			toggle_wave_data();
-
 		}
 		else
 		{
@@ -389,8 +383,6 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 			continue;
 		}
 	}
-
-	//toggle_wave_data();
 
 	return size;
 }
@@ -404,7 +396,6 @@ static inline int stream_get_bit(const uint8_t *bytes, uint8_t &stream_bit, uint
 	byte = byte << stream_bit;
 
 	if (byte & 0x80) retbit = 1;
-
 
 	stream_bit++;
 
@@ -433,34 +424,26 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 		{
 			uint8_t symbol = table2[i + 0];
 			uint16_t repetitions = table2[i + 1] + (table2[i + 2] << 8);
-			//printf("symbol %02x repititions %04x\n", symbol, repetitions); // does 1 mean repeat once, or that it only occurs once?
+			//printf("symbol %02x repetitions %04x\n", symbol, repetitions); // does 1 mean repeat once, or that it only occurs once?
 
 			for (int j = 0; j < repetitions; j++)
 			{
 				size += tzx_handle_symbol(buffer, symtable, symbol, npp);
-			//  toggle_wave_data();
 			}
-
-
 		}
 
 		// advance to after this data
 		bytes += ((2 * npp + 1)*asp) + totp * 3;
 	}
-	else
-	{
-		printf("no pilot block\n");
-	}
 
 	if (totd > 0)
 	{
-		printf("data block table %04x (has %0d symbols, max symbol length is %d)\n", totd, asd, npd);
+	//  printf("data block table %04x (has %0d symbols, max symbol length is %d)\n", totd, asd, npd);
 
 		const uint8_t *symtable = bytes;
 		const uint8_t *table2 = bytes + (2 * npd + 1)*asd;
 
 		int NB = ceil(compute_log2(asd)); // number of bits needed to represent each symbol
-		printf("NB is %d\n", NB);
 
 		uint8_t stream_bit = 0;
 		uint32_t stream_byte = 0;
@@ -475,16 +458,8 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 			}
 
 			size += tzx_handle_symbol(buffer, symtable, symbol, npd);
-
-			//toggle_wave_data();
 		}
 	}
-	else
-	{
-		printf("no data block\n");
-	}
-
-
 
 	/* pause */
 	if (pause > 0)
@@ -505,9 +480,7 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 
 static void ascii_block_common_log( const char *block_type_string, uint8_t block_type )
 {
-	LOG_FORMATS("%s (type %02x) encountered.\n", block_type_string, block_type);
-	LOG_FORMATS("This block contains info on the .tzx file you are loading.\n");
-	LOG_FORMATS("Please include the following info in your bug reports, if the image has issue in M.E.S.S.\n");
+	LOG_FORMATS("%s (type %02x) encountered:\n", block_type_string, block_type);
 }
 
 static const char *const archive_ident[] =
@@ -744,20 +717,18 @@ static int tzx_cas_do_work( int16_t **buffer )
 			{
 				// having this missing is fatal
 				// used crudely by batmanc in spectrum_cass list (which is just a redundant encoding of batmane ?)
-				printf("Unsupported block type (0x19 - Generalized Data Block) encountered.\n");
-
 				data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24);
 				pause_time= cur_block[5] + (cur_block[6] << 8);
 
 				uint32_t totp = cur_block[7] + (cur_block[8] << 8) + (cur_block[9] << 16) + (cur_block[10] << 24);
 				int npp = cur_block[11];
 				int asp = cur_block[12];
-				if (asp == 0) asp = 256;
+				if (asp == 0 && totp > 0) asp = 256;
 
 				uint32_t totd = cur_block[13] + (cur_block[14] << 8) + (cur_block[15] << 16) + (cur_block[16] << 24);
 				int npd = cur_block[17];
 				int asd = cur_block[18];
-				if (asd == 0) asd = 256;
+				if (asd == 0 && totd > 0) asd = 256;
 
 				size += tzx_handle_generalized(buffer, &cur_block[19], pause_time, data_size, totp, npp, asp, totd, npd, asd);
 
@@ -840,7 +811,7 @@ static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 	{
 		int data_size = p[0] + (p[1] << 8);
 		int pilot_length = (p[2] == 0x00) ? 8064 : 3220;    /* TZX specification */
-//      int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
+//  int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
 		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
 		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
@@ -859,7 +830,7 @@ static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	{
 		int data_size = bytes[0] + (bytes[1] << 8);
 		int pilot_length = (bytes[2] == 0x00) ? 8064 : 3220;    /* TZX specification */
-//      int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
+//  int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
 		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		bytes += 2;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
@@ -871,34 +842,34 @@ static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 static const struct CassetteLegacyWaveFiller tzx_legacy_fill_wave =
 {
 	tzx_cas_fill_wave,          /* fill_wave */
-	-1,                 /* chunk_size */
-	0,                  /* chunk_samples */
-	tzx_cas_to_wav_size,            /* chunk_sample_calc */
+	-1,                         /* chunk_size */
+	0,                          /* chunk_samples */
+	tzx_cas_to_wav_size,        /* chunk_sample_calc */
 	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                  /* header_samples */
-	0                   /* trailer_samples */
+	0,                          /* header_samples */
+	0                           /* trailer_samples */
 };
 
 static const struct CassetteLegacyWaveFiller tap_legacy_fill_wave =
 {
 	tap_cas_fill_wave,          /* fill_wave */
-	-1,                 /* chunk_size */
-	0,                  /* chunk_samples */
-	tap_cas_to_wav_size,            /* chunk_sample_calc */
+	-1,                         /* chunk_size */
+	0,                          /* chunk_samples */
+	tap_cas_to_wav_size,        /* chunk_sample_calc */
 	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                  /* header_samples */
-	0                   /* trailer_samples */
+	0,                          /* header_samples */
+	0                           /* trailer_samples */
 };
 
 static const struct CassetteLegacyWaveFiller cdt_legacy_fill_wave =
 {
 	cdt_cas_fill_wave,          /* fill_wave */
-	-1,                 /* chunk_size */
-	0,                  /* chunk_samples */
-	tzx_cas_to_wav_size,            /* chunk_sample_calc */
+	-1,                         /* chunk_size */
+	0,                          /* chunk_samples */
+	tzx_cas_to_wav_size,        /* chunk_sample_calc */
 	TZX_WAV_FREQUENCY,          /* sample_frequency */
-	0,                  /* header_samples */
-	0                   /* trailer_samples */
+	0,                          /* header_samples */
+	0                           /* trailer_samples */
 };
 
 static cassette_image::error tzx_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
@@ -931,7 +902,7 @@ static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 	return cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
 }
 
-static const struct CassetteFormat tzx_cassette_format =
+const struct CassetteFormat tzx_cassette_format =
 {
 	"tzx",
 	tzx_cassette_identify,
