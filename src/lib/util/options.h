@@ -179,6 +179,9 @@ public:
 	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS)]; }
 	int options_count() const { return m_entrylist.count(); }
 
+protected:
+	virtual void value_changed(const std::string &name, const std::string &value) {}
+
 private:
 	// internal helpers
 	void reset();

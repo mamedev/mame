@@ -390,11 +390,12 @@ public:
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
-	// cache frequently used options in members
-	void update_cached_options();
-
 	std::string main_value(const char *option) const;
 	std::string sub_value(const char *name, const char *subname) const;
+
+protected:
+	virtual void value_changed(const std::string &name, const std::string &value) override;
+
 private:
 	static const options_entry s_option_entries[];
 
