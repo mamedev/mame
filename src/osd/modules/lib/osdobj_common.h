@@ -194,6 +194,7 @@ public:
 	// debugger overridables
 	virtual void init_debugger() override;
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual bool debugger_break() override;
 
 	// audio overridables
 	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) override;

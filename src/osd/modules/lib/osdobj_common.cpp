@@ -515,6 +515,11 @@ void osd_common_t::wait_for_debugger(device_t &device, bool firststop)
 	m_debugger->wait_for_debugger(device, firststop);
 }
 
+bool osd_common_t::debugger_break()
+{
+	return m_debugger && m_debugger->debugger_break();
+}
+
 void osd_common_t::debugger_update()
 {
 	if (m_debugger) m_debugger->debugger_update();

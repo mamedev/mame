@@ -51,6 +51,7 @@ public:
 
 	virtual void init_debugger(running_machine &machine) override;
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual bool debugger_break() override;
 	virtual void debugger_update() override;
 
 protected:
@@ -148,6 +149,12 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 
 	// mark the debugger as active
 	m_waiting_for_debugger = false;
+}
+
+
+bool debugger_windows::debugger_break()
+{
+	return seq_pressed();
 }
 
 

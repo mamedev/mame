@@ -123,6 +123,7 @@ public:
 
 	virtual void init_debugger(running_machine &machine) override;
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual bool debugger_break() override;
 	virtual void debugger_update() override;
 
 private:
@@ -1525,6 +1526,12 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 	handle_keys_views();
 	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
+}
+
+
+bool debug_imgui::debugger_break()
+{
+	return m_machine->ui_input().pressed(IPT_UI_DEBUG_BREAK);
 }
 
 
