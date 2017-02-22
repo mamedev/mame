@@ -266,7 +266,7 @@ std::map<std::string, std::string> mame_options::evaluate_initial_softlist_optio
 		software_identifier_stack.push(software_identifier);
 
 		// we need to keep evaluating softlist identifiers until the stack is empty
-		while(!software_identifier_stack.empty())
+		while (!software_identifier_stack.empty())
 		{
 			// pop the identifier
 			software_identifier = std::move(software_identifier_stack.top());

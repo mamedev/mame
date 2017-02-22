@@ -489,10 +489,10 @@ const char *core_options::find_within_command_line(int argc, char **argv, const 
 	// find each of the targets in the argv array
 	for (int i = 1; i < argc - 1; i++)
 	{
-		auto iter = std::find_if(targets.begin(), targets.end(), [argv, i](const std::string &targ)
-		{
-			return targ == argv[i];
-		});
+		auto const iter = std::find_if(
+			targets.begin(),
+			targets.end(),
+			[argv, i](const std::string &targ) { return targ == argv[i]; });
 		if (iter != targets.end())
 			return argv[i + 1];
 	}
