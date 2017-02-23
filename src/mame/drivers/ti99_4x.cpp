@@ -68,6 +68,14 @@ class ti99_4x_state : public driver_device
 public:
 	ti99_4x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_keyboard_column(0),
+		m_check_alphalock(false),
+		m_nready_combined(0),
+		m_nready_prev(0),
+		m_model(0),
+		m_int1(0),
+		m_int2(0),
+		m_int12(0),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
 		m_gromport(*this, GROMPORT_TAG),
