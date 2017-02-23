@@ -131,8 +131,26 @@ namespace netlist
 
 		void retime(const Element &elem, const Time t) noexcept
 		{
-			remove(elem);
-			push(entry_t(t, elem));
+			/* Lock */
+			tqlock lck(m_lock);
+			for (entry_t * i = m_end - 1; i > &m_list[0]; i--)
+			{
+				if (i->m_object == elem)
+				{
+					i->m_exec_time = t;
+					while ((i-1)->m_exec_time < i->m_exec_time)
+					{
+						std::swap(*(i-1), *i);
+						i--;
+					}
+					while (i < m_end && (i+1)->m_exec_time > i->m_exec_time)
+					{
+						std::swap(*(i+1), *i);
+						i++;
+					}
+					return;
+				}
+			}
 		}
 
 		void clear()
@@ -212,28 +230,28 @@ namespace netlist
 		};
 
 		timed_queue(const std::size_t list_size)
+		: m_list(list_size)
 		{
-			m_list.reserve(list_size);
 			clear();
 		}
 
 		constexpr std::size_t capacity() const noexcept { return m_list.capacity(); }
-		constexpr bool empty() const noexcept { return m_list.empty(); }
+		constexpr bool empty() const noexcept { return &m_list[0] == m_end; }
 
 		void push(entry_t &&e) noexcept
 		{
 			/* Lock */
 			tqlock lck(m_lock);
-			m_list.push_back(e);
-			std::push_heap(m_list.begin(), m_list.end(), compare());
+			*m_end++ = e;
+			std::push_heap(&m_list[0], m_end, compare());
 			m_prof_call.inc();
 		}
 
 		entry_t pop() noexcept
 		{
 			entry_t t(m_list[0]);
-			std::pop_heap(m_list.begin(), m_list.end(), compare());
-			m_list.pop_back();
+			std::pop_heap(&m_list[0], m_end, compare());
+			m_end--;
 			return t;
 		}
 
@@ -243,26 +261,39 @@ namespace netlist
 		{
 			/* Lock */
 			tqlock lck(m_lock);
-			for (entry_t * i = &m_list[m_list.size() - 1]; i >= &m_list[0]; i--)
+			for (entry_t * i = m_end - 1; i >= &m_list[0]; i--)
 			{
 				if (i->m_object == elem)
 				{
-					m_list.erase(m_list.begin() + (i - &m_list[0]));
-					std::make_heap(m_list.begin(), m_list.end(), compare());
+					m_end--;
+					for (;i < m_end; i++)
+						*i = std::move(*(i+1));
+					std::make_heap(&m_list[0], m_end, compare());
+					return;
 				}
 			}
 		}
 
 		void retime(const Element &elem, const Time t) noexcept
 		{
-			remove(elem);
-			push(entry_t(t, elem));
+			/* Lock */
+			tqlock lck(m_lock);
+			for (entry_t * i = m_end - 1; i >= &m_list[0]; i--)
+			{
+				if (i->m_object == elem)
+				{
+					i->m_exec_time = t;
+					std::make_heap(&m_list[0], m_end, compare());
+					return;
+				}
+			}
 		}
 
 		void clear()
 		{
 			tqlock lck(m_lock);
 			m_list.clear();
+			m_end = &m_list[0];
 		}
 
 		// save state support & mame disasm
@@ -280,6 +311,7 @@ namespace netlist
 
 		tqmutex m_lock;
 		std::vector<entry_t> m_list;
+		entry_t *m_end;
 
 	public:
 		// profiling

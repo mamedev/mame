@@ -553,7 +553,9 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
 
-		while (1)
+		detail::queue_t::entry_t e;
+
+		do
 		{
 			while (m_queue.top().m_exec_time > mc_time)
 			{
@@ -563,16 +565,14 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 				mc_time += inc;
 			}
 
-			const detail::queue_t::entry_t e(m_queue.pop());
+			e = m_queue.pop();
 			m_time = e.m_exec_time;
 			if (e.m_object != nullptr)
 			{
 				e.m_object->update_devs();
 				m_perf_out_processed.inc();
 			}
-			else
-				break;
-		}
+		} while (e.m_object != nullptr);
 		mc_net.set_time(mc_time);
 	}
 	m_stat_mainloop.stop();
@@ -862,7 +862,11 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	{
 		p.device().m_stat_call_count.inc();
 		if ((p.state() & mask) != 0)
+		{
+			p.device().m_stat_total_time.start();
 			p.m_delegate();
+			p.device().m_stat_total_time.stop();
+		}
 	}
 }
 

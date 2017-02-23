@@ -308,7 +308,7 @@ public:
 			m_param[i]->setTo(v * (*m_param_mult[i])() + (*m_param_offset[i])());
 		}
 		m_pos++;
-		m_Q.push(!m_Q.net().new_Q(), m_inc  );
+		m_Q.net().toggle_and_push_to_queue(m_inc);
 	}
 
 public:
