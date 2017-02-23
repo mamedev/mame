@@ -53,7 +53,7 @@ Shift                21          Shift key pressed
 
 Control              19          Control key pressed
 
-Shift Lock I/O       20          Togglable input to signify caps lock.
+Shift Lock I/O       20          Togglable input to signify shift (NOT caps) lock.
 
 Clock                3           A TTL compatible clock signal 
 
@@ -65,6 +65,13 @@ Vgg                  18          -12V
 
 
 **********************************************************************/
+
+/* TODO:
+	Support Key-bounce mask
+	Support Repeat function
+	Support shift lock
+	Support additional internal ROMs
+*/
 
 #pragma once
 
@@ -104,19 +111,23 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	//template<class _Object> static devcb_base &set_x_cb(device_t &device, _Object rd, uint8_t i) { assert(i<9); return downcast<mm5740_device &>(device).m_read_x[i].set_callback(rd); }
-	//template<class _Object> static devcb_base &set_shift_cb(device_t &device, _Object rd) { return downcast<mm5740_device &>(device).m_read_shift.set_callback(rd); }
-	//template<class _Object> static devcb_base &set_control_cb(device_t &device, _Object rd) { return downcast<mm5740_device &>(device).m_read_control.set_callback(rd); }
-	//template<class _Object> static devcb_base &set_data_ready_cb(device_t &device, _Object wr) { return downcast<mm5740_device &>(device).m_write_data_ready.set_callback(wr); }
 	template<typename Object> static devcb_base &set_x_cb(device_t &device, Object &&object, uint8_t i) 
-	{ assert(i<9); return downcast<mm5740_device &>(device).m_read_x[i].set_callback(std::forward<Object>(object)); }
+	{
+		assert(i<9); return downcast<mm5740_device &>(device).m_read_x[i].set_callback(std::forward<Object>(object));
+	}
 	template<typename Object> static devcb_base &set_shift_cb(device_t &device, Object &&object)
-	{ return downcast<mm5740_device &>(device).m_read_shift.set_callback(std::forward<Object>(object)); }
+	{
+		return downcast<mm5740_device &>(device).m_read_shift.set_callback(std::forward<Object>(object));
+	}
 	template<typename Object> static devcb_base &set_control_cb(device_t &device, Object &&object)
-	{ return downcast<mm5740_device &>(device).m_read_control.set_callback(std::forward<Object>(object)); }
+	{
+		return downcast<mm5740_device &>(device).m_read_control.set_callback(std::forward<Object>(object));
+	}
 	template<typename Object> static devcb_base &set_data_ready_cb(device_t &device, Object &&object)
-	{ return downcast<mm5740_device &>(device).m_write_data_ready.set_callback(std::forward<Object>(object)); }
-
+	{
+		return downcast<mm5740_device &>(device).m_write_data_ready.set_callback(std::forward<Object>(object));
+	}
+	static uint32_t calc_effective_clock_key_debounce(uint32_t capacitance);
 
 protected:
 	// device-level overrides
@@ -124,28 +135,21 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	static const int MAX_KEYS_DOWN = 4;
-	
-	//devcb_read16 m_read_x1, m_read_x2, m_read_x3, m_read_x4, m_read_x5, m_read_x6, m_read_x7, m_read_x8, m_read_x9;
 	devcb_read16 m_read_x[9];
 	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_data_ready;
 
+	required_memory_region m_rom;                   // Internal ROM
+
 	int m_b;                    // output buffer
-	int m_ako;                  // any key down
 
 	int m_x_mask[9];            // mask of what keys are down
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer
-	static const uint16_t mm5740AAC_Unshift_mapping[9][10];
-	static const uint16_t mm5740AAC_Shift_mapping[9][10];
-	static const uint16_t mm5740AAC_Control_mapping[9][10];
-	static const uint16_t mm5740AAC_ShiftControl_mapping[9][10];
 };
 
 

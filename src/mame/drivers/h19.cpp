@@ -12,12 +12,11 @@
 
 	Input can also come from the serial port (a 8250).
 	Either device will signal an interrupt to the CPU when a key
-	is pressed/sent.
+	is pressed/data is received.
 
 	TODO:
 	- Finish connecting up the 8250
 	   - enable 8520 interrupts
-	- get remaining special keys defined/working
 	- speed up emulation
 
 	super19 version has the videoram at D800. This is not emulated.
@@ -61,8 +60,11 @@ Address   Description
 
 // Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL_12_288MHz / 6)
-
-#define MM5740_CLOCK (XTAL_12_288MHz / 12 / 8)
+#define MC6845_CLOCK (XTAL_12_288MHz /8)
+#define INS8250_CLOCK (XTAL_12_288MHz /4)
+// Capacitor value in pF
+#define H19_KEY_DEBOUNCE_CAPACITOR 5000
+#define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
 
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
@@ -94,10 +96,8 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(h19_80_r);
-	DECLARE_READ8_MEMBER(h19_a0_r);
-	DECLARE_WRITE8_MEMBER(h19_c0_w);
-	DECLARE_WRITE8_MEMBER(h19_e0_w);
+	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
+	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
 	DECLARE_READ8_MEMBER(kbd_flags_r);
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
@@ -153,7 +153,6 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	//AM_RANGE(0x2000, 0xf7ff) AM_RAM  // TODO - based on manual, this should be 0x4000
 	AM_RANGE(0x4000, 0x4100) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -168,8 +167,8 @@ static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x9F) AM_READ(kbd_key_r)
 	AM_RANGE(0xA0, 0xBF) AM_READ(kbd_flags_r)
-	AM_RANGE(0xC0, 0xDF) AM_WRITE(h19_c0_w)
-	AM_RANGE(0xE0, 0xFF) AM_WRITE(h19_e0_w)
+	AM_RANGE(0xC0, 0xDF) AM_WRITE(h19_keyclick_w)
+	AM_RANGE(0xE0, 0xFF) AM_WRITE(h19_bell_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -368,7 +367,7 @@ void h19_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( h19_state::h19_c0_w )
+WRITE8_MEMBER( h19_state::h19_keyclick_w )
 {
 /* Keyclick - 6 mSec */
 
@@ -377,7 +376,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
 	timer_set(attotime::from_msec(6), TIMER_KEY_CLICK_OFF);
 }
 
-WRITE8_MEMBER( h19_state::h19_e0_w )
+WRITE8_MEMBER( h19_state::h19_bell_w )
 {
 /* Bell (^G) - 200 mSec */
 
@@ -412,19 +411,9 @@ READ8_MEMBER(h19_state::kbd_key_r)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_strobe = false;
-	uint8_t rv = m_transchar;
 
-	if (rv & 0x80)
-	{
-		rv &= 0x7f;
-	}
-
-	if (mm5740_control_r())
-	{
-		rv |= KB_ENCODER_CONTROL_KEY_MASK;
-	}
-
-	return rv;
+	// high bit is for control key pressed, this is handled in the ROM, no processing needed.
+	return m_transchar;
 }
 
 READ8_MEMBER(h19_state::kbd_flags_r)
@@ -434,12 +423,15 @@ READ8_MEMBER(h19_state::kbd_flags_r)
 
 	rv = modifiers & 0xff;
 
+	// check both shifts
 	if (((modifiers & 0x020) == 0) || ((modifiers & 0x100) == 0))
 	{
 		rv |= 0x1;
 	}
 
+	// invert offline switch
 	rv ^= KB_STATUS_ONLINE_KEY_MASK;
+
 	if (!m_strobe)
 	{
 		rv |= KB_STATUS_KEYBOARD_STROBE_MASK;
@@ -537,19 +529,18 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	// TODO - get MC6845 to honor the screen size, enabling the 25th lines doesn't affect the screen size on a real h19.
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk taken from schematics
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
+	MCFG_MC6845_CHAR_WIDTH(8) 
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
+	MCFG_DEVICE_ADD("ins8250", INS8250, INS8250_CLOCK)
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
 
 	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
