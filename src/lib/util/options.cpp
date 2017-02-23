@@ -517,8 +517,8 @@ std::string core_options::pluck_from_command_line(std::vector<std::string> &args
 			result = std::move(args[i + 1]);
 
 			// remove this arguments from the list
-			auto const pos = std::advance(args.begin(), i);
-			args.erase(pos, std::advance(pos, 2));
+			auto const pos = std::next(args.begin(), i);
+			args.erase(pos, std::next(pos, 2));
 			break;
 		}
 	}

@@ -214,29 +214,37 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 
 	// if we have a command, execute that
 	if (*(m_options.command()) != 0)
+	{
 		execute_commands(exename.c_str());
+		return;
+	}
 
 	// otherwise, check for a valid system
-	else
+	load_translation(m_options);
+
+	manager->start_http_server();
+
+	manager->start_luaengine();
+
+	manager->start_context();
+
+	// We need to preprocess the config files once to determine the web server's configuration
+	// and file locations
+	if (m_options.read_config())
 	{
-		// We need to preprocess the config files once to determine the web server's configuration
-		// and file locations
-		if (m_options.read_config())
-		{
-			m_options.revert(OPTION_PRIORITY_INI);
-			mame_options::parse_standard_inis(m_options, option_errors);
-		}
-		if (!option_errors.empty())
-			osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
-
-		// if we can't find it, give an appropriate error
-		const game_driver *system = mame_options::system(m_options);
-		if (system == nullptr && *(m_options.system_name()) != 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
-
-		// otherwise just run the game
-		m_result = manager->execute();
+		m_options.revert(OPTION_PRIORITY_INI);
+		mame_options::parse_standard_inis(m_options, option_errors);
 	}
+	if (!option_errors.empty())
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+
+	// if we can't find it, give an appropriate error
+	const game_driver *system = mame_options::system(m_options);
+	if (system == nullptr && *(m_options.system_name()) != 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+	// otherwise just run the game
+	m_result = manager->execute();
 }
 
 //-------------------------------------------------
@@ -254,14 +262,6 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	{
 		std::string option_errors;
 		mame_options::parse_standard_inis(m_options, option_errors);
-
-		load_translation(m_options);
-
-		manager->start_http_server();
-
-		manager->start_luaengine();
-
-		manager->start_context();
 
 		start_execution(manager, args, option_errors);
 	}
