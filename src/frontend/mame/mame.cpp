@@ -326,9 +326,7 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, std:
 
 int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
 {
-	std::vector<std::string> args(argc);
-	for (int i = 0; i < argc; i++)
-		args[i] = argv[i];
+	std::vector<std::string> args(argv, argv + argc);
 	return start_frontend(options, osd, args);
 }
 

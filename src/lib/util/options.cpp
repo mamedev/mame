@@ -516,14 +516,9 @@ std::string core_options::pluck_from_command_line(std::vector<std::string> &args
 			// get the result
 			result = std::move(args[i + 1]);
 
-			// remove this arguments from the list (is there a standard
-			// way to do this?)
-			while (i < args.size() - 2)
-			{
-				args[i] = std::move(args[i + 2]);
-				i++;
-			}
-			args.resize(args.size() - 2);
+			// remove this arguments from the list
+			auto const pos = std::advance(args.begin(), i);
+			args.erase(pos, std::advance(pos, 2));
 			break;
 		}
 	}
