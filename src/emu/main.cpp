@@ -120,10 +120,9 @@ machine_manager::machine_manager(emu_options& options, osd_interface& osd)
 machine_manager::~machine_manager()
 {
 	if (options().http())
-	{
 		m_server->stop();
-	}
-	m_server_thread.join();
+        if (m_server_thread.joinable())
+            m_server_thread.join();
 }
 
 void machine_manager::start_http_server()
