@@ -390,7 +390,7 @@ Derby Owners Club (Japan) (Rev B)               840-0016C    22099B  14 (64Mb)  
 Derby Owners Club 2000 Ver.2 (Japan) (Rev A)    840-0052C    22284A  16 (64Mb)   present     315-6213  not present
 Dynamite Baseball '99 (Japan) (Rev B)           840-0019C    22141B  19 (64Mb)   ?           315-6213  317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
 Dynamite Baseball NAOMI (Japan)                 840-0001C    21575   21 (64Mb)   ?           315-6213  317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
-Ferrari F355 Challenge (deluxe, no link)        834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21863 (USA), 21864 (EXP), also known  to exists Japanese BIOS, not dumped
+Ferrari F355 Challenge (deluxe, no link)        834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21862 (JAP), 21863 (USA), 21864 (EXP)
 Ferrari F355 Challenge (twin/deluxe)            834-13950    22848   21 (64Mb)   present     315-6213  317-0267-COM   BIOS 22849 (JAP), 22850 (USA), 22851 (EXP)
 Ferrari F355 Challenge 2 (twin/deluxe)          840-0042C    23399   21 (64Mb)   present     315-6213  317-0287-COM   BIOS 22849 (JAP), 22850 (USA), 22851 (EXP)
 Giant Gram: All Japan Pro Wrestling 2           840-0007C    21820    9 (64Mb)   ?           315-6213  317-0253-JPN   joystick + 3 buttons
@@ -2908,6 +2908,7 @@ EPR-21330 & EPR-21331 differ by 7 bytes:
 
 Ferrari F355 specific Naomi BIOS roms:
 
+EPR-21862 - NAOMI BOOT ROM 1999 07/02  1.34 (Japan)
 EPR-21863 - NAOMI BOOT ROM 1999 07/02  1.34 (USA)
 EPR-21864 - NAOMI BOOT ROM 1999 07/02  1.34 (Export)
 EPR-22849 - NAOMI BOOT ROM 1999 08/30  1.35 (Japan)
@@ -3049,7 +3050,9 @@ Probably at some stage of development NAOMI was planned as non-JVS system as wel
 	ROM_SYSTEM_BIOS( 0, "bios0", "Ferrari F355 Deluxe (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21864.ic27", 0x000000, 0x200000, CRC(12ed7c66) SHA1(046be66e92eae766f3e05594aa837fc8888534ed) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "Ferrari F355 Deluxe (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21863.ic27", 0x000000, 0x200000, CRC(0615a4d1) SHA1(2c6986580b84278af75f396229fdd587bebc1768) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21863.ic27", 0x000000, 0x200000, CRC(0615a4d1) SHA1(2c6986580b84278af75f396229fdd587bebc1768) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "Ferrari F355 Deluxe (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "epr-21862.ic27", 0x000000, 0x200000, CRC(1f630716) SHA1(8d157809770467c3e7618c6299f3b96b5f10518c) )
 
 #define F355_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
