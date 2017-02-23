@@ -54,7 +54,7 @@ class mame_options
 
 public:
 	// parsing wrappers
-	static bool parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string);
+	static bool parse_command_line(emu_options &options, std::vector<std::string> &args, std::string &error_string);
 	static void parse_standard_inis(emu_options &options, std::string &error_string, const game_driver *driver = nullptr);
 	// FIXME: Couriersud: This should be in image_device_exit
 	static void remove_device_options(emu_options &options);

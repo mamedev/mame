@@ -276,7 +276,7 @@ const options_entry windows_options::s_option_entries[] =
 //  utf8_main
 //============================================================
 
-int main(int argc, char *argv[])
+int main(std::vector<std::string> &args)
 {
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
 		// Initialize this after the osd interface so that we are first in the
 		// output order
 		winui_output_error winerror;
-		if (win_is_gui_application() || is_double_click_start(argc))
+		if (win_is_gui_application() || is_double_click_start(args.size()))
 		{
 			// if we are a GUI app, output errors to message boxes
 			osd_output::push(&winerror);
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 			FreeConsole();
 		}
 		osd.register_options();
-		result = emulator_info::start_frontend(options, osd, argc, argv);
+		result = emulator_info::start_frontend(options, osd, args);
 		osd_output::pop(&winerror);
 	}
 

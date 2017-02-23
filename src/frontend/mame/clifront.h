@@ -31,7 +31,7 @@ public:
 	~cli_frontend();
 
 	// execute based on the incoming argc/argv
-	int execute(int argc, char **argv);
+	int execute(std::vector<std::string> &args);
 
 	// direct access to the command operations
 	void listxml(const char *gamename = "*");
@@ -59,7 +59,7 @@ private:
 	void display_help(const char *exename);
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
-	void start_execution(mame_machine_manager *manager, int argc, char **argv, std::string &option_errors);
+	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args, std::string &option_errors);
 
 	// internal state
 	emu_options &       m_options;

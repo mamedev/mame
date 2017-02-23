@@ -206,35 +206,48 @@ bool mame_options::parse_slot_devices(emu_options &options, std::function<void(e
 //  and update the devices
 //-------------------------------------------------
 
-bool mame_options::parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string)
+bool mame_options::parse_command_line(emu_options &options, std::vector<std::string> &args, std::string &error_string)
 {
 	// parse the command line
-	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	if (!options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, error_string))
+		return false;
 
 	// identify any options as a result of softlists 
 	auto softlist_opts = evaluate_initial_softlist_options(options);
 
 	// assemble a "value specifier" that will be used to specify options set up as a consequence
 	// of slot and device setup
-	auto value_specifier = [&softlist_opts, argc, argv, &error_string](emu_options &options, const std::string &arg)
+	auto value_specifier = [&softlist_opts, &args, &error_string](emu_options &options, const std::string &arg)
 	{
 		// first find within the command line
-		const char *arg_value = options.find_within_command_line(argc, argv, arg.c_str());
+		std::string arg_value = options.pluck_from_command_line(args, arg);
 
 		// next try to find within softlist-specified options
-		if (!arg_value)
+		if (arg_value.empty())
 		{
 			auto iter = softlist_opts.find(arg);
 			if (iter != softlist_opts.end())
-				arg_value = iter->second.c_str();
+				arg_value = iter->second;
 		}
 
 		// did we find something?
-		if (arg_value)
-			options.set_value(arg.c_str(), arg_value, OPTION_PRIORITY_MAXIMUM, error_string);
+		if (!arg_value.empty())
+			options.set_value(arg.c_str(), arg_value.c_str(), OPTION_PRIORITY_MAXIMUM, error_string);
 	};
 
-	return parse_slot_devices(options, value_specifier);
+	// parse the slot devices
+	if (!parse_slot_devices(options, value_specifier))
+		return false;
+
+	// at this point, we should have handled all arguments; the only argument that shouldn't have
+	// been handled is the file name
+	if (args.size() > 1)
+	{
+		error_string.append(string_format("Error: unknown option: %s\n", args[1]));
+		return false;
+	}
+
+	return true;
 }
 
 

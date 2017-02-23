@@ -194,10 +194,10 @@ cli_frontend::~cli_frontend()
 	mame_options::remove_device_options(m_options);
 }
 
-void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char **argv,std::string &option_errors)
+void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args, std::string &option_errors)
 {
 	// parse the command line, adding any system-specific options
-	if (!mame_options::parse_command_line(m_options, argc, argv, option_errors))
+	if (!mame_options::parse_command_line(m_options, args, option_errors))
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
@@ -210,7 +210,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 	// determine the base name of the EXE
-	std::string exename = core_filename_extract_base(argv[0], true);
+	std::string exename = core_filename_extract_base(args[0], true);
 
 	// if we have a command, execute that
 	if (*(m_options.command()) != 0)
@@ -244,7 +244,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 //  command line interface
 //-------------------------------------------------
 
-int cli_frontend::execute(int argc, char **argv)
+int cli_frontend::execute(std::vector<std::string> &args)
 {
 	// wrap the core execution in a try/catch to field all fatal errors
 	m_result = EMU_ERR_NONE;
@@ -263,7 +263,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		manager->start_context();
 
-		start_execution(manager, argc, argv, option_errors);
+		start_execution(manager, args, option_errors);
 	}
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
