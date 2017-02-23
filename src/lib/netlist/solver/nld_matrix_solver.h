@@ -125,8 +125,7 @@ public:
 	void update_forced();
 	void update_after(const netlist_time &after)
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(after);
+		m_Q_sync.net().toggle_and_push_to_queue(after);
 	}
 
 	/* netdevice functions */

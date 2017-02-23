@@ -36,7 +36,7 @@ enum fc_board_t {
 //**************************************************************************
 //  Base Device declaration
 //**************************************************************************
-class vme_fccpu20_device :	public device_t, public device_vme_card_interface
+class vme_fccpu20_device :  public device_t, public device_vme_card_interface
 {
 public:
 	vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, fc_board_t board_id);
@@ -68,10 +68,10 @@ private:
 	required_device<mpcc68561_device> m_mpcc3;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t	*m_sysrom;
-	uint32_t	m_sysram[2];
-	void 		update_irq_to_maincpu();
-	fc_board_t	m_board_id;
+	uint32_t    *m_sysrom;
+	uint32_t    m_sysram[2];
+	void        update_irq_to_maincpu();
+	fc_board_t  m_board_id;
 
 	// Below replaces machine_start and machine_reset from  src/mame/drivers/fccpu20.cpp
 protected:

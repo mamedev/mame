@@ -393,12 +393,6 @@ WRITE8_MEMBER( abc80_state::kbd_w )
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
 }
 
-/*
-DEVICE_INPUT_DEFAULTS_START( abc830_slow )
-    DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
-    DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
-*/
 
 
 //**************************************************************************
@@ -413,7 +407,9 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 {
 	switch (id)
 	{
-	case TIMER_ID_PIO:
+	case TIMER_ID_SCANLINE:
+		draw_scanline(m_bitmap, m_screen->vpos());
+		
 		m_pio_astb = !m_pio_astb;
 
 		m_pio->strobe_a(m_pio_astb);

@@ -239,7 +239,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 	unsigned itr_used = 0;
 	double rho_delta = 0.0;
 
-	const	 std::size_t n = this->N();
+	const    std::size_t n = this->N();
 
 	if (m_use_iLU_preconditioning)
 		mat.incomplete_LU_factorization(m_LU);

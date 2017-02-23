@@ -13,11 +13,11 @@
 
 // COL/ROW pins (offset for ROW)
 #define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
-	hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
+	devcb = &hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
 
 // DATA OUT pin, don't use on HLCD0569
 #define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
-	hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
+	devcb = &hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
 
 
 // pinout reference
@@ -46,7 +46,7 @@
      GND 20 |___________| 21 COL12
 
     HLCD 0569 doesn't have DATA OUT, instead it has what seems like OSC OUT on pin 34.
-    
+
     OSC is tied to a capacitor, the result frequency is 50000 * cap(in uF), eg. 0.01uF cap = 500Hz.
     Internally, this is divided by 2, and by number of rows to get display refresh frequency.
 */
@@ -58,8 +58,8 @@ public:
 	hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 colmax, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_write_cols_callback(device_t &device, _Object object) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_data_callback(device_t &device, _Object object) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(object); }
+	template<typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&object) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(std::forward<Object>(object)); }
+	template<typename Object> static devcb_base &set_write_data_callback(device_t &device, Object &&object) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(std::forward<Object>(object)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_cs);
@@ -75,7 +75,7 @@ protected:
 	void clock_data(int col);
 
 	u8 m_colmax;    // number of column pins
-	
+
 	int m_cs;       // input pin state
 	int m_clock;    // "
 	int m_data;     // "

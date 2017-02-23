@@ -1132,6 +1132,17 @@
 		</part>
 	</software>
 
+	<software name="conblend">
+		<description>Consonant Blends</description>
+		<year>1984</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Consonant Blends (Sherston).ssd" size="102400" crc="b6b21cac" sha1="26915934c77baaf1862cba3cc03e1b7a07d2265f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="domesday">
 		<description>The Domesday Project: Data Collection Program</description>
 		<year>1985</year>
@@ -1199,6 +1210,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="38400">
 				<rom name="London Adventure.ssd" size="38400" crc="ed449787" sha1="2dddb1010268163a40707c10115f9bd42a29b573" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mryog">
+		<description>Mr Yog and the Nippet</description>
+		<year>1984</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="43520">
+				<rom name="Mr Yog and the Nippet (Sherston).ssd" size="43520" crc="9dd6d401" sha1="aba82455fbefb8a6621d39af219d5238a8bb426a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1271,6 +1293,30 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="world without words.ssd" size="102400" crc="576db44b" sha1="c2cb171af63296eb00bdb56a3b47ed0073ddc764" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zillion">
+		<description>Zillion</description>
+		<year>1990</year>
+		<publisher>Sherston Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startup"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Zillion Startup (Sherston).ssd" size="102400" crc="47ad8b0c" sha1="2e5af30a7cf35660ca3388be8b87e9e81740708d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Planet"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Zillion Planet (Sherston).ssd" size="102400" crc="b360c9ef" sha1="4a3f7374313958976071a217ffa419889f1eb8b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Solar"/>
+			<dataarea name="flop" size="102400">
+				<rom name="Zillion Solar (Sherston).ssd" size="102400" crc="6980e5d3" sha1="19c2409ee1baadc2acf33ed7f48ca4632658e959" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1964,6 +2010,49 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="110592">
 				<rom name="bs-beebtrk3.ssd" size="110592" crc="4d349403" sha1="c82e305827cbebebf6f2d2f3fbd362ba6b5ac6f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byteappl">
+		<description>Byte The Apple Music Discs</description>
+		<year>1986</year>
+		<publisher>Byte The Apple</publisher>
+		<info name="author" value="Laurence Fenn" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="94464">
+				<rom name="ByteTheAppleMusicDisc1.ssd" size="94464" crc="93153714" sha1="8de077e98fadfc4e1f82cad4b51832746d250c73" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="107264">
+				<rom name="ByteTheAppleMusicDisc2.ssd" size="107264" crc="67208b29" sha1="d19ce86a805a8c39ac9c2fb701a2655f1e1a182f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3"/>
+			<dataarea name="flop" size="89344">
+				<rom name="ByteTheAppleMusicDisc3.ssd" size="89344" crc="7d7de2c2" sha1="138fbc85727258fed4121bbd0df64e1de46cf05a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 4"/>
+			<dataarea name="flop" size="165632">
+				<rom name="ByteTheAppleMusicDisc4.ssd" size="165632" crc="c02c0adb" sha1="b8601c1d5e0f1acaa4613f6b78f493c9f87a62d0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 5"/>
+			<dataarea name="flop" size="113920">
+				<rom name="ByteTheAppleMusicDisc5.ssd" size="113920" crc="91148f96" sha1="879a0975786ab3bb2467335d377e8d32dd2fc335" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 6"/>
+			<dataarea name="flop" size="184064">
+				<rom name="ByteTheAppleMusicDisc6.ssd" size="184064" crc="f4cd73a0" sha1="302404cc54b9e68b1aa3b04b6510cce495596090" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

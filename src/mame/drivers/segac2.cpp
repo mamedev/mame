@@ -32,8 +32,8 @@
     1992  Tant-R (Korea)             Sega              ?                C2
     1992  Waku Waku Marine           Sega              317-0140         C2
     1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
-	1993  Sega Sonic Cosmo Fighter   Sega              317-0140         C2
-	1994  PotoPoto (Japan)           Sega              317-0218         C2
+    1993  Sega Sonic Cosmo Fighter   Sega              317-0140         C2
+    1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
     1994  Stack Columns (World)      Sega              317-0223         C2
     1994  Ichidant-R (Japan)         Sega              317-0224         C2

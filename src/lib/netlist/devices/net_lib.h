@@ -52,6 +52,7 @@
 #include "nld_74123.h"
 #include "nld_74153.h"
 #include "nld_74161.h"
+#include "nld_74164.h"
 #include "nld_74165.h"
 #include "nld_74166.h"
 #include "nld_74174.h"
@@ -59,7 +60,6 @@
 #include "nld_74192.h"
 #include "nld_74193.h"
 #include "nld_74194.h"
-#include "nld_74279.h"
 #include "nld_74365.h"
 #include "nld_74ls629.h"
 #include "nld_82S16.h"
@@ -67,7 +67,6 @@
 #include "nld_82S123.h"
 #include "nld_82S126.h"
 #include "nld_9310.h"
-#include "nld_9312.h"
 #include "nld_9316.h"
 #include "nld_9322.h"
 

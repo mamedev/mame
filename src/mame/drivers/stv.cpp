@@ -3468,7 +3468,7 @@ GAME( 1997, prc297wia, prc297wi,stv,      stv, stv_state,       stv,        ROT0
 GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
 GAME( 1998, prc298su,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
 GAME( 1998, prc298au,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
-GAME( 2000, prc2ksu,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000) ", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
+GAME( 2000, prc2ksu,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 
 GAME( 1999, pclubor,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )

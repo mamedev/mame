@@ -6,6 +6,224 @@ local env = {}
 local output
 local curset
 
+function env.open(file, size)
+	if file == ".hi" then
+		local path = "hi"
+		local ini = emu.file(lfs.env_replace(manager:options().entries.inipath:value()), 1)
+		local ret = ini:open("hiscore.ini")
+		if not ret then
+			local inifile = ini:read(ini:size())
+			for line in inifile:gmatch("[^\n\r]") do
+				token, value = string.match(line, '([^ ]+) ([^ ]+)');
+				if token == "hi_path" then
+					path = value
+					break
+				end
+			end
+		end
+		file = path .. "/" .. curset .. ".hi"
+	else
+		file = lfs.env_replace(manager:options().entries.nvram_directory:value()) .. "/" .. curset .. "/" .. file
+	end
+	local f = io.open(file, "rb")
+	local content = f:read("*all")
+	f:close()
+	if #content < size then
+		content = content .. string.rep("\0", size - #content)
+	end
+	return content
+end
+
+function env.endianness(bytes, endian)
+	local newbytes = {}
+	if endian == "little_endian" then
+		for i = 1, #bytes do
+			newbytes[i] = bytes[#bytes - i + 1]
+		end
+	else
+		newbytes = bytes
+	end
+	return newbytes
+end
+
+function env.byte_skip(bytes, skip)
+	local newbytes = {}
+	if skip == "odd" then
+		-- lua lists are 1 based so use even indexes
+		for i = 2, #bytes, 2 do
+			newbytes[i/2] = bytes[i]
+		end
+	elseif skip == "even" then
+		for i = 1, #bytes, 2 do
+			newbytes[(i+1)/2] = bytes[i]
+		end
+	elseif skip == "1000" then
+		for i = 1, #bytes, 4 do
+			newbytes[(i+3)/4] = bytes[i]
+		end
+	elseif skip == "0100" then
+		for i = 2, #bytes, 4 do
+			newbytes[(i+2)/4] = bytes[i]
+		end
+	elseif skip == "0010" then
+		for i = 3, #bytes, 4 do
+			newbytes[(i+1)/4] = bytes[i]
+		end
+	elseif skip == "0001" then
+		for i = 4, #bytes, 4 do
+			newbytes[i/4] = bytes[i]
+		end
+	else
+		skip = tonumber(skip)
+		for i = 1, #bytes do
+			if bytes[i] ~= skip then
+				newbytes[#newbytes + 1] = bytes[i]
+			end
+		end
+	end
+	return newbytes
+end
+
+function env.byte_trim(bytes, val)
+	val = tonumber(val)
+	for i = 1, #bytes do
+		if bytes[i] ~= val then
+			return bytes
+		end
+		table.remove(bytes, 1)
+	end
+	return bytes
+end
+
+function env.byte_swap(bytes, val)
+	local newbytes = {}
+	val = tonumber(val)
+	for i = 1, #bytes do
+		local off = i + val - 1 - 2 * ((i - 1) % val)
+		if off > #bytes then -- ??
+			break
+		end
+		newbytes[i] = bytes[off]
+	end
+	return newbytes
+end
+
+function env.nibble_skip(bytes, skip)
+	local newbytes = {}
+	if skip == "odd" then
+		for i = 1, #bytes, 2 do
+			val1 = bytes[i]:byte(1)
+			val2 = bytes[i+1]:byte(1)
+			newbytes[(i+1)/2] = string.char(((val1 & 0x0f) << 4) | (val2 & 0x0f))
+		end
+	elseif skip == "even" then
+		for i = 1, #bytes, 2 do
+			val1 = bytes[i]:byte(1)
+			val2 = bytes[i+1]:byte(1)
+			newbytes[(i+1)/2] = string.char((val1 & 0xf0) | ((val2 & 0xf0) >> 4))
+		end
+	end
+	return newbytes
+end
+
+function env.bit_swap(bytes, swap)
+	if swap == "yes" then
+		for i = 1, #bytes do
+			val = bytes[i]:byte(1)
+			bytes[i] = string.char(((val & 1) << 7) | ((val & 2) << 5) | ((val & 4) << 3) | ((val & 8) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7))
+		end
+	end
+	return bytes
+end
+
+function env.bitmask(bytes, mask)
+	local newbytes = 0
+	bytes = string.unpack(">I" .. #bytes, table.concat(bytes))
+	for i = 1, #mask do
+		newbytes = newbytes | (((bytes >> mask.ishift) & mask.mask) << mask.oshift)
+	end
+	bytes = {}
+	while newbytes ~= 0 do
+		bytes[#bytes + 1] = newbytes & 0xff
+		newbytes = newbytes >> 8
+	end
+	newbytes = {}
+	for i = 1, #bytes do
+		newbytes[i] = string.char(bytes[#bytes + 1 - i])
+	end
+	return newbytes
+end
+
+function env.frombcd(val)
+	local result = 0
+	local mul = 1
+	while val ~= 0 do
+		result = result + ((val % 16) * mul)
+		val = val >> 4
+		mul = mul * 10
+	end
+	return result
+end
+
+function env.basechar(bytes, base)
+	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented\n")
+	if base == "32" then
+	elseif base == "40" then
+	end
+	return bytes
+end
+
+function env.charset_conv(bytes, charset)
+	if type(charset) == "string" then
+		local chartype, offset, delta = charset:match("CS_(%w*)%[?(%-?%d?%d?),?(%d?%d?)%]?")
+		if chartype == "NUMBER" then
+
+		end
+		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
+		return bytes
+	end
+	for num, char in ipairs(bytes) do
+		char = string.byte(char)
+		if charset[char] then
+			bytes[num] = charset[char]
+		elseif charset.default then
+			bytes[num] = charset.default
+		end
+	end
+	return bytes
+end
+
+function env.ascii_step(bytes, step)
+	for num, char in ipairs(bytes) do
+		bytes[num] = string.char(char:byte() / step)
+	end
+	return bytes
+end
+
+function env.ascii_offset(bytes, offset)
+	for num, char in ipairs(bytes) do
+		bytes[num] = string.char(char:byte() + offset)
+	end
+	return bytes
+end
+
+env.tostring = tostring
+env.type = type
+env.table = { pack = table.pack, concat = table.concat }
+env.string = { unpack = string.unpack, format = string.format, rep = string.rep, gsub = string.gsub, lower = string.lower, upper = string.upper }
+env.math = { min = math.min, max = math.max, floor = math.floor }
+
+do
+	local function readonly(t)
+		local mt = { __index = t, __newindex = function(t, k, v) return end }
+		return setmetatable({}, mt)
+	end
+	env.table = readonly(env.table)
+	env.string = readonly(env.string)
+	env.math = readonly(env.math)
+	env = readonly(env)
+end
+
 function dat.check(set, softlist)
 	if softlist then
 		return nil
@@ -15,7 +233,7 @@ function dat.check(set, softlist)
 		local table
 		datpath = file:fullpath():gsub(".zip", "/")
 		local data = file:read(file:size())
-		data = data:match("<hi2txt>(.*)</ *hi2txt>")
+		data = data:match("<hi2txt.->(.*)</ *hi2txt>")
 		local function get_tags(str, parent)
 			local arr = {}
 			while str ~= "" do
@@ -66,10 +284,11 @@ function dat.check(set, softlist)
 
 	local function parse_table(xml)
 		local total_size = 0
-		local s = { "data = open('" .. xml.structure[1].file .. "', size)\noffset = 1\narr = {}" }
+		local s = { "local data = open('" .. xml.structure[1].file .. "', size)\nlocal offset = 1\nlocal arr = {}",
+				"local elem, bytes, offset, value, lastindex, output"}
 		local fparam = {}
 		if xml.bitmask then
-			local bitmask = "bitmask = {"
+			local bitmask = "local bitmask = {"
 			for id, masks in pairs(xml.bitmask) do
 				bitmask = bitmask .. "['" .. id .. "'] = {"
 				for num, mask in ipairs(masks.character) do
@@ -94,7 +313,7 @@ function dat.check(set, softlist)
 			s[#s + 1] = bitmask .. "}"
 		end
 		if xml.charset then
-			local charset = "charset = {"
+			local charset = "local charset = {"
 			for id, set in pairs(xml.charset) do
 				local default
 				charset = charset .. "['" .. id .. "'] = {"
@@ -114,7 +333,7 @@ function dat.check(set, softlist)
 
 		local function check_format(formstr)
 			local formats = {}
-			local ret = " function tempform(val)"
+			local ret = "local function tempform(val)"
 			formstr = formstr:gsub("&gt;", ">")
 			formstr:gsub("([^;]+)", function(s) formats[#formats + 1] = s end)
 			for num, form in ipairs(formats) do
@@ -187,16 +406,17 @@ function dat.check(set, softlist)
 		end
 
 		if xml.format then
-			local format = { "format = {" }
+			local format = { "local format = {" }
 			for num, form in ipairs(xml.format) do
 				local param = {}
 				format[#format + 1] = "['" .. form["id"] .. "'] = "
-				--[[if form["input-as-subcolumns-input"] then
-				format[#format + 1] = "input_as_subcolumns_input = '" .. form["input-as-subcolumns-input"] .. "',"
-				end]]--
+				if form["input-as-subcolumns-input"] then
+					--format[#format + 1] = "input_as_subcolumns_input = '" .. form["input-as-subcolumns-input"] .. "',"
+					emu.print_verbose("data_hiscore: input-as-subcolumns-input unimplemented\n")
+				end
 				format[#format + 1] = "function(val, param) "
 				if form["formatter"] then
-					format[#format + 1] = "function tempform(val) "
+					format[#format + 1] = "local function tempform(val) "
 				end
 				if form["apply-to"]  == "char" then
 					format[#format + 1] = "val = val:gsub('(.)', function(val) "
@@ -362,7 +582,7 @@ function dat.check(set, softlist)
 				else
 					total_size = total_size + elem["size"]
 				end
-				s[#s + 1] = "offset = table.remove(bytes)"
+				s[#s + 1] = "offset = bytes[#bytes]\nbytes[#bytes] = nil"
 				if elem["decoding-profile"] then
 					if elem["decoding-profile"] == "base-40" then
 						elem["src-unit-size"] = 16
@@ -464,7 +684,7 @@ function dat.check(set, softlist)
 				parse_elem(elem)
 			end
 		end
-		table.insert(s, 1, "size = " .. total_size)
+		table.insert(s, 1, "local size = " .. total_size)
 
 		s[#s + 1] = "output = ''"
 
@@ -475,12 +695,12 @@ function dat.check(set, softlist)
 						fld["src"] = fld["id"]
 					end
 					s[#s + 1] = "output = output .. '" .. fld["id"] .. " '"
-					s[#s + 1] = "val = arr['" .. fld["src"] .. "'][1]"
+					s[#s + 1] = "value = arr['" .. fld["src"] .. "'][1]"
 					if fld["format"] then
 						s[#s + 1] = check_format(fld["format"])
-						s[#s + 1] = "val = tempform(val)"
+						s[#s + 1] = "value = tempform(value)"
 					end
-					s[#s + 1] = "output = output .. val .. '\\n'"
+					s[#s + 1] = "output = output .. value .. '\\n'"
 				elseif fld["tag"] == "table" then
 					local head = {}
 					local dat = {}
@@ -499,24 +719,24 @@ function dat.check(set, softlist)
 							end
 							if not loopcnt and col["src"] ~= "index" then
 								table.insert(dat, 1, "for i = 1, #arr['" .. col["src"] .. "'] do")
-								table.insert(dat, 2, "index = arr['" .. col["src"] .. "'][i].index or i - 1")
-								table.insert(dat, 3, "line = ''")
+								table.insert(dat, 2, "local index = arr['" .. col["src"] .. "'][i].index or i - 1")
+								table.insert(dat, 3, "local line = ''")
 								loopcnt = true
 							end
 							head[#head + 1] = "output = output .. '" .. col["id"] .. "\\t'"
 							if col["src"] == "index" then
-								dat[#dat + 1] = "val = index"
+								dat[#dat + 1] = "value = index"
 							else
-								dat[#dat + 1] = "if arr['"  .. col["src"] .. "'] then val = arr['" .. col["src"] .. "'][i].val end"
+								dat[#dat + 1] = "if arr['"  .. col["src"] .. "'] then value = arr['" .. col["src"] .. "'][i].val end"
 							end
 							if col["format"] then
 								dat[#dat + 1] = check_format(col["format"])
-								dat[#dat + 1] = "val = tempform(val)"
+								dat[#dat + 1] = "value = tempform(value)"
 							end
 							if igncol == col["id"] then
-								dat[#dat + 1] = "checkval = val"
+								dat[#dat + 1] = "local checkval = value"
 							end
-							dat[#dat + 1] = "line = line .. val .. '\\t'"
+							dat[#dat + 1] = "line = line .. value .. '\\t'"
 						end
 					end
 					if igncol then
@@ -543,213 +763,6 @@ function dat.check(set, softlist)
 			scrfile:write(script)
 		end
 		return script
-	end
-
-	if #env == 0 then
-		function env.open(file, size)
-			if file == ".hi" then
-				local path = "hi"
-				local ini = emu.file(lfs.env_replace(manager:options().entries.inipath:value()), 1)
-				local ret = ini:open("hiscore.ini")
-				if not ret then
-					local inifile = ini:read(ini:size())
-					for line in inifile:gmatch("[^\n\r]") do
-						token, value = string.match(line, '([^ ]+) ([^ ]+)');
-						if token == "hi_path" then
-							path = value
-							break
-						end
-					end
-				end
-				file = path .. "/" .. set .. ".hi"
-			else
-				file = lfs.env_replace(manager:options().entries.nvram_directory:value()) .. "/" .. set .. "/" .. file
-			end
-			local f = io.open(file, "rb")
-			local content = f:read("*all")
-			f:close()
-			if #content < size then
-				content = content .. string.rep("\0", size - #content)
-			end
-			return content
-		end
-
-		function env.endianness(bytes, endian)
-			local newbytes = {}
-			if endian == "little_endian" then
-				for i = 1, #bytes do
-					newbytes[i] = bytes[#bytes - i + 1]
-				end
-			else
-				newbytes = bytes
-			end
-			return newbytes
-		end
-
-		function env.byte_skip(bytes, skip)
-			local newbytes = {}
-			if skip == "odd" then
-				-- lua lists are 1 based so use even indexes
-				for i = 2, #bytes, 2 do
-					newbytes[i/2] = bytes[i]
-				end
-			elseif skip == "even" then
-				for i = 1, #bytes, 2 do
-					newbytes[(i+1)/2] = bytes[i]
-				end
-			elseif skip == "1000" then
-				for i = 1, #bytes, 4 do
-					newbytes[(i+3)/4] = bytes[i]
-				end
-			elseif skip == "0100" then
-				for i = 2, #bytes, 4 do
-					newbytes[(i+2)/4] = bytes[i]
-				end
-			elseif skip == "0010" then
-				for i = 3, #bytes, 4 do
-					newbytes[(i+1)/4] = bytes[i]
-				end
-			elseif skip == "0001" then
-				for i = 4, #bytes, 4 do
-					newbytes[i/4] = bytes[i]
-				end
-			else
-				skip = tonumber(skip)
-				for i = 1, #bytes do
-					if bytes[i] ~= skip then
-						newbytes[#newbytes + 1] = bytes[i]
-					end
-				end
-			end
-			return newbytes
-		end
-
-		function env.byte_trim(bytes, val)
-			val = tonumber(val)
-			for i = 1, #bytes do
-				if bytes[i] ~= val then
-					return bytes
-				end
-				table.remove(bytes, 1)
-			end
-			return bytes
-		end
-
-		function env.byte_swap(bytes, val)
-			local newbytes = {}
-			val = tonumber(val)
-			for i = 1, #bytes do
-				local off = i + val - 1 - 2 * ((i - 1) % val)
-				if off > #bytes then -- ??
-					break
-				end
-				newbytes[i] = bytes[off]
-			end
-			return newbytes
-		end
-
-		function env.nibble_skip(bytes, skip)
-			local newbytes = {}
-			if skip == "odd" then
-				for i = 1, #bytes, 2 do
-					val1 = bytes[i]:byte(1)
-					val2 = bytes[i+1]:byte(1)
-					newbytes[(i+1)/2] = string.char(((val1 & 0x0f) << 4) | (val2 & 0x0f))
-				end
-			elseif skip == "even" then
-				for i = 1, #bytes, 2 do
-					val1 = bytes[i]:byte(1)
-					val2 = bytes[i+1]:byte(1)
-					newbytes[(i+1)/2] = string.char((val1 & 0xf0) | ((val2 & 0xf0) >> 4))
-				end
-			end
-			return newbytes
-		end
-
-		function env.bit_swap(bytes, swap)
-			if swap == "yes" then
-				for i = 1, #bytes do
-					val = bytes[i]:byte(1)
-					bytes[i] = string.char(((val & 1) << 7) | ((val & 2) << 5) | ((val & 4) << 3) | ((val & 8) << 1) | ((val & 0x10) >> 1) | ((val & 0x20) >> 3) | ((val & 0x40) >> 5) | ((val & 0x80) >> 7))
-				end
-			end
-			return bytes
-		end
-
-		function env.bitmask(bytes, mask)
-			local newbytes = 0
-			bytes = string.unpack(">I" .. #bytes, table.concat(bytes))
-			for i = 1, #mask do
-				newbytes = newbytes | (((bytes >> mask.ishift) & mask.mask) << mask.oshift)
-			end
-			bytes = {}
-			while newbytes ~= 0 do
-				bytes[#bytes + 1] = newbytes & 0xff
-				newbytes = newbytes >> 8
-			end
-			newbytes = {}
-			for i = 1, #bytes do
-				newbytes[i] = string.char(bytes[#bytes + 1 - i])
-			end
-			return newbytes
-		end
-
-		function env.frombcd(val)
-			local result = 0
-			local mul = 1
-			while val ~= 0 do
-				result = result + ((val % 16) * mul)
-				val = val >> 4
-				mul = mul * 10
-			end
-			return result
-		end
-
-		function env.basechar(bytes, base)
-			if base == "32" then
-			elseif base == "40" then
-			end
-			return bytes
-		end
-
-		function env.charset_conv(bytes, charset)
-			if type(charset) == "string" then
-				local chartype, offset, delta = charset:match("CS_(%w*)%[?(%-?%d?%d?),?(%d?%d?)%]?")
-				if chartype == "NUMBER" then
-
-				end
-				return
-			end
-			for num, char in ipairs(bytes) do
-				char = string.byte(char)
-				if charset[char] then
-					bytes[num] = charset[char]
-				elseif charset.default then
-					bytes[num] = charset.default
-				end
-			end
-			return bytes
-		end
-
-		function env.ascii_step(bytes, step)
-			for num, char in ipairs(bytes) do
-				bytes[num] = string.char(char:byte() / step)
-			end
-			return bytes
-		end
-
-		function env.ascii_offset(bytes, offset)
-			for num, char in ipairs(bytes) do
-				bytes[num] = string.char(char:byte() + offset)
-			end
-			return bytes
-		end
-
-		env.tostring = tostring
-		env.type = type
-		env.table = { pack = table.pack, concat = table.concat, insert = table.insert, remove = table.remove }
-		env.string = { unpack = string.unpack, format = string.format, rep = string.rep, gsub = string.gsub, lower = string.lower, upper = string.upper }
-		env.math = { min = math.min, max = math.max, floor = math.floor }
 	end
 
 	if curset == set then

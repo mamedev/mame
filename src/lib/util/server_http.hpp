@@ -89,7 +89,7 @@ namespace webpp {
 			void send(std::string str) { m_ostream << m_header.str() << "Content-Length: " << str.length() << "\r\n\r\n" << str; }
 			size_t size() const { return m_streambuf.size(); }
 			std::shared_ptr<socket_type> socket() { return m_socket; }
-			
+
 			/// If true, force server to close the connection after the response have been sent.
 			///
 			/// This is useful when implementing a HTTP/1.0-server sending content
@@ -435,7 +435,7 @@ namespace webpp {
 						}
 
 						if (response->close_connection_after_response)
-                            return;
+							return;
 
 						auto range = request->header.equal_range("Connection");
 						case_insensitive_equals check;

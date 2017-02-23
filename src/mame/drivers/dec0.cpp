@@ -233,8 +233,8 @@ Bad Dudes      EI01  -     EI03  EI04  -     EI06  EI07  EI08  EI09  EI10  EI11 
 Dragon Ninja   EG01  -     EG03  EG04  -     EG06  EG07  EG08  EG09  EG10  EG11  EG12  EG13  EG14  EG15  EG16  -     EG18  -     EG20  -     EG22  -     EG24  EG25  EG26  -     EG28  -     EG30  EG31
 Heavy Barrel   EC01  EC02  EC03  EC04  EC05  EC06  EC07  EC08  EC09  EC10  EC11  EC12  EC13  EC14  EC15  EC16  EC17  EC18  EC19  EC20  EC21  EC22  EC23  EC24  EC25  EC26  EC27  EC28  EC29  EC30  EC31
 
-Note the games can be converted by swapping all of the ROMs and MCU. For example on a Birdie Try PCB, when the 
-ROMs are swapped for the 'hbarrel' set from MAME, the board will run Heavy Barrel. I can confirm the MCU dump 
+Note the games can be converted by swapping all of the ROMs and MCU. For example on a Birdie Try PCB, when the
+ROMs are swapped for the 'hbarrel' set from MAME, the board will run Heavy Barrel. I can confirm the MCU dump
 from the 'hbarrel' MAME ROM set (HB31.9A) and 'baddudes' MAME ROM set (EI31.9A) works fine on the real PCB.
 
 

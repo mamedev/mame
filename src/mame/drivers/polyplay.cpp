@@ -105,7 +105,7 @@ i/o ports:
 
   85        PIO PORT B
             bit 0-2 = light organ
-			bit 3-4 = control panel (not connected)
+            bit 3-4 = control panel (not connected)
             bit 5-7 = sound parameter (not used on production units?)
 
   86        PIO CTRL A
@@ -189,38 +189,38 @@ WRITE8_MEMBER(polyplay_state::pio_portb_w)
 	switch (lightState)
 	{
 		case 0:
-			output().set_lamp_value(1, 1); 
-			output().set_lamp_value(2, 0); 
-			output().set_lamp_value(3, 0); 
-			output().set_lamp_value(4, 0); 
+			output().set_lamp_value(1, 1);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
 			break;
-		
+
 		case 1:
-			output().set_lamp_value(1, 0); 
-			output().set_lamp_value(2, 1); 
-			output().set_lamp_value(3, 0); 
-			output().set_lamp_value(4, 0); 
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 1);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
 			break;
-		
+
 		case 2:
-			output().set_lamp_value(1, 0); 
-			output().set_lamp_value(2, 0); 
-			output().set_lamp_value(3, 1); 
-			output().set_lamp_value(4, 0); 
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 1);
+			output().set_lamp_value(4, 0);
 			break;
-		
+
 		case 3:
-			output().set_lamp_value(1, 0); 
-			output().set_lamp_value(2, 0); 
-			output().set_lamp_value(3, 0); 
-			output().set_lamp_value(4, 1); 
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 1);
 			break;
-			
+
 		default:
-			output().set_lamp_value(1, 0); 
-			output().set_lamp_value(2, 0); 
-			output().set_lamp_value(3, 0); 
-			output().set_lamp_value(4, 0); 
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
 			break;
 	}
 }

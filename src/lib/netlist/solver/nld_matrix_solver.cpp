@@ -380,8 +380,7 @@ void matrix_solver_t::update() NL_NOEXCEPT
 
 	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(new_timestep);
+		m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
 	}
 }
 
@@ -392,8 +391,7 @@ void matrix_solver_t::update_forced()
 
 	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+		m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
 
@@ -424,8 +422,7 @@ void matrix_solver_t::solve_base()
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
 			log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
-			m_Q_sync.net().toggle_new_Q();
-			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
+			m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
 		}
 	}
 	else

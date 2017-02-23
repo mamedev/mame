@@ -47,7 +47,7 @@ public:
 
 static ADDRESS_MAP_START(h89_mem, AS_PROGRAM, 8, h89_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	// Bank 0 - At startup has the format defined below, but software could swap it for RAM (Later H-89s and 
+	// Bank 0 - At startup has the format defined below, but software could swap it for RAM (Later H-89s and
 	//          Early ones with the Org-0 modification),
 	//          TODO - define the RAM so it can swap in/out under program control.
 	AM_RANGE(0x0000, 0x0fff) AM_ROM   // Page 0-4 - System ROM (at most 4k(MTR-90), early versions(MTR-88, MTR-89) only had 2k)
@@ -62,21 +62,21 @@ static ADDRESS_MAP_START( h89_io, AS_IO, 8, h89_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
-                                           //         - H37 5-1/4" Soft-sectored Controller MTR-90 ROM
-                                           //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-                                           //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
+										   //         - H37 5-1/4" Soft-sectored Controller MTR-90 ROM
+										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
 //  AM_RANGE(0x7c, 0x7f)    expansion 2    // Options - 5-1/4" Hard-sectored Controller (works with ALL ROMs)
-                                           //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
-                                           //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
+										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
+										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
 
 //  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
 //  AM_RANGE(0xd8, 0xdf)    8250 UART DTE - MODEM
 //  AM_RANGE(0xe0, 0xe7)    8250 UART DCE - LP
-	AM_RANGE(0xe8, 0xef)    AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console - this 
-                                                                                                 // connects internally to a Terminal board
-                                                                                                 // that is also used in the H19. Ideally,
-                                                                                                 // the H19 code could be connected and ran
-                                                                                                 // as a separate thread.
+	AM_RANGE(0xe8, 0xef)    AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console - this
+																								 // connects internally to a Terminal board
+																								 // that is also used in the H19. Ideally,
+																								 // the H19 code could be connected and ran
+																								 // as a separate thread.
 //  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 	AM_RANGE(0xf2, 0xf2)    AM_WRITE(port_f2_w) AM_READ_PORT("SW501")
 //  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( h89 )
 
-        // Settings with the MTR-88 ROM (#444-40)
+		// Settings with the MTR-88 ROM (#444-40)
 //  PORT_START("SW501")
 //  PORT_DIPNAME( 0x1f, 0x00, "Unused" )  PORT_DIPLOCATION("S1:1,S1:2,S1:3,S1:4,S1:5")
 //  PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )  PORT_DIPLOCATION("S1:6")
@@ -97,7 +97,7 @@ static INPUT_PORTS_START( h89 )
 //  PORT_DIPSETTING( 0x80, "38400" )
 //  PORT_DIPSETTING( 0xc0, "57600" )
 
-        // Settings with the MTR-89 ROM (#444-62)
+		// Settings with the MTR-89 ROM (#444-62)
 //  PORT_START("SW501")
 //  PORT_DIPNAME( 0x03, 0x00, "Expansion 1" )  PORT_DIPLOCATION("S1:1,S1:2")
 //  PORT_DIPSETTING( 0x00, "H-88-1" )
@@ -122,7 +122,7 @@ static INPUT_PORTS_START( h89 )
 //  PORT_DIPSETTING( 0x00, DEF_STR( Normal ) )
 //  PORT_DIPSETTING( 0x80, "Auto" )
 
-        // Settings with the MTR-90 ROM (#444-84 or 444-142)
+		// Settings with the MTR-90 ROM (#444-84 or 444-142)
 	PORT_START("SW501")
 	PORT_DIPNAME( 0x03, 0x00, "Expansion 1" )  PORT_DIPLOCATION("S1:1,S1:2")
 	PORT_DIPSETTING( 0x00, "H-88-1" )
@@ -161,13 +161,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 
 WRITE8_MEMBER( h89_state::port_f2_w )
 {
-    // Bit 0 - Single-step
-    // Bit 1 - Enable timer interrupt (2mSec Clock)
+	// Bit 0 - Single-step
+	// Bit 1 - Enable timer interrupt (2mSec Clock)
 	m_port_f2 = data;
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
-    // TODO - baud rate should be controlled by SW501 setting
+	// TODO - baud rate should be controlled by SW501 setting
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )

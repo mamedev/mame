@@ -2,8 +2,8 @@
 // copyright-holders:Felipe Sanches
 #pragma once
 
-#ifndef __PATINHOFEIO_H__
-#define __PATINHOFEIO_H__
+#ifndef MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
+#define MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
@@ -139,6 +139,6 @@ private:
 	uint8_t m_mode;
 };
 
-extern const device_type PATINHO_FEIO;
+extern const device_type PATO_FEIO_CPU;
 
-#endif /* __PATINHOFEIO_H__ */
+#endif // MAME_DEVICES_CPU_PATINHOFEIO_CPU_H

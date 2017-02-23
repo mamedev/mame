@@ -49,10 +49,8 @@
 // Generic macros
 // -----------------------------------------------------------------------------
 
-
 #ifdef RES_R
-// FIXME: avoid compile fails
-// #warning "Do not include rescap.h in a netlist environment"
+#warning "Do not include rescap.h in a netlist environment"
 #endif
 #ifndef RES_R
 #define RES_R(res) (static_cast<double>(res))

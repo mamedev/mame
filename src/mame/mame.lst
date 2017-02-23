@@ -1096,6 +1096,8 @@ ambush                          // (c) 1983
 ambushh                         // (c) 1983
 ambushj                         // (c) 1983 Nippon Amuse license
 ambushv                         // (c) 1983 Volt Electronics license
+dkong3abl                       // bootleg
+mariobl                         // bootleg
 
 @source:amerihok.cpp
 amerihok                        //
@@ -1436,6 +1438,7 @@ incasunu
 indrema5                       // (c) 1998
 jungjuic
 kgalah
+kgbirdmk5                       // (c) 1994
 koalamnt                        // (c) 2001
 kookabuk
 locoloot
@@ -1490,6 +1493,7 @@ swhr2
 swhr2u                        // (c) 1998
 swhr2v                        // (c) 1995
 topbana
+toutango                        // (c) 1998
 trstrove
 tritreat
 trojhors
@@ -2383,6 +2387,7 @@ atetrisc2                       // 136066           (c) 1989
 mwskins                         // (c) 2000 Midway
 mwskinsa                        // (c) 2000 Midway
 mwskinso                        // (c) 2000 Midway
+mwskinst                        // (c) 2000 Midway
 
 @source:atm.cpp
 atm                             //
@@ -2581,7 +2586,7 @@ bldwolfj                        // (c) 1988 Data East Corporation (Japan)
 
 @source:battlex.cpp
 battlex                         // (c) 1982 Omori E. Co., Ltd.
-dodgeman						//
+dodgeman                        //
 
 @source:battlnts.cpp
 battlnts                        // GX777 (c) 1987
@@ -10483,6 +10488,9 @@ spacefrt                        // (c) 1981 Century
 superbik                        // (c) 1983 Century
 wallst                          // (c) 1982 Century
 
+@source:cxgz80.cpp
+ch2001                          //
+
 @source:cxhumax.cpp
 hxhdci2k                        //
 
@@ -12288,6 +12296,7 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 
 @source:fidel6502.cpp
 chesster                        //
+chesstera                       //
 csc                             // CSC: Champion Sensory Chess Challenger (English)
 cscfr                           // * French
 cscg                            // * German
@@ -12474,7 +12483,7 @@ fp200                           //
 fp6000                          //
 
 @source:freekick.cpp
-omega							// (c) 1986 Nihon System
+omega                           // (c) 1986 Nihon System
 countrun                        // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1988.3
 countrunb                       // (c) 1988 bootleg
 countrunb2                      // (c) 1988 bootleg
@@ -14315,9 +14324,18 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
 maniac                          // Ideal
+melodym                         // GAF
+pabball                         // Caprice
+rockpin                         // Tiger Electronics
+tbaskb                          // Tandy Radio Shack
 touchme                         // Atari
+ttfball                         // Toytronic
+ttfballa                        // Toytronic
+usfball                         // US Games
+uspbball                        // US Games
 
 @source:hh_sm510.cpp
 gnwmndon                        // Nintendo
@@ -14534,6 +14552,7 @@ vector1                         //
 @source:hornet.cpp
 gradius4                        // GX837 (c)1999
 nbapbp                          // GX778 (c)1998
+nbapbpa                         // GX778 (c)1998
 sscope                          // GX830 (c)1999
 sscope2                         // GX931 (c)2000
 sscopea                         // GX830 (c)1999
@@ -16924,7 +16943,7 @@ whiterus                        // White Russia
 konin                           //
 
 @source:konmedal.cpp
-konmedal
+tsukande
 
 @source:kontest.cpp
 kontest                         // GX800 (c) 198? (Japan)
@@ -17804,9 +17823,7 @@ wanted                          // (c) 1984 Sigma Ent. Inc.
 marinedt                        // MG  (c) 1981 Taito Corporation
 
 @source:mario.cpp
-dkong3abl                       //
 mario                           // (c) 1983 Nintendo of America
-mariobl                         // bootleg
 marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 marioo                          // (c) 1983 Nintendo of America
@@ -20080,10 +20097,11 @@ phrcrazeb                       // (c) 1986 Merit
 phrcrazec                       // (c) 1986 Merit
 phrcrazev                       // (c) 1986 Merit
 pitboss                         // (c) 1983 Merit
-pitbossa                        // (c) 1983 Merit
-pitbossa1                       // (c) 1983 Merit
-pitbossb                        // (c) 1983 Merit
-pitbossc                        // (c) 1983 Merit
+pitboss04                       // (c) 1983 Merit
+pitboss03                       // (c) 1983 Merit
+pitboss03a                      // (c) 1983 Merit
+pitbossm4                       // (c) 1983 Merit
+pitbossps                       // (c) 1983 Merit
 riviera                         // (c) 1987 Merit
 rivieraa                        // (c) 1986 Merit
 rivierab                        // (c) 1986 Merit
@@ -31629,6 +31647,7 @@ raiden2                         // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2dx                       // (c) 1993 Seibu Kaihatsu
 raiden2e                        // (c) 1993 Seibu Kaihatsu
 raiden2ea                       // (c) 1993 Seibu Kaihatsu
+raiden2eg                       // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2eu                       // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2eua                      // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2f                        // (c) 1993 Seibu Kaihatsu
@@ -34719,6 +34738,7 @@ supracan                        //
 @source:suprgolf.cpp
 albatross                       //
 suprgolf                        // (c) 1989 Nasco
+suprgolfj                       // (c) 1989 Nasco
 
 @source:suprloco.cpp
 suprloco                        // (c) 1982 Sega
@@ -35361,6 +35381,7 @@ gwinggen                        // (c) 2004 Takumi Corporation
 homura                          // (c) 2005 SKonec Entertainment
 hotgmkmp                        // (c) 2005 XNauts
 kof98um                         // (c) 2008 SNK
+kofskyst                        // (c) 2008 Moss / SNK Playmore
 kofxii                          // (c) 2008 SNK Playmore
 raiden3                         // (c) 2005 Seibu Kaihatsu/Moss Ltd
 raiden4                         // (c) 2007 Seibu Kaihatsu/Moss Ltd

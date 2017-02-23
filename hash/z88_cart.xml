@@ -172,7 +172,7 @@
 			</dataarea>
 
 			<!-- The following are the levels and should be stored in z88 memory on the default device/directory, you don't
-					have to keep all 60 of them on the z88 just the ones you want to play and drag over more when required. -->
+			        have to keep all 60 of them on the z88 just the ones you want to play and drag over more when required. -->
 
 			<dataarea name="ram01" size="2695">
 				<rom name="lemlevel.01" size="2695" crc="b3ddde7d" sha1="ac2a1d6cd5b121bc33d516bed0d9d4e37c74ece0" offset="0"/>
@@ -399,6 +399,18 @@
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
 				<rom name="pyramid-std.epr" size="32768" crc="9441ea18" sha1="01785eceee7e24f2a82feb39f1ad8c05d6698060" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellmstr">
+		<description>Spell-Master</description>
+		<year>1988</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="128krom"/>
+			<dataarea name="rom" size="131072">
+				<rom name="spellmaster.epr" size="131072" crc="ad0c407d" sha1="1e9d302989e8e98e963f99ce1ea5a634ed1c466e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

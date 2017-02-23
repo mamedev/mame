@@ -21,11 +21,11 @@ Z80 A                    3.57954 MHz (Champion Boxing)
 8255 for I/O port work
 3 Eproms for program and graphics
 TMM2064 for program RAM
-TMS9928 for graphics ( 3.57954 MHz? )
+TMS9928ANL for graphics ( 3.57954 MHz? )
 8 8118 dynamic RAMs for the graphics
 74LS139 and 74LS32 for logic gating
-ULN2003 for coin counter output
-76489 for music
+ULN2003AN for coin counter output
+SN76489AN for music
 7808 voltage regulator to a transistorized circuit for TV output
 secondary crystal, numbers unknown for the TMS9928
 
@@ -154,7 +154,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489_device, write)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489a_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

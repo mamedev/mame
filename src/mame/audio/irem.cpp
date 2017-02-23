@@ -10,7 +10,6 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "audio/irem.h"
-#include "netlist/devices/net_lib.h"
 
 const device_type IREM_M62_AUDIO = &device_creator<m62_audio_device>;
 const device_type IREM_M52_SOUNDC_AUDIO = &device_creator<m52_soundc_audio_device>;

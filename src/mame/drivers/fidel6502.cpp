@@ -2190,6 +2190,14 @@ ROM_END
 
 ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("ch_1.3.ic9", 0x8000, 0x8000, CRC(8b42d1ad) SHA1(2161fc5ab2476fe7ca4ffc226e3cb329b8a57a01) ) // 27256, CH 1.3 on sticker
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD("101-1091b02.ic10", 0x0000, 0x20000, CRC(fa370e88) SHA1(a937c8f1ec295cf9539d12466993974e40771493) ) // AMI, 27C010 or equivalent
+ROM_END
+
+ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
 
 	ROM_REGION( 0x20000, "user1", 0 )
@@ -2247,4 +2255,5 @@ CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes,      driver_device, 0
 CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d,  fdes2100d,0,      fdes2000d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesstera,  chesster, 0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

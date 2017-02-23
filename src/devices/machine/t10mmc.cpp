@@ -266,7 +266,7 @@ void t10mmc::ExecCommand()
 			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
-		m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n", 
+		m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
 			m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
 
 		trk = cdrom_get_track(m_cdrom, m_lba);

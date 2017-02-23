@@ -56,7 +56,7 @@ typedef __int128_t INT128;
 //============================================================
 
 // This will be autodetected
-// #define PPMF_TYPE 0
+//#define PPMF_TYPE 0
 
 #define PPMF_TYPE_PMF             0
 #define PPMF_TYPE_GNUC_PMF_CONV   1
@@ -92,6 +92,11 @@ typedef __int128_t INT128;
 	#else
 		#define PPMF_TYPE PPMF_TYPE_PMF
 	#endif
+#else
+	#undef PHAS_PMF_INTERNAL
+	#define PHAS_PMF_INTERNAL 0
+	#undef MEMBER_ABI
+	#define MEMBER_ABI
 #endif
 
 #endif /* PCONFIG_H_ */

@@ -52,6 +52,17 @@ namespace plib
 		nocopyassignmove(const nocopyassignmove &) = delete;
 		nocopyassignmove(nocopyassignmove &&) = delete;
 		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
+		nocopyassignmove &operator=(nocopyassignmove &&) = delete;
+	};
+
+	struct nocopyassign
+	{
+	protected:
+		nocopyassign() = default;
+		~nocopyassign() = default;
+	private:
+		nocopyassign(const nocopyassign &) = delete;
+		nocopyassign &operator=(const nocopyassign &) = delete;
 	};
 
 	//============================================================

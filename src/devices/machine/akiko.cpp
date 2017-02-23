@@ -82,7 +82,7 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	m_frame_timer(nullptr),
 	m_cdrom_is_device(0),
 	m_mem_r(*this), m_mem_w(*this), m_int_w(*this),
-	m_scl_w(*this),	m_sda_r(*this),	m_sda_w(*this)
+	m_scl_w(*this), m_sda_r(*this), m_sda_w(*this)
 {
 	for (int i = 0; i < 8; i++)
 	{

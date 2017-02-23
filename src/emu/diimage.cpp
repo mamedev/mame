@@ -1153,30 +1153,12 @@ image_init_result device_image_interface::load_software(const std::string &softw
 bool device_image_interface::open_image_file(emu_options &options)
 {
 	const char* path = options.value(instance_name());
-	if (*path != 0 && m_software_part_ptr == nullptr)
+	if (*path != 0)
 	{
 		set_init_phase();
 		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
 		{
 			if (software_entry()==nullptr) return true;
-		}
-		else
-			m_software_part_ptr = find_software_item(path, true);
-
-		// if we're loading from a software list, check requirements
-		if (m_software_part_ptr != nullptr)
-		{
-			const char *requirement = m_software_part_ptr->feature("requirement");
-			if (requirement != nullptr)
-			{
-				const software_part *req_swpart = find_software_item(requirement, false);
-				if (req_swpart != nullptr)
-				{
-					device_image_interface *req_image = software_list_device::find_mountable_image(device().mconfig(), *req_swpart);
-					if (req_image != nullptr)
-						req_image->m_software_part_ptr = req_swpart;
-				}
-			}
 		}
 	}
 	return false;
@@ -1447,7 +1429,7 @@ bool device_image_interface::load_software_part(const std::string &identifier, c
 
 #ifdef UNUSED_VARIABLE
 	// Tell the world which part we actually loaded
-	std::string full_sw_name = string_format("%s:%s:%s", swlist->list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name = string_format("%s:%s:%s", swlist.list_name(), swpart->info().shortname(), swpart->name());
 #endif
 
 	// check compatibility
@@ -1476,8 +1458,7 @@ bool device_image_interface::load_software_part(const std::string &identifier, c
 			if (req_image != nullptr)
 			{
 				req_image->set_init_phase();
-				if (req_image->load_software(requirement) != image_init_result::PASS)
-					result = false;
+				req_image->load(requirement);
 			}
 		}
 	}
@@ -1492,18 +1473,20 @@ bool device_image_interface::load_software_part(const std::string &identifier, c
 
 std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
-	if (m_software_part_ptr != nullptr)
+	const char *path = device().mconfig().options().value(instance_name());
+	std::string result;
+	if (*path != '\0')
 	{
-		// use slot value if available
-		const char *slot = m_software_part_ptr->feature("slot");
-		return (slot != nullptr) ? slot : default_card_slot;
+		result.assign(default_card_slot);
+		const software_part *swpart = find_software_item(path, true);
+		if (swpart != nullptr)
+		{
+			const char *slot = swpart->feature("slot");
+			if (slot != nullptr)
+				result.assign(slot);
+		}
 	}
-
-	// necessary for image file creation???
-	if (*device().mconfig().options().value(instance_name()) != '\0')
-		return default_card_slot;
-
-	return std::string();
+	return result;
 }
 
 //----------------------------------------------------------------------------

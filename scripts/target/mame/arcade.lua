@@ -369,6 +369,7 @@ MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
 MACHINES["TTL74157"] = true
 --MACHINES["TTL74161"] = true
+--MACHINES["TTL74164"] = true
 --MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL7474"] = true
@@ -591,7 +592,7 @@ MACHINES["STEPPERS"] = true
 --MACHINES["WOZFDC"] = true
 --MACHINES["DIABLO_HD"] = true
 MACHINES["PCI9050"] = true
---MACHINES["TMS1024"] = true
+MACHINES["TMS1024"] = true
 MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
@@ -848,6 +849,8 @@ function createProjects_mame_arcade(_target, _subtarget)
 
 createMAMEProjects(_target, _subtarget, "shared")
 files {
+	MAME_DIR .. "src/mame/machine/meters.cpp",
+	MAME_DIR .. "src/mame/machine/meters.h",
 	MAME_DIR .. "src/mame/machine/nmk112.cpp",
 	MAME_DIR .. "src/mame/machine/nmk112.h",
 	MAME_DIR .. "src/mame/machine/pcshare.cpp",
@@ -858,6 +861,8 @@ files {
 	MAME_DIR .. "src/mame/machine/ticket.h",
 	MAME_DIR .. "src/mame/video/avgdvg.cpp",
 	MAME_DIR .. "src/mame/video/avgdvg.h",
+	MAME_DIR .. "src/mame/video/awpvid.cpp",
+	MAME_DIR .. "src/mame/video/awpvid.h",
 	MAME_DIR .. "src/mame/audio/dcs.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.h",
 	MAME_DIR .. "src/mame/audio/decobsmt.cpp",
@@ -1266,10 +1271,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/mpu4misc.hxx",
 	MAME_DIR .. "src/mame/drivers/mpu5.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu5.hxx",
-	MAME_DIR .. "src/mame/video/awpvid.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.h",
-	MAME_DIR .. "src/mame/machine/meters.cpp",
-	MAME_DIR .. "src/mame/machine/meters.h",
 }
 
 createMAMEProjects(_target, _subtarget, "bfm")
@@ -2088,10 +2089,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/jpmimpctsw.cpp",
 	MAME_DIR .. "src/mame/drivers/pluto5.cpp",
 	MAME_DIR .. "src/mame/drivers/jpmsys7.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.cpp",
-	MAME_DIR .. "src/mame/video/awpvid.h",
-	MAME_DIR .. "src/mame/machine/meters.cpp",
-	MAME_DIR .. "src/mame/machine/meters.h",
 }
 
 createMAMEProjects(_target, _subtarget, "kaneko")
@@ -3855,8 +3852,6 @@ files {
 createMAMEProjects(_target, _subtarget, "tecfri")
 files {
 	MAME_DIR .. "src/mame/drivers/ambush.cpp",
-	MAME_DIR .. "src/mame/includes/ambush.h",
-	MAME_DIR .. "src/mame/video/ambush.cpp",
 	MAME_DIR .. "src/mame/drivers/holeland.cpp",
 	MAME_DIR .. "src/mame/includes/holeland.h",
 	MAME_DIR .. "src/mame/video/holeland.cpp",

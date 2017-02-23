@@ -119,8 +119,8 @@
     electronically (mpla is usually the default, opla is often custom)
   - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-  - some of the games rely on the fact that faster/longer strobed leds appear
-    brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
+  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
+    eg. tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
   - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
   - 7in1ss: in 2-player mode, game select and skill select can be configured
@@ -7822,13 +7822,13 @@ static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
 
 	MCFG_DEVICE_ADD("expander", TMS1025, 0)
-	MCFG_TMS1024_WRITE_PORT_CB(1, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(2, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(3, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(4, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(5, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(6, WRITE8(tbreakup_state, expander_w))
-	MCFG_TMS1024_WRITE_PORT_CB(7, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT1, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT2, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT3, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT4, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT5, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT6, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(TMS1025_PORT7, WRITE8(tbreakup_state, expander_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tbreakup)

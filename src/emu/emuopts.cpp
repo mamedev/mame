@@ -262,21 +262,34 @@ std::string emu_options::sub_value(const char *name, const char *subname) const
 
 
 //-------------------------------------------------
-//  update_cached_options - to prevent tagmap
+//  value_changed - to prevent tagmap
 //    lookups keep copies of frequently requested
 //    options in member variables.
 //-------------------------------------------------
 
-void emu_options::update_cached_options()
+void emu_options::value_changed(const std::string &name, const std::string &value)
 {
-	m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
-	m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY);
-	m_sleep = bool_value(OPTION_SLEEP);
-	m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
-
-	auto ui_option_string = value(OPTION_UI);
-	if (!strcmp(ui_option_string, "simple"))
-		m_ui = UI_SIMPLE;
-	else
-		m_ui = UI_CABINET;
+	if (name == OPTION_COIN_IMPULSE)
+	{
+		m_coin_impulse = int_value(OPTION_COIN_IMPULSE);
+	}
+	else if (name == OPTION_JOYSTICK_CONTRADICTORY)
+	{
+		m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY);
+	}
+	else if (name == OPTION_SLEEP)
+	{
+		m_sleep = bool_value(OPTION_SLEEP);
+	}
+	else if (name == OPTION_REFRESHSPEED)
+	{
+		m_refresh_speed = bool_value(OPTION_REFRESHSPEED);
+	}
+	else if (name == OPTION_UI)
+	{
+		if (value == "simple")
+			m_ui = UI_SIMPLE;
+		else
+			m_ui = UI_CABINET;
+	}
 }

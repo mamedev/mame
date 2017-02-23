@@ -65,15 +65,25 @@ public:
 
 	/* no_argument options will be called with "" argument */
 
-	virtual int parse(const pstring &argument) = 0;
-
 	pstring short_opt() { return m_short; }
 	pstring long_opt() { return m_long; }
 	bool has_argument() { return m_has_argument ; }
+	bool was_specified() { return m_specified; }
+
+	int do_parse(const pstring &argument)
+	{
+		m_specified = true;
+		return parse(argument);
+	}
+
+protected:
+	virtual int parse(const pstring &argument) = 0;
+
 private:
 	pstring m_short;
 	pstring m_long;
 	bool m_has_argument;
+	bool m_specified;
 };
 
 class option_str : public option
@@ -83,9 +93,11 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
+	pstring operator ()() { return m_val; }
+
+protected:
 	virtual int parse(const pstring &argument) override;
 
-	pstring operator ()() { return m_val; }
 private:
 	pstring m_val;
 };
@@ -99,10 +111,11 @@ public:
 		m_limit = plib::psplit(limit, ":");
 	}
 
-	virtual int parse(const pstring &argument) override;
-
 	pstring operator ()() { return m_val; }
 	const std::vector<pstring> &limit() { return m_limit; }
+
+protected:
+	virtual int parse(const pstring &argument) override;
 
 private:
 	pstring m_val;
@@ -116,9 +129,11 @@ public:
 	: option(parent, ashort, along, help, false), m_val(false)
 	{}
 
+	bool operator ()() { return m_val; }
+
+protected:
 	virtual int parse(const pstring &argument) override;
 
-	bool operator ()() { return m_val; }
 private:
 	bool m_val;
 };
@@ -130,9 +145,11 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
+	double operator ()() { return m_val; }
+
+protected:
 	virtual int parse(const pstring &argument) override;
 
-	double operator ()() { return m_val; }
 private:
 	double m_val;
 };
@@ -144,9 +161,11 @@ public:
 	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
+	long operator ()() { return m_val; }
+
+protected:
 	virtual int parse(const pstring &argument) override;
 
-	long operator ()() { return m_val; }
 private:
 	long m_val;
 };
@@ -158,9 +177,11 @@ public:
 	: option(parent, ashort, along, help, true)
 	{}
 
+	std::vector<pstring> operator ()() { return m_val; }
+
+protected:
 	virtual int parse(const pstring &argument) override;
 
-	std::vector<pstring> operator ()() { return m_val; }
 private:
 	std::vector<pstring> m_val;
 };

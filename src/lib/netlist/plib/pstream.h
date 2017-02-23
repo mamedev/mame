@@ -12,6 +12,8 @@
 #include "pfmtlog.h"
 #include "pexception.h"
 
+#include <vector>
+
 namespace plib {
 // -----------------------------------------------------------------------------
 // pstream: things common to all streams
@@ -24,11 +26,6 @@ public:
 	using pos_type = std::size_t;
 
 	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
-
-	explicit pstream(const unsigned flags) : m_flags(flags)
-	{
-	}
-	virtual ~pstream();
 
 	bool seekable() const { return ((m_flags & FLAG_SEEKABLE) != 0); }
 
@@ -43,6 +40,11 @@ public:
 	}
 
 protected:
+	explicit pstream(const unsigned flags) : m_flags(flags)
+	{
+	}
+	virtual ~pstream();
+
 	virtual void vseek(const pos_type n) = 0;
 	virtual pos_type vtell() = 0;
 
@@ -76,7 +78,7 @@ public:
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
 
-	pos_type read(void *buf, const unsigned n)
+	pos_type read(void *buf, const pos_type n)
 	{
 		return vread(buf, n);
 	}
@@ -369,6 +371,76 @@ protected:
 	virtual void vdowrite(const pstring &ls) const override;
 
 private:
+};
+
+// -----------------------------------------------------------------------------
+// pbinary_writer_t: writer on top of ostream
+// -----------------------------------------------------------------------------
+
+class pbinary_writer : plib::nocopyassignmove
+{
+public:
+	explicit pbinary_writer(postream &strm) : m_strm(strm) {}
+	virtual ~pbinary_writer() {}
+
+	template <typename T>
+	void write(const T val)
+	{
+		m_strm.write(&val, sizeof(T));
+	}
+
+	void write(const pstring s)
+	{
+		write(s.blen());
+		m_strm.write(s.c_str(), s.blen());
+	}
+
+	template <typename T>
+	void write(const std::vector<T> val)
+	{
+		std::size_t sz = val.size();
+		write(sz);
+		m_strm.write(val.data(), sizeof(T) * sz);
+	}
+
+private:
+	postream &m_strm;
+};
+
+class pbinary_reader : plib::nocopyassignmove
+{
+public:
+	explicit pbinary_reader(pistream &strm) : m_strm(strm) {}
+	virtual ~pbinary_reader() {}
+
+	template <typename T>
+	void read(T &val)
+	{
+		m_strm.read(&val, sizeof(T));
+	}
+
+	void read( pstring &s)
+	{
+		std::size_t sz = 0;
+		read(sz);
+		pstring::mem_t *buf = new pstring::mem_t[sz+1];
+		m_strm.read(buf, sz);
+		buf[sz] = 0;
+		s = pstring(buf, pstring::UTF8);
+		delete [] buf;
+	}
+
+	template <typename T>
+	void read(std::vector<T> &val)
+	{
+		std::size_t sz = 0;
+		read(sz);
+		val.resize(sz);
+		m_strm.read(val.data(), sizeof(T) * sz);
+	}
+
+private:
+	pistream &m_strm;
 };
 
 }

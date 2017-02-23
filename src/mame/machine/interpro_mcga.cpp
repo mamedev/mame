@@ -69,8 +69,8 @@ WRITE16_MEMBER(interpro_mcga_device::write)
 			   // HACK: set or clear error status depending on ENMMBE bit
 		if (data & MCGA_CTRL_ENMMBE)
 			m_reg[4] |= MCGA_ERROR_VALID;
-		//		else
-		//			m_reg[4] &= ~MCGA_ERROR_VALID;
+		//      else
+		//          m_reg[4] &= ~MCGA_ERROR_VALID;
 
 	default:
 		m_reg[offset] = data;

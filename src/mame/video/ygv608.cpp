@@ -835,7 +835,7 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 	//int xc, yc;
 	//double r, alpha, sin_theta, cos_theta;
 	//const rectangle &visarea = screen.visible_area();
-	
+
 	if( m_regs.s.r7 & r7_zron )
 	{
 		// old code, for reference.
@@ -845,8 +845,8 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		//alpha = atan( (double)xc / (double)yc );
 		//sin_theta = (double)m_dyx / (double)0x10000;
 		//cos_theta = (double)m_dx / (double)0x10000;
-		
-		source_tilemap->draw_roz(screen, bitmap, cliprect, 
+
+		source_tilemap->draw_roz(screen, bitmap, cliprect,
 				m_ax, m_ay,
 				m_dx, m_dxy, m_dyx, m_dy, true, 0, 0 );
 	}
@@ -870,7 +870,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
 	bitmap.fill(0, visarea );
-	
+
 	// punt if not initialized
 	if (m_page_x == 0 || m_page_y == 0)
 	{
@@ -982,7 +982,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	else
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
-		
+
 		copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
 	}
 
@@ -997,7 +997,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
 	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
-	
+
 	if ((m_regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(m_regs.s.r11 & r11_prm) == PRM_SEABDX)
 		draw_sprites(bitmap,finalclip );

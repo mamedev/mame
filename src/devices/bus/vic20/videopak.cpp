@@ -19,7 +19,7 @@
 #define VIDEORAM_SIZE       0x800
 #define RAM_SIZE            0x10000
 
-#define MC6845_TAG       	"mc6845"
+#define MC6845_TAG          "mc6845"
 #define MC6845_SCREEN_TAG   "screen80"
 
 
@@ -314,14 +314,14 @@ void vic20_video_pak_t::vic20_cd_w(address_space &space, offs_t offset, uint8_t 
 		case 0x1bfc:
 			/*
 
-				bit 	description
+			    bit     description
 
-				0		0 = upper case, 1 = lower case
-				1		bank size: 0 = 2x24KB, 1 = 4x16KB
-				2		16KB mode address LSB
-				3		memory address MSB
-				4		0 = enable RAM, 1 = disable RAM
-				5		0 = 40 columns, 1 = 80 columns (Data 20 Video Manager)
+			    0       0 = upper case, 1 = lower case
+			    1       bank size: 0 = 2x24KB, 1 = 4x16KB
+			    2       16KB mode address LSB
+			    3       memory address MSB
+			    4       0 = enable RAM, 1 = disable RAM
+			    5       0 = 40 columns, 1 = 80 columns (Data 20 Video Manager)
 
 			*/
 

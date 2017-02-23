@@ -28,6 +28,10 @@ template <class C, std::size_t N>
 class uninitialised_array_t
 {
 public:
+
+	typedef C* iterator;
+	typedef const C* const_iterator;
+
 	uninitialised_array_t()
 	{
 	}
@@ -38,7 +42,7 @@ public:
 			(*this)[i].~C();
 	}
 
-	size_t size() { return N; }
+	size_t size() const { return N; }
 
 	C& operator[](const std::size_t &index) noexcept
 	{
@@ -56,6 +60,15 @@ public:
 		// allocate on buffer
 		new (&m_buf[index]) C(std::forward<Args>(args)...);
 	}
+
+	iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+	iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+
+	iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+	iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+
+	const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+	const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
 
 protected:
 
@@ -117,13 +130,13 @@ public:
 	constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 	constexpr iter_t end() const noexcept { return iter_t(nullptr); }
 
-	void push_front(LC *elem)
+	void push_front(LC *elem) noexcept
 	{
 		elem->m_next = m_head;
 		m_head = elem;
 	}
 
-	void push_back(LC *elem)
+	void push_back(LC *elem) noexcept
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
@@ -134,7 +147,7 @@ public:
 		elem->m_next = nullptr;
 	}
 
-	void remove(const LC *elem)
+	void remove(const LC *elem) noexcept
 	{
 		auto p = &m_head;
 		for ( ; *p != elem; p = &((*p)->m_next))
@@ -144,9 +157,9 @@ public:
 		(*p) = elem->m_next;
 	}
 
-	LC *front() const { return m_head; }
-	void clear() { m_head = nullptr; }
-	constexpr bool empty() const { return (m_head == nullptr); }
+	LC *front() const noexcept { return m_head; }
+	void clear() noexcept { m_head = nullptr; }
+	constexpr bool empty() const noexcept { return (m_head == nullptr); }
 
 private:
 	LC *m_head;

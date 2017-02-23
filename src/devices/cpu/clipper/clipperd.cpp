@@ -42,7 +42,7 @@ enum
 #define ADDR_RX ((insn[1] & 0xf0) >> 4)
 #define ADDR_I12 (((int16_t)insn[1]) >> 4)
 
-/* 
+/*
  * Branch condition code mnemonics - the forms beginning with 'c' are
  * supposed to be used for branches following comparison instructions,
  * while those beginning with 'r' are for use after move or logical
@@ -70,7 +70,7 @@ static const char *const cc[] =
 };
 
 /*
- * Decode an addressing mode into a string. 
+ * Decode an addressing mode into a string.
  */
 char *address (offs_t pc, u16 *insn)
 {
@@ -108,16 +108,16 @@ CPU_DISASSEMBLE(clipper)
 
 	switch (insn[0] >> 8)
 	{
-	case 0x00: 
+	case 0x00:
 		if (oprom[0] == 0)
 			util::stream_format(stream, "noop");
 		else
 			util::stream_format(stream, "noop $%d", oprom[0]);
-		bytes = 2; 
+		bytes = 2;
 		break;
 
 	case 0x10: util::stream_format(stream, "movwp   r%d,%s", R2, R1 == 0 ? "psw" : R1 == 1 ? "ssw" : "sswf"); bytes = 2; break;
-	case 0x11: util::stream_format(stream, "movpw   %s,r%d", R1 == 0 ? "psw" : "ssw", R2); bytes = 2; break; 
+	case 0x11: util::stream_format(stream, "movpw   %s,r%d", R1 == 0 ? "psw" : "ssw", R2); bytes = 2; break;
 	case 0x12: util::stream_format(stream, "calls   $%d", insn[0] & 0x7F); bytes = 2; flags |= DASMFLAG_STEP_OVER; break;
 	case 0x13: util::stream_format(stream, "ret     r%d", R2); bytes = 2; flags |= DASMFLAG_STEP_OUT; break;
 	case 0x14: util::stream_format(stream, "pushw   r%d,r%d", R2, R1); bytes = 2; break;
@@ -211,7 +211,7 @@ CPU_DISASSEMBLE(clipper)
 	case 0x7d: util::stream_format(stream, "storh   r%d,%s", ADDR_R2, address(pc, insn)); bytes = 2 + ADDR_SIZE; break;
 
 	case 0x80: util::stream_format(stream, "addw    r%d,r%d", R1, R2); bytes = 2; break;
-		
+
 	case 0x82: util::stream_format(stream, "addq    $%d,r%d", R1, R2); bytes = 2; break;
 	case 0x83: util::stream_format(stream, "addi    $%d,r%d", IMM_VALUE, R2); bytes = 2 + IMM_SIZE; break;
 	case 0x84: util::stream_format(stream, "movw    r%d,r%d", R1, R2); bytes = 2; break;

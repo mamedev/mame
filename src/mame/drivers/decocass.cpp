@@ -14,10 +14,10 @@
     The Dumping Union
     Team Japump!!!
     Hau
-	Jean-Francois Del Nero
-	Omar Cornut
-	Game Preservation Society
-	Joseph Redon
+    Jean-Francois Del Nero
+    Omar Cornut
+    Game Preservation Society
+    Joseph Redon
 
     The DECO cassette system consists of three PCBS in a card cage:
     Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
@@ -25,7 +25,7 @@
     One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor and bios, graphics, dipswitches?)
     One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
     One DE-0066B-0 card rack board that the other three boards plug into.
-	This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
+    This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
     Later boardset: (1984 onward, schematic is dated October 1983)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
@@ -35,9 +35,9 @@
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
     Each cassette has one track on it and is separated into clock and data by two Magtek IC in the player, for a form of synchronous serial.
-	The data is stored in blocks with headers and CRC16 checksums.
-	The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
-	The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
+    The data is stored in blocks with headers and CRC16 checksums.
+    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
+    The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
 
  ***********************************************************************/
 
@@ -677,7 +677,7 @@ static INPUT_PORTS_START( cfboy0a1 ) /* 12 */
 	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
 	PORT_DIPNAME( 0x08, 0x08, "Number of Alien Missiles" )               PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )	
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	PORT_DIPNAME( 0x10, 0x10, "Alien Craft Movement" )                   PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )

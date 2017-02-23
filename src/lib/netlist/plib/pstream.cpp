@@ -9,7 +9,6 @@
 #include "palloc.h"
 
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
 #include <algorithm>
 
@@ -278,7 +277,7 @@ pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
 
 	if (ret > 0)
 	{
-		memcpy(buf, m_mem + m_pos, ret);
+		std::copy(m_mem + m_pos, m_mem + m_pos + ret, static_cast<char *>(buf));
 		m_pos += ret;
 	}
 
@@ -331,11 +330,11 @@ void pomemstream::vwrite(const void *buf, const pos_type n)
 		{
 			throw out_of_mem_e("pomemstream::vwrite");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 
-	memcpy(m_mem + m_pos, buf, n);
+	std::copy(static_cast<const char *>(buf), static_cast<const char *>(buf) + n, m_mem + m_pos);
 	m_pos += n;
 	m_size = std::max(m_pos, m_size);
 }
@@ -354,7 +353,7 @@ void pomemstream::vseek(const pos_type n)
 		{
 			throw out_of_mem_e("pomemstream::vseek");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 }

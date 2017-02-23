@@ -219,9 +219,9 @@ void vme_device::static_set_cputag(device_t &device, const char *tag)
 	vme.m_cputag = tag;
 }
 
-// static_set_use_owner_spaces - disables use of the memory interface and use the address spaces 
+// static_set_use_owner_spaces - disables use of the memory interface and use the address spaces
 // of the owner instead. This is useful for VME buses where no address modifiers or arbitration is
-// being used and gives some gain in performance. 
+// being used and gives some gain in performance.
 void vme_device::static_use_owner_spaces(device_t &device)
 {
 	LOG("%s %s\n", device.tag(), FUNCNAME);
@@ -288,9 +288,9 @@ void vme_device::add_vme_card(device_vme_card_interface *card)
 }
 
 #if 0
-/* 
+/*
  *  Install UB (Utility Bus) handlers for this board
- * 
+ *
  * The Utility Bus signal lines
  *------------------------------
  * System Clock (SYSCLK)
@@ -306,7 +306,7 @@ void vme_device::install_ub_handler(offs_t start, offs_t end, read8_delegate rha
 }
 #endif
 
-/* 
+/*
  *  Install DTB (Data Transfer Bus) handlers for this board
  */
 
@@ -331,11 +331,11 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
 		break;
-	case 24: 
+	case 24:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
 		break;
 	case 32:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask); 
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	default: fatalerror("VME D8: Bus width %d not supported\n", m_prgwidth);
 	}
@@ -362,11 +362,11 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read1
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
 		break;
-	case 24: 
+	case 24:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
 		break;
 	case 32:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask); 
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	default: fatalerror("VME D16: Bus width %d not supported\n", m_prgwidth);
 	}
@@ -393,11 +393,11 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read3
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
 		break;
-	case 24: 
+	case 24:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
 		break;
 	case 32:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask); 
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	default: fatalerror("VME D32: Bus width %d not supported\n", m_prgwidth);
 	}

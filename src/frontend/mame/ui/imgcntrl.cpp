@@ -223,7 +223,7 @@ void menu_control_device_image::handle()
 		}
 		else
 		{
-			m_swp = &m_swi->parts().front();
+			m_swp = m_swi->find_part("", m_image.image_interface());
 			load_software_part();
 		}
 		break;

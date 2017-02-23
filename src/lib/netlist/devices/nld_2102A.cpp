@@ -75,7 +75,7 @@ namespace netlist
 			unsigned a = 0;
 			for (std::size_t i=0; i<10; i++)
 			{
-				a |= m_A[i]() << i;
+				a |= (m_A[i]() << i);
 			}
 			const unsigned byte = ADDR2BYTE(a);
 			const unsigned bit = ADDR2BIT(a);

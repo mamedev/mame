@@ -31,10 +31,16 @@
  */
 #define USE_MEMPOOL                 (0)
 
-#define USE_TRUTHTABLE              (1)
+/*
+ * FIXME: Using truthtable is a lot slower than the explicit device
+ *        in breakout. Performance drops by 20%. This can be fixed by
+ *        setting param USE_DEACTIVATE for the device.
+ */
+
+#define USE_TRUTHTABLE_7448 (0)
 
 // How many times do we try to resolve links (connections)
-#define NL_MAX_LINK_RESOLVE_LOOPS	(100)
+#define NL_MAX_LINK_RESOLVE_LOOPS   (100)
 
 //============================================================
 //  Solver defines
