@@ -1921,6 +1921,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/txc.h",
 		MAME_DIR .. "src/devices/bus/nes/waixing.cpp",
 		MAME_DIR .. "src/devices/bus/nes/waixing.h",
+		MAME_DIR .. "src/devices/bus/nes/zemina.cpp",
+		MAME_DIR .. "src/devices/bus/nes/zemina.h",
 	}
 end
 
