@@ -174,12 +174,6 @@ INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,ladybugg)
-{
-	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
-}
-
 DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
 {
 	int i;
