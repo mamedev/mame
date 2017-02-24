@@ -41,7 +41,7 @@ Games on this system include....
 |*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
 | | 20041209 | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
 |*| 2005     | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
-| | 2004     | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
+|*| 2004     | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
 |*| 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
 | | 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
 |*| 200504   | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
@@ -1909,6 +1909,16 @@ ROM_START( gundamos )
 	ROM_LOAD("317-0400-jpn.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
 ROM_END
 
+ROM_START( outr2sto )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0014", 0, SHA1(95fa57242e3b708c134c2a34616b745d96c6c811) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
+ROM_END
+
 ROM_START( outr2st )
 	CHIHIRO_BIOS
 
@@ -2126,7 +2136,7 @@ ROM_END
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0012A */ GAME( 2004, ghostsqu, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (Rev A) (GDX-0012A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0013  */ GAME( 2005, gundamos, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Gundam Battle Operating Simulator (GDX-0013)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0014     GAME( 2004, outr2sto, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (GDX-0014)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0014  */ GAME( 2004, outr2sto, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (GDX-0014)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0014A */ GAME( 2004, outr2st,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Rev A) (GDX-0014A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0015  */ GAME( 2005, wangmid2j,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0015A */ GAME( 2005, wangmid2ja,wangmid2,chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0015A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
