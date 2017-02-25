@@ -21,10 +21,6 @@
 #include "../gtx/closest_point.hpp"
 #include "../gtx/vector_query.hpp"
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#	error "GLM: GLM_GTX_closest_point is an experimental extension and may change in the future. Use #define GLM_ENABLE_EXPERIMENTAL before including it, if you really want to use it."
-#endif
-
 #if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_closest_point extension included")
 #endif
@@ -37,24 +33,23 @@ namespace glm
 	//! Compute the intersection of a ray and a plane.
 	//! Ray direction and plane normal must be unit length.
 	//! From GLM_GTX_intersect extension.
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectRayPlane(
 		genType const & orig, genType const & dir,
 		genType const & planeOrig, genType const & planeNormal,
 		typename genType::value_type & intersectionDistance);
 
 	//! Compute the intersection of a ray and a triangle.
-	/// Based om Tomas Möller implementation http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/raytri/
 	//! From GLM_GTX_intersect extension.
-	template<typename T, precision P>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectRayTriangle(
-		vec<3, T, P> const& orig, vec<3, T, P> const& dir,
-		vec<3, T, P> const& v0, vec<3, T, P> const& v1, vec<3, T, P> const& v2,
-		vec<3, T, P>& baryPosition, T& distance);
+		genType const & orig, genType const & dir,
+		genType const & vert0, genType const & vert1, genType const & vert2,
+		genType & baryPosition);
 
 	//! Compute the intersection of a line and a triangle.
 	//! From GLM_GTX_intersect extension.
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectLineTriangle(
 		genType const & orig, genType const & dir,
 		genType const & vert0, genType const & vert1, genType const & vert2,
@@ -63,7 +58,7 @@ namespace glm
 	//! Compute the intersection distance of a ray and a sphere. 
 	//! The ray direction vector is unit length.
 	//! From GLM_GTX_intersect extension.
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectRaySphere(
 		genType const & rayStarting, genType const & rayNormalizedDirection,
 		genType const & sphereCenter, typename genType::value_type const sphereRadiusSquered,
@@ -71,7 +66,7 @@ namespace glm
 
 	//! Compute the intersection of a ray and a sphere.
 	//! From GLM_GTX_intersect extension.
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectRaySphere(
 		genType const & rayStarting, genType const & rayNormalizedDirection,
 		genType const & sphereCenter, const typename genType::value_type sphereRadius,
@@ -79,7 +74,7 @@ namespace glm
 
 	//! Compute the intersection of a line and a sphere.
 	//! From GLM_GTX_intersect extension
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_DECL bool intersectLineSphere(
 		genType const & point0, genType const & point1,
 		genType const & sphereCenter, typename genType::value_type sphereRadius,

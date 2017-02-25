@@ -1,75 +1,70 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// OpenGL Image Copyright (c) 2008 - 2011 G-Truc Creation (www.g-truc.net)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Created : 2011-04-06
+// Updated : 2011-04-06
+// Licence : This source is under MIT License
+// File    : gli/core/texture_cube.inl
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 namespace gli
 {
-	inline texture_cube::texture_cube()
+	inline textureCube::textureCube()
 	{}
 
-	inline texture_cube::texture_cube(format_type Format, extent_type const& Extent, swizzles_type const& Swizzles)
-		: texture(TARGET_CUBE, Format, texture::extent_type(Extent, 1), 1, 6, gli::levels(Extent), Swizzles)
-	{}
-
-	inline texture_cube::texture_cube(format_type Format, extent_type const& Extent, size_type Levels, swizzles_type const& Swizzles)
-		: texture(TARGET_CUBE, Format, texture::extent_type(Extent, 1), 1, 6, Levels, Swizzles)
-	{}
-
-	inline texture_cube::texture_cube(texture const& Texture)
-		: texture(Texture, TARGET_CUBE, Texture.format())
-	{}
-
-	inline texture_cube::texture_cube
+	inline textureCube::textureCube
 	(
-		texture const& Texture,
-		format_type Format,
-		size_type BaseLayer, size_type MaxLayer,
-		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel,
-		swizzles_type const& Swizzles
+		level_type const & Levels
 	)
-		: texture(
-			Texture, TARGET_CUBE, Format,
-			BaseLayer, MaxLayer,
-			BaseFace, MaxFace,
-			BaseLevel, MaxLevel,
-			Swizzles)
+	{
+		this->Faces.resize(FACE_MAX);
+		for(textureCube::size_type i = 0; i < FACE_MAX; ++i)
+			this->Faces[i].resize(Levels);
+	}
+
+	inline textureCube::~textureCube()
 	{}
 
-	inline texture_cube::texture_cube
+	inline texture2D & textureCube::operator[] 
 	(
-		texture_cube const& Texture,
-		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		face_type const & Face
 	)
-		: texture(
-			Texture, TARGET_CUBE, Texture.format(),
-			Texture.base_layer(), Texture.max_layer(),
-			Texture.base_face() + BaseFace, Texture.base_face() + MaxFace,
-			Texture.base_level() + BaseLevel, Texture.base_level() + MaxLevel)
-	{}
-
-	inline texture2d texture_cube::operator[](size_type Face) const
 	{
-		GLI_ASSERT(Face < this->faces());
-
-		return texture2d(
-			*this, this->format(),
-			this->base_layer(), this->max_layer(),
-			this->base_face() + Face, this->base_face() + Face,
-			this->base_level(), this->max_level());
+		return this->Faces[Face];
 	}
 
-	inline texture_cube::extent_type texture_cube::extent(size_type Level) const
+	inline texture2D const & textureCube::operator[] 
+	(
+		face_type const & Face
+	) const
 	{
-		return extent_type(this->texture::extent(Level));
+		return this->Faces[Face];
 	}
 
-	template <typename gen_type>
-	inline gen_type texture_cube::load(extent_type const& TexelCoord, size_type Face, size_type Level) const
+	inline bool textureCube::empty() const
 	{
-		return this->texture::load<gen_type>(texture::extent_type(TexelCoord, 0), 0, Face, Level);
+		return this->Faces.size() == 0;
 	}
 
-	template <typename gen_type>
-	inline void texture_cube::store(extent_type const& TexelCoord, size_type Face, size_type Level, gen_type const& Texel)
+	inline textureCube::format_type textureCube::format() const
 	{
-		this->texture::store<gen_type>(texture::extent_type(TexelCoord, 0), 0, Face, Level, Texel);
+		return this->Faces.empty() ? FORMAT_NULL : this->Faces[0].format();
 	}
+
+	inline textureCube::level_type textureCube::levels() const
+	{
+		if(this->empty())
+			return 0;
+		return this->Faces[POSITIVE_X].levels();
+	}
+
+	inline void textureCube::resize
+	(
+		level_type const & Levels
+	)
+	{
+		for(textureCube::size_type i = 0; i < FACE_MAX; ++i)
+			this->Faces[i].resize(Levels);
+	}
+
 }//namespace gli
