@@ -2344,7 +2344,7 @@ static MACHINE_CONFIG_DERIVED( dkongjrm, mooncrst )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rockclim, galaxian )
+static MACHINE_CONFIG_DERIVED( rockclim, mooncrst )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
