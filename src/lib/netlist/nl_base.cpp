@@ -147,7 +147,7 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_t &nl)
-	: timed_queue<net_t *, netlist_time>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>>(512)
 	, netlist_ref(nl)
 	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
@@ -537,13 +537,15 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 
 	if (m_mainclock == nullptr)
 	{
-		detail::queue_t::entry_t e(m_queue.pop());
+		detail::queue_t::entry_t e(m_queue.top());
+		m_queue.pop();
 		m_time = e.m_exec_time;
 		while (e.m_object != nullptr)
 		{
 			e.m_object->update_devs();
 			m_perf_out_processed.inc();
-			e = m_queue.pop();
+			e = m_queue.top();
+			m_queue.pop();
 			m_time = e.m_exec_time;
 		}
 	}
@@ -565,7 +567,8 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 				mc_time += inc;
 			}
 
-			e = m_queue.pop();
+			e = m_queue.top();
+			m_queue.pop();
 			m_time = e.m_exec_time;
 			if (e.m_object != nullptr)
 			{
@@ -780,9 +783,9 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, netlist_ref(nl)
 	, m_new_Q(*this, "m_new_Q", 0)
 	, m_cur_Q (*this, "m_cur_Q", 0)
+	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_active(*this, "m_active", 0)
-	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
 	, m_railterminal(mr)
 {
