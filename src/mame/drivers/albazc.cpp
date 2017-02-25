@@ -3,6 +3,11 @@
 /* Hanaroku - Alba ZC HW */
 
 /*
+Payout:
+ Once the "Payout" button is pressed, The game waits for a "Medal In" signal to indicate a Medal was dispensed.
+ Once it receives the signal - The game decreases the credit count.
+ (The payout dispenses only one medal per press)
+ 
 TODO:
 - colour decoding might not be perfect
 - Background color should be green, but current handling might be wrong.
@@ -210,7 +215,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Medal In")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
