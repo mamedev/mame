@@ -327,5 +327,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
-CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "NOVAG Industries Ltd",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "SciSys / Novag",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany
