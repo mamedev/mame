@@ -47,12 +47,12 @@ public:
 	typedef Ratio										period;
 	typedef std::chrono::duration<rep, period>			duration;
 	typedef std::chrono::time_point<arbitrary_clock>	time_point;
-	static const int base_year = Y;
-	static const int base_month = M;
-	static const int base_day = D;
-	static const int base_hour = H;
-	static const int base_minute = N;
-	static const int base_second = S;
+	static constexpr int base_year = Y;
+	static constexpr int base_month = M;
+	static constexpr int base_day = D;
+	static constexpr int base_hour = H;
+	static constexpr int base_minute = N;
+	static constexpr int base_second = S;
 
 	//---------------------------------------------------------
 	//	from_arbitrary_time_point - converts an arbitrary_clock
@@ -62,14 +62,14 @@ public:
 	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
 	static time_point from_arbitrary_time_point(const std::chrono::time_point<arbitrary_clock<Rep2, Y2, M2, D2, H2, N2, S2, Ratio2> > &tp)
 	{
-		int64_t our_absolute_day = absolute_day(Y, M, D);
-		int64_t their_absolute_day = absolute_day(Y2, M2, D2);
+		const int64_t our_absolute_day = absolute_day(Y, M, D);
+		const int64_t their_absolute_day = absolute_day(Y2, M2, D2);
 
-		auto our_fract_day = std::chrono::hours(H) + std::chrono::minutes(N) + std::chrono::seconds(S);
-		auto their_fract_day = std::chrono::hours(H2) + std::chrono::minutes(N2) + std::chrono::seconds(S2);
+		const auto our_fract_day = std::chrono::hours(H) + std::chrono::minutes(N) + std::chrono::seconds(S);
+		const auto their_fract_day = std::chrono::hours(H2) + std::chrono::minutes(N2) + std::chrono::seconds(S2);
 
-		std::chrono::duration<Rep, Ratio> adjustment(std::chrono::hours(24) * (their_absolute_day - our_absolute_day) + (their_fract_day - our_fract_day));
-		duration result_duration = std::chrono::duration_cast<duration>(tp.time_since_epoch() + adjustment);
+		const std::chrono::duration<Rep, Ratio> adjustment(std::chrono::hours(24) * (their_absolute_day - our_absolute_day) + (their_fract_day - our_fract_day));
+		const duration result_duration = std::chrono::duration_cast<duration>(tp.time_since_epoch() + adjustment);
 		return time_point(result_duration);
 	}
 
@@ -149,10 +149,10 @@ private:
 
 	static struct tm internal_to_tm(std::chrono::duration<std::int64_t, std::ratio<1, 1> > duration)
 	{
-		constexpr auto days_in_year(365);
-		constexpr auto days_in_four_years((days_in_year * 4) + 1);
-		constexpr auto days_in_century((days_in_four_years * 25) - 1);
-		constexpr auto days_in_four_centuries((days_in_century * 4) + 1);
+		constexpr int days_in_year(365);
+		constexpr int days_in_four_years((days_in_year * 4) + 1);
+		constexpr int days_in_century((days_in_four_years * 25) - 1);
+		constexpr int days_in_four_centuries((days_in_century * 4) + 1);
 
 		constexpr tm_conversion_clock::duration day(std::chrono::hours(24));
 		constexpr tm_conversion_clock::duration year(day * days_in_year);
@@ -162,21 +162,21 @@ private:
 
 		// figure out the day of week (note that 0 is Sunday, but January 1st 1601 is
 		// a Monday, so we have to adjust by one day)
-		int day_of_week = (int)(((duration + std::chrono::hours(24)) / day) % 7);
+		const int day_of_week = int((duration + std::chrono::hours(24)) / day % 7);
 
 		// figure out the year
-		int four_centuries_count = (int)(duration / four_centuries);
+		const int four_centuries_count = int(duration / four_centuries);
 		duration -= four_centuries_count * four_centuries;
-		int century_count = std::min((int)(duration / century), 3);
+		const int century_count = std::min(int(duration / century), 3);
 		duration -= century_count * century;
-		int four_years_count = std::min((int)(duration / four_years), 25);
+		const int four_years_count = std::min(int(duration / four_years), 25);
 		duration -= four_years_count * four_years;
-		int year_count = (int)(duration / year);
+		const int year_count = int(duration / year);
 		duration -= year_count * year;
-		int actual_year = tm_conversion_clock::base_year + four_centuries_count * 400 + century_count * 100 + four_years_count * 4 + year_count;
+		const int actual_year = tm_conversion_clock::base_year + four_centuries_count * 400 + century_count * 100 + four_years_count * 4 + year_count;
 
 		// figure out the day in the year
-		int day_in_year = (int)(duration / day);
+		const int day_in_year = int(duration / day);
 		duration -= day_in_year * day;
 
 		// figure out the month
@@ -192,11 +192,11 @@ private:
 			throw false;
 
 		// figure out the time
-		int hour = (int)(duration / std::chrono::hours(1));
+		const int hour = int(duration / std::chrono::hours(1));
 		duration -= std::chrono::hours(hour);
-		int minute = (int)(duration / std::chrono::minutes(1));
+		const int minute = int(duration / std::chrono::minutes(1));
 		duration -= std::chrono::minutes(minute);
-		int second = (int)(duration / std::chrono::seconds(1));
+		const int second = int(duration / std::chrono::seconds(1));
 		duration -= std::chrono::seconds(second);
 
 		// populate the result and return

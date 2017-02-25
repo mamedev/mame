@@ -29,7 +29,7 @@ uint32_t bcd_2_dec(uint32_t a);
     GREGORIAN CALENDAR HELPERS
 ***************************************************************************/
 
-inline constexpr bool gregorian_is_leap_year(int year)
+constexpr bool gregorian_is_leap_year(int year)
 {
 	return !((year % 100) ? (year % 4) : (year % 400));
 }
@@ -48,7 +48,7 @@ inline int gregorian_days_in_month(int month, int year)
 	{
 	case 4: case 6:
 	case 9: case 11:
-		// Thirty days has September, April, June, and November.
+		// Thirty days have September, April, June, and November.
 		result = 30;
 		break;
 

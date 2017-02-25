@@ -40,11 +40,12 @@ static std::chrono::system_clock::duration calculate_system_clock_adjustment()
 	constexpr auto days_in_four_centuries((days_in_century * 4) + 1);
 
 	// can't use std::chrono::system_clock::duration here, out of fear of integer overflow
-	constexpr std::chrono::duration<std::int64_t, std::ratio<1, 1> > day(std::chrono::hours(24));
-	constexpr std::chrono::duration<std::int64_t, std::ratio<1, 1> > year(day * days_in_year);
-	constexpr std::chrono::duration<std::int64_t, std::ratio<1, 1> > four_years(day * days_in_four_years);
-	constexpr std::chrono::duration<std::int64_t, std::ratio<1, 1> > century(day * days_in_century);
-	constexpr std::chrono::duration<std::int64_t, std::ratio<1, 1> > four_centuries(day * days_in_four_centuries);
+	typedef std::chrono::duration<std::int64_t, std::ratio<1, 1> > int64_second_duration;
+	constexpr int64_second_duration day(std::chrono::hours(24));
+	constexpr int64_second_duration year(day * days_in_year);
+	constexpr int64_second_duration four_years(day * days_in_four_years);
+	constexpr int64_second_duration century(day * days_in_century);
+	constexpr int64_second_duration four_centuries(day * days_in_four_centuries);
 
 	std::time_t const zero(0);
 	std::tm const epoch(*std::gmtime(&zero));
@@ -75,7 +76,7 @@ static std::chrono::system_clock::duration calculate_system_clock_adjustment()
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d)
 {
 	typedef arbitrary_clock<std::uint64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 10000000 > > ntfs_clock;
-	std::chrono::time_point<ntfs_clock> tp(d);
+	const std::chrono::time_point<ntfs_clock> tp(d);
 	return ntfs_clock::to_system_clock(tp);
 }
 
