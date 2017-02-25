@@ -43,7 +43,7 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 
 mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM5740, "MM5740", tag, owner, clock, "mm5740", __FILE__),
-	m_read_x({*this, *this, *this, *this, *this, *this, *this, *this, *this}),
+	m_read_x{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
 	m_read_shift(*this),
 	m_read_control(*this),
 	m_write_data_ready(*this),

@@ -107,7 +107,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
-	uint8_t m_term_data;
+	//uint8_t m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
