@@ -1002,8 +1002,8 @@ ROM_START( openicea ) /* PCB had alternate ROM labels showing the dates & checks
 	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U3  OPEN ICE HOCKEY  9/1/95  C200 */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
-	ROM_LOAD16_BYTE( "open_ice_781c_r1.2a.u54", 0x00000, 0x80000, CRC(63296053) SHA1(9f6fcb1f95a09165c211b569001563b56d06876c) ) /* hand written as  781C  R1.21 - games reports as Revision 1.2A */
-	ROM_LOAD16_BYTE( "open_ice_6937_r1.2a.u63", 0x00001, 0x80000, CRC(04441034) SHA1(d0af6305749a26adddb17aabb512e0347fcac767) ) /* hand written as  6937  R1.21 - games reports as Revision 1.2A */
+	ROM_LOAD16_BYTE( "open_ice_781c_r1.2a.u54", 0x00000, 0x80000, CRC(63296053) SHA1(9f6fcb1f95a09165c211b569001563b56d06876c) ) /* hand written as  781C  R1.21 - game reports as Revision 1.2A */
+	ROM_LOAD16_BYTE( "open_ice_6937_r1.2a.u63", 0x00001, 0x80000, CRC(04441034) SHA1(d0af6305749a26adddb17aabb512e0347fcac767) ) /* hand written as  6937  R1.21 - game reports as Revision 1.2A */
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 ) /* label for U133 is likely for v1.1 with different data for that bank of 4 roms dated 9/14/95 */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u133", 0x0000000, 0x100000, CRC(8a81605c) SHA1(cf397b8da242566b21579b90528857ccd2f93141) ) /* 2M.0  U133  OPEN ICE HOCKEY  9/14/95  EE39 - however, this should be: 2M.0  U133  OPEN ICE HOCKEY  10/17/95  04E5 - Same as parent */
@@ -1012,7 +1012,7 @@ ROM_START( openicea ) /* PCB had alternate ROM labels showing the dates & checks
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u130", 0x0000003, 0x100000, CRC(74c2d50c) SHA1(7880a28b003aa44878384efcb72b98833383f67e) ) /* 2M.3  U130  OPEN ICE HOCKEY  10/17/95  D784 */
 
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u129", 0x0400000, 0x100000, CRC(9e2ff012) SHA1(35160ab239f0d8efcb2dc67dee4bd8d204226e3d) ) /* 4M.0  U129  OPEN ICE HOCKEY  9/14/95  97E0 */
-	ROM_LOAD32_BYTE( "open_ice_l1.2.u128", 0x0400001, 0x100000, CRC(35d2e610) SHA1(c4bd18f44592299f120344ecaf1464a8b31d80c8) ) /* 4M.1	U128  OPEN ICE HOCKEY  9/14/95  96FC */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u128", 0x0400001, 0x100000, CRC(35d2e610) SHA1(c4bd18f44592299f120344ecaf1464a8b31d80c8) ) /* 4M.1  U128  OPEN ICE HOCKEY  9/14/95  96FC */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u127", 0x0400002, 0x100000, CRC(bcbf19fe) SHA1(e28f0238ef020b75b10318e5c3dd4c5472b3638a) ) /* 4M.2  U127  OPEN ICE HOCKEY  9/14/95  6A67 */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u126", 0x0400003, 0x100000, CRC(8e3106ae) SHA1(58d1fd097e23578195d28671f22cfa3ed161c0f5) ) /* 4M.3  U126  OPEN ICE HOCKEY  9/14/95  E92F */
 
