@@ -42,6 +42,9 @@ write
 #include "sound/ay8910.h"
 #include "includes/marineb.h"
 
+#define MASTER_CLOCK (XTAL_12MHz)
+#define CPU_CLOCK (MASTER_CLOCK/4)
+#define SOUND_CLOCK (MASTER_CLOCK/8)
 
 void marineb_state::machine_reset()
 {

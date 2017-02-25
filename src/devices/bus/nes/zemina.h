@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Kaz
-#ifndef __NES_ZEMINA_H
-#define __NES_ZEMINA_H
+#ifndef MAME_BUS_NES_ZEMINA_H
+#define MAME_BUS_NES_ZEMINA_H
 
 #include "nxrom.h"
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
 // ======================> nes_zemina_device
 
-class nes_zemina_device : public nes_nrom_device
+class nes_zemina_device :
+		public nes_nrom_device
 {
 public:
 	// construction/destruction
@@ -23,4 +28,4 @@ public:
 // device type definition
 extern const device_type NES_ZEMINA;
 
-#endif
+#endif /* MAME_BUS_NES_ZEMINA_H */
