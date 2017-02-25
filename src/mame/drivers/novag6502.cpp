@@ -11,7 +11,7 @@
     such as Arena(in editmode).
 
     TODO:
-    - cforteb emulation (was initially sforteba romset)
+    - cforteb lcd (chip unknown, probably serially via 1f00 w)
     - verify supercon IRQ and beeper frequency
     - sforte irq active time (21.5us is too long)
     - sforte/sexpert led handling is correct?
@@ -29,11 +29,14 @@ Super Constellation Chess Computer (model 844):
 ******************************************************************************
 
 Constellation Forte:
-- x
+- 65C02 @ 5MHz
+- 4KB RAM, 64KB ROM
+- 10-digit 7seg LCD display
+- TTL, 18 LEDs, 8*8 chessboard buttons
 
 When it was first added to MAME as skeleton driver in mmodular.c, this romset
 was assumed to be Super Forte B, but it definitely isn't. I/O is similar to
-Super Constellation, let's assume for now it's a Constellation Forte B.
+Super Constellation, it's near-certainly a Constellation Forte B.
 
 
 ******************************************************************************
@@ -61,6 +64,7 @@ instead of magnet sensors.
 #include "machine/nvram.h"
 
 // internal artwork
+#include "novag_cforte.lh" // clickable
 #include "novag_sexpert.lh" // clickable
 #include "novag_sforte.lh" // clickable
 #include "novag_supercon.lh" // clickable
@@ -214,6 +218,17 @@ void novagbase_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void novagbase_state::set_display_segmask(u32 digits, u32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
 }
 
 void novagbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
@@ -422,7 +437,7 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
     Address Maps
 ******************************************************************************/
 
-// Super Constellation
+// Super Constellation / Constellation Forte
 
 static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
@@ -430,15 +445,6 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITENOP // printer/clock?
 	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, supercon_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, supercon_control_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-// Constellation Forte
-
-static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -674,6 +680,43 @@ static INPUT_PORTS_START( supercon )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( cforte )
+	PORT_INCLUDE( cb_buttons )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Player/Player / Gambit/Large / King")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Verify/Set Up / Pro-Op")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Random/Tour/Normal / Training Level / Queen")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Change Color / Time Control / Priority")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Depth Search / Bishop")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Flip Display / Clear Board / Clear Book")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Solve Mate / Infinite / Knight")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves / Print Evaluations / Print Book")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Print Board / Interface / Rook")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Trace Forward / Auto Play / No/End")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint / Next Best / Yes/Start")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Set Level")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Go / ->")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Take Back / Restore / <-")
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sexy_shared )
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
@@ -765,12 +808,12 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 250) // guessed
-	MCFG_CPU_PROGRAM_MAP(cforte_map)
+	MCFG_CPU_PROGRAM_MAP(supercon_map)
 
-	//MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
+	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -922,7 +965,7 @@ ROM_END
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     INIT                      COMPANY, FULLNAME, FLAGS */
 CONS( 1984, supercon,  0,        0,      supercon, supercon, driver_device,   0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, cforteb,   0,        0,      cforte,   supercon, driver_device,   0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1986, cforteb,   0,        0,      cforte,   cforte,   driver_device,   0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
