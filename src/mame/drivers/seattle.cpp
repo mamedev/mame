@@ -2727,6 +2727,11 @@ static MACHINE_CONFIG_DERIVED( sfrushrk, flagstaff )
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sfrushrkw, sfrushrk )
+	MCFG_DEVICE_MODIFY("ioasic")
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( calspeed, seattle150_widget )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
@@ -2912,7 +2917,7 @@ ROM_END
 
 
 ROM_START( sfrushrk )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code 1.0 Oct 2 1997*/
 	ROM_LOAD( "boot.bin",   0x000000, 0x080000, CRC(0555b3cf) SHA1(a48abd6d06a26f4f9b6c52d8c0af6095b6be57fd) )
 
 	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
@@ -2930,6 +2935,43 @@ ROM_START( sfrushrk )
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 ROM_END
 
+ROM_START( sfrushrkw )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code */
+	ROM_LOAD( "1ff6.bin",   0x000000, 0x080000, CRC(0b30f080) SHA1(2dfa14b927d1c185e6876b1bf464c117682331c9) ) // Hand written "Rush The Rock w/wavenet 1ff6 8/10/97"
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
+
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
+	ROM_LOAD32_WORD( "audio.u62",  0x400000, 0x200000, CRC(cacf09e3) SHA1(349af1767cb0ee2a0eb9d7c2ab078fcae5fec8e7) )
+	ROM_LOAD32_WORD( "audio.u61",  0x400002, 0x200000, CRC(ea895d29) SHA1(1edde0497f2abd1636c5d7bcfbc03bcff321261c) )
+	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
+	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
+
+	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.2 */
+	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+ROM_END
+
+ROM_START( sfrushrkwo )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code */
+	ROM_LOAD( "boottest.bin",   0x000000, 0x080000, CRC(3f83f8e0) SHA1(c1862fc35c119586f79f23c52ecea6c35c37828a) ) // Labeled "Rush The Rock Boot Eeprom Test Only"
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
+
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
+	ROM_LOAD32_WORD( "audio.u62",  0x400000, 0x200000, CRC(cacf09e3) SHA1(349af1767cb0ee2a0eb9d7c2ab078fcae5fec8e7) )
+	ROM_LOAD32_WORD( "audio.u61",  0x400002, 0x200000, CRC(ea895d29) SHA1(1edde0497f2abd1636c5d7bcfbc03bcff321261c) )
+	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
+	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
+
+	DISK_REGION( "ide:0:hdd:image" )    /* Hard Drive Version 1.2 */
+	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+ROM_END
 
 ROM_START( calspeed )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
@@ -3323,28 +3365,30 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
  *************************************/
 
 /* Atari */
-GAME( 1996, wg3dh,    0,        wg3dh,             wg3dh, seattle_state,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, mace,     0,        mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, macea,    mace,     mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrusha, sfrush,    sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, mace,       0,        mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 
 
 
-GAMEL( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
-GAMEL( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 /* Midway */
-GAME( 1997, biofreak, 0,        biofreak,          biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, blitz,    0,        blitz,             blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, blitz11,  blitz,    blitz,             blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, blitz99,  0,        blitz99,           blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, blitz99a, blitz99,  blitz99,           blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, carnevil, 0,        carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, carnevil1,carnevil, carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
