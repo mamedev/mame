@@ -17,6 +17,7 @@
       can be removed together with this note when we implement it across MAME.
     - verify cpu speed and rom labels where unknown
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
+    - granits gives error beeps at start, need to press clear to play
 
 ******************************************************************************
 
@@ -351,7 +352,7 @@ Designer 2000 (model 6102)
 8KB RAM(KM6264AL-10), 32KB ROM(AMI 101.1077A01)
 Ricoh RP65C02G CPU, 3MHz XTAL
 PCB label 510-1129A01
-basically same as Excellence hardware, reskinned board
+basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): same hardware, XTAL 5MHz?, ROMs unknown
 
@@ -1752,6 +1753,13 @@ static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( granits, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_8MHz) // R65C02P4, overclocked
+	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
 
 	/* basic machine hardware */
@@ -2138,14 +2146,17 @@ ROM_END
 
 ROM_START( fexcel ) // model 6080(B), PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
 ROM_END
 
-#define rom_fexceld rom_fexcel /* model 6093, PCB label 510.1117A02 */
+ROM_START( fexceld ) // model 6093, PCB label 510.1117A02
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same rom as fexcel
+ROM_END
 
 ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256, same rom as fexcel
 
 	ROM_REGION( 0x8000, "speech", 0 )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
@@ -2161,14 +2172,25 @@ ROM_START( fexcelb ) // model EP12, PCB label 510-1099A01
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
 
-ROM_START( fexcelp ) // model 6083, PCB label 510-1099B01
+
+ROM_START( fexcelp ) // model 6083, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) )
+ROM_END
+
+ROM_START( fexcelpb ) // model 6083, PCB label 510-1099B01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label, only 1 byte difference, assume bugfix in bookrom
+ROM_END
+
+ROM_START( granits ) // modified SC12 board, overclocked Par Excellence program
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("granit_s-4", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
 ROM_END
 
 ROM_START( fdes2000 ) // model 6102, PCB label 510.1129A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI, same label as fexcelp
 ROM_END
 
 
@@ -2239,7 +2261,7 @@ CONS( 1986, feag2100fr, feag2100, 0,      eag,       eagg,      driver_device, 0
 
 CONS( 1982, fscc9,      0,        0,      sc9,       sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, fscc9b,     fscc9,    0,      sc9b,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
 CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
@@ -2248,9 +2270,11 @@ CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
 CONS( 1985, fexcelb,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelpb,   fexcelp,  0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, granits,    fexcelp,  0,      granits,   fexcel,    driver_device, 0, "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, fdes2000,   fexcelp,  0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
 
 CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d,  fdes2100d,0,      fdes2000d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
