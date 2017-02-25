@@ -462,7 +462,7 @@ void deco32_state::deco32_set_audio_output(uint8_t raw_data)
 	m_oki1->set_output_gain(ALL_OUTPUTS, vol_output);
 	m_oki2->set_output_gain(ALL_OUTPUTS, vol_output);
 
-	popmessage("%02x %02x %f",raw_data,raw_vol,vol_output);
+	//popmessage("%02x %02x %f",raw_data,raw_vol,vol_output);
 }
 
 READ32_MEMBER(deco32_state::_71_r)
