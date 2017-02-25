@@ -1912,6 +1912,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA3", MACHINE_NOT_WORKING )
+COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA3", MACHINE_NOT_WORKING )
