@@ -486,7 +486,7 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 //	value from within a command line
 //-------------------------------------------------
 
-std::string core_options::pluck_from_command_line(std::vector<std::string> &args, const std::string &optionname)
+bool core_options::pluck_from_command_line(std::vector<std::string> &args, const std::string &optionname, std::string &result)
 {
 	// find this entry within the options (it is illegal to call this with a non-existant option
 	// so we assert if not present)
@@ -504,7 +504,6 @@ std::string core_options::pluck_from_command_line(std::vector<std::string> &args
 	}
 
 	// find each of the targets in the argv array
-	std::string result;
 	for (int i = 1; i < args.size() - 1; i++)
 	{
 		auto const iter = std::find_if(
@@ -519,10 +518,12 @@ std::string core_options::pluck_from_command_line(std::vector<std::string> &args
 			// remove this arguments from the list
 			auto const pos = std::next(args.begin(), i);
 			args.erase(pos, std::next(pos, 2));
-			break;
+			return true;
 		}
 	}
-	return result;
+
+	result.clear();
+	return false;
 }
 
 

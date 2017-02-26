@@ -149,7 +149,7 @@ public:
 	// parsing/input
 	bool parse_command_line(std::vector<std::string> &args, int priority, std::string &error_string);
 	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
-	std::string pluck_from_command_line(std::vector<std::string> &args, const std::string &name);
+	bool pluck_from_command_line(std::vector<std::string> &args, const std::string &name, std::string &result);
 
 	// reverting
 	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
