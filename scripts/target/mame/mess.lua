@@ -599,6 +599,7 @@ MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
 MACHINES["INPUT_MERGER"] = true
+MACHINES["IE15"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2059,6 +2060,15 @@ files {
 	MAME_DIR .. "src/mame/machine/ibm6580_fdc.h",
 }
 
+createMESSProjects(_target, _subtarget, "ie15")
+files {
+	MAME_DIR .. "src/mame/drivers/ie15.cpp",
+	MAME_DIR .. "src/mame/machine/ie15.cpp",
+	MAME_DIR .. "src/mame/machine/ie15.h",
+	MAME_DIR .. "src/mame/machine/ie15_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/ie15_kbd.h",
+}
+
 createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
@@ -3363,9 +3373,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
-	MAME_DIR .. "src/mame/drivers/ie15.cpp",
-	MAME_DIR .. "src/mame/machine/ie15_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/ie15_kbd.h",
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
