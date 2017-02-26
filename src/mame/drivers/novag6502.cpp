@@ -11,8 +11,8 @@
     such as Arena(in editmode).
 
     TODO:
-    - cforteb lcd (chip unknown, probably serially via 1f00 w)
-    - verify supercon IRQ and beeper frequency
+    - cforte lcd(chip unknown), and ACIA?
+    - verify supercon/cforte IRQ and beeper frequency
     - sforte irq active time (21.5us is too long)
     - sforte/sexpert led handling is correct?
     - printer port
@@ -85,6 +85,9 @@ public:
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
+
+	// Constellation Forte
+	DECLARE_WRITE8_MEMBER(cforte_control_w);
 
 	// Super Expert
 	DECLARE_WRITE8_MEMBER(sexpert_leds_w);
@@ -326,6 +329,27 @@ READ8_MEMBER(novag6502_state::supercon_input2_r)
 
 
 /******************************************************************************
+    Constellation Forte
+******************************************************************************/
+
+// TTL
+
+WRITE8_MEMBER(novag6502_state::cforte_control_w)
+{
+	// TODO: unknown lcd at d0-d3, clocks it 34 times with rowselect in lower bits
+	// d0: lcd data
+	// d1: lcd clock
+	// d2: lcd cs
+	// d3: unused?
+	m_lcd_control = data;
+	
+	// other: same as supercon
+	supercon_control_w(space, offset, data);
+}
+
+
+
+/******************************************************************************
     Super Expert
 ******************************************************************************/
 
@@ -446,6 +470,11 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, supercon_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, supercon_control_w)
 	AM_RANGE(0x2000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, cforte_control_w)
+	AM_IMPORT_FROM( supercon_map )
 ADDRESS_MAP_END
 
 
@@ -808,7 +837,7 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 250) // guessed
-	MCFG_CPU_PROGRAM_MAP(supercon_map)
+	MCFG_CPU_PROGRAM_MAP(cforte_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
