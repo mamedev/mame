@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 FDC device (model B504)
+	Poisk-1 FDC device (model B504)
 
 **********************************************************************/
 
@@ -31,10 +31,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_READ8_MEMBER(p1_fdc_r);
 	DECLARE_WRITE8_MEMBER(p1_fdc_w);
-	DECLARE_WRITE_LINE_MEMBER( p1_fdc_irq_drq );
+	DECLARE_WRITE_LINE_MEMBER(p1_fdc_irq_drq);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
