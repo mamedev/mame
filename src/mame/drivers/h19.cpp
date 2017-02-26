@@ -602,12 +602,12 @@ ROM_START( watz19 )
 	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 	// Watzman keyboard
 	ROM_REGION( 0x1000, "keyboard", 0 )
-	ROM_LOAD( "keybd.bin", 0x0800, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
+	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
 COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", 0 )
 /*  TODO - verify the years for these third-party replacement ROMs. */
 COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_NOT_WORKING )
-COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", MACHINE_NOT_WORKING )
+COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
 
