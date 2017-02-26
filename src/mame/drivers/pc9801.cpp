@@ -1468,7 +1468,7 @@ READ16_MEMBER(pc9801_state::upd7220_grcg_r)
 {
 	uint16_t res = 0;
 
-	if(!(m_grcg.mode & 0x80) || space.debugger_access())
+	if(!(m_grcg.mode & 0x80) || machine().side_effect_disabled())
 		res = m_video_ram_2[offset];
 	else if(m_ex_video_ff[2])
 		res = egc_blit_r(offset, mem_mask);

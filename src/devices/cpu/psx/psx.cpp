@@ -194,14 +194,14 @@ static const uint32_t mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if( !space.debugger_access() )
+	if( !machine().side_effect_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if( !space.debugger_access() )
+	if( !machine().side_effect_disabled() )
 		m_berr = 1;
 }
 

@@ -714,7 +714,7 @@ private:
 	template<typename _UintType>
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.debugger_access())
+		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
@@ -785,7 +785,7 @@ private:
 	template<typename _UintType>
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.debugger_access())
+		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
@@ -1739,7 +1739,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_logbytemask(address_to_byte_end(m_logaddrmask)),
 		m_unmap(0),
 		m_spacenum(spacenum),
-		m_debugger_access(false),
 		m_log_unmap(true),
 		m_direct(std::make_unique<direct_read_data>(*this)),
 		m_name(memory.space_config(spacenum)->name()),

@@ -105,7 +105,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
 		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
@@ -119,12 +119,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	}
 
 	// Now that's sorted out we can call the normal read handler
-	address_space &program_space(m_maincpu->space(AS_PROGRAM));
-	bool const prev_debugger_access(program_space.debugger_access());
-	program_space.set_debugger_access(space.debugger_access());
-	uint8_t const data(program_space.read_byte(offset));
-	program_space.set_debugger_access(prev_debugger_access);
-	return data;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )

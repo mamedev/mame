@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 
 READ8_MEMBER( pcd_state::nmi_io_r )
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return 0;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -172,7 +172,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 
 WRITE8_MEMBER( pcd_state::nmi_io_w )
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return;
 	logerror("%s: unmapped %s %04x\n", machine().describe_context(), space.name(), offset);
 	m_stat |= 0xfd;
@@ -394,7 +394,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !space.debugger_access())
+		if(!reg && !machine().side_effect_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -416,7 +416,7 @@ READ16_MEMBER(pcd_state::mem_r)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !space.debugger_access())
+		if(!reg && !machine().side_effect_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);

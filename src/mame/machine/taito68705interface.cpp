@@ -83,7 +83,7 @@ READ8_MEMBER(taito68705_mcu_device_base::data_r)
 {
 	// clear MCU semaphore flag and return data
 	u8 const result(m_mcu_latch);
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		m_mcu_flag = false;
 		m_semaphore_cb(CLEAR_LINE);

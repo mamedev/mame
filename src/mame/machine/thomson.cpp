@@ -462,7 +462,7 @@ READ8_MEMBER( thomson_state::to7_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to7_update_cart_bank();
@@ -759,7 +759,7 @@ void thomson_state::to7_modem_init()
 
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 	{
 		return 0;
 	}
@@ -1632,7 +1632,7 @@ READ8_MEMBER( thomson_state::mo5_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo5_update_cart_bank();
@@ -1856,7 +1856,7 @@ READ8_MEMBER( thomson_state::to9_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -2036,7 +2036,7 @@ READ8_MEMBER( thomson_state::to9_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to9_update_cart_bank();
@@ -2190,7 +2190,7 @@ READ8_MEMBER( thomson_state::to9_kbd_r )
 		return m_to9_kbd_status;
 
 	case 1: /* get input data */
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
 			if ( m_to9_kbd_overrun )
@@ -3241,7 +3241,7 @@ READ8_MEMBER( thomson_state::to8_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to8_update_cart_bank();
@@ -3275,7 +3275,7 @@ void thomson_state::to8_floppy_reset()
 
 READ8_MEMBER( thomson_state::to8_floppy_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
@@ -3334,7 +3334,7 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -3419,7 +3419,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 	{
-		if ( space.debugger_access() )
+		if ( machine().side_effect_disabled() )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
@@ -3433,7 +3433,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -4115,7 +4115,7 @@ READ8_MEMBER( thomson_state::mo6_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo6_update_cart_bank();
@@ -4289,7 +4289,7 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -4371,7 +4371,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 			return to7_floppy_r( space, 0xc );
 		}
 
@@ -4552,7 +4552,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 READ8_MEMBER( thomson_state::mo5nr_net_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( to7_controller_type )

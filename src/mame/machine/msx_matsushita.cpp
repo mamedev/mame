@@ -85,7 +85,7 @@ READ8_MEMBER(msx_matsushita_device::switched_read)
 		{
 			uint8_t result = (((m_pattern & 0x80) ? m_nibble1 : m_nibble2) << 4) | ((m_pattern & 0x40) ? m_nibble1 : m_nibble2);
 
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				m_pattern = (m_pattern << 2) | (m_pattern >> 6);
 
 			return result;

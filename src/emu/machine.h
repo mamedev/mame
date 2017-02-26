@@ -167,8 +167,11 @@ class running_machine
 {
 	DISABLE_COPYING(running_machine);
 
+	struct side_effect_disabler;
+
 	friend class sound_manager;
 	friend class memory_manager;
+	friend struct side_effect_disabler;
 
 	typedef std::function<void(const char*)> logerror_callback;
 
@@ -218,6 +221,10 @@ public:
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
 	screen_device *first_screen() const { return primary_screen; }
+
+	// RAII-based side effect disable
+	side_effect_disabler disable_side_effect() { return side_effect_disabler(this); }
+	bool side_effect_disabled() const { return m_side_effect_disabled != 0; }
 
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
@@ -274,11 +281,32 @@ private:
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless
 
+	// side effect disable counter
+	u32                     m_side_effect_disabled;
+
 public:
 	// debugger-related information
 	u32                     debug_flags;        // the current debug flags
 
 private:
+	struct side_effect_disabler {
+		running_machine *m_machine;
+
+		side_effect_disabler(running_machine *m) : m_machine(m) {
+			m_machine->disable_side_effect_count();
+		}
+
+		~side_effect_disabler() {
+			m_machine->enable_side_effect_count();
+		}
+
+		side_effect_disabler(const side_effect_disabler &) = delete;
+		side_effect_disabler(side_effect_disabler &&) = default;
+	};
+
+	void disable_side_effect_count() { m_side_effect_disabled++; }
+	void enable_side_effect_count()  { m_side_effect_disabled--; }
+
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
 	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };

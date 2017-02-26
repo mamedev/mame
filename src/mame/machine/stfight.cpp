@@ -198,7 +198,7 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
 	uint8_t const data = m_fm_data;
 
 	// Acknowledge the command
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_fm_data &= ~0x80;
 
 	return data;

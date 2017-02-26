@@ -173,7 +173,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 READ8_MEMBER(m68hc05_device::port_r)
 {
 	offset &= PORT_COUNT - 1;
-	if (!space.debugger_access() && !m_port_cb_r[offset].isnull())
+	if (!machine().side_effect_disabled() && !m_port_cb_r[offset].isnull())
 	{
 		u8 const newval(m_port_cb_r[offset](space, 0, ~m_port_ddr[offset] & m_port_bits[offset]) & m_port_bits[offset]);
 		u8 const diff(newval ^ m_port_input[offset]);
@@ -257,7 +257,7 @@ WRITE8_MEMBER(m68hc05_device::tcr_w)
 
 READ8_MEMBER(m68hc05_device::tsr_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		u8 const events(m_tsr & ~m_tsr_seen);
 		if (events)
@@ -276,7 +276,7 @@ READ8_MEMBER(m68hc05_device::icr_r)
 	// reading ICRL after reading TCR with ICF set clears ICF
 
 	u8 const low(BIT(offset, 0));
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (low)
 		{
@@ -304,7 +304,7 @@ READ8_MEMBER(m68hc05_device::ocr_r)
 	// reading OCRL after reading TCR with OCF set clears OCF
 
 	u8 const low(BIT(offset, 0));
-	if (!space.debugger_access() && low && BIT(m_tsr_seen, 6))
+	if (!machine().side_effect_disabled() && low && BIT(m_tsr_seen, 6))
 	{
 		LOGTIMER("read OCRL, clear OCF\n");
 		m_tsr &= 0xbf;
@@ -320,7 +320,7 @@ WRITE8_MEMBER(m68hc05_device::ocr_w)
 	// writing OCRL after reading TCR with OCF set clears OCF
 
 	u8 const low(BIT(offset, 0));
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (low)
 		{
@@ -354,7 +354,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 	u8 const alt(BIT(offset, 1));
 	if (low)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_trl_latched[alt]) LOGTIMER("read %sTRL, read sequence complete\n", alt ? "A" : "");
 			m_trl_latched[alt] = false;
@@ -370,7 +370,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 	}
 	else
 	{
-		if (!space.debugger_access() && !m_trl_latched[alt])
+		if (!machine().side_effect_disabled() && !m_trl_latched[alt])
 		{
 			LOGTIMER("read %sTRH, latch %sTRL\n", alt ? "A" : "", alt ? "A" : "");
 			m_trl_latched[alt] = true;

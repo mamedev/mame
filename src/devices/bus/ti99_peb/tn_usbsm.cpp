@@ -180,7 +180,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::cruwrite)
 */
 READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -231,7 +231,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 */
 WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{

@@ -473,10 +473,9 @@ uint16_t tms9995_device::read_workspace_register_debug(int reg)
 	}
 	else
 	{
-		m_prgspace->set_debugger_access(true);
+		auto dis = machine().disable_side_effect();
 		value = (m_prgspace->read_byte(addrb) << 8) & 0xff00;
 		value |= m_prgspace->read_byte(addrb+1);
-		m_prgspace->set_debugger_access(false);
 	}
 	m_icount = temp;
 	return value;
@@ -494,10 +493,9 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	}
 	else
 	{
-		m_prgspace->set_debugger_access(true);
+		auto dis = machine().disable_side_effect();
 		m_prgspace->write_byte(addrb, (data >> 8) & 0xff);
 		m_prgspace->write_byte(addrb+1, data & 0xff);
-		m_prgspace->set_debugger_access(false);
 	}
 	m_icount = temp;
 }

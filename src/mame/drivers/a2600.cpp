@@ -120,7 +120,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(a2600_state::cart_over_all_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
@@ -342,7 +342,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 // TODO: is this the correct behavior for the real hardware?!?
 READ8_MEMBER(a2600_state::cart_over_riot_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }

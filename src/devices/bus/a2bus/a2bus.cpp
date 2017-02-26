@@ -248,15 +248,11 @@ void a2bus_device::set_maincpu_halt(int state)
 
 uint8_t a2bus_device::dma_r(address_space &space, uint16_t offset)
 {
-	m_maincpu_space->set_debugger_access(space.debugger_access());
-
 	return m_maincpu_space->read_byte(offset);
 }
 
 void a2bus_device::dma_w(address_space &space, uint16_t offset, uint8_t data)
 {
-	m_maincpu_space->set_debugger_access(space.debugger_access());
-
 	m_maincpu_space->write_byte(offset, data);
 }
 

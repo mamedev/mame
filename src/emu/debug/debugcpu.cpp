@@ -98,8 +98,8 @@ void debugger_cpu::configure_memory(symbol_table &table)
 	table.configure_memory(
 		&m_machine,
 		std::bind(&debugger_cpu::expression_validate, this, _1, _2, _3),
-		std::bind(&debugger_cpu::expression_read_memory, this, _1, _2, _3, _4, _5),
-		std::bind(&debugger_cpu::expression_write_memory, this, _1, _2, _3, _4, _5, _6));
+		std::bind(&debugger_cpu::expression_read_memory, this, _1, _2, _3, _4, _5, _6),
+		std::bind(&debugger_cpu::expression_write_memory, this, _1, _2, _3, _4, _5, _6, _7));
 }
 
 /*-------------------------------------------------
@@ -370,10 +370,6 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
 
-	/* all accesses from this point on are for the debugger */
-	m_debugger_access = true;
-	space.set_debugger_access(true);
-
 	/* translate if necessary; if not mapped, return 0xff */
 	u8 result;
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
@@ -385,9 +381,6 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 		result = space.read_byte(address);
 	}
 
-	/* no longer accessing via the debugger */
-	m_debugger_access = false;
-	space.set_debugger_access(false);
 	return result;
 }
 
@@ -418,10 +411,6 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 	{   /* otherwise, this proceeds like the byte case */
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-
 		/* translate if necessary; if not mapped, return 0xffff */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
@@ -431,10 +420,6 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_word(address);
 		}
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -467,10 +452,6 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 	{   /* otherwise, this proceeds like the byte case */
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
@@ -479,10 +460,6 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_dword(address);
 		}
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -515,10 +492,6 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 	{   /* otherwise, this proceeds like the byte case */
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
@@ -528,10 +501,6 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 		{   /* otherwise, call the byte reading function for the translated address */
 			result = space.read_qword(address);
 		}
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -569,10 +538,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
 
-	/* all accesses from this point on are for the debugger */
-	m_debugger_access = true;
-	space.set_debugger_access(true);
-
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		;
@@ -580,10 +545,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	/* otherwise, call the byte reading function for the translated address */
 	else
 		space.write_byte(address, data);
-
-	/* no longer accessing via the debugger */
-	m_debugger_access = false;
-	space.set_debugger_access(false);
 
 	m_memory_modified = true;
 }
@@ -619,10 +580,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 	{
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
@@ -630,10 +587,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_word(address, data);
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -670,9 +623,6 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 	{
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		space.set_debugger_access(m_debugger_access = true);
-
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
@@ -680,10 +630,6 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_dword(address, data);
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -720,10 +666,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 	{
 		device_memory_interface &memory = space.device().memory();
 
-		/* all accesses from this point on are for the debugger */
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
@@ -731,10 +673,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_qword(address, data);
-
-		/* no longer accessing via the debugger */
-		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -771,9 +709,6 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 	/* keep in logical range */
 	address &= space.logbytemask();
-
-	m_debugger_access = true;
-	space.set_debugger_access(true);
 
 	/* if we're bigger than the address bus, break into smaller pieces */
 	if (size > space.data_width() / 8)
@@ -848,13 +783,6 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 			fatalerror("read_opcode: unknown type = %d\n", space.data_width() / 8 * 10 + size);
 	}
 
-	/* turn on debugger access */
-	if (!m_debugger_access)
-	{
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-	}
-
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
 	{
@@ -901,10 +829,6 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 			}
 			break;
 	}
-
-	/* no longer accessing via the debugger */
-	m_debugger_access = false;
-	space.set_debugger_access(false);
 
 	return result;
 }
@@ -1005,7 +929,7 @@ device_t* debugger_cpu::expression_get_device(const char *tag)
     space
 -------------------------------------------------*/
 
-u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size)
+u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, bool with_se)
 {
 	switch (spacenum)
 	{
@@ -1027,7 +951,11 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				return read_memory(space, space.address_to_byte(address), size, true);
+				if (!with_se) {
+					auto dis = m_machine.disable_side_effect();
+					return read_memory(space, space.address_to_byte(address), size, true);
+				} else
+					return read_memory(space, space.address_to_byte(address), size, true);
 			}
 			break;
 		}
@@ -1050,7 +978,11 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				return read_memory(space, space.address_to_byte(address), size, false);
+				if (!with_se) {
+					auto dis = m_machine.disable_side_effect();
+					return read_memory(space, space.address_to_byte(address), size, false);
+				} else 
+					return read_memory(space, space.address_to_byte(address), size, false);
 			}
 			break;
 		}
@@ -1068,7 +1000,11 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+			if (!with_se) {
+				auto dis = m_machine.disable_side_effect();
+				return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+			} else
+				return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
 
@@ -1192,7 +1128,7 @@ u64 debugger_cpu::expression_read_memory_region(const char *rgntag, offs_t addre
     space
 -------------------------------------------------*/
 
-void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data)
+void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data, bool with_se)
 {
 	device_t *device = nullptr;
 	device_memory_interface *memory;
@@ -1213,7 +1149,11 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				write_memory(space, space.address_to_byte(address), data, size, true);
+				if (!with_se) {
+					auto dis = m_machine.disable_side_effect();
+					write_memory(space, space.address_to_byte(address), data, size, true);
+				} else
+					write_memory(space, space.address_to_byte(address), data, size, true);
 			}
 			break;
 
@@ -1231,7 +1171,11 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				write_memory(space, space.address_to_byte(address), data, size, false);
+				if (!with_se) {
+					auto dis = m_machine.disable_side_effect();
+					write_memory(space, space.address_to_byte(address), data, size, false);
+				} else
+					write_memory(space, space.address_to_byte(address), data, size, false);
 			}
 			break;
 
@@ -1244,7 +1188,11 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			if (!with_se) {
+				auto dis = m_machine.disable_side_effect();
+				expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			} else
+				expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
@@ -2859,7 +2807,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist)
 {
 	// if we're within debugger code, don't stop
-	if (m_within_instruction_hook || m_debugger_access)
+	if (m_within_instruction_hook || m_machine.side_effect_disabled())
 		return;
 
 	m_within_instruction_hook = true;

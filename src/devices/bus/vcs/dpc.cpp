@@ -294,7 +294,7 @@ WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
 
 DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
 {
-	if (!direct.space().debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		uint8_t new_bit;
 		new_bit = (m_dpc->m_shift_reg & 0x80) ^ ((m_dpc->m_shift_reg & 0x20) << 2);

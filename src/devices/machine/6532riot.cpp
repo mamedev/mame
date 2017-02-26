@@ -233,7 +233,7 @@ void riot6532_device::reg_w(uint8_t offset, uint8_t data)
 
 READ8_MEMBER( riot6532_device::read )
 {
-	return reg_r(offset, space.debugger_access());
+	return reg_r(offset, machine().side_effect_disabled());
 }
 
 uint8_t riot6532_device::reg_r(uint8_t offset, bool debugger_access)

@@ -341,7 +341,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!space.debugger_access() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -357,7 +357,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 	if (offset < 0x4000)
 	{
-		if (space.debugger_access() || m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
+		if (m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
 		{
 			COMBINE_DATA(&m_ram[offset]);
 		}

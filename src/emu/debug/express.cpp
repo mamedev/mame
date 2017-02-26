@@ -517,7 +517,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 //  memory_value - return a value read from memory
 //-------------------------------------------------
 
-u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size)
+u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size, bool with_se)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -525,7 +525,7 @@ u64 symbol_table::memory_value(const char *name, expression_space space, u32 off
 		{
 			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
-				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size);
+				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size, with_se);
 			return 0;
 		}
 	return 0;
@@ -536,7 +536,7 @@ u64 symbol_table::memory_value(const char *name, expression_space space, u32 off
 //  set_memory_value - write a value to memory
 //-------------------------------------------------
 
-void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value)
+void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool with_se)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -544,7 +544,7 @@ void symbol_table::set_memory_value(const char *name, expression_space space, u3
 		{
 			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
-				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value);
+				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value, with_se);
 			return;
 		}
 }
@@ -684,7 +684,7 @@ void parsed_expression::print_tokens(FILE *out)
 					case TVL_ASSIGNBXOR:    fprintf(out, "^=\n");                   break;
 					case TVL_ASSIGNBOR:     fprintf(out, "|=\n");                   break;
 					case TVL_COMMA:         fprintf(out, ",\n");                    break;
-					case TVL_MEMORYAT:      fprintf(out, "mem@\n");                 break;
+					case TVL_MEMORYAT:      fprintf(out, token.memory_size_effect() ? "mem!\n" : "mem@\n");break;
 					case TVL_EXECUTEFUNC:   fprintf(out, "execute\n");              break;
 					default:                fprintf(out, "INVALID OPERATOR\n");     break;
 				}
@@ -874,10 +874,11 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	}
 
 	// check for memory @ operators
-	if (string[0] == '@')
+	if (string[0] == '@' || string[0] == '!')
 	{
+		bool with_se = string[0] == '!';
 		string += 1;
-		return parse_memory_operator(token, buffer.c_str());
+		return parse_memory_operator(token, buffer.c_str(), with_se);
 	}
 
 	// empty string is automatically invalid
@@ -1097,7 +1098,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 //  forms of memory operators
 //-------------------------------------------------
 
-void parsed_expression::parse_memory_operator(parse_token &token, const char *string)
+void parsed_expression::parse_memory_operator(parse_token &token, const char *string, bool with_se)
 {
 	// if there is a '.', it means we have a name
 	const char *startstring = string;
@@ -1174,7 +1175,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	}
 
 	// configure the token
-	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring);
+	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring).set_memory_side_effect(with_se);
 }
 
 
@@ -1717,8 +1718,9 @@ u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 		return m_symbol->value();
 
 	// or get the value from the memory callbacks
-	else if (is_memory() && table != nullptr)
-		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size());
+	else if (is_memory() && table != nullptr) {
+		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effect());
+	}
 
 	return 0;
 }
@@ -1737,7 +1739,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 
 	// or set the value via the memory callbacks
 	else if (is_memory() && table != nullptr)
-		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value);
+		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effect());
 }
 
 

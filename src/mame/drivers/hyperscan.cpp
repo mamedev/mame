@@ -224,7 +224,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
@@ -387,7 +387,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif

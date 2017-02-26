@@ -1084,7 +1084,7 @@ void apple2e_state::lc_update(int offset, int access)
 // most softswitches don't care about read vs write, so handle them here
 void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	// Handle C058-C05F according to IOUDIS
 	if ((offset & 0x58) == 0x58)
@@ -1285,7 +1285,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 
 READ8_MEMBER(apple2e_state::c000_r)
 {
-	if(space.debugger_access()) return read_floatingbus();
+	if(machine().side_effect_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1396,7 +1396,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 WRITE8_MEMBER(apple2e_state::c000_w)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	switch (offset)
 	{
@@ -1514,7 +1514,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 
 READ8_MEMBER(apple2e_state::c000_iic_r)
 {
-	if(space.debugger_access()) return read_floatingbus();
+	if(machine().side_effect_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1658,7 +1658,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 WRITE8_MEMBER(apple2e_state::c000_iic_w)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	switch (offset)
 	{
@@ -1856,7 +1856,7 @@ void apple2e_state::update_iic_mouse()
 
 READ8_MEMBER(apple2e_state::c080_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		int slot;
 
@@ -1905,7 +1905,7 @@ uint8_t apple2e_state::read_slot_rom(address_space &space, int slotbias, int off
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -1923,7 +1923,7 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -1936,7 +1936,7 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 uint8_t apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
 {
 #if 0
-	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!space.debugger_access()))
+	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!machine().side_effect_disabled()))
 	{
 		m_cnxx_slot = CNXX_INTROM;
 		update_slotrom_banks();
@@ -2021,7 +2021,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
 			update_slotrom_banks();
@@ -2045,7 +2045,7 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if ((offset == 0x7ff) && !space.debugger_access())
+	if ((offset == 0x7ff) && !machine().side_effect_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
@@ -2062,7 +2062,7 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if ((offset == 0x7ff) && !space.debugger_access())
+	if ((offset == 0x7ff) && !machine().side_effect_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
@@ -2082,7 +2082,7 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
 			m_intc8rom = false;

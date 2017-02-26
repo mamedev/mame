@@ -513,7 +513,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 			return m_io->read_word(offset << 1);
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
 	}
 
@@ -625,7 +625,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 			break;
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
 	}
 }

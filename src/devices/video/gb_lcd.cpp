@@ -2886,7 +2886,7 @@ void dmg_ppu_device::lcd_switch_on(uint8_t new_data)
 
 READ8_MEMBER(dmg_ppu_device::vram_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		LOG(("vram_r: offset=0x%04x\n", offset));
@@ -2908,7 +2908,7 @@ WRITE8_MEMBER(dmg_ppu_device::vram_w)
 
 READ8_MEMBER(dmg_ppu_device::oam_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		LOG(("oam_r: offset=0x%02x\n", offset));
@@ -2931,7 +2931,7 @@ WRITE8_MEMBER(dmg_ppu_device::oam_w)
 
 READ8_MEMBER(dmg_ppu_device::video_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		if (offset == 1) LOG(("STAT read\n"));
@@ -3203,7 +3203,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 
 READ8_MEMBER(cgb_ppu_device::video_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		if (offset == 1) LOG(("STAT read\n"));

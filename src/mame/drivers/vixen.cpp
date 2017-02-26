@@ -79,18 +79,14 @@ void vixen_state::update_interrupt()
 
 READ8_MEMBER( vixen_state::opram_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		membank("bank3")->set_entry(0); // read videoram
-	bool const prev_debugger_access(m_program->debugger_access());
-	m_program->set_debugger_access(space.debugger_access());
-	uint8_t const data(m_program->read_byte(offset));
-	m_program->set_debugger_access(prev_debugger_access);
-	return data;
+	return m_program->read_byte(offset);
 }
 
 READ8_MEMBER( vixen_state::oprom_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
