@@ -14153,9 +14153,10 @@ gyrussce                        // GX347 (c) 1983 + Centuri license
 venus                           // bootleg
 
 @source:h19.cpp
-h19                             //
-super19                         //
-watz19                          //
+h19                             // Heath H19 (Zenith Z-19)
+super19                         // Super19 replacement ROMS for H19
+watz19                          // Watzman replacement ROMS for H19
+ssh19                           // Superset replacement Roms for H19
 
 @source:h8.cpp
 h8                              //
