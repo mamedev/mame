@@ -2,12 +2,12 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 sound card.  DAC, ADC, MIDI in/out and 6 music channels.
+	Poisk-1 sound card.  DAC, ADC, MIDI in/out and 6 music channels.
 
-    Memory-mapped, uses IRQ3 and IRQ7, no DMA.
+	Memory-mapped, uses IRQ3 and IRQ7, no DMA.
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright MESS Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -80,7 +80,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor p1_sound_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( p1_sound );
+	return MACHINE_CONFIG_NAME(p1_sound);
 }
 
 
@@ -92,66 +92,68 @@ machine_config_constructor p1_sound_device::device_mconfig_additions() const
 //  p1_sound_device - constructor
 //-------------------------------------------------
 
-p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, P1_SOUND, "Poisk-1 sound card (B623)", tag, owner, clock, "p1_sound", __FILE__),
-	device_isa8_card_interface( mconfig, *this ),
-	m_dac(*this, "dac"),
-	m_filter(*this, "filter"),
-	m_midi(*this, "midi"),
-	m_d14(*this, "d14"),
-	m_d16(*this, "d16"),
-	m_d17(*this, "d17")
+p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, P1_SOUND, "Poisk-1 sound card (B623)", tag, owner, clock, "p1_sound", __FILE__)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_dac(*this, "dac")
+	, m_filter(*this, "filter")
+	, m_midi(*this, "midi")
+	, m_d14(*this, "d14")
+	, m_d16(*this, "d16")
+	, m_d17(*this, "d17")
 {
 }
 
-READ8_MEMBER( p1_sound_device::d14_r )
+READ8_MEMBER(p1_sound_device::d14_r)
 {
-	return m_d14->read(space, offset>>1);
+	return m_d14->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d14_w )
+WRITE8_MEMBER(p1_sound_device::d14_w)
 {
-	m_d14->write(space, offset>>1, data);
+	m_d14->write(space, offset >> 1, data);
 }
 
-READ8_MEMBER( p1_sound_device::d16_r )
+READ8_MEMBER(p1_sound_device::d16_r)
 {
-	return m_d16->read(space, offset>>1);
+	return m_d16->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d16_w )
+WRITE8_MEMBER(p1_sound_device::d16_w)
 {
-	m_d16->write(space, offset>>1, data);
+	m_d16->write(space, offset >> 1, data);
 }
 
-READ8_MEMBER( p1_sound_device::d17_r )
+READ8_MEMBER(p1_sound_device::d17_r)
 {
-	return m_d17->read(space, offset>>1);
+	return m_d17->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d17_w )
+WRITE8_MEMBER(p1_sound_device::d17_w)
 {
-	m_d17->write(space, offset>>1, data);
+	m_d17->write(space, offset >> 1, data);
 }
 
-READ8_MEMBER( p1_sound_device::adc_r )
+READ8_MEMBER(p1_sound_device::adc_r)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( p1_sound_device::dac_w )
+WRITE8_MEMBER(p1_sound_device::dac_w)
 {
-//  logerror("DAC write: %02x <- %02x\n", offset>>1, data);
-	m_dac_data[offset>>1] = data;
+//	logerror("DAC write: %02x <- %02x\n", offset>>1, data);
+	m_dac_data[offset >> 1] = data;
 	m_isa->irq7_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( p1_sound_device::sampler_sync )
+WRITE_LINE_MEMBER(p1_sound_device::sampler_sync)
 {
-	if (state) {
+	if (state)
+	{
 		m_dac->write(m_dac_data[m_dac_ptr++]);
 		m_dac_ptr &= 7;
-		if ((m_dac_ptr % 8) == 0) {
+		if ((m_dac_ptr % 8) == 0)
+		{
 			m_isa->irq7_w(state);
 		}
 	}
@@ -205,5 +207,5 @@ void p1_sound_device::device_reset()
 	m_dac_ptr = 0;
 
 	// 5 kHz lowpass filter.  XXX check schematics
-	m_filter->filter_rc_set_RC(FLT_RC_LOWPASS, 330, 0, 0, CAP_N(100) );
+	m_filter->filter_rc_set_RC(FLT_RC_LOWPASS, 330, 0, 0, CAP_N(100));
 }

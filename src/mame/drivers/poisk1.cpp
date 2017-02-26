@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/poisk1.c
+	drivers/poisk1.c
 
-    Driver file for Poisk-1
+	Driver file for Poisk-1
 
 ***************************************************************************/
 
@@ -29,7 +29,7 @@
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
 
-#define BG_COLOR(x) (((x) & 7)|(((x) & 0x10) >> 1))
+#define BG_COLOR(x) (((x)&7) | (((x)&0x10) >> 1))
 
 #define VERBOSE_DBG 0
 
@@ -50,26 +50,27 @@ class p1_state : public driver_device
 {
 public:
 	p1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pic8259(*this, "pic8259"),
-		m_pit8253(*this, "pit8253"),
-		m_ppi8255n1(*this, "ppi8255n1"),
-		m_ppi8255n2(*this, "ppi8255n2"),
-		m_isabus(*this, "isa"),
-		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic8259(*this, "pic8259")
+		, m_pit8253(*this, "pit8253")
+		, m_ppi8255n1(*this, "ppi8255n1")
+		, m_ppi8255n2(*this, "ppi8255n2")
+		, m_isabus(*this, "isa")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+		, m_palette(*this, "palette")
+	{ }
 
-	required_device<cpu_device>  m_maincpu;
-	required_device<pic8259_device>  m_pic8259;
-	required_device<pit8253_device>  m_pit8253;
-	required_device<i8255_device>  m_ppi8255n1;
-	required_device<i8255_device>  m_ppi8255n2;
-	required_device<isa8_device>  m_isabus;
-	required_device<speaker_sound_device>  m_speaker;
-	required_device<cassette_image_device>  m_cassette;
+	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic8259;
+	required_device<pit8253_device> m_pit8253;
+	required_device<i8255_device> m_ppi8255n1;
+	required_device<i8255_device> m_ppi8255n2;
+	required_device<isa8_device> m_isabus;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 
@@ -139,22 +140,21 @@ public:
 READ8_MEMBER(p1_state::p1_trap_r)
 {
 	uint8_t data = m_video.trap[offset];
-	DBG_LOG(1,"trap",("R %.2x $%02x\n", 0x28+offset, data));
-	if (offset == 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	DBG_LOG(1, "trap", ("R %.2x $%02x\n", 0x28 + offset, data));
+	if (offset == 0) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return data;
 }
 
 WRITE8_MEMBER(p1_state::p1_trap_w)
 {
-	DBG_LOG(1,"trap",("W %.2x $%02x\n", 0x28+offset, data));
+	DBG_LOG(1, "trap", ("W %.2x $%02x\n", 0x28 + offset, data));
 }
 
 READ8_MEMBER(p1_state::p1_cga_r)
 {
 	uint16_t port = offset + 0x3d0;
 
-	DBG_LOG(1,"cga",("R %.4x\n", port));
+	DBG_LOG(1, "cga", ("R %.4x\n", port));
 	m_video.trap[1] = 0x40 | ((port >> 8) & 0x3f);
 	m_video.trap[0] = port & 255;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -165,7 +165,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 {
 	uint16_t port = offset + 0x3d0;
 
-	DBG_LOG(1,"cga",("W %.4x $%02x\n", port, data));
+	DBG_LOG(1, "cga", ("W %.4x $%02x\n", port, data));
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0xC0 | ((port >> 8) & 0x3f);
 	m_video.trap[0] = port & 255;
@@ -174,9 +174,8 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 
 WRITE8_MEMBER(p1_state::p1_vram_w)
 {
-	DBG_LOG(1,"vram",("W %.4x $%02x\n", offset, data));
-	if (m_video.videoram_base)
-		m_video.videoram_base[offset] = data;
+	DBG_LOG(1, "vram", ("W %.4x $%02x\n", offset, data));
+	if (m_video.videoram_base) m_video.videoram_base[offset] = data;
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0x80 | ((offset >> 8) & 0x3f);
 	m_video.trap[0] = offset & 255;
@@ -197,31 +196,37 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
+	DBG_LOG(1, "color_select_68", ("W $%02x\n", data));
 
 	// NMI DISABLE
-	if (BIT((data ^ m_video.color_select_68), 3)) {
-		program.unmap_readwrite( 0xb8000, 0xbbfff, 0 );
-		if (BIT(data, 3)) {
-			program.install_readwrite_bank( 0xb8000, 0xbbfff, "bank11" );
-		} else {
-			program.install_read_bank( 0xb8000, 0xbbfff, "bank11" );
-			program.install_write_handler( 0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w) );
+	if (BIT((data ^ m_video.color_select_68), 3))
+	{
+		program.unmap_readwrite(0xb8000, 0xbbfff, 0);
+		if (BIT(data, 3))
+		{
+			program.install_readwrite_bank(0xb8000, 0xbbfff, "bank11");
+		}
+		else
+		{
+			program.install_read_bank(0xb8000, 0xbbfff, "bank11");
+			program.install_write_handler(0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w));
 		}
 	}
 	// DISPLAY BANK
-	if (BIT((data ^ m_video.color_select_68), 6)) {
+	if (BIT((data ^ m_video.color_select_68), 6))
+	{
 		if (BIT(data, 6))
 			m_video.videoram = m_video.videoram_base.get() + 0x4000;
 		else
 			m_video.videoram = m_video.videoram_base.get();
 	}
 	// HIRES -- XXX
-	if (BIT((data ^ m_video.color_select_68), 7)) {
+	if (BIT((data ^ m_video.color_select_68), 7))
+	{
 		if (BIT(data, 7))
-			machine().first_screen()->set_visible_area(0, 640-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 640 - 1, 0, 200 - 1);
 		else
-			machine().first_screen()->set_visible_area(0, 320-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 320 - 1, 0, 200 - 1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -229,12 +234,12 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 
 /*
 06Ah    Dxx 6   Enable/Disable color burst (?)
-        7   Enable/Disable D7H/D7L
+		7   Enable/Disable D7H/D7L
 */
 
 WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
 {
-	DBG_LOG(1,"mode_control_6a",("W $%02x\n", data));
+	DBG_LOG(1, "mode_control_6a", ("W $%02x\n", data));
 
 	m_video.mode_control_6a = data;
 	set_palette_luts();
@@ -244,7 +249,7 @@ void p1_state::set_palette_luts(void)
 {
 	/* Setup 2bpp palette lookup table */
 	// HIRES
-	if ( m_video.color_select_68 & 0x80 )
+	if (m_video.color_select_68 & 0x80)
 	{
 		m_video.palette_lut_2bpp[0] = 0;
 	}
@@ -285,17 +290,17 @@ void p1_state::set_palette_luts(void)
   cga fetches 2 byte per mc6845 access.
 ***************************************************************************/
 
-POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
+POISK1_UPDATE_ROW(p1_state::cga_gfx_2bpp_update_row)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(ra);
-	uint16_t  odd, offset;
+	uint32_t *p = &bitmap.pix32(ra);
+	uint16_t odd, offset;
 	int i;
 
-	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
-	odd = ( ra & 1 ) << 13;
-	offset = ( ma & 0x1fff ) | odd;
-	for ( i = 0; i < stride; i++ )
+	if (ra == 0) DBG_LOG(1, "cga_gfx_2bpp_update_row", ("\n"));
+	odd = (ra & 1) << 13;
+	offset = (ma & 0x1fff) | odd;
+	for (i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
@@ -312,18 +317,18 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
+POISK1_UPDATE_ROW(p1_state::cga_gfx_1bpp_update_row)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(ra);
-	uint8_t   fg = 15, bg = BG_COLOR(m_video.color_select_68);
-	uint16_t  odd, offset;
+	uint32_t *p = &bitmap.pix32(ra);
+	uint8_t fg = 15, bg = BG_COLOR(m_video.color_select_68);
+	uint16_t odd, offset;
 	int i;
 
-	if ( ra == 0 ) DBG_LOG(1,"cga_gfx_1bpp_update_row",("bg %d\n", bg));
-	odd = ( ra & 1 ) << 13;
-	offset = ( ma & 0x1fff ) | odd;
-	for ( i = 0; i < stride; i++ )
+	if (ra == 0) DBG_LOG(1, "cga_gfx_1bpp_update_row", ("bg %d\n", bg));
+	odd = (ra & 1) << 13;
+	offset = (ma & 0x1fff) | odd;
+	for (i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
@@ -344,18 +349,18 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000
 ***************************************************************************/
 
-POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
+POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(ra);
-	uint8_t   fg, bg = BG_COLOR(m_video.color_select_68);
-	uint16_t  odd, offset;
+	uint32_t *p = &bitmap.pix32(ra);
+	uint8_t fg, bg = BG_COLOR(m_video.color_select_68);
+	uint16_t odd, offset;
 	int i;
 
-	if ( ra == 0 ) DBG_LOG(1,"poisk1_gfx_1bpp_update_row",("bg %d\n", bg));
-	odd = ( ra & 1 ) << 13;
-	offset = ( ma & 0x1fff ) | odd;
-	for ( i = 0; i < stride; i++ )
+	if (ra == 0) DBG_LOG(1, "poisk1_gfx_1bpp_update_row", ("bg %d\n", bg));
+	odd = (ra & 1) << 13;
+	offset = (ma & 0x1fff) | odd;
+	for (i = 0; i < stride; i++)
 	{
 		uint8_t data = videoram[ offset++ ];
 
@@ -376,28 +381,28 @@ PALETTE_INIT_MEMBER(p1_state, p1)
 {
 	int i;
 
-	DBG_LOG(0,"init",("palette_init()\n"));
+	DBG_LOG(0, "init", ("palette_init()\n"));
 
-	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
+	for (i = 0; i < CGA_PALETTE_SETS * 16; i++)
 	{
-		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
 	}
 }
 
 void p1_state::video_start()
 {
-	address_space &space = m_maincpu->space( AS_PROGRAM );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(0,"init",("video_start()\n"));
+	DBG_LOG(0, "init", ("video_start()\n"));
 
 	memset(&m_video, 0, sizeof(m_video));
 	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
 
-	space.install_readwrite_bank(0xb8000, 0xbbfff, "bank11" );
+	space.install_readwrite_bank(0xb8000, 0xbbfff, "bank11");
 	machine().root_device().membank("bank11")->set_base(m_video.videoram);
-	space.install_readwrite_bank(0xbc000, 0xbffff, "bank12" );
+	space.install_readwrite_bank(0xbc000, 0xbffff, "bank12");
 	machine().root_device().membank("bank12")->set_base(m_video.videoram + 0x4000);
 }
 
@@ -410,13 +415,19 @@ uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	// bit 6 of 6Ah disables color burst -- not implemented
 	for (ra = cliprect.min_y; ra <= cliprect.max_y; ra++)
 	{
-		if (BIT(m_video.color_select_68, 7)) {
-			if (BIT(m_video.mode_control_6a, 7)) {
+		if (BIT(m_video.color_select_68, 7))
+		{
+			if (BIT(m_video.mode_control_6a, 7))
+			{
 				cga_gfx_1bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
-			} else {
+			}
+			else
+			{
 				poisk1_gfx_1bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
 			}
-		} else {
+		}
+		else
+		{
 			cga_gfx_2bpp_update_row(bitmap, cliprect, m_video.videoram, ma, ra, m_video.stride);
 		}
 		if (ra & 1) ma += m_video.stride;
@@ -427,13 +438,13 @@ uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 // Timer.  Poisk-1 uses single XTAL for everything? -- check
 
-WRITE_LINE_MEMBER( p1_state::p1_speaker_set_spkrdata )
+WRITE_LINE_MEMBER(p1_state::p1_speaker_set_spkrdata)
 {
 	m_p1_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);
 }
 
-WRITE_LINE_MEMBER( p1_state::p1_pit8253_out2_changed )
+WRITE_LINE_MEMBER(p1_state::p1_pit8253_out2_changed)
 {
 	m_p1_input = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);
@@ -444,7 +455,7 @@ WRITE_LINE_MEMBER( p1_state::p1_pit8253_out2_changed )
 WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
 {
 	m_kbpoll_mask = data;
-	DBG_LOG(2,"p1_ppi_porta_w",("( %02X -> %02X )\n", data, m_kbpoll_mask));
+	DBG_LOG(2, "p1_ppi_porta_w", ("( %02X -> %02X )\n", data, m_kbpoll_mask));
 }
 
 READ8_MEMBER(p1_state::p1_ppi_porta_r)
@@ -452,7 +463,7 @@ READ8_MEMBER(p1_state::p1_ppi_porta_r)
 	uint8_t ret;
 
 	ret = m_kbpoll_mask;
-	DBG_LOG(1,"p1_ppi_porta_r",("= %02X\n", ret));
+	DBG_LOG(1, "p1_ppi_porta_r", ("= %02X\n", ret));
 	return ret;
 }
 
@@ -499,60 +510,59 @@ READ8_MEMBER(p1_state::p1_ppi2_portc_r)
 	int data = 0xff;
 	double tap_val = m_cassette->input();
 
-	data = ( data & ~0x10 ) | ( tap_val < 0 ? 0x10 : 0x00 );
+	data = (data & ~0x10) | (tap_val < 0 ? 0x10 : 0x00);
 
-	DBG_LOG(2,"p1_ppi_portc_r",("= %02X (tap_val %f) at %s\n",
-		data, tap_val, machine().describe_context()));
+	DBG_LOG(2, "p1_ppi_portc_r", ("= %02X (tap_val %f) at %s\n", data, tap_val, machine().describe_context()));
 	return data;
 }
 
 WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
 {
 	m_pit8253->write_gate2(BIT(data, 0));
-	p1_speaker_set_spkrdata( data & 0x02 );
+	p1_speaker_set_spkrdata(data & 0x02);
 }
 
 READ8_MEMBER(p1_state::p1_ppi_r)
 {
-//  DBG_LOG(1,"p1ppi",("R %.2x\n", 0x60+offset));
-	switch (offset) {
-		case 0:
-			return m_ppi8255n1->read(space, 0);
-		case 9:
-		case 10:
-		case 11:
-			return m_ppi8255n1->read(space, offset - 8);
-		case 8:
-			return m_ppi8255n2->read(space, 0);
-		case 1:
-		case 2:
-		case 3:
-			return m_ppi8255n2->read(space, offset);
-		default:
-			DBG_LOG(1,"p1ppi",("R %.2x (unimp)\n", 0x60+offset));
-			return 0xff;
+	switch (offset)
+	{
+	case 0:
+		return m_ppi8255n1->read(space, 0);
+	case 9:
+	case 10:
+	case 11:
+		return m_ppi8255n1->read(space, offset - 8);
+	case 8:
+		return m_ppi8255n2->read(space, 0);
+	case 1:
+	case 2:
+	case 3:
+		return m_ppi8255n2->read(space, offset);
+	default:
+		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
+		return 0xff;
 	}
 }
 
 WRITE8_MEMBER(p1_state::p1_ppi_w)
 {
-//  DBG_LOG(1,"p1ppi",("W %.2x $%02x\n", 0x60+offset, data));
-	switch (offset) {
-		case 0:
-			return m_ppi8255n1->write(space, 0, data);
-		case 9:
-		case 10:
-		case 11:
-			return m_ppi8255n1->write(space, offset - 8, data);
-		case 8:
-			return m_ppi8255n2->write(space, 0, data);
-		case 1:
-		case 2:
-		case 3:
-			return m_ppi8255n2->write(space, offset, data);
-		default:
-			DBG_LOG(1,"p1ppi",("W %.2x $%02x (unimp)\n", 0x60+offset, data));
-			return;
+	switch (offset)
+	{
+	case 0:
+		return m_ppi8255n1->write(space, 0, data);
+	case 9:
+	case 10:
+	case 11:
+		return m_ppi8255n1->write(space, offset - 8, data);
+	case 8:
+		return m_ppi8255n2->write(space, 0, data);
+	case 1:
+	case 2:
+	case 3:
+		return m_ppi8255n2->write(space, offset, data);
+	default:
+		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
+		return;
 	}
 }
 
@@ -562,24 +572,24 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER( p1_state, poisk1 )
+DRIVER_INIT_MEMBER(p1_state, poisk1)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(0,"init",("driver_init()\n"));
+	DBG_LOG(0, "init", ("driver_init()\n"));
 
-	program.install_readwrite_bank(0, m_ram->size()-1, "bank10");
-	membank( "bank10" )->set_base( m_ram->pointer() );
+	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
+	membank("bank10")->set_base(m_ram->pointer());
 }
 
-MACHINE_START_MEMBER( p1_state, poisk1 )
+MACHINE_START_MEMBER(p1_state, poisk1)
 {
-	DBG_LOG(0,"init",("machine_start()\n"));
+	DBG_LOG(0, "init", ("machine_start()\n"));
 }
 
-MACHINE_RESET_MEMBER( p1_state, poisk1 )
+MACHINE_RESET_MEMBER(p1_state, poisk1)
 {
-	DBG_LOG(0,"init",("machine_reset()\n"));
+	DBG_LOG(0, "init", ("machine_reset()\n"));
 
 	m_kbpoll_mask = 0;
 }

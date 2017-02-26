@@ -2,15 +2,15 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/iskr103x.c
+	drivers/iskr103x.c
 
-    Driver file for Iskra-1030, 1031
+	Driver file for Iskra-1030, 1031
 
-    TODO
-    - fix cyrillic chargen upload for CGA and MDA
-    - replace DIP switch definition
-    - keyboard test is not passing (code 301)
-    - hard disk is connected but untested
+	TODO
+	- fix cyrillic chargen upload for CGA and MDA
+	- replace DIP switch definition
+	- keyboard test is not passing (code 301)
+	- hard disk is connected but untested
 
 ***************************************************************************/
 
@@ -31,8 +31,9 @@ class iskr103x_state : public driver_device
 {
 public:
 	iskr103x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 };

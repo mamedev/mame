@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/mc1502.c
+	drivers/mc1502.c
 
-    Driver file for Electronika MC 1502
+	Driver file for Elektronika MS 1502
 
 ***************************************************************************/
 
@@ -64,13 +64,16 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	   keep pulsing while any key is pressed, and pulse one time after all keys
 	   are released.
 	 */
-	if (key) {
-		if (m_kbd.pulsing < 2) {
+	if (key)
+	{
+		if (m_kbd.pulsing < 2)
+		{
 			m_kbd.pulsing += 2;
 		}
 	}
 
-	if (m_kbd.pulsing) {
+	if (m_kbd.pulsing)
+	{
 		m_pic8259->ir1_w(m_kbd.pulsing & 1);
 		m_kbd.pulsing--;
 	}
@@ -105,9 +108,9 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	int data = 0xff;
 	double tap_val = m_cassette->input();
 
-	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(m_ppi_portb, 7) && m_pit_out2) ? 0x40 : 0x00 );
-	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
-	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00 );
+	data = (data & ~0x40) | (tap_val < 0 ? 0x40 : 0x00) | ((BIT(m_ppi_portb, 7) && m_pit_out2) ? 0x40 : 0x00);
+	data = (data & ~0x20) | (m_pit_out2 ? 0x20 : 0x00);
+	data = (data & ~0x10) | ((BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00);
 
 //  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
 //      data, tap_val, m_pit_out2, machine().describe_context()));
@@ -155,7 +158,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 {
-	if (!BIT(m_ppi_portc,3))
+	if (!BIT(m_ppi_portc, 3))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -178,35 +181,36 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
+DRIVER_INIT_MEMBER(mc1502_state, mc1502)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(0,"init",("driver_init()\n"));
+	DBG_LOG(0, "init", ("driver_init()\n"));
 
-	program.install_readwrite_bank(0, m_ram->size()-1, "bank10");
-	membank( "bank10" )->set_base( m_ram->pointer() );
+	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
+	membank("bank10")->set_base(m_ram->pointer());
 }
 
-MACHINE_START_MEMBER( mc1502_state, mc1502 )
+MACHINE_START_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0,"init",("machine_start()\n"));
+	DBG_LOG(0, "init", ("machine_start()\n"));
 
 	/*
-	       Keyboard polling circuit holds IRQ1 high until a key is
-	       pressed, then it starts a timer that pulses IRQ1 low each
-	       40ms (check) for 20ms (check) until all keys are released.
-	       Last pulse causes BIOS to write a 'break' scancode into port 60h.
+		   Keyboard polling circuit holds IRQ1 high until a key is
+		   pressed, then it starts a timer that pulses IRQ1 low each
+		   40ms (check) for 20ms (check) until all keys are released.
+		   Last pulse causes BIOS to write a 'break' scancode into port 60h.
 	 */
 	m_pic8259->ir1_w(1);
 	memset(&m_kbd, 0, sizeof(m_kbd));
-	m_kbd.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_state::keyb_signal_callback),this));
-	m_kbd.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
+	m_kbd.keyb_signal_timer =
+	machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_state::keyb_signal_callback), this));
+	m_kbd.keyb_signal_timer->adjust(attotime::from_msec(20), 0, attotime::from_msec(20));
 }
 
-MACHINE_RESET_MEMBER( mc1502_state, mc1502 )
+MACHINE_RESET_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0,"init",("machine_reset()\n"));
+	DBG_LOG(0, "init", ("machine_reset()\n"));
 
 	m_spkrdata = 0;
 	m_pit_out2 = 1;
@@ -254,7 +258,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_PIT8253_CLK2(XTAL_16MHz/12) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
@@ -268,7 +272,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_I8255_IN_PORTC_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(mc1502_state, mc1502_kppi_portc_w))
 
-	MCFG_DEVICE_ADD( "upd8251", I8251, 0)
+	MCFG_DEVICE_ADD("upd8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -314,7 +318,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
+//	MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */
@@ -395,5 +399,5 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
-COMP ( 1989,    mc1502,     ibm5150,    0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MC-1502", 0)
-COMP ( 1988,    pk88,       ibm5150,    0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP ( 1989,    mc1502,     0,          0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0)
+COMP ( 1988,    pk88,       0,          0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

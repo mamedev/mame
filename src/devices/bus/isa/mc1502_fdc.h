@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Electronika MC 1502 FDC device
+	Electronika MC 1502 FDC device
 
 **********************************************************************/
 
@@ -31,13 +31,13 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	TIMER_CALLBACK_MEMBER( motor_callback );
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	TIMER_CALLBACK_MEMBER(motor_callback);
 
 	DECLARE_READ8_MEMBER(mc1502_fdc_r);
 	DECLARE_READ8_MEMBER(mc1502_fdcv2_r);
 	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
-	DECLARE_WRITE_LINE_MEMBER( mc1502_fdc_irq_drq );
+	DECLARE_WRITE_LINE_MEMBER(mc1502_fdc_irq_drq);
 
 protected:
 	// device-level overrides
@@ -53,7 +53,6 @@ public:
 	uint8_t mc1502_wd17xx_aux_r();
 	uint8_t mc1502_wd17xx_drq_r();
 	uint8_t mc1502_wd17xx_motor_r();
-
 };
 
 

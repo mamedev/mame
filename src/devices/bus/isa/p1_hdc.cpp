@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 HDC device (model B942)
+	Poisk-1 HDC device (model B942)
 
 **********************************************************************/
 
@@ -73,7 +73,7 @@ ROM_END
 
 machine_config_constructor p1_hdc_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( hdc_b942 );
+	return MACHINE_CONFIG_NAME(hdc_b942);
 }
 
 
@@ -83,7 +83,7 @@ machine_config_constructor p1_hdc_device::device_mconfig_additions() const
 
 const tiny_rom_entry *p1_hdc_device::device_rom_region() const
 {
-	return ROM_NAME( p1_hdc );
+	return ROM_NAME(p1_hdc);
 }
 
 
@@ -96,19 +96,23 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 {
 	uint8_t data = 0x00;
 
-	switch (offset >> 8) {
-		case 8:     data = m_hdc->read(space, offset & 255);
+	switch (offset >> 8)
+	{
+	case 8:
+		data = m_hdc->read(space, offset & 255);
 	}
-	DBG_LOG(1,"hdc",("R $%04x == $%02x\n", offset, data));
+	DBG_LOG(1, "hdc", ("R $%04x == $%02x\n", offset, data));
 
 	return data;
 }
 
 WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 {
-	DBG_LOG(1,"hdc",("W $%04x <- $%02x\n", offset, data));
-	switch (offset >> 8) {
-		case 8:     m_hdc->write(space, offset & 255, data, 0);
+	DBG_LOG(1, "hdc", ("W $%04x <- $%02x\n", offset, data));
+	switch (offset >> 8)
+	{
+	case 8:
+		m_hdc->write(space, offset & 255, data, 0);
 	}
 }
 
@@ -116,10 +120,10 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 //  p1_hdc_device - constructor
 //-------------------------------------------------
 
-p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, P1_HDC, "Poisk-1 MFM disk B942", tag, owner, clock, "p1_hdc", __FILE__),
-	device_isa8_card_interface( mconfig, *this ),
-	m_hdc(*this, KM1809VG7_TAG)
+p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, P1_HDC, "Poisk-1 MFM disk B942", tag, owner, clock, "p1_hdc", __FILE__)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_hdc(*this, KM1809VG7_TAG)
 {
 }
 
