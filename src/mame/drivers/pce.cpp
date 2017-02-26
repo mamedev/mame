@@ -419,6 +419,6 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "NEC", "PC Engine", MACHINE_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "NEC", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "NEC", "SuperGrafx", MACHINE_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "NEC / Hudson Soft", "PC Engine", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "NEC / Hudson Soft", "TurboGrafx 16", MACHINE_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "NEC / Hudson Soft", "SuperGrafx", MACHINE_IMPERFECT_SOUND)
