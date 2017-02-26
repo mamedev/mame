@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( polyplay_io_zrepp, AS_IO, 8, polyplay_state )
 	AM_IMPORT_FROM(polyplay_io_zre)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( polyplay )
