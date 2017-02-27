@@ -952,7 +952,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"homelab",
 		"hp",
 		"ibm6580",
-		"ie15",
 		"imp",
 		"intel",
 		"interpro",
