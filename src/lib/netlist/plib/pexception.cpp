@@ -30,7 +30,7 @@ pexception::~pexception() noexcept
 {
 }
 
-file_e::file_e(const pstring fmt, const pstring &filename)
+file_e::file_e(const pstring &fmt, const pstring &filename)
 	: pexception(pfmt(fmt)(filename))
 {
 }

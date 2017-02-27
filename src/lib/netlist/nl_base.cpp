@@ -641,7 +641,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-core_device_t *netlist_t::get_single_device(const pstring classname, bool (*cc)(core_device_t *))
+core_device_t *netlist_t::get_single_device(const pstring &classname, bool (*cc)(core_device_t *))
 {
 	core_device_t *ret = nullptr;
 	for (auto &d : m_devices)
@@ -764,7 +764,7 @@ void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_term
 // family_setter_t
 // -----------------------------------------------------------------------------
 
-detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring desc)
+detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring &desc)
 {
 	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
 }
@@ -1186,7 +1186,7 @@ const pstring param_model_t::model_type()
 	return m_map["COREMODEL"];
 }
 
-param_str_t::param_str_t(device_t &device, const pstring name, const pstring val)
+param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1200,7 +1200,7 @@ void param_str_t::changed()
 {
 }
 
-param_double_t::param_double_t(device_t &device, const pstring name, const double val)
+param_double_t::param_double_t(device_t &device, const pstring &name, const double val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1211,7 +1211,7 @@ param_double_t::~param_double_t()
 {
 }
 #endif
-param_int_t::param_int_t(device_t &device, const pstring name, const int val)
+param_int_t::param_int_t(device_t &device, const pstring &name, const int val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1224,7 +1224,7 @@ param_int_t::~param_int_t()
 }
 #endif
 
-param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
+param_logic_t::param_logic_t(device_t &device, const pstring &name, const bool val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1237,7 +1237,7 @@ param_logic_t::~param_logic_t()
 }
 #endif
 
-param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
+param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 : param_t(device, name)
 {
 	m_param = val; //device.setup().get_initial_param_val(this->name(),val);
@@ -1270,7 +1270,7 @@ nl_double param_model_t::model_value(const pstring &entity)
 	return netlist().setup().model_value(m_map, entity);
 }
 
-param_data_t::param_data_t(device_t &device, const pstring name)
+param_data_t::param_data_t(device_t &device, const pstring &name)
 : param_str_t(device, name, "")
 {
 }
