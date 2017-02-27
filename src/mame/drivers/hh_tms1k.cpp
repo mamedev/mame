@@ -27,7 +27,7 @@
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
- @MP0908   TMS1000   1979, Conic I.Q.
+ @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
@@ -171,6 +171,7 @@
 #include "einvader.lh"
 #include "elecbowl.lh"
 #include "elecdet.lh"
+#include "eleciq.lh" // clickable
 #include "esbattle.lh"
 #include "esoccer.lh"
 #include "f2pbball.lh"
@@ -1776,8 +1777,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic Basketball
+  * PCB label CONIC 101-006
   * TMS1000NLL MP0907 (die label 1000B MP0907)
-  * PCB label: CONIC 101-006
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   There are 3 known versions of Conic Basketball: MP0910(101-003) and
@@ -1885,8 +1886,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic Multisport
+  * PCB label CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * TMS1000 MP0168 (die label same)
-  * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * 2 7seg LEDs, 33 other LEDs, 1-bit sound
 
   This handheld includes 3 games: Basketball, Ice Hockey, Soccer.
@@ -2251,8 +2252,12 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic I.Q.
+  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
+    CONIC 102-001, led PCB: CONIC 100-003 REV A itac
   * TMS1000NLL MP0908 (die label 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
+  
+  This is a peg solitaire game, with random start position.
 
   known releases:
   - Hong Kong: Electronic I.Q.
@@ -2271,6 +2276,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
@@ -2305,17 +2312,61 @@ WRITE16_MEMBER(eleciq_state::write_o)
 READ8_MEMBER(eleciq_state::read_k)
 {
 	// K: multiplexed inputs
-	return 0;
-	//return read_inputs(3);
+	return read_inputs(7);
 }
 
 
 // config
 
 static INPUT_PORTS_START( eleciq )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_START("IN.0") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Up-Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Up")
+
+	PORT_START("IN.1") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Button B")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Up-Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Down")
+
+	PORT_START("IN.2") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Down-Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Left")
+
+	PORT_START("IN.3") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button D")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Down-Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Right")
+
+	PORT_START("IN.4") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Button E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Button 5")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button F")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R9
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x01, "2" ) // professional
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, 0)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
+{
+	// reset button is directly wired to TMS1000 INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static MACHINE_CONFIG_START( eleciq, eleciq_state )
 
@@ -2326,7 +2377,7 @@ static MACHINE_CONFIG_START( eleciq, eleciq_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eleciq_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_eleciq)
+	MCFG_DEFAULT_LAYOUT(layout_eleciq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2580,7 +2631,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 2
-  * PCB label: ZENY
+  * PCB label ZENY
   * TMS1000 MCU, MP0923 (die label same)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -2703,7 +2754,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 3
-  * PCB label: ZENY
+  * PCB label ZENY
   * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
@@ -8939,7 +8990,7 @@ CONS( 1979, cnbaskb,   0,        0, cnbaskb,   cnbaskb,   driver_device, 0, "Con
 CONS( 1979, cmsport,   0,        0, cmsport,   cmsport,   driver_device, 0, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, eleciq,    0,        0, eleciq,    eleciq,    driver_device, 0, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, eleciq,    0,        0, eleciq,    eleciq,    driver_device, 0, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, esoccer,   0,        0, esoccer,   esoccer,   driver_device, 0, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
