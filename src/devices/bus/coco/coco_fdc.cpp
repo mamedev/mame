@@ -127,8 +127,8 @@ static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
 
 	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
