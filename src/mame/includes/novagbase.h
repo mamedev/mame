@@ -17,6 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_lcd(*this, "hd44780"),
+		m_nvram(*this, "nvram"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -27,6 +28,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<beep_device> m_beeper;
 	optional_device<hd44780_device> m_lcd;
+	optional_shared_ptr<uint8_t> m_nvram;
 	optional_ioport_array<8> m_inp_matrix; // max 8
 
 	// misc common
