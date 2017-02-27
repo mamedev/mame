@@ -14,7 +14,7 @@
 static const int samplerate = 48000;
 static const int defgain = 48;
 
-const device_type WIPING = &device_creator<wiping_sound_device>;
+const device_type WIPING = device_creator<wiping_sound_device>;
 
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WIPING, "Wiping Audio Custom", tag, owner, clock, "wiping_sound", __FILE__),

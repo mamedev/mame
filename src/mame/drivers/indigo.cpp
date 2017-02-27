@@ -19,14 +19,16 @@
 \*********************************************************************/
 
 #include "emu.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/8530scc.h"
-#include "machine/sgi.h"
 #include "machine/eepromser.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "screen.h"
+#include "speaker.h"
 
 class indigo_state : public driver_device
 {

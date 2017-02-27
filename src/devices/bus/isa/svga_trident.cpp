@@ -10,6 +10,8 @@
 #include "svga_trident.h"
 #include "video/pc_vga.h"
 
+#include "screen.h"
+
 
 ROM_START( tgui9680 )
 	ROM_REGION( 0x8000, "tgui9680", 0 )
@@ -21,7 +23,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SVGA_TGUI9680 = &device_creator<isa16_svga_tgui9680_device>;
+const device_type ISA16_SVGA_TGUI9680 = device_creator<isa16_svga_tgui9680_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_trident )

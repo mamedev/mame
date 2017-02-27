@@ -176,26 +176,33 @@ TODO:
         approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
  ***********************************************************************************************************/
 #include "emu.h"
-#include "machine/6821pia.h"
-#include "machine/6840ptm.h"
-#include "machine/nvram.h"
+#include "includes/mpu4.h"
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
+
+#include "machine/6821pia.h"
+#include "machine/6840ptm.h"
+#include "machine/6850acia.h"
+#include "machine/meters.h"
+#include "machine/nvram.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
+
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/ym2413.h"
-#include "sound/upd7759.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
-#include "video/scn2674.h"
-#include "video/ef9369.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/6850acia.h"
 #include "sound/saa1099.h"
+#include "sound/upd7759.h"
+#include "sound/ym2413.h"
+
+#include "video/ef9369.h"
+#include "video/scn2674.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
-#include "includes/mpu4.h"
 
 
 struct bt471_t

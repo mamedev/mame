@@ -27,6 +27,7 @@ CPU is an Intel 80188
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "screen.h"
 
 
 class timetrv_state : public driver_device

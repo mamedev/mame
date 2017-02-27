@@ -10,7 +10,7 @@ static const int divisor[TMS3615_TONES] = { 478, 451, 426, 402, 379, 358, 338, 3
 
 
 // device type definition
-const device_type TMS3615 = &device_creator<tms3615_device>;
+const device_type TMS3615 = device_creator<tms3615_device>;
 
 
 //**************************************************************************

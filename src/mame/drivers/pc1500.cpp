@@ -16,6 +16,8 @@
 #include "cpu/lh5801/lh5801.h"
 #include "machine/lh5810.h"
 #include "machine/upd1990a.h"
+#include "screen.h"
+
 #include "pc1500.lh"
 
 

@@ -47,7 +47,7 @@ SMS version is not playing PSG sound on his Mark III with the FM unit.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SEGA_FM_UNIT = &device_creator<sega_fm_unit_device>;
+const device_type SEGA_FM_UNIT = device_creator<sega_fm_unit_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( fm_config )

@@ -30,21 +30,21 @@
 //#define LOG_DEV_CALLS(x)   printf x
 #define LOG_DEV_CALLS(x)   do { } while (0)
 
-const device_type NETLIST_CORE = &device_creator<netlist_mame_device_t>;
-const device_type NETLIST_CPU = &device_creator<netlist_mame_cpu_device_t>;
-const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
+const device_type NETLIST_CORE = device_creator<netlist_mame_device_t>;
+const device_type NETLIST_CPU = device_creator<netlist_mame_cpu_device_t>;
+const device_type NETLIST_SOUND = device_creator<netlist_mame_sound_device_t>;
 
 /* subdevices */
 
-const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
-const device_type NETLIST_INT_INPUT = &device_creator<netlist_mame_int_input_t>;
-const device_type NETLIST_RAM_POINTER = &device_creator<netlist_ram_pointer_t>;
-const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
-const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
+const device_type NETLIST_ANALOG_INPUT = device_creator<netlist_mame_analog_input_t>;
+const device_type NETLIST_INT_INPUT = device_creator<netlist_mame_int_input_t>;
+const device_type NETLIST_RAM_POINTER = device_creator<netlist_ram_pointer_t>;
+const device_type NETLIST_LOGIC_INPUT = device_creator<netlist_mame_logic_input_t>;
+const device_type NETLIST_STREAM_INPUT = device_creator<netlist_mame_stream_input_t>;
 
-const device_type NETLIST_LOGIC_OUTPUT = &device_creator<netlist_mame_logic_output_t>;
-const device_type NETLIST_ANALOG_OUTPUT = &device_creator<netlist_mame_analog_output_t>;
-const device_type NETLIST_STREAM_OUTPUT = &device_creator<netlist_mame_stream_output_t>;
+const device_type NETLIST_LOGIC_OUTPUT = device_creator<netlist_mame_logic_output_t>;
+const device_type NETLIST_ANALOG_OUTPUT = device_creator<netlist_mame_analog_output_t>;
+const device_type NETLIST_STREAM_OUTPUT = device_creator<netlist_mame_stream_output_t>;
 
 // ----------------------------------------------------------------------------------------
 // Special netlist extension devices  ....

@@ -42,15 +42,19 @@ ToDO:
 *****************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "taito.lh"
+
 
 class taito_state : public genpin_class
 {

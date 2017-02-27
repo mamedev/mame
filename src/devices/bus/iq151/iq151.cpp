@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151CART_SLOT = &device_creator<iq151cart_slot_device>;
+const device_type IQ151CART_SLOT = device_creator<iq151cart_slot_device>;
 
 //**************************************************************************
 //    IQ151 cartridge interface

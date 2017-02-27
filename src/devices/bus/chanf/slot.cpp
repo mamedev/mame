@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CHANF_CART_SLOT = &device_creator<channelf_cart_slot_device>;
+const device_type CHANF_CART_SLOT = device_creator<channelf_cart_slot_device>;
 
 //**************************************************************************
 //    Channel F cartridges Interface

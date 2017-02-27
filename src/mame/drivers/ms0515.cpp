@@ -26,7 +26,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
-#include "formats/ms0515_dsk.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -34,8 +33,12 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+
+#include "screen.h"
+
+#include "formats/ms0515_dsk.h"
 
 #include "ms0515.lh"
 

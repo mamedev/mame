@@ -60,15 +60,20 @@
 ******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9980a.h"
+#include "imagedev/cassette.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
-#include "video/tms9928a.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "video/tms9928a.h"
+
+#include "speaker.h"
+
 #include "tm990189.lh"
 #include "tm990189v.lh"
+
 
 #define TMS9901_0_TAG "tms9901_usr"
 #define TMS9901_1_TAG "tms9901_sys"
@@ -77,15 +82,16 @@ class tm990189_state : public driver_device
 {
 public:
 	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_tms9980a(*this, "maincpu"),
-	m_speaker(*this, "speaker"),
-	m_cass(*this, "cassette"),
-	m_tms9918(*this, "tms9918" ),
-	m_maincpu(*this, "maincpu"),
-	m_cassette(*this, "cassette"),
-	m_tms9901_usr(*this, TMS9901_0_TAG),
-	m_tms9901_sys(*this, TMS9901_1_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_tms9980a(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_tms9918(*this, "tms9918")
+		, m_maincpu(*this, "maincpu")
+		, m_cassette(*this, "cassette")
+		, m_tms9901_usr(*this, TMS9901_0_TAG)
+		, m_tms9901_sys(*this, TMS9901_1_TAG)
+	{ }
 
 	required_device<tms9980a_device> m_tms9980a;
 	required_device<speaker_sound_device> m_speaker;
@@ -451,7 +457,7 @@ protected:
 	virtual void device_start() override;
 };
 
-const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
+const device_type TM990_189_RS232 = device_creator<tm990_189_rs232_image_device>;
 
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),

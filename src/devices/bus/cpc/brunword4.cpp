@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "brunword4.h"
 
-const device_type CPC_BRUNWORD_MK4 = &device_creator<cpc_brunword4_device>;
+const device_type CPC_BRUNWORD_MK4 = device_creator<cpc_brunword4_device>;
 
 
 ROM_START( cpc_brunword4 )

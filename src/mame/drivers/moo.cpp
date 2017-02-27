@@ -115,14 +115,16 @@ Bucky:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/moo.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/moo.h"
+#include "speaker.h"
 
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)

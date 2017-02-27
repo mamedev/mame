@@ -97,23 +97,20 @@ Address bus A0-A11 is Y0-Y11
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/bankdev.h"
-#include "machine/ram.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "formats/ap2_dsk.h"
+#include "video/apple2.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "formats/ap_dsk35.h"
-#include "machine/sonydriv.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/appldriv.h"
-#include "bus/rs232/rs232.h"
+#include "machine/bankdev.h"
+#include "machine/kb3600.h"
 #include "machine/mos6551.h"
-#include "video/apple2.h"
+#include "machine/ram.h"
+#include "machine/sonydriv.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"
@@ -150,7 +147,15 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
 
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap2_dsk.h"
+#include "formats/ap_dsk35.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"

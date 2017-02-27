@@ -24,8 +24,11 @@
 #include "emu.h"
 #include "ef9364.h"
 
+#include "screen.h"
+
+
 // devices
-const device_type EF9364 = &device_creator<ef9364_device>;
+const device_type EF9364 = device_creator<ef9364_device>;
 
 //-------------------------------------------------
 // default address map

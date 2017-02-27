@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-extern const device_type MIDWAY_CHEAP_SQUEAK_DELUXE = &device_creator<midway_cheap_squeak_deluxe_device>;
+const device_type MIDWAY_CHEAP_SQUEAK_DELUXE = device_creator<midway_cheap_squeak_deluxe_device>;
 
 //-------------------------------------------------
 //  audio cpu map

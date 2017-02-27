@@ -26,7 +26,10 @@ Bugs
 
 #include "emu.h"
 #include "includes/aim65.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 #include "aim65.lh"
 
 

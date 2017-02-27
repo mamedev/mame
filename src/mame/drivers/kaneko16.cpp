@@ -97,12 +97,15 @@ Non-Bugs (happen on real PCB)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kaneko16.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/kaneko16.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "machine/kaneko_hit.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************

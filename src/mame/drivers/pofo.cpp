@@ -33,8 +33,7 @@
 */
 
 #include "emu.h"
-#include "rendlay.h"
-#include "softlist.h"
+
 #include "cpu/i86/i86.h"
 #include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
@@ -42,6 +41,11 @@
 #include "machine/ram.h"
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
 
 
 

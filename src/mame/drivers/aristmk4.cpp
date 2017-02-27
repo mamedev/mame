@@ -320,6 +320,8 @@
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 // Button panel and lamps
 #include "aristmk4.lh" // AU 90cr with gamble

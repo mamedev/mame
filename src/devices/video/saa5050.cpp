@@ -26,14 +26,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SAA5050 = &device_creator<saa5050_device>;
-const device_type SAA5051 = &device_creator<saa5051_device>;
-const device_type SAA5052 = &device_creator<saa5052_device>;
-const device_type SAA5053 = &device_creator<saa5053_device>;
-const device_type SAA5054 = &device_creator<saa5054_device>;
-const device_type SAA5055 = &device_creator<saa5055_device>;
-const device_type SAA5056 = &device_creator<saa5056_device>;
-const device_type SAA5057 = &device_creator<saa5057_device>;
+const device_type SAA5050 = device_creator<saa5050_device>;
+const device_type SAA5051 = device_creator<saa5051_device>;
+const device_type SAA5052 = device_creator<saa5052_device>;
+const device_type SAA5053 = device_creator<saa5053_device>;
+const device_type SAA5054 = device_creator<saa5054_device>;
+const device_type SAA5055 = device_creator<saa5055_device>;
+const device_type SAA5056 = device_creator<saa5056_device>;
+const device_type SAA5057 = device_creator<saa5057_device>;
 
 
 //-------------------------------------------------

@@ -11,12 +11,13 @@
 
 #include <algorithm>
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // devices
-const device_type MM5740 = &device_creator<mm5740_device>;
+const device_type MM5740 = device_creator<mm5740_device>;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

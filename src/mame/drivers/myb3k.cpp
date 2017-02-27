@@ -14,8 +14,9 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
 #include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class myb3k_state : public driver_device
 {

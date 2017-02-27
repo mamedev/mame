@@ -86,9 +86,12 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bishi.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
-#include "includes/bishi.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(bishi_state::control_r)
 {

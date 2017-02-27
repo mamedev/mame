@@ -3,6 +3,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "sound/qs1000.h"
+#include "screen.h"
 
 class eolith_state : public driver_device
 {

@@ -16,10 +16,10 @@
 #include "emu.h"
 #include "decopincpu.h"
 
-const device_type DECOCPU1 = &device_creator<decocpu_type1_device>;
-const device_type DECOCPU2 = &device_creator<decocpu_type2_device>;
-const device_type DECOCPU3 = &device_creator<decocpu_type3_device>;
-const device_type DECOCPU3B = &device_creator<decocpu_type3b_device>;
+const device_type DECOCPU1 = device_creator<decocpu_type1_device>;
+const device_type DECOCPU2 = device_creator<decocpu_type2_device>;
+const device_type DECOCPU3 = device_creator<decocpu_type3_device>;
+const device_type DECOCPU3B = device_creator<decocpu_type3b_device>;
 
 static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")

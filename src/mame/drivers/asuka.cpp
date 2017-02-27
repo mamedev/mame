@@ -216,17 +216,20 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/asuka.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z180/z180.h"
+#include "cpu/z80/z80.h"
+#include "machine/bonzeadv.h"
 #include "machine/watchdog.h"
 #include "sound/2610intf.h"
-#include "sound/ym2151.h"
 #include "sound/msm5205.h"
-#include "includes/asuka.h"
-#include "machine/bonzeadv.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***********************************************************

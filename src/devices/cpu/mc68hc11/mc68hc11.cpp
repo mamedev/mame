@@ -39,7 +39,7 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-const device_type MC68HC11 = &device_creator<mc68hc11_cpu_device>;
+const device_type MC68HC11 = device_creator<mc68hc11_cpu_device>;
 
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

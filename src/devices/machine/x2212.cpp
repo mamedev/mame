@@ -31,8 +31,8 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // device type definition
-const device_type X2212 = &device_creator<x2212_device>;
-const device_type X2210 = &device_creator<x2210_device>;
+const device_type X2212 = device_creator<x2212_device>;
+const device_type X2210 = device_creator<x2210_device>;
 
 //-------------------------------------------------
 //  x2212_device - constructor

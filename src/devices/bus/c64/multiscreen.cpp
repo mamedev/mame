@@ -78,7 +78,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MULTISCREEN = &device_creator<c64_multiscreen_cartridge_device>;
+const device_type C64_MULTISCREEN = device_creator<c64_multiscreen_cartridge_device>;
 
 
 //-------------------------------------------------

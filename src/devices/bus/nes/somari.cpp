@@ -36,7 +36,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_SOMARI = &device_creator<nes_somari_device>;
+const device_type NES_SOMARI = device_creator<nes_somari_device>;
 
 
 nes_somari_device::nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

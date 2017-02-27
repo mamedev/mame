@@ -728,4 +728,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-const device_type TI99_BWG = &device_creator<snug_bwg_device>;
+const device_type TI99_BWG = device_creator<snug_bwg_device>;

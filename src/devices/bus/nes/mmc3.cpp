@@ -30,6 +30,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -45,12 +46,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TXROM = &device_creator<nes_txrom_device>;
-const device_type NES_HKROM = &device_creator<nes_hkrom_device>;
-const device_type NES_TXSROM = &device_creator<nes_txsrom_device>;
-const device_type NES_TQROM = &device_creator<nes_tqrom_device>;
-const device_type NES_QJ_PCB = &device_creator<nes_qj_device>;
-const device_type NES_ZZ_PCB = &device_creator<nes_zz_device>;
+const device_type NES_TXROM = device_creator<nes_txrom_device>;
+const device_type NES_HKROM = device_creator<nes_hkrom_device>;
+const device_type NES_TXSROM = device_creator<nes_txsrom_device>;
+const device_type NES_TQROM = device_creator<nes_tqrom_device>;
+const device_type NES_QJ_PCB = device_creator<nes_qj_device>;
+const device_type NES_ZZ_PCB = device_creator<nes_zz_device>;
 
 
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

@@ -33,7 +33,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
+const device_type A78_CART_SLOT = device_creator<a78_cart_slot_device>;
 
 
 //-------------------------------------------------

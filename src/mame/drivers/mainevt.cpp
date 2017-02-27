@@ -23,13 +23,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mainevt.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/mainevt.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_interrupt)
 {

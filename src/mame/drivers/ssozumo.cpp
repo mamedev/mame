@@ -11,11 +11,14 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 #include "emu.h"
 #include "includes/ssozumo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void ssozumo_state::machine_start()

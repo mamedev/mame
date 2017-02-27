@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_TUBE_SLOT = &device_creator<bbc_tube_slot_device>;
+const device_type BBC_TUBE_SLOT = device_creator<bbc_tube_slot_device>;
 
 
 

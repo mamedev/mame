@@ -13,7 +13,7 @@
 #include "includes/hp9845.h"
 
 // device type definition
-const device_type HP9845_IO_SLOT = &device_creator<hp9845_io_slot_device>;
+const device_type HP9845_IO_SLOT = device_creator<hp9845_io_slot_device>;
 
 // +---------------------+
 // |hp9845_io_slot_device|

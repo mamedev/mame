@@ -38,13 +38,15 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
+#include "machine/6821pia.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class pegasus_state : public driver_device

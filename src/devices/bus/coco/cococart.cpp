@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
+const device_type COCOCART_SLOT = device_creator<cococart_slot_device>;
 
 
 

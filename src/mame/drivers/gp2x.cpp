@@ -21,6 +21,8 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class gp2x_state : public driver_device

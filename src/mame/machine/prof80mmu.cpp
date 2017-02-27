@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PROF80_MMU = &device_creator<prof80_mmu_device>;
+const device_type PROF80_MMU = device_creator<prof80_mmu_device>;
 
 
 DEVICE_ADDRESS_MAP_START( z80_program_map, 8, prof80_mmu_device )

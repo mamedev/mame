@@ -1454,4 +1454,4 @@ machine_config_constructor diablo_hd_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( diablo_drive );
 }
 
-const device_type DIABLO_HD = &device_creator<diablo_hd_device>;
+const device_type DIABLO_HD = device_creator<diablo_hd_device>;

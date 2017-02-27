@@ -23,7 +23,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type JANGOU_BLITTER = &device_creator<jangou_blitter_device>;
+const device_type JANGOU_BLITTER = device_creator<jangou_blitter_device>;
 
 
 //**************************************************************************

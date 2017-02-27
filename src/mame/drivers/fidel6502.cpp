@@ -404,6 +404,7 @@ I/O is via TTL, very similar to Designer Display
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
@@ -411,6 +412,7 @@ I/O is via TTL, very similar to Designer Display
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "fidel_chesster.lh" // clickable

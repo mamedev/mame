@@ -37,10 +37,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/drgnmst.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
-#include "includes/drgnmst.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)

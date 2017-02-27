@@ -21,9 +21,12 @@
 **************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-
 #include "audio/t5182.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class metlfrzr_state : public driver_device
 {
@@ -37,7 +40,7 @@ public:
 		m_video_regs(*this, "vregs"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode")
-		{ }
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

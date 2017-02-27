@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_EXPANSION_SLOT = &device_creator<cbm2_expansion_slot_device>;
+const device_type CBM2_EXPANSION_SLOT = device_creator<cbm2_expansion_slot_device>;
 
 
 

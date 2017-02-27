@@ -35,19 +35,25 @@
 ************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh2/sh2.h"
+#include "includes/stv.h"
+#include "audio/rax.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
+#include "cpu/sh2/sh2.h"
+#include "imagedev/chd_cd.h"
 #include "machine/eepromser.h"
-#include "sound/scsp.h"
-#include "sound/cdda.h"
-#include "audio/rax.h"
 #include "machine/smpc.h"
 #include "machine/stvprot.h"
-#include "includes/stv.h"
-#include "imagedev/chd_cd.h"
-#include "coreutil.h"
+#include "sound/cdda.h"
+#include "sound/scsp.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 

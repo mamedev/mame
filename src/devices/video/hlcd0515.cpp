@@ -17,8 +17,8 @@
 #include "video/hlcd0515.h"
 
 
-const device_type HLCD0515 = &device_creator<hlcd0515_device>;
-const device_type HLCD0569 = &device_creator<hlcd0569_device>;
+const device_type HLCD0515 = device_creator<hlcd0515_device>;
+const device_type HLCD0569 = device_creator<hlcd0569_device>;
 
 //-------------------------------------------------
 //  constructor

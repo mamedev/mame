@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "epson_lx810l.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 //extern const char layout_lx800[]; /* use layout from lx800 */
 
@@ -42,8 +44,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_LX810L = &device_creator<epson_lx810l_t>;
-const device_type EPSON_AP2000 = &device_creator<epson_ap2000_t>;
+const device_type EPSON_LX810L = device_creator<epson_lx810l_t>;
+const device_type EPSON_AP2000 = device_creator<epson_ap2000_t>;
 
 
 //-------------------------------------------------

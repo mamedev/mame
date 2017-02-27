@@ -12,13 +12,17 @@ Bruce Tomlin (hardware info)
 
 #include "emu.h"
 #include "includes/vectrex.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
 #include "video/vector.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start

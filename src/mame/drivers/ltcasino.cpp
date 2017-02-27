@@ -18,6 +18,8 @@ etc.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ltcasino_state : public driver_device

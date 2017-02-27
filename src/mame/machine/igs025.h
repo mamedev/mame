@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 /* Common device stuff for IGS025 / IGS022, should be split into devices for each chip once we know where what part does what */
-
+#ifndef MAME_MACHINE_IGS025_H
+#define MAME_MACHINE_IGS025_H
 
 
 // used to connect the 022
@@ -56,5 +57,6 @@ protected:
 };
 
 
-
 extern const device_type IGS025;
+
+#endif // MAME_MACHINE_IGS025_H

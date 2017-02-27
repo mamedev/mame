@@ -19,8 +19,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jackpool_state : public driver_device

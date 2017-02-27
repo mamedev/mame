@@ -31,6 +31,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 class capr1_state : public driver_device

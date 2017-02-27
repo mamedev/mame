@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CRVISION_CART_SLOT = &device_creator<crvision_cart_slot_device>;
+const device_type CRVISION_CART_SLOT = device_creator<crvision_cart_slot_device>;
 
 //**************************************************************************
 //    CreatiVision Cartridges Interface

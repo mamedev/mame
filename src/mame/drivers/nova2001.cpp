@@ -122,10 +122,14 @@ e000 - e7ff        R/W      Work RAM
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/nova2001.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/nova2001.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_12MHz
 

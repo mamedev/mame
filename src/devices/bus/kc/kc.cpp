@@ -118,8 +118,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KCEXP_SLOT  = &device_creator<kcexp_slot_device>;
-const device_type KCCART_SLOT = &device_creator<kccart_slot_device>;
+const device_type KCEXP_SLOT  = device_creator<kcexp_slot_device>;
+const device_type KCCART_SLOT = device_creator<kccart_slot_device>;
 
 
 //**************************************************************************

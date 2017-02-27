@@ -15,6 +15,7 @@
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
+#include "screen.h"
 
 struct pcfx_pad_t
 {

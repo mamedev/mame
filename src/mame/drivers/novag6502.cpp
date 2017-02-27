@@ -57,11 +57,14 @@ instead of magnet sensors.
 
 #include "emu.h"
 #include "includes/novagbase.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
-#include "bus/rs232/rs232.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "novag_cforte.lh" // clickable

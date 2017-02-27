@@ -22,6 +22,7 @@ Debugging information:
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"
 #include "rendlay.h"
+#include "screen.h"
 
 class cfx9850_state : public driver_device
 {

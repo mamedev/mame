@@ -445,6 +445,8 @@ Notes:
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/naomigd.h"
+#include "screen.h"
+
 
 class triforce_state : public driver_device
 {

@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MB90082 = &device_creator<mb90082_device>;
+const device_type MB90082 = device_creator<mb90082_device>;
 
 static ADDRESS_MAP_START( mb90082_vram, AS_0, 16, mb90082_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // main screen vram

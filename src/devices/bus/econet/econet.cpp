@@ -26,8 +26,8 @@ static const char *const SIGNAL_NAME[] = { "CLK", "DATA" };
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ECONET = &device_creator<econet_device>;
-const device_type ECONET_SLOT = &device_creator<econet_slot_device>;
+const device_type ECONET = device_creator<econet_device>;
+const device_type ECONET_SLOT = device_creator<econet_slot_device>;
 
 
 

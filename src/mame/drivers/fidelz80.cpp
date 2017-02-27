@@ -491,6 +491,7 @@ expect that the software reads these once on startup only.
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
@@ -498,6 +499,7 @@ expect that the software reads these once on startup only.
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "fidel_cc.lh" // clickable

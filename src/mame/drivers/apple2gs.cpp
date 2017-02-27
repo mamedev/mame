@@ -44,22 +44,18 @@
 
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "includes/apple2e.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ap2_dsk.h"
-#include "formats/ap_dsk35.h"
 #include "includes/apple2gs.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "sound/es5503.h"
-#include "machine/applefdc.h"
-#include "machine/z80scc.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
-#include "bus/a2bus/a2bus.h"
+#include "cpu/g65816/g65816.h"
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
+#include "machine/applefdc.h"
+#include "machine/sonydriv.h"
+#include "machine/z80scc.h"
+#include "sound/es5503.h"
+
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
@@ -78,9 +74,13 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
-#include "bus/rs232/rs232.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
+
 
 static const gfx_layout apple2gs_text_layout =
 {

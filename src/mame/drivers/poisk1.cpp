@@ -9,21 +9,22 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "machine/kb_poisk1.h"
-#include "video/cgapal.h"
+
+#include "bus/isa/isa.h"
+#include "bus/isa/xsu_cards.h"
+#include "cpu/i86/i86.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
-#include "bus/isa/isa.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "bus/isa/xsu_cards.h"
-#include "sound/speaker.h"
-
-#include "cpu/i86/i86.h"
+#include "sound/spkrdev.h"
+#include "video/cgapal.h"
 
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */

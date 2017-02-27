@@ -33,6 +33,8 @@
 
 #include "emu.h"
 #include "video/ygv608.h"
+#include "screen.h"
+
 
 #define _ENABLE_SPRITES
 #define _ENABLE_SCROLLX
@@ -147,7 +149,7 @@ static GFXDECODE_START( ygv608 )
 GFXDECODE_END
 
 
-const device_type YGV608 = &device_creator<ygv608_device>;
+const device_type YGV608 = device_creator<ygv608_device>;
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),

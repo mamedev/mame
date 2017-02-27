@@ -33,11 +33,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/epos.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/epos.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
 {

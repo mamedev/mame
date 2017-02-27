@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
+#include "screen.h"
 
 #define MAINCPU_TAG "maincpu"
 #define PTM6840_TAG "ptm"

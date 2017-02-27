@@ -98,22 +98,22 @@ static const uint8_t fpmode_source[4] =
 #define ROPCODE(pc)     direct->read_dword(pc)
 
 
-const device_type VR4300BE = &device_creator<vr4300be_device>;
-const device_type VR4300LE = &device_creator<vr4300le_device>;
-const device_type VR4310BE = &device_creator<vr4310be_device>;
-const device_type VR4310LE = &device_creator<vr4310le_device>;
-const device_type R4600BE = &device_creator<r4600be_device>;
-const device_type R4600LE = &device_creator<r4600le_device>;
-const device_type R4650BE = &device_creator<r4650be_device>;
-const device_type R4650LE = &device_creator<r4650le_device>;
-const device_type R4700BE = &device_creator<r4700be_device>;
-const device_type R4700LE = &device_creator<r4700le_device>;
-const device_type R5000BE = &device_creator<r5000be_device>;
-const device_type R5000LE = &device_creator<r5000le_device>;
-const device_type QED5271BE = &device_creator<qed5271be_device>;
-const device_type QED5271LE = &device_creator<qed5271le_device>;
-const device_type RM7000BE = &device_creator<rm7000be_device>;
-const device_type RM7000LE = &device_creator<rm7000le_device>;
+const device_type VR4300BE = device_creator<vr4300be_device>;
+const device_type VR4300LE = device_creator<vr4300le_device>;
+const device_type VR4310BE = device_creator<vr4310be_device>;
+const device_type VR4310LE = device_creator<vr4310le_device>;
+const device_type R4600BE = device_creator<r4600be_device>;
+const device_type R4600LE = device_creator<r4600le_device>;
+const device_type R4650BE = device_creator<r4650be_device>;
+const device_type R4650LE = device_creator<r4650le_device>;
+const device_type R4700BE = device_creator<r4700be_device>;
+const device_type R4700LE = device_creator<r4700le_device>;
+const device_type R5000BE = device_creator<r5000be_device>;
+const device_type R5000LE = device_creator<r5000le_device>;
+const device_type QED5271BE = device_creator<qed5271be_device>;
+const device_type QED5271LE = device_creator<qed5271le_device>;
+const device_type RM7000BE = device_creator<rm7000be_device>;
+const device_type RM7000LE = device_creator<rm7000le_device>;
 
 
 // VR4300 and VR5432 have 4 fewer PFN bits, and only 32 TLB entries

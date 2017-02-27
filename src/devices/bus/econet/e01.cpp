@@ -75,8 +75,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type E01 = &device_creator<e01_device>;
-const device_type E01S = &device_creator<e01s_device>;
+const device_type E01 = device_creator<e01_device>;
+const device_type E01S = device_creator<e01s_device>;
 
 e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:e01_device(mconfig, E01S, "Acorn FileStore E01S", tag, owner, clock, "e01s", __FILE__) { m_variant = TYPE_E01S; }

@@ -10,14 +10,17 @@
 */
 
 #include "emu.h"
+#include "includes/n64.h"
+
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "imagedev/harddriv.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class n64_mess_state : public n64_state
 {

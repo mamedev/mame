@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
+const device_type NUBUS_SLOT = device_creator<nubus_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -61,7 +61,7 @@ void nubus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS = &device_creator<nubus_device>;
+const device_type NUBUS = device_creator<nubus_device>;
 
 void nubus_device::static_set_cputag(device_t &device, const char *tag)
 {

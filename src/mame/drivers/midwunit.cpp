@@ -91,12 +91,14 @@ Notes:
 
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "audio/dcs.h"
-#include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
+#include "audio/dcs.h"
+
+#include "cpu/tms34010/tms34010.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "machine/nvram.h"
+#include "screen.h"
 
 
 #define PIXEL_CLOCK     (8000000)

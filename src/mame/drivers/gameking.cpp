@@ -25,12 +25,14 @@
   Datasheet: http://www.generalplus.com/doc/ds/GPL133AV10_spec.pdf
 */
 
-#include <stddef.h>
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+
+#include <stddef.h>
 
 class gameking_state : public driver_device
 {

@@ -183,10 +183,12 @@ NOTES:
 #include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/es5503.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/esqpanel.h"
+#include "sound/es5503.h"
+#include "speaker.h"
+
 
 #define WD1772_TAG      "wd1772"
 
@@ -224,7 +226,7 @@ private:
 	void recalc_filter(filter &f);
 };
 
-static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
+static const device_type ESQ1_FILTERS = device_creator<esq1_filters>;
 
 esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),

@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
@@ -27,7 +28,11 @@
 #include "machine/i8251.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "vt100.lh"
+
 
 #define RS232_TAG       "rs232"
 #define COM5016T_TAG    "com5016t"

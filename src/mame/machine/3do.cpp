@@ -61,8 +61,12 @@ Expansion bus stuff:
 
 #include "emu.h"
 #include "includes/3do.h"
+
 #include "cpu/arm7/arm7core.h"
+
 #include "debugger.h"
+#include "screen.h"
+
 
 #define VERBOSE         1
 #define LOG(x) do { if (VERBOSE) printf x; } while (0)

@@ -27,11 +27,15 @@
 
 #include "emu.h"
 #include "includes/next.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "screen.h"
 #include "softlist.h"
+
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

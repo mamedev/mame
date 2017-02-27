@@ -428,7 +428,7 @@ namespace
 	};
 
 }
-const device_type COCO_FDC = &device_creator<coco_fdc_device>;
+const device_type COCO_FDC = device_creator<coco_fdc_device>;
 
 
 //**************************************************************************
@@ -463,7 +463,7 @@ namespace
 	};
 };
 
-const device_type COCO_FDC_V11 = &device_creator<coco_fdc_v11_device>;
+const device_type COCO_FDC_V11 = device_creator<coco_fdc_v11_device>;
 
 
 //**************************************************************************
@@ -498,7 +498,7 @@ namespace
 	};
 };
 
-const device_type COCO3_HDB1 = &device_creator<coco3_hdb1_device>;
+const device_type COCO3_HDB1 = device_creator<coco3_hdb1_device>;
 
 //**************************************************************************
 //              CP400 FDC
@@ -529,4 +529,4 @@ namespace
 	};
 };
 
-const device_type CP400_FDC = &device_creator<cp400_fdc_device>;
+const device_type CP400_FDC = device_creator<cp400_fdc_device>;

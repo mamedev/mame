@@ -21,12 +21,16 @@
 
 ***********************************************************************************/
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "splus.lh"
+
 
 #define DEBUG_OUTPUT 0
 

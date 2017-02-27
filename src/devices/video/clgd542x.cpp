@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "clgd542x.h"
 
+#include "screen.h"
+
+
 #define LOG_REG 0
 #define LOG_BLIT 1
 
@@ -38,12 +41,12 @@
 
 #define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
-const device_type CIRRUS_GD5428 = &device_creator<cirrus_gd5428_device>;
-const device_type CIRRUS_GD5430 = &device_creator<cirrus_gd5430_device>;
+const device_type CIRRUS_GD5428 = device_creator<cirrus_gd5428_device>;
+const device_type CIRRUS_GD5430 = device_creator<cirrus_gd5430_device>;
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
 {
 }
 

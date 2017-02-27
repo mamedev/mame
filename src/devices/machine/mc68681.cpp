@@ -56,9 +56,9 @@ static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 
 #define CHAND_TAG   "chd"
 
 // device type definition
-const device_type MC68681 = &device_creator<mc68681_device>;
-const device_type SC28C94 = &device_creator<sc28c94_device>;
-const device_type MC68681_CHANNEL = &device_creator<mc68681_channel>;
+const device_type MC68681 = device_creator<mc68681_device>;
+const device_type SC28C94 = device_creator<sc28c94_device>;
+const device_type MC68681_CHANNEL = device_creator<mc68681_channel>;
 
 MACHINE_CONFIG_FRAGMENT( duart68681 )
 	MCFG_DEVICE_ADD(CHANA_TAG, MC68681_CHANNEL, 0)

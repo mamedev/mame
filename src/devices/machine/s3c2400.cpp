@@ -9,9 +9,12 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "machine/s3c2400.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/s3c2400.h"
+#include "screen.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -38,7 +41,7 @@ uint32_t s3c2400_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return s3c24xx_video_update(screen, bitmap, cliprect);
 }
 
-const device_type S3C2400 = &device_creator<s3c2400_device>;
+const device_type S3C2400 = device_creator<s3c2400_device>;
 
 s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, S3C2400, "Samsung S3C2400", tag, owner, clock, "s3c2400", __FILE__),

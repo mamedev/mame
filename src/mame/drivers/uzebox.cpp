@@ -13,12 +13,17 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/avr8/avr8.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180

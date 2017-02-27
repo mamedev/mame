@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VB_MONEY_MINDER = &device_creator<videobrain_money_minder_cartridge_device>;
+const device_type VB_MONEY_MINDER = device_creator<videobrain_money_minder_cartridge_device>;
 
 
 

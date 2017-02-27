@@ -21,6 +21,7 @@
 #include "machine/pckeybrd.h"
 #include "bus/lpci/mpc105.h"
 #include "bus/scsi/scsi.h"
+#include "speaker.h"
 
 /* Devices */
 #include "bus/scsi/scsicd.h"

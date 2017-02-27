@@ -291,7 +291,7 @@ int apple525_read_status(device_t *device)
 }
 
 // device type definition
-const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
+const device_type FLOPPY_APPLE = device_creator<apple525_floppy_image_device>;
 
 //-------------------------------------------------
 //  apple525_floppy_image_device - constructor

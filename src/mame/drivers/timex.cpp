@@ -147,20 +147,19 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/timex.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/ay8910.h"
-#include "formats/tzx_cas.h"
-#include "machine/spec_snqk.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/beta.h"
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
-#include "machine/spec_snqk.h"
+
+#include "formats/tzx_cas.h"
+
 
 /****************************************************************************************************/
 /* TS2048 specific functions */

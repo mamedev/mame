@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8257 = &device_creator<i8257_device>;
+const device_type I8257 = device_creator<i8257_device>;
 
 
 

@@ -18,7 +18,7 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 
 // device type definition
-const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
+const device_type WSWAN_SND = device_creator<wswan_sound_device>;
 
 
 //**************************************************************************

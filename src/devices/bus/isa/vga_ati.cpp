@@ -18,7 +18,10 @@
 #include "emu.h"
 #include "vga_ati.h"
 #include "mach32.h"
+
 #include "video/pc_vga.h"
+#include "screen.h"
+
 
 ROM_START( gfxultra )
 	ROM_REGION(0x8000,"gfxultra", 0)
@@ -65,9 +68,9 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_VGA_GFXULTRA = &device_creator<isa16_vga_gfxultra_device>;
-const device_type ISA16_SVGA_GFXULTRAPRO = &device_creator<isa16_vga_gfxultrapro_device>;
-const device_type ISA16_SVGA_MACH64 = &device_creator<isa16_vga_mach64_device>;
+const device_type ISA16_VGA_GFXULTRA = device_creator<isa16_vga_gfxultra_device>;
+const device_type ISA16_SVGA_GFXULTRAPRO = device_creator<isa16_vga_gfxultrapro_device>;
+const device_type ISA16_SVGA_MACH64 = device_creator<isa16_vga_mach64_device>;
 
 static MACHINE_CONFIG_FRAGMENT( vga_ati )
 	MCFG_SCREEN_ADD("screen", RASTER)

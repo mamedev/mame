@@ -100,11 +100,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deco_mlc.h"
+
 #include "machine/deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
-#include "includes/deco_mlc.h"
+#include "speaker.h"
 
 
 /***************************************************************************/

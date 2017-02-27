@@ -178,9 +178,13 @@ Notes:
 
 #include "emu.h"
 #include "includes/fmtowns.h"
+
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 // CD controller IRQ types

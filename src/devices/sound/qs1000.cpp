@@ -131,7 +131,7 @@
 
 
 // device type definition
-const device_type QS1000 = &device_creator<qs1000_device>;
+const device_type QS1000 = device_creator<qs1000_device>;
 
 //**************************************************************************
 //  GLOBAL VARIABLES

@@ -42,7 +42,7 @@ MACHINE_CONFIG_END
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type RX01 = &device_creator<rx01_device>;
+const device_type RX01 = device_creator<rx01_device>;
 
 //-------------------------------------------------
 //  rx01_device - constructor

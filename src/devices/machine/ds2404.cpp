@@ -18,7 +18,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type DS2404 = &device_creator<ds2404_device>;
+const device_type DS2404 = device_creator<ds2404_device>;
 
 //-------------------------------------------------
 //  ds2404_device - constructor

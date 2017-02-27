@@ -13,7 +13,7 @@
 #include "chd_cd.h"
 
 // device type definition
-const device_type CDROM = &device_creator<cdrom_image_device>;
+const device_type CDROM = device_creator<cdrom_image_device>;
 
 //-------------------------------------------------
 //  cdrom_image_device - constructor

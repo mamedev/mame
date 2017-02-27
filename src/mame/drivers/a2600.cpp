@@ -27,7 +27,9 @@ TODO:
 #include "bus/vcs/scharger.h"
 #include "bus/vcs/compumat.h"
 #include "bus/vcs_ctrl/ctrl.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 #if USE_NEW_RIOT

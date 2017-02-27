@@ -30,7 +30,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NANJING = &device_creator<nes_nanjing_device>;
+const device_type NES_NANJING = device_creator<nes_nanjing_device>;
 
 
 nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

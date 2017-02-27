@@ -115,10 +115,10 @@ typedef uint32_t DWORD;
 #include "nec.h"
 #include "necpriv.h"
 
-const device_type V20 = &device_creator<v20_device>;
-const device_type V30 = &device_creator<v30_device>;
-const device_type V33 = &device_creator<v33_device>;
-const device_type V33A =&device_creator<v33a_device>;
+const device_type V20 = device_creator<v20_device>;
+const device_type V30 = device_creator<v30_device>;
+const device_type V33 = device_creator<v33_device>;
+const device_type V33A =device_creator<v33a_device>;
 
 
 

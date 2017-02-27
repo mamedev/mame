@@ -4823,5 +4823,5 @@ void hdc92x4_device::device_reset()
 	m_out_dmarq(CLEAR_LINE);
 }
 
-const device_type HDC9224 = &device_creator<hdc9224_device>;
-const device_type HDC9234 = &device_creator<hdc9234_device>;
+const device_type HDC9224 = device_creator<hdc9224_device>;
+const device_type HDC9234 = device_creator<hdc9234_device>;

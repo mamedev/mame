@@ -254,15 +254,17 @@
 
 ***************************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_10MHz
-#define CPU_CLOCK       (MASTER_CLOCK/16)
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6805/m6805.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
+#define CPU_CLOCK       (MASTER_CLOCK/16)
 
 
 class blitz_state : public driver_device
@@ -273,7 +275,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;

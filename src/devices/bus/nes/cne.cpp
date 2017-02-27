@@ -32,9 +32,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_CNE_DECATHL = &device_creator<nes_cne_decathl_device>;
-const device_type NES_CNE_FSB = &device_creator<nes_cne_fsb_device>;
-const device_type NES_CNE_SHLZ = &device_creator<nes_cne_shlz_device>;
+const device_type NES_CNE_DECATHL = device_creator<nes_cne_decathl_device>;
+const device_type NES_CNE_FSB = device_creator<nes_cne_fsb_device>;
+const device_type NES_CNE_SHLZ = device_creator<nes_cne_shlz_device>;
 
 
 nes_cne_decathl_device::nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

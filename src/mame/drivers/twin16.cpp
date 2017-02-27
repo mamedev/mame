@@ -46,15 +46,16 @@ Known Issues:
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "machine/gen_latch.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
 #include "includes/twin16.h"
 #include "includes/konamipt.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 
 #define CPUA_IRQ_ENABLE (m_CPUA_register & 0x20)

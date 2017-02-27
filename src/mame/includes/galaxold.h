@@ -16,6 +16,7 @@
 #define __GALAXOLD_H__
 
 #include "machine/7474.h"
+#include "screen.h"
 
 /* star circuit */
 #define STAR_COUNT  252

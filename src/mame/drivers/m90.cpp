@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "includes/m90.h"
 #include "includes/iremipt.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
@@ -28,6 +29,8 @@
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************/

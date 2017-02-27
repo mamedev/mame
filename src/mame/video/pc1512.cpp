@@ -2,6 +2,7 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/pc1512.h"
+#include "screen.h"
 
 
 

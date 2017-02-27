@@ -17,6 +17,7 @@
 #include "machine/ram.h"
 #include "machine/i8251.h"
 #include "bus/centronics/ctronics.h"
+#include "screen.h"
 
 /***************************************************************************
     CONSTANTS

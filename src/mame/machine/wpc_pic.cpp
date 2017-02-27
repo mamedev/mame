@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "wpc_pic.h"
 
-const device_type WPC_PIC = &device_creator<wpc_pic_device>;
+const device_type WPC_PIC = device_creator<wpc_pic_device>;
 
 wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_PIC, "Williams Pinball Controller PIC Security", tag, owner, clock, "wpc_pic", __FILE__),

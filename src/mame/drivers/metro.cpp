@@ -98,16 +98,18 @@ driver modified by Hau
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/metro.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/h8/h83006.h"
-#include "includes/metro.h"
 #include "machine/watchdog.h"
 #include "sound/ym2413.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -1715,7 +1717,7 @@ private:
 	uint8_t value;
 };
 
-const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
+const device_type PUZZLET_IO = device_creator<puzzlet_io_device>;
 
 
 puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -18,11 +18,15 @@
 */
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/atari400.h"
-#include "sound/speaker.h"
+
+#include "cpu/m6502/m6502.h"
+#include "sound/spkrdev.h"
 #include "sound/pokey.h"
 #include "video/gtia.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class bartop52_state : public atari_common_state

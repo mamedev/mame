@@ -52,7 +52,7 @@ PD7 Y MOTOR COM D
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1520 = &device_creator<vic1520_t>;
+const device_type VIC1520 = device_creator<vic1520_t>;
 
 
 //-------------------------------------------------

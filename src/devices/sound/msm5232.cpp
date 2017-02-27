@@ -11,7 +11,7 @@
     8 channel tone generator
 */
 
-const device_type MSM5232 = &device_creator<msm5232_device>;
+const device_type MSM5232 = device_creator<msm5232_device>;
 
 msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock, "msm5232", __FILE__),

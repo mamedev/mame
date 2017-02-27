@@ -76,7 +76,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_COM = &device_creator<isa8_com_device>;
+const device_type ISA8_COM = device_creator<isa8_com_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -173,7 +173,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_COM_AT = &device_creator<isa8_com_at_device>;
+const device_type ISA8_COM_AT = device_creator<isa8_com_at_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

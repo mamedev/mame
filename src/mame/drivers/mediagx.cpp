@@ -74,6 +74,8 @@
 #include "machine/idectrl.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define SPEEDUP_HACKS   1
 

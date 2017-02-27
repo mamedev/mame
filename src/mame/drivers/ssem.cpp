@@ -6,10 +6,11 @@
     Driver by Ryan Holtz
 */
 
-
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
 #include "imagedev/snapquik.h"
+#include "screen.h"
+
 
 class ssem_state : public driver_device
 {

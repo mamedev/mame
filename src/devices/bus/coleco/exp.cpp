@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_CARTRIDGE_SLOT = &device_creator<colecovision_cartridge_slot_device>;
+const device_type COLECOVISION_CARTRIDGE_SLOT = device_creator<colecovision_cartridge_slot_device>;
 
 
 

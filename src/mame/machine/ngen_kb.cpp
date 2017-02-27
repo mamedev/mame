@@ -106,4 +106,4 @@ void ngen_keyboard_device::key_break(uint8_t row, uint8_t column)
 	}
 }
 
-const device_type NGEN_KEYBOARD = &device_creator<ngen_keyboard_device>;
+const device_type NGEN_KEYBOARD = device_creator<ngen_keyboard_device>;

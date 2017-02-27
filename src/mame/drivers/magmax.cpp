@@ -26,10 +26,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ay8910.h"
 #include "includes/magmax.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(magmax_state::magmax_sound_w)

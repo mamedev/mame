@@ -254,15 +254,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/samples.h"
-#include "machine/gen_latch.h"
-#include "machine/segacrpt_device.h"
-#include "machine/i8255.h"
-#include "audio/segasnd.h"
 #include "includes/zaxxon.h"
+#include "audio/segasnd.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/i8255.h"
+#include "machine/segacrpt_device.h"
+#include "sound/samples.h"
+#include "sound/sn76496.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -151,7 +151,7 @@ rom.
 
 #define T5182_CLOCK     XTAL_14_31818MHz/4
 
-const device_type T5182 = &device_creator<t5182_device>;
+const device_type T5182 = device_creator<t5182_device>;
 
 t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, T5182, "T5182 MCU", tag, owner, clock, "t5182", __FILE__),

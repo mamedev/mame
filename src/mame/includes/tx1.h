@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "screen.h"
+
 
 #define TX1_PIXEL_CLOCK     (XTAL_18MHz / 3)
 #define TX1_HBSTART         256

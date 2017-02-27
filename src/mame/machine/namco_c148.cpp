@@ -54,7 +54,7 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
 //**************************************************************************
 
 // device type definition
-const device_type NAMCO_C148 = &device_creator<namco_c148_device>;
+const device_type NAMCO_C148 = device_creator<namco_c148_device>;
 
 
 //**************************************************************************

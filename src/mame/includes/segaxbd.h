@@ -16,6 +16,7 @@
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
 #include "video/resnet.h"
+#include "screen.h"
 
 // ======================> segaxbd_state
 

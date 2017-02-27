@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "compiskb.h"
 
+#include "cpu/mcs48/mcs48.h"
+
+#include "speaker.h"
+
 
 
 //**************************************************************************
@@ -24,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_KEYBOARD = &device_creator<compis_keyboard_device>;
+const device_type COMPIS_KEYBOARD = device_creator<compis_keyboard_device>;
 
 
 //-------------------------------------------------

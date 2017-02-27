@@ -107,11 +107,13 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/rpunch.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
-#include "includes/rpunch.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        16000000

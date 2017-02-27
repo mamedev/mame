@@ -30,11 +30,13 @@ TODO
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/keyboard.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "imagedev/snapquik.h"
+#include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 class cd2650_state : public driver_device
 {

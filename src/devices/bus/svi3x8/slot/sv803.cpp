@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV803 = &device_creator<sv803_device>;
+const device_type SV803 = device_creator<sv803_device>;
 
 
 //**************************************************************************

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAMLINK = &device_creator<adamlink_device>;
+const device_type ADAMLINK = device_creator<adamlink_device>;
 
 
 

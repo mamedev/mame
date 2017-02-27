@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_SIEL = &device_creator<c64_siel_midi_cartridge_device>;
+const device_type C64_MIDI_SIEL = device_creator<c64_siel_midi_cartridge_device>;
 
 
 WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::acia_irq_w )

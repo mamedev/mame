@@ -593,7 +593,7 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
+const device_type TO7_IO_LINE = device_creator<to7_io_line_device>;
 
 //-------------------------------------------------
 //  to7_io_line_device - constructor

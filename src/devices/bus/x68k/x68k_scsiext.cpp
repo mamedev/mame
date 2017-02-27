@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_SCSIEXT = &device_creator<x68k_scsiext_device>;
+const device_type X68K_SCSIEXT = device_creator<x68k_scsiext_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

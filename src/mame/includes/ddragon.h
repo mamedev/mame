@@ -9,6 +9,7 @@
 #include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "screen.h"
 
 
 class ddragon_state : public driver_device

@@ -40,6 +40,9 @@ RUN
 #include "emu.h"
 #include "includes/phc25.h"
 
+#include "speaker.h"
+
+
 /* Read/Write Handlers */
 
 READ8_MEMBER( phc25_state::port40_r )

@@ -52,7 +52,7 @@ static void ATTR_PRINTF(3,4) verbose_log(running_machine &machine, int level, co
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
+const device_type NCR53C7XX = device_creator<ncr53c7xx_device>;
 
 //-------------------------------------------------
 //  ncr53c7xx_device - constructor/destructor

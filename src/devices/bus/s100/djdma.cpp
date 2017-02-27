@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_DJDMA = &device_creator<s100_djdma_device>;
+const device_type S100_DJDMA = device_creator<s100_djdma_device>;
 
 
 //-------------------------------------------------

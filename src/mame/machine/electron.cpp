@@ -11,8 +11,7 @@
 
 #include "emu.h"
 #include "includes/electron.h"
-#include "sound/beep.h"
-#include "imagedev/cassette.h"
+#include "screen.h"
 
 
 void electron_state::waitforramsync()

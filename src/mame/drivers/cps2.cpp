@@ -632,6 +632,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 /*************************************

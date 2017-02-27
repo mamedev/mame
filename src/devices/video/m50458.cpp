@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "video/m50458.h"
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -26,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type M50458 = &device_creator<m50458_device>;
+const device_type M50458 = device_creator<m50458_device>;
 
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram

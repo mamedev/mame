@@ -1113,4 +1113,4 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_hfdc );
 }
 
-const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
+const device_type TI99_HFDC = device_creator<myarc_hfdc_device>;

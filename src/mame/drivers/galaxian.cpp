@@ -658,12 +658,15 @@ TODO:
 #include "includes/galaxian.h"
 #include "audio/cclimber.h"
 #include "audio/galaxian.h"
+
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define KONAMI_SOUND_CLOCK      XTAL_14_31818MHz

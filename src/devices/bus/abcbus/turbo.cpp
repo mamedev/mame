@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TURBO_KONTROLLER = &device_creator<turbo_kontroller_device>;
+const device_type TURBO_KONTROLLER = device_creator<turbo_kontroller_device>;
 
 
 //-------------------------------------------------

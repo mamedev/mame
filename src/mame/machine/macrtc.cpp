@@ -33,7 +33,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type RTC3430042 = &device_creator<rtc3430042_device>;
+const device_type RTC3430042 = device_creator<rtc3430042_device>;
 
 
 //-------------------------------------------------

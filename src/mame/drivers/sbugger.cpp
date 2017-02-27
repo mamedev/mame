@@ -100,10 +100,13 @@ Sound PCB
 */
 
 #include "emu.h"
+#include "includes/sbugger.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/sn76496.h"
-#include "includes/sbugger.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* memory maps */

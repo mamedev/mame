@@ -68,6 +68,7 @@ Notes:
 #include "includes/sg1000.h"
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 /***************************************************************************

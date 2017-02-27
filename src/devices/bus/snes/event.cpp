@@ -17,7 +17,7 @@
 //  sns_rom_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_PFEST94 = &device_creator<sns_pfest94_device>;
+const device_type SNS_PFEST94 = device_creator<sns_pfest94_device>;
 
 
 sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

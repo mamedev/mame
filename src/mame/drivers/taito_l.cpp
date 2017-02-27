@@ -65,6 +65,9 @@ puzznici note
 #include "sound/2610intf.h"
 #include "sound/msm5205.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 namespace {
 

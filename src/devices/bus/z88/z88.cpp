@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88CART_SLOT = &device_creator<z88cart_slot_device>;
+const device_type Z88CART_SLOT = device_creator<z88cart_slot_device>;
 
 
 //**************************************************************************

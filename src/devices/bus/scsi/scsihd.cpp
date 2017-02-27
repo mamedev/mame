@@ -10,7 +10,7 @@
 #include "scsihd.h"
 
 // device type definition
-const device_type SCSIHD = &device_creator<scsihd_device>;
+const device_type SCSIHD = device_creator<scsihd_device>;
 
 scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scsihle_device(mconfig, SCSIHD, "SCSI HD", tag, owner, clock, "scsihd", __FILE__)

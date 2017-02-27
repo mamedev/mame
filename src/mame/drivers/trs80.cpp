@@ -137,6 +137,10 @@ There don't seem to be any JV1 boot disks for Model III/4.
 
 #include "emu.h"
 #include "includes/trs80.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/trs80_dsk.h"
 #include "formats/dmk_dsk.h"
 

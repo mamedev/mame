@@ -151,8 +151,12 @@ Notes:
 
 #include "emu.h"
 #include "includes/v1050.h"
+
 #include "bus/rs232/rs232.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 void v1050_state::set_interrupt(int line, int state)
 {

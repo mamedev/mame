@@ -519,15 +519,18 @@ Filter Board
 
 */
 #include "emu.h"
+#include "includes/namcos21.h"
+#include "includes/namcoic.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
-#include "includes/namcoic.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
-#include "includes/namcos21.h"
 #include "machine/nvram.h"
+#include "sound/c140.h"
+#include "speaker.h"
+
 
 #define PTRAM_SIZE 0x20000
 // TODO: basic parameters to get 60.606060 Hz, x2 is for interlace

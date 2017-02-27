@@ -9,14 +9,16 @@
 #include "emu.h"
 #include "hd61830.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HD61830 = &device_creator<hd61830_device>;
-const device_type HD61830B = &device_creator<hd61830_device>;
+const device_type HD61830 = device_creator<hd61830_device>;
+const device_type HD61830B = device_creator<hd61830_device>;
 
 
 // default address map

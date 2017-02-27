@@ -25,18 +25,21 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "rendlay.h"
 #include "machine/nvram.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class cesclassic_state : public driver_device
 {
 public:
 	cesclassic_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_oki(*this, "oki"),
-	m_vram(*this, "vram"),
-	m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_vram(*this, "vram")
+		, m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq3_ack_w);

@@ -2,6 +2,7 @@
 // copyright-holders:BUT
 #include "sound/namco.h"
 #include "video/c45.h"
+#include "screen.h"
 
 class tceptor_state : public driver_device
 {

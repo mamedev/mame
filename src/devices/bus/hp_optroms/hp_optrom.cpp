@@ -13,8 +13,8 @@
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
 
-const device_type HP_OPTROM_CART = &device_creator<hp_optrom_cart_device>;
-const device_type HP_OPTROM_SLOT = &device_creator<hp_optrom_slot_device>;
+const device_type HP_OPTROM_CART = device_creator<hp_optrom_cart_device>;
+const device_type HP_OPTROM_SLOT = device_creator<hp_optrom_slot_device>;
 
 // +---------------------+
 // |hp_optrom_cart_device|

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/astrof.h"
+#include "speaker.h"
 
 
 /*************************************

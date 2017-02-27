@@ -34,7 +34,7 @@ MACHINE_CONFIG_END
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CCLIMBER_AUDIO = &device_creator<cclimber_audio_device>;
+const device_type CCLIMBER_AUDIO = device_creator<cclimber_audio_device>;
 
 
 //**************************************************************************

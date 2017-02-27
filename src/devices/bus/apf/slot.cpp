@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type APF_CART_SLOT = &device_creator<apf_cart_slot_device>;
+const device_type APF_CART_SLOT = device_creator<apf_cart_slot_device>;
 
 //**************************************************************************
 //    APF Cartridges Interface

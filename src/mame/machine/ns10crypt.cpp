@@ -118,14 +118,14 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
-const device_type CHOCOVDR_DECRYPTER = &device_creator<chocovdr_decrypter_device>;
-const device_type GAMSHARA_DECRYPTER = &device_creator<gamshara_decrypter_device>;
-const device_type  GJSPACE_DECRYPTER = &device_creator<gjspace_decrypter_device>;
-const device_type KNPUZZLE_DECRYPTER = &device_creator<knpuzzle_decrypter_device>;
-const device_type KONOTAKO_DECRYPTER = &device_creator<konotako_decrypter_device>;
-const device_type MRDRILR2_DECRYPTER = &device_creator<mrdrilr2_decrypter_device>;
-const device_type NFLCLSFB_DECRYPTER = &device_creator<nflclsfb_decrypter_device>;
-const device_type STARTRGN_DECRYPTER = &device_creator<startrgn_decrypter_device>;
+const device_type CHOCOVDR_DECRYPTER = device_creator<chocovdr_decrypter_device>;
+const device_type GAMSHARA_DECRYPTER = device_creator<gamshara_decrypter_device>;
+const device_type  GJSPACE_DECRYPTER = device_creator<gjspace_decrypter_device>;
+const device_type KNPUZZLE_DECRYPTER = device_creator<knpuzzle_decrypter_device>;
+const device_type KONOTAKO_DECRYPTER = device_creator<konotako_decrypter_device>;
+const device_type MRDRILR2_DECRYPTER = device_creator<mrdrilr2_decrypter_device>;
+const device_type NFLCLSFB_DECRYPTER = device_creator<nflclsfb_decrypter_device>;
+const device_type STARTRGN_DECRYPTER = device_creator<startrgn_decrypter_device>;
 
 // base class
 

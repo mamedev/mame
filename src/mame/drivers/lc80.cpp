@@ -43,6 +43,7 @@
 
 #include "emu.h"
 #include "includes/lc80.h"
+#include "speaker.h"
 #include "lc80.lh"
 
 /* Memory Maps */

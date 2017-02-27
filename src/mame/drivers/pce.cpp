@@ -57,15 +57,20 @@ Super System Card:
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
+
 #include "bus/pce/pce_rom.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
-#include "video/huc6270.h"
 #include "video/huc6202.h"
+#include "video/huc6270.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )

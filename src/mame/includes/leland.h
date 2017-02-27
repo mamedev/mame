@@ -12,6 +12,7 @@
 #include "sound/ay8910.h"
 #include "machine/pit8253.h"
 #include "cpu/i86/i186.h"
+#include "screen.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800

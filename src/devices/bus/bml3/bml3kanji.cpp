@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_KANJI = &device_creator<bml3bus_kanji_device>;
+const device_type BML3BUS_KANJI = device_creator<bml3bus_kanji_device>;
 
 #define KANJI_ROM_REGION  "kanji_rom"
 

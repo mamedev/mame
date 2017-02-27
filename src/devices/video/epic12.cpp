@@ -7,7 +7,7 @@
 
 
 
-const device_type EPIC12 = &device_creator<epic12_device>;
+const device_type EPIC12 = device_creator<epic12_device>;
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EPIC12, "EP1C12 Blitter", tag, owner, clock, "epic12", __FILE__),

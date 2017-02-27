@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV801 = &device_creator<sv801_device>;
+const device_type SV801 = device_creator<sv801_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

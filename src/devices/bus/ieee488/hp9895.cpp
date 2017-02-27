@@ -130,7 +130,7 @@ enum {
 #define MIN_SYNC_BITS       29      // Number of bits to synchronize
 
 // device type definition
-const device_type HP9895 = &device_creator<hp9895_device>;
+const device_type HP9895 = device_creator<hp9895_device>;
 
 // Masks of drive selectors in XV register
 static const uint8_t xv_drive_masks[] = {

@@ -22,15 +22,20 @@
 ***************************************************************************************************/
 
 #include "emu.h"
+#include "includes/pasopia.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
 #include "machine/i8255.h"
-#include "machine/z80pio.h"
 #include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+
 #include "rendlay.h"
-#include "includes/pasopia.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class pasopia7_state : public driver_device
 {

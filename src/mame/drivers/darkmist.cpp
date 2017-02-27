@@ -29,8 +29,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/darkmist.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 void darkmist_state::machine_start()
 {

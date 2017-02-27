@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_CART_SLOT = &device_creator<astrocade_cart_slot_device>;
+const device_type ASTROCADE_CART_SLOT = device_creator<astrocade_cart_slot_device>;
 
 //**************************************************************************
 //    Astrocade Cartridges Interface

@@ -14,6 +14,8 @@
 
 #include "emu.h"
 #include "nubus_spec8.h"
+#include "screen.h"
+
 
 #define SPEC8S3_SCREEN_NAME "spec8s3_screen"
 #define SPEC8S3_ROM_REGION  "spec8s3_rom"
@@ -37,7 +39,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_SPEC8S3 = &device_creator<nubus_spec8s3_device>;
+const device_type NUBUS_SPEC8S3 = device_creator<nubus_spec8s3_device>;
 
 
 //-------------------------------------------------

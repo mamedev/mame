@@ -10,22 +10,29 @@
 
 
 #include "emu.h"
+#include "includes/radio86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 class mikrosha_state : public radio86_state
 {
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-		{ }
+		: radio86_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+	{ }
+
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_MACHINE_RESET(mikrosha);

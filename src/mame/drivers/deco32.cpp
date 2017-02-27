@@ -363,6 +363,8 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deco32.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/arm/arm.h"
 #include "cpu/h6280/h6280.h"
@@ -370,7 +372,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "cpu/z80/z80.h"
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
-#include "includes/deco32.h"
+#include "speaker.h"
 
 /**********************************************************************************/
 

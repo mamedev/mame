@@ -25,6 +25,7 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #include "emu.h"
 #include "includes/megadriv.h"
+#include "speaker.h"
 
 
 MACHINE_CONFIG_EXTERN( megadriv );

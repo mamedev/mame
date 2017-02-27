@@ -73,11 +73,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gberet.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "includes/gberet.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *

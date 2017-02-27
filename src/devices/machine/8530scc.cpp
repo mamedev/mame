@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "8530scc.h"
 
-const device_type SCC8530 = &device_creator<scc8530_t>;
+const device_type SCC8530 = device_creator<scc8530_t>;
 
 
 /***************************************************************************

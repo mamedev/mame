@@ -109,7 +109,7 @@ note: if ROM is not mounted its area readed as 0xFF
 
 ********************************************************************************************************/
 
-const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
+const device_type NAOMI_M2_BOARD = device_creator<naomi_m2_board>;
 
 naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),

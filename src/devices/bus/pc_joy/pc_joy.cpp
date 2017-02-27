@@ -12,7 +12,7 @@
 #include "pc_joy.h"
 #include "pc_joy_sw.h"
 
-const device_type PC_JOY = &device_creator<pc_joy_device>;
+const device_type PC_JOY = device_creator<pc_joy_device>;
 
 pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_JOY, "PC joystick port", tag, owner, clock, "pc_joy", __FILE__),
@@ -78,7 +78,7 @@ ioport_constructor pc_basic_joy_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc_joystick );
 }
 
-const device_type PC_BASIC_JOY = &device_creator<pc_basic_joy_device>;
+const device_type PC_BASIC_JOY = device_creator<pc_basic_joy_device>;
 
 pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_BASIC_JOY, "PC basic joystick", tag, owner, clock, "basic_joy", __FILE__),

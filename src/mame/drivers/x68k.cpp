@@ -116,24 +116,25 @@
 */
 
 #include "emu.h"
-#include "machine/mc68901.h"
-#include "machine/upd765.h"
-#include "sound/okim6258.h"
-#include "machine/rp5c15.h"
-#include "machine/mb89352.h"
-#include "formats/xdf_dsk.h"
-#include "formats/dim_dsk.h"
+#include "includes/x68k.h"
 #include "machine/x68k_hdc.h"
 #include "machine/x68k_kbd.h"
-#include "includes/x68k.h"
-#include "machine/ram.h"
+
+#include "machine/mb89352.h"
 #include "machine/nvram.h"
+
 #include "bus/x68k/x68kexp.h"
 #include "bus/x68k/x68k_neptunex.h"
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/dim_dsk.h"
+#include "formats/xdf_dsk.h"
+
 #include "x68000.lh"
 
 

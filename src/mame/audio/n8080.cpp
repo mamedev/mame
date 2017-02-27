@@ -9,9 +9,11 @@
 #include "emu.h"
 #include "includes/n8080.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
-static const double ATTACK_RATE = 10e-6 * 500;
-static const double DECAY_RATE = 10e-6 * 16000;
+
+constexpr double ATTACK_RATE = 10e-6 * 500;
+constexpr double DECAY_RATE = 10e-6 * 16000;
 
 
 void n8080_state::spacefev_update_SN76477_status()

@@ -19,7 +19,9 @@
 #include "machine/ram.h"
 #include "includes/b2m.h"
 #include "formats/smx_dsk.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(b2m_mem, AS_PROGRAM, 8, b2m_state )

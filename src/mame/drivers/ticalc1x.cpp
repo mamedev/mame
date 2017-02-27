@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "includes/hh_tms1k.h"
 
+#include "speaker.h"
+
 // internal artwork
 #include "cmulti8.lh"
 #include "dataman.lh"

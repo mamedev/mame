@@ -14,10 +14,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ohmygod.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "includes/ohmygod.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)

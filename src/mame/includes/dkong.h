@@ -13,6 +13,7 @@
 #include "machine/latch8.h"
 #include "machine/z80dma.h"
 #include "machine/i8257.h"
+#include "screen.h"
 
 
 /*

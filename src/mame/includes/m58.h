@@ -6,6 +6,7 @@
     Irem M58 hardware
 
 ****************************************************************************/
+#include "screen.h"
 
 class m58_state : public driver_device
 {

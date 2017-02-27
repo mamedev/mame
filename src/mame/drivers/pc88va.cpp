@@ -25,17 +25,23 @@
 ********************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+//#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
-#include "formats/xdf_dsk.h"
-//#include "machine/upd71071.h"
-#include "machine/am9517a.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/xdf_dsk.h"
+
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0

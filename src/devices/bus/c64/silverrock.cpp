@@ -48,7 +48,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SILVERROCK = &device_creator<c64_silverrock_cartridge_device>;
+const device_type C64_SILVERROCK = device_creator<c64_silverrock_cartridge_device>;
 
 
 

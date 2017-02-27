@@ -8,18 +8,21 @@
  *
  ****************************************************************************/
 
-#ifndef X68K_H_
-#define X68K_H_
+#ifndef MAME_INCLUDES_X68K_H
+#define MAME_INCLUDES_X68K_H
 
 #include "cpu/m68000/m68000.h"
+#include "machine/8530scc.h"
 #include "machine/hd63450.h"
+#include "machine/i8255.h"
+#include "machine/mc68901.h"
+#include "machine/ram.h"
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
 #include "sound/okim6258.h"
-#include "machine/ram.h"
-#include "machine/8530scc.h"
 #include "sound/ym2151.h"
-#include "machine/i8255.h"
+
+#include "screen.h"
 
 #define MC68901_TAG     "mc68901"
 #define RP5C15_TAG      "rp5c15"
@@ -354,4 +357,4 @@ protected:
 
 
 
-#endif /* X68K_H_ */
+#endif // MAME_INCLUDES_X68K_H

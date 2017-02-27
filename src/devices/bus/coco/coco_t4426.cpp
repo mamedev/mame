@@ -124,7 +124,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_T4426 = &device_creator<coco_t4426_device>;
+const device_type COCO_T4426 = device_creator<coco_t4426_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -80,7 +80,10 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "cc40.lh"
 

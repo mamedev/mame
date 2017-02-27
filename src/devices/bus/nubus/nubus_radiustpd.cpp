@@ -12,6 +12,8 @@
 
 #include "emu.h"
 #include "nubus_radiustpd.h"
+#include "screen.h"
+
 
 #define RADIUSTPD_SCREEN_NAME "tpd_screen"
 #define RADIUSTPD_ROM_REGION  "tpd_rom"
@@ -35,7 +37,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_RADIUSTPD = &device_creator<nubus_radiustpd_device>;
+const device_type NUBUS_RADIUSTPD = device_creator<nubus_radiustpd_device>;
 
 
 //-------------------------------------------------

@@ -5,6 +5,7 @@
     Jaleco Exerion
 
 *************************************************************************/
+#include "screen.h"
 
 
 #define EXERION_MASTER_CLOCK      (XTAL_19_968MHz)   /* verified on pcb */

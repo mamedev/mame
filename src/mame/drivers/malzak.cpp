@@ -65,11 +65,13 @@
 */
 
 #include "emu.h"
+#include "includes/malzak.h"
+
 #include "cpu/s2650/s2650.h"
+#include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "video/saa5050.h"
-#include "machine/nvram.h"
-#include "includes/malzak.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)

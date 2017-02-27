@@ -96,7 +96,9 @@ c0   8 data bits, Rx disabled
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"

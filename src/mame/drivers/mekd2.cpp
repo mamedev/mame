@@ -74,12 +74,14 @@ TODO
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800

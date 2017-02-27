@@ -54,7 +54,7 @@ static const char *datapack_option_spec =
 
 
 // device type definition
-const device_type PSION_DATAPACK = &device_creator<datapack_device>;
+const device_type PSION_DATAPACK = device_creator<datapack_device>;
 
 //-------------------------------------------------
 //  datapack_device - constructor

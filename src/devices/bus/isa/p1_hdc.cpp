@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_HDC = &device_creator<p1_hdc_device>;
+const device_type P1_HDC = device_creator<p1_hdc_device>;
 
 static MACHINE_CONFIG_FRAGMENT( hdc_b942 )
 	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?

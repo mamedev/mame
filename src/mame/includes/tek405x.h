@@ -1,21 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_TEK405X_H
+#define MAME_INCLUDES_TEK405X_H
+
 #pragma once
 
-#ifndef __TEK405X__
-#define __TEK405X__
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/ieee488/ieee488.h"
 
 #include "cpu/m6800/m6800.h"
-#include "machine/ram.h"
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "machine/ram.h"
+
+#include "sound/spkrdev.h"
+
 #include "video/vector.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"
@@ -158,4 +163,4 @@ public:
 	virtual void video_start() override;
 };
 
-#endif
+#endif // MAME_INCLUDES_TEK405X_H

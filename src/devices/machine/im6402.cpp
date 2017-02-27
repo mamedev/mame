@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IM6402 = &device_creator<im6402_device>;
+const device_type IM6402 = device_creator<im6402_device>;
 
 
 

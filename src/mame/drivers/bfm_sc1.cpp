@@ -101,6 +101,7 @@ Optional (on expansion card) (Viper)
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/bfm_comn.h"
+#include "speaker.h"
 
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"

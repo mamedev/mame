@@ -337,16 +337,19 @@ Boards:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/pacman.h"
+#include "machine/epos.h"
+#include "machine/jumpshot.h"
+#include "machine/pacplus.h"
+
 #include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "machine/epos.h"
-#include "machine/jumpshot.h"
-#include "machine/pacplus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

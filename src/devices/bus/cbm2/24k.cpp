@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_24K = &device_creator<cbm2_24k_cartridge_device>;
+const device_type CBM2_24K = device_creator<cbm2_24k_cartridge_device>;
 
 
 

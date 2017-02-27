@@ -18,10 +18,13 @@
 */
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/pk8000.h"
+
+#include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class photon_state : public pk8000_base_state

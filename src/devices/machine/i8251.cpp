@@ -30,8 +30,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8251 = &device_creator<i8251_device>;
-const device_type V53_SCU = &device_creator<v53_scu_device>;
+const device_type I8251 = device_creator<i8251_device>;
+const device_type V53_SCU = device_creator<v53_scu_device>;
 
 template class device_finder<i8251_device, false>;
 template class device_finder<i8251_device, true>;

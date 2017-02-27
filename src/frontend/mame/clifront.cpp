@@ -702,14 +702,12 @@ void cli_frontend::listslots(const char *gamename)
 			{
 				if (option.second->selectable())
 				{
-					device_t *dev = (*option.second->devtype())(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
+					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
 					dev->config_complete();
-					if (first_option) {
+					if (first_option)
 						printf("%-16s %s\n", option.second->name(),dev->name());
-					} else {
+					else
 						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
-					}
-					global_free(dev);
 
 					first_option = false;
 				}

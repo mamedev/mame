@@ -25,11 +25,14 @@ GP1 HDD data contents:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/qdrmfgp.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/ataintf.h"
-#include "sound/k054539.h"
 #include "machine/nvram.h"
-#include "includes/qdrmfgp.h"
+#include "sound/k054539.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define IDE_HACK    1

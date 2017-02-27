@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type AT_KEYBOARD_CONTROLLER = &device_creator<at_keyboard_controller_device>;
+const device_type AT_KEYBOARD_CONTROLLER = device_creator<at_keyboard_controller_device>;
 
 // i/o map for the 8042
 static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8, at_keyboard_controller_device)

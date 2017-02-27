@@ -25,8 +25,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GB_CART_SLOT = &device_creator<gb_cart_slot_device>;
-const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device>;
+const device_type GB_CART_SLOT = device_creator<gb_cart_slot_device>;
+const device_type MEGADUCK_CART_SLOT = device_creator<megaduck_cart_slot_device>;
 
 //**************************************************************************
 //    GB cartridges Interface

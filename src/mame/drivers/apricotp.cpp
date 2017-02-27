@@ -25,11 +25,12 @@
 */
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "cpu/m6800/m6800.h"
+#include "formats/apridisk.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -37,7 +38,8 @@
 #include "machine/z80dart.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-#include "formats/apridisk.h"
+#include "screen.h"
+#include "speaker.h"
 #include "apricotp.lh"
 
 

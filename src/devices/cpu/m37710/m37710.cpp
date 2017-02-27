@@ -62,9 +62,9 @@
 #define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
 
 
-const device_type M37702M2 = &device_creator<m37702m2_device>;
-const device_type M37702S1 = &device_creator<m37702s1_device>;
-const device_type M37710S4 = &device_creator<m37710s4_device>;
+const device_type M37702M2 = device_creator<m37702m2_device>;
+const device_type M37702S1 = device_creator<m37702s1_device>;
+const device_type M37710S4 = device_creator<m37710s4_device>;
 
 
 // On-board RAM, ROM, and peripherals

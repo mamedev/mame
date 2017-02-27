@@ -28,6 +28,8 @@
 #include "machine/eepromser.h"
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
+#include "screen.h"
+#include "speaker.h"
 
 class _39in1_state : public driver_device
 {

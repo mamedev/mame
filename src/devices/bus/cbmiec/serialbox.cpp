@@ -32,7 +32,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SERIAL_BOX = &device_creator<serial_box_device>;
+const device_type SERIAL_BOX = device_creator<serial_box_device>;
 
 
 //-------------------------------------------------

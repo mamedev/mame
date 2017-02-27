@@ -17,6 +17,8 @@
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"
 #include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

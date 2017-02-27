@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "video/gtia.h"
+#include "screen.h"
 
 #define GTIA_P0 0x01
 #define GTIA_P1 0x02
@@ -111,7 +112,7 @@
 
 
 // devices
-const device_type ATARI_GTIA = &device_creator<gtia_device>;
+const device_type ATARI_GTIA = device_creator<gtia_device>;
 
 //-------------------------------------------------
 //  upd7220_device - constructor

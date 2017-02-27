@@ -271,11 +271,15 @@ GFX:                Custom 145     ( 80 pin PQFP)
                     Custom 169     (120 pin PQFP)
 */
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/namconb1.h"
 #include "includes/namcoic.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/namcomcu.h"
 #include "sound/c352.h"
+
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_48_384MHz
 

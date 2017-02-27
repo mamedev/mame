@@ -9,15 +9,22 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "chd.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/ldpr8210.h"
 #include "machine/ldv1000.h"
-#include <ctype.h>
+
 #include "ui/uimain.h"
 
+#include "emuopts.h"
+#include "speaker.h"
+
+#include "chd.h"
+
 #include "pr8210.lh"
+
+#include <ctype.h>
+
 
 class ldplayer_state : public driver_device
 {

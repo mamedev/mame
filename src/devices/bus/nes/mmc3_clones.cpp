@@ -28,42 +28,42 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NITRA = &device_creator<nes_nitra_device>;
-const device_type NES_KS7057 = &device_creator<nes_ks7057_device>;
-const device_type NES_SBROS11 = &device_creator<nes_sbros11_device>;
-const device_type NES_MALISB = &device_creator<nes_malisb_device>;
-const device_type NES_FAMILY4646 = &device_creator<nes_family4646_device>;
-const device_type NES_PIKAY2K = &device_creator<nes_pikay2k_device>;
-const device_type NES_8237 = &device_creator<nes_8237_device>;
-const device_type NES_SG_LIONK = &device_creator<nes_sglionk_device>;
-const device_type NES_SG_BOOG = &device_creator<nes_sgboog_device>;
-const device_type NES_KASING = &device_creator<nes_kasing_device>;
-const device_type NES_KAY = &device_creator<nes_kay_device>;
-const device_type NES_H2288 = &device_creator<nes_h2288_device>;
-const device_type NES_6035052 = &device_creator<nes_6035052_device>;
-const device_type NES_TXC_TW = &device_creator<nes_txc_tw_device>;
-const device_type NES_KOF97 = &device_creator<nes_kof97_device>;
-const device_type NES_KOF96 = &device_creator<nes_kof96_device>;
-const device_type NES_SF3 = &device_creator<nes_sf3_device>;
-const device_type NES_GOUDER = &device_creator<nes_gouder_device>;
-const device_type NES_SA9602B = &device_creator<nes_sa9602b_device>;
-const device_type NES_SACHEN_SHERO = &device_creator<nes_sachen_shero_device>;
-//const device_type NES_A9746 = &device_creator<nes_a9746_device>;
+const device_type NES_NITRA = device_creator<nes_nitra_device>;
+const device_type NES_KS7057 = device_creator<nes_ks7057_device>;
+const device_type NES_SBROS11 = device_creator<nes_sbros11_device>;
+const device_type NES_MALISB = device_creator<nes_malisb_device>;
+const device_type NES_FAMILY4646 = device_creator<nes_family4646_device>;
+const device_type NES_PIKAY2K = device_creator<nes_pikay2k_device>;
+const device_type NES_8237 = device_creator<nes_8237_device>;
+const device_type NES_SG_LIONK = device_creator<nes_sglionk_device>;
+const device_type NES_SG_BOOG = device_creator<nes_sgboog_device>;
+const device_type NES_KASING = device_creator<nes_kasing_device>;
+const device_type NES_KAY = device_creator<nes_kay_device>;
+const device_type NES_H2288 = device_creator<nes_h2288_device>;
+const device_type NES_6035052 = device_creator<nes_6035052_device>;
+const device_type NES_TXC_TW = device_creator<nes_txc_tw_device>;
+const device_type NES_KOF97 = device_creator<nes_kof97_device>;
+const device_type NES_KOF96 = device_creator<nes_kof96_device>;
+const device_type NES_SF3 = device_creator<nes_sf3_device>;
+const device_type NES_GOUDER = device_creator<nes_gouder_device>;
+const device_type NES_SA9602B = device_creator<nes_sa9602b_device>;
+const device_type NES_SACHEN_SHERO = device_creator<nes_sachen_shero_device>;
+//const device_type NES_A9746 = device_creator<nes_a9746_device>;
 
-const device_type NES_FK23C = &device_creator<nes_fk23c_device>;
-const device_type NES_FK23CA = &device_creator<nes_fk23ca_device>;
-const device_type NES_S24IN1SC03 = &device_creator<nes_s24in1sc03_device>;
-const device_type NES_BMC_15IN1 = &device_creator<nes_bmc_15in1_device>;
-const device_type NES_BMC_SBIG7 = &device_creator<nes_bmc_sbig7_device>;
-const device_type NES_BMC_HIK8 = &device_creator<nes_bmc_hik8_device>;
-const device_type NES_BMC_HIK4 = &device_creator<nes_bmc_hik4_device>;
-const device_type NES_BMC_MARIO7IN1 = &device_creator<nes_bmc_mario7in1_device>;
-const device_type NES_BMC_GOLD7IN1 = &device_creator<nes_bmc_gold7in1_device>;
-const device_type NES_BMC_GC6IN1 = &device_creator<nes_bmc_gc6in1_device>;
-const device_type NES_BMC_411120C = &device_creator<nes_bmc_411120c_device>;
-const device_type NES_BMC_830118C = &device_creator<nes_bmc_830118c_device>;
-const device_type NES_PJOY84 = &device_creator<nes_pjoy84_device>;
-const device_type NES_COOLBOY = &device_creator<nes_coolboy_device>;
+const device_type NES_FK23C = device_creator<nes_fk23c_device>;
+const device_type NES_FK23CA = device_creator<nes_fk23ca_device>;
+const device_type NES_S24IN1SC03 = device_creator<nes_s24in1sc03_device>;
+const device_type NES_BMC_15IN1 = device_creator<nes_bmc_15in1_device>;
+const device_type NES_BMC_SBIG7 = device_creator<nes_bmc_sbig7_device>;
+const device_type NES_BMC_HIK8 = device_creator<nes_bmc_hik8_device>;
+const device_type NES_BMC_HIK4 = device_creator<nes_bmc_hik4_device>;
+const device_type NES_BMC_MARIO7IN1 = device_creator<nes_bmc_mario7in1_device>;
+const device_type NES_BMC_GOLD7IN1 = device_creator<nes_bmc_gold7in1_device>;
+const device_type NES_BMC_GC6IN1 = device_creator<nes_bmc_gc6in1_device>;
+const device_type NES_BMC_411120C = device_creator<nes_bmc_411120c_device>;
+const device_type NES_BMC_830118C = device_creator<nes_bmc_830118c_device>;
+const device_type NES_PJOY84 = device_creator<nes_pjoy84_device>;
+const device_type NES_COOLBOY = device_creator<nes_coolboy_device>;
 
 
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

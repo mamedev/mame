@@ -51,12 +51,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_UV201_H
+#define MAME_VIDEO_UV201_H
+
 #pragma once
 
-#ifndef __UV201__
-#define __UV201__
 
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -153,6 +154,4 @@ private:
 // device type definition
 extern const device_type UV201;
 
-
-
-#endif
+#endif // MAME_VIDEO_UV201_H

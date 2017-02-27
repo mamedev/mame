@@ -33,27 +33,27 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_WAIXING_A = &device_creator<nes_waixing_a_device>;
-const device_type NES_WAIXING_A1 = &device_creator<nes_waixing_a1_device>;
-const device_type NES_WAIXING_B = &device_creator<nes_waixing_b_device>;
-const device_type NES_WAIXING_C = &device_creator<nes_waixing_c_device>;
-const device_type NES_WAIXING_D = &device_creator<nes_waixing_d_device>;
-const device_type NES_WAIXING_E = &device_creator<nes_waixing_e_device>;
-const device_type NES_WAIXING_F = &device_creator<nes_waixing_f_device>;
-const device_type NES_WAIXING_G = &device_creator<nes_waixing_g_device>;
-const device_type NES_WAIXING_H = &device_creator<nes_waixing_h_device>;
-const device_type NES_WAIXING_H1 = &device_creator<nes_waixing_h1_device>;
-const device_type NES_WAIXING_I = &device_creator<nes_waixing_i_device>;
-const device_type NES_WAIXING_J = &device_creator<nes_waixing_j_device>;
-const device_type NES_WAIXING_SH2 = &device_creator<nes_waixing_sh2_device>;
-const device_type NES_WAIXING_SEC = &device_creator<nes_waixing_sec_device>;
-const device_type NES_WAIXING_SGZ = &device_creator<nes_waixing_sgz_device>;
-const device_type NES_WAIXING_SGZLZ = &device_creator<nes_waixing_sgzlz_device>;
-const device_type NES_WAIXING_FFV = &device_creator<nes_waixing_ffv_device>;
-const device_type NES_WAIXING_WXZS = &device_creator<nes_waixing_wxzs_device>;
-const device_type NES_WAIXING_DQ8 = &device_creator<nes_waixing_dq8_device>;
-const device_type NES_WAIXING_WXZS2 = &device_creator<nes_waixing_wxzs2_device>;
-const device_type NES_WAIXING_FS304 = &device_creator<nes_waixing_fs304_device>;
+const device_type NES_WAIXING_A = device_creator<nes_waixing_a_device>;
+const device_type NES_WAIXING_A1 = device_creator<nes_waixing_a1_device>;
+const device_type NES_WAIXING_B = device_creator<nes_waixing_b_device>;
+const device_type NES_WAIXING_C = device_creator<nes_waixing_c_device>;
+const device_type NES_WAIXING_D = device_creator<nes_waixing_d_device>;
+const device_type NES_WAIXING_E = device_creator<nes_waixing_e_device>;
+const device_type NES_WAIXING_F = device_creator<nes_waixing_f_device>;
+const device_type NES_WAIXING_G = device_creator<nes_waixing_g_device>;
+const device_type NES_WAIXING_H = device_creator<nes_waixing_h_device>;
+const device_type NES_WAIXING_H1 = device_creator<nes_waixing_h1_device>;
+const device_type NES_WAIXING_I = device_creator<nes_waixing_i_device>;
+const device_type NES_WAIXING_J = device_creator<nes_waixing_j_device>;
+const device_type NES_WAIXING_SH2 = device_creator<nes_waixing_sh2_device>;
+const device_type NES_WAIXING_SEC = device_creator<nes_waixing_sec_device>;
+const device_type NES_WAIXING_SGZ = device_creator<nes_waixing_sgz_device>;
+const device_type NES_WAIXING_SGZLZ = device_creator<nes_waixing_sgzlz_device>;
+const device_type NES_WAIXING_FFV = device_creator<nes_waixing_ffv_device>;
+const device_type NES_WAIXING_WXZS = device_creator<nes_waixing_wxzs_device>;
+const device_type NES_WAIXING_DQ8 = device_creator<nes_waixing_dq8_device>;
+const device_type NES_WAIXING_WXZS2 = device_creator<nes_waixing_wxzs2_device>;
+const device_type NES_WAIXING_FS304 = device_creator<nes_waixing_fs304_device>;
 
 
 nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

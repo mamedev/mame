@@ -61,9 +61,12 @@ this seems to be the only zoom feature actually used in the games.
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
 #include "tc0080vco.h"
 #include "video/taito_helper.h"
+
+#include "drawgfxm.h"
+#include "screen.h"
+
 
 #define TC0080VCO_RAM_SIZE 0x21000
 #define TC0080VCO_CHAR_RAM_SIZE 0x2000
@@ -75,7 +78,7 @@ this seems to be the only zoom feature actually used in the games.
 *****************************************************************************/
 
 
-const device_type TC0080VCO = &device_creator<tc0080vco_device>;
+const device_type TC0080VCO = device_creator<tc0080vco_device>;
 
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock, "tc0080vco", __FILE__),

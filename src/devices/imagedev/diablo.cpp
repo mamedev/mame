@@ -23,7 +23,7 @@ static const char *dsk_option_spec =
 
 
 // device type definition
-const device_type DIABLO = &device_creator<diablo_image_device>;
+const device_type DIABLO = device_creator<diablo_image_device>;
 
 //-------------------------------------------------
 //  diablo_image_device - constructor

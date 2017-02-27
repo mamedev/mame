@@ -30,7 +30,7 @@ TODO:
 #include "imagedev/chd_cd.h"
 
 // device type definition
-const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
+const device_type MACHINE_CDICDIC = device_creator<cdicdic_device>;
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)

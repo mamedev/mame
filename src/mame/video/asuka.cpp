@@ -2,6 +2,7 @@
 // copyright-holders:David Graves, Brian Troha
 #include "emu.h"
 #include "includes/asuka.h"
+#include "screen.h"
 
 /**************************************************************
                  SPRITE READ AND WRITE HANDLERS

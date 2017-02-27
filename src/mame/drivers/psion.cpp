@@ -22,8 +22,12 @@
 
 #include "emu.h"
 #include "includes/psion.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {

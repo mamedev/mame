@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M5_CART_SLOT = &device_creator<m5_cart_slot_device>;
+const device_type M5_CART_SLOT = device_creator<m5_cart_slot_device>;
 
 //**************************************************************************
 //    M5 Cartridges Interface

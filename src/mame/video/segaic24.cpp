@@ -16,11 +16,12 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 
 #include "emu.h"
 #include "segaic24.h"
+#include "screen.h"
 
 
-const device_type S24TILE = &device_creator<segas24_tile>;
-const device_type S24SPRITE = &device_creator<segas24_sprite>;
-const device_type S24MIXER = &device_creator<segas24_mixer>;
+const device_type S24TILE = device_creator<segas24_tile>;
+const device_type S24SPRITE = device_creator<segas24_sprite>;
+const device_type S24MIXER = device_creator<segas24_mixer>;
 
 
 segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

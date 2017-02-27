@@ -26,15 +26,17 @@ $c088-$c095 player tiles
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
-#include "video/resnet.h"
 #include "video/jangou_blitter.h"
-#include "machine/nvram.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 

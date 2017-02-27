@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class wwfsstar_state : public driver_device
 {

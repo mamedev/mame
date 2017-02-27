@@ -13,8 +13,8 @@
 #include "emu.h"
 #include "msm6222b.h"
 
-const device_type MSM6222B = &device_creator<msm6222b_device>;
-const device_type MSM6222B_01 = &device_creator<msm6222b_01_device>;
+const device_type MSM6222B = device_creator<msm6222b_device>;
+const device_type MSM6222B_01 = device_creator<msm6222b_01_device>;
 
 ROM_START( msm6222b_01 )
 	ROM_REGION( 0x1000, "cgrom", 0 )

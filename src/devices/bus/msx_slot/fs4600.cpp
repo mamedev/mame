@@ -8,7 +8,7 @@
 #include "fs4600.h"
 
 
-const device_type MSX_SLOT_FS4600 = &device_creator<msx_slot_fs4600_device>;
+const device_type MSX_SLOT_FS4600 = device_creator<msx_slot_fs4600_device>;
 
 
 msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -25,9 +25,14 @@ Game Status:
 
 #include "emu.h"
 #include "includes/gamecom.h"
+
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "gamecom.lh"
+
 
 static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM AM_REGION("maincpu", 0x00)

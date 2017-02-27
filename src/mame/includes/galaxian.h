@@ -11,6 +11,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
+#include "screen.h"
 
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE         3

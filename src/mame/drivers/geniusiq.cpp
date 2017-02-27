@@ -239,6 +239,7 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "screen.h"
 #include "softlist.h"
 
 #define KEYBOARD_QUEUE_SIZE     0x80

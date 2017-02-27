@@ -8,20 +8,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
+#include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
-#include "video/tms9928a.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
-#include "formats/svi_cas.h"
-#include "bus/generic/slot.h"
+#include "video/tms9928a.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/svi3x8/expander/expander.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/svi_cas.h"
 
 
 //**************************************************************************

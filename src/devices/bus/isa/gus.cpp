@@ -9,8 +9,10 @@
 
 #include "emu.h"
 #include "gus.h"
+
 #include "bus/midi/midi.h"
 #include "machine/clock.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -34,8 +36,8 @@ static const uint16_t volume_ramp_table[4] =
 	1, 8, 64, 512
 };
 
-const device_type GGF1 = &device_creator<gf1_device>;
-const device_type ISA16_GUS = &device_creator<isa16_gus_device>;
+const device_type GGF1 = device_creator<gf1_device>;
+const device_type ISA16_GUS = device_creator<isa16_gus_device>;
 
 #ifdef LOG_SOUND
 FILE* f;

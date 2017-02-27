@@ -34,10 +34,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 
 #include "beta.lh"
 

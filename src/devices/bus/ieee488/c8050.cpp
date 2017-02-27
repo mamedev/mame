@@ -54,10 +54,10 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C8050 = &device_creator<c8050_t>;
-const device_type C8250 = &device_creator<c8250_t>;
-const device_type C8250LP = &device_creator<c8250lp_t>;
-const device_type SFD1001 = &device_creator<sfd1001_t>;
+const device_type C8050 = device_creator<c8050_t>;
+const device_type C8250 = device_creator<c8250_t>;
+const device_type C8250LP = device_creator<c8250lp_t>;
+const device_type SFD1001 = device_creator<sfd1001_t>;
 
 
 //-------------------------------------------------

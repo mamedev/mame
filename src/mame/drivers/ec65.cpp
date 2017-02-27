@@ -17,6 +17,7 @@
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
 #define PIA6821_TAG "pia6821"
 #define ACIA6850_TAG "acia6850"

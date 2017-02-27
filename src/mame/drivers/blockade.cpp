@@ -11,9 +11,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/samples.h"
 #include "sound/discrete.h"
+#include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "blockade.lh"
 

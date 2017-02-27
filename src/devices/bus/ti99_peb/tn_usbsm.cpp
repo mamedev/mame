@@ -376,4 +376,4 @@ ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 	return INPUT_PORTS_NAME(tn_usbsm);
 }
 
-const device_type TI99_USBSM = &device_creator<nouspikel_usb_smartmedia_device>;
+const device_type TI99_USBSM = device_creator<nouspikel_usb_smartmedia_device>;

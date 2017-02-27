@@ -81,9 +81,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
-#include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50

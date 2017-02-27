@@ -32,11 +32,14 @@ DIP locations verified for:
 
 #include "emu.h"
 #include "includes/lasso.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)

@@ -36,10 +36,13 @@ TODO: Emulated sound
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/gotya.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "includes/gotya.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( gotya_map, AS_PROGRAM, 8, gotya_state )

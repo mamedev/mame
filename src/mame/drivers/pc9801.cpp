@@ -383,40 +383,32 @@ Keyboard TX commands:
 
 #include "emu.h"
 
+#include "cpu/i386/i386.h"
+#include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
-#include "cpu/i86/i286.h"
-#include "cpu/i386/i386.h"
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/am9517a.h"
-#include "machine/pic8259.h"
-#include "machine/upd765.h"
-#include "machine/upd1990a.h"
-#include "machine/i8251.h"
 #include "machine/bankdev.h"
+#include "machine/buffer.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/latch.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd1990a.h"
+#include "machine/upd765.h"
 
 #include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
-#include "machine/buffer.h"
-#include "machine/latch.h"
 
-#include "sound/beep.h"
-#include "sound/speaker.h"
 #include "sound/2608intf.h"
+#include "sound/beep.h"
+#include "sound/spkrdev.h"
 
 #include "video/upd7220.h"
-
-#include "machine/ram.h"
-
-#include "formats/pc98_dsk.h"
-#include "formats/pc98fdi_dsk.h"
-#include "formats/fdd_dsk.h"
-#include "formats/dcp_dsk.h"
-#include "formats/dip_dsk.h"
-#include "formats/nfd_dsk.h"
 
 #include "machine/pc9801_26.h"
 #include "machine/pc9801_86.h"
@@ -429,7 +421,16 @@ Keyboard TX commands:
 #include "machine/idehd.h"
 
 #include "debugger.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/pc98_dsk.h"
+#include "formats/pc98fdi_dsk.h"
+#include "formats/fdd_dsk.h"
+#include "formats/dcp_dsk.h"
+#include "formats/dip_dsk.h"
+#include "formats/nfd_dsk.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"

@@ -17,7 +17,7 @@
 #define VT83C461_CONFIG_DATA               3
 
 
-const device_type VT83C461 = &device_creator<vt83c461_device>;
+const device_type VT83C461 = device_creator<vt83c461_device>;
 
 vt83c461_device::vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_32_device(mconfig, VT83C461, "VIA VT83C461", tag, owner, clock, "vt83c461", __FILE__),

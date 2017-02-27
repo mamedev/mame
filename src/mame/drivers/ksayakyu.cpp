@@ -67,10 +67,14 @@ SRAM:
 
 #include "emu.h"
 #include "includes/ksayakyu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_18_432MHz
 

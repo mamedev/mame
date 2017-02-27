@@ -62,20 +62,22 @@
 */
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
+#include "cpu/i86/i186.h"
+#include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/z80dart.h"
-#include "machine/wd_fdc.h"
 #include "machine/wd2010.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ngen_kb.h"
-#include "machine/clock.h"
-#include "imagedev/harddriv.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 class ngen_state : public driver_device
 {

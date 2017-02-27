@@ -13,7 +13,7 @@
 enum { ClockDelay=32 };
 
 // device type definition
-const device_type GAMATE_SND = &device_creator<gamate_sound_device>;
+const device_type GAMATE_SND = device_creator<gamate_sound_device>;
 
 const int gamate_sound_device::DAConverter[]={ 0, 3, 7, 13,  23, 41, 75, 137,  249, 453, 825, 1499,  2726, 4956, 9011, 16383 }; // (*.55) on the real below index 8 bareless measureable
 const uint8_t Mask[]={ 0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0x3f,  0x1f, 0x1f, 0x1f, 0xff, 0xff, 0xf };

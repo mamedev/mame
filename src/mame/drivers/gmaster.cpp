@@ -5,12 +5,18 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/upd7810/upd7810.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class gmaster_state : public driver_device
 {

@@ -22,7 +22,11 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "alinvade.lh"
+
 
 class alinvade_state : public driver_device
 {

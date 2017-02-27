@@ -94,12 +94,12 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_21046 = &device_creator<luxor_55_21046_t>;
-const device_type ABC830 = &device_creator<abc830_t>;
-const device_type ABC832 = &device_creator<abc832_t>;
-const device_type ABC834 = &device_creator<abc834_t>;
-const device_type ABC838 = &device_creator<abc838_device>;
-const device_type ABC850_FLOPPY = &device_creator<abc850_floppy_t>;
+const device_type LUXOR_55_21046 = device_creator<luxor_55_21046_t>;
+const device_type ABC830 = device_creator<abc830_t>;
+const device_type ABC832 = device_creator<abc832_t>;
+const device_type ABC834 = device_creator<abc834_t>;
+const device_type ABC838 = device_creator<abc838_device>;
+const device_type ABC850_FLOPPY = device_creator<abc850_floppy_t>;
 
 
 //-------------------------------------------------

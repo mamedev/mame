@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV807 = &device_creator<sv807_device>;
+const device_type SV807 = device_creator<sv807_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

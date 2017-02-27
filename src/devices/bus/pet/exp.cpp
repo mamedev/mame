@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_EXPANSION_SLOT = &device_creator<pet_expansion_slot_device>;
+const device_type PET_EXPANSION_SLOT = device_creator<pet_expansion_slot_device>;
 
 
 

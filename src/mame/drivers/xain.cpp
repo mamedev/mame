@@ -144,6 +144,8 @@ Updates by Bryan McPhail, 12/12/2004:
 
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK        XTAL_12MHz
 #define CPU_CLOCK           MASTER_CLOCK / 8

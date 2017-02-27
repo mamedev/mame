@@ -10,11 +10,14 @@
 
 #include "emu.h"
 #include "mameopts.h"
+
 #include "drivenum.h"
+#include "screen.h"
 #include "softlist_dev.h"
 
 #include <ctype.h>
 #include <stack>
+
 
 int mame_options::m_slot_options = 0;
 int mame_options::m_device_options = 0;

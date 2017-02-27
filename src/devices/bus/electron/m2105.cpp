@@ -9,13 +9,14 @@
 
 #include "emu.h"
 #include "m2105.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_M2105 = &device_creator<electron_m2105_device>;
+const device_type ELECTRON_M2105 = device_creator<electron_m2105_device>;
 
 
 //-------------------------------------------------

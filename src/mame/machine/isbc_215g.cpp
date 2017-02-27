@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "isbc_215g.h"
 
-const device_type ISBC_215G = &device_creator<isbc_215g_device>;
+const device_type ISBC_215G = device_creator<isbc_215g_device>;
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_215G, "ISBC 215G Winchester Disk Controller", tag, owner, clock, "isbc_215g", __FILE__),

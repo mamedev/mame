@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VECTREX_CART_SLOT = &device_creator<vectrex_cart_slot_device>;
+const device_type VECTREX_CART_SLOT = device_creator<vectrex_cart_slot_device>;
 
 //**************************************************************************
 //    Vectrex Cartridges Interface

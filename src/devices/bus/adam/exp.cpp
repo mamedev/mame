@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_EXPANSION_SLOT = &device_creator<adam_expansion_slot_device>;
+const device_type ADAM_EXPANSION_SLOT = device_creator<adam_expansion_slot_device>;
 
 
 

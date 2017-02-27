@@ -49,6 +49,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sangho_state : public driver_device

@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "n2a03.h"
 
-const device_type N2A03 = &device_creator<n2a03_device>;
+const device_type N2A03 = device_creator<n2a03_device>;
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {

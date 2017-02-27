@@ -43,7 +43,7 @@
 #define FACTOR ((m_tcr & 4) ? 8 : 1)
 
 
-const device_type MC6846 = &device_creator<mc6846_device>;
+const device_type MC6846 = device_creator<mc6846_device>;
 
 mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6846, "MC6846 Programmable Timer", tag, owner, clock, "mc6846", __FILE__),

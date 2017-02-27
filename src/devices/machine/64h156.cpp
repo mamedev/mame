@@ -43,7 +43,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64H156 = &device_creator<c64h156_device>;
+const device_type C64H156 = device_creator<c64h156_device>;
 
 
 

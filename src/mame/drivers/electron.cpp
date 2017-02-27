@@ -72,7 +72,9 @@ Missing:
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 #include "sound/beep.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static const rgb_t electron_palette[8]=
 {

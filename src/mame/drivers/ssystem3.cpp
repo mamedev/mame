@@ -36,9 +36,10 @@ backup of playfield rom and picture/description of its board
 */
 
 #include "emu.h"
-
 #include "includes/ssystem3.h"
+
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons

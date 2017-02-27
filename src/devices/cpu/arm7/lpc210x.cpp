@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "lpc210x.h"
 
-const device_type LPC2103 = &device_creator<lpc210x_device>;
+const device_type LPC2103 = device_creator<lpc210x_device>;
 
 static ADDRESS_MAP_START( lpc2103_map, AS_PROGRAM, 32, lpc210x_device )
 	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(flash_r, flash_w) // 32kb internal FLASH rom

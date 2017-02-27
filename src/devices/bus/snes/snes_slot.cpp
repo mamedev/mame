@@ -56,9 +56,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SNS_CART_SLOT = &device_creator<sns_cart_slot_device>;
-const device_type SNS_SUFAMI_CART_SLOT = &device_creator<sns_sufami_cart_slot_device>;
-const device_type SNS_BSX_CART_SLOT = &device_creator<sns_bsx_cart_slot_device>;
+const device_type SNS_CART_SLOT = device_creator<sns_cart_slot_device>;
+const device_type SNS_SUFAMI_CART_SLOT = device_creator<sns_sufami_cart_slot_device>;
+const device_type SNS_BSX_CART_SLOT = device_creator<sns_bsx_cart_slot_device>;
 
 //**************************************************************************
 //    SNES Cartridge Interface

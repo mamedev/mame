@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "screen.h"
+
 class m52_state : public driver_device
 {
 public:

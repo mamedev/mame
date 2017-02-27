@@ -41,14 +41,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i86/i86.h"
-#include "machine/i8255.h"
-#include "sound/ay8910.h"
-#include "rendlay.h"
 #include "includes/tx1.h"
+
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "rendlay.h"
+#include "speaker.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef PC_VGA_H
-#define PC_VGA_H
+#ifndef MAME_DEVICES_VIDEO_PC_VGA_H
+#define MAME_DEVICES_VIDEO_PC_VGA_H
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
@@ -33,14 +33,13 @@ enum
 
 // ======================> vga_device
 
-class vga_device :  public device_t
+class vga_device : public device_t
 {
 	friend class ibm8514a_device;
 
 public:
 	// construction/destruction
 	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -56,7 +55,10 @@ public:
 	virtual READ8_MEMBER(mem_linear_r);
 	virtual WRITE8_MEMBER(mem_linear_w);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
+
 protected:
+	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -242,12 +244,13 @@ extern const device_type VGA;
 class svga_device :  public vga_device
 {
 public:
+	virtual void zero() override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+protected:
 	// construction/destruction
 	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual void zero() override;
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-protected:
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -264,15 +267,14 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
-	}svga;
+	} svga;
 };
 
 // ======================> ibm8514_device
 
-class ibm8514a_device :  public device_t
+class ibm8514a_device : public device_t
 {
 public:
-	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
@@ -378,6 +380,8 @@ public:
 
 	} ibm8514;
 protected:
+	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 	vga_device* m_vga;  // for pass-through
@@ -411,7 +415,6 @@ extern const device_type IBM8514A;
 class mach8_device :  public ibm8514a_device
 {
 public:
-	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	READ16_MEMBER(mach8_ec0_r);
@@ -441,6 +444,7 @@ public:
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
 
 protected:
+	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual void device_start() override;
 	struct
 	{
@@ -516,7 +520,6 @@ class ati_vga_device :  public svga_device
 public:
 	// construction/destruction
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(mem_r) override;
 	virtual WRITE8_MEMBER(mem_w) override;
@@ -531,6 +534,7 @@ public:
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual void device_start() override;
 private:
 	void ati_define_video_mode();
@@ -549,12 +553,11 @@ extern const device_type ATI_VGA;
 
 // ======================> s3_vga_device
 
-class s3_vga_device :  public ati_vga_device
+class s3_vga_device : public ati_vga_device
 {
 public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(port_03b0_r) override;
 	virtual WRITE8_MEMBER(port_03b0_w) override;
@@ -571,7 +574,10 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
+
 protected:
+	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -699,4 +705,4 @@ extern const device_type GAMTOR_VGA;
 */
 
 
-#endif /* PC_VGA_H */
+#endif /* MAME_DEVICES_VIDEO_PC_VGA_H */

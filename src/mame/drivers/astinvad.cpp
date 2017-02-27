@@ -22,6 +22,8 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK         XTAL_2MHz

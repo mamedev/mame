@@ -56,7 +56,7 @@
 	}
 
 
-const device_type F8 = &device_creator<f8_cpu_device>;
+const device_type F8 = device_creator<f8_cpu_device>;
 
 
 f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

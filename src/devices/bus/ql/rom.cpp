@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_ROM_CARTRIDGE_SLOT = &device_creator<ql_rom_cartridge_slot_t>;
+const device_type QL_ROM_CARTRIDGE_SLOT = device_creator<ql_rom_cartridge_slot_t>;
 
 
 

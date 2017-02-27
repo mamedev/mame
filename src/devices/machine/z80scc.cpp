@@ -134,16 +134,16 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type Z80SCC   = &device_creator<z80scc_device>;
-const device_type Z80SCC_CHANNEL = &device_creator<z80scc_channel>;
-const device_type SCC8030  = &device_creator<scc8030_device>;
-const device_type SCC80C30 = &device_creator<scc80C30_device>;
-const device_type SCC80230 = &device_creator<scc80230_device>;
-const device_type SCC8530N = &device_creator<scc8530_device>;  // remove trailing N when 8530scc.c is fully replaced and removed
-const device_type SCC85C30 = &device_creator<scc85C30_device>;
-const device_type SCC85230 = &device_creator<scc85230_device>;
-const device_type SCC85233 = &device_creator<scc85233_device>;
-const device_type SCC8523L = &device_creator<scc8523L_device>;
+const device_type Z80SCC   = device_creator<z80scc_device>;
+const device_type Z80SCC_CHANNEL = device_creator<z80scc_channel>;
+const device_type SCC8030  = device_creator<scc8030_device>;
+const device_type SCC80C30 = device_creator<scc80C30_device>;
+const device_type SCC80230 = device_creator<scc80230_device>;
+const device_type SCC8530N = device_creator<scc8530_device>;  // remove trailing N when 8530scc.c is fully replaced and removed
+const device_type SCC85C30 = device_creator<scc85C30_device>;
+const device_type SCC85230 = device_creator<scc85230_device>;
+const device_type SCC85233 = device_creator<scc85233_device>;
+const device_type SCC8523L = device_creator<scc8523L_device>;
 
 //-------------------------------------------------
 //  device_mconfig_additions -

@@ -63,10 +63,14 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #include "emu.h"
 #include "includes/rltennis.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)

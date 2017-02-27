@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SG1000_EXPANSION_SLOT = &device_creator<sg1000_expansion_slot_device>;
+const device_type SG1000_EXPANSION_SLOT = device_creator<sg1000_expansion_slot_device>;
 
 
 

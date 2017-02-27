@@ -24,7 +24,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, asst128_mb_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
 
-const device_type ASST128_MOTHERBOARD = &device_creator<asst128_mb_device>;
+const device_type ASST128_MOTHERBOARD = device_creator<asst128_mb_device>;
 
 class asst128_state : public driver_device
 {

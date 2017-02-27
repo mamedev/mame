@@ -38,9 +38,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_HENGG_SRICH = &device_creator<nes_hengg_srich_device>;
-const device_type NES_HENGG_XHZS = &device_creator<nes_hengg_xhzs_device>;
-const device_type NES_HENGG_SHJY3 = &device_creator<nes_hengg_shjy3_device>;
+const device_type NES_HENGG_SRICH = device_creator<nes_hengg_srich_device>;
+const device_type NES_HENGG_XHZS = device_creator<nes_hengg_xhzs_device>;
+const device_type NES_HENGG_SHJY3 = device_creator<nes_hengg_shjy3_device>;
 
 
 nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

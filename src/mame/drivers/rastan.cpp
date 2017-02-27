@@ -154,14 +154,18 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
+#include "includes/rastan.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "sound/ym2151.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/msm5205.h"
-#include "includes/rastan.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(rastan_state::rastan_bankswitch_w)
 {

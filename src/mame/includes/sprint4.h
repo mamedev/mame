@@ -2,6 +2,8 @@
 // copyright-holders:Stefan Jokisch
 
 #include "machine/watchdog.h"
+#include "sound/discrete.h"
+#include "screen.h"
 
 class sprint4_state : public driver_device
 {

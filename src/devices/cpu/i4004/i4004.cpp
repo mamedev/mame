@@ -21,7 +21,7 @@ static const uint8_t kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x0
 #define GET_PC                  (m_ADDR[m_pc_pos])
 
 
-const device_type I4004 = &device_creator<i4004_cpu_device>;
+const device_type I4004 = device_creator<i4004_cpu_device>;
 
 
 i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

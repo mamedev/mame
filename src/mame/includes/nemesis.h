@@ -5,6 +5,9 @@
 #include "sound/k005289.h"
 #include "sound/vlm5030.h"
 
+#include "screen.h"
+
+
 class nemesis_state : public driver_device
 {
 public:

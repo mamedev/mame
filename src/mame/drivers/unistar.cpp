@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class unistar_state : public driver_device
@@ -21,7 +22,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_PALETTE_INIT(unistar);
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

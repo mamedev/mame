@@ -47,7 +47,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_SPORTS_PAD = &device_creator<sms_sports_pad_device>;
+const device_type SMS_SPORTS_PAD = device_creator<sms_sports_pad_device>;
 
 // time interval not verified
 #define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/512)

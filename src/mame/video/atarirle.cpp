@@ -22,13 +22,14 @@
 
 #include "emu.h"
 #include "atarirle.h"
+#include "screen.h"
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const device_type ATARI_RLE_OBJECTS = &device_creator<atari_rle_objects_device>;
+const device_type ATARI_RLE_OBJECTS = device_creator<atari_rle_objects_device>;
 
 enum { atarirle_hilite_index = -1 };
 

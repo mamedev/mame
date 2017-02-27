@@ -57,16 +57,18 @@
 
 ************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12MHz
-#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
-#define SND_CLOCK       MASTER_CLOCK/8  /* guess */
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_12MHz
+#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
+#define SND_CLOCK       MASTER_CLOCK/8  /* guess */
 
 class supdrapo_state : public driver_device
 {

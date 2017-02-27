@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 // device type definition
-const device_type FIXFREQ = &device_creator<fixedfreq_device>;
+const device_type FIXFREQ = device_creator<fixedfreq_device>;
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),

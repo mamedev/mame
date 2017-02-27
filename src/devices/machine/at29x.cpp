@@ -521,6 +521,6 @@ void at29x_device::device_reset(void)
 	m_programming_last_offset = 0;
 }
 
-const device_type AT29C020 = &device_creator<at29c020_device>;
-const device_type AT29C040 = &device_creator<at29c040_device>;
-const device_type AT29C040A = &device_creator<at29c040a_device>;
+const device_type AT29C020 = device_creator<at29c020_device>;
+const device_type AT29C040 = device_creator<at29c040_device>;
+const device_type AT29C040A = device_creator<at29c040a_device>;

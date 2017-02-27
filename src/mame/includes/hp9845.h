@@ -10,6 +10,7 @@
 #include "machine/hp_taco.h"
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
+#include "screen.h"
 
 class hp9845b_state : public driver_device
 {

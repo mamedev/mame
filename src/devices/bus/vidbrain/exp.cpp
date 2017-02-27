@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIDEOBRAIN_EXPANSION_SLOT = &device_creator<videobrain_expansion_slot_device>;
+const device_type VIDEOBRAIN_EXPANSION_SLOT = device_creator<videobrain_expansion_slot_device>;
 
 
 

@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTVECS_CONTROL_PORT = &device_creator<intvecs_control_port_device>;
+const device_type INTVECS_CONTROL_PORT = device_creator<intvecs_control_port_device>;
 
 
 //**************************************************************************
@@ -137,7 +137,7 @@ SLOT_INTERFACE_END
 //  ECS_CTRLS - A pair of hand controllers
 //-------------------------------------------------
 
-const device_type ECS_CTRLS = &device_creator<intvecs_ctrls_device>;
+const device_type ECS_CTRLS = device_creator<intvecs_ctrls_device>;
 
 static SLOT_INTERFACE_START( intvecs_controller )
 	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
@@ -184,7 +184,7 @@ uint8_t intvecs_ctrls_device::read_portB()
 //  ECS_KEYBD - Keyboard
 //-------------------------------------------------
 
-const device_type ECS_KEYBD = &device_creator<intvecs_keybd_device>;
+const device_type ECS_KEYBD = device_creator<intvecs_keybd_device>;
 
 static INPUT_PORTS_START( intvecs_keybd )
 /*
@@ -320,7 +320,7 @@ void intvecs_keybd_device::write_portA(uint8_t data)
 //  ECS_SYNTH - Synth
 //-------------------------------------------------
 
-const device_type ECS_SYNTH = &device_creator<intvecs_synth_device>;
+const device_type ECS_SYNTH = device_creator<intvecs_synth_device>;
 
 
 static INPUT_PORTS_START( intvecs_synth )

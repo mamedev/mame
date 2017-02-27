@@ -21,8 +21,10 @@
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
 #include "video/deco16ic.h"
-#include "rendlay.h"
 #include "video/decospr.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class backfire_state : public driver_device

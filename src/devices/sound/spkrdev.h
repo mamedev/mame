@@ -7,8 +7,8 @@
     driven by one or more output bits
 
 **********************************************************************/
-#ifndef MAME_DEVICES_SOUND_SPEAKER_H
-#define MAME_DEVICES_SOUND_SPEAKER_H
+#ifndef MAME_DEVICES_SOUND_SPKRDEV_H
+#define MAME_DEVICES_SOUND_SPKRDEV_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ extern const device_type SPEAKER_SOUND;
 extern template class device_finder<speaker_sound_device, false>;
 extern template class device_finder<speaker_sound_device, true>;
 
-#endif // MAME_DEVICES_SOUND_SPEAKER_H
+#endif // MAME_DEVICES_SOUND_SPKRDEV_H

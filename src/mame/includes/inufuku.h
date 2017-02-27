@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_INUFUKU_H
+#define MAME_INCLUDES_INUFUKU_H
 
+#include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 
 class inufuku_state : public driver_device
@@ -69,3 +72,5 @@ public:
 	uint32_t screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_inufuku(screen_device &screen, bool state);
 };
+
+#endif // MAME_INCLUDES_INUFUKU_H

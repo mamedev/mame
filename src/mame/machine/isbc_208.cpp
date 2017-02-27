@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "isbc_208.h"
 
-const device_type ISBC_208 = &device_creator<isbc_208_device>;
+const device_type ISBC_208 = device_creator<isbc_208_device>;
 
 isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_208, "ISBC 208 Flexible Disk Drive Controller", tag, owner, clock, "isbc_208", __FILE__),

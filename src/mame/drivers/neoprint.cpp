@@ -25,8 +25,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "sound/2610intf.h"
 #include "machine/upd1990a.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class neoprint_state : public driver_device

@@ -9,13 +9,14 @@
 #include "emu.h"
 #include "digiblst.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  COVOX DEVICE
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_DIGIBLASTER = &device_creator<centronics_digiblaster_device>;
+const device_type CENTRONICS_DIGIBLASTER = device_creator<centronics_digiblaster_device>;
 
 static MACHINE_CONFIG_FRAGMENT( digiblst )
 	/* sound hardware */

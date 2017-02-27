@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV802 = &device_creator<sv802_device>;
+const device_type SV802 = device_creator<sv802_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

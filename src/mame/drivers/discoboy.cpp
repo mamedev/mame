@@ -43,10 +43,12 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/74157.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "i82730.h"
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -25,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I82730 = &device_creator<i82730_device>;
+const device_type I82730 = device_creator<i82730_device>;
 
 const char *i82730_device::m_command_names[] =
 {

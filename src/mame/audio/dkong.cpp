@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "emu.h"
+#include "includes/dkong.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
-
 #include "sound/tms5110.h"
-
-#include "includes/dkong.h"
+#include "speaker.h"
 
 
 /****************************************************************

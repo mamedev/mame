@@ -107,4 +107,4 @@ machine_config_constructor ti_32k_expcard_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( mem32k );
 }
 
-const device_type TI_32KMEM = &device_creator<ti_32k_expcard_device>;
+const device_type TI_32KMEM = device_creator<ti_32k_expcard_device>;

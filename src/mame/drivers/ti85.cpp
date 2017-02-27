@@ -202,10 +202,14 @@ TI-86 ports:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ti85.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/snapquik.h"
-#include "includes/ti85.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* port i/o functions */
 

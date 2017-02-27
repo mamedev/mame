@@ -15,9 +15,12 @@
 */
 
 #include "emu.h"
+#include "includes/bigstrkb.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/bigstrkb.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*
 

@@ -1,19 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Eugene Sandulenko
+#ifndef MAME_INCLUDES_TIAMC1_H
+#define MAME_INCLUDES_TIAMC1_H
+
+#pragma once
 
 #include "machine/pit8253.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 class tiamc1_state : public driver_device
 {
 public:
 	tiamc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_speaker(*this, "speaker")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_speaker(*this, "speaker")
+	{ }
 
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t *m_tileram;
@@ -137,3 +141,5 @@ private:
 };
 
 extern const device_type TIAMC1;
+
+#endif // MAME_INCLUDES_TIAMC1_H

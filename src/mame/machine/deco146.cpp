@@ -1315,7 +1315,7 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 }
 
 
-//const device_type DECO146BASE = &device_creator<deco_146_base_device>;
+//const device_type DECO146BASE = device_creator<deco_146_base_device>;
 
 
 
@@ -1464,7 +1464,7 @@ void deco_146_base_device::device_reset()
 
 
 
-const device_type DECO146PROT = &device_creator<deco146_device>;
+const device_type DECO146PROT = device_creator<deco146_device>;
 
 
 uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)

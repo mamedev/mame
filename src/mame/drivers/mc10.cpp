@@ -8,16 +8,21 @@
 
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "formats/coco_cas.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "video/mc6847.h"
 #include "video/ef9345.h"
+#include "video/mc6847.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/coco_cas.h"
+
 
 //printer state
 enum
@@ -36,14 +41,14 @@ class mc10_state : public driver_device
 {
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_mc6847(*this, "mc6847"),
-	m_ef9345(*this, "ef9345"),
-	m_dac(*this, "dac"),
-	m_ram(*this, RAM_TAG),
-	m_cassette(*this, "cassette"),
-	m_printer(*this, "printer")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mc6847(*this, "mc6847")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
+		, m_cassette(*this, "cassette")
+		, m_printer(*this, "printer")
 	{ }
 
 	required_device<m6803_cpu_device> m_maincpu;

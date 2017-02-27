@@ -23,8 +23,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HPC104 = &device_creator<hpc104_t>;
-const device_type HPC104_2 = &device_creator<hpc104_2_t>;
+const device_type HPC104 = device_creator<hpc104_t>;
+const device_type HPC104_2 = device_creator<hpc104_2_t>;
 
 
 //-------------------------------------------------

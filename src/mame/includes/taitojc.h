@@ -8,6 +8,7 @@
 
 #include "video/tc0780fpa.h"
 #include "machine/taitoio.h"
+#include "screen.h"
 
 class taitojc_state : public driver_device
 {

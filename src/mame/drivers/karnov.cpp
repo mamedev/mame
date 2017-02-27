@@ -79,12 +79,16 @@ Stephh's notes (based on the games M68000 code and some tests) :
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/karnov.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/karnov.h"
 #include "cpu/mcs51/mcs51.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *

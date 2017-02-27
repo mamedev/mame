@@ -63,13 +63,16 @@
 
 */
 
+#include "includes/plygonet.h"
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/k054539.h"
 #include "machine/watchdog.h"
-#include "includes/plygonet.h"
+#include "sound/k054539.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 

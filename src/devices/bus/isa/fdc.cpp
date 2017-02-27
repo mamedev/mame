@@ -160,8 +160,8 @@ machine_config_constructor isa8_fdc_superio_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME(cfg_superio);
 }
 
-const device_type ISA8_FDC_XT = &device_creator<isa8_fdc_xt_device>;
-const device_type ISA8_FDC_AT = &device_creator<isa8_fdc_at_device>;
-const device_type ISA8_FDC_SMC = &device_creator<isa8_fdc_smc_device>;
-const device_type ISA8_FDC_PS2 = &device_creator<isa8_fdc_ps2_device>;
-const device_type ISA8_FDC_SUPERIO = &device_creator<isa8_fdc_superio_device>;
+const device_type ISA8_FDC_XT = device_creator<isa8_fdc_xt_device>;
+const device_type ISA8_FDC_AT = device_creator<isa8_fdc_at_device>;
+const device_type ISA8_FDC_SMC = device_creator<isa8_fdc_smc_device>;
+const device_type ISA8_FDC_PS2 = device_creator<isa8_fdc_ps2_device>;
+const device_type ISA8_FDC_SUPERIO = device_creator<isa8_fdc_superio_device>;

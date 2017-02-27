@@ -21,10 +21,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
 #include "imagedev/cassette.h"
+#include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define AY8910_TAG "g12"
 #define HD46505SP_TAG "h45"

@@ -185,15 +185,19 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "audio/cage.h"
+#include "audio/dcs.h"
+
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "audio/dcs.h"
-#include "audio/cage.h"
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
+#include "machine/nvram.h"
 #include "machine/smc91c9x.h"
 #include "video/voodoo.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "calspeed.lh"
 #include "vaportrx.lh"
 #include "hyprdriv.lh"

@@ -32,7 +32,7 @@ static const char *hd_option_spec =
 
 
 // device type definition
-const device_type HARDDISK = &device_creator<harddisk_image_device>;
+const device_type HARDDISK = device_creator<harddisk_image_device>;
 
 //-------------------------------------------------
 //  harddisk_image_device - constructor

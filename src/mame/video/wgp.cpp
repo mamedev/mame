@@ -2,6 +2,7 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/wgp.h"
+#include "screen.h"
 
 
 /*******************************************************************/

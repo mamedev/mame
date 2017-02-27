@@ -9,9 +9,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/turrett.h"
+
 #include "cpu/mips/r3000.h"
 #include "machine/ataintf.h"
-#include "includes/turrett.h"
+#include "speaker.h"
 
 
 
@@ -336,7 +338,7 @@ public:
 	}
 };
 
-const device_type TURRETT_HARDDISK = &device_creator<turrett_hdd>;
+const device_type TURRETT_HARDDISK = device_creator<turrett_hdd>;
 
 SLOT_INTERFACE_START(turrett_devices)
 	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)

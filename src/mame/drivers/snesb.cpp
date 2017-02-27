@@ -148,6 +148,7 @@ Iron PCB (same as Final Fight 2?)
 #include "emu.h"
 #include "includes/snes.h"
 #include "cpu/mcs51/mcs51.h"
+#include "speaker.h"
 
 class snesb_state : public snes_state
 {

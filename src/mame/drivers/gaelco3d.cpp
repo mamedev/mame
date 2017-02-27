@@ -145,16 +145,17 @@ REF. 970429
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/gaelco3d.h"
-#include "cpu/tms32031/tms32031.h"
+
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/tms32031/tms32031.h"
 #include "machine/eepromser.h"
 
+#include "speaker.h"
+
+
 #define LOG             0
-
-
-
 
 
 WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)

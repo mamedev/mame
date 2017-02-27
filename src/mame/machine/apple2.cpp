@@ -9,15 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
+
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
+
 #include "debugger.h"
+#include "screen.h"
+
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1

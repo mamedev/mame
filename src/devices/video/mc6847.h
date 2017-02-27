@@ -7,11 +7,12 @@
     Implementation of Motorola 6847 video hardware chip
 
 ***************************************************************************/
+#ifndef MAME_DEVICES_VIDEO_MC6847_H
+#define MAME_DEVICES_VIDEO_MC6847_H
 
 #pragma once
 
-#ifndef __MC6847__
-#define __MC6847__
+#include "screen.h"
 
 
 #define MC6847_MODE_AG      0x80
@@ -700,4 +701,4 @@ extern const device_type MC6847T1_PAL;
 extern const device_type S68047;
 extern const device_type M5C6847P1;
 
-#endif /* __MC6847__ */
+#endif // MAME_DEVICES_VIDEO_MC6847_H

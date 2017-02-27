@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VB_STD = &device_creator<videobrain_standard_cartridge_device>;
+const device_type VB_STD = device_creator<videobrain_standard_cartridge_device>;
 
 
 

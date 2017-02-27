@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GBA_CART_SLOT = &device_creator<gba_cart_slot_device>;
+const device_type GBA_CART_SLOT = device_creator<gba_cart_slot_device>;
 
 //**************************************************************************
 //    GBA cartridges Interface

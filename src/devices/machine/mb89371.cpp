@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "mb89371.h"
 
-const device_type MB89371 = &device_creator<mb89371_device>;
+const device_type MB89371 = device_creator<mb89371_device>;
 
 mb89371_device::mb89371_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, MB89371, "MB89371 Dual Serial UART", tag, owner, clock, "mb89371", __FILE__)

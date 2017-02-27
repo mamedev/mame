@@ -120,10 +120,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ccastles.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "includes/ccastles.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    (10000000)

@@ -29,9 +29,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A800_CART_SLOT = &device_creator<a800_cart_slot_device>;
-const device_type A5200_CART_SLOT = &device_creator<a5200_cart_slot_device>;
-const device_type XEGS_CART_SLOT = &device_creator<xegs_cart_slot_device>;
+const device_type A800_CART_SLOT = device_creator<a800_cart_slot_device>;
+const device_type A5200_CART_SLOT = device_creator<a5200_cart_slot_device>;
+const device_type XEGS_CART_SLOT = device_creator<xegs_cart_slot_device>;
 
 
 //-------------------------------------------------

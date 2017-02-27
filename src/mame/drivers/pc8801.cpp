@@ -255,19 +255,20 @@
 
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
+#include "machine/i8214.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
-#include "machine/i8214.h"
-#include "machine/i8251.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/beep.h"
+#include "screen.h"
 #include "softlist.h"
-//#include "includes/pc8801.h"
+#include "speaker.h"
 
 //#define USE_PROPER_I8214
 

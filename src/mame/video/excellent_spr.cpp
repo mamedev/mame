@@ -17,9 +17,10 @@
 
 #include "emu.h"
 #include "excellent_spr.h"
+#include "screen.h"
 
 
-const device_type EXCELLENT_SPRITE = &device_creator<excellent_spr_device>;
+const device_type EXCELLENT_SPRITE = device_creator<excellent_spr_device>;
 
 excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXCELLENT_SPRITE, "Excellent 8-bit Sprite", tag, owner, clock, "excellent_spr", __FILE__),

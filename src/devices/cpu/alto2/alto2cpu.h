@@ -5,14 +5,15 @@
  *   Xerox AltoII CPU core interface
  *
  *****************************************************************************/
-#ifndef _CPU_ALTO2_H_
-#define _CPU_ALTO2_H_
+#ifndef MAME_DEVICES_CPU_ALTO2_H
+#define MAME_DEVICES_CPU_ALTO2_H
 
-#define ALTO2_TAG "alto2"
+#include "machine/diablo_hd.h"
+#include "sound/spkrdev.h"
 
 #include "debugger.h"
-#include "sound/speaker.h"
-#include "machine/diablo_hd.h"
+
+#define ALTO2_TAG "alto2"
 
 /**
  * \brief AltoII register names
@@ -938,5 +939,4 @@ private:
 
 extern const device_type ALTO2;
 
-
-#endif /* _CPU_ALTO2_H_ */
+#endif // MAME_DEVICES_CPU_ALTO2_H

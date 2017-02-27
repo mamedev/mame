@@ -90,12 +90,14 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
-#include "machine/msm6242.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "sound/ym2413.h"
+#include "machine/msm6242.h"
+#include "machine/tmp68301.h"
 #include "sound/okim6295.h"
+#include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 class joystand_state : public driver_device
 {

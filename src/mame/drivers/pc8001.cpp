@@ -25,6 +25,8 @@
 
 #include "emu.h"
 #include "includes/pc8001.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 

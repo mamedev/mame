@@ -18,15 +18,18 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "sound/ym2151.h"
-#include "includes/konamipt.h"
+
+#include "speaker.h"
 
 
 //**************************************************************************

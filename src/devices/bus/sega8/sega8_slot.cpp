@@ -37,8 +37,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SEGA8_CART_SLOT = &device_creator<sega8_cart_slot_device>;
-const device_type SEGA8_CARD_SLOT = &device_creator<sega8_card_slot_device>;
+const device_type SEGA8_CART_SLOT = device_creator<sega8_cart_slot_device>;
+const device_type SEGA8_CARD_SLOT = device_creator<sega8_card_slot_device>;
 
 
 //**************************************************************************

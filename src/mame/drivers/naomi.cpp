@@ -1572,6 +1572,9 @@ Premier Eleven
 #include "emu.h"
 #include "includes/naomi.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 #define CPU_CLOCK (200000000)
 

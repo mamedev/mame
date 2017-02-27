@@ -123,7 +123,7 @@ static const uint8_t envelope[8][64] = {
 
 
 // device type definition
-const device_type SAA1099 = &device_creator<saa1099_device>;
+const device_type SAA1099 = device_creator<saa1099_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

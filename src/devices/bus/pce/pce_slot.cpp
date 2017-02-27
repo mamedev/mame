@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCE_CART_SLOT = &device_creator<pce_cart_slot_device>;
+const device_type PCE_CART_SLOT = device_creator<pce_cart_slot_device>;
 
 //**************************************************************************
 //    PCE cartridges Interface

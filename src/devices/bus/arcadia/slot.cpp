@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EA2001_CART_SLOT = &device_creator<arcadia_cart_slot_device>;
+const device_type EA2001_CART_SLOT = device_creator<arcadia_cart_slot_device>;
 
 //**************************************************************************
 //    ARCADIA Cartridges Interface

@@ -50,6 +50,7 @@
 #include "machine/wd_fdc.h"
 #include "formats/esq8_dsk.h"
 #include "sound/es5503.h"
+#include "speaker.h"
 
 #include "mirage.lh"
 

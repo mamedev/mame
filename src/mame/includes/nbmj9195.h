@@ -8,6 +8,7 @@
 
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 #define VRAM_MAX    2
 

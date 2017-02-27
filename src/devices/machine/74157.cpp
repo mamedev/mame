@@ -20,7 +20,7 @@
 //  74LS157 DEVICE
 //**************************************************************************
 
-const device_type LS157 = &device_creator<ls157_device>;
+const device_type LS157 = device_creator<ls157_device>;
 
 //-------------------------------------------------
 //  ls157_device - constructor
@@ -211,7 +211,7 @@ void ls157_device::update_output()
 //  74HCT157 DEVICE
 //**************************************************************************
 
-const device_type HCT157 = &device_creator<hct157_device>;
+const device_type HCT157 = device_creator<hct157_device>;
 
 hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ls157_device(mconfig, HCT157, "74HCT157 Quad 2-to-1 Multiplexer", tag, owner, clock, "74hct157", __FILE__)

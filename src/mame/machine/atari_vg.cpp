@@ -35,7 +35,7 @@
 
 
 // device type definition
-const device_type ATARIVGEAROM = &device_creator<atari_vg_earom_device>;
+const device_type ATARIVGEAROM = device_creator<atari_vg_earom_device>;
 
 //-------------------------------------------------
 //  atari_vg_earom_device - constructor

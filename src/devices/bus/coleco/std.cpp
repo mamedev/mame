@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_STANDARD = &device_creator<colecovision_standard_cartridge_device>;
+const device_type COLECOVISION_STANDARD = device_creator<colecovision_standard_cartridge_device>;
 
 
 

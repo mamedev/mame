@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VCS_CART_SLOT = &device_creator<vcs_cart_slot_device>;
+const device_type VCS_CART_SLOT = device_creator<vcs_cart_slot_device>;
 
 
 //-------------------------------------------------

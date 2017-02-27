@@ -39,9 +39,9 @@
 
 #include "emu.h"
 #include "egret.h"
+#include "includes/mac.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/asc.h"
-#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -53,7 +53,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EGRET = &device_creator<egret_device>;
+const device_type EGRET = device_creator<egret_device>;
 
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)

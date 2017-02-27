@@ -9,16 +9,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "machine/z80pio.h"
-#include "machine/ay31015.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/ay31015.h"
+#include "machine/ram.h"
+#include "machine/z80pio.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
+
 #include "softlist.h"
+#include "screen.h"
+
 
 //**************************************************************************
 //  CONSTANTS/MACROS

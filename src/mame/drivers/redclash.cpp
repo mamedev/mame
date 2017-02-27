@@ -23,9 +23,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/redclash.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/redclash.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Sound comm between CPU's */

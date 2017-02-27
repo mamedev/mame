@@ -69,6 +69,8 @@ TODO:
 #include "emu.h"
 #include "includes/hh_ucom4.h"
 #include "video/hlcd0515.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "efball.lh"

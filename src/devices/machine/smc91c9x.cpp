@@ -181,7 +181,7 @@ void smc91c9x_device::device_reset()
 }
 
 
-const device_type SMC91C94 = &device_creator<smc91c94_device>;
+const device_type SMC91C94 = device_creator<smc91c94_device>;
 
 smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: smc91c9x_device(mconfig, SMC91C94, "SMC91C94 Ethernet Controller", tag, owner, clock, "smc91c94", __FILE__)
@@ -189,7 +189,7 @@ smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag,
 }
 
 
-const device_type SMC91C96 = &device_creator<smc91c96_device>;
+const device_type SMC91C96 = device_creator<smc91c96_device>;
 
 smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock, "smc91c96", __FILE__)

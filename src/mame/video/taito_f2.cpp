@@ -2,6 +2,7 @@
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
 #include "emu.h"
 #include "includes/taito_f2.h"
+#include "screen.h"
 
 /************************************************************
                       SPRITE BANKING

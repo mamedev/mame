@@ -16,14 +16,16 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 ****************************************************************************/
 
 #include "emu.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "softlist.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define LOG 0
 

@@ -114,17 +114,20 @@
 */
 
 #include "emu.h"
-#include "machine/eepromser.h"
-#include "machine/nvram.h"
-#include "video/segaic24.h"
+#include "includes/model2.h"
+
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/mb86235/mb86235.h"
+#include "cpu/sharc/sharc.h"
 #include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "sound/2612intf.h"
-#include "includes/model2.h"
+#include "video/segaic24.h"
+#include "speaker.h"
+
 
 enum {
 	DSP_TYPE_TGP    = 1,

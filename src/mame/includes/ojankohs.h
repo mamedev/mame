@@ -6,6 +6,7 @@
 
 *************************************************************************/
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class ojankohs_state : public driver_device
 {

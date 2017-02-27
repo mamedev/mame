@@ -8,9 +8,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
+
 #include "cpu/melps4/m58846.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 

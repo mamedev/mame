@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GENERIC_SOCKET = &device_creator<generic_slot_device>;
+const device_type GENERIC_SOCKET = device_creator<generic_slot_device>;
 
 
 //-------------------------------------------------

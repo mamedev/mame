@@ -81,15 +81,18 @@ class device_missing_dependencies : public emu_exception { };
 
 
 // a device_type is simply a pointer to its alloc function
-typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+typedef std::unique_ptr<device_t> (*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 
 // this template function creates a stub which constructs a device
-template<class _DeviceClass>
-device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+template <class DeviceClass>
+std::unique_ptr<device_t> device_creator_impl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 {
-	return global_alloc_clear<_DeviceClass>(mconfig, tag, owner, clock);
+	return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
 }
+
+template <class DeviceClass>
+constexpr device_type device_creator = &device_creator_impl<DeviceClass>;
 
 
 // timer IDs for devices
@@ -194,7 +197,15 @@ class device_t : public delegate_late_bind
 
 protected:
 	// construction/destruction
-	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
+	device_t(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			u32 clock,
+			const char *shortname,
+			const char *source);
 public:
 	virtual ~device_t();
 
@@ -332,7 +343,7 @@ protected:
 	//------------------- end derived class overrides
 
 	// core device properties
-	const device_type       m_type;                 // device type
+	device_type             m_type;                 // device type
 	std::string             m_name;                 // name of the device
 	std::string             m_shortname;            // short name of the device
 	std::string             m_searchpath;           // search path, used for media loading
@@ -436,12 +447,13 @@ class device_iterator
 public:
 	class auto_iterator
 	{
-public:
+	public:
 		// construction
 		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
-			: m_curdevice(devptr),
-				m_curdepth(curdepth),
-				m_maxdepth(maxdepth) { }
+			: m_curdevice(devptr)
+			, m_curdepth(curdepth)
+			, m_maxdepth(maxdepth)
+		{ }
 
 		// getters
 		device_t *current() const { return m_curdevice; }
@@ -452,7 +464,7 @@ public:
 		device_t &operator*() const { assert(m_curdevice != nullptr); return *m_curdevice; }
 		const auto_iterator &operator++() { advance(); return *this; }
 
-protected:
+	protected:
 		// search depth-first for the next device
 		void advance()
 		{
@@ -551,7 +563,7 @@ private:
 // ======================> device_type_iterator
 
 // helper class to find devices of a given type in the device hierarchy
-template<device_type _DeviceType, class _DeviceClass = device_t>
+template <device_type const &_DeviceType, class _DeviceClass = device_t>
 class device_type_iterator
 {
 public:
@@ -563,7 +575,7 @@ public:
 			: device_iterator::auto_iterator(devptr, curdepth, maxdepth)
 		{
 			// make sure the first device is of the specified type
-			while (m_curdevice != nullptr && m_curdevice->type() != _DeviceType)
+			while (m_curdevice && (m_curdevice->type() != _DeviceType))
 				advance();
 		}
 

@@ -1,14 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_BOSCO_H
+#define MAME_INCLUDES_BOSCO_H
+
+#pragma once
+
+#include "galaga.h"
 
 class bosco_state : public galaga_state
 {
 public:
 	bosco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag),
-			m_bosco_radarattr(*this, "bosco_radarattr"),
-			m_bosco_starcontrol(*this, "starcontrol"),
-			m_bosco_starblink(*this, "bosco_starblink") { }
+		: galaga_state(mconfig, type, tag)
+		, m_bosco_radarattr(*this, "bosco_radarattr")
+		, m_bosco_starcontrol(*this, "starcontrol")
+		, m_bosco_starblink(*this, "bosco_starblink")
+	{
+	}
 
 	required_shared_ptr<uint8_t> m_bosco_radarattr;
 
@@ -39,3 +47,5 @@ public:
 	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
 	DECLARE_WRITE8_MEMBER( bosco_starclr_w );
 };
+
+#endif // MAME_INCLUDES_BOSCO_H

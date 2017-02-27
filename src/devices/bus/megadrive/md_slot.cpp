@@ -51,9 +51,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MD_CART_SLOT = &device_creator<md_cart_slot_device>;
-const device_type PICO_CART_SLOT = &device_creator<pico_cart_slot_device>;
-const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
+const device_type MD_CART_SLOT = device_creator<md_cart_slot_device>;
+const device_type PICO_CART_SLOT = device_creator<pico_cart_slot_device>;
+const device_type COPERA_CART_SLOT = device_creator<copera_cart_slot_device>;
 
 //**************************************************************************
 //    MD cartridges Interface

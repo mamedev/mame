@@ -5,8 +5,14 @@
     The Game Room Lethal Justice hardware
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_LETHALJ_H
+#define MAME_INCLUDES_LETHALJ_H
 
+#pragma once
+
+#include "cpu/tms34010/tms34010.h"
 #include "machine/ticket.h"
+#include "screen.h"
 
 
 class lethalj_state : public driver_device
@@ -66,3 +72,5 @@ protected:
 
 /*----------- defined in video/lethalj.c -----------*/
 void lethalj_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
+
+#endif // MAME_INCLUDES_LETHALJ_H

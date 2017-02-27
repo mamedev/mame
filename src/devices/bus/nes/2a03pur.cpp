@@ -31,7 +31,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_2A03PURITANS = &device_creator<nes_2a03pur_device>;
+const device_type NES_2A03PURITANS = device_creator<nes_2a03pur_device>;
 
 
 nes_2a03pur_device::nes_2a03pur_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

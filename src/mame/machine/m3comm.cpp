@@ -116,7 +116,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M3COMM = &device_creator<m3comm_device>;
+const device_type M3COMM = device_creator<m3comm_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

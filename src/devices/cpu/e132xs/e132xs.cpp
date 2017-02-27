@@ -4964,17 +4964,17 @@ void hyperstone_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-const device_type E116T = &device_creator<e116t_device>;
-const device_type E116XT = &device_creator<e116xt_device>;
-const device_type E116XS = &device_creator<e116xs_device>;
-const device_type E116XSR = &device_creator<e116xsr_device>;
-const device_type E132N = &device_creator<e132n_device>;
-const device_type E132T = &device_creator<e132t_device>;
-const device_type E132XN = &device_creator<e132xn_device>;
-const device_type E132XT = &device_creator<e132xt_device>;
-const device_type E132XS = &device_creator<e132xs_device>;
-const device_type E132XSR = &device_creator<e132xsr_device>;
-const device_type GMS30C2116 = &device_creator<gms30c2116_device>;
-const device_type GMS30C2132 = &device_creator<gms30c2132_device>;
-const device_type GMS30C2216 = &device_creator<gms30c2216_device>;
-const device_type GMS30C2232 = &device_creator<gms30c2232_device>;
+const device_type E116T = device_creator<e116t_device>;
+const device_type E116XT = device_creator<e116xt_device>;
+const device_type E116XS = device_creator<e116xs_device>;
+const device_type E116XSR = device_creator<e116xsr_device>;
+const device_type E132N = device_creator<e132n_device>;
+const device_type E132T = device_creator<e132t_device>;
+const device_type E132XN = device_creator<e132xn_device>;
+const device_type E132XT = device_creator<e132xt_device>;
+const device_type E132XS = device_creator<e132xs_device>;
+const device_type E132XSR = device_creator<e132xsr_device>;
+const device_type GMS30C2116 = device_creator<gms30c2116_device>;
+const device_type GMS30C2132 = device_creator<gms30c2132_device>;
+const device_type GMS30C2216 = device_creator<gms30c2216_device>;
+const device_type GMS30C2232 = device_creator<gms30c2232_device>;

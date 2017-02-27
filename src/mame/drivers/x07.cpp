@@ -30,7 +30,11 @@
 
 #include "emu.h"
 #include "includes/x07.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     T6834 IMPLEMENTATION

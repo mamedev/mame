@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "machine/wd7600.h"
 
-const device_type WD7600 = &device_creator<wd7600_device>;
+const device_type WD7600 = device_creator<wd7600_device>;
 
 #define LOG (1)
 

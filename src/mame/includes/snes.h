@@ -7,6 +7,7 @@
 #include "cpu/g65816/g65816.h"
 #include "audio/snes_snd.h"
 #include "video/snes_ppu.h"
+#include "screen.h"
 
 /*
     SNES timing theory:

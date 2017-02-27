@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "mvc.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -60,7 +62,7 @@ static const rgb_t PALETTE_MVC[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_MVC = &device_creator<wangpc_mvc_device>;
+const device_type WANGPC_MVC = device_creator<wangpc_mvc_device>;
 
 
 //-------------------------------------------------

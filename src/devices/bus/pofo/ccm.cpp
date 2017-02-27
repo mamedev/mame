@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PORTFOLIO_MEMORY_CARD_SLOT = &device_creator<portfolio_memory_card_slot_t>;
+const device_type PORTFOLIO_MEMORY_CARD_SLOT = device_creator<portfolio_memory_card_slot_t>;
 
 
 

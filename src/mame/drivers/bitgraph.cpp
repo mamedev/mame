@@ -55,6 +55,9 @@
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 #include "bitgrpha.lh"
 #include "bitgrphb.lh"
 

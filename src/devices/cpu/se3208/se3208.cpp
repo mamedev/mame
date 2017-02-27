@@ -42,7 +42,7 @@
 // are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
 #define ALLOW_UNALIGNED_DWORD_ACCESS 0
 
-const device_type SE3208 = &device_creator<se3208_device>;
+const device_type SE3208 = device_creator<se3208_device>;
 
 
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

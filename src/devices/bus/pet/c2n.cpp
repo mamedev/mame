@@ -15,9 +15,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2N = &device_creator<c2n_device>;
-const device_type C1530 = &device_creator<c1530_device>;
-const device_type C1531 = &device_creator<c1531_device>;
+const device_type C2N = device_creator<c2n_device>;
+const device_type C1530 = device_creator<c1530_device>;
+const device_type C1531 = device_creator<c1531_device>;
 
 
 //-------------------------------------------------

@@ -100,13 +100,15 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/galaxold.h"
+#include "audio/galaxian.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "audio/galaxian.h"
-#include "includes/galaxold.h"
+#include "speaker.h"
 
 
 /*************************************

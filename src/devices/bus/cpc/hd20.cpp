@@ -14,7 +14,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_HD20 = &device_creator<cpc_hd20_device>;
+const device_type CPC_HD20 = device_creator<cpc_hd20_device>;
 
 static MACHINE_CONFIG_FRAGMENT( cpc_hd20 )
 	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)

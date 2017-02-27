@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device>;
+const device_type C64_EXPANSION_SLOT = device_creator<c64_expansion_slot_device>;
 
 
 

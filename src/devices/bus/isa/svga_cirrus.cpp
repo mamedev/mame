@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "svga_cirrus.h"
 
+#include "screen.h"
+
+
 ROM_START( dm_clgd5430 )
 	ROM_REGION(0x8000,"dm_clgd5430", 0)
 	ROM_LOAD("speedstar_pro_se_v1.00.u2", 0x00000, 0x8000, CRC(ed79572c) SHA1(15131e2b2db7a34971083a250e4a21ab7bd64a9d) )
@@ -19,8 +22,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SVGA_CIRRUS = &device_creator<isa16_svga_cirrus_device>;
-const device_type ISA16_SVGA_CIRRUS_GD542X = &device_creator<isa16_svga_cirrus_gd542x_device>;
+const device_type ISA16_SVGA_CIRRUS = device_creator<isa16_svga_cirrus_device>;
+const device_type ISA16_SVGA_CIRRUS_GD542X = device_creator<isa16_svga_cirrus_gd542x_device>;
 
 static MACHINE_CONFIG_FRAGMENT( vga_cirrus )
 	MCFG_SCREEN_ADD("screen", RASTER)

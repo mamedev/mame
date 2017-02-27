@@ -20,9 +20,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS2791 = &device_creator<bbc_opus2791_device>;
-const device_type BBC_OPUS2793 = &device_creator<bbc_opus2793_device>;
-const device_type BBC_OPUS1770 = &device_creator<bbc_opus1770_device>;
+const device_type BBC_OPUS2791 = device_creator<bbc_opus2791_device>;
+const device_type BBC_OPUS2793 = device_creator<bbc_opus2793_device>;
+const device_type BBC_OPUS1770 = device_creator<bbc_opus1770_device>;
 
 
 //-------------------------------------------------

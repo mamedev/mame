@@ -1,18 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
+#ifndef MAME_INCLUDES_SUPER80_H
+#define MAME_INCLUDES_SUPER80_H
+
+#pragma once
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/samples.h"
+#include "imagedev/snapquik.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
-#include "video/mc6845.h"
-#include "machine/z80pio.h"
-#include "machine/z80dma.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80dma.h"
+#include "machine/z80pio.h"
+#include "sound/samples.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
 
 
 /* Bits in m_portf0 variable:
@@ -125,3 +130,5 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 };
+
+#endif // MAME_INCLUDES_SUPER80_H

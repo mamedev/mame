@@ -1255,16 +1255,19 @@ Notes:
 */
 
 #include "emu.h"
-#include <float.h>
-#include "video/poly.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
+#include "cpu/mips/mips3.h"
 #include "cpu/sh2/sh2.h"
-#include "sound/c352.h"
+#include "machine/namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
-#include "machine/namco_settings.h"
+#include "sound/c352.h"
+#include "video/poly.h"
+#include "speaker.h"
+
+#include <float.h>
+
 
 #define JVSCLOCK    (XTAL_14_7456MHz)
 

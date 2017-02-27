@@ -3,8 +3,9 @@
 #include "emu.h"
 #include "wpc_dmd.h"
 #include "rendlay.h"
+#include "screen.h"
 
-const device_type WPC_DMD = &device_creator<wpc_dmd_device>;
+const device_type WPC_DMD = device_creator<wpc_dmd_device>;
 
 DEVICE_ADDRESS_MAP_START( registers, 8, wpc_dmd_device )
 	AM_RANGE(0, 0) AM_WRITE(bank2_w)

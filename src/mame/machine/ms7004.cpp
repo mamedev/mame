@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "ms7004.h"
+#include "speaker.h"
+
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -34,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MS7004 = &device_creator<ms7004_device>;
+const device_type MS7004 = device_creator<ms7004_device>;
 
 ROM_START( ms7004 )
 	ROM_REGION (0x800, MS7004_CPU_TAG, 0)

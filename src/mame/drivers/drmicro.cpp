@@ -11,10 +11,13 @@ Quite similar to Appoooh
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/drmicro.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
-#include "includes/drmicro.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 18432000
 

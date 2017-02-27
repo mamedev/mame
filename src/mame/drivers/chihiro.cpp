@@ -373,23 +373,20 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 */
 
-#include <functional>
-
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/pic8259.h"
-#include "machine/idectrl.h"
-#include "machine/idehd.h"
-#include "machine/naomigd.h"
-#include "video/poly.h"
-#include "debug/debugcon.h"
-#include "debug/debugcmd.h"
-#include "debugger.h"
-#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
-#include "includes/xbox_usb.h"
-#include "machine/jvshost.h"
+
+#include "cpu/i386/i386.h"
+#include "machine/idehd.h"
 #include "machine/jvs13551.h"
+#include "machine/jvshost.h"
+#include "machine/naomigd.h"
+
+#include "debug/debugcmd.h"
+#include "debug/debugcon.h"
+#include "debugger.h"
+
+#include <functional>
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
@@ -410,7 +407,7 @@ public:
 	int received_packet(uint8_t *buffer);
 };
 
-const device_type JVS_MASTER = &device_creator<jvs_master>;
+const device_type JVS_MASTER = device_creator<jvs_master>;
 
 jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
@@ -496,7 +493,7 @@ private:
 	} jvs;
 };
 
-const device_type OHCI_HLEAN2131QC = &device_creator<ohci_hlean2131qc_device>;
+const device_type OHCI_HLEAN2131QC = device_creator<ohci_hlean2131qc_device>;
 
 extern const device_type OHCI_HLEAN2131SC;
 
@@ -527,7 +524,7 @@ private:
 	uint8_t *region;
 };
 
-const device_type OHCI_HLEAN2131SC = &device_creator<ohci_hlean2131sc_device>;
+const device_type OHCI_HLEAN2131SC = device_creator<ohci_hlean2131sc_device>;
 
 class chihiro_state : public xbox_base_state
 {
@@ -1286,7 +1283,7 @@ protected:
 //**************************************************************************
 
 // device type definition
-const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
+const device_type IDE_BASEBOARD = device_creator<ide_baseboard_device>;
 
 //-------------------------------------------------
 //  ide_baseboard_device - constructor

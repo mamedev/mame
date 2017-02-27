@@ -6,11 +6,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_V9938_H
+#define MAME_DEVICES_VIDEO_V9938_H
+
 #pragma once
 
-#ifndef __V9938_H__
-#define __V9938_H__
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -296,4 +297,4 @@ protected:
 };
 
 
-#endif
+#endif // MAME_DEVICES_VIDEO_V9938_H

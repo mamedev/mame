@@ -107,7 +107,9 @@ the Neogeo Pocket.
 #include "sound/volt_reg.h"
 #include "video/k1ge.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 enum flash_state
 {

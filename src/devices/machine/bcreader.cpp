@@ -53,7 +53,7 @@
 #include "bcreader.h"
 
 // device type definition
-const device_type BARCODE_READER = &device_creator<barcode_reader_device>;
+const device_type BARCODE_READER = device_creator<barcode_reader_device>;
 
 //-------------------------------------------------
 //  barcode_reader_device - constructor

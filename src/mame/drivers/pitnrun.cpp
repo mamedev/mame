@@ -76,6 +76,9 @@ K1000233A
 
 #include "sound/ay8910.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
 {

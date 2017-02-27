@@ -19,6 +19,7 @@ needs inputs, prom decode, sound, artwork (lamps), probably some irq masking and
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 
 class summit_state : public driver_device

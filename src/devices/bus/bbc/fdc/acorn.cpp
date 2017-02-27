@@ -15,8 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_ACORN8271 = &device_creator<bbc_acorn8271_device>;
-const device_type BBC_ACORN1770 = &device_creator<bbc_acorn1770_device>;
+const device_type BBC_ACORN8271 = device_creator<bbc_acorn8271_device>;
+const device_type BBC_ACORN1770 = device_creator<bbc_acorn1770_device>;
 
 
 //-------------------------------------------------

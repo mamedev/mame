@@ -223,11 +223,15 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 
 #include "emu.h"
 #include "includes/40love.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void fortyl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

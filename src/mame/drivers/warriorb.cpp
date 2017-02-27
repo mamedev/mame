@@ -147,12 +147,16 @@ Colscroll effects?
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "rendlay.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/warriorb.h"
 #include "includes/taitoipt.h"
+
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/2610intf.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

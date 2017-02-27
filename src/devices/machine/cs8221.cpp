@@ -27,7 +27,7 @@
 #define LOG_REGISTER    1
 #define LOG_MEMORY      1
 
-const device_type CS8221 = &device_creator<cs8221_device>;
+const device_type CS8221 = device_creator<cs8221_device>;
 
 
 static const char *const register_names[] =

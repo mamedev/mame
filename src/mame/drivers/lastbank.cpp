@@ -17,6 +17,9 @@
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_14_31818MHz
 

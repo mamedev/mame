@@ -189,7 +189,7 @@
 #endif
 
 
-const device_type SSP1601 = &device_creator<ssp1601_device>;
+const device_type SSP1601 = device_creator<ssp1601_device>;
 
 
 ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

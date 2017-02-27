@@ -23,11 +23,15 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/supbtime.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/supbtime.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /******************************************************************************/
 

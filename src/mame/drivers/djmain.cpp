@@ -66,13 +66,15 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 */
 
 #include "emu.h"
+#include "includes/djmain.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
-#include "includes/djmain.h"
 #include "machine/idehd.h"
 
-
+#include "screen.h"
+#include "speaker.h"
 
 
 

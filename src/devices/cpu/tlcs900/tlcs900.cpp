@@ -20,8 +20,8 @@ TODO:
 #include "tlcs900.h"
 
 
-const device_type TMP95C061 = &device_creator<tmp95c061_device>;
-const device_type TMP95C063 = &device_creator<tmp95c063_device>;
+const device_type TMP95C061 = device_creator<tmp95c061_device>;
+const device_type TMP95C063 = device_creator<tmp95c063_device>;
 
 
 static ADDRESS_MAP_START( tmp95c061_mem8, AS_PROGRAM, 8, tmp95c061_device )

@@ -74,15 +74,18 @@ Bit 5+6  LED 1-8 enable
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m65c02.h"
-#include "sound/beep.h"
 //#include "machine/mos6551.h"
+#include "machine/nvram.h"
+#include "sound/beep.h"
 #include "video/hd44780.h"
 
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
-#include "machine/nvram.h"
 
 //static uint16_t unknown2_data = 0;
 // Berlin Pro 68020

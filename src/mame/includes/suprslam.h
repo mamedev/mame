@@ -5,7 +5,10 @@
     Super Slams
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SUPRSLAM_H
+#define MAME_INCLUDES_SUPRSLAM_H
 
+#include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 #include "video/k053936.h"
 
@@ -68,3 +71,5 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_SUPRSLAM_H

@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood,Paul Priest
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class ms32_state : public driver_device
 {

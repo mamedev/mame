@@ -86,7 +86,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
+const device_type INTV_CART_SLOT = device_creator<intv_cart_slot_device>;
 
 //**************************************************************************
 //    Intellivision Cartridges Interface

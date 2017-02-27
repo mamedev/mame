@@ -37,21 +37,26 @@ E I1     Vectored interrupt error
 
 
 #include "emu.h"
-#include "cpu/z8000/z8000.h"
+#include "machine/m20_8086.h"
+#include "machine/m20_kbd.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "cpu/z8000/z8000.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "softlist.h"
+
 #include "formats/m20_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/m20_kbd.h"
-#include "bus/rs232/rs232.h"
-#include "machine/m20_8086.h"
-#include "softlist.h"
+
 
 class m20_state : public driver_device
 {

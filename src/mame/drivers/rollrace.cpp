@@ -10,10 +10,13 @@ Issues:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rollrace.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/rollrace.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void rollrace_state::machine_start()

@@ -24,7 +24,7 @@
 #include "emu.h"
 #include "pci9050.h"
 
-const device_type PCI9050 = &device_creator<pci9050_device>;
+const device_type PCI9050 = device_creator<pci9050_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, pci9050_device)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(lasrr_r,   lasrr_w  )

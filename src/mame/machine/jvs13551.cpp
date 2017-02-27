@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "jvs13551.h"
 
-const device_type SEGA_837_13551 = &device_creator<sega_837_13551>;
+const device_type SEGA_837_13551 = device_creator<sega_837_13551>;
 
 WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_1_w)
 {

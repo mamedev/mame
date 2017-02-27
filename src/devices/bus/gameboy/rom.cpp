@@ -19,14 +19,14 @@
 //  gb_rom_device - constructor
 //-------------------------------------------------
 
-const device_type GB_STD_ROM = &device_creator<gb_rom_device>;
-const device_type GB_ROM_TAMA5 = &device_creator<gb_rom_tama5_device>;
-const device_type GB_ROM_WISDOM = &device_creator<gb_rom_wisdom_device>;
-const device_type GB_ROM_YONG = &device_creator<gb_rom_yong_device>;
-const device_type GB_ROM_ATVRAC = &device_creator<gb_rom_atvrac_device>;
-const device_type GB_ROM_LASAMA = &device_creator<gb_rom_lasama_device>;
+const device_type GB_STD_ROM = device_creator<gb_rom_device>;
+const device_type GB_ROM_TAMA5 = device_creator<gb_rom_tama5_device>;
+const device_type GB_ROM_WISDOM = device_creator<gb_rom_wisdom_device>;
+const device_type GB_ROM_YONG = device_creator<gb_rom_yong_device>;
+const device_type GB_ROM_ATVRAC = device_creator<gb_rom_atvrac_device>;
+const device_type GB_ROM_LASAMA = device_creator<gb_rom_lasama_device>;
 
-const device_type MEGADUCK_ROM = &device_creator<megaduck_rom_device>;
+const device_type MEGADUCK_ROM = device_creator<megaduck_rom_device>;
 
 
 gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

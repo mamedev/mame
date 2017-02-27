@@ -26,6 +26,7 @@ Boards:
 #include "emu.h"
 #include "includes/pandoras.h"
 #include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -34,6 +35,8 @@ Boards:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_18_432MHz

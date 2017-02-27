@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "mos7360.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -158,7 +160,7 @@ static const rgb_t PALETTE_MOS[] =
 //**************************************************************************
 
 // device type definition
-const device_type MOS7360 = &device_creator<mos7360_device>;
+const device_type MOS7360 = device_creator<mos7360_device>;
 
 
 // default address maps

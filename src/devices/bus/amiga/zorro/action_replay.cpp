@@ -22,9 +22,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ACTION_REPLAY_MK1 = &device_creator<action_replay_mk1_device>;
-const device_type ACTION_REPLAY_MK2 = &device_creator<action_replay_mk2_device>;
-const device_type ACTION_REPLAY_MK3 = &device_creator<action_replay_mk3_device>;
+const device_type ACTION_REPLAY_MK1 = device_creator<action_replay_mk1_device>;
+const device_type ACTION_REPLAY_MK2 = device_creator<action_replay_mk2_device>;
+const device_type ACTION_REPLAY_MK3 = device_creator<action_replay_mk3_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

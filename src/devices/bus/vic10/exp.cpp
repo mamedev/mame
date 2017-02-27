@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC10_EXPANSION_SLOT = &device_creator<vic10_expansion_slot_device>;
+const device_type VIC10_EXPANSION_SLOT = device_creator<vic10_expansion_slot_device>;
 
 
 

@@ -5,7 +5,7 @@
 
 
 // device type definition
-const device_type FILTER_VOLUME = &device_creator<filter_volume_device>;
+const device_type FILTER_VOLUME = device_creator<filter_volume_device>;
 
 //-------------------------------------------------
 //  filter_volume_device - constructor

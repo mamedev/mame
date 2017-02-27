@@ -6,15 +6,17 @@
  *
  ****************************************************************************/
 
-#ifndef TI85_H_
-#define TI85_H_
+#ifndef MAME_INCLUDES_TI85_H
+#define MAME_INCLUDES_TI85_H
+
+#pragma once
 
 #include "imagedev/snapquik.h"
-#include "video/t6a04.h"
 #include "machine/bankdev.h"
-#include "sound/speaker.h"
-#include "machine/nvram.h"
 #include "machine/intelfsh.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "video/t6a04.h"
 
 
 /* model */
@@ -227,4 +229,4 @@ public:
 	//address_space &asic;
 };
 
-#endif /* TI85_H_ */
+#endif // MAME_INCLUDES_TI85_H

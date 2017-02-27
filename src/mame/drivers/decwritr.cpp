@@ -11,10 +11,12 @@
 // tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
 
 #include "emu.h"
-#include "render.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
+#include "render.h"
+#include "speaker.h"
+
 
 #define KBD_VERBOSE 1
 #define LED_VERBOSE 1

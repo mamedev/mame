@@ -222,17 +222,23 @@ TODO:
 */
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
-#include "imagedev/cassette.h"
-#include "formats/spc1000_cas.h"
-#include "bus/centronics/ctronics.h"
-#define VDP_CLOCK  XTAL_42_9545MHz
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/spc1000_cas.h"
+
+#define VDP_CLOCK  XTAL_42_9545MHz
 
 class spc1500_state : public driver_device
 {

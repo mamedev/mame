@@ -24,15 +24,19 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "includes/galaxy.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
+
+#include "cpu/z80/z80.h"
 #include "formats/gtp_cas.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/ram.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)

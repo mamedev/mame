@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SWIFTLINK = &device_creator<c64_swiftlink_cartridge_device>;
+const device_type C64_SWIFTLINK = device_creator<c64_swiftlink_cartridge_device>;
 
 
 //-------------------------------------------------

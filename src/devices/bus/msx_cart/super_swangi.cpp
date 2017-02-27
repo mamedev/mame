@@ -4,7 +4,7 @@
 #include "super_swangi.h"
 
 
-const device_type MSX_CART_SUPER_SWANGI = &device_creator<msx_cart_super_swangi>;
+const device_type MSX_CART_SUPER_SWANGI = device_creator<msx_cart_super_swangi>;
 
 
 msx_cart_super_swangi::msx_cart_super_swangi(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CDP1871 = &device_creator<cdp1871_device>;
+const device_type CDP1871 = device_creator<cdp1871_device>;
 
 
 

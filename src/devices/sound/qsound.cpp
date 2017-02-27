@@ -27,7 +27,7 @@
 #include "qsound.h"
 
 // device type definition
-const device_type QSOUND = &device_creator<qsound_device>;
+const device_type QSOUND = device_creator<qsound_device>;
 
 
 // program map for the DSP (points to internal 4096 words of internal ROM)

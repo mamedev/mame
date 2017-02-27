@@ -272,7 +272,7 @@ protected:
 
 	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
-	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
+	void update_names(device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	bool load_software_part(const std::string &identifier);

@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DAVE = &device_creator<dave_device>;
+const device_type DAVE = device_creator<dave_device>;
 
 
 DEVICE_ADDRESS_MAP_START( z80_program_map, 8, dave_device )

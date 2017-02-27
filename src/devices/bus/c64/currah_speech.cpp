@@ -69,6 +69,7 @@ Notes:
 
 #include "emu.h"
 #include "currah_speech.h"
+#include "speaker.h"
 
 
 
@@ -84,7 +85,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_CURRAH_SPEECH = &device_creator<c64_currah_speech_cartridge_device>;
+const device_type C64_CURRAH_SPEECH = device_creator<c64_currah_speech_cartridge_device>;
 
 
 //-------------------------------------------------

@@ -47,7 +47,8 @@
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "hccbaskb.lh"
 #include "leboom.lh" // clickable

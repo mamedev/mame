@@ -15,7 +15,7 @@
 #include "machine/mb8421.h"
 
 
-const device_type MB8421 = &device_creator<mb8421_device>;
+const device_type MB8421 = device_creator<mb8421_device>;
 
 //-------------------------------------------------
 //  mb8421_device - constructor

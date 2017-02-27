@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
 #include "sound/discrete.h"
+#include "screen.h"
 
 class sprint8_state : public driver_device
 {

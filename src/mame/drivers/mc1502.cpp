@@ -10,13 +10,15 @@
 
 #include "emu.h"
 #include "includes/mc1502.h"
-#include "bus/rs232/rs232.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/kb_7007_3.h"
-#include "sound/speaker.h"
 #include "sound/wave.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define VERBOSE_DBG 0
 

@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type WS_CART_SLOT = &device_creator<ws_cart_slot_device>;
+const device_type WS_CART_SLOT = device_creator<ws_cart_slot_device>;
 
 //**************************************************************************
 //    Wonderswan Cartridges Interface

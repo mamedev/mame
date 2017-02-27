@@ -67,6 +67,9 @@
 #include "emu.h"
 #include "ef9365.h"
 
+#include "screen.h"
+
+
 #ifdef DBGMODE
 //-------------------------------------------------
 // Some debug mode const strings
@@ -122,7 +125,7 @@ const char * commands_names[]=
 #endif
 
 // devices
-const device_type EF9365 = &device_creator<ef9365_device>;
+const device_type EF9365 = device_creator<ef9365_device>;
 
 ROM_START( ef9365 )
 	ROM_REGION( 0x1E0, "ef9365", 0 )

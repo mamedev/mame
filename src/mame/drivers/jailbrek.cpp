@@ -86,12 +86,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jailbrek.h"
+#include "includes/konamipt.h"
 #include "machine/konami1.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "includes/jailbrek.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(jailbrek_state::ctrl_w)

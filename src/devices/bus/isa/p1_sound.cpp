@@ -13,13 +13,16 @@
 
 #include "emu.h"
 #include "p1_sound.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_SOUND = &device_creator<p1_sound_device>;
+const device_type P1_SOUND = device_creator<p1_sound_device>;
 
 
 //-------------------------------------------------

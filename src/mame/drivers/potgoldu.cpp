@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
+#include "screen.h"
 
 
 class potgold_state : public driver_device

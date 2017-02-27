@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type O2_CART_SLOT = &device_creator<o2_cart_slot_device>;
+const device_type O2_CART_SLOT = device_creator<o2_cart_slot_device>;
 
 //**************************************************************************
 //    Odyssey 2 Cartridges Interface

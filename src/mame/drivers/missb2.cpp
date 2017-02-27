@@ -18,10 +18,13 @@ OKI M6295 sound ROM dump is bad.
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
-#include "sound/3526intf.h"
 #include "includes/bublbobl.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/3526intf.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class missb2_state : public bublbobl_state

@@ -24,10 +24,12 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/spdodgeb.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
-#include "includes/spdodgeb.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(spdodgeb_state::sound_command_w)

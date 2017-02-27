@@ -285,14 +285,17 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "audio/taitosnd.h"
-#include "sound/2610intf.h"
-#include "sound/flt_vol.h"
 #include "includes/othunder.h"
 #include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "sound/2610intf.h"
+#include "sound/flt_vol.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***********************************************************

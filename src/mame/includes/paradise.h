@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class paradise_state : public driver_device
 {

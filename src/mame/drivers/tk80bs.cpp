@@ -26,6 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
 class tk80bs_state : public driver_device
 {

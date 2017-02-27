@@ -14,12 +14,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/holeland.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "machine/nvram.h"
-#include "includes/holeland.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )

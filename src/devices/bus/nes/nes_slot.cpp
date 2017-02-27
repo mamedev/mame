@@ -93,7 +93,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
+const device_type NES_CART_SLOT = device_creator<nes_cart_slot_device>;
 
 
 //**************************************************************************

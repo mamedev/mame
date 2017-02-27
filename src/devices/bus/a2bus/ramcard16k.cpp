@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_RAMCARD16K = &device_creator<a2bus_ramcard_device>;
+const device_type A2BUS_RAMCARD16K = device_creator<a2bus_ramcard_device>;
 
 /***************************************************************************
     FUNCTION PROTOTYPES

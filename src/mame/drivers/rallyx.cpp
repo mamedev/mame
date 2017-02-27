@@ -191,11 +191,14 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rallyx.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "includes/rallyx.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_18_432MHz
 

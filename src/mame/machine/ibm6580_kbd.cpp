@@ -16,7 +16,7 @@
 	} while (0)
 
 
-const device_type DW_KEYBOARD = &device_creator<dw_keyboard_device>;
+const device_type DW_KEYBOARD = device_creator<dw_keyboard_device>;
 
 ROM_START( dw_keyboard )
 	ROM_REGION(0x800, "mcu", 0)

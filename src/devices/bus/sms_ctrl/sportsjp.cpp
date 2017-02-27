@@ -50,7 +50,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_SPORTS_PAD_JP = &device_creator<sms_sports_pad_jp_device>;
+const device_type SMS_SPORTS_PAD_JP = device_creator<sms_sports_pad_jp_device>;
 
 // time interval not verified
 #define SPORTS_PAD_JP_INTERVAL attotime::from_hz(20000)

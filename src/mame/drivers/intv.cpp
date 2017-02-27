@@ -51,12 +51,15 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 
 
 #include "emu.h"
+#include "includes/intv.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
-#include "video/tms9927.h"
-#include "includes/intv.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #ifndef VERBOSE
 #ifdef MAME_DEBUG

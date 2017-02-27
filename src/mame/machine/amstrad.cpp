@@ -38,6 +38,8 @@ This gives a total of 19968 NOPs per frame.
 
 
 #include "emu.h"
+#include "includes/amstrad.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
@@ -47,7 +49,6 @@ This gives a total of 19968 NOPs per frame.
 #include "bus/cpc/mface2.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "includes/amstrad.h"
 #include "sound/ay8910.h"
 #include "machine/ram.h"
 

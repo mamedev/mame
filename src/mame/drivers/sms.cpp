@@ -244,14 +244,14 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/ym2413.h"
-#include "video/315_5124.h"
 #include "includes/sms.h"
+
+#include "cpu/z80/z80.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "sms1.lh"
+
 
 #define MASTER_CLOCK_GG     32215905
 #define MASTER_CLOCK_PALN   10746168

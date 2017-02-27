@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SCV_CART_SLOT = &device_creator<scv_cart_slot_device>;
+const device_type SCV_CART_SLOT = device_creator<scv_cart_slot_device>;
 
 //**************************************************************************
 //    SCV cartridges Interface

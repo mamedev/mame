@@ -15,8 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VC4000_CART_SLOT = &device_creator<vc4000_cart_slot_device>;
-const device_type H21_CART_SLOT = &device_creator<h21_cart_slot_device>;
+const device_type VC4000_CART_SLOT = device_creator<vc4000_cart_slot_device>;
+const device_type H21_CART_SLOT = device_creator<h21_cart_slot_device>;
 
 //**************************************************************************
 //    VC4000 Cartridges Interface

@@ -66,9 +66,12 @@ IO ports and memory map changes. Dip switches differ too.
 
 #include "emu.h"
 #include "includes/kchamp.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /********************

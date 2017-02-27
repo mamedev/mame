@@ -29,7 +29,7 @@ typedef std::unordered_map<std::string, const software_info *> softlist_map;
 //**************************************************************************
 
 // device type definition
-const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
+const device_type SOFTWARE_LIST = device_creator<software_list_device>;
 false_software_list_loader false_software_list_loader::s_instance;
 rom_software_list_loader rom_software_list_loader::s_instance;
 image_software_list_loader image_software_list_loader::s_instance;

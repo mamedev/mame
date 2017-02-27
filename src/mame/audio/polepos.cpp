@@ -213,7 +213,7 @@ static void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2
 
 
 // device type definition
-const device_type POLEPOS = &device_creator<polepos_sound_device>;
+const device_type POLEPOS = device_creator<polepos_sound_device>;
 
 
 //**************************************************************************

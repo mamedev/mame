@@ -9,6 +9,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 
 /* Discrete Sound Input Nodes */

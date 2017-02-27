@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "rs232.h"
 
-const device_type RS232_PORT = &device_creator<rs232_port_device>;
+const device_type RS232_PORT = device_creator<rs232_port_device>;
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),

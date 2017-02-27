@@ -21,27 +21,27 @@
 //  a26_rom_*k_device - constructor
 //-------------------------------------------------
 
-const device_type A26_ROM_2K = &device_creator<a26_rom_2k_device>;
-const device_type A26_ROM_4K = &device_creator<a26_rom_4k_device>;
-const device_type A26_ROM_F4 = &device_creator<a26_rom_f4_device>;
-const device_type A26_ROM_F6 = &device_creator<a26_rom_f6_device>;
-const device_type A26_ROM_F8 = &device_creator<a26_rom_f8_device>;
-const device_type A26_ROM_F8_SW = &device_creator<a26_rom_f8_sw_device>;
-const device_type A26_ROM_FA = &device_creator<a26_rom_fa_device>;
-const device_type A26_ROM_FE = &device_creator<a26_rom_fe_device>;
-const device_type A26_ROM_3E = &device_creator<a26_rom_3e_device>;
-const device_type A26_ROM_3F = &device_creator<a26_rom_3f_device>;
-const device_type A26_ROM_E0 = &device_creator<a26_rom_e0_device>;
-const device_type A26_ROM_E7 = &device_creator<a26_rom_e7_device>;
-const device_type A26_ROM_UA = &device_creator<a26_rom_ua_device>;
-const device_type A26_ROM_CV = &device_creator<a26_rom_cv_device>;
-const device_type A26_ROM_DC = &device_creator<a26_rom_dc_device>;
-const device_type A26_ROM_FV = &device_creator<a26_rom_fv_device>;
-const device_type A26_ROM_JVP = &device_creator<a26_rom_jvp_device>;
-const device_type A26_ROM_4IN1 = &device_creator<a26_rom_4in1_device>;
-const device_type A26_ROM_8IN1 = &device_creator<a26_rom_8in1_device>;
-const device_type A26_ROM_32IN1 = &device_creator<a26_rom_32in1_device>;
-const device_type A26_ROM_X07 = &device_creator<a26_rom_x07_device>;
+const device_type A26_ROM_2K = device_creator<a26_rom_2k_device>;
+const device_type A26_ROM_4K = device_creator<a26_rom_4k_device>;
+const device_type A26_ROM_F4 = device_creator<a26_rom_f4_device>;
+const device_type A26_ROM_F6 = device_creator<a26_rom_f6_device>;
+const device_type A26_ROM_F8 = device_creator<a26_rom_f8_device>;
+const device_type A26_ROM_F8_SW = device_creator<a26_rom_f8_sw_device>;
+const device_type A26_ROM_FA = device_creator<a26_rom_fa_device>;
+const device_type A26_ROM_FE = device_creator<a26_rom_fe_device>;
+const device_type A26_ROM_3E = device_creator<a26_rom_3e_device>;
+const device_type A26_ROM_3F = device_creator<a26_rom_3f_device>;
+const device_type A26_ROM_E0 = device_creator<a26_rom_e0_device>;
+const device_type A26_ROM_E7 = device_creator<a26_rom_e7_device>;
+const device_type A26_ROM_UA = device_creator<a26_rom_ua_device>;
+const device_type A26_ROM_CV = device_creator<a26_rom_cv_device>;
+const device_type A26_ROM_DC = device_creator<a26_rom_dc_device>;
+const device_type A26_ROM_FV = device_creator<a26_rom_fv_device>;
+const device_type A26_ROM_JVP = device_creator<a26_rom_jvp_device>;
+const device_type A26_ROM_4IN1 = device_creator<a26_rom_4in1_device>;
+const device_type A26_ROM_8IN1 = device_creator<a26_rom_8in1_device>;
+const device_type A26_ROM_32IN1 = device_creator<a26_rom_32in1_device>;
+const device_type A26_ROM_X07 = device_creator<a26_rom_x07_device>;
 
 
 a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

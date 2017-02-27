@@ -53,10 +53,13 @@ Address   Description
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/beep.h"
 #include "machine/ins8250.h"
 #include "machine/mm5740.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 // Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL_12_288MHz / 6)

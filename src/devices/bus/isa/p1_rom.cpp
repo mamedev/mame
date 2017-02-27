@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_ROM = &device_creator<p1_rom_device>;
+const device_type P1_ROM = device_creator<p1_rom_device>;
 
 
 //-------------------------------------------------

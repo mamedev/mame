@@ -72,6 +72,8 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/eepromser.h"
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class feversoc_state : public driver_device

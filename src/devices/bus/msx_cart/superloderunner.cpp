@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "superloderunner.h"
 
-const device_type MSX_CART_SUPERLODERUNNER = &device_creator<msx_cart_superloderunner>;
+const device_type MSX_CART_SUPERLODERUNNER = device_creator<msx_cart_superloderunner>;
 
 
 msx_cart_superloderunner::msx_cart_superloderunner(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

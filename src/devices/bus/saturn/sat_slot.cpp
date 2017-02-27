@@ -29,7 +29,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SATURN_CART_SLOT = &device_creator<sat_cart_slot_device>;
+const device_type SATURN_CART_SLOT = device_creator<sat_cart_slot_device>;
 
 
 //-------------------------------------------------

@@ -49,7 +49,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_WARP_SPEED = &device_creator<c64_warp_speed_cartridge_device>;
+const device_type C64_WARP_SPEED = device_creator<c64_warp_speed_cartridge_device>;
 
 
 //-------------------------------------------------

@@ -16,7 +16,7 @@
 //  NASBUS SLOT DEVICE
 //**************************************************************************
 
-const device_type NASBUS_SLOT = &device_creator<nasbus_slot_device>;
+const device_type NASBUS_SLOT = device_creator<nasbus_slot_device>;
 
 //-------------------------------------------------
 //  nasbus_slot_device - constructor
@@ -64,7 +64,7 @@ void nasbus_slot_device::device_start()
 //  NASBUS DEVICE
 //**************************************************************************
 
-const device_type NASBUS = &device_creator<nasbus_device>;
+const device_type NASBUS = device_creator<nasbus_device>;
 
 //-------------------------------------------------
 //  nasbus_device - constructor

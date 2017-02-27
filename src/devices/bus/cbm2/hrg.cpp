@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "hrg.h"
+#include "screen.h"
 
 
 
@@ -37,8 +38,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_HRG_A = &device_creator<cbm2_hrg_a_t>;
-const device_type CBM2_HRG_B = &device_creator<cbm2_hrg_b_t>;
+const device_type CBM2_HRG_A = device_creator<cbm2_hrg_a_t>;
+const device_type CBM2_HRG_B = device_creator<cbm2_hrg_b_t>;
 
 
 //-------------------------------------------------

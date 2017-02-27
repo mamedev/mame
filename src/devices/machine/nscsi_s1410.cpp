@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/nscsi_s1410.h"
 
-const device_type NSCSI_S1410 = &device_creator<nscsi_s1410_device>;
+const device_type NSCSI_S1410 = device_creator<nscsi_s1410_device>;
 
 nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_harddisk_device(mconfig, NSCSI_S1410, "S1410", tag, owner, clock, "scsi_s1410", __FILE__)

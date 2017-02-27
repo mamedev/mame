@@ -189,7 +189,7 @@ private:
 extern const device_type SOFTWARE_LIST;
 
 // device type iterator
-typedef device_type_iterator<&device_creator<software_list_device>, software_list_device> software_list_device_iterator;
+typedef device_type_iterator<SOFTWARE_LIST, software_list_device> software_list_device_iterator;
 
 
 #endif // __SOFTLIST_DEV_H_

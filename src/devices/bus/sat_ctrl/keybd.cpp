@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_KEYBD = &device_creator<saturn_keybd_device>;
+const device_type SATURN_KEYBD = device_creator<saturn_keybd_device>;
 
 
 static INPUT_PORTS_START( saturn_joy )

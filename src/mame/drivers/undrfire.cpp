@@ -189,12 +189,14 @@ Board contains only 29 ROMs and not much else.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/undrfire.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
-#include "includes/undrfire.h"
+#include "screen.h"
 
 #include "cbombers.lh"
 

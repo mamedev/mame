@@ -20,7 +20,7 @@
 #include "mb86233.h"
 
 
-const device_type MB86233 = &device_creator<mb86233_cpu_device>;
+const device_type MB86233 = device_creator<mb86233_cpu_device>;
 
 
 mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -10,15 +10,15 @@
  *
  ****************************************************************************/
 
-#ifndef SAMCOUPE_H_
-#define SAMCOUPE_H_
+#ifndef MAME_INCLUDES_SAMCOUPE_H
+#define MAME_INCLUDES_SAMCOUPE_H
 
-#include "machine/wd_fdc.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/ram.h"
+#include "imagedev/cassette.h"
 #include "machine/msm6242.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -200,4 +200,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* SAMCOUPE_H_ */
+#endif // MAME_INCLUDES_SAMCOUPE_H

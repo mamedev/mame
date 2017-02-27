@@ -184,6 +184,7 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "sound/beep.h"
 #include "sound/cdp1864.h"
@@ -192,7 +193,10 @@ Notes:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define CDP1802_TAG     "ic1"
 #define CDP1861_TAG     "ic2"

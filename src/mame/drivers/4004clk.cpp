@@ -12,6 +12,8 @@
 #include "cpu/i4004/i4004.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "4004clk.lh"
 
 class nixieclock_state : public driver_device
