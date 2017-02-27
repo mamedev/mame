@@ -235,7 +235,7 @@ std::unique_ptr<device_t> driver_device_creator_impl(const machine_config &mconf
 }
 
 template <class DriverClass>
-const device_type driver_device_creator = &driver_device_creator_impl<DriverClass>;
+constexpr device_type driver_device_creator = &driver_device_creator_impl<DriverClass>;
 
 
 #endif  /* MAME_EMU_DRIVER_H */
