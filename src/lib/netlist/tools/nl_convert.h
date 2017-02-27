@@ -55,7 +55,7 @@ private:
 	struct net_t
 	{
 	public:
-		net_t(const pstring &aname)
+		explicit net_t(const pstring &aname)
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}

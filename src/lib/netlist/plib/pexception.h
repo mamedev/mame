@@ -20,7 +20,7 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	explicit pexception(const pstring text);
+	explicit pexception(const pstring &text);
 	pexception(const pexception &e) : std::exception(e), m_text(e.m_text) { }
 
 	virtual ~pexception() noexcept;

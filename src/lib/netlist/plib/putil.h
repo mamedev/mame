@@ -56,7 +56,7 @@ namespace plib
 	template <class C>
 	struct indexed_compare
 	{
-		indexed_compare(const C& target): m_target(target) {}
+		explicit indexed_compare(const C& target): m_target(target) {}
 
 		bool operator()(int a, int b) const { return m_target[a] < m_target[b]; }
 

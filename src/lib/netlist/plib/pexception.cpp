@@ -21,9 +21,9 @@ namespace plib {
 //  Exceptions
 //============================================================
 
-pexception::pexception(const pstring text)
+pexception::pexception(const pstring &text)
+: m_text(text)
 {
-	m_text = text;
 }
 
 pexception::~pexception() noexcept

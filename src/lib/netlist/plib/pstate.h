@@ -65,7 +65,7 @@ public:
 	{
 		using list_t = std::vector<std::unique_ptr<entry_t>>;
 
-		entry_t(const pstring &stname, const datatype_t dt, const void *owner,
+		entry_t(const pstring &stname, const datatype_t &dt, const void *owner,
 				const std::size_t count, void *ptr)
 		: m_name(stname), m_dt(dt), m_owner(owner), m_callback(nullptr), m_count(count), m_ptr(ptr) { }
 
@@ -112,7 +112,7 @@ public:
 
 	const entry_t::list_t &save_list() const { return m_save; }
 
-	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t dt, const std::size_t count, void *ptr);
+	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr);
 
 protected:
 

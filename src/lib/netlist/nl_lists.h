@@ -107,7 +107,7 @@ namespace netlist
 	{
 	public:
 
-		timed_queue(const std::size_t list_size)
+		explicit timed_queue(const std::size_t list_size)
 		: m_list(list_size)
 		{
 			clear();
@@ -220,7 +220,7 @@ namespace netlist
 			bool operator()(const T &a, const T &b) { return QueueOp::less(b,a); }
 		};
 
-		timed_queue(const std::size_t list_size)
+		explicit timed_queue(const std::size_t list_size)
 		: m_list(list_size)
 		{
 			clear();

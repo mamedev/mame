@@ -83,7 +83,7 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
-bool setup_t::device_exists(const pstring name) const
+bool setup_t::device_exists(const pstring &name) const
 {
 	for (auto e : m_device_factory)
 	{
@@ -147,7 +147,7 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 	return pstring("Error");
 }
 
-pstring setup_t::get_initial_param_val(const pstring name, const pstring def)
+pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
@@ -156,7 +156,7 @@ pstring setup_t::get_initial_param_val(const pstring name, const pstring def)
 		return def;
 }
 
-double setup_t::get_initial_param_val(const pstring name, const double def)
+double setup_t::get_initial_param_val(const pstring &name, const double def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
@@ -170,7 +170,7 @@ double setup_t::get_initial_param_val(const pstring name, const double def)
 		return def;
 }
 
-int setup_t::get_initial_param_val(const pstring name, const int def)
+int setup_t::get_initial_param_val(const pstring &name, const int def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
@@ -184,7 +184,7 @@ int setup_t::get_initial_param_val(const pstring name, const int def)
 		return def;
 }
 
-void setup_t::register_param(pstring name, param_t &param)
+void setup_t::register_param(const pstring &name, param_t &param)
 {
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal(MF_1_ADDING_PARAMETER_1_TO_PARAMETER_LIST, name);
@@ -222,7 +222,7 @@ void setup_t::register_link(const pstring &sin, const pstring &sout)
 	register_link_fqn(build_fqn(sin), build_fqn(sout));
 }
 
-void setup_t::remove_connections(const pstring pin)
+void setup_t::remove_connections(const pstring &pin)
 {
 	pstring pinfn = build_fqn(pin);
 	bool found = false;
@@ -243,7 +243,7 @@ void setup_t::remove_connections(const pstring pin)
 }
 
 
-void setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
+void setup_t::register_frontier(const pstring &attach, const double r_IN, const double r_OUT)
 {
 	pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 	m_frontier_cnt++;
@@ -945,7 +945,7 @@ void setup_t::include(const pstring &netlist_name)
 	log().fatal(MF_1_NOT_FOUND_IN_SOURCE_COLLECTION, netlist_name);
 }
 
-std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
+std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 {
 	for (auto &source : m_sources)
 	{

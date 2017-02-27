@@ -175,7 +175,7 @@ public:
 	virtual ~pofilestream();
 
 protected:
-	pofilestream(void *file, const pstring name, const bool do_close);
+	pofilestream(void *file, const pstring &name, const bool do_close);
 	/* write n bytes to stream */
 	virtual void vwrite(const void *buf, const pos_type n) override;
 	virtual void vseek(const pos_type n) override;
@@ -224,7 +224,7 @@ public:
 	virtual ~pifilestream();
 
 protected:
-	pifilestream(void *file, const pstring name, const bool do_close);
+	pifilestream(void *file, const pstring &name, const bool do_close);
 
 	/* read up to n bytes from stream */
 	virtual pos_type vread(void *buf, const pos_type n) override;
@@ -284,7 +284,7 @@ private:
 class pistringstream : public pimemstream
 {
 public:
-	pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
+	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
 	virtual ~pistringstream();
 
 private:
@@ -389,14 +389,14 @@ public:
 		m_strm.write(&val, sizeof(T));
 	}
 
-	void write(const pstring s)
+	void write(const pstring &s)
 	{
 		write(s.blen());
 		m_strm.write(s.c_str(), s.blen());
 	}
 
 	template <typename T>
-	void write(const std::vector<T> val)
+	void write(const std::vector<T> &val)
 	{
 		std::size_t sz = val.size();
 		write(sz);

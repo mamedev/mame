@@ -19,7 +19,7 @@
 
 struct pstr_t
 {
-	pstr_t(const std::size_t alen) { init(alen); }
+	explicit pstr_t(const std::size_t alen) { init(alen); }
 	void init(const std::size_t alen)
 	{
 		m_ref_count = 1;
@@ -141,13 +141,13 @@ public:
 	pstring_t& operator+=(const code_t c) { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(c, buf); pcat(buf); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
-	iterator find(const pstring_t search, iterator start) const;
-	iterator find(const pstring_t search) const { return find(search, begin()); }
+	iterator find(const pstring_t &search, iterator start) const;
+	iterator find(const pstring_t &search) const { return find(search, begin()); }
 	iterator find(const code_t search, iterator start) const;
 	iterator find(const code_t search) const { return find(search, begin()); }
 
-	const pstring_t substr(const iterator start, const iterator end) const ;
-	const pstring_t substr(const iterator start) const { return substr(start, end()); }
+	const pstring_t substr(const iterator &start, const iterator &end) const ;
+	const pstring_t substr(const iterator &start) const { return substr(start, end()); }
 	const pstring_t substr(size_type start) const { return (start >= len()) ? pstring_t("") : substr(begin() + start, end()); }
 
 	const pstring_t left(iterator leftof) const { return substr(begin(), leftof); }
@@ -156,9 +156,9 @@ public:
 	iterator find_first_not_of(const pstring_t &no) const;
 	iterator find_last_not_of(const pstring_t &no) const;
 
-	const pstring_t ltrim(const pstring_t ws = pstring_t(" \t\n\r")) const;
-	const pstring_t rtrim(const pstring_t ws = pstring_t(" \t\n\r")) const;
-	const pstring_t trim(const pstring_t ws = pstring_t(" \t\n\r")) const { return this->ltrim(ws).rtrim(ws); }
+	const pstring_t ltrim(const pstring_t &ws = pstring_t(" \t\n\r")) const;
+	const pstring_t rtrim(const pstring_t &ws = pstring_t(" \t\n\r")) const;
+	const pstring_t trim(const pstring_t &ws = pstring_t(" \t\n\r")) const { return this->ltrim(ws).rtrim(ws); }
 
 	const pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
 
@@ -339,8 +339,8 @@ public:
 	~pstringbuffer();
 
 	// construction with copy
-	pstringbuffer(const char *string) {init(); if (string != nullptr) pcopy(string); }
-	pstringbuffer(const pstring &string) {init(); pcopy(string); }
+	explicit pstringbuffer(const char *string) {init(); if (string != nullptr) pcopy(string); }
+	explicit pstringbuffer(const pstring &string) {init(); pcopy(string); }
 	pstringbuffer(const pstringbuffer &stringb) {init(); pcopy(stringb); }
 	pstringbuffer(pstringbuffer &&b) : m_ptr(b.m_ptr), m_size(b.m_size), m_len(b.m_len) { b.m_ptr = nullptr; b.m_size = 0; b.m_len = 0; }
 

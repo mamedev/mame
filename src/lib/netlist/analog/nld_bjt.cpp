@@ -100,7 +100,7 @@ private:
 	class bjt_model_t : public param_model_t
 	{
 	public:
-		bjt_model_t(device_t &device, const pstring name, const pstring val)
+		bjt_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_model_t(device, name, val)
 		, m_IS(*this, "IS")
 		, m_BF(*this, "BF")

@@ -164,7 +164,7 @@ protected:
 class pfmt : public pformat_base<pfmt>
 {
 public:
-	explicit pfmt(const pstring fmt);
+	explicit pfmt(const pstring &fmt);
 	virtual ~pfmt();
 
 	operator pstring() const { return pstring(m_str, pstring::UTF8); }
@@ -194,42 +194,42 @@ public:
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
-	void log(const pstring fmt, Args&&... args) const
+	void log(const pstring & fmt, Args&&... args) const
 	{
 		if (build_enabled && enabled && m_enabled) (*this)(fmt, std::forward<Args>(args)...);
 	}
 
-	void operator ()(const pstring fmt) const
+	void operator ()(const pstring &fmt) const
 	{
 		if (build_enabled && m_enabled) vdowrite(fmt);
 	}
 
 	template<typename T1>
-	void operator ()(const pstring fmt, const T1 &v1) const
+	void operator ()(const pstring &fmt, const T1 &v1) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1));
 	}
 
 	template<typename T1, typename T2>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2));
 	}
 
 	template<typename T1, typename T2, typename T3>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
 	}

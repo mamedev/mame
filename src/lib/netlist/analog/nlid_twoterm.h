@@ -329,7 +329,7 @@ private:
 class diode_model_t : public param_model_t
 {
 public:
-	diode_model_t(device_t &device, const pstring name, const pstring val)
+	diode_model_t(device_t &device, const pstring &name, const pstring &val)
 	: param_model_t(device, name, val)
 	, m_IS(*this, "IS")
 	, m_N(*this, "N")
@@ -356,7 +356,7 @@ public:
 	}
 
 	template <class CLASS>
-	NETLIB_NAME(D)(CLASS &owner, const pstring name, const pstring model)
+	NETLIB_NAME(D)(CLASS &owner, const pstring &name, const pstring &model)
 	: NETLIB_NAME(twoterm)(owner, name)
 	, m_model(*this, "MODEL", model)
 	, m_D(*this, "m_D")

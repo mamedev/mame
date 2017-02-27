@@ -404,7 +404,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 
 void matrix_solver_t::solve_base()
 {
-	m_stat_vsolver_calls++;
+	++m_stat_vsolver_calls;
 	if (has_dynamic_devices())
 	{
 		unsigned this_resched;

@@ -77,7 +77,7 @@ private:
 	void run();
 	void static_compile();
 
-	void mac_out(const pstring s, const bool cont = true);
+	void mac_out(const pstring &s, const bool cont = true);
 	void cmac(const netlist::factory::element_t *e);
 	void mac(const netlist::factory::element_t *e);
 
@@ -124,7 +124,7 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 		auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
 		return strm;
 	}
-	catch (plib::pexception e)
+	catch (const plib::pexception &e)
 	{
 
 	}
@@ -414,7 +414,7 @@ void tool_app_t::static_compile()
 
 }
 
-void tool_app_t::mac_out(const pstring s, const bool cont)
+void tool_app_t::mac_out(const pstring &s, const bool cont)
 {
 	static const unsigned RIGHT = 72;
 	if (cont)

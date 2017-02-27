@@ -56,6 +56,7 @@ NETLIB_OBJECT(solver)
 	, m_dynamic_min_ts(*this, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
 
 	, m_log_stats(*this, "LOG_STATS", 1)   // nl_double timestep resolution
+	, m_params()
 	{
 		// internal staff
 

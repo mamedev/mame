@@ -65,7 +65,7 @@ pifilestream::pifilestream(const pstring &fname)
 	init();
 }
 
-pifilestream::pifilestream(void *file, const pstring name, const bool do_close)
+pifilestream::pifilestream(void *file, const pstring &name, const bool do_close)
 : pistream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
 {
 	if (m_file == nullptr)
@@ -155,7 +155,7 @@ pofilestream::pofilestream(const pstring &fname)
 	init();
 }
 
-pofilestream::pofilestream(void *file, const pstring name, const bool do_close)
+pofilestream::pofilestream(void *file, const pstring &name, const bool do_close)
 : postream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
 {
 	if (m_file == nullptr)
