@@ -194,8 +194,10 @@ cli_frontend::~cli_frontend()
 	mame_options::remove_device_options(m_options);
 }
 
-void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args, std::string &option_errors)
+void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args)
 {
+	std::string option_errors;
+
 	// parse the command line, adding any system-specific options
 	if (!mame_options::parse_command_line(m_options, args, option_errors))
 	{
@@ -219,6 +221,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 		return;
 	}
 
+	// read INI's, if appropriate
+	if (m_options.read_config())
+		mame_options::parse_standard_inis(m_options, option_errors);
+
 	// otherwise, check for a valid system
 	load_translation(m_options);
 
@@ -228,13 +234,6 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 
 	manager->start_context();
 
-	// We need to preprocess the config files once to determine the web server's configuration
-	// and file locations
-	if (m_options.read_config())
-	{
-		m_options.revert(OPTION_PRIORITY_INI);
-		mame_options::parse_standard_inis(m_options, option_errors);
-	}
 	if (!option_errors.empty())
 		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
@@ -260,10 +259,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 	try
 	{
-		std::string option_errors;
-		mame_options::parse_standard_inis(m_options, option_errors);
-
-		start_execution(manager, args, option_errors);
+		start_execution(manager, args);
 	}
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
