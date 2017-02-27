@@ -961,8 +961,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - Hong Kong: Rocket Pinball
-  - USA(1): Rocket Pinball (model 60-2140), distributed by Tandy
-  - USA(2): Cosmic Pinball (model 49-65456), distributed by Sears
+  - USA(1): Rocket Pinball (model 60-2140), published by Tandy
+  - USA(2): Cosmic Pinball (model 49-65456), published by Sears
 
 ***************************************************************************/
 
@@ -1078,7 +1078,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - Hong Kong: Half Court Computer Basketball
-  - USA: Electronic Basketball (model 49-65453), distributed by Sears
+  - USA: Electronic Basketball (model 49-65453), published by Sears
 
 ***************************************************************************/
 
@@ -1340,7 +1340,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA(1): Half Court Computer Basketball
-  - USA(2): 2-Player Baseball (model 60-2157), distributed by Tandy
+  - USA(2): 2-Player Baseball (model 60-2157), published by Tandy
 
 ***************************************************************************/
 
@@ -1416,7 +1416,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA(1): Football
-  - USA(2): 2-Player Baseball (model 60-2157), distributed by Tandy
+  - USA(2): 2-Player Baseball (model 60-2157), published by Tandy
 
 ***************************************************************************/
 

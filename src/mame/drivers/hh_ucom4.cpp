@@ -1854,8 +1854,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - Japan: Game Robot 9
-  - USA: Fabulous Fred - The Ultimate Electronic Game, distributed by Mego
-  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
+  - USA: Fabulous Fred - The Ultimate Electronic Game, published by Mego
+  - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     12-button version, a clone of Tandy-12)
 
   Accessories were included for some of the minigames.
