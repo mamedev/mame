@@ -833,7 +833,7 @@ image_init_result nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			char magic[4];
 

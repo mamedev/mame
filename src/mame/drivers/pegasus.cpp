@@ -421,7 +421,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() != nullptr && size == 0)
+	if (image.loaded_through_softlist() && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"

@@ -300,7 +300,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 

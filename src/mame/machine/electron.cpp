@@ -407,7 +407,7 @@ void electron_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		uint32_t filesize = image.length();
 

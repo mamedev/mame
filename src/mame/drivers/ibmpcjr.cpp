@@ -441,7 +441,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		int header_size = 0;
 

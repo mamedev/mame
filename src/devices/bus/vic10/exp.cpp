@@ -115,7 +115,7 @@ image_init_result vic10_expansion_slot_device::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 

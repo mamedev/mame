@@ -337,7 +337,7 @@ image_init_result kccart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);

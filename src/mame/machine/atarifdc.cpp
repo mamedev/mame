@@ -144,7 +144,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	//m_drv[id].image = (uint8_t*)image.image_realloc(m_drv[id].image, size);
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype returns "" :/
-	bool is_softlist_entry = image.software_entry() != nullptr;
+	bool is_softlist_entry = image.loaded_through_softlist();
 
 	/* no extension: assume XFD format (no header) */
 	if (image.is_filetype("") && !is_softlist_entry)

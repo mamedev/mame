@@ -82,7 +82,7 @@ image_init_result ql_rom_cartridge_slot_t::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 

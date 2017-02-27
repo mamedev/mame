@@ -261,7 +261,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
 	// loading directly from file
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if (slot->length() > 0x1000)
 		{

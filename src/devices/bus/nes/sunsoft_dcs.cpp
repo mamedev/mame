@@ -85,7 +85,7 @@ image_init_result nes_ntb_slot_device::call_load()
 		if (!ROM)
 			return image_init_result::FAIL;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x4000)
 				return image_init_result::FAIL;

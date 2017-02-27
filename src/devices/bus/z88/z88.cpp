@@ -125,7 +125,7 @@ image_init_result z88cart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);

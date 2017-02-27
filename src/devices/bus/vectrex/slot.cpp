@@ -152,7 +152,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint8_t *ROM;
 
 		if (size > 0x10000)
@@ -164,7 +164,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);

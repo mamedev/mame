@@ -2057,7 +2057,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 {
 	uint32_t size, load_offset = 0;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		size = image.length();
 

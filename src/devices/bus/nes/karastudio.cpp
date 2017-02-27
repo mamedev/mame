@@ -105,8 +105,8 @@ image_init_result nes_kstudio_slot_device::call_load()
 		if (!ROM)
 			return image_init_result::FAIL;
 
-		// Existing exapnsion carts are all 128K, so we only load files of this size
-		if (software_entry() == nullptr)
+		// Existing expansion carts are all 128K, so we only load files of this size
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20000)
 				return image_init_result::FAIL;

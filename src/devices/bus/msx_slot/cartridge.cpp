@@ -106,7 +106,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 {
 	if ( m_cartridge )
 	{
-		if ( software_entry() )
+		if (loaded_through_softlist())
 		{
 			uint32_t length;
 

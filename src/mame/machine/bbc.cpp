@@ -1595,7 +1595,7 @@ image_init_result bbc_state::bbc_load_rom(device_image_interface &image, generic
 
 image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		uint32_t filesize = image.length();
 

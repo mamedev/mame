@@ -94,7 +94,7 @@ image_init_result cdrom_image_device::call_load()
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
 
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 	{
 		if (is_filetype("chd") && is_loaded()) {
 			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */

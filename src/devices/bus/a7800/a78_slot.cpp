@@ -349,7 +349,7 @@ image_init_result a78_cart_slot_device::call_load()
 	{
 		uint32_t len;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? true : false;

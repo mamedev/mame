@@ -1130,7 +1130,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 	uint8_t *ROM;
 	uint32_t size = slot->common_get_size("rom");
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		return image_init_result::FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
