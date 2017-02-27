@@ -414,8 +414,10 @@ void novag6502_state::sexpert_set_cpu_freq()
 
 MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 {
-	membank("bank1")->set_entry(0);
 	novagbase_state::machine_reset();
+
+	sexpert_set_cpu_freq();
+	membank("bank1")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(novag6502_state, sexpert)
