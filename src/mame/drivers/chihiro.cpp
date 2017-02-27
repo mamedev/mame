@@ -46,7 +46,7 @@ Games on this system include....
 | | 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
 |*| 200504   | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
 |*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
-| | 2005     | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+|*| 2005     | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
 |*| 2005     | Wangan Midnight Maximum Tune 2 (Export) (Rev A)    | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
 | | 2005     | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
 | | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
@@ -1946,6 +1946,16 @@ ROM_START( wangmid2ja )
 	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
+ROM_START( wangmid2o )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0016", 0, SHA1(a373e3af96bbeea00a44bbe3adfd863d5a94aed9) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
+ROM_END
+
 ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
@@ -2137,7 +2147,7 @@ ROM_END
 /* 0014A */ GAME( 2004, outr2st,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Rev A) (GDX-0014A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0015  */ GAME( 2005, wangmid2j,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0015A */ GAME( 2005, wangmid2ja,wangmid2,chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0015A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0016     GAME( 2005, wangmid2o,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0016  */ GAME( 2005, wangmid2o,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0016A */ GAME( 2005, wangmid2, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (Rev A) (GDX-0016A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0017     GAME( 2005, mj3o,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (GDX-0017)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0017A    GAME( 2005, mj3a,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev A) (GDX-0017A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
