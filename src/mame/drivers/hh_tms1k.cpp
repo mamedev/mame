@@ -105,12 +105,12 @@
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
  *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
+ *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
  @TMS1007  TMS1000   1976, TSI Speech+ (S14002-A)
  @CD7282SL TMS1100   1981, Tandy Radio Shack Tandy-12 (serial is similar to TI Speak & Spell series?)
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -129,6 +129,7 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
+  - quizwizc cartridge configs
 
 ***************************************************************************/
 
@@ -190,6 +191,7 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "quizwizc.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
 #include "speechp.lh"
@@ -1627,8 +1629,14 @@ MACHINE_CONFIG_END
   * TMS1000NLL M32001-N2 (die label 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
   
-  This is a 4-player version of Quiz Wiz.
-  ..
+  This is a 4-player version of Quiz Wiz, the same cartridges and question
+  books can be used.
+  
+  known cartridge configurations:
+  #  config           to K1     title
+  -----------------------------------------------
+  1  1-2-3-4,5-6-7-8  1,2,3     1001 Questions
+  8  1-5,2-6,3-7,4-8  8         The Book of Lists
 
 ***************************************************************************/
 
@@ -1653,7 +1661,7 @@ void quizwizc_state::prepare_display()
 	set_display_segmask(0x3c0, 0x7f);
 
 	// note: O7 is on VSS
-	display_matrix(7, 11, m_o, (m_r & 0x3ff) | (m_o << 3 & 0x400));
+	display_matrix(8, 11, m_o, m_r | 0x400);
 }
 
 WRITE16_MEMBER(quizwizc_state::write_r)
@@ -1662,7 +1670,8 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// R0-R5: input mux
-	m_inp_mux = data & 0x3f;
+	// R4-R9: cartridge pins
+	m_inp_mux = data;
 
 	// R0-R3: led select
 	// R6-R9: digit select
@@ -1680,16 +1689,78 @@ WRITE16_MEMBER(quizwizc_state::write_o)
 READ8_MEMBER(quizwizc_state::read_k)
 {
 	// K: multiplexed inputs
-	return 0;
-	//return read_inputs(6);
+	// K1: cartridge pin 4 (pin 5 N/C)
+	return read_inputs(10);
 }
 
 
 // config
 
 static INPUT_PORTS_START( quizwizc )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // A (player 1 at bottom, increment counter-clockwise)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // B
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) // C
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) // D
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(4)
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(3)
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_START("IN.4") // R4
+	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 1" ) PORT_DIPLOCATION(":1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Go")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Fast Forward")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Slow Forward")
+
+	PORT_START("IN.5") // R5
+	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 7" ) PORT_DIPLOCATION(":7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x00, "Game Select")
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R6
+	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 2" ) PORT_DIPLOCATION(":2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // R7
+	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 3" ) PORT_DIPLOCATION(":3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.8") // R8
+	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 6" ) PORT_DIPLOCATION(":6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.9") // R9
+	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 8" ) PORT_DIPLOCATION(":8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
@@ -1701,7 +1772,7 @@ static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(quizwizc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_quizwizc)
+	MCFG_DEFAULT_LAYOUT(layout_quizwizc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4358,11 +4429,11 @@ static INPUT_PORTS_START( elecdet )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.4") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("End Turn")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static const s16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
@@ -6550,11 +6621,11 @@ static INPUT_PORTS_START( stopthief )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.2") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static const s16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
@@ -9088,7 +9159,7 @@ CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Col
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, quizwizc,  0,        0, quizwizc,  quizwizc,  driver_device, 0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1981, quizwizc,  0,        0, quizwizc,  quizwizc,  driver_device, 0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, cnbaskb,   0,        0, cnbaskb,   cnbaskb,   driver_device, 0, "Conic", "Electronic Basktetball (Conic)", MACHINE_SUPPORTS_SAVE )
