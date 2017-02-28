@@ -24,7 +24,6 @@ class sun_keyboard_port_device : public device_t, public device_slot_interface
 
 public:
 	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
-	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source);
 	virtual ~sun_keyboard_port_device();
 
 	// static configuration helpers
@@ -35,6 +34,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
 
 protected:
+	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source);
+
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -52,7 +53,6 @@ class device_sun_keyboard_port_interface : public device_slot_card_interface
 	friend class sun_keyboard_port_device;
 
 public:
-	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 	virtual ~device_sun_keyboard_port_interface() override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 protected:
+	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
+
 	sun_keyboard_port_device *m_port;
 
 	static constexpr int START_BIT_COUNT = 1;

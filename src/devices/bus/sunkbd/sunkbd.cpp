@@ -69,7 +69,7 @@ void sun_keyboard_port_device::device_start()
 
 WRITE_LINE_MEMBER( sun_keyboard_port_device::write_txd )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_txd(state);
 }
 
