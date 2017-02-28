@@ -24,10 +24,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
-	DECLARE_READ16_MEMBER(graphic_r);
-	DECLARE_WRITE16_MEMBER(graphic_w);
+	virtual DECLARE_READ16_MEMBER(graphic_r) = 0;
+	virtual DECLARE_WRITE16_MEMBER(graphic_w) = 0;
 	attotime time_to_gv_mem_availability(void) const;
-	void update_graphic_bits(void);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq(void);
@@ -70,15 +69,13 @@ protected:
 
 	void setup_ram_block(unsigned block , unsigned offset);
 
-	virtual uint16_t graphic_r5_r(void) = 0;
-	virtual void     graphic_r5_w(uint16_t data) = 0;
 	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
 
 	// Optional character generator
-	optional_region_ptr<uint8_t> m_optional_chargen;
+	required_region_ptr<uint8_t> m_optional_chargen;
 
 	// Text mode video I/F
 	typedef struct {
@@ -117,7 +114,11 @@ protected:
 	uint8_t m_gv_cmd; // U65 (GC)
 	uint16_t m_gv_data_w;     // U29, U45, U28 & U44 (GC)
 	uint16_t m_gv_data_r;     // U59 & U60 (GC)
-	uint16_t m_gv_cursor_w;   // U38 & U39 (GS)
+	uint16_t m_gv_io_counter; // U1, U2, U14 & U15 (GC)
+	uint16_t m_gv_cursor_x;   // U31 & U23 (GS)
+	uint16_t m_gv_cursor_y;   // U15 & U8 (GS)
+	bool m_gv_cursor_gc;    // U8 (GS)
+	bool m_gv_cursor_fs;    // U8 (GS)
 
 	// Interrupt handling
 	uint8_t m_irl_pending;
