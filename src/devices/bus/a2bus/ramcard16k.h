@@ -40,10 +40,10 @@ protected:
 	virtual int inh_type() override;
 
 private:
-	void do_io(int offset);
+	void do_io(int offset, bool write);
 
 	int m_inh_state;
-	int m_last_offset;
+	int m_writecnt;
 	int m_dxxx_bank;
 	uint8_t m_ram[16*1024];
 };
