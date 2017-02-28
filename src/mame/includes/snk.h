@@ -9,6 +9,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class snk_state : public driver_device
 {

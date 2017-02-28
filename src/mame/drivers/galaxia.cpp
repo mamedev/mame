@@ -69,9 +69,11 @@ TODO:
 */
 
 #include "emu.h"
+#include "includes/galaxia.h"
+
 #include "machine/s2636.h"
 #include "cpu/s2650/s2650.h"
-#include "includes/galaxia.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)

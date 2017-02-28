@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "videopak.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -28,7 +30,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_VIDEO_PAK = &device_creator<vic20_video_pak_t>;
+const device_type VIC20_VIDEO_PAK = device_creator<vic20_video_pak_t>;
 
 
 //-------------------------------------------------

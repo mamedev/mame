@@ -38,11 +38,14 @@ To Do:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/wd_fdc.h"
+#include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/com8116.h"
+#include "machine/wd_fdc.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class sbrain_state : public driver_device
 {

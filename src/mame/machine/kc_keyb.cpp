@@ -328,7 +328,7 @@ triggers the time measurement by the CTC channel 3."
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_KEYBOARD = &device_creator<kc_keyboard_device>;
+const device_type KC_KEYBOARD = device_creator<kc_keyboard_device>;
 
 //**************************************************************************
 //  Input Ports

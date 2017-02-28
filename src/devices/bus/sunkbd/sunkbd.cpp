@@ -5,7 +5,7 @@
 #include "sunkbd.h"
 
 
-device_type const SUNKBD_PORT = &device_creator<sun_keyboard_port_device>;
+device_type const SUNKBD_PORT = device_creator<sun_keyboard_port_device>;
 
 
 int const device_sun_keyboard_port_interface::START_BIT_COUNT;

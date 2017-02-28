@@ -639,20 +639,24 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+#include "includes/calomega.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
+#include "machine/6821pia.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_10MHz
 #define CPU_CLOCK   (MASTER_CLOCK/16)
 #define UART_CLOCK  (MASTER_CLOCK/16)
 #define SND_CLOCK   (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "video/mc6845.h"
-#include "machine/6821pia.h"
-#include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "includes/calomega.h"
 
 
 /**************************************************

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "k054539.h"
 
-const device_type K054539 = &device_creator<k054539_device>;
+const device_type K054539 = device_creator<k054539_device>;
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

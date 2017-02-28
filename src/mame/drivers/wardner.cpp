@@ -127,12 +127,14 @@ out:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
-#include "machine/bankdev.h"
-#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
+#include "includes/toaplipt.h"
+
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 class wardner_state : public twincobr_state

@@ -40,10 +40,13 @@ the "America" release.
 
 #include "emu.h"
 #include "includes/tsamurai.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void tsamurai_state::machine_start()

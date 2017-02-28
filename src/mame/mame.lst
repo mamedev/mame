@@ -9447,6 +9447,7 @@ mj3d                            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev
 mj3evo                          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
 ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
+outr2sto                        // 2004.09 Outrun 2 Special Tours
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 outr2stj                        // 2004.12 Outrun 2 Special Tours (Japan) (Rev A)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
@@ -9455,6 +9456,7 @@ vcop3                           // 2003.05.21 Virtua Cop 3 (Rev B)
 wangmid                         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
 wangmidj                        // 2004.06 Wangan Midnight Maximum Tune (Japan) (Rev B)
 wangmid2                        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
+wangmid2o                       // 2005.02 Wangan Midnight Maximum Tune 2 (Export)
 wangmid2j                       // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 wangmid2ja                      // 2005.09 Wangan Midnight Maximum Tune 2 (Japan) (Rev A)
 questofd                        // 2004.09 Quest of D (CDV-10005C)
@@ -12302,6 +12304,7 @@ cscfr                           // * French
 cscg                            // * German
 cscsp                           // * Spanish
 fdes2000                        //
+fdes2100                        //
 fdes2000d                       //
 fdes2100d                       //
 feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
@@ -12321,11 +12324,14 @@ fexcela                         //
 fexcelb                         //
 fexceld                         //
 fexcelp                         //
+fexcelpb                        //
 fexcelv                         //
+fphantom                        //
 fscc9                           //
 fscc9b                          //
 fscc9ps                         //
 fscc12                          //
+granits                         // RCS
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
 super9ccfr                      // * French
@@ -14373,6 +14379,7 @@ efootb4                         // Entex
 einvader                        // Entex
 elecbowl                        // Marx
 elecdet                         // Ideal
+eleciq                          // Conic
 esbattle                        // Entex
 esoccer                         // Entex
 f2pbball                        // Fonas
@@ -14393,6 +14400,7 @@ merlin                          // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Radio Shack
 phpball                         // Tomy
+quizwizc                        // Coleco
 raisedvl                        // Entex
 simon                           // Milton Bradley
 speechp                         // TSI
@@ -20370,6 +20378,7 @@ nbahangt                        // (c) 1996 Midway
 nbamht                          // (c) 1996 Midway
 nbamht1                         // (c) 1996 Midway
 openice                         // (c) 1995 Midway
+openicea                        // (c) 1995 Midway
 rmpgwt                          // (c) 1997 Midway
 rmpgwt11                        // (c) 1997 Midway
 umk3                            // (c) 1994 Midway
@@ -30675,9 +30684,6 @@ kov3hd103
 kov3hd102
 kov3hd101
 
-@source:phantom.cpp
-fphantom                        //
-
 @source:phc25.cpp
 phc25                           //
 phc25j                          //
@@ -32607,7 +32613,10 @@ hyprdriv                        // (c) 1998 Midway Games
 mace                            // (c) 1996 Atari Games
 macea                           // (c) 1996 Atari Games
 sfrush                          // (c) 1996 Atari Games
+sfrusha                         // (c) 1996 Atari Games
 sfrushrk                        // (c) 1996 Atari Games
+sfrushrkw                       // (c) 1996 Atari Games
+sfrushrkwo                      // (c) 1996 Atari Games
 vaportrx                        // (c) 1998 Atari Games
 vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games

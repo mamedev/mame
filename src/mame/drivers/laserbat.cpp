@@ -77,13 +77,14 @@
 */
 
 #include "emu.h"
-
 #include "includes/laserbat.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 
 #include "machine/clock.h"
+
+#include "speaker.h"
 
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)

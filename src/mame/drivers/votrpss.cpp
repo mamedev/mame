@@ -69,20 +69,23 @@ Things to be looked at:
 
 /* Core includes */
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 //#include "votrpss.lh"
 
 /* Components */
-#include "sound/ay8910.h"
-#include "sound/votrax.h"
 #include "machine/clock.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/i8251.h"
+#include "sound/ay8910.h"
+#include "sound/votrax.h"
 
 /* For testing */
 #include "machine/terminal.h"
+
+#include "speaker.h"
 
 #define TERMINAL_TAG "terminal"
 

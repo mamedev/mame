@@ -11,7 +11,7 @@
 
 // class centronics_device
 
-const device_type CENTRONICS = &device_creator<centronics_device>;
+const device_type CENTRONICS = device_creator<centronics_device>;
 
 centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock, "centronics", __FILE__),

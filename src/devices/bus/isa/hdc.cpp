@@ -157,9 +157,9 @@ static INPUT_PORTS_START( isa_hdc )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 INPUT_PORTS_END
 
-const device_type XT_HDC = &device_creator<xt_hdc_device>;
-const device_type EC1841_HDC = &device_creator<ec1841_device>;
-const device_type ST11M_HDC = &device_creator<st11m_device>;
+const device_type XT_HDC = device_creator<xt_hdc_device>;
+const device_type EC1841_HDC = device_creator<ec1841_device>;
+const device_type ST11M_HDC = device_creator<st11m_device>;
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__), buffer_ptr(nullptr), csb(0), status(0), error(0), m_current_cmd(0),
@@ -928,8 +928,8 @@ void xt_hdc_device::set_ready()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_HDC = &device_creator<isa8_hdc_device>;
-const device_type ISA8_HDC_EC1841 = &device_creator<isa8_hdc_ec1841_device>;
+const device_type ISA8_HDC = device_creator<isa8_hdc_device>;
+const device_type ISA8_HDC_EC1841 = device_creator<isa8_hdc_ec1841_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

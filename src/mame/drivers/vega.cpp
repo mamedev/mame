@@ -80,6 +80,8 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 struct vega_obj
@@ -102,13 +104,15 @@ class vega_state : public driver_device
 public:
 
 	vega_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_i8255(*this, "ppi8255"),
-	m_ins8154(*this, "ins8154"),
-	m_ay8910(*this, "ay8910"),
-	m_gfxdecode(*this, "gfxdecode"),
-	m_palette(*this, "palette") {}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_i8255(*this, "ppi8255")
+		, m_ins8154(*this, "ins8154")
+		, m_ay8910(*this, "ay8910")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+	}
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<i8255_device>   m_i8255;

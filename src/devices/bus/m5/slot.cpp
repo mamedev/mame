@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M5_CART_SLOT = &device_creator<m5_cart_slot_device>;
+const device_type M5_CART_SLOT = device_creator<m5_cart_slot_device>;
 
 //**************************************************************************
 //    M5 Cartridges Interface
@@ -163,10 +163,9 @@ image_init_result m5_cart_slot_device::call_load()
 	{
 		m_type=M5_STD;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name = get_feature("slot");
-			//software_info *name=m_software_info_ptr;
 			if (pcb_name) //is it ram cart?
 				m_type = m5_get_pcb_id(m_full_software_name.c_str());
 			else
@@ -175,7 +174,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 		if (m_type == M5_STD || m_type>2) //carts with roms
 		{
-			uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+			uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
@@ -185,7 +184,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 			m_cart->rom_alloc(size, tag());
 
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 				fread(m_cart->get_rom_base(), size);
 			else
 				memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);

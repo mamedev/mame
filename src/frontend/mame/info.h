@@ -8,10 +8,13 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef __INFO_H__
 #define __INFO_H__
+
+#pragma once
+
+#include "emuopts.h"
+
 
 class driver_enumerator;
 

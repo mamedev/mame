@@ -19,12 +19,12 @@
 #include "machine/timehelp.h"
 
 // device type definition
-const device_type M48T02 = &device_creator<m48t02_device>;
-const device_type M48T35 = &device_creator<m48t35_device>;
-const device_type M48T37 = &device_creator<m48t37_device>;
-const device_type M48T58 = &device_creator<m48t58_device>;
-const device_type MK48T08 = &device_creator<mk48t08_device>;
-const device_type MK48T12 = &device_creator<mk48t12_device>;
+const device_type M48T02 = device_creator<m48t02_device>;
+const device_type M48T35 = device_creator<m48t35_device>;
+const device_type M48T37 = device_creator<m48t37_device>;
+const device_type M48T58 = device_creator<m48t58_device>;
+const device_type MK48T08 = device_creator<mk48t08_device>;
+const device_type MK48T12 = device_creator<mk48t12_device>;
 
 
 /***************************************************************************

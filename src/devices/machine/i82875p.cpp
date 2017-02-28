@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "i82875p.h"
 
-const device_type I82875P_HOST     = &device_creator<i82875p_host_device>;
-const device_type I82875P_AGP      = &device_creator<i82875p_agp_device>;
-const device_type I82875P_OVERFLOW = &device_creator<i82875p_overflow_device>;
+const device_type I82875P_HOST     = device_creator<i82875p_host_device>;
+const device_type I82875P_AGP      = device_creator<i82875p_agp_device>;
+const device_type I82875P_OVERFLOW = device_creator<i82875p_overflow_device>;
 
 DEVICE_ADDRESS_MAP_START(agp_translation_map, 32, i82875p_host_device)
 ADDRESS_MAP_END

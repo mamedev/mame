@@ -66,14 +66,17 @@ Stephh's additional notes :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/galpanic.h"
+#include "includes/galpnipt.h"
 #include "includes/kaneko16.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
-#include "includes/galpanic.h"
-#include "includes/galpnipt.h"
+#include "speaker.h"
+
 
 void galpanic_state::machine_start()
 {

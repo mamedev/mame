@@ -177,4 +177,4 @@ void rmnimbus_keyboard_device::received_byte(uint8_t byte)
 }
 
 
-const device_type RMNIMBUS_KEYBOARD = &device_creator<rmnimbus_keyboard_device>;
+const device_type RMNIMBUS_KEYBOARD = device_creator<rmnimbus_keyboard_device>;

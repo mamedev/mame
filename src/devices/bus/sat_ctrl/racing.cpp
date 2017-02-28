@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_WHEEL = &device_creator<saturn_wheel_device>;
+const device_type SATURN_WHEEL = device_creator<saturn_wheel_device>;
 
 
 static INPUT_PORTS_START( saturn_racing )

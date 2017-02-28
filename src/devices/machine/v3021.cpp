@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type v3021 = &device_creator<v3021_device>;
+const device_type v3021 = device_creator<v3021_device>;
 
 
 //**************************************************************************

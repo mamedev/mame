@@ -81,14 +81,18 @@
 */
 
 #include "emu.h"
+#include "includes/boogwing.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/boogwing.h"
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 {

@@ -14,8 +14,12 @@
 
 #include "emu.h"
 #include "includes/nes.h"
+
 #include "cpu/m6502/n2a03.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 {

@@ -24,8 +24,10 @@ todo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/gomoku.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 
 /* input ports are rotated 90 degrees */

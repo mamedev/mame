@@ -52,9 +52,11 @@ write:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dday.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/dday.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( dday_map, AS_PROGRAM, 8, dday_state )

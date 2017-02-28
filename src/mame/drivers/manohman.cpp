@@ -131,12 +131,13 @@
 
 ***************************************************************************/
 
-#define MASTER_CLOCK        XTAL_8MHz
-#define SECONDARY_CLOCK     XTAL_3_6864MHz
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/saa1099.h"
+#include "speaker.h"
+
+#define MASTER_CLOCK        XTAL_8MHz
+#define SECONDARY_CLOCK     XTAL_3_6864MHz
 
 
 class _manohman_state : public driver_device

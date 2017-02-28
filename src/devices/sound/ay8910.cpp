@@ -1142,7 +1142,7 @@ WRITE8_MEMBER( ay8914_device::write )
 
 
 
-const device_type AY8910 = &device_creator<ay8910_device>;
+const device_type AY8910 = device_creator<ay8910_device>;
 
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
@@ -1252,7 +1252,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 	}
 }
 
-const device_type AY8912 = &device_creator<ay8912_device>;
+const device_type AY8912 = device_creator<ay8912_device>;
 
 ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, PSG_TYPE_AY, 3, 1, "ay8912", __FILE__)
@@ -1260,7 +1260,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8913 = &device_creator<ay8913_device>;
+const device_type AY8913 = device_creator<ay8913_device>;
 
 ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8913, "AY-3-8913A", tag, owner, clock, PSG_TYPE_AY, 3, 0, "ay8913", __FILE__)
@@ -1268,7 +1268,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8914 = &device_creator<ay8914_device>;
+const device_type AY8914 = device_creator<ay8914_device>;
 
 ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8914, "AY-3-8914", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8914", __FILE__)
@@ -1276,7 +1276,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8930 = &device_creator<ay8930_device>;
+const device_type AY8930 = device_creator<ay8930_device>;
 
 ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8930, "AY8930", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8930", __FILE__)
@@ -1284,7 +1284,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YM2149 = &device_creator<ym2149_device>;
+const device_type YM2149 = device_creator<ym2149_device>;
 
 ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2149, "YM2149", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2149", __FILE__)
@@ -1292,7 +1292,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YM3439 = &device_creator<ym3439_device>;
+const device_type YM3439 = device_creator<ym3439_device>;
 
 ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM3439, "YM3439", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym3429", __FILE__)
@@ -1300,7 +1300,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YMZ284 = &device_creator<ymz284_device>;
+const device_type YMZ284 = device_creator<ymz284_device>;
 
 ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ284, "YMZ284", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz284", __FILE__)
@@ -1308,7 +1308,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YMZ294 = &device_creator<ymz294_device>;
+const device_type YMZ294 = device_creator<ymz294_device>;
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ294, "YMZ294", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz294", __FILE__)

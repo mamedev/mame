@@ -15,9 +15,11 @@ TODO:
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/ikki.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/ikki.h"
+#include "speaker.h"
 
 
 /*************************************

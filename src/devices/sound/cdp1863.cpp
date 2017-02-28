@@ -35,7 +35,7 @@
 //**************************************************************************
 
 // devices
-const device_type CDP1863 = &device_creator<cdp1863_device>;
+const device_type CDP1863 = device_creator<cdp1863_device>;
 
 
 

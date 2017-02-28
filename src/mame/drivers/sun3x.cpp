@@ -129,18 +129,22 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
+
 #include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "machine/ncr539x.h"
-#include "machine/upd765.h"
-#include "formats/pc_dsk.h"
+#include "bus/scsi/scsihd.h"
+#include "cpu/m68000/m68000.h"
 #include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "machine/ncr539x.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -161,7 +165,7 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;

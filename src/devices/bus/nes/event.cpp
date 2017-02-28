@@ -32,7 +32,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_EVENT = &device_creator<nes_event_device>;
+const device_type NES_EVENT = device_creator<nes_event_device>;
 
 
 nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

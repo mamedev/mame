@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "i82439hx.h"
 
-const device_type I82439HX = &device_creator<i82439hx_host_device>;
+const device_type I82439HX = device_creator<i82439hx_host_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82439hx_host_device)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(pcon_r,   pcon_w,   0x000000ff)

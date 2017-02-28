@@ -11,6 +11,7 @@ driver by Chris Moore
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 #define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
 #define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)

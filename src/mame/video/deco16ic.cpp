@@ -174,7 +174,7 @@ Rowscroll style:
 #include "video/deco16ic.h"
 #include "render.h"
 
-const device_type DECO16IC = &device_creator<deco16ic_device>;
+const device_type DECO16IC = device_creator<deco16ic_device>;
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO16IC, "DECO 55 / 56 / 74 / 141 IC", tag, owner, clock, "deco16ic", __FILE__),

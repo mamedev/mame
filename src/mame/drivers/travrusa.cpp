@@ -51,9 +51,11 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/irem.h"
 #include "includes/travrusa.h"
+#include "audio/irem.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )

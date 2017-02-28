@@ -14,6 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/mos6560.h"
+#include "speaker.h"
 
 
 //**************************************************************************

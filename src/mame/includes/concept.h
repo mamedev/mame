@@ -10,14 +10,14 @@
  *
  ****************************************************************************/
 
-#ifndef CONCEPT_H_
-#define CONCEPT_H_
+#ifndef MAME_INCLUDES_CONCEPT_H
+#define MAME_INCLUDES_CONCEPT_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "machine/mm58274c.h"   /* mm58274 seems to be compatible with mm58174 */
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "bus/a2bus/a2bus.h"
 
 #define ACIA_0_TAG  "acia0"
@@ -68,4 +68,4 @@ public:
 	void concept_set_interrupt(int level, int state);
 };
 
-#endif /* CONCEPT_H_ */
+#endif // MAME_INCLUDES_CONCEPT_H

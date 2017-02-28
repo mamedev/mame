@@ -17,7 +17,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_SMARTWATCH = &device_creator<cpc_smartwatch_device>;
+const device_type CPC_SMARTWATCH = device_creator<cpc_smartwatch_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_smartwatch )

@@ -6,20 +6,22 @@
  *
  ****************************************************************************/
 
-#ifndef GENPC_H_
-#define GENPC_H_
+#ifndef MAME_DEVICES_MACHINE_GENPC_H
+#define MAME_DEVICES_MACHINE_GENPC_H
 
-#include "machine/ins8250.h"
-#include "machine/i8255.h"
+#include "imagedev/cassette.h"
 #include "machine/am9517a.h"
+#include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
+
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
@@ -192,4 +194,4 @@ public:
 
 extern const device_type PCNOPPI_MOTHERBOARD;
 
-#endif /* GENPC_H_ */
+#endif // MAME_DEVICES_MACHINE_GENPC_H

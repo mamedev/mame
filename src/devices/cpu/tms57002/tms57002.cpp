@@ -13,7 +13,7 @@
 #include "debugger.h"
 #include "tms57002.h"
 
-const device_type TMS57002 = &device_creator<tms57002_device>;
+const device_type TMS57002 = device_creator<tms57002_device>;
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)

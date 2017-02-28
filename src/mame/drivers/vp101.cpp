@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "machine/ataintf.h"
+#include "screen.h"
 
 
 class vp10x_state : public driver_device

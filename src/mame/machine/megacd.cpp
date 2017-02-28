@@ -6,9 +6,9 @@
 #include "megacd.lh"
 
 
-const device_type SEGA_SEGACD_US = &device_creator<sega_segacd_us_device>;
-const device_type SEGA_SEGACD_JAPAN = &device_creator<sega_segacd_japan_device>;
-const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device>;
+const device_type SEGA_SEGACD_US = device_creator<sega_segacd_us_device>;
+const device_type SEGA_SEGACD_JAPAN = device_creator<sega_segacd_japan_device>;
+const device_type SEGA_SEGACD_EUROPE = device_creator<sega_segacd_europe_device>;
 
 
 /* Callback when the genesis enters interrupt code */

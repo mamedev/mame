@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall, David Haywood
 
-#pragma once
+#ifndef MAME_VIDEO_STFIGHT_VIDEO_H
+#define MAME_VIDEO_STFIGHT_VIDEO_H
 
-#ifndef __STFIGHT_VIDEO__
-#define __STFIGHT_VIDEO__
+#pragma once
 
 
 
@@ -73,4 +73,4 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif
+#endif // MAME_VIDEO_STFIGHT_VIDEO_H

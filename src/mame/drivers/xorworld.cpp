@@ -30,10 +30,14 @@ EEPROM chip: 93C46
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/saa1099.h"
 #include "includes/xorworld.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
+#include "sound/saa1099.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /****************************************************************

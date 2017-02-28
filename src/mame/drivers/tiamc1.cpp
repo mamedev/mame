@@ -117,15 +117,20 @@
 
 */
 
+#include "emu.h"
+#include "includes/tiamc1.h"
+
+#include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MASTER_CLOCK    (15750000)
 #define CPU_CLOCK       (MASTER_CLOCK / 9)
 #define SND_CLOCK       (MASTER_CLOCK / 9)
 #define PIXEL_CLOCK     (MASTER_CLOCK / 3)
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "includes/tiamc1.h"
 
 void tiamc1_state::machine_reset()
 {

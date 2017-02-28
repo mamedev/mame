@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "includes/finalizr.h"
 #include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
@@ -23,6 +24,9 @@
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)

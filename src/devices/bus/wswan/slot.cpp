@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type WS_CART_SLOT = &device_creator<ws_cart_slot_device>;
+const device_type WS_CART_SLOT = device_creator<ws_cart_slot_device>;
 
 //**************************************************************************
 //    Wonderswan Cartridges Interface
@@ -165,18 +165,18 @@ image_init_result ws_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint8_t *ROM;
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint32_t nvram_size = 0;
 
 		m_cart->rom_alloc(size, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			int chunks = size / 0x10000;
 			// get cart type and nvram length

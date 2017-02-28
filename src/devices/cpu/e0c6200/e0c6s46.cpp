@@ -28,7 +28,7 @@ enum
 	IRQREG_INPUT1
 };
 
-const device_type E0C6S46 = &device_creator<e0c6s46_device>;
+const device_type E0C6S46 = device_creator<e0c6s46_device>;
 
 
 // internal memory maps

@@ -8,9 +8,12 @@
 
 #include "emu.h"
 #include "includes/svision.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "svision.lh"
+
 
 #define MAKE8_RGB32(red3, green3, blue2) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue2)<<(0+6)) )
 #define MAKE9_RGB32(red3, green3, blue3) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue3)<<(0+5)) )

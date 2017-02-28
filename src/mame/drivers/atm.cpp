@@ -15,13 +15,9 @@ computer to boot up (with keyboard problems).
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/specpls3.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
+
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
 #include "machine/beta.h"
-#include "machine/ram.h"
-#include "machine/spec_snqk.h"
 
 
 class atm_state : public spectrum_state

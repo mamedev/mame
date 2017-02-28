@@ -28,8 +28,10 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/pc_vga.h"
 #include "machine/mcf5206e.h"
+#include "video/pc_vga.h"
+#include "speaker.h"
+
 
 class gaminator_state : public driver_device
 {

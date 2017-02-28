@@ -54,11 +54,11 @@ enum
 //**************************************************************************
 
 // device type definitions
-const device_type MSM6242 = &device_creator<msm6242_device>;
-const device_type RTC62421 = &device_creator<rtc62421_device>;
-const device_type RTC62423 = &device_creator<rtc62423_device>;
-const device_type RTC72421 = &device_creator<rtc72421_device>;
-const device_type RTC72423 = &device_creator<rtc72423_device>;
+const device_type MSM6242 = device_creator<msm6242_device>;
+const device_type RTC62421 = device_creator<rtc62421_device>;
+const device_type RTC62423 = device_creator<rtc62423_device>;
+const device_type RTC72421 = device_creator<rtc72421_device>;
+const device_type RTC72423 = device_creator<rtc72423_device>;
 
 
 //**************************************************************************

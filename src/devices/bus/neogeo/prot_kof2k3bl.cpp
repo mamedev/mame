@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "prot_kof2k3bl.h"
 
-extern const device_type KOF2K3BL_PROT = &device_creator<kof2k3bl_prot_device>;
+const device_type KOF2K3BL_PROT = device_creator<kof2k3bl_prot_device>;
 
 
 kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

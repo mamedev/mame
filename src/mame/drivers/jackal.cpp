@@ -70,11 +70,14 @@ Address          Dir Data     Description
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jackal.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/jackal.h"
-#include "includes/konamipt.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

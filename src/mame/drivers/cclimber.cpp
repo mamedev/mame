@@ -238,12 +238,15 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cclimber.h"
+#include "audio/cclimber.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "audio/cclimber.h"
-#include "includes/cclimber.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK            XTAL_18_432MHz

@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_IBM_PC_XT_83 = &device_creator<ibm_pc_xt_83_keyboard_device>;
+const device_type PC_KBD_IBM_PC_XT_83 = device_creator<ibm_pc_xt_83_keyboard_device>;
 
 
 //-------------------------------------------------

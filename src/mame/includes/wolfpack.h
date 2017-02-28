@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sound/s14001a.h"
+#include "screen.h"
 
 class wolfpack_state : public driver_device
 {

@@ -16,7 +16,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIIN = &device_creator<midiin_device>;
+const device_type MIDIIN = device_creator<midiin_device>;
 
 /*-------------------------------------------------
     ctor

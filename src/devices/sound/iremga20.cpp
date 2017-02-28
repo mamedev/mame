@@ -35,7 +35,7 @@ Revisions:
 
 
 // device type definition
-const device_type IREMGA20 = &device_creator<iremga20_device>;
+const device_type IREMGA20 = device_creator<iremga20_device>;
 
 
 //**************************************************************************

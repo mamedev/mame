@@ -31,6 +31,7 @@ https://www.youtube.com/watch?v=9DIhuOEVwf4
 
 #include "emu.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 class aftrshok_state : public driver_device

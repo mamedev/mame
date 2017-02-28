@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC1502_ROM = &device_creator<mc1502_rom_device>;
+const device_type MC1502_ROM = device_creator<mc1502_rom_device>;
 
 
 //-------------------------------------------------

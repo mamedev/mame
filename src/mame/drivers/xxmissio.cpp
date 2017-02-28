@@ -11,9 +11,12 @@ XX Mission (c) 1986 UPL
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/xxmissio.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/xxmissio.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(xxmissio_state::bank_sel_w)

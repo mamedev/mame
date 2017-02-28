@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "emu.h"
 #include "includes/playmark.h"
+#include "screen.h"
 
 
 /***************************************************************************

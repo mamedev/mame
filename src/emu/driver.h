@@ -226,13 +226,16 @@ private:
 
 
 // this template function creates a stub which constructs a device
-template<class _DriverClass>
-device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+template<class DriverClass>
+std::unique_ptr<device_t> driver_device_creator_impl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 {
 	assert(owner == nullptr);
 	assert(clock == 0);
-	return global_alloc_clear<_DriverClass>(mconfig, &driver_device_creator<_DriverClass>, tag);
+	return make_unique_clear<DriverClass>(mconfig, &driver_device_creator_impl<DriverClass>, tag);
 }
+
+template <class DriverClass>
+constexpr device_type driver_device_creator = &driver_device_creator_impl<DriverClass>;
 
 
 #endif  /* MAME_EMU_DRIVER_H */

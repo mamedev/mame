@@ -9,17 +9,23 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "debugcpu.h"
-#include "debugcon.h"
+
 #include "express.h"
+#include "debugcon.h"
 #include "debugvw.h"
+
 #include "debugger.h"
+#include "emuopts.h"
+#include "screen.h"
 #include "uiinput.h"
-#include "xmlfile.h"
+
 #include "coreutil.h"
+#include "osdepend.h"
+#include "xmlfile.h"
+
 #include <ctype.h>
+
 
 enum
 {

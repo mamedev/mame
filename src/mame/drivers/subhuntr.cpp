@@ -21,6 +21,8 @@ QTY     Type    position
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class subhuntr_state : public driver_device

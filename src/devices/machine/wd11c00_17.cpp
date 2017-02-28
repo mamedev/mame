@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WD11C00_17 = &device_creator<wd11c00_17_device>;
+const device_type WD11C00_17 = device_creator<wd11c00_17_device>;
 
 
 //**************************************************************************

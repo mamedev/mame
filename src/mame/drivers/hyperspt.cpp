@@ -9,10 +9,11 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/konamipt.h"
 #include "includes/hyperspt.h"
-#include "audio/trackfld.h"
+#include "includes/konamipt.h"
 #include "audio/hyprolyb.h"
+#include "audio/trackfld.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
@@ -22,6 +23,9 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 void hyperspt_state::machine_start()

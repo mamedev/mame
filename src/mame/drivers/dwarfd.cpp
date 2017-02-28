@@ -301,6 +301,8 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "video/i8275.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dwarfd_state : public driver_device
 {
@@ -312,7 +314,7 @@ public:
 		m_crtc(*this, "i8275"),
 		m_charmap(*this, "gfx1"),
 		m_dsw2(*this, "DSW2")
-		{ }
+	{ }
 
 	/* video-related */
 	int m_crt_access;

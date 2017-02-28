@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_FCKEYBOARD = &device_creator<nes_fckeybrd_device>;
+const device_type NES_FCKEYBOARD = device_creator<nes_fckeybrd_device>;
 
 
 static INPUT_PORTS_START( fc_keyboard )

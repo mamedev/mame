@@ -105,7 +105,7 @@ void midway_serial_pic_device::serial_register_state()
 	save_item(NAME(m_ormask));
 }
 
-const device_type MIDWAY_SERIAL_PIC = &device_creator<midway_serial_pic_device>;
+const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
 
 
 //-------------------------------------------------
@@ -200,7 +200,7 @@ WRITE8_MEMBER(midway_serial_pic_device::write)
  *************************************/
 
 
-const device_type MIDWAY_SERIAL_PIC_EMU = &device_creator<midway_serial_pic_emu_device>;
+const device_type MIDWAY_SERIAL_PIC_EMU = device_creator<midway_serial_pic_emu_device>;
 
 
 //-------------------------------------------------
@@ -285,7 +285,7 @@ static inline uint8_t make_bcd(uint8_t data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-const device_type MIDWAY_SERIAL_PIC2 = &device_creator<midway_serial_pic2_device>;
+const device_type MIDWAY_SERIAL_PIC2 = device_creator<midway_serial_pic2_device>;
 
 
 //-------------------------------------------------
@@ -662,7 +662,7 @@ void midway_ioasic_device::ioasic_register_state()
 	save_item(NAME(m_fifo_force_buffer_empty_pc));
 }
 
-const device_type MIDWAY_IOASIC = &device_creator<midway_ioasic_device>;
+const device_type MIDWAY_IOASIC = device_creator<midway_ioasic_device>;
 
 
 //-------------------------------------------------

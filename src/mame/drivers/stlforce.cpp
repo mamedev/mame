@@ -70,10 +70,13 @@ TO DO :
 */
 
 #include "emu.h"
+#include "includes/stlforce.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/stlforce.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(stlforce_state::eeprom_w)

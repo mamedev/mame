@@ -28,8 +28,8 @@ extern int z8k_segm_mode;
 
 #include "z8000cpu.h"
 
-const device_type Z8001 = &device_creator<z8001_device>;
-const device_type Z8002 = &device_creator<z8002_device>;
+const device_type Z8001 = device_creator<z8001_device>;
+const device_type Z8002 = device_creator<z8002_device>;
 
 
 z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "rendlay.h"
 #include "includes/comx35.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 WRITE8_MEMBER( comx35_state::cdp1869_w )
 {

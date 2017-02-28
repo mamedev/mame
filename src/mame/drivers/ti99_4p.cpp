@@ -116,14 +116,14 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900.h"
-#include "sound/wave.h"
-
-#include "machine/tms9901.h"
-#include "imagedev/cassette.h"
-#include "bus/ti99x/joyport.h"
 #include "bus/ti99_peb/peribox.h"
+#include "bus/ti99x/joyport.h"
+#include "cpu/tms9900/tms9900.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/tms9901.h"
+#include "sound/wave.h"
+#include "speaker.h"
 
 #define TMS9901_TAG "tms9901"
 #define SGCPU_TAG "sgcpu"

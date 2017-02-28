@@ -89,23 +89,27 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/midi/midi.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/es5510/es5510.h"
-#include "sound/es5506.h"
-#include "machine/mc68681.h"
 #include "machine/esqpanel.h"
+
+#include "bus/midi/midi.h"
+#include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/mc68681.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
+
 
 class esqkt_state : public driver_device
 {
 public:
 	esqkt_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_esp(*this, "esp"),
-		m_duart(*this, "duart"),
-		m_sq1panel(*this, "sq1panel"),
-		m_mdout(*this, "mdout")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_esp(*this, "esp")
+		, m_duart(*this, "duart")
+		, m_sq1panel(*this, "sq1panel")
+		, m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68ec020_device> m_maincpu;

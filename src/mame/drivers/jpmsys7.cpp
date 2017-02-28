@@ -19,18 +19,18 @@ Pluto 8: ColdFire 5475
 */
 
 
-
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mcf5206e.h"
+#include "speaker.h"
+
 
 class jpmsys7_state : public driver_device
 {
 public:
 	jpmsys7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 protected:

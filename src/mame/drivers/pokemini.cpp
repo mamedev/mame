@@ -10,13 +10,15 @@ The LCD is likely to be a SSD1828 LCD.
 ********************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
-#include "machine/i2cmem.h"
 #include "cpu/minx/minx.h"
+#include "machine/i2cmem.h"
+#include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 struct PRC
 {

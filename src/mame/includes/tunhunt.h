@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, David Haywood
+#include "screen.h"
+
 class tunhunt_state : public driver_device
 {
 public:

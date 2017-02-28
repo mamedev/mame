@@ -255,35 +255,35 @@ static void decode(uint8_t *data, uint8_t *opcodes, int size, const uint8_t conv
 
 
 
-const device_type SEGACRPT_Z80 = &device_creator<segacrpt_z80_device>;
+const device_type SEGACRPT_Z80 = device_creator<segacrpt_z80_device>;
 
-const device_type SEGA_315_5132 = &device_creator<sega_315_5132_device>;
-const device_type SEGA_315_5155 = &device_creator<sega_315_5155_device>;
-const device_type SEGA_315_5110 = &device_creator<sega_315_5110_device>;
-const device_type SEGA_315_5135 = &device_creator<sega_315_5135_device>;
-const device_type SEGA_315_5051 = &device_creator<sega_315_5051_device>;
-const device_type SEGA_315_5098 = &device_creator<sega_315_5098_device>; // also 315-5030 ?
-const device_type SEGA_315_5102 = &device_creator<sega_315_5102_device>;
-const device_type SEGA_315_5065 = &device_creator<sega_315_5065_device>;
-const device_type SEGA_315_5064 = &device_creator<sega_315_5064_device>;
-const device_type SEGA_315_5033 = &device_creator<sega_315_5033_device>;
-const device_type SEGA_315_5041 = &device_creator<sega_315_5041_device>;
-const device_type SEGA_315_5048 = &device_creator<sega_315_5048_device>;
-const device_type SEGA_315_5093 = &device_creator<sega_315_5093_device>;
-const device_type SEGA_315_5099 = &device_creator<sega_315_5099_device>;
-const device_type SEGA_315_5015 = &device_creator<sega_315_5015_device>;
-const device_type SEGA_315_5133 = &device_creator<sega_315_5133_device>; // NOT DECRYPTED YET
-const device_type SEGA_315_5061 = &device_creator<sega_315_5061_device>;
-const device_type SEGA_315_5028 = &device_creator<sega_315_5028_device>;
-const device_type SEGA_315_5084 = &device_creator<sega_315_5084_device>;
-const device_type SEGA_315_5013 = &device_creator<sega_315_5013_device>;
-const device_type SEGA_315_5014 = &device_creator<sega_315_5014_device>;
-const device_type SEGA_315_5018 = &device_creator<sega_315_5018_device>;
-const device_type SEGA_315_5010 = &device_creator<sega_315_5010_device>;
+const device_type SEGA_315_5132 = device_creator<sega_315_5132_device>;
+const device_type SEGA_315_5155 = device_creator<sega_315_5155_device>;
+const device_type SEGA_315_5110 = device_creator<sega_315_5110_device>;
+const device_type SEGA_315_5135 = device_creator<sega_315_5135_device>;
+const device_type SEGA_315_5051 = device_creator<sega_315_5051_device>;
+const device_type SEGA_315_5098 = device_creator<sega_315_5098_device>; // also 315-5030 ?
+const device_type SEGA_315_5102 = device_creator<sega_315_5102_device>;
+const device_type SEGA_315_5065 = device_creator<sega_315_5065_device>;
+const device_type SEGA_315_5064 = device_creator<sega_315_5064_device>;
+const device_type SEGA_315_5033 = device_creator<sega_315_5033_device>;
+const device_type SEGA_315_5041 = device_creator<sega_315_5041_device>;
+const device_type SEGA_315_5048 = device_creator<sega_315_5048_device>;
+const device_type SEGA_315_5093 = device_creator<sega_315_5093_device>;
+const device_type SEGA_315_5099 = device_creator<sega_315_5099_device>;
+const device_type SEGA_315_5015 = device_creator<sega_315_5015_device>;
+const device_type SEGA_315_5133 = device_creator<sega_315_5133_device>; // NOT DECRYPTED YET
+const device_type SEGA_315_5061 = device_creator<sega_315_5061_device>;
+const device_type SEGA_315_5028 = device_creator<sega_315_5028_device>;
+const device_type SEGA_315_5084 = device_creator<sega_315_5084_device>;
+const device_type SEGA_315_5013 = device_creator<sega_315_5013_device>;
+const device_type SEGA_315_5014 = device_creator<sega_315_5014_device>;
+const device_type SEGA_315_5018 = device_creator<sega_315_5018_device>;
+const device_type SEGA_315_5010 = device_creator<sega_315_5010_device>;
 
 // below are unknown part numbers
-const device_type SEGA_315_SPAT = &device_creator<sega_315_spat_device>; // unknown part number
-const device_type SEGA_CPU_PBACTIO4 =  &device_creator<sega_cpu_pbactio4_device>;
+const device_type SEGA_315_SPAT = device_creator<sega_315_spat_device>; // unknown part number
+const device_type SEGA_CPU_PBACTIO4 =  device_creator<sega_cpu_pbactio4_device>;
 
 
 

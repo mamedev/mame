@@ -12,7 +12,7 @@
 #include "snapquik.h"
 
 // device type definition
-const device_type SNAPSHOT = &device_creator<snapshot_image_device>;
+const device_type SNAPSHOT = device_creator<snapshot_image_device>;
 
 //-------------------------------------------------
 //  snapshot_image_device - constructor
@@ -90,7 +90,7 @@ image_init_result snapshot_image_device::call_load()
 }
 
 // device type definition
-const device_type QUICKLOAD = &device_creator<quickload_image_device>;
+const device_type QUICKLOAD = device_creator<quickload_image_device>;
 
 //-------------------------------------------------
 //  quickload_image_device - constructor

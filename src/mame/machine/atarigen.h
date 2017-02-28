@@ -8,13 +8,14 @@
 
 ***************************************************************************/
 
-#ifndef __MACHINE_ATARIGEN__
-#define __MACHINE_ATARIGEN__
+#ifndef MAME_MACHINE_ATARIGEN_H
+#define MAME_MACHINE_ATARIGEN_H
 
+#include "includes/slapstic.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
 #include "video/atarimo.h"
-#include "cpu/m6502/m6502.h"
-#include "includes/slapstic.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -458,4 +459,4 @@ public:
 ***************************************************************************/
 
 
-#endif
+#endif // MAME_MACHINE_ATARIGEN_H

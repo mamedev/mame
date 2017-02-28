@@ -7,16 +7,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/speaker.h"
-#include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
-#include "machine/z80dart.h"
+#include "machine/input_merger.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/input_merger.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK  23961600
 

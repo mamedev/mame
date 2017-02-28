@@ -69,7 +69,7 @@ READ8_MEMBER(kstudio_cart_interface::read)
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_KSEXPANSION_SLOT = &device_creator<nes_kstudio_slot_device>;
+const device_type NES_KSEXPANSION_SLOT = device_creator<nes_kstudio_slot_device>;
 
 nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 							device_t(mconfig, NES_KSEXPANSION_SLOT, "NES Karaoke Studio Expansion Slot", tag, owner, clock, "nes_ks_slot", __FILE__),
@@ -105,8 +105,8 @@ image_init_result nes_kstudio_slot_device::call_load()
 		if (!ROM)
 			return image_init_result::FAIL;
 
-		// Existing exapnsion carts are all 128K, so we only load files of this size
-		if (software_entry() == nullptr)
+		// Existing expansion carts are all 128K, so we only load files of this size
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20000)
 				return image_init_result::FAIL;
@@ -142,7 +142,7 @@ ROM_START( ks_exp_rom )
 	ROM_REGION(0x20000, "exrom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_KSEXPANSION_ROM = &device_creator<nes_kstudio_rom_device>;
+const device_type NES_KSEXPANSION_ROM = device_creator<nes_kstudio_rom_device>;
 
 nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 							: device_t(mconfig, NES_KSEXPANSION_ROM, "NES Karaoke Studio Expansion ROM", tag, owner, clock, "nes_ks_rom", __FILE__),
@@ -178,7 +178,7 @@ uint8_t *nes_kstudio_rom_device::get_cart_base()
 //
 //------------------------------------------
 
-const device_type NES_KARAOKESTUDIO = &device_creator<nes_karaokestudio_device>;
+const device_type NES_KARAOKESTUDIO = device_creator<nes_karaokestudio_device>;
 
 
 nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

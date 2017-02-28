@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
+const device_type NEOGEO_CART_SLOT = device_creator<neogeo_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -239,7 +239,7 @@ image_init_result neogeo_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			uint16_t *ROM16;
 			uint8_t *ROM8;

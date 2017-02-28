@@ -136,7 +136,7 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type DSP32C = &device_creator<dsp32c_device>;
+const device_type DSP32C = device_creator<dsp32c_device>;
 
 //-------------------------------------------------
 //  dsp32c_device - constructor

@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/gradient_paint.hpp>
 
 int test_radialGradient()

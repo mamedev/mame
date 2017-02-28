@@ -81,6 +81,9 @@ ________________________|___________________________
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_16MHz
 #define VIDEO_CLOCK     XTAL_6MHz

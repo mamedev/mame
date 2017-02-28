@@ -28,7 +28,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-const device_type MC68328 = &device_creator<mc68328_device>;
+const device_type MC68328 = device_creator<mc68328_device>;
 
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

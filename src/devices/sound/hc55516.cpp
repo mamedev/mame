@@ -23,7 +23,7 @@
 
 
 
-const device_type HC55516 = &device_creator<hc55516_device>;
+const device_type HC55516 = device_creator<hc55516_device>;
 
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HC55516, "HC-55516", tag, owner, clock, "hc55516", __FILE__),
@@ -84,7 +84,7 @@ void hc55516_device::device_reset()
 	m_last_clock_state = 0;
 }
 
-const device_type MC3417 = &device_creator<mc3417_device>;
+const device_type MC3417 = device_creator<mc3417_device>;
 
 mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hc55516_device(mconfig, MC3417, "MC3417", tag, owner, clock, "mc3417", __FILE__)
@@ -101,7 +101,7 @@ void mc3417_device::device_start()
 }
 
 
-const device_type MC3418 = &device_creator<mc3418_device>;
+const device_type MC3418 = device_creator<mc3418_device>;
 
 mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hc55516_device(mconfig, MC3418, "MC3418", tag, owner, clock, "mc3418", __FILE__)

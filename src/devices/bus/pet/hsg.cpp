@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "hsg.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -36,8 +38,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM8000_HSG_A = &device_creator<cbm8000_hsg_a_t>;
-const device_type CBM8000_HSG_B = &device_creator<cbm8000_hsg_b_t>;
+const device_type CBM8000_HSG_A = device_creator<cbm8000_hsg_a_t>;
+const device_type CBM8000_HSG_B = device_creator<cbm8000_hsg_b_t>;
 
 
 //-------------------------------------------------

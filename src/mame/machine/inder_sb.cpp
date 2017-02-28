@@ -5,10 +5,12 @@
 
 #include "emu.h"
 #include "machine/inder_sb.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
-extern const device_type INDER_AUDIO = &device_creator<inder_sb_device>;
+const device_type INDER_AUDIO = device_creator<inder_sb_device>;
 
 
 inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

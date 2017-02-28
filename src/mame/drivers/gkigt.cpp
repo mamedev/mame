@@ -85,8 +85,11 @@ More chips (from eBay auction):
 
 #include "emu.h"
 #include "cpu/i960/i960.h"
-#include "sound/ymz280b.h"
 #include "machine/nvram.h"
+#include "sound/ymz280b.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class igt_gameking_state : public driver_device
 {

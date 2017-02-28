@@ -4,7 +4,7 @@
 #include "arc.h"
 
 
-const device_type MSX_CART_ARC = &device_creator<msx_cart_arc>;
+const device_type MSX_CART_ARC = device_creator<msx_cart_arc>;
 
 
 msx_cart_arc::msx_cart_arc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

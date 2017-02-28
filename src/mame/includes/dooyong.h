@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria,Vas Crabb
 #include "video/bufsprite.h"
+#include "screen.h"
 
 #define MCFG_DOOYONG_ROM_TILEMAP_ADD(tag, gfx, num, rom, offset) \
 		MCFG_DEVICE_ADD(tag, DOOYONG_ROM_TILEMAP, 0) \

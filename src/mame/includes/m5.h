@@ -1,11 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Ales Dlabac
-#ifndef __M5__
-#define __M5__
+#ifndef MAME_INCLUDES_M5_H
+#define MAME_INCLUDES_M5_H
 
-
-#include "machine/z80ctc.h"
+#include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+
+#include "machine/i8255.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/wd_fdc.h" //brno mod
+#include "machine/z80ctc.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/m5/slot.h"
 
 
 #define Z80_TAG         "ic17"
@@ -27,20 +35,20 @@ class m5_state : public driver_device
 {
 public:
 	m5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_fd5cpu(*this, Z80_FD5_TAG),
-			m_ppi(*this, I8255A_TAG),
-			m_fdc(*this, UPD765_TAG),
-			m_floppy0(*this, UPD765_TAG ":0:525dd"),
-			m_cassette(*this, "cassette"),
-			m_cart1(*this, "cartslot1"),
-			m_cart2(*this, "cartslot2"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_ram(*this, RAM_TAG),
-			m_reset(*this, "RESET"),
-			m_DIPS(*this, "DIPS")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_ctc(*this, Z80CTC_TAG)
+		, m_fd5cpu(*this, Z80_FD5_TAG)
+		, m_ppi(*this, I8255A_TAG)
+		, m_fdc(*this, UPD765_TAG)
+		, m_floppy0(*this, UPD765_TAG ":0:525dd")
+		, m_cassette(*this, "cassette")
+		, m_cart1(*this, "cartslot1")
+		, m_cart2(*this, "cartslot2")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_reset(*this, "RESET")
+		, m_DIPS(*this, "DIPS")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -162,4 +170,4 @@ public:
 	uint8_t m_rammap[16]; // memory map
 };
 
-#endif
+#endif // MAME_INCLUDES_M5_H

@@ -43,7 +43,7 @@ control registers
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K051316 = &device_creator<k051316_device>;
+const device_type K051316 = device_creator<k051316_device>;
 
 
 const gfx_layout k051316_device::charlayout4 =

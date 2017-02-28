@@ -127,8 +127,8 @@ static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
 
 	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
@@ -428,7 +428,7 @@ namespace
 	};
 
 }
-const device_type COCO_FDC = &device_creator<coco_fdc_device>;
+const device_type COCO_FDC = device_creator<coco_fdc_device>;
 
 
 //**************************************************************************
@@ -463,7 +463,7 @@ namespace
 	};
 };
 
-const device_type COCO_FDC_V11 = &device_creator<coco_fdc_v11_device>;
+const device_type COCO_FDC_V11 = device_creator<coco_fdc_v11_device>;
 
 
 //**************************************************************************
@@ -498,7 +498,7 @@ namespace
 	};
 };
 
-const device_type COCO3_HDB1 = &device_creator<coco3_hdb1_device>;
+const device_type COCO3_HDB1 = device_creator<coco3_hdb1_device>;
 
 //**************************************************************************
 //              CP400 FDC
@@ -529,4 +529,4 @@ namespace
 	};
 };
 
-const device_type CP400_FDC = &device_creator<cp400_fdc_device>;
+const device_type CP400_FDC = device_creator<cp400_fdc_device>;

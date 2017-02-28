@@ -9,14 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hcastle.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/k051649.h"
-#include "includes/konamipt.h"
-#include "includes/hcastle.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(hcastle_state::hcastle_bankswitch_w)

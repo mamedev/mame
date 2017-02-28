@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "decocpu6.h"
 
+const device_type DECO_CPU6 = device_creator<deco_cpu6_device>;
+
+
 deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO_CPU6, "DECO CPU-6", tag, owner, clock, "decocpu6", __FILE__)
 {

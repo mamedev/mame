@@ -87,7 +87,7 @@ namespace netlist
 
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		m_Q.push(!m_feedback.Q(), m_inc);
+		m_Q.push(!m_feedback(), m_inc);
 
 		/* shift register
 		 *

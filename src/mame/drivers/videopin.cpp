@@ -18,11 +18,14 @@ solarwar
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/videopin.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
-#include "includes/videopin.h"
-#include "videopin.lh"
 #include "sound/discrete.h"
+#include "speaker.h"
+
+#include "videopin.lh"
 
 
 void videopin_state::update_plunger()

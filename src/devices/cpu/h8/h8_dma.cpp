@@ -1,8 +1,8 @@
 #include "emu.h"
 #include "h8_dma.h"
 
-const device_type H8_DMA         = &device_creator<h8_dma_device>;
-const device_type H8_DMA_CHANNEL = &device_creator<h8_dma_channel_device>;
+const device_type H8_DMA         = device_creator<h8_dma_device>;
+const device_type H8_DMA_CHANNEL = device_creator<h8_dma_channel_device>;
 
 h8_dma_device::h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA, "H8 DMA controller", tag, owner, clock, "h8_dma", __FILE__),

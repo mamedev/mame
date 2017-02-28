@@ -16,19 +16,21 @@
 
 #include "emu.h"
 #include "includes/x1.h"
-
 #include "includes/pce.h"
-//#include "cpu/h6280/h6280.h"
-//#include "sound/c6280.h"
-#include "softlist.h"
+
 #include "rendlay.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 class x1twin_state : public x1_state
 {
-	public:
-		x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
+public:
+	x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x1_state(mconfig, type, tag)
 	{ }
+
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);

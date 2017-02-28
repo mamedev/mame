@@ -186,6 +186,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mhavoc.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
@@ -194,7 +196,9 @@
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/mhavoc.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Quad pokey hookup (based on schematics):
 Address: 543210

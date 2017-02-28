@@ -21,9 +21,9 @@
 
 
 #include "emu.h"
-#include "machine/watchdog.h"
-#include "video/atarirle.h"
 #include "includes/atarig1.h"
+#include "machine/watchdog.h"
+#include "speaker.h"
 
 
 

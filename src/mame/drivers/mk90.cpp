@@ -18,6 +18,7 @@ months for an average citizen.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "screen.h"
 
 
 class mk90_state : public driver_device

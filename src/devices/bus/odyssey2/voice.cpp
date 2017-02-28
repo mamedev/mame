@@ -14,13 +14,14 @@
 
 #include "emu.h"
 #include "voice.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  o2_voice_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_VOICE = &device_creator<o2_voice_device>;
+const device_type O2_ROM_VOICE = device_creator<o2_voice_device>;
 
 
 o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -43,7 +43,9 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class unior_state : public driver_device

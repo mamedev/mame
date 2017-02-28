@@ -7,7 +7,7 @@
 // 2 = everything
 const int V = 0;
 
-const device_type H8_DTC         = &device_creator<h8_dtc_device>;
+const device_type H8_DTC         = device_creator<h8_dtc_device>;
 
 const int h8_dtc_device::vector_to_enable[92] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7

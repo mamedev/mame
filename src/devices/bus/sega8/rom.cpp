@@ -19,28 +19,28 @@
 
 // Base cart type shared across SG-1000, SG-1000 Mark II, SG-1000 Mark III, SMS, GG
 // even if in sg1000 rom banks are never changed and ram is never enabled
-const device_type SEGA8_ROM_STD = &device_creator<sega8_rom_device>;
+const device_type SEGA8_ROM_STD = device_creator<sega8_rom_device>;
 
 // Specific SG-1000 MkI - MkII cart types
-const device_type SEGA8_ROM_OTHELLO = &device_creator<sega8_othello_device>;
-const device_type SEGA8_ROM_CASTLE = &device_creator<sega8_castle_device>;
-const device_type SEGA8_ROM_BASIC_L3 = &device_creator<sega8_basic_l3_device>;
-const device_type SEGA8_ROM_MUSIC_EDITOR = &device_creator<sega8_music_editor_device>;
-const device_type SEGA8_ROM_TEREBI = &device_creator<sega8_terebi_device>;
-const device_type SEGA8_ROM_DAHJEE_TYPEA = &device_creator<sega8_dahjee_typea_device>;
-const device_type SEGA8_ROM_DAHJEE_TYPEB = &device_creator<sega8_dahjee_typeb_device>;
+const device_type SEGA8_ROM_OTHELLO = device_creator<sega8_othello_device>;
+const device_type SEGA8_ROM_CASTLE = device_creator<sega8_castle_device>;
+const device_type SEGA8_ROM_BASIC_L3 = device_creator<sega8_basic_l3_device>;
+const device_type SEGA8_ROM_MUSIC_EDITOR = device_creator<sega8_music_editor_device>;
+const device_type SEGA8_ROM_TEREBI = device_creator<sega8_terebi_device>;
+const device_type SEGA8_ROM_DAHJEE_TYPEA = device_creator<sega8_dahjee_typea_device>;
+const device_type SEGA8_ROM_DAHJEE_TYPEB = device_creator<sega8_dahjee_typeb_device>;
 
 // Specific SG-1000 MkIII - SMS - GG cart types
-const device_type SEGA8_ROM_EEPROM = &device_creator<sega8_eeprom_device>;
-const device_type SEGA8_ROM_CODEMASTERS = &device_creator<sega8_codemasters_device>;
-const device_type SEGA8_ROM_4PAK = &device_creator<sega8_4pak_device>;
-const device_type SEGA8_ROM_ZEMINA = &device_creator<sega8_zemina_device>;
-const device_type SEGA8_ROM_NEMESIS = &device_creator<sega8_nemesis_device>;
-const device_type SEGA8_ROM_JANGGUN = &device_creator<sega8_janggun_device>;
-const device_type SEGA8_ROM_HICOM = &device_creator<sega8_hicom_device>;
-const device_type SEGA8_ROM_KOREAN = &device_creator<sega8_korean_device>;
-const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
-const device_type SEGA8_ROM_SEOJIN = &device_creator<sega8_seojin_device>;
+const device_type SEGA8_ROM_EEPROM = device_creator<sega8_eeprom_device>;
+const device_type SEGA8_ROM_CODEMASTERS = device_creator<sega8_codemasters_device>;
+const device_type SEGA8_ROM_4PAK = device_creator<sega8_4pak_device>;
+const device_type SEGA8_ROM_ZEMINA = device_creator<sega8_zemina_device>;
+const device_type SEGA8_ROM_NEMESIS = device_creator<sega8_nemesis_device>;
+const device_type SEGA8_ROM_JANGGUN = device_creator<sega8_janggun_device>;
+const device_type SEGA8_ROM_HICOM = device_creator<sega8_hicom_device>;
+const device_type SEGA8_ROM_KOREAN = device_creator<sega8_korean_device>;
+const device_type SEGA8_ROM_KOREAN_NB = device_creator<sega8_korean_nb_device>;
+const device_type SEGA8_ROM_SEOJIN = device_creator<sega8_seojin_device>;
 
 
 

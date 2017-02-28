@@ -64,15 +64,17 @@ C004      76489 #4 trigger
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/tp84.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/sn76496.h"
 #include "sound/flt_rc.h"
-#include "includes/konamipt.h"
-#include "includes/tp84.h"
+#include "sound/sn76496.h"
 
+#include "speaker.h"
 
 
 void tp84_state::machine_start()

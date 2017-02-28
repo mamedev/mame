@@ -90,7 +90,7 @@
 #include "machine/upd71071.h"
 
 
-const device_type UPD71071 = &device_creator<upd71071_device>;
+const device_type UPD71071 = device_creator<upd71071_device>;
 
 upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock, "upd71071", __FILE__),

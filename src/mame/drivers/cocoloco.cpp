@@ -188,16 +188,20 @@
 
 **************************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/m6502/m6502.h"
+#include "machine/netlist.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "netlist/devices/net_lib.h"
+
 
 #define MASTER_CLOCK    XTAL_20MHz           /* confirmed */
 #define CPU_CLOCK       MASTER_CLOCK / 16    /* confirmed */
 #define SND_CLOCK       MASTER_CLOCK / 8     /* confirmed */
-
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
 
 
 class cocoloco_state : public driver_device

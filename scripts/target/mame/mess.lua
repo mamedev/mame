@@ -471,6 +471,7 @@ MACHINES["MIOT6530"] = true
 MACHINES["MM58167"] = true
 MACHINES["MM58274C"] = true
 MACHINES["MM74C922"] = true
+MACHINES["MM5740"] = true
 MACHINES["MOS6526"] = true
 MACHINES["MOS6529"] = true
 MACHINES["MOS6551"] = true
@@ -2199,7 +2200,6 @@ files {
 createMESSProjects(_target, _subtarget, "mb")
 files {
 	MAME_DIR .. "src/mame/drivers/microvsn.cpp",
-	MAME_DIR .. "src/mame/drivers/phantom.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mchester")

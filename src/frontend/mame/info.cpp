@@ -9,16 +9,23 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "info.h"
 #include "mameopts.h"
+
 #include "machine/ram.h"
 #include "sound/samples.h"
-#include "info.h"
-#include "xmlfile.h"
+
 #include "config.h"
 #include "drivenum.h"
+#include "screen.h"
 #include "softlist_dev.h"
+#include "speaker.h"
+
+#include "xmlfile.h"
 
 #include <ctype.h>
+
 
 #define XML_ROOT                "mame"
 #define XML_TOP                 "machine"

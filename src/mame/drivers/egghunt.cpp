@@ -47,6 +47,8 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class egghunt_state : public driver_device
 {

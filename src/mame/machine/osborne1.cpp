@@ -12,6 +12,8 @@ There are three IRQ sources:
 #include "emu.h"
 #include "includes/osborne1.h"
 
+#include "screen.h"
+
 
 WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
 {

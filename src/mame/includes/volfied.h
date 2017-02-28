@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "video/pc090oj.h"
+#include "screen.h"
 
 class volfied_state : public driver_device
 {

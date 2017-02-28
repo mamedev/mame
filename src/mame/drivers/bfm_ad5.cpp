@@ -15,6 +15,7 @@
 #include "includes/bfm_ad5.h"
 #include "machine/mcf5206e.h"
 #include "machine/bfm_sc45_helper.h"
+#include "speaker.h"
 
 DRIVER_INIT_MEMBER(adder5_state,ad5)
 {

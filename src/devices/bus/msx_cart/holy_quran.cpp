@@ -4,7 +4,7 @@
 #include "holy_quran.h"
 
 
-const device_type MSX_CART_HOLY_QURAN = &device_creator<msx_cart_holy_quran>;
+const device_type MSX_CART_HOLY_QURAN = device_creator<msx_cart_holy_quran>;
 
 
 msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

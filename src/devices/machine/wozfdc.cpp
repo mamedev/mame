@@ -21,8 +21,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DISKII_FDC = &device_creator<diskii_fdc>;
-const device_type APPLEIII_FDC = &device_creator<appleiii_fdc>;
+const device_type DISKII_FDC = device_creator<diskii_fdc>;
+const device_type APPLEIII_FDC = device_creator<appleiii_fdc>;
 
 #define DISKII_P6_REGION  "diskii_rom_p6"
 

@@ -24,10 +24,14 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "emu.h"
 #include "includes/vigilant.h"
 #include "includes/iremipt.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void vigilant_state::machine_start()
 {

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EASYFLASH = &device_creator<c64_easyflash_cartridge_device>;
+const device_type C64_EASYFLASH = device_creator<c64_easyflash_cartridge_device>;
 
 
 //-------------------------------------------------

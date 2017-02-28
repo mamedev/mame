@@ -52,12 +52,15 @@
 #include "emu.h"
 #include "cesblit.h"
 
+#include "screen.h"
+
+
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
 // device type definition
-const device_type CESBLIT = &device_creator<cesblit_device>;
+const device_type CESBLIT = device_creator<cesblit_device>;
 
 /***************************************************************************
     LIVE DEVICE

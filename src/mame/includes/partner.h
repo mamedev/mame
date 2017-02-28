@@ -6,8 +6,12 @@
  *
  ****************************************************************************/
 
-#ifndef partner_H_
-#define partner_H_
+#ifndef MAME_INCLUDES_PARTNER_H
+#define MAME_INCLUDES_PARTNER_H
+
+#pragma once
+
+#include "includes/radio86.h"
 
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
@@ -17,9 +21,11 @@ class partner_state : public radio86_state
 {
 public:
 	partner_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag),
-		m_ram(*this, RAM_TAG),
-		m_fdc(*this, "wd1793") { }
+		: radio86_state(mconfig, type, tag)
+		, m_ram(*this, RAM_TAG)
+		, m_fdc(*this, "wd1793")
+	{
+	}
 
 	uint8_t m_mem_page;
 	uint8_t m_win_mem_page;
@@ -42,4 +48,4 @@ public:
 };
 
 
-#endif /* partner_H_ */
+#endif // MAME_INCLUDES_PARTNER_H

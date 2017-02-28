@@ -95,7 +95,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M1COMM = &device_creator<m1comm_device>;
+const device_type M1COMM = device_creator<m1comm_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

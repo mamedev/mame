@@ -15,7 +15,7 @@
 #include "machine/ataintf.h"
 #include "machine/at_keybc.h"
 
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 

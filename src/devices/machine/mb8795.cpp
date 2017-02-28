@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "mb8795.h"
 
-const device_type MB8795 = &device_creator<mb8795_device>;
+const device_type MB8795 = device_creator<mb8795_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(txstat_r, txstat_w)

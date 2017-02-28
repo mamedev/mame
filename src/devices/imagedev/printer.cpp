@@ -13,7 +13,7 @@
 
 
 // device type definition
-const device_type PRINTER = &device_creator<printer_image_device>;
+const device_type PRINTER = device_creator<printer_image_device>;
 
 //-------------------------------------------------
 //  printer_image_device - constructor

@@ -31,8 +31,13 @@
 
 #include "emu.h"
 #include "includes/px8.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "px8.lh"
+
 
 /***************************************************************************
     CONSTANTS

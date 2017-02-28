@@ -631,11 +631,10 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/v60/v60.h"
-#include "video/segaic24.h"
-#include "cpu/mb86233/mb86233.h"
-#include "machine/nvram.h"
 #include "includes/model1.h"
+
+#include "machine/nvram.h"
+#include "speaker.h"
 
 #include "vr.lh"
 

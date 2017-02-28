@@ -48,16 +48,16 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_KS7058 = &device_creator<nes_ks7058_device>;
-const device_type NES_KS7022 = &device_creator<nes_ks7022_device>;
-const device_type NES_KS7032 = &device_creator<nes_ks7032_device>;
-const device_type NES_KS202 = &device_creator<nes_ks202_device>;
-const device_type NES_KS7017 = &device_creator<nes_ks7017_device>;
-const device_type NES_KS7012 = &device_creator<nes_ks7012_device>;
-const device_type NES_KS7013B = &device_creator<nes_ks7013b_device>;
-const device_type NES_KS7031 = &device_creator<nes_ks7031_device>;
-const device_type NES_KS7016 = &device_creator<nes_ks7016_device>;
-const device_type NES_KS7037 = &device_creator<nes_ks7037_device>;
+const device_type NES_KS7058 = device_creator<nes_ks7058_device>;
+const device_type NES_KS7022 = device_creator<nes_ks7022_device>;
+const device_type NES_KS7032 = device_creator<nes_ks7032_device>;
+const device_type NES_KS202 = device_creator<nes_ks202_device>;
+const device_type NES_KS7017 = device_creator<nes_ks7017_device>;
+const device_type NES_KS7012 = device_creator<nes_ks7012_device>;
+const device_type NES_KS7013B = device_creator<nes_ks7013b_device>;
+const device_type NES_KS7031 = device_creator<nes_ks7031_device>;
+const device_type NES_KS7016 = device_creator<nes_ks7016_device>;
+const device_type NES_KS7037 = device_creator<nes_ks7037_device>;
 
 
 nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

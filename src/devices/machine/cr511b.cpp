@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CR511B = &device_creator<cr511b_device>;
+const device_type CR511B = device_creator<cr511b_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

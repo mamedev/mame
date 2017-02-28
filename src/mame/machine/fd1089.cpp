@@ -142,8 +142,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type FD1089A = &device_creator<fd1089a_device>;
-const device_type FD1089B = &device_creator<fd1089b_device>;
+const device_type FD1089A = device_creator<fd1089a_device>;
+const device_type FD1089B = device_creator<fd1089b_device>;
 
 // common base lookup table, shared between A and B variants
 const uint8_t fd1089_base_device::s_basetable_fd1089[0x100] =

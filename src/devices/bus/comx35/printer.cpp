@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PRN = &device_creator<comx_prn_device>;
+const device_type COMX_PRN = device_creator<comx_prn_device>;
 
 
 //-------------------------------------------------

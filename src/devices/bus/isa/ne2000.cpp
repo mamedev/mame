@@ -11,7 +11,7 @@ static MACHINE_CONFIG_FRAGMENT(ne2000_config)
 	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(ne2000_device, ne2000_mem_write))
 MACHINE_CONFIG_END
 
-const device_type NE2000 = &device_creator<ne2000_device>;
+const device_type NE2000 = device_creator<ne2000_device>;
 
 machine_config_constructor ne2000_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(ne2000_config);

@@ -46,8 +46,8 @@ enum
 };
 
 
-const device_type TMS32051 = &device_creator<tms32051_device>;
-const device_type TMS32053 = &device_creator<tms32053_device>;
+const device_type TMS32051 = device_creator<tms32051_device>;
+const device_type TMS32053 = device_creator<tms32053_device>;
 
 
 /**************************************************************************

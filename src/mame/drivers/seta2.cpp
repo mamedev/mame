@@ -109,12 +109,15 @@ reelquak:
 
 #include "emu.h"
 #include "includes/seta2.h"
-#include "cpu/m68000/m68000.h"
+
 #include "cpu/h8/h83006.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
-#include "machine/mcf5206e.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -651,7 +654,7 @@ private:
 	uint8_t m_serial[4];
 };
 
-const device_type FUNCUBE_TOUCHSCREEN = &device_creator<funcube_touchscreen_device>;
+const device_type FUNCUBE_TOUCHSCREEN = device_creator<funcube_touchscreen_device>;
 
 static INPUT_PORTS_START( funcube_touchscreen )
 	PORT_START("touch_btn")

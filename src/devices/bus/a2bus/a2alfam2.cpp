@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "a2alfam2.h"
 #include "sound/sn76496.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ALFAM2 = &device_creator<a2bus_alfam2_device>;
-const device_type A2BUS_AESMS = &device_creator<a2bus_aesms_device>;
+const device_type A2BUS_ALFAM2 = device_creator<a2bus_alfam2_device>;
+const device_type A2BUS_AESMS = device_creator<a2bus_aesms_device>;
 
 #define SN1_TAG         "sn76489_1" // left
 #define SN2_TAG         "sn76489_2" // center

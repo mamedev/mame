@@ -58,6 +58,9 @@ Twenty four 8116 rams.
 #include "video/mc6845.h"
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class progolf_state : public driver_device
 {

@@ -83,6 +83,9 @@ DONE:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/tms9927.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class notetaker_state : public driver_device
 {

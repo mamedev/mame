@@ -714,4 +714,4 @@ ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_hsgpl);
 }
 
-const device_type TI99_HSGPL = &device_creator<snug_high_speed_gpl_device>;
+const device_type TI99_HSGPL = device_creator<snug_high_speed_gpl_device>;

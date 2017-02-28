@@ -19,19 +19,23 @@ Issues:
 ****************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/upd765.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/7474.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/7474.h"
+#include "machine/am9517a.h"
 #include "machine/clock.h"
-#include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "video/i8275.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 

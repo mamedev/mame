@@ -124,7 +124,7 @@ const tiny_rom_entry *spc1000_fdd_exp_device::device_rom_region() const
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPC1000_FDD_EXP = &device_creator<spc1000_fdd_exp_device>;
+const device_type SPC1000_FDD_EXP = device_creator<spc1000_fdd_exp_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

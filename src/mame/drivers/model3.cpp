@@ -732,12 +732,15 @@ JP4/5/6/7 - Jumpers to configure ROMs
 */
 
 #include "emu.h"
+#include "includes/model3.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
 #include "machine/m3comm.h"
-#include "includes/model3.h"
+#include "speaker.h"
+
 
 void model3_state::update_irq_state()
 {

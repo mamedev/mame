@@ -277,7 +277,7 @@ static const hp_taco_device::tape_pos_t tape_holes[] = {
 };
 
 // Device type definition
-const device_type HP_TACO = &device_creator<hp_taco_device>;
+const device_type HP_TACO = device_creator<hp_taco_device>;
 
 // Constructors
 hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)

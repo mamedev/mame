@@ -115,7 +115,9 @@ Hardware:   PPIA 8255
 #include "emu.h"
 #include "includes/atom.h"
 #include "formats/imageutl.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS

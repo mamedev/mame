@@ -22,12 +22,15 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "video/mcd212.h"
 #include "includes/cdi.h"
 
+#include "cpu/m68000/m68000.h"
+#include "screen.h"
+
+
 // device type definition
-const device_type MACHINE_MCD212 = &device_creator<mcd212_device>;
+const device_type MACHINE_MCD212 = device_creator<mcd212_device>;
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)

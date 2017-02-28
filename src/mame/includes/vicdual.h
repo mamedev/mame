@@ -10,6 +10,7 @@
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class vicdual_state : public driver_device
 {

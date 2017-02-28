@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "clock.h"
 
-const device_type CLOCK = &device_creator<clock_device>;
+const device_type CLOCK = device_creator<clock_device>;
 
 clock_device::clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CLOCK, "Clock", tag, owner, clock, "clock", __FILE__),

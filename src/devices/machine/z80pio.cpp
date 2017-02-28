@@ -32,7 +32,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type Z80PIO = &device_creator<z80pio_device>;
+const device_type Z80PIO = device_creator<z80pio_device>;
 
 //-------------------------------------------------
 //  z80pio_device - constructor

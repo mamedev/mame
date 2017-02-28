@@ -34,6 +34,9 @@ Year  Game                         Manufacturer    Notes
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class igs009_state : public driver_device
 {

@@ -79,7 +79,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S32COMM = &device_creator<s32comm_device>;
+const device_type S32COMM = device_creator<s32comm_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

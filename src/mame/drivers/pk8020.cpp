@@ -11,13 +11,16 @@
 
 
 #include "emu.h"
+#include "includes/pk8020.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pk8020_dsk.h"
-#include "includes/pk8020.h"
 #include "machine/ram.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pk8020_mem, AS_PROGRAM, 8, pk8020_state )

@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_COSMICOS_H
+#define MAME_INCLUDES_COSMICOS_H
 
-#ifndef __COSMICOS__
-#define __COSMICOS__
+#pragma once
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "imagedev/snapquik.h"
+#include "machine/ram.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/dm9368.h"
 
 #define CDP1802_TAG     "ic19"
@@ -136,4 +136,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
 };
 
-#endif
+#endif // MAME_INCLUDES_COSMICOS_H

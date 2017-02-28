@@ -45,7 +45,7 @@
 //**************************************************************************
 
 // devices
-const device_type PHILLIPS_22VP931 = &device_creator<phillips_22vp931_device>;
+const device_type PHILLIPS_22VP931 = device_creator<phillips_22vp931_device>;
 
 
 

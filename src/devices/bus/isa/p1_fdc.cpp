@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_FDC = &device_creator<p1_fdc_device>;
+const device_type P1_FDC = device_creator<p1_fdc_device>;
 
 FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT

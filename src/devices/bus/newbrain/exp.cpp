@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEWBRAIN_EXPANSION_SLOT = &device_creator<newbrain_expansion_slot_t>;
+const device_type NEWBRAIN_EXPANSION_SLOT = device_creator<newbrain_expansion_slot_t>;
 
 
 

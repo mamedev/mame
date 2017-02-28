@@ -118,11 +118,6 @@
 
 *******************************************************************************/
 
-
-#define MAIN_CLOCK  XTAL_18MHz
-#define SEC_CLOCK   XTAL_8MHz
-#define AUX_CLOCK   XTAL_3_579545MHz
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
@@ -131,8 +126,15 @@
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "sigmab52.lh"
+
+
+#define MAIN_CLOCK  XTAL_18MHz
+#define SEC_CLOCK   XTAL_8MHz
+#define AUX_CLOCK   XTAL_3_579545MHz
 
 class sigmab52_state : public driver_device
 {

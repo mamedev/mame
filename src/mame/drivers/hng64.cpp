@@ -435,13 +435,14 @@ or Fatal Fury for example).
 */
 
 
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mips/mips3.h"
-#include "machine/nvram.h"
 #include "includes/hng64.h"
+
+#include "cpu/mips/mips3.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/hng64_net.h"
+
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...

@@ -86,11 +86,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/gen_latch.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "pairmtch.lh"

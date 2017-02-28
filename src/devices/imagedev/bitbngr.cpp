@@ -15,7 +15,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type BITBANGER = &device_creator<bitbanger_device>;
+const device_type BITBANGER = device_creator<bitbanger_device>;
 
 /*-------------------------------------------------
     ctor

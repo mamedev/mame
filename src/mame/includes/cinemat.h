@@ -6,23 +6,26 @@
 
 *************************************************************************/
 
+#include "cpu/ccpu/ccpu.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "video/vector.h"
+#include "screen.h"
 
 class cinemat_state : public driver_device
 {
 public:
 	cinemat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ay1(*this, "ay1"),
-		m_samples(*this, "samples"),
-		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
-		m_rambase(*this, "rambase"),
-		m_analog_x(*this, "ANALOGX"),
-		m_analog_y(*this, "ANALOGY") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ay1(*this, "ay1")
+		, m_samples(*this, "samples")
+		, m_vector(*this, "vector")
+		, m_screen(*this, "screen")
+		, m_rambase(*this, "rambase")
+		, m_analog_x(*this, "ANALOGX")
+		, m_analog_y(*this, "ANALOGY")
+	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;

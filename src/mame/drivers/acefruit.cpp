@@ -14,6 +14,7 @@ Inputs and Dip Switches by Stephh
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 #include "sidewndr.lh"
 

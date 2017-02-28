@@ -30,11 +30,14 @@
 
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9995.h"
 #include "sound/sn76496.h"
 #include "machine/i8255.h"
 #include "machine/tms9902.h"
 #include "machine/meters.h"
+#include "speaker.h"
+
 #include "jpmmps.lh"
 
 // MFME2MAME layouts:

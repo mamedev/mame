@@ -94,6 +94,7 @@ TODO:
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 #include "debugger.h"
+#include "screen.h"
 
 
 //#define SPECIALMODE 1 // Alternate code path

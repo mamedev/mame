@@ -46,11 +46,15 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 
 #include "emu.h"
 #include "includes/seicross.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {

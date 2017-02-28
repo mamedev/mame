@@ -1760,14 +1760,14 @@ mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double fac
 //  VARIATIONS
 //**************************************************************************
 
-const device_type MC6847_NTSC = &device_creator<mc6847_ntsc_device>;
-const device_type MC6847_PAL = &device_creator<mc6847_pal_device>;
-const device_type MC6847Y_NTSC = &device_creator<mc6847y_ntsc_device>;
-const device_type MC6847Y_PAL = &device_creator<mc6847y_pal_device>;
-const device_type MC6847T1_NTSC = &device_creator<mc6847t1_ntsc_device>;
-const device_type MC6847T1_PAL = &device_creator<mc6847t1_pal_device>;
-const device_type S68047 = &device_creator<s68047_device>;
-const device_type M5C6847P1 = &device_creator<m5c6847p1_device>;
+const device_type MC6847_NTSC = device_creator<mc6847_ntsc_device>;
+const device_type MC6847_PAL = device_creator<mc6847_pal_device>;
+const device_type MC6847Y_NTSC = device_creator<mc6847y_ntsc_device>;
+const device_type MC6847Y_PAL = device_creator<mc6847y_pal_device>;
+const device_type MC6847T1_NTSC = device_creator<mc6847t1_ntsc_device>;
+const device_type MC6847T1_PAL = device_creator<mc6847t1_pal_device>;
+const device_type S68047 = device_creator<s68047_device>;
+const device_type M5C6847P1 = device_creator<m5c6847p1_device>;
 
 
 

@@ -18,6 +18,8 @@
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_200MHz
 

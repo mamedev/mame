@@ -14,13 +14,15 @@
 
 #include "emu.h"
 #include "audio/timeplt.h"
+
 #include "machine/gen_latch.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK         XTAL_14_31818MHz
 
 
-const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
+const device_type TIMEPLT_AUDIO = device_creator<timeplt_audio_device>;
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock, "timeplt_audio", __FILE__),

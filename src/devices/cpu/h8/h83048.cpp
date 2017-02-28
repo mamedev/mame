@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h83048.h"
 
-const device_type H83044 = &device_creator<h83044_device>;
-const device_type H83045 = &device_creator<h83045_device>;
-const device_type H83047 = &device_creator<h83047_device>;
-const device_type H83048 = &device_creator<h83048_device>;
+const device_type H83044 = device_creator<h83044_device>;
+const device_type H83045 = device_creator<h83045_device>;
+const device_type H83047 = device_creator<h83047_device>;
+const device_type H83048 = device_creator<h83048_device>;
 
 h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83048_device::map), this)),

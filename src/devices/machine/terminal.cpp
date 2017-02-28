@@ -2,6 +2,8 @@
 // copyright-holders:Miodrag Milanovic
 #include "emu.h"
 #include "machine/terminal.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define KEYBOARD_TAG "keyboard"
 
@@ -444,4 +446,4 @@ ioport_constructor generic_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(generic_terminal);
 }
 
-const device_type GENERIC_TERMINAL = &device_creator<generic_terminal_device>;
+const device_type GENERIC_TERMINAL = device_creator<generic_terminal_device>;

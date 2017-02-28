@@ -25,7 +25,7 @@
     CONSTANTS
 ***************************************************************************/
 
-const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
+const device_type IDE_CONTROLLER = device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock, "ide_controller", __FILE__)
@@ -88,7 +88,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 }
 
 
-const device_type IDE_CONTROLLER_32 = &device_creator<ide_controller_32_device>;
+const device_type IDE_CONTROLLER_32 = device_creator<ide_controller_32_device>;
 
 ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_device(mconfig, IDE_CONTROLLER, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller32", __FILE__)
@@ -167,7 +167,7 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs1)
 #define IDE_BUSMASTER_STATUS_ERROR          0x02
 #define IDE_BUSMASTER_STATUS_IRQ            0x04
 
-const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
+const device_type BUS_MASTER_IDE_CONTROLLER = device_creator<bus_master_ide_controller_device>;
 
 bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock, "bus_master_ide_controller", __FILE__),

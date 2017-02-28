@@ -22,4 +22,4 @@ protected:
 
 };
 
-static const device_type DECO_CPU7 = &device_creator<deco_cpu7_device>;
+extern const device_type DECO_CPU7;

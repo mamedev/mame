@@ -23,7 +23,7 @@ static const char *dsk_option_spec =
 
 
 // device type definition
-const device_type DIABLO = &device_creator<diablo_image_device>;
+const device_type DIABLO = device_creator<diablo_image_device>;
 
 //-------------------------------------------------
 //  diablo_image_device - constructor
@@ -214,7 +214,7 @@ image_init_result diablo_image_device::internal_load_dsk()
 		hard_disk_close(m_hard_disk_handle);
 
 	/* open the CHD file */
-	if (software_entry() != nullptr)
+	if (loaded_through_softlist())
 	{
 		m_chd = device().machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
 	}

@@ -25,8 +25,11 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "cardline.lh"
+
 
 #define MASTER_CLOCK XTAL_12MHz
 

@@ -118,21 +118,24 @@ How does the Super Famicom Box operates
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snes.h"
+
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
-#include "includes/snes.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 
 class sfcbox_state : public snes_state
 {
 public:
 	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag),
-		m_bios(*this, "bios"),
-		m_mb90082(*this,"mb90082"),
-		m_s3520cf(*this, "s3520cf")
-		{ }
+		: snes_state(mconfig, type, tag)
+		, m_bios(*this, "bios")
+		, m_mb90082(*this,"mb90082")
+		, m_s3520cf(*this, "s3520cf")
+	{ }
 
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;

@@ -27,6 +27,7 @@
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
+ @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
@@ -60,10 +61,10 @@
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
- *MP3300   TMS1000   1980, Estrela Genius (from Brazil, looks and plays identical to Simon)
+ *MP3300   TMS1000   1979, Milton Bradley Simon (newer)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
- *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
+ @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device, decap/dump is available
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
@@ -133,11 +134,15 @@
 
 #include "emu.h"
 #include "includes/hh_tms1k.h"
+
 #include "machine/tms1024.h"
-#include "video/hlcd0515.h"
 #include "sound/beep.h"
-#include "sound/sn76477.h"
 #include "sound/s14001a.h"
+#include "sound/sn76477.h"
+#include "video/hlcd0515.h"
+
+#include "screen.h"
+#include "speaker.h"
 #include "rendlay.h"
 
 // internal artwork
@@ -166,6 +171,7 @@
 #include "einvader.lh"
 #include "elecbowl.lh"
 #include "elecdet.lh"
+#include "eleciq.lh" // clickable
 #include "esbattle.lh"
 #include "esoccer.lh"
 #include "f2pbball.lh"
@@ -422,8 +428,8 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 
   known releases:
   - Japan: Match Number (white case, Queen playing card bezel)
-  - USA: Electronic Concentration, distributed by LJN (black case, rainbow pattern bezel)
-  - UK: Electronic Concentration, distributed by Peter Pan Playthings (same as USA version)
+  - USA: Electronic Concentration, published by LJN (black case, rainbow pattern bezel)
+  - UK: Electronic Concentration, published by Peter Pan Playthings (same as USA version)
 
 ***************************************************************************/
 
@@ -731,8 +737,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - Japan: System Control Car: Cheetah
-  - USA: The Incredible Brain Buggy, distributed by Fundimensions
-  - UK: The Incredible Brain Buggy, distributed by Palitoy (same as USA version)
+  - USA: The Incredible Brain Buggy, published by Fundimensions
+  - UK: The Incredible Brain Buggy, published by Palitoy (same as USA version)
 
 ***************************************************************************/
 
@@ -1139,7 +1145,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA(1): Electronic Quarterback
-  - USA(2): Electronic Touchdown, distributed by Sears
+  - USA(2): Electronic Touchdown, published by Sears
 
 ***************************************************************************/
 
@@ -1257,7 +1263,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA(1): Head to Head Football
-  - USA(2): Team Play Football, distributed by Sears
+  - USA(2): Team Play Football, published by Sears
 
 ***************************************************************************/
 
@@ -1617,6 +1623,98 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Quiz Wiz Challenger
+  * TMS1000NLL M32001-N2 (die label 1000E, M32001)
+  * 4 7seg LEDs, 17 other LEDs, 1-bit sound
+  
+  This is a 4-player version of Quiz Wiz.
+  ..
+
+***************************************************************************/
+
+class quizwizc_state : public hh_tms1k_state
+{
+public:
+	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void quizwizc_state::prepare_display()
+{
+	// R6-R9 are 7segs
+	set_display_segmask(0x3c0, 0x7f);
+
+	// note: O7 is on VSS
+	display_matrix(7, 11, m_o, (m_r & 0x3ff) | (m_o << 3 & 0x400));
+}
+
+WRITE16_MEMBER(quizwizc_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R5: input mux
+	m_inp_mux = data & 0x3f;
+
+	// R0-R3: led select
+	// R6-R9: digit select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(quizwizc_state::write_o)
+{
+	// O0-O7: led/digit segment data
+	m_o = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	prepare_display();
+}
+
+READ8_MEMBER(quizwizc_state::read_k)
+{
+	// K: multiplexed inputs
+	return 0;
+	//return read_inputs(6);
+}
+
+
+// config
+
+static INPUT_PORTS_START( quizwizc )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(quizwizc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(quizwizc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(quizwizc_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_quizwizc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die label MP7334)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
@@ -1771,8 +1869,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic Basketball
+  * PCB label CONIC 101-006
   * TMS1000NLL MP0907 (die label 1000B MP0907)
-  * PCB label: CONIC 101-006
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   There are 3 known versions of Conic Basketball: MP0910(101-003) and
@@ -1780,7 +1878,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - Hong Kong: Electronic Basketball
-  - USA: Electronic Basketball, distributed by Cardinal
+  - USA: Electronic Basketball, published by Cardinal
 
 ***************************************************************************/
 
@@ -1822,7 +1920,7 @@ WRITE16_MEMBER(cnbaskb_state::write_r)
 
 WRITE16_MEMBER(cnbaskb_state::write_o)
 {
-	// O0-O6: led/digit data
+	// O0-O6: led/digit segment data
 	// O7: N/C
 	m_o = data;
 	prepare_display();
@@ -1880,8 +1978,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Conic Electronic Multisport
+  * PCB label CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * TMS1000 MP0168 (die label same)
-  * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * 2 7seg LEDs, 33 other LEDs, 1-bit sound
 
   This handheld includes 3 games: Basketball, Ice Hockey, Soccer.
@@ -1890,8 +1988,8 @@ MACHINE_CONFIG_END
   known releases:
   - Hong Kong: Electronic Multisport
   - Hong Kong: Basketball/Ice Hockey/Soccer (3 separate handhelds)
-  - USA(1): Electronic Multisport, distributed by Innocron
-  - USA(2): Sports Arena, distributed by Tandy (model 60-2158)
+  - USA(1): Electronic Multisport, published by Innocron
+  - USA(2): Sports Arena, published by Tandy (model 60-2158)
 
 ***************************************************************************/
 
@@ -1932,7 +2030,7 @@ WRITE16_MEMBER(cmsport_state::write_r)
 
 WRITE16_MEMBER(cmsport_state::write_o)
 {
-	// O0-O7: led/digit data
+	// O0-O7: led/digit segment data
 	m_o = data;
 	prepare_display();
 }
@@ -2245,6 +2343,147 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Conic Electronic I.Q.
+  * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
+    CONIC 102-001, led PCB: CONIC 100-003 REV A itac
+  * TMS1000NLL MP0908 (die label 1000B, MP0908)
+  * 2 7seg LEDs, 30 other LEDs, 1-bit sound
+  
+  This is a peg solitaire game, with random start position.
+
+  known releases:
+  - Hong Kong: Electronic I.Q.
+  - UK: Solitaire, published by Grandstand
+
+***************************************************************************/
+
+class eleciq_state : public hh_tms1k_state
+{
+public:
+	eleciq_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+};
+
+// handlers
+
+void eleciq_state::prepare_display()
+{
+	// R7,R8 are 7segs
+	set_display_segmask(0x180, 0x7f);
+	display_matrix(7, 9, m_o, m_r & ~1);
+}
+
+WRITE16_MEMBER(eleciq_state::write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R1-R6,R9: input mux
+	m_inp_mux = (data >> 1 & 0x3f) | (data >> 3 & 0x40);
+
+	// R1-R8: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(eleciq_state::write_o)
+{
+	// O0-O6: led/digit segment data
+	// O7: N/C
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(eleciq_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(7);
+}
+
+
+// config
+
+static INPUT_PORTS_START( eleciq )
+	PORT_START("IN.0") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Button A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Up-Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Up")
+
+	PORT_START("IN.1") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Button B")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Up-Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Down")
+
+	PORT_START("IN.2") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Button C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Down-Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Left")
+
+	PORT_START("IN.3") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Button D")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button 4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Down-Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Right")
+
+	PORT_START("IN.4") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Button E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Button 5")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Button F")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R9
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x01, "2" ) // professional
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, eleciq_state, reset_button, 0)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
+{
+	// reset button is directly wired to TMS1000 INIT pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static MACHINE_CONFIG_START( eleciq, eleciq_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=50pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(eleciq_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eleciq_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eleciq_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_eleciq)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Entex (Electronic) Soccer
   * TMS1000NL MP0158 (die label same)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
@@ -2485,7 +2724,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 2
-  * PCB label: ZENY
+  * PCB label ZENY
   * TMS1000 MCU, MP0923 (die label same)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -2608,7 +2847,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 3
-  * PCB label: ZENY
+  * PCB label ZENY
   * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
@@ -3393,8 +3632,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: 2 Player Baseball
-  - USA: 2 Player Baseball, distributed by Sears
-  - Canada: 2 Player Baseball, distributed by Talbot Electronics
+  - USA: 2 Player Baseball, published by Sears
+  - Canada: 2 Player Baseball, published by Talbot Electronics
 
   led translation table: led zz from game PCB = MAME y.x:
 
@@ -3890,7 +4129,7 @@ MACHINE_CONFIG_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was distributed later in the USA by Tandy Radio Shack,
+  for more information. It was published later in the USA by Tandy Radio Shack,
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
@@ -4582,7 +4821,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA: Thoroughbred Horse Race Analyzer
-  - China/Canada: Thoroughbred Horse Race Analyzer, distributed in 1994 by
+  - China/Canada: Thoroughbred Horse Race Analyzer, published in 1994 by
     Advanced Handicapping Technologies, Inc.
 
 ***************************************************************************/
@@ -6798,9 +7037,9 @@ MACHINE_CONFIG_END
   The hardware is almost the same as the MP1193 one, they added an extra row of leds.
 
   known releases:
-  - World(1): Superbowl XV Football, distributed by E.R.S.(Electronic Readout Systems)
+  - World(1): Superbowl XV Football, published by E.R.S.(Electronic Readout Systems)
   - World(2): Super-Pro Football, no brand
-  - USA: Championship Football (model 60-2151), distributed by Tandy
+  - USA: Championship Football (model 60-2151), published by Tandy
 
 ***************************************************************************/
 
@@ -6862,7 +7101,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Tandy-12: Computerized Arcade
-  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
+  - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
   This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
@@ -7030,7 +7269,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA(1): Monkey See
-  - USA(2): Heathcliff, distributed by McNaught Syndicate in 1983
+  - USA(2): Heathcliff, published by McNaught Syndicate in 1983
 
 ***************************************************************************/
 
@@ -7284,8 +7523,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Copy Cat
-  - USA(1): Follow Me, distributed by Sears
-  - USA(2): Electronic Repeat, distributed by Tandy
+  - USA(1): Follow Me, published by Sears
+  - USA(2): Electronic Repeat, published by Tandy
 
 ***************************************************************************/
 
@@ -7465,7 +7704,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Ditto
-  - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), distributed by Tandy
+  - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), published by Tandy
     note: 1996 model 60-2482 MCU is a Z8, and is assumed to be a clone of Tiger Copycat Jr.
 
 ***************************************************************************/
@@ -7540,7 +7779,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: 7 in 1 Sports Stadium
-  - USA: 7 in 1 Sports, distributed by Sears
+  - USA: 7 in 1 Sports, published by Sears
 
 ***************************************************************************/
 
@@ -8206,6 +8445,17 @@ ROM_START( h2hboxing )
 ROM_END
 
 
+ROM_START( quizwizc )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
+ROM_END
+
+
 ROM_START( tc4 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
@@ -8258,6 +8508,17 @@ ROM_START( cnfball2 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_cnfball2_output.pla", 0, 365, NO_DUMP )
+ROM_END
+
+
+ROM_START( eleciq )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0908", 0x0000, 0x0400, CRC(db59b82c) SHA1(c9a6bcba208969560495ad9f8775f53de16a69c3) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_eleciq_output.pla", 0, 365, CRC(b8e04232) SHA1(22eed6d9b1fb1e5c9974ea3df16cda71a39aad57) )
 ROM_END
 
 
@@ -8564,7 +8825,7 @@ ROM_START( bigtrak )
 	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_bigtrak_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
 ROM_END
@@ -8827,12 +9088,14 @@ CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Col
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, quizwizc,  0,        0, quizwizc,  quizwizc,  driver_device, 0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, cnbaskb,   0,        0, cnbaskb,   cnbaskb,   driver_device, 0, "Conic", "Electronic Basktetball (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cmsport,   0,        0, cmsport,   cmsport,   driver_device, 0, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, eleciq,    0,        0, eleciq,    eleciq,    driver_device, 0, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, esoccer,   0,        0, esoccer,   esoccer,   driver_device, 0, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )

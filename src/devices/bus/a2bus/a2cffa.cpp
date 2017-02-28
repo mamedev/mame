@@ -27,8 +27,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CFFA2 = &device_creator<a2bus_cffa2_device>;
-const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
+const device_type A2BUS_CFFA2 = device_creator<a2bus_cffa2_device>;
+const device_type A2BUS_CFFA2_6502 = device_creator<a2bus_cffa2_6502_device>;
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"

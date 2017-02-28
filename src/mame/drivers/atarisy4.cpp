@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "video/poly.h"
+#include "screen.h"
 
 
 struct atarisy4_polydata

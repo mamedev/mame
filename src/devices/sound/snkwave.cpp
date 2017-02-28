@@ -15,7 +15,7 @@
 #define CLOCK_SHIFT 8
 
 
-const device_type SNKWAVE = &device_creator<snkwave_device>;
+const device_type SNKWAVE = device_creator<snkwave_device>;
 
 //-------------------------------------------------
 //  snkwave_device - constructor

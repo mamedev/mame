@@ -23,9 +23,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1526 = &device_creator<c1526_t>;
-const device_type MPS802 = &device_creator<c1526_t>;
-const device_type C4023 = &device_creator<c4023_t>;
+const device_type C1526 = device_creator<c1526_t>;
+const device_type MPS802 = device_creator<c1526_t>;
+const device_type C4023 = device_creator<c4023_t>;
 
 
 //-------------------------------------------------

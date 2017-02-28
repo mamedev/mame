@@ -172,17 +172,20 @@ Not all regional versions are available for each Megatouch series
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/ay8910.h"
-#include "video/v9938.h"
 #include "machine/ds1204.h"
 #include "machine/i8255.h"
-#include "machine/z80pio.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "machine/z80pio.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+
+#include "speaker.h"
 
 
 class meritm_state : public driver_device

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "v1050kb.h"
 
+#include "speaker.h"
+
 
 
 //**************************************************************************
@@ -24,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type V1050_KEYBOARD = &device_creator<v1050_keyboard_device>;
+const device_type V1050_KEYBOARD = device_creator<v1050_keyboard_device>;
 
 
 //-------------------------------------------------

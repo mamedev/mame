@@ -11,7 +11,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type X68K_EXPANSION_SLOT = &device_creator<x68k_expansion_slot_device>;
+const device_type X68K_EXPANSION_SLOT = device_creator<x68k_expansion_slot_device>;
 
 
 //**************************************************************************

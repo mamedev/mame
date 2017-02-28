@@ -79,6 +79,7 @@
 
 #include "emu.h"
 #include "pc_xporter.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -88,7 +89,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PCXPORTER = &device_creator<a2bus_pcxporter_device>;
+const device_type A2BUS_PCXPORTER = device_creator<a2bus_pcxporter_device>;
 
 static ADDRESS_MAP_START( pc_map, AS_PROGRAM, 16, a2bus_pcxporter_device )
 	ADDRESS_MAP_UNMAP_HIGH

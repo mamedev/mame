@@ -3,9 +3,12 @@
 #include "emu.h"
 #include "es1373.h"
 
+#include "speaker.h"
+
+
 #define LOG_ES            (0)
 #define LOG_ES_REG        (0)
-#define LOG_ES_FILE         (0)
+#define LOG_ES_FILE       (0)
 
 
 static MACHINE_CONFIG_FRAGMENT( es1373 )
@@ -17,7 +20,7 @@ machine_config_constructor es1373_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( es1373 );
 }
 
-const device_type ES1373 = &device_creator<es1373_device>;
+const device_type ES1373 = device_creator<es1373_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, es1373_device)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)

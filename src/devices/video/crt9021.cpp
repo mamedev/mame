@@ -36,12 +36,14 @@
 #include "emu.h"
 #include "crt9021.h"
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CRT9021 = &device_creator<crt9021_t>;
+const device_type CRT9021 = device_creator<crt9021_t>;
 
 
 

@@ -24,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SMS_CONTROL_PORT = &device_creator<sms_control_port_device>;
+const device_type SMS_CONTROL_PORT = device_creator<sms_control_port_device>;
 
 
 

@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC1502_FDC = &device_creator<mc1502_fdc_device>;
+const device_type MC1502_FDC = device_creator<mc1502_fdc_device>;
 
 FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT

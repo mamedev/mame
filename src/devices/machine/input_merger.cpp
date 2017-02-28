@@ -20,8 +20,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type INPUT_MERGER_ACTIVE_HIGH = &device_creator<input_merger_active_high_device>;
-const device_type INPUT_MERGER_ACTIVE_LOW = &device_creator<input_merger_active_low_device>;
+const device_type INPUT_MERGER_ACTIVE_HIGH = device_creator<input_merger_active_high_device>;
+const device_type INPUT_MERGER_ACTIVE_LOW = device_creator<input_merger_active_low_device>;
 
 
 //**************************************************************************

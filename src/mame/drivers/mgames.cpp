@@ -217,6 +217,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "screen.h"
+
 #include "mgames.lh"
 
 

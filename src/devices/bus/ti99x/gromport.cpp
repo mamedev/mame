@@ -278,7 +278,7 @@ ioport_constructor gromport_device::device_input_ports() const
 	return INPUT_PORTS_NAME(gromport);
 }
 
-const device_type GROMPORT = &device_creator<gromport_device>;
+const device_type GROMPORT = device_creator<gromport_device>;
 
 /***************************************************************************
     Different versions of cartridge connections
@@ -291,9 +291,9 @@ const device_type GROMPORT = &device_creator<gromport_device>;
 
 ***************************************************************************/
 
-const device_type GROMPORT_SINGLE = &device_creator<single_conn_device>;
-const device_type GROMPORT_MULTI = &device_creator<multi_conn_device>;
-const device_type GROMPORT_GK = &device_creator<gkracker_device>;
+const device_type GROMPORT_SINGLE = device_creator<single_conn_device>;
+const device_type GROMPORT_MULTI = device_creator<multi_conn_device>;
+const device_type GROMPORT_GK = device_creator<gkracker_device>;
 
 ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -1565,7 +1565,7 @@ const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
 	return ROM_NAME( cartridge_memory );
 }
 
-const device_type TI99CART = &device_creator<ti99_cartridge_device>;
+const device_type TI99CART = device_creator<ti99_cartridge_device>;
 
 /***************************************************************************
     Cartridge types

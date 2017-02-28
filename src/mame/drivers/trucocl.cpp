@@ -36,9 +36,13 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 #include "emu.h"
 #include "includes/trucocl.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {

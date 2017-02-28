@@ -58,7 +58,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD_HLE = &device_creator<apricot_keyboard_hle_device>;
+const device_type APRICOT_KEYBOARD_HLE = device_creator<apricot_keyboard_hle_device>;
 
 
 //-------------------------------------------------

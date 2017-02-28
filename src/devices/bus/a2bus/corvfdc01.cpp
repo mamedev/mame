@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVFDC01 = &device_creator<a2bus_corvfdc01_device>;
+const device_type A2BUS_CORVFDC01 = device_creator<a2bus_corvfdc01_device>;
 
 #define FDC01_ROM_REGION    "fdc01_rom"
 #define FDC01_FDC_TAG       "fdc01_fdc"

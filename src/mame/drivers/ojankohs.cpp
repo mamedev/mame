@@ -34,11 +34,13 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/ojankohs.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "machine/nvram.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)

@@ -18,7 +18,7 @@ skeleton device
 //**************************************************************************
 
 // device type definition
-const device_type UPD7752 = &device_creator<upd7752_device>;
+const device_type UPD7752 = device_creator<upd7752_device>;
 
 /* TODO: unknown exact size */
 static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )

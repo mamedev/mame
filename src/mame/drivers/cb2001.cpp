@@ -44,8 +44,10 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 #include "emu.h"
 #include "cpu/nec/v25.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cb2001_state : public driver_device

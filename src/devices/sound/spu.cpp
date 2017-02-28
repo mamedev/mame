@@ -34,7 +34,7 @@
 #endif
 
 // device type definition
-const device_type SPU = &device_creator<spu_device>;
+const device_type SPU = device_creator<spu_device>;
 
 //
 //

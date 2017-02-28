@@ -33,8 +33,9 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/jalcrpt.h"
 #include "includes/tetrisp2.h"
+#include "machine/jalcrpt.h"
+#include "screen.h"
 
 
 /***************************************************************************

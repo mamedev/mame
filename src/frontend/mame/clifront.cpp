@@ -194,10 +194,12 @@ cli_frontend::~cli_frontend()
 	mame_options::remove_device_options(m_options);
 }
 
-void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char **argv,std::string &option_errors)
+void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args)
 {
+	std::string option_errors;
+
 	// parse the command line, adding any system-specific options
-	if (!mame_options::parse_command_line(m_options, argc, argv, option_errors))
+	if (!mame_options::parse_command_line(m_options, args, option_errors))
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
@@ -210,33 +212,38 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 	// determine the base name of the EXE
-	std::string exename = core_filename_extract_base(argv[0], true);
+	std::string exename = core_filename_extract_base(args[0], true);
 
 	// if we have a command, execute that
 	if (*(m_options.command()) != 0)
+	{
 		execute_commands(exename.c_str());
+		return;
+	}
+
+	// read INI's, if appropriate
+	if (m_options.read_config())
+		mame_options::parse_standard_inis(m_options, option_errors);
 
 	// otherwise, check for a valid system
-	else
-	{
-		// We need to preprocess the config files once to determine the web server's configuration
-		// and file locations
-		if (m_options.read_config())
-		{
-			m_options.revert(OPTION_PRIORITY_INI);
-			mame_options::parse_standard_inis(m_options, option_errors);
-		}
-		if (!option_errors.empty())
-			osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+	load_translation(m_options);
 
-		// if we can't find it, give an appropriate error
-		const game_driver *system = mame_options::system(m_options);
-		if (system == nullptr && *(m_options.system_name()) != 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+	manager->start_http_server();
 
-		// otherwise just run the game
-		m_result = manager->execute();
-	}
+	manager->start_luaengine();
+
+	manager->start_context();
+
+	if (!option_errors.empty())
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
+
+	// if we can't find it, give an appropriate error
+	const game_driver *system = mame_options::system(m_options);
+	if (system == nullptr && *(m_options.system_name()) != 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+	// otherwise just run the game
+	m_result = manager->execute();
 }
 
 //-------------------------------------------------
@@ -244,7 +251,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 //  command line interface
 //-------------------------------------------------
 
-int cli_frontend::execute(int argc, char **argv)
+int cli_frontend::execute(std::vector<std::string> &args)
 {
 	// wrap the core execution in a try/catch to field all fatal errors
 	m_result = EMU_ERR_NONE;
@@ -252,18 +259,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 	try
 	{
-		std::string option_errors;
-		mame_options::parse_standard_inis(m_options, option_errors);
-
-		load_translation(m_options);
-
-		manager->start_http_server();
-
-		manager->start_luaengine();
-
-		manager->start_context();
-
-		start_execution(manager, argc, argv, option_errors);
+		start_execution(manager, args);
 	}
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
@@ -702,14 +698,12 @@ void cli_frontend::listslots(const char *gamename)
 			{
 				if (option.second->selectable())
 				{
-					device_t *dev = (*option.second->devtype())(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
+					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
 					dev->config_complete();
-					if (first_option) {
+					if (first_option)
 						printf("%-16s %s\n", option.second->name(),dev->name());
-					} else {
+					else
 						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
-					}
-					global_free(dev);
 
 					first_option = false;
 				}

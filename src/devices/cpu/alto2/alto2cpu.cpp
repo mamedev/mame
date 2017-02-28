@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ALTO2 = &device_creator<alto2_cpu_device>;
+const device_type ALTO2 = device_creator<alto2_cpu_device>;
 
 //**************************************************************************
 //  LOGGING AND DEBUGGING

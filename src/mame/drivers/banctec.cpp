@@ -19,6 +19,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 class banctec_state : public driver_device
 {
@@ -30,7 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);

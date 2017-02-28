@@ -29,6 +29,8 @@
 #include "machine/msm6242.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class d9final_state : public driver_device

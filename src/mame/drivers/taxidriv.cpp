@@ -12,10 +12,13 @@ OTHER: 5 * M5L8255AP
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/taxidriv.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "includes/taxidriv.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void taxidriv_state::machine_start()

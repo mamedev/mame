@@ -32,7 +32,7 @@
  *  Device config
  */
 
-const device_type FMSCSI = &device_creator<fmscsi_device>;
+const device_type FMSCSI = device_creator<fmscsi_device>;
 
 /*
  * Device

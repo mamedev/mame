@@ -690,7 +690,7 @@ READ_LINE_MEMBER( legacy_floppy_image_device::floppy_ready_r )
 }
 
 // device type definition
-const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
+const device_type LEGACY_FLOPPY = device_creator<legacy_floppy_image_device>;
 
 //-------------------------------------------------
 //  legacy_floppy_image_device - constructor

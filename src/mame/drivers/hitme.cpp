@@ -17,9 +17,11 @@
 */
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/hitme.h"
+
+#include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "barricad.lh"
 

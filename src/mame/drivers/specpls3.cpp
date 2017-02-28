@@ -150,15 +150,13 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/specpls3.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
-#include "sound/speaker.h"
-#include "formats/tzx_cas.h"
 
-/* +3 hardware */
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
+
+#include "formats/tzx_cas.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */

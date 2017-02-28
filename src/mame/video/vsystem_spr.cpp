@@ -59,17 +59,12 @@ Abstracts the VS9210
 
 */
 
-
-
 #include "emu.h"
 #include "vsystem_spr.h"
+#include "screen.h"
 
 
-
-
-
-
-const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
+const device_type VSYSTEM_SPR = device_creator<vsystem_spr_device>;
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR, "Video System Sprites", tag, owner, clock, "vsystem_spr", __FILE__)

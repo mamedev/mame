@@ -13,10 +13,13 @@
 
 #include "emu.h"
 #include "cpu/cop400/cop400.h"
-#include "sound/speaker.h"
+
+#include "sound/spkrdev.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 //#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "bship82.lh" // clickable
@@ -592,7 +595,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - USA: I Took a Lickin' From a Chicken
-  - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, distributed by Bandai
+  - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, published by Bandai
     (not sure if it's the same ROM, or just licensed the outer shell)
 
 ***************************************************************************/

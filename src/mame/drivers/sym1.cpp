@@ -7,12 +7,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
-#include "machine/ram.h"
-#include "sound/speaker.h"
-#include "machine/mos6530n.h"
 #include "machine/6522via.h"
 #include "machine/74145.h"
+#include "machine/mos6530n.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
+#include "speaker.h"
+
 #include "sym1.lh"
 
 

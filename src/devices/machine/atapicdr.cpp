@@ -8,8 +8,8 @@
 #define T10MMC_GET_EVENT_STATUS_NOTIFICATION 0x4a
 
 // device type definition
-const device_type ATAPI_CDROM = &device_creator<atapi_cdrom_device>;
-const device_type ATAPI_FIXED_CDROM = &device_creator<atapi_fixed_cdrom_device>;
+const device_type ATAPI_CDROM = device_creator<atapi_cdrom_device>;
+const device_type ATAPI_FIXED_CDROM = device_creator<atapi_fixed_cdrom_device>;
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)

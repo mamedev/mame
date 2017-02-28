@@ -105,7 +105,7 @@
 
 
 // device type definition
-const device_type CEM3394 = &device_creator<cem3394_device>;
+const device_type CEM3394 = device_creator<cem3394_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

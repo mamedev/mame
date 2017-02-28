@@ -156,13 +156,15 @@ Quick Jack administration/service mode:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ay8910.h"
-#include "video/hd63484.h"
-#include "machine/microtch.h"
 #include "machine/mc68681.h"
+#include "machine/microtch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class adp_state : public driver_device

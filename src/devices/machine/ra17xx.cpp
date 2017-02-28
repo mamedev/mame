@@ -53,7 +53,7 @@
  *
  *************************************/
 
-const device_type RA17XX = &device_creator<ra17xx_device>;
+const device_type RA17XX = device_creator<ra17xx_device>;
 
 ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RA17XX, "Rockwell A17XX", tag, owner, clock, "ra17xx", __FILE__),

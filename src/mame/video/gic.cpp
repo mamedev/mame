@@ -62,9 +62,10 @@
 
 #include "emu.h"
 #include "gic.h"
+#include "screen.h"
 
 // device type definition
-const device_type GIC = &device_creator<gic_device>;
+const device_type GIC = device_creator<gic_device>;
 
 
 //Font data taken from Paul Robson's simulator

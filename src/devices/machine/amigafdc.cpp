@@ -12,7 +12,7 @@
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
 
-const device_type AMIGA_FDC = &device_creator<amiga_fdc>;
+const device_type AMIGA_FDC = device_creator<amiga_fdc>;
 
 FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
 	FLOPPY_ADF_FORMAT

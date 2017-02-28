@@ -339,7 +339,7 @@ void core_options::set_description(const char *name, const char *description)
 //  command line arguments
 //-------------------------------------------------
 
-bool core_options::parse_command_line(int argc, char **argv, int priority, std::string &error_string)
+bool core_options::parse_command_line(std::vector<std::string> &args, int priority, std::string &error_string)
 {
 	// reset the errors and the command
 	error_string.clear();
@@ -347,21 +347,28 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, std::
 
 	// iterate through arguments
 	int unadorned_index = 0;
-	bool retval = true;
-	for (int arg = 1; arg < argc; arg++)
+	size_t new_argc = 1;
+	for (size_t arg = 1; arg < args.size(); arg++)
 	{
 		// determine the entry name to search for
-		const char *curarg = argv[arg];
+		const char *curarg = args[arg].c_str();
 		bool is_unadorned = (curarg[0] != '-');
 		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
 
-		// find our entry; if not found, indicate invalid option
+		// find our entry; if not found, continue
 		auto curentry = m_entrymap.find(optionname);
 		if (curentry == m_entrymap.end())
 		{
-			error_string.append(string_format("Error: unknown option: %s\n", curarg));
-			retval = false;
-			if (!is_unadorned) arg++;
+			// we need to relocate this option
+			if (new_argc != arg)
+				args[new_argc++] = std::move(args[arg]);
+
+			if (!is_unadorned)
+			{
+				arg++;
+				if (new_argc != arg && arg < args.size())
+					args[new_argc++] = std::move(args[arg]);
+			}
 			continue;
 		}
 
@@ -379,23 +386,33 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, std::
 		}
 
 		// get the data for this argument, special casing booleans
-		const char *newdata;
+		std::string newdata;
 		if (curentry->second->type() == OPTION_BOOLEAN)
+		{
 			newdata = (strncmp(&curarg[1], "no", 2) == 0) ? "0" : "1";
+		}
 		else if (is_unadorned)
+		{
 			newdata = curarg;
-		else if (arg + 1 < argc)
-			newdata = argv[++arg];
+		}
+		else if (arg + 1 < args.size())
+		{
+			args[arg++].clear();
+			newdata = std::move(args[arg]);
+		}
 		else
 		{
 			error_string.append(string_format("Error: option %s expected a parameter\n", curarg));
 			return false;
 		}
+		args[arg].clear();
 
 		// set the new data
-		validate_and_set_data(*curentry->second, newdata, priority, error_string);
+		validate_and_set_data(*curentry->second, std::move(newdata), priority, error_string);
 	}
-	return retval;
+
+	args.resize(new_argc);
+	return true;
 }
 
 
@@ -465,11 +482,11 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 
 
 //-------------------------------------------------
-//	find_within_command_line - finds a specific
+//	pluck_from_command_line - finds a specific
 //	value from within a command line
 //-------------------------------------------------
 
-const char *core_options::find_within_command_line(int argc, char **argv, const char *optionname)
+bool core_options::pluck_from_command_line(std::vector<std::string> &args, const std::string &optionname, std::string &result)
 {
 	// find this entry within the options (it is illegal to call this with a non-existant option
 	// so we assert if not present)
@@ -487,16 +504,26 @@ const char *core_options::find_within_command_line(int argc, char **argv, const 
 	}
 
 	// find each of the targets in the argv array
-	for (int i = 1; i < argc - 1; i++)
+	for (int i = 1; i < args.size() - 1; i++)
 	{
 		auto const iter = std::find_if(
 			targets.begin(),
 			targets.end(),
-			[argv, i](const std::string &targ) { return targ == argv[i]; });
+			[&args, i](const std::string &targ) { return targ == args[i]; });
 		if (iter != targets.end())
-			return argv[i + 1];
+		{
+			// get the result
+			result = std::move(args[i + 1]);
+
+			// remove this arguments from the list
+			auto const pos = std::next(args.begin(), i);
+			args.erase(pos, std::next(pos, 2));
+			return true;
+		}
 	}
-	return nullptr;
+
+	result.clear();
+	return false;
 }
 
 
@@ -804,12 +831,10 @@ void core_options::copyfrom(const core_options &src)
  * @return  true if it succeeds, false if it fails.
  */
 
-bool core_options::validate_and_set_data(core_options::entry &curentry, const char *newdata, int priority, std::string &error_string)
+bool core_options::validate_and_set_data(core_options::entry &curentry, std::string &&data, int priority, std::string &error_string)
 {
 	// trim any whitespace
-	std::string data(newdata);
 	strtrimspace(data);
-
 
 	// trim quotes
 	if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)

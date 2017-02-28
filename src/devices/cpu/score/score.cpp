@@ -16,7 +16,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const device_type SCORE7 = &device_creator<score7_cpu_device>;
+const device_type SCORE7 = device_creator<score7_cpu_device>;
 
 
 //**************************************************************************

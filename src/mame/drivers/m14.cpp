@@ -54,6 +54,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class m14_state : public driver_device

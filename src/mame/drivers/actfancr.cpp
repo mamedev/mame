@@ -25,12 +25,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/actfancr.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/actfancr.h"
+#include "screen.h"
+#include "speaker.h"
 
 /******************************************************************************/
 

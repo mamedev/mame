@@ -52,9 +52,9 @@ namespace netlist
 			if (m_reset)
 			{
 				m_bcd = (m_bcd + 1) & 0x07;
-				m_QB.push(m_bcd & 1, out_delay);
-				m_QC.push((m_bcd >> 1) & 1, out_delay2);
 				m_QD.push((m_bcd >> 2) & 1, out_delay3);
+				m_QC.push((m_bcd >> 1) & 1, out_delay2);
+				m_QB.push(m_bcd & 1, out_delay);
 			}
 		}
 

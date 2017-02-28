@@ -33,11 +33,12 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/tms9928a.h"
-#include "sound/ay8910.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 
 class kingpin_state : public driver_device

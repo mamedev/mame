@@ -38,16 +38,20 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/6840ptm.h"
-#include "machine/i8255.h"
-#include "machine/6850acia.h"
-#include "video/tms34061.h"
-#include "video/ef9369.h"
-#include "sound/sn76496.h"
-#include "machine/wd_fdc.h"
 #include "formats/guab_dsk.h"
+#include "machine/6840ptm.h"
+#include "machine/6850acia.h"
+#include "machine/i8255.h"
+#include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "video/ef9369.h"
+#include "video/tms34061.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "guab.lh"
 
 

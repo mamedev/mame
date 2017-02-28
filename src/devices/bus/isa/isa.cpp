@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SLOT = &device_creator<isa8_slot_device>;
+const device_type ISA8_SLOT = device_creator<isa8_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -64,7 +64,7 @@ void isa8_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SLOT = &device_creator<isa16_slot_device>;
+const device_type ISA16_SLOT = device_creator<isa16_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -100,7 +100,7 @@ void isa16_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8 = &device_creator<isa8_device>;
+const device_type ISA8 = device_creator<isa8_device>;
 
 void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -455,7 +455,7 @@ void device_isa8_card_interface::set_isa_device()
 }
 
 
-const device_type ISA16 = &device_creator<isa16_device>;
+const device_type ISA16 = device_creator<isa16_device>;
 
 //-------------------------------------------------
 //  isa16_device - constructor

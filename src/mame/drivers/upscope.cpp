@@ -26,10 +26,11 @@
 **********************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
+#include "speaker.h"
 
 
 class upscope_state : public amiga_state

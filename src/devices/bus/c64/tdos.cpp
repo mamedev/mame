@@ -146,7 +146,7 @@ BASIC commands (SYS 32768 to activate)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_TDOS = &device_creator<c64_tdos_cartridge_device>;
+const device_type C64_TDOS = device_creator<c64_tdos_cartridge_device>;
 
 
 //-------------------------------------------------

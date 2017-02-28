@@ -21,7 +21,7 @@ zeus2_renderer::zeus2_renderer(zeus2_device *state)
 {
 }
 
-const device_type ZEUS2 = &device_creator<zeus2_device>;
+const device_type ZEUS2 = device_creator<zeus2_device>;
 
 zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ZEUS2, "Midway Zeus2", tag, owner, clock, "zeus2", __FILE__),

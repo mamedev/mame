@@ -53,16 +53,22 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
-#include "formats/d88_dsk.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/msm58321.h"
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
-#include "machine/msm58321.h"
-#include "machine/i8251.h"
 #include "sound/beep.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/d88_dsk.h"
+#include "formats/mfi_dsk.h"
+
 
 class pc100_state : public driver_device
 {

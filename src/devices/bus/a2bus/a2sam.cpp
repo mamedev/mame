@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "a2sam.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -20,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SAM = &device_creator<a2bus_sam_device>;
+const device_type A2BUS_SAM = device_creator<a2bus_sam_device>;
 
 MACHINE_CONFIG_FRAGMENT( a2sam )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

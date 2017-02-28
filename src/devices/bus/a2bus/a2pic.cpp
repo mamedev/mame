@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PIC = &device_creator<a2bus_pic_device>;
+const device_type A2BUS_PIC = device_creator<a2bus_pic_device>;
 
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"

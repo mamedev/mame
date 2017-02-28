@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "includes/gamecom.h"
 
+#include "screen.h"
+
+
 #define Y_PIXELS 200
 
 

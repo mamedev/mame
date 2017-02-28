@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "prot_cthd.h"
 
-extern const device_type CTHD_PROT = &device_creator<cthd_prot_device>;
+const device_type CTHD_PROT = device_creator<cthd_prot_device>;
 
 
 cthd_prot_device::cthd_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -36,7 +36,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_THUNDERCLOCK = &device_creator<a2bus_thunderclock_device>;
+const device_type A2BUS_THUNDERCLOCK = device_creator<a2bus_thunderclock_device>;
 
 #define THUNDERCLOCK_ROM_REGION  "thunclk_rom"
 #define THUNDERCLOCK_UPD1990_TAG "thunclk_upd"

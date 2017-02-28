@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_ROSS = &device_creator<c64_ross_cartridge_device>;
+const device_type C64_ROSS = device_creator<c64_ross_cartridge_device>;
 
 
 

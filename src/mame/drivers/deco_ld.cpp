@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "speaker.h"
 
 
 class deco_ld_state : public driver_device

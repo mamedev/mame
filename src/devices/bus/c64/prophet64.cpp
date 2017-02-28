@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_PROPHET64 = &device_creator<c64_prophet64_cartridge_device>;
+const device_type C64_PROPHET64 = device_creator<c64_prophet64_cartridge_device>;
 
 
 

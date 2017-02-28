@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ECBBUS_SLOT = &device_creator<ecbbus_slot_device>;
+const device_type ECBBUS_SLOT = device_creator<ecbbus_slot_device>;
 
 
 
@@ -63,7 +63,7 @@ void ecbbus_slot_device::device_start()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ECBBUS = &device_creator<ecbbus_device>;
+const device_type ECBBUS = device_creator<ecbbus_device>;
 
 
 

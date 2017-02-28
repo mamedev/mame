@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_GRAPHICS_SLOT = &device_creator<compis_graphics_slot_t>;
+const device_type COMPIS_GRAPHICS_SLOT = device_creator<compis_graphics_slot_t>;
 
 
 

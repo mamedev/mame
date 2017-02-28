@@ -52,15 +52,15 @@
 //**************************************************************************
 
 // device type definition
-const device_type Z80DART = &device_creator<z80dart_device>;
-const device_type Z80DART_CHANNEL = &device_creator<z80dart_channel>;
-const device_type Z80SIO0 = &device_creator<z80sio0_device>;
-const device_type Z80SIO1 = &device_creator<z80sio1_device>;
-const device_type Z80SIO2 = &device_creator<z80sio2_device>;
-const device_type Z80SIO3 = &device_creator<z80sio3_device>;
-const device_type Z80SIO4 = &device_creator<z80sio4_device>;
-const device_type I8274 = &device_creator<i8274_device>;
-const device_type UPD7201 = &device_creator<upd7201_device>;
+const device_type Z80DART = device_creator<z80dart_device>;
+const device_type Z80DART_CHANNEL = device_creator<z80dart_channel>;
+const device_type Z80SIO0 = device_creator<z80sio0_device>;
+const device_type Z80SIO1 = device_creator<z80sio1_device>;
+const device_type Z80SIO2 = device_creator<z80sio2_device>;
+const device_type Z80SIO3 = device_creator<z80sio3_device>;
+const device_type Z80SIO4 = device_creator<z80sio4_device>;
+const device_type I8274 = device_creator<i8274_device>;
+const device_type UPD7201 = device_creator<upd7201_device>;
 
 
 //-------------------------------------------------

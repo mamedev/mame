@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_STD = &device_creator<c64_standard_cartridge_device>;
+const device_type C64_STD = device_creator<c64_standard_cartridge_device>;
 
 
 

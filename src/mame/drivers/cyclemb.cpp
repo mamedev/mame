@@ -72,10 +72,13 @@ Dumped by Chack'n
 ****************************************************************************************************/
 
 #include "emu.h"
+#include "machine/tait8741.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "machine/tait8741.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cyclemb_state : public driver_device

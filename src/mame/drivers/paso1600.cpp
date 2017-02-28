@@ -12,9 +12,10 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/pic8259.h"
 #include "machine/am9517a.h"
+#include "machine/pic8259.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 class paso1600_state : public driver_device
@@ -32,7 +33,8 @@ public:
 		, m_p_pcg(*this, "pcg")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{
+	}
 
 	DECLARE_READ8_MEMBER(paso1600_pcg_r);
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);

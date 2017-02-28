@@ -104,13 +104,16 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-
 #include "includes/jpmimpct.h"
-#include "machine/nvram.h"
-#include "jpmimpct.lh"
-#include "video/awpvid.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "video/awpvid.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "jpmimpct.lh"
 
 /*************************************
  *

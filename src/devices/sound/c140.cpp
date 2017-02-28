@@ -67,7 +67,7 @@ struct voice_registers
 
 
 // device type definition
-const device_type C140 = &device_creator<c140_device>;
+const device_type C140 = device_creator<c140_device>;
 
 
 //**************************************************************************

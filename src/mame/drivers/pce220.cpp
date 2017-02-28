@@ -26,14 +26,16 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/pce220_ser.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
-#include "machine/pce220_ser.h"
-#include "machine/nvram.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 // Interrupt flags
 #define IRQ_FLAG_KEY        0x01

@@ -37,6 +37,9 @@
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAKE_BANK(lo, hi)       ((lo) | ((hi)<<8))
 

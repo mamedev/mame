@@ -6,14 +6,14 @@
  *
  ****************************************************************************/
 
-#ifndef MZ80_H_
-#define MZ80_H_
+#ifndef MAME_INCLUDES_MZ80_H
+#define MAME_INCLUDES_MZ80_H
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
 
 class mz80_state : public driver_device
@@ -69,4 +69,4 @@ private:
 extern const gfx_layout mz80k_charlayout;
 extern const gfx_layout mz80kj_charlayout;
 
-#endif /* MZ80_H_ */
+#endif // MAME_INCLUDES_MZ80_H

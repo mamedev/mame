@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_TRACK = &device_creator<saturn_track_device>;
+const device_type SATURN_TRACK = device_creator<saturn_track_device>;
 
 
 static INPUT_PORTS_START( saturn_track )

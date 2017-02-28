@@ -69,17 +69,20 @@
 */
 
 #include "emu.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
 #include "cpu/tms57002/tms57002.h"
-#include "video/psx.h"
 #include "machine/am53cf96.h"
 #include "machine/eepromser.h"
 #include "machine/mb89371.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-#include "sound/k056800.h"
+#include "machine/ram.h"
 #include "sound/k054539.h"
+#include "sound/k056800.h"
+#include "video/psx.h"
+#include "speaker.h"
+
 
 class konamigq_state : public driver_device
 {

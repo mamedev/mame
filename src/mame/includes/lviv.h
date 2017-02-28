@@ -6,14 +6,14 @@
  *
  ****************************************************************************/
 
-#ifndef LVIV_H_
-#define LVIV_H_
+#ifndef MAME_INCLUDES_LVIV_H
+#define MAME_INCLUDES_LVIV_H
 
+#include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/i8255.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "sound/spkrdev.h"
 
 class lviv_state : public driver_device
 {
@@ -67,4 +67,4 @@ public:
 extern const unsigned char lviv_palette[8*3];
 
 
-#endif /* LVIV_H_ */
+#endif /* MAME_INCLUDES_LVIV_H */

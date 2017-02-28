@@ -89,8 +89,8 @@
 #define LOG(x)
 #endif
 
-const device_type PPS4 = &device_creator<pps4_device>;
-const device_type PPS4_2 = &device_creator<pps4_2_device>;
+const device_type PPS4 = device_creator<pps4_device>;
+const device_type PPS4_2 = device_creator<pps4_2_device>;
 
 pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *file)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, file)

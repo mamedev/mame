@@ -39,7 +39,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A8SIO_SLOT = &device_creator<a8sio_slot_device>;
+const device_type A8SIO_SLOT = device_creator<a8sio_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -87,7 +87,7 @@ void a8sio_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A8SIO = &device_creator<a8sio_device>;
+const device_type A8SIO = device_creator<a8sio_device>;
 
 
 //**************************************************************************

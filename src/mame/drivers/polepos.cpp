@@ -218,20 +218,22 @@ Todo:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/polepos.h"
+#include "audio/namco52.h"
+#include "audio/namco54.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "machine/namco06.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "audio/namco52.h"
-#include "audio/namco54.h"
-#include "includes/polepos.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+#include "speaker.h"
 
 #include "polepos.lh"
 #include "topracer.lh"

@@ -8,6 +8,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
+#include "screen.h"
 
 /* Calculated from CRT controller writes */
 #define PIXEL_CLOCK            (XTAL_21MHz / 3)

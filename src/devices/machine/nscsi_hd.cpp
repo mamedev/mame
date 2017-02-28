@@ -4,7 +4,7 @@
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 
-const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
+const device_type NSCSI_HARDDISK = device_creator<nscsi_harddisk_device>;
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)

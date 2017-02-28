@@ -13,8 +13,8 @@
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
 
-const device_type HP_OPTROM_CART = &device_creator<hp_optrom_cart_device>;
-const device_type HP_OPTROM_SLOT = &device_creator<hp_optrom_slot_device>;
+const device_type HP_OPTROM_CART = device_creator<hp_optrom_cart_device>;
+const device_type HP_OPTROM_SLOT = device_creator<hp_optrom_slot_device>;
 
 // +---------------------+
 // |hp_optrom_cart_device|
@@ -55,7 +55,7 @@ void hp_optrom_slot_device::device_start()
 
 void hp_optrom_slot_device::device_config_complete()
 {
-		update_names(HP_OPTROM_SLOT , "optional_rom" , "optrom");
+		update_names();
 }
 
 image_init_result hp_optrom_slot_device::call_load()

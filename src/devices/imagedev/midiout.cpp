@@ -16,7 +16,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIOUT = &device_creator<midiout_device>;
+const device_type MIDIOUT = device_creator<midiout_device>;
 
 /*-------------------------------------------------
     ctor

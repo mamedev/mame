@@ -15,7 +15,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type CDP1879 = &device_creator<cdp1879_device>;
+const device_type CDP1879 = device_creator<cdp1879_device>;
 
 //-------------------------------------------------
 //  cdp1879_device - constructor

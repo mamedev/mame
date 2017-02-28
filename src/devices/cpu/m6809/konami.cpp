@@ -77,7 +77,7 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type KONAMI = &device_creator<konami_cpu_device>;
+const device_type KONAMI = device_creator<konami_cpu_device>;
 
 
 //-------------------------------------------------

@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/finalizr.h"
+#include "video/resnet.h"
+#include "screen.h"
 
 
 /***************************************************************************

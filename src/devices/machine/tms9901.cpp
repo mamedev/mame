@@ -670,4 +670,4 @@ void tms9901_device::device_start(void)
 	save_item(NAME(m_clock_read_register));
 }
 
-const device_type TMS9901 = &device_creator<tms9901_device>;
+const device_type TMS9901 = device_creator<tms9901_device>;

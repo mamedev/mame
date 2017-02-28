@@ -24,10 +24,14 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 
 #include "emu.h"
 #include "includes/ut88.h"
+
 #include "formats/rk_cas.h"
 #include "softlist.h"
 #include "ut88mini.lh"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static GFXDECODE_START( ut88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ut88_charlayout, 0, 1 )

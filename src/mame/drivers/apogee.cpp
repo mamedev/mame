@@ -10,15 +10,21 @@
 
 
 #include "emu.h"
+#include "includes/radio86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 class apogee_state : public radio86_state
 {

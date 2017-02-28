@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS8722 = &device_creator<mos8722_device>;
+const device_type MOS8722 = device_creator<mos8722_device>;
 
 
 

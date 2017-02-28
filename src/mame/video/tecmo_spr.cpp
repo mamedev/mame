@@ -10,12 +10,12 @@
 
 */
 
-
 #include "emu.h"
 #include "tecmo_spr.h"
+#include "screen.h"
 
 
-const device_type TECMO_SPRITE = &device_creator<tecmo_spr_device>;
+const device_type TECMO_SPRITE = device_creator<tecmo_spr_device>;
 
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TECMO_SPRITE, "Tecmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),

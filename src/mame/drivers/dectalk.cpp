@@ -267,6 +267,7 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/x2212.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 class dectalk_state : public driver_device

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CST_QL_DISC_INTERFACE = &device_creator<cst_ql_disc_interface_t>;
+const device_type CST_QL_DISC_INTERFACE = device_creator<cst_ql_disc_interface_t>;
 
 
 //-------------------------------------------------

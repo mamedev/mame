@@ -46,14 +46,15 @@
 
 *************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12MHz
-
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_12MHz
 
 
 class nibble_state : public driver_device

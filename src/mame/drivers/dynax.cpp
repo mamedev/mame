@@ -77,14 +77,18 @@ TODO:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/dynax.h"
+
 #include "cpu/tlcs90/tlcs90.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "machine/nvram.h"
+
 #include "rendlay.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC80_16KB_RAM_CARD = &device_creator<abc80_16kb_ram_card_t>;
+const device_type ABC80_16KB_RAM_CARD = device_creator<abc80_16kb_ram_card_t>;
 
 
 

@@ -87,8 +87,8 @@ const int GIEFLAG   = 0x2000;
 //**************************************************************************
 
 // device type definition
-const device_type TMS32031 = &device_creator<tms32031_device>;
-const device_type TMS32032 = &device_creator<tms32032_device>;
+const device_type TMS32031 = device_creator<tms32031_device>;
+const device_type TMS32032 = device_creator<tms32032_device>;
 
 
 // internal memory maps

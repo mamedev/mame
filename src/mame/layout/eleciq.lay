@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="disk_black"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="disk_white"><disk><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+
+	<element name="text_l1"><text string="TIME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="butw" defstate="0">
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
+		<disk state="1"><color red="0.9" green="0.9" blue="0.9" /></disk>
+	</element>
+	<element name="butr" defstate="0">
+		<disk state="0"><color red="0.2" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><color red="0.9" green="0.2" blue="0.2" /></disk>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.2" blue="0.23" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="30" top="0" bottom="30" />
+
+	<!-- bezel, buttons -->
+
+	<!-- leds -->
+
+		<bezel name="digit8" element="digit"><bounds x="0" y="0" width="2" height="3" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="2" y="0" width="2" height="3" /></bezel>
+
+		<bezel name="1.6" element="led"><bounds x="4"  y="9" width="1" height="1" /></bezel>
+		<bezel name="2.6" element="led"><bounds x="8"  y="9" width="1" height="1" /></bezel>
+		<bezel name="3.6" element="led"><bounds x="12" y="9" width="1" height="1" /></bezel>
+		<bezel name="4.6" element="led"><bounds x="16" y="9" width="1" height="1" /></bezel>
+		<bezel name="5.6" element="led"><bounds x="20" y="9" width="1" height="1" /></bezel>
+		<bezel name="6.6" element="led"><bounds x="24" y="9" width="1" height="1" /></bezel>
+
+		<bezel name="1.5" element="led"><bounds x="4"  y="12" width="1" height="1" /></bezel>
+		<bezel name="2.5" element="led"><bounds x="8"  y="12" width="1" height="1" /></bezel>
+		<bezel name="3.5" element="led"><bounds x="12" y="12" width="1" height="1" /></bezel>
+		<bezel name="4.5" element="led"><bounds x="16" y="12" width="1" height="1" /></bezel>
+		<bezel name="5.5" element="led"><bounds x="20" y="12" width="1" height="1" /></bezel>
+		<bezel name="6.5" element="led"><bounds x="24" y="12" width="1" height="1" /></bezel>
+
+		<bezel name="1.4" element="led"><bounds x="4"  y="15" width="1" height="1" /></bezel>
+		<bezel name="2.4" element="led"><bounds x="8"  y="15" width="1" height="1" /></bezel>
+		<bezel name="3.4" element="led"><bounds x="12" y="15" width="1" height="1" /></bezel>
+		<bezel name="4.4" element="led"><bounds x="16" y="15" width="1" height="1" /></bezel>
+		<bezel name="5.4" element="led"><bounds x="20" y="15" width="1" height="1" /></bezel>
+		<bezel name="6.4" element="led"><bounds x="24" y="15" width="1" height="1" /></bezel>
+
+		<bezel name="1.1" element="led"><bounds x="4"  y="18" width="1" height="1" /></bezel>
+		<bezel name="2.1" element="led"><bounds x="8"  y="18" width="1" height="1" /></bezel>
+		<bezel name="3.1" element="led"><bounds x="12" y="18" width="1" height="1" /></bezel>
+		<bezel name="4.1" element="led"><bounds x="16" y="18" width="1" height="1" /></bezel>
+		<bezel name="5.1" element="led"><bounds x="20" y="18" width="1" height="1" /></bezel>
+		<bezel name="6.1" element="led"><bounds x="24" y="18" width="1" height="1" /></bezel>
+
+		<bezel name="1.0" element="led"><bounds x="4"  y="21" width="1" height="1" /></bezel>
+		<bezel name="2.0" element="led"><bounds x="8"  y="21" width="1" height="1" /></bezel>
+		<bezel name="3.0" element="led"><bounds x="12" y="21" width="1" height="1" /></bezel>
+		<bezel name="4.0" element="led"><bounds x="16" y="21" width="1" height="1" /></bezel>
+		<bezel name="5.0" element="led"><bounds x="20" y="21" width="1" height="1" /></bezel>
+		<bezel name="6.0" element="led"><bounds x="24" y="21" width="1" height="1" /></bezel>
+
+	</view>
+</mamelayout>

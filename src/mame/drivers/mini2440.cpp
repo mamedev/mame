@@ -13,6 +13,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 

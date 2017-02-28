@@ -19,7 +19,7 @@
 //  constructors
 //-------------------------------------------------
 
-const device_type SEGA8_ROM_CARDCATCH = &device_creator<sega8_cardcatch_device>;
+const device_type SEGA8_ROM_CARDCATCH = device_creator<sega8_cardcatch_device>;
 
 
 

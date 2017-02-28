@@ -10,6 +10,7 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "video/tms34061.h"
+#include "screen.h"
 
 class capbowl_state : public driver_device
 {

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "ataflash.h"
 
-const device_type ATA_FLASH_PCCARD = &device_creator<ata_flash_pccard_device>;
+const device_type ATA_FLASH_PCCARD = device_creator<ata_flash_pccard_device>;
 
 ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_hdd_device(mconfig, ATA_FLASH_PCCARD, "ATA Flash PCCARD", tag, owner, clock, "ataflash", __FILE__)
@@ -117,7 +117,7 @@ attotime ata_flash_pccard_device::seek_time()
 }
 
 
-const device_type TAITO_PCCARD1 = &device_creator<taito_pccard1_device>;
+const device_type TAITO_PCCARD1 = device_creator<taito_pccard1_device>;
 
 taito_pccard1_device::taito_pccard1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_PCCARD1, "Taito PC-CARD (Type 1)", tag, owner, clock, "taito_pccard1", __FILE__),
@@ -208,7 +208,7 @@ bool taito_pccard1_device::is_ready()
 	return m_locked == 0;
 }
 
-const device_type TAITO_PCCARD2 = &device_creator<taito_pccard2_device>;
+const device_type TAITO_PCCARD2 = device_creator<taito_pccard2_device>;
 
 taito_pccard2_device::taito_pccard2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_PCCARD1, "Taito PC-CARD (Type 2)", tag, owner, clock, "taito_pccard2", __FILE__),
@@ -307,7 +307,7 @@ bool taito_pccard2_device::is_ready()
 	return !m_locked;
 }
 
-const device_type TAITO_COMPACT_FLASH = &device_creator<taito_compact_flash_device>;
+const device_type TAITO_COMPACT_FLASH = device_creator<taito_compact_flash_device>;
 
 taito_compact_flash_device::taito_compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_flash_pccard_device(mconfig, TAITO_COMPACT_FLASH, "Taito Compact Flash", tag, owner, clock, "taito_cf", __FILE__),

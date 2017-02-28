@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "machine/megacdcd.h"
 
-const device_type LC89510_TEMP = &device_creator<lc89510_temp_device>;
+const device_type LC89510_TEMP = device_creator<lc89510_temp_device>;
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LC89510_TEMP, "lc89510_temp_device", tag, owner, clock, "lc89510_temp", __FILE__)

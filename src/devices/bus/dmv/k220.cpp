@@ -122,7 +122,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K220 = &device_creator<dmv_k220_device>;
+const device_type DMV_K220 = device_creator<dmv_k220_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

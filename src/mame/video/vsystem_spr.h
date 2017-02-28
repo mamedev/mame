@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, David Haywood
 // Video System Sprites
+#ifndef MAME_VIDEO_VSYSTEM_SPR_H
+#define MAME_VIDEO_VSYSTEM_SPR_H
 
 
 typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
@@ -79,3 +81,5 @@ private:
 
 
 extern const device_type VSYSTEM_SPR;
+
+#endif // MAME_VIDEO_VSYSTEM_SPR_H

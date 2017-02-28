@@ -37,11 +37,15 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #include "emu.h"
+#include "includes/kickgoal.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/kickgoal.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /**************************************************************************
    This table converts commands sent from the main CPU, into sample numbers

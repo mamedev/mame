@@ -165,7 +165,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 
 
-const device_type MC6854 = &device_creator<mc6854_device>;
+const device_type MC6854 = device_creator<mc6854_device>;
 
 mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6854, "MC6854 ADLC", tag, owner, clock, "mc6854", __FILE__),

@@ -6,13 +6,12 @@
 
 *********************************************************************/
 
+#ifndef MAME_INCLUDES_COMPISKB_H
+#define MAME_INCLUDES_COMPISKB_H
+
 #pragma once
 
-#ifndef __COMPIS_KEYBOARD__
-#define __COMPIS_KEYBOARD__
-
-#include "cpu/mcs48/mcs48.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 
 
@@ -78,4 +77,4 @@ extern const device_type COMPIS_KEYBOARD;
 
 
 
-#endif
+#endif // MAME_INCLUDES_COMPISKB_H

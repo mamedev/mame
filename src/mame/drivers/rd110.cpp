@@ -18,10 +18,11 @@
 */
 
 #include "emu.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "video/msm6222b.h"
 #include "cpu/mcs96/i8x9x.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "video/msm6222b.h"
+#include "screen.h"
 
 static INPUT_PORTS_START( d110 )
 	PORT_START("SC0")

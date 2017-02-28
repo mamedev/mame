@@ -15,7 +15,7 @@
 //  sns_rom_superfx_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERFX = &device_creator<sns_rom_superfx_device>;
+const device_type SNS_LOROM_SUPERFX = device_creator<sns_rom_superfx_device>;
 
 
 sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

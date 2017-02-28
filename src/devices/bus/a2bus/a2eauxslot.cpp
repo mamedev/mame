@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUXSLOT_SLOT = &device_creator<a2eauxslot_slot_device>;
+const device_type A2EAUXSLOT_SLOT = device_creator<a2eauxslot_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -61,7 +61,7 @@ void a2eauxslot_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUXSLOT = &device_creator<a2eauxslot_device>;
+const device_type A2EAUXSLOT = device_creator<a2eauxslot_device>;
 
 void a2eauxslot_device::static_set_cputag(device_t &device, const char *tag)
 {

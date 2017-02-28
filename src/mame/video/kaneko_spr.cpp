@@ -26,10 +26,11 @@
 
 #include "emu.h"
 #include "kaneko_spr.h"
+#include "screen.h"
 
-//const device_type KANEKO16_SPRITE = &device_creator<kaneko16_sprite_device>; // we have pure virtual functions
-const device_type KANEKO_VU002_SPRITE = &device_creator<kaneko_vu002_sprite_device>;
-const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_device>;
+//const device_type KANEKO16_SPRITE = device_creator<kaneko16_sprite_device>; // we have pure virtual functions
+const device_type KANEKO_VU002_SPRITE = device_creator<kaneko_vu002_sprite_device>;
+const device_type KANEKO_KC002_SPRITE = device_creator<kaneko_kc002_sprite_device>;
 
 kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type)
 	: device_t(mconfig, type, "Kaneko 16-bit Sprites", tag, owner, clock, "kaneko16_sprite", __FILE__)

@@ -76,12 +76,16 @@ a joystick.  This is not an emulation bug.
 
 #include "emu.h"
 #include "includes/snowbros.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
-#include "cpu/mcs51/mcs51.h" // for semicom mcu
-#include "machine/watchdog.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)

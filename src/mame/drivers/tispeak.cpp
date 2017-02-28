@@ -400,11 +400,14 @@ K28 modules:
 
 #include "emu.h"
 #include "includes/hh_tms1k.h"
-#include "sound/tms5110.h"
-#include "machine/tms6100.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/tms6100.h"
+#include "sound/tms5110.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 // internal artwork
 #include "k28m2.lh"

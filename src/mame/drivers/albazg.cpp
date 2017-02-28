@@ -41,6 +41,8 @@ PCB:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK XTAL_12MHz
 

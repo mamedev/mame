@@ -153,11 +153,14 @@ Player 2 and Player 1 share the same controls !
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/thepit.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/thepit.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        (18432000)

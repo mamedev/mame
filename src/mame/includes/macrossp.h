@@ -8,6 +8,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class macrossp_state : public driver_device
 {

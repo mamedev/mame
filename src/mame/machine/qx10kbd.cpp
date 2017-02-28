@@ -244,4 +244,4 @@ ioport_constructor qx10_keyboard_device::device_input_ports() const
 }
 
 
-const device_type QX10_KEYBOARD = &device_creator<qx10_keyboard_device>;
+const device_type QX10_KEYBOARD = device_creator<qx10_keyboard_device>;

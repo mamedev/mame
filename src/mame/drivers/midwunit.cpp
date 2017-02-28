@@ -91,12 +91,14 @@ Notes:
 
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "audio/dcs.h"
-#include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
+#include "audio/dcs.h"
+
+#include "cpu/tms34010/tms34010.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "machine/nvram.h"
+#include "screen.h"
 
 
 #define PIXEL_CLOCK     (8000000)
@@ -960,37 +962,71 @@ ROM_START( umk3r10 )
 ROM_END
 
 
-ROM_START( openice ) /* a PCB with alternate ROM labels also showed the dates */
+ROM_START( openice )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* This one labeled as L1.2 - dated 10/10/95 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* This one labeled as L1 - dated 9/1/95 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* This one labeled as L1 - dated 9/1/95 */
-	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* This one labeled as L1 - dated 9/1/95 */
+	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* This one labeled as L1.2 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* This one labeled as L1 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* This one labeled as L1 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* This one labeled as L1 */
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "open_ice_l1.21.u54", 0x00000, 0x80000, CRC(e4225284) SHA1(d5e267cf35826c106bb0a800363849ed4d489e56) ) /* Labeled as L1.21 */
 	ROM_LOAD16_BYTE( "open_ice_l1.21.u63", 0x00001, 0x80000, CRC(97d308a3) SHA1(0a517fab77bc2277884587c7e29e392bb360d27b) ) /* Labeled as L1.21 */
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
-	ROM_LOAD32_BYTE( "open_ice_l1.2.u133", 0x0000000, 0x100000, CRC(8a81605c) SHA1(cf397b8da242566b21579b90528857ccd2f93141) ) /* These 4 are labeled as L1.2 - dated 10/17/95 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u133", 0x0000000, 0x100000, CRC(8a81605c) SHA1(cf397b8da242566b21579b90528857ccd2f93141) ) /* These 4 are labeled as L1.2 */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u132", 0x0000001, 0x100000, CRC(cfdd6702) SHA1(0198d2cc2de93a8aa345ba0af8d92713d798be8a) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u131", 0x0000002, 0x100000, CRC(cc428eb7) SHA1(ff2403077453f24bd1b176f57b17649b1b64bccf) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u130", 0x0000003, 0x100000, CRC(74c2d50c) SHA1(7880a28b003aa44878384efcb72b98833383f67e) )
 
-	ROM_LOAD32_BYTE( "open_ice_l1.2.u129", 0x0400000, 0x100000, CRC(9e2ff012) SHA1(35160ab239f0d8efcb2dc67dee4bd8d204226e3d) ) /* These 4 are labeled as L1.2 - dated 9/14/95 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u129", 0x0400000, 0x100000, CRC(9e2ff012) SHA1(35160ab239f0d8efcb2dc67dee4bd8d204226e3d) ) /* These 4 are labeled as L1.2 */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u128", 0x0400001, 0x100000, CRC(35d2e610) SHA1(c4bd18f44592299f120344ecaf1464a8b31d80c8) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u127", 0x0400002, 0x100000, CRC(bcbf19fe) SHA1(e28f0238ef020b75b10318e5c3dd4c5472b3638a) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u126", 0x0400003, 0x100000, CRC(8e3106ae) SHA1(58d1fd097e23578195d28671f22cfa3ed161c0f5) )
 
-	ROM_LOAD32_BYTE( "open_ice_l1.u125",   0x0800000, 0x100000, CRC(a7b54550) SHA1(83e3627c4e84466ec10023b0e2259ad86b791fd7) ) /* Yes, these 4 are labeled as L1, NOT L1.2 - dated 7/11/95 */
+	ROM_LOAD32_BYTE( "open_ice_l1.u125",   0x0800000, 0x100000, CRC(a7b54550) SHA1(83e3627c4e84466ec10023b0e2259ad86b791fd7) ) /* Yes, these 4 are labeled as L1, NOT L1.2 */
 	ROM_LOAD32_BYTE( "open_ice_l1.u124",   0x0800001, 0x100000, CRC(7c02cb50) SHA1(92d24bcfd66396c52c823b816118eed39c4ef9cd) )
 	ROM_LOAD32_BYTE( "open_ice_l1.u123",   0x0800002, 0x100000, CRC(d543bd9d) SHA1(a9ff8589fe185ea058b549c2ed4e71f6c50e9638) )
 	ROM_LOAD32_BYTE( "open_ice_l1.u122",   0x0800003, 0x100000, CRC(3744d291) SHA1(e4484f377a66c4c64b015ef461419d956b6e23e4) )
 
-	ROM_LOAD32_BYTE( "open_ice_l1.2.u121", 0x0c00000, 0x100000, CRC(acd2f7c7) SHA1(82d6f09e63a825b118c36d668427011cd8892eaa) ) /* These 4 are labeled as L1.2 - dated 8/14/95 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u121", 0x0c00000, 0x100000, CRC(acd2f7c7) SHA1(82d6f09e63a825b118c36d668427011cd8892eaa) ) /* These 4 are labeled as L1.2 */
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u120", 0x0c00001, 0x100000, CRC(4295686a) SHA1(2522e57335bb8cca6d76942d2fd62560f88e37a6) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u119", 0x0c00002, 0x100000, CRC(948b9b27) SHA1(62d031410f491d557e27ba055d3db9d36d5a153c) )
 	ROM_LOAD32_BYTE( "open_ice_l1.2.u118", 0x0c00003, 0x100000, CRC(9eaaf93e) SHA1(56bd881df5282f659ac68ace960a3b085c13dd9d) )
+ROM_END
+
+
+ROM_START( openicea ) /* PCB had alternate ROM labels showing the dates & checksums */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
+	ROM_LOAD16_BYTE( "open_ice_l1.2.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* U2  OPEN ICE HOCKEY  R1.2  10/10/95  1900 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u3",   0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) ) /* U3  OPEN ICE HOCKEY  9/1/95  4D00 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u4",   0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) ) /* U3  OPEN ICE HOCKEY  9/1/95  4700 */
+	ROM_LOAD16_BYTE( "open_ice_l1.u5",   0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) ) /* U3  OPEN ICE HOCKEY  9/1/95  C200 */
+
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
+	ROM_LOAD16_BYTE( "open_ice_781c_r1.2a.u54", 0x00000, 0x80000, CRC(63296053) SHA1(9f6fcb1f95a09165c211b569001563b56d06876c) ) /* hand written as  781C  R1.21 - game reports as Revision 1.2A */
+	ROM_LOAD16_BYTE( "open_ice_6937_r1.2a.u63", 0x00001, 0x80000, CRC(04441034) SHA1(d0af6305749a26adddb17aabb512e0347fcac767) ) /* hand written as  6937  R1.21 - game reports as Revision 1.2A */
+
+	ROM_REGION( 0x2000000, "gfxrom", 0 ) /* label for U133 is likely for v1.1 with different data for that bank of 4 roms dated 9/14/95 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u133", 0x0000000, 0x100000, CRC(8a81605c) SHA1(cf397b8da242566b21579b90528857ccd2f93141) ) /* 2M.0  U133  OPEN ICE HOCKEY  9/14/95  EE39 - however, this should be: 2M.0  U133  OPEN ICE HOCKEY  10/17/95  04E5 - Same as parent */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u132", 0x0000001, 0x100000, CRC(cfdd6702) SHA1(0198d2cc2de93a8aa345ba0af8d92713d798be8a) ) /* 2M.1  U132  OPEN ICE HOCKEY  10/17/95  595E */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u131", 0x0000002, 0x100000, CRC(cc428eb7) SHA1(ff2403077453f24bd1b176f57b17649b1b64bccf) ) /* 2M.2  U131  OPEN ICE HOCKEY  10/17/95  B2BF */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u130", 0x0000003, 0x100000, CRC(74c2d50c) SHA1(7880a28b003aa44878384efcb72b98833383f67e) ) /* 2M.3  U130  OPEN ICE HOCKEY  10/17/95  D784 */
+
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u129", 0x0400000, 0x100000, CRC(9e2ff012) SHA1(35160ab239f0d8efcb2dc67dee4bd8d204226e3d) ) /* 4M.0  U129  OPEN ICE HOCKEY  9/14/95  97E0 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u128", 0x0400001, 0x100000, CRC(35d2e610) SHA1(c4bd18f44592299f120344ecaf1464a8b31d80c8) ) /* 4M.1  U128  OPEN ICE HOCKEY  9/14/95  96FC */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u127", 0x0400002, 0x100000, CRC(bcbf19fe) SHA1(e28f0238ef020b75b10318e5c3dd4c5472b3638a) ) /* 4M.2  U127  OPEN ICE HOCKEY  9/14/95  6A67 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u126", 0x0400003, 0x100000, CRC(8e3106ae) SHA1(58d1fd097e23578195d28671f22cfa3ed161c0f5) ) /* 4M.3  U126  OPEN ICE HOCKEY  9/14/95  E92F */
+
+	ROM_LOAD32_BYTE( "open_ice_l1.u125",   0x0800000, 0x100000, CRC(a7b54550) SHA1(83e3627c4e84466ec10023b0e2259ad86b791fd7) ) /* 6M.0  U125  OPEN ICE HOCKEY  7/11/95  23F8 */
+	ROM_LOAD32_BYTE( "open_ice_l1.u124",   0x0800001, 0x100000, CRC(7c02cb50) SHA1(92d24bcfd66396c52c823b816118eed39c4ef9cd) ) /* 6M.1  U124  OPEN ICE HOCKEY  7/11/95  A90C */
+	ROM_LOAD32_BYTE( "open_ice_l1.u123",   0x0800002, 0x100000, CRC(d543bd9d) SHA1(a9ff8589fe185ea058b549c2ed4e71f6c50e9638) ) /* 6M.2  U123  OPEN ICE HOCKEY  7/11/95  EA1C */
+	ROM_LOAD32_BYTE( "open_ice_l1.u122",   0x0800003, 0x100000, CRC(3744d291) SHA1(e4484f377a66c4c64b015ef461419d956b6e23e4) ) /* 6M.3  U122  OPEN ICE HOCKEY  7/11/95  AA6B */
+
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u121", 0x0c00000, 0x100000, CRC(acd2f7c7) SHA1(82d6f09e63a825b118c36d668427011cd8892eaa) ) /* 8M.0  U121  OPEN ICE HOCKEY  9/14/95  0A39 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u120", 0x0c00001, 0x100000, CRC(4295686a) SHA1(2522e57335bb8cca6d76942d2fd62560f88e37a6) ) /* 8M.1  U120  OPEN ICE HOCKEY  9/14/95  64AD */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u119", 0x0c00002, 0x100000, CRC(948b9b27) SHA1(62d031410f491d557e27ba055d3db9d36d5a153c) ) /* 8M.2  U119  OPEN ICE HOCKEY  9/14/95  3446 */
+	ROM_LOAD32_BYTE( "open_ice_l1.2.u118", 0x0c00003, 0x100000, CRC(9eaaf93e) SHA1(56bd881df5282f659ac68ace960a3b085c13dd9d) ) /* 8M.3  U118  OPEN ICE HOCKEY  9/14/95  3FD9 */
 ROM_END
 
 
@@ -1308,6 +1344,7 @@ GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmani
 GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
 

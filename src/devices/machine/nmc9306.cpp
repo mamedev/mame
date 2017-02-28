@@ -56,7 +56,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type NMC9306 = &device_creator<nmc9306_device>;
+const device_type NMC9306 = device_creator<nmc9306_device>;
 
 //-------------------------------------------------
 //  nmc9306_device - constructor

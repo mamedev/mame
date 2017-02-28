@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WD1002A_WX1 = &device_creator<isa8_wd1002a_wx1_device>;
+const device_type ISA8_WD1002A_WX1 = device_creator<isa8_wd1002a_wx1_device>;
 
 
 //-------------------------------------------------

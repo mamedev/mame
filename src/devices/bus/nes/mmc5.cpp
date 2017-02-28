@@ -41,7 +41,7 @@ static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_EXROM = &device_creator<nes_exrom_device>;
+const device_type NES_EXROM = device_creator<nes_exrom_device>;
 
 
 nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

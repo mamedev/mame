@@ -70,7 +70,7 @@
 #include <ctype.h>
 
 
-const device_type CORVUS_HDC = &device_creator<corvus_hdc_t>;
+const device_type CORVUS_HDC = device_creator<corvus_hdc_t>;
 
 corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CORVUS_HDC, "Corvus Flat Cable HDC", tag, owner, clock, "corvus_hdc", __FILE__),

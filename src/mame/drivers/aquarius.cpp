@@ -23,7 +23,10 @@
 
 #include "emu.h"
 #include "includes/aquarius.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     CONSTANTS

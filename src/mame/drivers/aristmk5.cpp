@@ -167,10 +167,9 @@
 *****************************************************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_72MHz      /* confirmed */
-
 #include "emu.h"
 #include "includes/archimds.h"
+
 #include "cpu/arm/arm.h"
 #include "machine/ds1302.h"
 #include "machine/watchdog.h"
@@ -181,9 +180,12 @@
 #include "machine/ins8250.h"
 #include "machine/ticket.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #include "aristmk5.lh"
 #include "aristmk5_us.lh"
+
+#define MASTER_CLOCK        XTAL_72MHz      /* confirmed */
 
 class aristmk5_state : public archimedes_state
 {

@@ -143,10 +143,10 @@ bits(7:4) and bit(24)), X, and Y:
 
 
 #include "emu.h"
-
-#include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"
+
+#include "screen.h"
 
 
 /*************************************
@@ -5781,7 +5781,7 @@ void voodoo_device::device_stop()
 }
 
 
-const device_type VOODOO_1 = &device_creator<voodoo_1_device>;
+const device_type VOODOO_1 = device_creator<voodoo_1_device>;
 
 voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: voodoo_device(mconfig, VOODOO_1, "3dfx Voodoo Graphics", tag, owner, clock, "voodoo_1", __FILE__)
@@ -5798,7 +5798,7 @@ void voodoo_1_device::device_start()
 }
 
 
-const device_type VOODOO_2 = &device_creator<voodoo_2_device>;
+const device_type VOODOO_2 = device_creator<voodoo_2_device>;
 
 voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: voodoo_device(mconfig, VOODOO_2, "3dfx Voodoo 2", tag, owner, clock, "voodoo_2", __FILE__)
@@ -5815,7 +5815,7 @@ void voodoo_2_device::device_start()
 }
 
 
-const device_type VOODOO_BANSHEE = &device_creator<voodoo_banshee_device>;
+const device_type VOODOO_BANSHEE = device_creator<voodoo_banshee_device>;
 
 voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: voodoo_device(mconfig, VOODOO_BANSHEE, "3dfx Voodoo Banshee", tag, owner, clock, "voodoo_banshee", __FILE__)
@@ -5837,7 +5837,7 @@ void voodoo_banshee_device::device_start()
 }
 
 
-const device_type VOODOO_3 = &device_creator<voodoo_3_device>;
+const device_type VOODOO_3 = device_creator<voodoo_3_device>;
 
 voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: voodoo_banshee_device(mconfig, VOODOO_3, "3dfx Voodoo 3", tag, owner, clock, "voodoo_3", __FILE__)

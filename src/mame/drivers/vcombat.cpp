@@ -83,14 +83,16 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/i860/i860.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "video/tlc34076.h"
 #include "video/mc6845.h"
+#include "video/tlc34076.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vcombat_state : public driver_device

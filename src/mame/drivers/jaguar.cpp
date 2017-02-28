@@ -348,6 +348,7 @@ Notes:
 #include "sound/volt_reg.h"
 #include "cdrom.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #define COJAG_CLOCK         XTAL_52MHz
 #define R3000_CLOCK         XTAL_40MHz
@@ -393,7 +394,7 @@ public:
 	}
 };
 
-const device_type COJAG_HARDDISK = &device_creator<cojag_hdd>;
+const device_type COJAG_HARDDISK = device_creator<cojag_hdd>;
 
 SLOT_INTERFACE_START(cojag_devices)
 	SLOT_INTERFACE("hdd", COJAG_HARDDISK)
@@ -2057,7 +2058,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 {
 	uint32_t size, load_offset = 0;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		size = image.length();
 

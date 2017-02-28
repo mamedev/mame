@@ -160,15 +160,17 @@
 
 *******************************************************************************/
 
-
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_8MHz
-#define CLOCK_C XTAL_19_6608MHz
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define CLOCK_A XTAL_30MHz
+#define CLOCK_B XTAL_8MHz
+#define CLOCK_C XTAL_19_6608MHz
 
 
 class magicard_state : public driver_device

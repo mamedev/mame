@@ -23,7 +23,7 @@
 #include "prot_misc.h"
 
 
-extern const device_type NEOBOOT_PROT = &device_creator<neoboot_prot_device>;
+const device_type NEOBOOT_PROT = device_creator<neoboot_prot_device>;
 
 
 neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

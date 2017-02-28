@@ -6,11 +6,15 @@
 
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "audio/s11c_bg.h"
 #include "audio/wpcsnd.h"
+
+#include "cpu/m6809/m6809.h"
 #include "machine/wpc.h"
+#include "speaker.h"
+
 #include "wpc_an.lh"
+
 
 #define LOG_WPC (1)
 

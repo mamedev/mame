@@ -48,7 +48,9 @@
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class rx78_state : public driver_device
 {

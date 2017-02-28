@@ -41,7 +41,7 @@ THen 2 nibbles are read to form a byte containing the absolute Y coordiante.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_GRAPHIC = &device_creator<sms_graphic_device>;
+const device_type SMS_GRAPHIC = device_creator<sms_graphic_device>;
 
 
 static INPUT_PORTS_START( sms_graphic )

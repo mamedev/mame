@@ -1159,7 +1159,7 @@ void cheat_manager::reload()
 			// if we are loading through a software list, try to load softlist_name/shortname.xml
 			// this allows the coexistence of arcade cheats with cheats for home conversions which
 			// have the same shortname
-			if (image.software_entry() != nullptr)
+			if (image.loaded_through_softlist())
 			{
 				load_cheats(string_format("%s%s%s", image.software_list_name(), PATH_SEPARATOR, image.basename()).c_str());
 				break;

@@ -33,9 +33,11 @@ Test Paste:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "imagedev/cassette.h"
+#include "machine/6821pia.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mkit09.lh"
 
 

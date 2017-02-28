@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_STANDARD_ROM_CARTRIDGE = &device_creator<ql_standard_rom_cartridge_t>;
+const device_type QL_STANDARD_ROM_CARTRIDGE = device_creator<ql_standard_rom_cartridge_t>;
 
 
 

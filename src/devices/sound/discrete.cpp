@@ -45,7 +45,7 @@
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
 // device type definition
-const device_type DISCRETE = &device_creator<discrete_sound_device>;
+const device_type DISCRETE = device_creator<discrete_sound_device>;
 
 /*************************************
  *

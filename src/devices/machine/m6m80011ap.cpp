@@ -16,7 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 // device type definition
-const device_type M6M80011AP = &device_creator<m6m80011ap_device>;
+const device_type M6M80011AP = device_creator<m6m80011ap_device>;
 
 
 //**************************************************************************

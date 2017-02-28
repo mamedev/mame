@@ -6,6 +6,7 @@
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
+#include "screen.h"
 
 enum
 {

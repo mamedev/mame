@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type Z88_1024K_FLASH =  &device_creator<z88_1024k_flash_device>;
+const device_type Z88_1024K_FLASH =  device_creator<z88_1024k_flash_device>;
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( z88_flash )

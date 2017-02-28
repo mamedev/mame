@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/chqflag.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/chqflag.h"
-#include "includes/konamipt.h"
+#include "speaker.h"
+
 #include "chqflag.lh"
 
 

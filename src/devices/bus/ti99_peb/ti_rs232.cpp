@@ -1155,6 +1155,6 @@ ioport_constructor ti_rs232_pio_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti_rs232);
 }
 
-const device_type TI99_RS232 = &device_creator<ti_rs232_pio_device>;
-const device_type TI99_RS232_DEV = &device_creator<ti_rs232_attached_device>;
-const device_type TI99_PIO_DEV = &device_creator<ti_pio_attached_device>;
+const device_type TI99_RS232 = device_creator<ti_rs232_pio_device>;
+const device_type TI99_RS232_DEV = device_creator<ti_rs232_attached_device>;
+const device_type TI99_PIO_DEV = device_creator<ti_pio_attached_device>;

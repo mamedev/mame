@@ -54,8 +54,11 @@
 #include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "imagedev/snapquik.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class binbug_state : public driver_device
 {

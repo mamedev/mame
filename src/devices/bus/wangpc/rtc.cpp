@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_RTC = &device_creator<wangpc_rtc_device>;
+const device_type WANGPC_RTC = device_creator<wangpc_rtc_device>;
 
 
 //-------------------------------------------------

@@ -23,8 +23,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IMI7000_BUS = &device_creator<imi7000_bus_device>;
-const device_type IMI7000_SLOT = &device_creator<imi7000_slot_device>;
+const device_type IMI7000_BUS = device_creator<imi7000_bus_device>;
+const device_type IMI7000_SLOT = device_creator<imi7000_slot_device>;
 
 
 

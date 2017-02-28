@@ -25,9 +25,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_EZCGI = &device_creator<a2bus_ezcgi_device>;
-const device_type A2BUS_EZCGI_9938 = &device_creator<a2bus_ezcgi_9938_device>;
-const device_type A2BUS_EZCGI_9958 = &device_creator<a2bus_ezcgi_9958_device>;
+const device_type A2BUS_EZCGI = device_creator<a2bus_ezcgi_device>;
+const device_type A2BUS_EZCGI_9938 = device_creator<a2bus_ezcgi_9938_device>;
+const device_type A2BUS_EZCGI_9958 = device_creator<a2bus_ezcgi_9958_device>;
 
 MACHINE_CONFIG_FRAGMENT( ezcgi )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )

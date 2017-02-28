@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MPC105 = &device_creator<mpc105_device>;
+const device_type MPC105 = device_creator<mpc105_device>;
 
 
 //**************************************************************************

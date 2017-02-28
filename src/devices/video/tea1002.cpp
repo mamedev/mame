@@ -39,7 +39,7 @@ const int tea1002_device::m_amplitute[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TEA1002 = &device_creator<tea1002_device>;
+const device_type TEA1002 = device_creator<tea1002_device>;
 
 
 //**************************************************************************

@@ -25,16 +25,20 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
+#include "machine/meters.h"
+#include "machine/roc10937.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
+
+#include "speaker.h"
 
 #include "proconn.lh"
+
 
 class proconn_state : public driver_device
 {

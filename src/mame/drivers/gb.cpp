@@ -299,7 +299,9 @@ space. This mapper uses 32KB sized banks.
 #include "includes/gb.h"
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 #define DMG_FRAMES_PER_SECOND   59.732155

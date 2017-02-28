@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "compumat.h"
 
-const device_type A26_ROM_COMPUMATE = &device_creator<a26_rom_cm_device>;
+const device_type A26_ROM_COMPUMATE = device_creator<a26_rom_cm_device>;
 
 
 a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -224,6 +224,8 @@ To Do:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "victor5.lh"
 #include "victor21.lh"

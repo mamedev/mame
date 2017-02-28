@@ -5,6 +5,7 @@
     Atari I, Robot hardware
 
 *************************************************************************/
+#include "screen.h"
 
 #define IR_TIMING               1       /* try to emulate MB and VG running time */
 

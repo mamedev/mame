@@ -137,4 +137,4 @@ void pseudo_terminal_device::queue(void)
 		}
 }
 
-const device_type PSEUDO_TERMINAL = &device_creator<pseudo_terminal_device>;
+const device_type PSEUDO_TERMINAL = device_creator<pseudo_terminal_device>;

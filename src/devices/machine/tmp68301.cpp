@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "machine/tmp68301.h"
 
-const device_type TMP68301 = &device_creator<tmp68301_device>;
+const device_type TMP68301 = device_creator<tmp68301_device>;
 
 static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
 //  AM_RANGE(0x000,0x3ff) AM_RAM

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/docastle.h"
+#include "screen.h"
 
 /***************************************************************************
 

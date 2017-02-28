@@ -229,7 +229,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 	}
 }
 
-const device_type C6280 = &device_creator<c6280_device>;
+const device_type C6280 = device_creator<c6280_device>;
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock, "c6280", __FILE__)

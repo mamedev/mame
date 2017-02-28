@@ -3,6 +3,9 @@
 #include "emu.h"
 #include "voodoo_pci.h"
 
+#include "screen.h"
+
+
 int voodoo_pci_device::m_type = 0;
 
 static MACHINE_CONFIG_FRAGMENT( voodoo_1_pci )
@@ -50,7 +53,7 @@ machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
 	}
 }
 
-const device_type VOODOO_PCI = &device_creator<voodoo_pci_device>;
+const device_type VOODOO_PCI = device_creator<voodoo_pci_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
 	AM_RANGE(0x40, 0x4f) AM_READWRITE  (pcictrl_r,  pcictrl_w)

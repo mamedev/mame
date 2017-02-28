@@ -48,9 +48,14 @@
 
 
 #include "emu.h"
-#include "machine/keyboard.h"
 #include "includes/llc.h"
+
+#include "machine/keyboard.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "llc1.lh"
+
 
 /* Address maps */
 static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )

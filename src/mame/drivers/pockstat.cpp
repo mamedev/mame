@@ -47,6 +47,8 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAX_PS_TIMERS   3
 

@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "prot_kof98.h"
 
-extern const device_type KOF98_PROT = &device_creator<kof98_prot_device>;
+const device_type KOF98_PROT = device_creator<kof98_prot_device>;
 
 
 kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

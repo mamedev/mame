@@ -132,11 +132,15 @@ Additional notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sidepckt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/sidepckt.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 // protection tables
 static const uint8_t sidepckt_prot_table_1[0x10]={0x05,0x03,0x02,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};

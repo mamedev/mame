@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_JOYSTICK_ADAPTER = &device_creator<pet_userport_joystick_adapter_device>;
+const device_type PET_USERPORT_JOYSTICK_ADAPTER = device_creator<pet_userport_joystick_adapter_device>;
 
 
 //-------------------------------------------------

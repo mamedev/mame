@@ -100,21 +100,27 @@
 
 #include "emu.h"
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
-#include "machine/clock.h"
-#include "machine/7474.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/mos6551.h"
+#include "machine/7474.h"
+#include "machine/clock.h"
 #include "machine/i8214.h"
-#include "machine/wd_fdc.h"
-#include "machine/msm5832.h"
 #include "machine/input_merger.h"
+#include "machine/mos6551.h"
+#include "machine/msm5832.h"
+#include "machine/wd_fdc.h"
+
 #include "video/dl1416.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define Q209_CPU_CLOCK      4000000 // ?
 
@@ -292,7 +298,7 @@ private:
 	int     m_irq_state;
 };
 
-const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
+const device_type CMI01A_CHANNEL_CARD = device_creator<cmi01a_device>;
 
 cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CMI01A_CHANNEL_CARD, "Fairlight CMI-01A Channel Card", tag, owner, clock, "cmi_01a", __FILE__)

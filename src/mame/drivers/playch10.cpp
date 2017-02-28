@@ -292,13 +292,16 @@ Notes & Todo:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/playch10.h"
+
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
 
 #include "rendlay.h"
-#include "includes/playch10.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* clock frequency */
 #define N2A03_DEFAULTCLOCK (21477272.724 / 12)

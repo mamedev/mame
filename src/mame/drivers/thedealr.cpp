@@ -30,10 +30,13 @@
 
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
-#include "video/seta001.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/seta001.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class thedealr_state : public driver_device
 {
@@ -44,7 +47,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;

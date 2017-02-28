@@ -54,10 +54,13 @@ Press one of the start buttons to exit.
 */
 
 #include "emu.h"
+#include "includes/wc90.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2608intf.h"
-#include "includes/wc90.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(wc90_state::bankswitch_w)

@@ -9,12 +9,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/z8/z8.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define UB8830D_TAG     "ub8830d"

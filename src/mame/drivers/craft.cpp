@@ -12,6 +12,8 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define VERBOSE_LEVEL   (0)
 

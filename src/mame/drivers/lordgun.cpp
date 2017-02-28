@@ -40,12 +40,14 @@ Notes:
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "includes/lordgun.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/3812intf.h"
 #include "sound/ymf278b.h"
-#include "includes/lordgun.h"
+#include "speaker.h"
 
 
 /***************************************************************************

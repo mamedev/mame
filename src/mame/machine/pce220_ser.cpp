@@ -37,7 +37,7 @@ enum
 };
 
 // device type definition
-const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
+const device_type PCE220SERIAL = device_creator<pce220_serial_device>;
 
 //-------------------------------------------------
 //  pce220_serial_device - constructor

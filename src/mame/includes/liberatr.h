@@ -10,6 +10,7 @@
 #include "machine/er2055.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
+#include "screen.h"
 
 class liberatr_state : public driver_device
 {

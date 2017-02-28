@@ -20,16 +20,16 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A500_KBD_US = &device_creator<bus::amiga::keyboard::a500_kbd_us_device>;
-const device_type A500_KBD_DE = &device_creator<bus::amiga::keyboard::a500_kbd_de_device>;
-const device_type A500_KBD_FR = &device_creator<bus::amiga::keyboard::a500_kbd_fr_device>;
-const device_type A500_KBD_IT = &device_creator<bus::amiga::keyboard::a500_kbd_it_device>;
-const device_type A500_KBD_SE = &device_creator<bus::amiga::keyboard::a500_kbd_se_device>;
-const device_type A500_KBD_ES = &device_creator<bus::amiga::keyboard::a500_kbd_es_device>;
-const device_type A500_KBD_DK = &device_creator<bus::amiga::keyboard::a500_kbd_dk_device>;
-const device_type A500_KBD_CH = &device_creator<bus::amiga::keyboard::a500_kbd_ch_device>;
-const device_type A500_KBD_NO = &device_creator<bus::amiga::keyboard::a500_kbd_no_device>;
-const device_type A500_KBD_GB = &device_creator<bus::amiga::keyboard::a500_kbd_gb_device>;
+const device_type A500_KBD_US = device_creator<bus::amiga::keyboard::a500_kbd_us_device>;
+const device_type A500_KBD_DE = device_creator<bus::amiga::keyboard::a500_kbd_de_device>;
+const device_type A500_KBD_FR = device_creator<bus::amiga::keyboard::a500_kbd_fr_device>;
+const device_type A500_KBD_IT = device_creator<bus::amiga::keyboard::a500_kbd_it_device>;
+const device_type A500_KBD_SE = device_creator<bus::amiga::keyboard::a500_kbd_se_device>;
+const device_type A500_KBD_ES = device_creator<bus::amiga::keyboard::a500_kbd_es_device>;
+const device_type A500_KBD_DK = device_creator<bus::amiga::keyboard::a500_kbd_dk_device>;
+const device_type A500_KBD_CH = device_creator<bus::amiga::keyboard::a500_kbd_ch_device>;
+const device_type A500_KBD_NO = device_creator<bus::amiga::keyboard::a500_kbd_no_device>;
+const device_type A500_KBD_GB = device_creator<bus::amiga::keyboard::a500_kbd_gb_device>;
 
 
 namespace bus { namespace amiga { namespace keyboard {

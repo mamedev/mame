@@ -9,12 +9,15 @@
 
 #include "emu.h"
 #include "machine/genpc.h"
+
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "sound/speaker.h"
 #include "machine/ram.h"
-#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 
 #define VERBOSE_PIO 0   /* PIO (keyboard controller) */
 
@@ -386,7 +389,7 @@ WRITE8_MEMBER( ibm5160_mb_device::nmi_enable_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IBM5160_MOTHERBOARD = &device_creator<ibm5160_mb_device>;
+const device_type IBM5160_MOTHERBOARD = device_creator<ibm5160_mb_device>;
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -573,7 +576,7 @@ void ibm5160_mb_device::device_reset()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IBM5150_MOTHERBOARD = &device_creator<ibm5150_mb_device>;
+const device_type IBM5150_MOTHERBOARD = device_creator<ibm5150_mb_device>;
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -755,7 +758,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EC1841_MOTHERBOARD = &device_creator<ec1841_mb_device>;
+const device_type EC1841_MOTHERBOARD = device_creator<ec1841_mb_device>;
 
 static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
@@ -918,4 +921,4 @@ DEVICE_ADDRESS_MAP_START( map, 8, pc_noppi_mb_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
 
-const device_type PCNOPPI_MOTHERBOARD = &device_creator<pc_noppi_mb_device>;
+const device_type PCNOPPI_MOTHERBOARD = device_creator<pc_noppi_mb_device>;

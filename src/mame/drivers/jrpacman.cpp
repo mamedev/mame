@@ -101,8 +101,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/pacman.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jrpacman_state : public pacman_state

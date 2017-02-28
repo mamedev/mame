@@ -93,7 +93,9 @@ TODO:
 #include "includes/pcw16.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 // interrupt counter
 /* controls which bank of 2mb address space is paged into memory */

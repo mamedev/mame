@@ -35,8 +35,8 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_CONY = &device_creator<nes_cony_device>;
-const device_type NES_YOKO = &device_creator<nes_yoko_device>;
+const device_type NES_CONY = device_creator<nes_cony_device>;
+const device_type NES_YOKO = device_creator<nes_yoko_device>;
 
 
 nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

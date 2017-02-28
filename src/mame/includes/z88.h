@@ -6,18 +6,21 @@
  *
  ****************************************************************************/
 
-#ifndef Z88_H_
-#define Z88_H_
+#ifndef MAME_INCLUDES_Z88_H
+#define MAME_INCLUDES_Z88_H
 
 #include "cpu/z80/z80.h"
-#include "machine/upd65031.h"
 #include "machine/ram.h"
-#include "bus/z88/z88.h"
+#include "machine/upd65031.h"
+#include "sound/spkrdev.h"
+
 #include "bus/z88/flash.h"
 #include "bus/z88/ram.h"
 #include "bus/z88/rom.h"
-#include "sound/speaker.h"
+#include "bus/z88/z88.h"
+
 #include "rendlay.h"
+
 
 #define Z88_NUM_COLOURS 3
 
@@ -91,4 +94,4 @@ public:
 	DECLARE_PALETTE_INIT(z88);
 };
 
-#endif /* Z88_H_ */
+#endif /* MAME_INCLUDES_Z88_H */

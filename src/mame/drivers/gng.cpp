@@ -23,11 +23,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gng.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/gng.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(gng_state::gng_bankswitch_w)

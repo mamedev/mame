@@ -33,9 +33,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NINA001 = &device_creator<nes_nina001_device>;
-const device_type NES_NINA006 = &device_creator<nes_nina006_device>;
-const device_type NES_MAXI15 = &device_creator<nes_maxi15_device>;
+const device_type NES_NINA001 = device_creator<nes_nina001_device>;
+const device_type NES_NINA006 = device_creator<nes_nina006_device>;
+const device_type NES_MAXI15 = device_creator<nes_maxi15_device>;
 
 
 nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

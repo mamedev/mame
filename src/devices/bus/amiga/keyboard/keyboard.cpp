@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AMIGA_KEYBOARD_INTERFACE = &device_creator<amiga_keyboard_bus_device>;
+const device_type AMIGA_KEYBOARD_INTERFACE = device_creator<amiga_keyboard_bus_device>;
 
 
 //**************************************************************************

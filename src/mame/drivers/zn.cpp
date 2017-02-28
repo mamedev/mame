@@ -11,27 +11,33 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/rax.h"
+#include "audio/taito_zm.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
 #include "cpu/z80/z80.h"
-#include "video/psx.h"
-#include "machine/at28c16.h"
-#include "machine/nvram.h"
-#include "machine/mb3773.h"
 #include "machine/7200fifo.h"
-#include "machine/cat702.h"
-#include "machine/znmcu.h"
+#include "machine/at28c16.h"
 #include "machine/ataintf.h"
-#include "machine/vt83c461.h"
+#include "machine/cat702.h"
 #include "machine/gen_latch.h"
-#include "audio/taitosnd.h"
+#include "machine/mb3773.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/vt83c461.h"
+#include "machine/znmcu.h"
 #include "sound/2610intf.h"
-#include "sound/ymz280b.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"
 #include "sound/ymf271.h"
-#include "audio/rax.h"
-#include "audio/taito_zm.h"
+#include "sound/ymz280b.h"
+#include "video/psx.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 

@@ -81,8 +81,10 @@
 
 #include "emu.h"
 #include "includes/leland.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define LOG_COMM 0
 #define LOG_EXTERN 0
@@ -349,7 +351,7 @@ void leland_80186_sound_device::device_reset()
 	m_ext_active = 0;
 }
 
-const device_type LELAND_80186 = &device_creator<leland_80186_sound_device>;
+const device_type LELAND_80186 = device_creator<leland_80186_sound_device>;
 
 leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LELAND_80186, "80186 DAC (Leland)", tag, owner, clock, "leland_80186_sound", __FILE__),
@@ -404,7 +406,7 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 {
 }
 
-const device_type REDLINE_80186 = &device_creator<redline_80186_sound_device>;
+const device_type REDLINE_80186 = device_creator<redline_80186_sound_device>;
 
 redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Redline Racer)", tag, owner, clock, "redline_80186_sound", __FILE__)
@@ -412,7 +414,7 @@ redline_80186_sound_device::redline_80186_sound_device(const machine_config &mco
 	m_type = TYPE_REDLINE;
 }
 
-const device_type ATAXX_80186 = &device_creator<ataxx_80186_sound_device>;
+const device_type ATAXX_80186 = device_creator<ataxx_80186_sound_device>;
 
 ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Ataxx)", tag, owner, clock, "ataxx_80186_sound", __FILE__)
@@ -420,7 +422,7 @@ ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig
 	m_type = TYPE_ATAXX;
 }
 
-const device_type WSF_80186 = &device_creator<wsf_80186_sound_device>;
+const device_type WSF_80186 = device_creator<wsf_80186_sound_device>;
 
 wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (WSF)", tag, owner, clock, "wsf_80186_sound", __FILE__)

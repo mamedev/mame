@@ -19,11 +19,15 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "includes/ac1.h"
+
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/z80pio.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static GFXDECODE_START( ac1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ac1_charlayout, 0, 1 )

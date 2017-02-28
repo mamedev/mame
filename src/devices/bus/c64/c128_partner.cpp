@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C128_PARTNER = &device_creator<partner128_t>;
+const device_type C128_PARTNER = device_creator<partner128_t>;
 
 
 //-------------------------------------------------

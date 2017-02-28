@@ -8,6 +8,7 @@
 
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 #define EXIDY_MASTER_CLOCK              (XTAL_11_289MHz)
 #define EXIDY_CPU_CLOCK                 (EXIDY_MASTER_CLOCK / 16)

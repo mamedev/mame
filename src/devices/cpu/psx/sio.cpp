@@ -25,8 +25,8 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 	}
 }
 
-const device_type PSX_SIO0 = &device_creator<psxsio0_device>;
-const device_type PSX_SIO1 = &device_creator<psxsio1_device>;
+const device_type PSX_SIO0 = device_creator<psxsio0_device>;
+const device_type PSX_SIO1 = device_creator<psxsio1_device>;
 
 psxsio0_device::psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	psxsio_device(mconfig, PSX_SIO0, "Sony PSX SIO-0", tag, owner, clock, "psxsio0", __FILE__)

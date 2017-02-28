@@ -296,7 +296,7 @@ INPUT_PORTS_END
  ***************************************************************************/
 
 // device type definition
-const device_type ISA16_3C505 = &device_creator<threecom3c505_device> ;
+const device_type ISA16_3C505 = device_creator<threecom3c505_device> ;
 
 //-------------------------------------------------
 // threecom3c505_device - constructor

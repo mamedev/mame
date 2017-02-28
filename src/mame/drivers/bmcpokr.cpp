@@ -22,6 +22,8 @@ Other:  BMC B816140 (CPLD)
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
 
 class bmcpokr_state : public driver_device
 {

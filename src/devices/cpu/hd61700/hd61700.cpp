@@ -95,7 +95,7 @@ static const uint16_t irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
 //  HD61700 DEVICE
 //**************************************************************************
 
-const device_type HD61700 = &device_creator<hd61700_cpu_device>;
+const device_type HD61700 = device_creator<hd61700_cpu_device>;
 
 //-------------------------------------------------
 //  hd61700_cpu_device - constructor

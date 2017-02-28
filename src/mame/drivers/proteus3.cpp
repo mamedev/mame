@@ -45,14 +45,19 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "imagedev/cassette.h"
 #include "sound/wave.h"
+
 #include "bus/rs232/rs232.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class proteus3_state : public driver_device

@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "sound/esqpump.h"
 
-const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
+const device_type ESQ_5505_5510_PUMP = device_creator<esq_5505_5510_pump>;
 
 esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock, "esq_5505_5510_pump", __FILE__),

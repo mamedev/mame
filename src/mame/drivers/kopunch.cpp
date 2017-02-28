@@ -32,9 +32,11 @@
 ********************************************************/
 
 #include "emu.h"
+#include "includes/kopunch.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "includes/kopunch.h"
+#include "screen.h"
 
 
 /********************************************************

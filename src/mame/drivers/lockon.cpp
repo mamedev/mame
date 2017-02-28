@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/lockon.h"
+
 #include "cpu/nec/nec.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
-#include "includes/lockon.h"
+#include "speaker.h"
+
 
 #define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)

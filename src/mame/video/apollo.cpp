@@ -13,13 +13,18 @@
  *
  */
 
+#include "emu.h"
+
 #define VERBOSE 0
 
-#include "emu.h"
 #include "includes/apollo.h"
+
 #include "rendlay.h"
+#include "screen.h"
+
 #include "apollo.lh"
 #include "apollo_15i.lh"
+
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -1715,7 +1720,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_graphics )
 	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_15i, screen_update)
 MACHINE_CONFIG_END
 
-const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
+const device_type APOLLO_GRAPHICS = device_creator<apollo_graphics_15i> ;
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, "Apollo Screen", tag, owner, clock,"apollo_graphics_15i", __FILE__),
@@ -1886,7 +1891,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_19i, screen_update)
 	MACHINE_CONFIG_END
 
-const device_type APOLLO_MONO19I = &device_creator<apollo_graphics_19i> ;
+const device_type APOLLO_MONO19I = device_creator<apollo_graphics_19i> ;
 
 apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig,
 		const char *tag, device_t *owner, uint32_t clock) :

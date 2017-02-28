@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "includes/kc.h"
 
+#include "screen.h"
+
+
 // 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue
 static const uint8_t kc85_palette[KC85_PALETTE_SIZE * 3] =
 {

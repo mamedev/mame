@@ -20,7 +20,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_MIRACLE = &device_creator<snes_miracle_device>;
+const device_type SNES_MIRACLE = device_creator<snes_miracle_device>;
 
 
 MACHINE_CONFIG_FRAGMENT( snes_miracle )

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "grafik.h"
+#include "screen.h"
 
 #define LOG 0
 
@@ -27,7 +28,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_GRAFIK = &device_creator<iq151_grafik_device>;
+const device_type IQ151_GRAFIK = device_creator<iq151_grafik_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

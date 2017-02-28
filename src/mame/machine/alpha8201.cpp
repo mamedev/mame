@@ -277,7 +277,7 @@ Notes:
 
 /**************************************************************************/
 
-const device_type ALPHA_8201 = &device_creator<alpha_8201_device>;
+const device_type ALPHA_8201 = device_creator<alpha_8201_device>;
 
 //-------------------------------------------------
 //  alpha_8201_device - constructor

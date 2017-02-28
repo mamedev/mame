@@ -62,7 +62,9 @@ Timings:
 
 #include "emu.h"
 #include "includes/dai.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* I/O ports */
 static ADDRESS_MAP_START( dai_io , AS_IO, 8, dai_state )

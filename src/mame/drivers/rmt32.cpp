@@ -161,9 +161,10 @@ Notes: (All IC's listed for completeness)
 */
 
 #include "emu.h"
+#include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
 #include "video/sed1200.h"
-#include "cpu/mcs96/i8x9x.h"
+#include "screen.h"
 
 static INPUT_PORTS_START( mt32 )
 	PORT_START("SC0")

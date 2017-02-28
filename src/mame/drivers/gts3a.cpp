@@ -20,9 +20,12 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "video/mc6845.h"
+#include "screen.h"
+
 
 class gts3a_state : public driver_device
 {

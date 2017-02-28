@@ -13,19 +13,20 @@
 
 
 #include "emu.h"
-#include "cpu/i86/i286.h"
-#include "cpu/i386/i386.h"
-#include "machine/at.h"
-#include "machine/wd7600.h"
-#include "machine/cs8221.h"
-#include "machine/nvram.h"
-#include "machine/vt82c496.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
-#include "machine/ds128x.h"
-#include "machine/ram.h"
-#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "cpu/i386/i386.h"
+#include "cpu/i86/i286.h"
+#include "machine/at.h"
+#include "machine/cs8221.h"
+#include "machine/ds128x.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/vt82c496.h"
+#include "machine/wd7600.h"
+#include "speaker.h"
 
 class at_state : public driver_device
 {

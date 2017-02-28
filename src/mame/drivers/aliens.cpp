@@ -10,12 +10,14 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/aliens.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/aliens.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)

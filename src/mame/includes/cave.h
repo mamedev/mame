@@ -11,6 +11,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 struct sprite_cave
 {

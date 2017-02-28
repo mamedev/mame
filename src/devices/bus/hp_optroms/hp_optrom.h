@@ -46,7 +46,7 @@ public:
 		virtual void call_unload() override;
 		virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-		virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+		virtual iodevice_t image_type() const override { return IO_ROM; }
 		virtual bool is_readable()  const override { return true; }
 		virtual bool is_writeable() const override { return false; }
 		virtual bool is_creatable() const override { return false; }

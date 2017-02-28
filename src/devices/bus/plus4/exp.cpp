@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PLUS4_EXPANSION_SLOT = &device_creator<plus4_expansion_slot_device>;
+const device_type PLUS4_EXPANSION_SLOT = device_creator<plus4_expansion_slot_device>;
 
 
 
@@ -125,7 +125,7 @@ image_init_result plus4_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			// TODO
 		}

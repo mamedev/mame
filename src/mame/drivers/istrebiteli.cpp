@@ -24,6 +24,8 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define I8080_TAG   "maincpu"
 
@@ -58,7 +60,7 @@ extern const device_type ISTREBITELI_SOUND;
 
 //////////////////////////////////////////////////////////////
 
-const device_type ISTREBITELI_SOUND = &device_creator<istrebiteli_sound_device>;
+const device_type ISTREBITELI_SOUND = device_creator<istrebiteli_sound_device>;
 
 istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISTREBITELI_SOUND, "Istrebiteli Sound", tag, owner, clock, "istrebiteli_sound", __FILE__),

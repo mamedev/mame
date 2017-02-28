@@ -51,10 +51,12 @@ Notes:
 
 
 #include "emu.h"
+#include "includes/aquarium.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
-#include "includes/aquarium.h"
+#include "speaker.h"
 
 
 READ16_MEMBER(aquarium_state::aquarium_coins_r)

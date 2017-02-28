@@ -215,7 +215,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, device
 }
 
 
-const device_type ATA_INTERFACE = &device_creator<ata_interface_device>;
+const device_type ATA_INTERFACE = device_creator<ata_interface_device>;
 
 ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ATA_INTERFACE, "ATA Interface", tag, owner, clock, "ata_interface", __FILE__),
@@ -290,7 +290,7 @@ machine_config_constructor ata_interface_device::device_mconfig_additions() cons
 //**************************************************************************
 
 // device type definition
-const device_type ATA_SLOT = &device_creator<ata_slot_device>;
+const device_type ATA_SLOT = device_creator<ata_slot_device>;
 
 //-------------------------------------------------
 //  ata_slot_device - constructor

@@ -73,9 +73,11 @@ JMON ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "speaker.h"
+
 #include "tec1.lh"
 
 

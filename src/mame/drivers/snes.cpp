@@ -27,15 +27,19 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/snes_snd.h"
-#include "cpu/spc700/spc700.h"
 #include "includes/snes.h"
+#include "audio/snes_snd.h"
+
+#include "cpu/spc700/spc700.h"
 #include "machine/snescx4.h"
 
 #include "bus/snes/snes_slot.h"
 #include "bus/snes/snes_carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class snes_console_state : public snes_state
 {

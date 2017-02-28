@@ -22,8 +22,10 @@
 #include "machine/msm58321.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class clcd_state : public driver_device
 {

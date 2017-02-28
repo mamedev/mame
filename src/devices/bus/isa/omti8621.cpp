@@ -375,14 +375,14 @@ void omti8621_device::device_reset()
 	alternate_track_address[1] = 0;
 }
 
-const device_type ISA16_OMTI8621 = &device_creator<omti8621_pc_device>;
+const device_type ISA16_OMTI8621 = device_creator<omti8621_pc_device>;
 
 omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621, tag, owner, clock)
 {
 }
 
-const device_type ISA16_OMTI8621_APOLLO = &device_creator<omti8621_apollo_device>;
+const device_type ISA16_OMTI8621_APOLLO = device_creator<omti8621_apollo_device>;
 
 omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, tag, owner, clock)
@@ -1309,7 +1309,7 @@ void omti8621_device::eop_w(int state)
 //##########################################################################
 
 // device type definition
-const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
+const device_type OMTI_DISK = device_creator<omti_disk_image_device>;
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OMTI_DISK, "OMTI8621 ESDI disk", tag, owner, clock, "omti_disk_image", __FILE__),

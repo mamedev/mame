@@ -126,7 +126,7 @@ to through the chip.
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K052109 = &device_creator<k052109_device>;
+const device_type K052109 = device_creator<k052109_device>;
 
 const gfx_layout k052109_device::charlayout =
 {

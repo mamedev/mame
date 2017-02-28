@@ -15,31 +15,36 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "sound/beep.h"
 #include "video/hd44780.h"
 #include "video/sed1520.h"
-#include "sound/beep.h"
-#include "rendlay.h"
-#include "softlist.h"
-#include "gl3000s.lh"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
+#include "gl3000s.lh"
 
 
 class pc2000_state : public driver_device
 {
 public:
 	pc2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_lcdc(*this, "hd44780"),
-			m_beep(*this, "beeper"),
-			m_cart(*this, "cartslot"),
-			m_bank0(*this, "bank0"),
-			m_bank1(*this, "bank1"),
-			m_bank2(*this, "bank2")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc(*this, "hd44780")
+		, m_beep(*this, "beeper")
+		, m_cart(*this, "cartslot")
+		, m_bank0(*this, "bank0")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;

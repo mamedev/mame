@@ -9,19 +9,24 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "machine/pic8259.h"
-#include "machine/mc2661.h"
-#include "machine/wd_fdc.h"
-#include "machine/mc146818.h"
 #include "machine/pcd_kbd.h"
 #include "video/pcd.h"
-#include "sound/speaker.h"
-#include "formats/pc_dsk.h"
-#include "bus/scsi/omti5100.h"
+
 #include "bus/rs232/rs232.h"
+#include "bus/scsi/omti5100.h"
+#include "cpu/i86/i186.h"
+#include "machine/mc146818.h"
+#include "machine/mc2661.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+
+#include "speaker.h"
+
+#include "formats/pc_dsk.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,19 +35,19 @@
 class pcd_state : public driver_device
 {
 public:
-	pcd_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pic1(*this, "pic1"),
-	m_pic2(*this, "pic2"),
-	m_speaker(*this, "speaker"),
-	m_fdc(*this, "fdc"),
-	m_rtc(*this, "rtc"),
-	m_scsi(*this, "scsi"),
-	m_scsi_data_out(*this, "scsi_data_out"),
-	m_scsi_data_in(*this, "scsi_data_in"),
-	m_ram(*this, "ram"),
-	m_req_hack(nullptr)
+	pcd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic1(*this, "pic1")
+		, m_pic2(*this, "pic2")
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "fdc")
+		, m_rtc(*this, "rtc")
+		, m_scsi(*this, "scsi")
+		, m_scsi_data_out(*this, "scsi_data_out")
+		, m_scsi_data_in(*this, "scsi_data_in")
+		, m_ram(*this, "ram")
+		, m_req_hack(nullptr)
 	{ }
 
 	DECLARE_READ8_MEMBER( irq_callback );

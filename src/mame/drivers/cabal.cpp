@@ -44,12 +44,16 @@ Dip locations verified with Fabtek manual for the trackball version
 ******************************************************************/
 
 #include "emu.h"
+#include "includes/cabal.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/msm5205.h"
-#include "includes/cabal.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 MACHINE_START_MEMBER(cabal_state,cabal)
 {

@@ -24,6 +24,7 @@ I/O Board with Altera Flex EPF15K50EQC240-3
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "screen.h"
 
 
 class tokyocop_state : public driver_device

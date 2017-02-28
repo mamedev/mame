@@ -48,6 +48,8 @@ Note
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jackie_state : public driver_device

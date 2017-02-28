@@ -1,27 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef FMTOWNS_H_
-#define FMTOWNS_H_
+#ifndef MAME_INCLUDES_FMTOWNS_H
+#define MAME_INCLUDES_FMTOWNS_H
 
+#pragma once
 
 #include "cpu/i386/i386.h"
-#include "sound/2612intf.h"
-#include "sound/rf5c68.h"
-#include "sound/cdda.h"
-#include "sound/speaker.h"
 #include "imagedev/chd_cd.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
-#include "formats/fmtowns_dsk.h"
-#include "machine/upd71071.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
 #include "machine/fm_scsi.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 #include "machine/fmt_icmem.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd71071.h"
+#include "machine/wd_fdc.h"
+#include "sound/2612intf.h"
+#include "sound/cdda.h"
+#include "sound/rf5c68.h"
+#include "sound/spkrdev.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
+#include "formats/fmtowns_dsk.h"
+
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
 
@@ -376,4 +380,4 @@ class marty_state : public towns_state
 	virtual void driver_start() override;
 };
 
-#endif /*FMTOWNS_H_*/
+#endif // MAME_INCLUDES_FMTOWNS_H

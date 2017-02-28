@@ -12,6 +12,7 @@
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define MW8080BW_MASTER_CLOCK             (19968000.0)

@@ -9,6 +9,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/bsmt2000.h"
+#include "screen.h"
 
 class dcheese_state : public driver_device
 {

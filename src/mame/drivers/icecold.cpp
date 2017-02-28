@@ -11,7 +11,10 @@
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "icecold.lh"
+
 
 class icecold_state : public driver_device
 {

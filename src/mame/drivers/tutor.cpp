@@ -169,15 +169,20 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 *********************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9995.h"
-#include "sound/wave.h"
-#include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
+#include "sound/wave.h"
+#include "video/tms9928a.h"
+
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class tutor_state : public driver_device
 {

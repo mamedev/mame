@@ -30,7 +30,11 @@
 
 #include "emu.h"
 #include "includes/x07.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -1053,7 +1057,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	uint32_t size = m_card->common_get_size("rom");
 
 	// check card type
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		const char *card_type = image.get_feature("card_type");
 

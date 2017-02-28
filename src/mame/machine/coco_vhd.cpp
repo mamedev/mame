@@ -65,7 +65,7 @@
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const device_type COCO_VHD = &device_creator<coco_vhd_image_device>;
+const device_type COCO_VHD = device_creator<coco_vhd_image_device>;
 
 //-------------------------------------------------
 //  coco_vhd_image_device - constructor

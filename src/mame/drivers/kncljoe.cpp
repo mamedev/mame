@@ -28,10 +28,12 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kncljoe.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/sn76496.h"
-#include "includes/kncljoe.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(kncljoe_state::sound_cmd_w)

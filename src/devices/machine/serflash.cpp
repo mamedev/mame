@@ -16,7 +16,7 @@ ALLOW_SAVE_TYPE(flash_state_t);
 //**************************************************************************
 
 // device type definition
-const device_type SERFLASH = &device_creator<serflash_device>;
+const device_type SERFLASH = device_creator<serflash_device>;
 
 //-------------------------------------------------
 //  serflash_device - constructor

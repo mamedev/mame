@@ -50,9 +50,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "video/clgd542x.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "sound/upd7759.h"
+#include "video/clgd542x.h"
+#include "speaker.h"
 
 
 class gambl186_state : public driver_device

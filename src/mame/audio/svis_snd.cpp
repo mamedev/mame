@@ -11,7 +11,7 @@
 
 
 // device type definition
-const device_type SVISION_SND = &device_creator<svision_sound_device>;
+const device_type SVISION_SND = device_creator<svision_sound_device>;
 
 
 //**************************************************************************

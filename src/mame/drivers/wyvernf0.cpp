@@ -34,6 +34,9 @@ Actual game video: http://www.nicozon.net/watch/sm10823430
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class wyvernf0_state : public driver_device
 {

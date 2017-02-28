@@ -149,10 +149,14 @@ TODO:
 */
 
 #include "emu.h"
-#include "coreutil.h"
-#include "includes/saturn.h"
 #include "machine/smpc.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
 #include "machine/eepromser.h"
+#include "screen.h"
+
+#include "coreutil.h"
+
 
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0

@@ -52,14 +52,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/vicdual.h"
 #include "audio/carnival.h"
 #include "audio/depthch.h"
 #include "audio/invinco.h"
 #include "audio/pulsar.h"
 #include "audio/vicdual.h"
+
+#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 #include "depthch.lh"
 

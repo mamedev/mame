@@ -5,6 +5,7 @@
     D-Day
 
 *************************************************************************/
+#include "screen.h"
 
 
 class dday_state : public driver_device

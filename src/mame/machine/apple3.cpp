@@ -47,6 +47,7 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
+#include "screen.h"
 
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1

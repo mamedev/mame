@@ -74,6 +74,9 @@
 
 
 #include "emu.h"
+#include "includes/megadriv.h"
+#include "includes/segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -81,9 +84,7 @@
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
-#include "includes/segaipt.h"
-
-#include "includes/megadriv.h"
+#include "speaker.h"
 
 
 #define XL1_CLOCK           XTAL_640kHz

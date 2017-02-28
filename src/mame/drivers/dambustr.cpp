@@ -51,11 +51,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 
 #include "emu.h"
+#include "includes/galaxold.h"
+#include "audio/galaxian.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "audio/galaxian.h"
-#include "includes/galaxold.h"
+#include "speaker.h"
 
 
 class dambustr_state : public galaxold_state

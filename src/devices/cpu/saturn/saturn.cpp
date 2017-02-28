@@ -39,7 +39,7 @@
 
 
 
-const device_type SATURN = &device_creator<saturn_device>;
+const device_type SATURN = device_creator<saturn_device>;
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -47,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_VIZASTAR = &device_creator<c64_vizastar_cartridge_device>;
+const device_type C64_VIZASTAR = device_creator<c64_vizastar_cartridge_device>;
 
 
 

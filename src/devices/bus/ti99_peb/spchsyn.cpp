@@ -23,8 +23,11 @@
 
 #include "emu.h"
 #include "spchsyn.h"
-#include "sound/wave.h"
+
 #include "machine/spchrom.h"
+#include "sound/wave.h"
+#include "speaker.h"
+
 
 #define TRACE_MEM 0
 #define TRACE_ADDR 0
@@ -171,4 +174,4 @@ const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }
-const device_type TI99_SPEECH = &device_creator<ti_speech_synthesizer_device>;
+const device_type TI99_SPEECH = device_creator<ti_speech_synthesizer_device>;

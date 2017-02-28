@@ -6,6 +6,7 @@
 
 ****************************************************************************/
 #include "sound/samples.h"
+#include "screen.h"
 /*
  *  SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of
  *  the graphics use a clock half of SPACEFB_PIXEL_CLOCK, thus creating

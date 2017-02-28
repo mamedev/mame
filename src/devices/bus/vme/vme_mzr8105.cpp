@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MZR8105 = &device_creator<vme_mzr8105_card_device>;
+const device_type VME_MZR8105 = device_creator<vme_mzr8105_card_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

@@ -13,7 +13,7 @@
 #include "audio/geebee.h"
 
 
-const device_type GEEBEE = &device_creator<geebee_sound_device>;
+const device_type GEEBEE = device_creator<geebee_sound_device>;
 
 geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GEEBEE, "Gee Bee Audio Custom", tag, owner, clock, "geebee_sound", __FILE__),

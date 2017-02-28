@@ -55,10 +55,10 @@ CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
 
-const device_type SH3LE = &device_creator<sh3_device>;
-const device_type SH3BE = &device_creator<sh3be_device>;
-const device_type SH4LE = &device_creator<sh4_device>;
-const device_type SH4BE = &device_creator<sh4be_device>;
+const device_type SH3LE = device_creator<sh3_device>;
+const device_type SH3BE = device_creator<sh3be_device>;
+const device_type SH4LE = device_creator<sh4_device>;
+const device_type SH4BE = device_creator<sh4be_device>;
 
 
 #if 0

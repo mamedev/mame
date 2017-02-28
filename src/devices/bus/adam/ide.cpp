@@ -35,7 +35,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_IDE = &device_creator<powermate_ide_device>;
+const device_type ADAM_IDE = device_creator<powermate_ide_device>;
 
 
 //-------------------------------------------------

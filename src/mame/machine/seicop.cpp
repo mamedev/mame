@@ -18,7 +18,7 @@
 #include "includes/legionna.h"
 
 
-const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
+const device_type SEIBU_COP_BOOTLEG = device_creator<seibu_cop_bootleg_device>;
 
 READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
 {

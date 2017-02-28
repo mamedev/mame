@@ -97,15 +97,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/simpsons.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "cpu/z80/z80.h"
-
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
-#include "includes/simpsons.h"
-#include "includes/konamipt.h"
+#include "speaker.h"
 
 
 /***************************************************************************

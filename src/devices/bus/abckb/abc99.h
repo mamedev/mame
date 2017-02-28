@@ -6,14 +6,15 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_ABCKB_ABC99_H
+#define MAME_BUS_ABCKB_ABC99_H
+
 #pragma once
 
-#ifndef __ABC99__
-#define __ABC99__
+#include "abckb.h"
 
 #include "cpu/mcs48/mcs48.h"
-#include "abckb.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 
 
@@ -109,5 +110,4 @@ private:
 extern const device_type ABC99;
 
 
-
-#endif
+#endif // MAME_BUS_ABCKB_ABC99_H

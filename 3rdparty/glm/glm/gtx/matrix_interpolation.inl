@@ -3,11 +3,11 @@
 
 namespace glm
 {
-	template<typename T, precision P>
+	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER void axisAngle
 	(
-		mat<4, 4, T, P> const& mat,
-		vec<3, T, P> & axis,
+		tmat4x4<T, P> const & mat,
+		tvec3<T, P> & axis,
 		T & angle
 	)
 	{
@@ -25,12 +25,12 @@ namespace glm
 				return;
 			}
 			angle = static_cast<T>(3.1415926535897932384626433832795);
-			T xx = (mat[0][0] + (T)1.0) * (T)0.5;
-			T yy = (mat[1][1] + (T)1.0) * (T)0.5;
-			T zz = (mat[2][2] + (T)1.0) * (T)0.5;
-			T xy = (mat[1][0] + mat[0][1]) * (T)0.25;
-			T xz = (mat[2][0] + mat[0][2]) * (T)0.25;
-			T yz = (mat[2][1] + mat[1][2]) * (T)0.25;
+			T xx = (mat[0][0] + (T)1.0) / (T)2.0;
+			T yy = (mat[1][1] + (T)1.0) / (T)2.0;
+			T zz = (mat[2][2] + (T)1.0) / (T)2.0;
+			T xy = (mat[1][0] + mat[0][1]) / (T)4.0;
+			T xz = (mat[2][0] + mat[0][2]) / (T)4.0;
+			T yz = (mat[2][1] + mat[1][2]) / (T)4.0;
 			if((xx > yy) && (xx > zz))
 			{
 				if (xx < epsilon) {
@@ -72,58 +72,60 @@ namespace glm
 		T s = sqrt((mat[2][1] - mat[1][2]) * (mat[2][1] - mat[1][2]) + (mat[2][0] - mat[0][2]) * (mat[2][0] - mat[0][2]) + (mat[1][0] - mat[0][1]) * (mat[1][0] - mat[0][1]));
 		if (glm::abs(s) < T(0.001))
 			s = (T)1.0;
-		angle = acos((mat[0][0] + mat[1][1] + mat[2][2] - (T)1.0) * (T)0.5);
+		angle = acos((mat[0][0] + mat[1][1] + mat[2][2] - (T)1.0) / (T)2.0);
 		axis.x = (mat[1][2] - mat[2][1]) / s;
 		axis.y = (mat[2][0] - mat[0][2]) / s;
 		axis.z = (mat[0][1] - mat[1][0]) / s;
 	}
 
-	template<typename T, precision P>
-	GLM_FUNC_QUALIFIER mat<4, 4, T, P> axisAngleMatrix
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tmat4x4<T, P> axisAngleMatrix
 	(
-		vec<3, T, P> const & axis,
+		tvec3<T, P> const & axis,
 		T const angle
 	)
 	{
 		T c = cos(angle);
 		T s = sin(angle);
 		T t = static_cast<T>(1) - c;
-		vec<3, T, P> n = normalize(axis);
+		tvec3<T, P> n = normalize(axis);
 
-		return mat<4, 4, T, P>(
+		return tmat4x4<T, P>(
 			t * n.x * n.x + c,          t * n.x * n.y + n.z * s,    t * n.x * n.z - n.y * s,    T(0),
 			t * n.x * n.y - n.z * s,    t * n.y * n.y + c,          t * n.y * n.z + n.x * s,    T(0),
 			t * n.x * n.z + n.y * s,    t * n.y * n.z - n.x * s,    t * n.z * n.z + c,          T(0),
-			T(0),                        T(0),                        T(0),                     T(1));
+			T(0),                        T(0),                        T(0),                     T(1)
+		);
 	}
 
-	template<typename T, precision P>
-	GLM_FUNC_QUALIFIER mat<4, 4, T, P> extractMatrixRotation
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tmat4x4<T, P> extractMatrixRotation
 	(
-		mat<4, 4, T, P> const& m
+		tmat4x4<T, P> const & mat
 	)
 	{
-		return mat<4, 4, T, P>(
-			m[0][0], m[0][1], m[0][2], 0.0,
-			m[1][0], m[1][1], m[1][2], 0.0,
-			m[2][0], m[2][1], m[2][2], 0.0,
-			0.0,     0.0,     0.0,     1.0);
+		return tmat4x4<T, P>(
+			mat[0][0], mat[0][1], mat[0][2], 0.0,
+			mat[1][0], mat[1][1], mat[1][2], 0.0,
+			mat[2][0], mat[2][1], mat[2][2], 0.0,
+			0.0,       0.0,       0.0,       1.0
+		);
 	}
 
-	template<typename T, precision P>
-	GLM_FUNC_QUALIFIER mat<4, 4, T, P> interpolate
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tmat4x4<T, P> interpolate
 	(
-		mat<4, 4, T, P> const& m1,
-		mat<4, 4, T, P> const& m2,
+		tmat4x4<T, P> const & m1,
+		tmat4x4<T, P> const & m2,
 		T const delta
 	)
 	{
-		mat<4, 4, T, P> m1rot = extractMatrixRotation(m1);
-		mat<4, 4, T, P> dltRotation = m2 * transpose(m1rot);
-		vec<3, T, P> dltAxis;
+		tmat4x4<T, P> m1rot = extractMatrixRotation(m1);
+		tmat4x4<T, P> dltRotation = m2 * transpose(m1rot);
+		tvec3<T, P> dltAxis;
 		T dltAngle;
 		axisAngle(dltRotation, dltAxis, dltAngle);
-		mat<4, 4, T, P> out = axisAngleMatrix(dltAxis, dltAngle * delta) * m1rot;
+		tmat4x4<T, P> out = axisAngleMatrix(dltAxis, dltAngle * delta) * m1rot;
 		out[3][0] = m1[3][0] + delta * (m2[3][0] - m1[3][0]);
 		out[3][1] = m1[3][1] + delta * (m2[3][1] - m1[3][1]);
 		out[3][2] = m1[3][2] + delta * (m2[3][2] - m1[3][2]);

@@ -10,9 +10,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mosaic.h"
+
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
-#include "includes/mosaic.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(mosaic_state::protection_w)
 {

@@ -23,12 +23,14 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "video/tlc34076.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+#include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tickee_state : public driver_device

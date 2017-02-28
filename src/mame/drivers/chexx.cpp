@@ -17,10 +17,13 @@ Electro-mechanical bubble hockey games:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "sound/digitalk.h"
-#include "machine/6522via.h"
+#include "speaker.h"
+
 #include "chexx.lh"
+
 
 #define MAIN_CLOCK XTAL_4MHz
 

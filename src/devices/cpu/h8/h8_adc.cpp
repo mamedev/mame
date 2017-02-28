@@ -8,12 +8,12 @@
 // 1 = everything
 const int V = 0;
 
-const device_type H8_ADC_3337 = &device_creator<h8_adc_3337_device>;
-const device_type H8_ADC_3006 = &device_creator<h8_adc_3006_device>;
-const device_type H8_ADC_2245 = &device_creator<h8_adc_2245_device>;
-const device_type H8_ADC_2320 = &device_creator<h8_adc_2320_device>;
-const device_type H8_ADC_2357 = &device_creator<h8_adc_2357_device>;
-const device_type H8_ADC_2655 = &device_creator<h8_adc_2655_device>;
+const device_type H8_ADC_3337 = device_creator<h8_adc_3337_device>;
+const device_type H8_ADC_3006 = device_creator<h8_adc_3006_device>;
+const device_type H8_ADC_2245 = device_creator<h8_adc_2245_device>;
+const device_type H8_ADC_2320 = device_creator<h8_adc_2320_device>;
+const device_type H8_ADC_2357 = device_creator<h8_adc_2357_device>;
+const device_type H8_ADC_2655 = device_creator<h8_adc_2655_device>;
 
 h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),

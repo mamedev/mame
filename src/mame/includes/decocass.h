@@ -11,6 +11,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "cpu/mcs48/mcs48.h"
+#include "screen.h"
 
 #define T1PROM 1
 #define T1DIRECT 2

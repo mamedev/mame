@@ -169,15 +169,20 @@ Protection Notes:
 ********************************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "includes/raiden2.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/3812intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/raiden2.h"
+#include "sound/ym2151.h"
 #include "machine/r2crypt.h"
+
+#include "debugger.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void raiden2_state::machine_start()
 {

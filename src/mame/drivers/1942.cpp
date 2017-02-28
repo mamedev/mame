@@ -62,21 +62,26 @@ correctly.
 ***************************************************************************/
 
 /* 12mhz OSC */
-#define MAIN_CPU_CLOCK      (XTAL_12MHz/3)
-#define SOUND_CPU_CLOCK     (XTAL_12MHz/4)
-#define AUDIO_CLOCK     (XTAL_12MHz/8)
+#define MASTER_CLOCK      (XTAL_12MHz)
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK/3)
+#define SOUND_CPU_CLOCK     (MASTER_CLOCK/4)
+#define AUDIO_CLOCK     (MASTER_CLOCK/8)
 /* 20mhz OSC - both Z80s are 4 MHz */
-#define MAIN_CPU_CLOCK_1942P      (XTAL_20MHz/5)
-#define SOUND_CPU_CLOCK_1942P     (XTAL_20MHz/5)
-#define AUDIO_CLOCK_1942P     (XTAL_20MHz/16)
+#define MASTER_CLOCK_1942P     (XTAL_20MHz)
+#define MAIN_CPU_CLOCK_1942P      (MASTER_CLOCK_1942P/5)
+#define SOUND_CPU_CLOCK_1942P     (MASTER_CLOCK_1942P/5)
+#define AUDIO_CLOCK_1942P     (MASTER_CLOCK_1942P/16)
 
 #include "emu.h"
+#include "includes/1942.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
+#include "screen.h"
+#include "speaker.h"
 
-#include "includes/1942.h"
+#include "netlist/devices/net_lib.h"
 
 #define NLFILT(RA, R1, C1, R2) \
 	NET_C(RA.1, V5)             \

@@ -115,12 +115,12 @@ DONE (x) (p=partly)         NMOS         CMOS
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type DUSCC         = &device_creator<duscc_device>;
-const device_type DUSCC_CHANNEL = &device_creator<duscc_channel>;
-const device_type DUSCC26562    = &device_creator<duscc26562_device>;
-const device_type DUSCC26C562   = &device_creator<duscc26C562_device>;
-const device_type DUSCC68562    = &device_creator<duscc68562_device>;
-const device_type DUSCC68C562   = &device_creator<duscc68C562_device>;
+const device_type DUSCC         = device_creator<duscc_device>;
+const device_type DUSCC_CHANNEL = device_creator<duscc_channel>;
+const device_type DUSCC26562    = device_creator<duscc26562_device>;
+const device_type DUSCC26C562   = device_creator<duscc26C562_device>;
+const device_type DUSCC68562    = device_creator<duscc68562_device>;
+const device_type DUSCC68C562   = device_creator<duscc68C562_device>;
 
 //-------------------------------------------------
 //  device_mconfig_additions -

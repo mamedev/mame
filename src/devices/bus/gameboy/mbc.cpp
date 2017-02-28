@@ -18,23 +18,23 @@
 //  gb_rom_mbc*_device - constructor
 //-------------------------------------------------
 
-const device_type GB_ROM_MBC1 = &device_creator<gb_rom_mbc1_device>;
-const device_type GB_ROM_MBC2 = &device_creator<gb_rom_mbc2_device>;
-const device_type GB_ROM_MBC3 = &device_creator<gb_rom_mbc3_device>;
-const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
-const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
-const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
-const device_type GB_ROM_M161 = &device_creator<gb_rom_m161_device>;
-const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
-const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen_mmc1_device>;
-const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen_mmc2_device>;
-const device_type GB_ROM_188IN1 = &device_creator<gb_rom_188in1_device>;
-const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
-const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
-const device_type GB_ROM_LICHENG = &device_creator<gb_rom_licheng_device>;
-const device_type GB_ROM_DIGIMON = &device_creator<gb_rom_digimon_device>;
-const device_type GB_ROM_ROCKMAN8 = &device_creator<gb_rom_rockman8_device>;
-const device_type GB_ROM_SM3SP = &device_creator<gb_rom_sm3sp_device>;
+const device_type GB_ROM_MBC1 = device_creator<gb_rom_mbc1_device>;
+const device_type GB_ROM_MBC2 = device_creator<gb_rom_mbc2_device>;
+const device_type GB_ROM_MBC3 = device_creator<gb_rom_mbc3_device>;
+const device_type GB_ROM_MBC5 = device_creator<gb_rom_mbc5_device>;
+const device_type GB_ROM_MBC6 = device_creator<gb_rom_mbc6_device>;
+const device_type GB_ROM_MBC7 = device_creator<gb_rom_mbc7_device>;
+const device_type GB_ROM_M161 = device_creator<gb_rom_m161_device>;
+const device_type GB_ROM_MMM01 = device_creator<gb_rom_mmm01_device>;
+const device_type GB_ROM_SACHEN1 = device_creator<gb_rom_sachen_mmc1_device>;
+const device_type GB_ROM_SACHEN2 = device_creator<gb_rom_sachen_mmc2_device>;
+const device_type GB_ROM_188IN1 = device_creator<gb_rom_188in1_device>;
+const device_type GB_ROM_SINTAX = device_creator<gb_rom_sintax_device>;
+const device_type GB_ROM_CHONGWU = device_creator<gb_rom_chongwu_device>;
+const device_type GB_ROM_LICHENG = device_creator<gb_rom_licheng_device>;
+const device_type GB_ROM_DIGIMON = device_creator<gb_rom_digimon_device>;
+const device_type GB_ROM_ROCKMAN8 = device_creator<gb_rom_rockman8_device>;
+const device_type GB_ROM_SM3SP = device_creator<gb_rom_sm3sp_device>;
 
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
