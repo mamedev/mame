@@ -64,7 +64,7 @@
  *MP3300   TMS1000   1979, Milton Bradley Simon (newer)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
- *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
+ @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device, decap/dump is available
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
@@ -1623,6 +1623,98 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Quiz Wiz Challenger
+  * TMS1000NLL M32001-N2 (die label 1000E, M32001)
+  * 4 7seg LEDs, 17 other LEDs, 1-bit sound
+  
+  This is a 4-player version of Quiz Wiz.
+  ..
+
+***************************************************************************/
+
+class quizwizc_state : public hh_tms1k_state
+{
+public:
+	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void quizwizc_state::prepare_display()
+{
+	// R6-R9 are 7segs
+	set_display_segmask(0x3c0, 0x7f);
+
+	// note: O7 is on VSS
+	display_matrix(7, 11, m_o, (m_r & 0x3ff) | (m_o << 3 & 0x400));
+}
+
+WRITE16_MEMBER(quizwizc_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R5: input mux
+	m_inp_mux = data & 0x3f;
+
+	// R0-R3: led select
+	// R6-R9: digit select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(quizwizc_state::write_o)
+{
+	// O0-O7: led/digit segment data
+	m_o = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	prepare_display();
+}
+
+READ8_MEMBER(quizwizc_state::read_k)
+{
+	// K: multiplexed inputs
+	return 0;
+	//return read_inputs(6);
+}
+
+
+// config
+
+static INPUT_PORTS_START( quizwizc )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(quizwizc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(quizwizc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(quizwizc_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_quizwizc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die label MP7334)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
@@ -1828,7 +1920,7 @@ WRITE16_MEMBER(cnbaskb_state::write_r)
 
 WRITE16_MEMBER(cnbaskb_state::write_o)
 {
-	// O0-O6: led/digit data
+	// O0-O6: led/digit segment data
 	// O7: N/C
 	m_o = data;
 	prepare_display();
@@ -1938,7 +2030,7 @@ WRITE16_MEMBER(cmsport_state::write_r)
 
 WRITE16_MEMBER(cmsport_state::write_o)
 {
-	// O0-O7: led/digit data
+	// O0-O7: led/digit segment data
 	m_o = data;
 	prepare_display();
 }
@@ -2304,7 +2396,8 @@ WRITE16_MEMBER(eleciq_state::write_r)
 
 WRITE16_MEMBER(eleciq_state::write_o)
 {
-	// O0-O6: led/digit data
+	// O0-O6: led/digit segment data
+	// O7: N/C
 	m_o = data;
 	prepare_display();
 }
@@ -8352,6 +8445,17 @@ ROM_START( h2hboxing )
 ROM_END
 
 
+ROM_START( quizwizc )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "m32001", 0x0000, 0x0400, CRC(053657eb) SHA1(38c84f7416f79aa679f434a3d35df54cd9aa528a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_quizwizc_output.pla", 0, 365, CRC(475b7053) SHA1(8f61bf736eb41d7029a6b165cc0a184ba0a70a2a) )
+ROM_END
+
+
 ROM_START( tc4 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
@@ -8721,7 +8825,7 @@ ROM_START( bigtrak )
 	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_bigtrak_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_LOAD( "tms1000_common3_micro.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bigtrak_output.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
 ROM_END
@@ -8984,6 +9088,7 @@ CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Col
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, quizwizc,  0,        0, quizwizc,  quizwizc,  driver_device, 0, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, cnbaskb,   0,        0, cnbaskb,   cnbaskb,   driver_device, 0, "Conic", "Electronic Basktetball (Conic)", MACHINE_SUPPORTS_SAVE )
