@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "machine/ram.h"
 #include "dma.h"
 #include "gte.h"
 #include "irq.h"
@@ -132,8 +133,6 @@ enum
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class ram_device;
 
 class psxcpu_state
 {

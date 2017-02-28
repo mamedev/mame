@@ -70,7 +70,6 @@
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
-#include "machine/ram.h"
 #include "debugger.h"
 
 #define LOG_BIOSCALL ( 0 )
