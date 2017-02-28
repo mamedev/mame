@@ -1424,8 +1424,8 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.10") // hardwired (2 diodes)
-	PORT_CONFNAME( 0x01, 0x00, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -1436,8 +1436,8 @@ static INPUT_PORTS_START( vscg )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 

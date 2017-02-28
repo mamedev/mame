@@ -500,7 +500,7 @@ static INPUT_PORTS_START( matchnum )
 	PORT_START("IN.2") // R5
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Change")
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 
@@ -662,7 +662,7 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.5") // R10
-	PORT_CONFNAME( 0x01, 0x00, "Players")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1217,7 +1217,7 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
-	PORT_CONFNAME( 0x03, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 
@@ -1320,7 +1320,7 @@ READ8_MEMBER(h2hfootb_state::read_k)
 
 static INPUT_PORTS_START( h2hfootb )
 	PORT_START("IN.0") // K1
-	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
@@ -1329,7 +1329,7 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
-	PORT_CONFNAME( 0x03, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
@@ -1465,7 +1465,7 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing")
 
 	PORT_START("IN.5") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, h2hbaseb_state, skill_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, h2hbaseb_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
@@ -1572,7 +1572,7 @@ READ8_MEMBER(h2hboxing_state::read_k)
 
 static INPUT_PORTS_START( h2hboxing )
 	PORT_START("IN.0") // R0
-	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1937,7 +1937,7 @@ READ8_MEMBER(cnbaskb_state::read_k)
 
 static INPUT_PORTS_START( cnbaskb )
 	PORT_START("IN.0") // R0
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" ) // amateur
 	PORT_CONFSETTING(    0x01, "2" ) // professional
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -2062,7 +2062,7 @@ static INPUT_PORTS_START( cmsport )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" ) // amateur
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
@@ -2182,7 +2182,7 @@ static INPUT_PORTS_START( cnfball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
-	PORT_CONFNAME( 0x08, 0x08, "Skill Level" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x08, "1" ) // college
 	PORT_CONFSETTING(    0x00, "2" ) // professional
 
@@ -2291,7 +2291,7 @@ static INPUT_PORTS_START( cnfball2 )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_TOGGLE PORT_NAME("Play Selector") // pass/run
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" ) // college
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 
@@ -2446,7 +2446,7 @@ static INPUT_PORTS_START( eleciq )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // R9
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" ) // amateur
 	PORT_CONFSETTING(    0x01, "2" ) // professional
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2559,7 +2559,7 @@ static INPUT_PORTS_START( esoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("IN.2") // R2
-	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" ) // Auto
 	PORT_CONFSETTING(    0x02, "2" ) // Manual
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -2674,7 +2674,7 @@ static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Change Sides")
-	PORT_CONFNAME( 0x04, 0x04, "Players" )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x04, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2802,7 +2802,7 @@ READ8_MEMBER(ebball2_state::read_k)
 static INPUT_PORTS_START( ebball2 )
 	PORT_START("IN.0") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
@@ -2972,14 +2972,14 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Steal Defense")
 
 	PORT_START("IN.2") // R2
-	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
@@ -3109,7 +3109,7 @@ static INPUT_PORTS_START( esbattle )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire 1") // F1
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Fire 2") // F2
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Launch")
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
@@ -3199,7 +3199,7 @@ static INPUT_PORTS_START( einvader )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, nullptr)
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
@@ -3333,10 +3333,10 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R4
-	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
-	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x02, "Professional" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Status")
@@ -3437,10 +3437,10 @@ READ8_MEMBER(ebaskb2_state::read_k)
 
 static INPUT_PORTS_START( ebaskb2 )
 	PORT_START("IN.0") // R6
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "Amateur" )
 	PORT_CONFSETTING(    0x00, "Professional" )
-	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
@@ -3574,7 +3574,7 @@ static INPUT_PORTS_START( raisedvl )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1 (only bit 0)
-	PORT_CONFNAME( 0x31, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, raisedvl_state, skill_switch, nullptr)
+	PORT_CONFNAME( 0x31, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, raisedvl_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x10, "2" )
 	PORT_CONFSETTING(    0x11, "3" )
@@ -3707,9 +3707,9 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_START("IN.0") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Pick Off")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x0c, 0x04, "Players" )
+	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x04, "1" )
-	PORT_CONFSETTING(    0x00, "Practice" )
+	PORT_CONFSETTING(    0x00, "Practice" ) // middle switch
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.1") // R9
@@ -5586,7 +5586,7 @@ static INPUT_PORTS_START( simon )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R9
-	PORT_CONFNAME( 0x0f, 0x02, "Skill Level")
+	PORT_CONFNAME( 0x0f, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
@@ -5695,7 +5695,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Red Button")
 
 	PORT_START("IN.4") // R9
-	PORT_CONFNAME( 0x0f, 0x02, "Skill Level")
+	PORT_CONFNAME( 0x0f, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "Head-to-Head" ) // this sets R10 K2, see below
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
@@ -7002,7 +7002,7 @@ static INPUT_PORTS_START( tcfball )
 
 	PORT_START("IN.2") // R7
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" ) // college
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
@@ -7576,7 +7576,7 @@ static INPUT_PORTS_START( copycat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
 
 	PORT_START("IN.1") // R5
-	PORT_CONFNAME( 0x0f, 0x01, "Skill Level")
+	PORT_CONFNAME( 0x0f, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
@@ -7853,7 +7853,7 @@ static INPUT_PORTS_START( ss7in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN.3") // R10
-	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -8021,7 +8021,7 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x04, "5" )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, nullptr)
 	PORT_CONFSETTING(    0x00, "Pro 1" )
 	PORT_CONFSETTING(    0x01, "Pro 2" )
 INPUT_PORTS_END
@@ -8283,10 +8283,10 @@ static INPUT_PORTS_START( ssports4 )
 
 	PORT_START("IN.2") // R5
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x00, "Speed" )
-	PORT_CONFSETTING(    0x00, "Low" )
-	PORT_CONFSETTING(    0x04, "High" )
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 

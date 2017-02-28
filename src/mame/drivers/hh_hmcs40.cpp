@@ -432,11 +432,11 @@ static INPUT_PORTS_START( bambball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Display")
 
 	PORT_START("IN.3") // D10 port R0x
-	PORT_CONFNAME( 0x07, 0x01, "Skill Level")
+	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -567,10 +567,10 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port D
-	PORT_CONFNAME( 0x0001, 0x0000, "Players" )
+	PORT_CONFNAME( 0x0001, 0x0000, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0001, "2" )
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START )
@@ -1856,10 +1856,10 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0040, DEF_STR( On ) )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_CONFNAME( 0x0800, 0x0800, "Players" )
+	PORT_CONFNAME( 0x0800, 0x0800, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0800, "1" )
 	PORT_CONFSETTING(      0x0000, "2" )
-	PORT_CONFNAME( 0x3000, 0x2000, "Skill Level" )
+	PORT_CONFNAME( 0x3000, 0x2000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x2000, "1" )
 	PORT_CONFSETTING(      0x1000, "2" )
 	PORT_CONFSETTING(      0x0000, "3" )
@@ -1966,7 +1966,7 @@ READ16_MEMBER(alnattck_state::input_r)
 
 static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.0") // D7 line D5
-	PORT_CONFNAME( 0x20, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
 
@@ -2230,7 +2230,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN.1") // R11 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2350,7 +2350,7 @@ READ8_MEMBER(cpacman_state::input_r)
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2467,7 +2467,7 @@ READ8_MEMBER(cmspacmn_state::input_r)
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2606,7 +2606,7 @@ static INPUT_PORTS_START( sag )
 	PORT_START("IN.2") // D4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
-	PORT_CONFNAME( 0x04, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 
@@ -2626,7 +2626,7 @@ static INPUT_PORTS_START( sag )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
 
 	PORT_START("FAKE") // shared D3/D5
-	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "Demo" )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
@@ -2738,10 +2738,10 @@ static INPUT_PORTS_START( egalaxn2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFNAME( 0x0c, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" ) // for Demo mode: need to hold down Fire button at power-on
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
@@ -2822,10 +2822,10 @@ static INPUT_PORTS_START( epacman2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFNAME( 0x0c, 0x04, "Players" )
+	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
@@ -2971,13 +2971,13 @@ static INPUT_PORTS_START( eturtles )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.5") // D6 INT0/1
-	PORT_CONFNAME( 0x03, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x02, "0 (Demo)" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
@@ -3094,11 +3094,11 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
@@ -3348,7 +3348,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
-	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0010, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "A" )
 	PORT_CONFSETTING(      0x0010, "B" )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -4061,7 +4061,7 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // port D
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level")
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )

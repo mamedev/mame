@@ -2,7 +2,7 @@
 // copyright-holders:hap, Sean Riddle, Kevin Horton
 /***************************************************************************
 
-  GI PIC16xx-driven dedicated handhelds or other simple devices.
+  GI PIC 16xx-driven dedicated handhelds or other simple devices.
 
   known chips:
 
@@ -280,13 +280,13 @@ u16 hh_pic16_state::read_inputs(int columns)
 /***************************************************************************
 
   Atari Touch Me
-  * PIC1655A-053
+  * PIC 1655A-053
   * 2 7seg LEDs + 4 other LEDs, 1-bit sound
 
   This is the handheld version of the 1974 arcade game.
 
   known revisions:
-  - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC1655A-053
+  - Model BH-100 GI C013233 Rev 2 Atari W 1979: PIC 1655A-053
   - Model BH-100 C013150 Rev 6 Atari 1979: AMI C10745 (custom ASIC)
 
 ***************************************************************************/
@@ -403,7 +403,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Caprice Pro-Action Baseball (manufactured by Calfax)
-  * PIC1655A-043
+  * PIC 1655A-043
   * x
 
 ***************************************************************************/
@@ -475,7 +475,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   GAF Melody Madness
-  * PIC1655A-094
+  * PIC 1655A-094
   * 2 lamps under tube, 1-bit sound
 
   Melody Madness is a tabletop music memory game, shaped like a jukebox.
@@ -590,7 +590,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Ideal Maniac, by Ralph Baer
-  * PIC1655A-036
+  * PIC 1655A-036
   * 2 7seg LEDs, 1-bit sound
 
   Maniac is a reflex game for 2-4 players. There are 4 challenges:
@@ -657,10 +657,10 @@ WRITE8_MEMBER(maniac_state::write_c)
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // top button, increment clockwise
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // top button, increment clockwise
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
@@ -690,7 +690,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Lakeside Le Boom
-  * PIC1655A-061
+  * PIC 1655A-061
   * 1 led, 1-bit sound with RC circuit for volume decay
 
   This is a tabletop timebomb defusion game. It's shaped like an aerial bomb,
@@ -847,7 +847,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tandy Electronic Basketball (model 60-2146)
-  * PIC1655A-51
+  * PIC 1655A-51
   * 2 7seg LEDs + 21 other LEDs, 1-bit sound
 
   The ROM is nearly identical to hccbaskb, the shell/overlay is the same as
@@ -926,7 +926,7 @@ static INPUT_PORTS_START( tbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN.5") // port A2
-	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -956,7 +956,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tiger Electronics Rocket Pinball (model 7-460)
-  * PIC1650A-110, 69-11397
+  * PIC 1650A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
 
   known releases:
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tiger Electronics Half Court Computer Basketball (model 7-470)
-  * PIC1655A(no serial), 69-11557
+  * PIC 1655A(no serial), 69-11557
   * 2 7seg LEDs + 26 other LEDs, 1-bit sound
 
   known releases:
@@ -1153,7 +1153,7 @@ static INPUT_PORTS_START( hccbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN.5") // port A2
-	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -1183,16 +1183,16 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Toytronic Football (set 1)
-  * PIC1655A-033
+  * PIC 1655A-033
   * 4511 7seg BCD decoder, 7 7seg LEDs + 27 other LEDs, 1-bit sound
 
   (no brand) Football (set 2)
-  * PIC1655-024
+  * PIC 1655-024
   * rest same as above, 1 less button
 
   Hello and welcome to another Mattel Football clone, there are so many of these.
-  The PIC1655-024 one came from an unbranded handheld, but comparison suggests
-  that it's the 'prequel' of PIC1655A-033.
+  The 1655-024 one came from an unbranded handheld, but comparison suggests that
+  it's the 'prequel' of 1655A-033.
 
 ***************************************************************************/
 
@@ -1277,7 +1277,7 @@ static INPUT_PORTS_START( ttfball )
 	PORT_START("IN.5") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Status")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Score")
-	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -1301,7 +1301,7 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_START("IN.5") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Status")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Score")
-	PORT_CONFNAME( 0x04, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 
@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   U.S. Games Programmable Baseball
-  * PIC1650A-133
+  * PIC 1650A-133
   * x
 
   known releases:
@@ -1411,7 +1411,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   U.S. Games Football
-  * PIC1650A-144
+  * PIC 1650A-144
   * x
 
   known releases:
@@ -1492,43 +1492,43 @@ MACHINE_CONFIG_END
 
 ROM_START( touchme )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
+	ROM_LOAD( "pic_1655a-053", 0x0000, 0x0400, CRC(f0858f0a) SHA1(53ffe111d43db1c110847590350ef62f02ed5e0e) )
 ROM_END
 
 
 ROM_START( pabball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
+	ROM_LOAD( "pic_1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
 ROM_END
 
 
 ROM_START( melodym )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
+	ROM_LOAD( "pic_1655a-094", 0x0000, 0x0400, CRC(6d35bd7b) SHA1(20e326085878f69a9d4ef1651ef4443f27188567) )
 ROM_END
 
 
 ROM_START( maniac )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
+	ROM_LOAD( "pic_1655a-036", 0x0000, 0x0400, CRC(a96f7011) SHA1(e97ae44d3c1e74c7e1024bb0bdab03eecdc9f827) )
 ROM_END
 
 
 ROM_START( leboom )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-061", 0x0000, 0x0400, CRC(5880eea1) SHA1(e3795b347fd5df9de084da36e33f6b70fbc0b0ae) )
+	ROM_LOAD( "pic_1655a-061", 0x0000, 0x0400, CRC(5880eea1) SHA1(e3795b347fd5df9de084da36e33f6b70fbc0b0ae) )
 ROM_END
 
 
 ROM_START( tbaskb )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
+	ROM_LOAD( "pic_1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
 ROM_END
 
 
 ROM_START( rockpin )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1650a-110_69-11397", 0x0000, 0x0400, CRC(d5396e77) SHA1(952feaff70fde53a9eda84c54704520d50749e78) )
+	ROM_LOAD( "pic_1650a-110_69-11397", 0x0000, 0x0400, CRC(d5396e77) SHA1(952feaff70fde53a9eda84c54704520d50749e78) )
 ROM_END
 
 
@@ -1540,24 +1540,24 @@ ROM_END
 
 ROM_START( ttfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655a-033", 0x0000, 0x0400, CRC(2b500501) SHA1(f7fe464663c56e2181a31a1dc5f1f5239df57bed) )
+	ROM_LOAD( "pic_1655a-033", 0x0000, 0x0400, CRC(2b500501) SHA1(f7fe464663c56e2181a31a1dc5f1f5239df57bed) )
 ROM_END
 
 ROM_START( ttfballa )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1655-024", 0x0000, 0x0400, CRC(9091102f) SHA1(ef72759f20b5a99e0366863caad1e26be114263f) )
+	ROM_LOAD( "pic_1655-024", 0x0000, 0x0400, CRC(9091102f) SHA1(ef72759f20b5a99e0366863caad1e26be114263f) )
 ROM_END
 
 
 ROM_START( uspbball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1650a-133", 0x0000, 0x0400, CRC(479e98be) SHA1(67437177b059dfa6e01940da26daf997cec96ead) )
+	ROM_LOAD( "pic_1650a-133", 0x0000, 0x0400, CRC(479e98be) SHA1(67437177b059dfa6e01940da26daf997cec96ead) )
 ROM_END
 
 
 ROM_START( usfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic1650a-144", 0x0000, 0x0400, CRC(ef3677c9) SHA1(33f89c79e7e090710681dffe09eddaf66b5cb794) )
+	ROM_LOAD( "pic_1650a-144", 0x0000, 0x0400, CRC(ef3677c9) SHA1(33f89c79e7e090710681dffe09eddaf66b5cb794) )
 ROM_END
 
 
