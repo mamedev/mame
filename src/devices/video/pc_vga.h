@@ -11,6 +11,8 @@
 #ifndef MAME_DEVICES_VIDEO_PC_VGA_H
 #define MAME_DEVICES_VIDEO_PC_VGA_H
 
+#include "screen.h"
+
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
