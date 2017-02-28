@@ -2,7 +2,6 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/rollerg.h"
-#include "screen.h"
 
 /***************************************************************************
 

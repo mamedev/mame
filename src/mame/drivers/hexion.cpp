@@ -87,7 +87,6 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 

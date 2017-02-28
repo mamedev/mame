@@ -31,7 +31,6 @@ GP1 HDD data contents:
 #include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "sound/k054539.h"
-#include "screen.h"
 #include "speaker.h"
 
 

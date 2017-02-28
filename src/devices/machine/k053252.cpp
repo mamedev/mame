@@ -62,8 +62,6 @@ TODO:
 #include "emu.h"
 #include "k053252.h"
 
-#include "screen.h"
-
 
 const device_type K053252 = device_creator<k053252_device>;
 

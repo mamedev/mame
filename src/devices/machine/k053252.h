@@ -8,6 +8,8 @@
 #pragma once
 
 
+#include "screen.h"
+
 #define MCFG_K053252_INT1_EN_CB(_devcb) \
 	devcb = &k053252_device::set_int1_en_callback(*device, DEVCB_##_devcb);
 
