@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "epson_lx810l.h"
 #include "sound/volt_reg.h"
-#include "screen.h"
 #include "speaker.h"
 
 //extern const char layout_lx800[]; /* use layout from lx800 */
