@@ -208,7 +208,6 @@ TI-86 ports:
 #include "imagedev/snapquik.h"
 #include "machine/bankdev.h"
 #include "screen.h"
-#include "speaker.h"
 
 
 /* port i/o functions */
@@ -599,10 +598,7 @@ static MACHINE_CONFIG_DERIVED( ti85, ti81 )
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -629,18 +625,14 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	//MCFG_TI82SERIAL_ADD( "tiserial" )
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti81v2, ti82 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ti81v2_io)
 
-	//MCFG_DEVICE_REMOVE( "tiserial" )
+	MCFG_DEVICE_REMOVE("linkport")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83, ti81 )
@@ -670,7 +662,6 @@ static MACHINE_CONFIG_DERIVED( ti86, ti85 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
-	//MCFG_TI86SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
@@ -716,13 +707,9 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 
 	MCFG_AMD_29F400T_ADD("flash")
-
-	//MCFG_TI83PSERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
@@ -744,8 +731,6 @@ static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
 	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
-
-	//MCFG_TI83PSERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
@@ -770,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( ti84pse, ti83pse )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti73, ti83p )
-	//MCFG_DEVICE_REMOVE( "tiserial" )
+	MCFG_DEVICE_REMOVE("linkport")
 	//MCFG_TI73SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
@@ -921,15 +906,15 @@ ROM_START (ti84p)
 	ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4af31251) SHA1(8f67269346644b87e7cd0f353f5f4030e787cf57), ROM_BIOS(1) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT   COMPANY                 FULLNAME                        FLAGS */
-COMP( 1990, ti81,       0,      0,      ti81,   ti81, driver_device,   0,     "Texas Instruments",    "TI-81",                        MACHINE_NO_SOUND )
-COMP( 1992, ti85,       0,      0,      ti85d,  ti85, driver_device,   0,     "Texas Instruments",    "TI-85",                        MACHINE_NO_SOUND )
-COMP( 1993, ti82,       0,      0,      ti82,   ti82, driver_device,   0,     "Texas Instruments",    "TI-82",                        MACHINE_NO_SOUND )
-COMP( 1994, ti81v2,     ti81,   0,      ti81v2, ti81, driver_device,   0,     "Texas Instruments",    "TI-81 v2.0",                   MACHINE_NO_SOUND )
-COMP( 1996, ti83,       0,      0,      ti83,   ti83, driver_device,   0,     "Texas Instruments",    "TI-83",                        MACHINE_NO_SOUND )
-COMP( 1997, ti86,       0,      0,      ti86,   ti85, driver_device,   0,     "Texas Instruments",    "TI-86",                        MACHINE_NO_SOUND )
-COMP( 1998, ti73,       0,      0,      ti73,   ti82, driver_device,   0,     "Texas Instruments",    "TI-73",                        MACHINE_NO_SOUND )
-COMP( 1999, ti83p,      0,      0,      ti83p,  ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus",                   MACHINE_NO_SOUND )
-COMP( 2001, ti83pse,    0,      0,      ti83pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus Silver Edition", MACHINE_NO_SOUND )
-COMP( 2004, ti84p,      0,      0,      ti84p,   ti82, driver_device,   0,   "Texas Instruments",    "TI-84 Plus",                    MACHINE_NO_SOUND )
-COMP( 2004, ti84pse,    0,      0,      ti84pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-84 Plus Silver Edition", MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT  INIT                    COMPANY              FULLNAME                     FLAGS
+COMP( 1990, ti81,       0,      0,      ti81,    ti81,  driver_device,   0,     "Texas Instruments", "TI-81",                     MACHINE_NO_SOUND_HW )
+COMP( 1992, ti85,       0,      0,      ti85d,   ti85,  driver_device,   0,     "Texas Instruments", "TI-85",                     MACHINE_NO_SOUND_HW )
+COMP( 1993, ti82,       0,      0,      ti82,    ti82,  driver_device,   0,     "Texas Instruments", "TI-82",                     MACHINE_NO_SOUND_HW )
+COMP( 1994, ti81v2,     ti81,   0,      ti81v2,  ti81,  driver_device,   0,     "Texas Instruments", "TI-81 v2.0",                MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,      0,      ti83,    ti83,  driver_device,   0,     "Texas Instruments", "TI-83",                     MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,      0,      ti86,    ti85,  driver_device,   0,     "Texas Instruments", "TI-86",                     MACHINE_NO_SOUND_HW )
+COMP( 1998, ti73,       0,      0,      ti73,    ti82,  driver_device,   0,     "Texas Instruments", "TI-73",                     MACHINE_NO_SOUND_HW )
+COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  driver_device,   0,     "Texas Instruments", "TI-83 Plus",                MACHINE_NO_SOUND_HW )
+COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  driver_device,   0,     "Texas Instruments", "TI-83 Plus Silver Edition", MACHINE_NO_SOUND_HW )
+COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  driver_device,   0,     "Texas Instruments", "TI-84 Plus",                MACHINE_NO_SOUND_HW )
+COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  driver_device,   0,     "Texas Instruments", "TI-84 Plus Silver Edition", MACHINE_NO_SOUND_HW )

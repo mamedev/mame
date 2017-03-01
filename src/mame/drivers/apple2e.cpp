@@ -757,7 +757,9 @@ void apple2e_state::machine_reset()
 	m_lcram = false;
 	m_lcram2 = true;
 	m_lcwriteenable = true;
-	m_wrtcount = 0;
+	m_wrtcount = 2;
+	// set bank device to read ROM, write enabled
+	m_lcbank->set_bank(0);
 
 	m_exp_bankhior = 0xf0;
 
@@ -1013,12 +1015,12 @@ void apple2e_state::lc_update(int offset, bool write)
 
 	m_lcram = false;
 	m_lcram2 = false;
-	m_lcwriteenable = false;
 
 	switch (offset)
 	{
 		case 0x0: case 0x8: case 0x4: case 0xc:
 			m_wrtcount = 0;
+			m_lcwriteenable = false;
 			m_lcram = true;
 			break;
 			
@@ -1035,6 +1037,7 @@ void apple2e_state::lc_update(int offset, bool write)
 
 		case 0x2: case 0xa: case 0x6: case 0xe:
 			m_wrtcount = 0;
+			m_lcwriteenable = false;
 			break;
 			
 		case 0x3: case 0xb: case 0x7: case 0xf:
@@ -1053,6 +1056,7 @@ void apple2e_state::lc_update(int offset, bool write)
 	if (m_wrtcount >= 2)
 	{
 		m_lcwriteenable = true;
+		m_wrtcount = 2;
 	}
 
 	if (!(offset & 8))
@@ -1080,9 +1084,10 @@ void apple2e_state::lc_update(int offset, bool write)
 	}
 
 	#if 0
-	printf("LC: new state %c%c dxxx=%04x altzp=%d\n",
+	printf("LC: new state %c%c (%d) dxxx=%04x altzp=%d\n",
 			m_lcram ? 'R' : 'x',
 			m_lcwriteenable ? 'W' : 'x',
+			m_wrtcount,
 			m_lcram2 ? 0x1000 : 0x0000,
 			m_altzp);
 	#endif

@@ -186,4 +186,13 @@ ROM_START( timetrv )
 	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
 ROM_END
 
-GAME( 1991, timetrv,  0,       timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+ROM_START( timetrv2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "epr-72491.u9",   0xc0000, 0x40000, CRC(c7998e2f) SHA1(26060653b2368f52c304e6433b4f447f99a36839) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
+ROM_END
+
+GAME( 1991, timetrv,  0,       timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, timetrv2, timetrv, timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Europe?

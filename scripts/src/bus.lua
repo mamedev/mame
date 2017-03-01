@@ -2290,6 +2290,26 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/ti8x/ti8x.h,BUSES["TI8X"] = true
+---------------------------------------------------
+
+if (BUSES["TI8X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.h",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.h",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.h",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.h",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true

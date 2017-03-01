@@ -7,7 +7,6 @@
   status: 3/80 POSTs, 3/460 needs its unique RTC chip (also used by non-3x Sun 3s).
 
   TODO:
-    - Z8530 SCC needs to actually speak serial so we can hook up the mouse and keyboard.
     - Improve interrupt controller emulation.
     - Figure out how the IOMMU works.
     - Intersil 7170 device for 3/460 and 3/480 (they use the same PROMs).
@@ -142,6 +141,7 @@
 #include "machine/z80scc.h"
 
 #include "bus/rs232/rs232.h"
+#include "bus/sunkbd/sunkbd.h"
 
 #include "screen.h"
 
@@ -153,6 +153,7 @@
 #define FDC_TAG         "fdc"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
+#define KEYBOARD_TAG    "keyboard"
 
 class sun3x_state : public driver_device
 {
@@ -581,6 +582,11 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
