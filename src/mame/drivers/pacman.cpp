@@ -1177,7 +1177,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 
 	/* vanvan: probably a leftover from development: the Sanritsu version writes
-	   the color lookup table here, while the Karateko version writes garbage. */
+	   the color lookup table here, while the Karateco version writes garbage. */
 	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
 ADDRESS_MAP_END
 
