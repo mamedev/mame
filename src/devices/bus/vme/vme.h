@@ -61,7 +61,6 @@
 #define MCFG_VME_J1_CB(_devcb) \
 	devcb = &vme_slot_device::static_set_vme_j1_callback(*device, DEVCB_##_devcb);
 
-//SLOT_INTERFACE_EXTERN(vme_slot1); // Disabled until we know how to combine a board driver and a slot device.
 SLOT_INTERFACE_EXTERN(vme_slots);
 
 class device_vme_card_interface; // This interface is standardized
@@ -143,6 +142,9 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 	static void static_use_owner_spaces(device_t &device);
 
+	virtual DECLARE_READ32_MEMBER(read32);
+	virtual DECLARE_WRITE32_MEMBER(write32);
+
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
@@ -206,15 +208,12 @@ protected:
 	cpu_device   *m_maincpu;
 
 	// address spaces
-	address_space *m_prgspace;
-	int m_prgwidth;
-	bool m_allocspaces;
+	address_space	*m_prgspace;
+	int				m_prgwidth;
+	bool			m_allocspaces;
 
-	const char                 *m_cputag;
-
+	const char		*m_cputag;
 };
-
-
 
 // device type definition
 extern const device_type VME_SLOT;

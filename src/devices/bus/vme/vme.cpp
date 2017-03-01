@@ -8,7 +8,7 @@
  * been approved since then up until recently and the VME64 revision.
  *
  * This bus driver starts with Versabus and VME rev C.
- *   http://bitsavers.informatik.uni-stuttgart.de/pdf/motorola/versabus/M68KVBS_VERSAbus_Specification_Manual_Jul81.pdf
+ *   http://bitsavers.org/pdf/motorola/versabus/M68KVBS_VERSAbus_Specification_Manual_Jul81.pdf
  *
  * Acronymes from the specification
  * ---------------------------------
@@ -68,25 +68,24 @@
 
 #include "emu.h"
 #include "vme.h"
-//#include "bus/vme/vme_mzr8105.h"
 #include "bus/vme/vme_mzr8300.h"
 #include "bus/vme/vme_mvme350.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
+#define LOG_VME     (1U <<  3)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_VME)
+#define LOG_OUTPUT_FUNC printf  // always turned on as logerror is not available here
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#define logerror printf // logerror is not available here
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGVME(...)   LOGMASKED(LOG_VME,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -128,7 +127,8 @@ vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type
 //-------------------------------------------------
 void vme_slot_device::static_update_vme_chains(device_t &device, uint32_t slot_nbr)
 {
-	LOG("%s %s - %d\n", FUNCNAME, device.tag(), slot_nbr);
+	LOGSETUP("%s %s - %d\n", FUNCNAME, device.tag(), slot_nbr);
+	// TODO: link the chained signals between boards
 }
 
 //-------------------------------------------------
@@ -136,10 +136,10 @@ void vme_slot_device::static_update_vme_chains(device_t &device, uint32_t slot_n
 //-------------------------------------------------
 void vme_slot_device::static_set_vme_slot(device_t &device, const char *tag, const char *slottag)
 {
-	LOG("%s %s - %s\n", FUNCNAME, tag, slottag);
-	vme_slot_device &vme_card = dynamic_cast<vme_slot_device&>(device);
-	vme_card.m_vme_tag = tag;
-	vme_card.m_vme_slottag = slottag;
+	vme_slot_device &vme_slot = dynamic_cast<vme_slot_device&>(device);
+	vme_slot.m_vme_tag = tag;
+	vme_slot.m_vme_slottag = slottag;
+	LOGSETUP("%s %s - %s\n", FUNCNAME, vme_slot.m_vme_tag, vme_slot.m_vme_slottag);
 }
 
 //-------------------------------------------------
@@ -147,14 +147,12 @@ void vme_slot_device::static_set_vme_slot(device_t &device, const char *tag, con
 //-------------------------------------------------
 void vme_slot_device::device_start()
 {
-	device_vme_card_interface *dev = dynamic_cast<device_vme_card_interface *>(get_card_device());
-	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_tag, m_vme_slottag);
-	if (dev)
+	device_vme_card_interface *vme_card = dynamic_cast<device_vme_card_interface *>(get_card_device());
+	LOGSETUP("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_tag, m_vme_slottag);
+	if (vme_card)
 	{
-		device_vme_card_interface::static_set_vme_tag(*dev, m_vme_tag, m_vme_slottag);
+		device_vme_card_interface::static_set_vme_tag(*vme_card, m_vme_tag, m_vme_slottag);
 	}
-
-	//  m_card = dynamic_cast<device_vme_card_interface *>(get_card_device());
 }
 
 //-------------------------------------------------
@@ -168,35 +166,22 @@ void vme_slot_device::device_config_complete()
 }
 
 //-------------------------------------------------
-//  P1 D8 read
+//  P1 D8 read - remove?
 //-------------------------------------------------
 READ8_MEMBER(vme_slot_device::read8)
 {
 	uint16_t result = 0x00;
 	LOG("%s %s\n", tag(), FUNCNAME);
-	//  printf("%s %s\n", tag(), FUNCNAME);
-	//  if (m_card)     result = m_card->read8(space, offset);
 	return result;
 }
 
 //-------------------------------------------------
-//  P1 D8 write
+//  P1 D8 write - remove?
 //-------------------------------------------------
 WRITE8_MEMBER(vme_slot_device::write8)
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	//  printf("%s %s\n", tag(), FUNCNAME);
-	//  if (m_card)     m_card->write8(space, offset, data);
 }
-
-#if 0 // Disabled until we know how to make a board driver also a slot device
-/* The following two slot collections be combined once we intriduce capabilities for each board */
-/* Usually a VME firmware supports only a few boards so it will have its own slot collection defined */
-// Controller capable boards that can go into slot1 ( or has an embedded VME bus )
-SLOT_INTERFACE_START( vme_slot1 )
-//  SLOT_INTERFACE("mzr8105", VME_MZR8105)
-SLOT_INTERFACE_END
-#endif
 
 // All boards that can be non-controller boards, eg not driving the VME CLK etc
 SLOT_INTERFACE_START( vme_slots )
@@ -207,9 +192,8 @@ SLOT_INTERFACE_START( vme_slots )
 SLOT_INTERFACE_END
 
 //
-// VME device P1
+// VME device
 //
-
 const device_type VME = device_creator<vme_device>;
 
 // static_set_cputag - used to be able to lookup the CPU owning this VME bus
@@ -258,21 +242,21 @@ vme_device::~vme_device()
 
 void vme_device::device_start()
 {
-	LOG("%s %s %s\n", owner()->tag(), tag(), FUNCNAME);
+	LOGSETUP("%s %s %s\n", owner()->tag(), tag(), FUNCNAME);
 	if (m_allocspaces)
 	{
-		LOG(" - using my own memory spaces\n");
+		LOGSETUP(" - using my own memory spaces\n");
 		m_prgspace = &space(AS_PROGRAM);
 		m_prgwidth = m_prgspace->data_width();
-		LOG(" - Done at %d width\n", m_prgwidth);
+		LOGSETUP(" - Done at %d width\n", m_prgwidth);
 	}
 	else    // use host CPU's spaces directly
 	{
-		LOG(" - using owner memory spaces for %s\n", m_cputag);
+		LOGSETUP(" - using owner memory spaces for %s\n", m_cputag);
 		m_maincpu = owner()->subdevice<cpu_device>(m_cputag);
 		m_prgspace = &m_maincpu->space(AS_PROGRAM);
 		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
-		LOG(" - Done at %d width\n", m_prgwidth);
+		LOGSETUP(" - Done at %d width\n", m_prgwidth);
 	}
 }
 
@@ -283,7 +267,7 @@ void vme_device::device_reset()
 
 void vme_device::add_vme_card(device_vme_card_interface *card)
 {
-	LOG("%s %s\n", tag(), FUNCNAME);
+	LOGSETUP("%s %s\n", tag(), FUNCNAME);
 	m_device_list.append(*card);
 }
 
@@ -313,9 +297,9 @@ void vme_device::install_ub_handler(offs_t start, offs_t end, read8_delegate rha
 // D8 bit devices in A16, A24 and A32
 void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
 {
-	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
+	LOGSETUP("%s %s AM%d D%d mask:%08x\n", tag(), FUNCNAME, amod, m_prgwidth, mask);
 
-	LOG(" - width:%d\n", m_prgwidth);
+	LOGSETUP(" - width:%d\n", m_prgwidth);
 
 	// TODO: support address modifiers and buscycles other than single access cycles
 	switch(amod)
@@ -329,13 +313,12 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8
 	switch(m_prgwidth)
 	{
 	case 16:
+		LOGSETUP(" - installing D8 handlers in D16 bus: %08x-%08x Mask:%08x\n", start, end, mask);
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
 		break;
-	case 24:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
-		break;
 	case 32:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
+		LOGSETUP(" - installing D8 handlers in D32 bus: %08x-%08x Mask:%08x\n", start, end, mask);
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask); 
 		break;
 	default: fatalerror("VME D8: Bus width %d not supported\n", m_prgwidth);
 	}
@@ -344,7 +327,7 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8
 // D16 bit devices in A16, A24 and A32
 void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {
-	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
+	LOG("%s %s AM%d D%d\n", tag(), FUNCNAME, amod, m_prgwidth);
 
 	LOG(" - width:%d\n", m_prgwidth);
 
@@ -361,9 +344,6 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read1
 	{
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
-		break;
-	case 24:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
 		break;
 	case 32:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
@@ -392,9 +372,6 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read3
 	{
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
-		break;
-	case 24:
-		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
 		break;
 	case 32:
 		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
@@ -433,13 +410,161 @@ void device_vme_card_interface::static_set_vme_tag(device_t &device, const char 
 
 void device_vme_card_interface::set_vme_device()
 {
-	LOG("%s %s\n", m_device->tag(), FUNCNAME);
+	LOGSETUP("%s %s\n", m_device->tag(), FUNCNAME);
 	m_vme = dynamic_cast<vme_device *>(device().machine().device(m_vme_tag));
-	//  printf("*** %s %sfound\n", m_vme_tag, m_vme ? "" : "not ");
+	LOGSETUP(" - %s %sfound\n", m_vme_tag, m_vme ? "" : "not ");
 	if (m_vme) m_vme->add_vme_card(this);
 }
 
-/* VME D8 accesses */
+/* 
+   MASTERS use address lines A02-A31 to select which 4-byte group will be accessed. Four
+   additional lines (DS1*, DS0*, A01, and LWORD*) are then used to select which byte
+   location(s) within the 4-byte group are accessed during the data transfer. Using these four
+   lines, a MASTER can access 1, 2, 3, or 4-byte locations simultaneously, depending upon the
+   type of cycle. There are 34 possible cycle types available using these four lines
+
+   A set of byte locations whose addresses differs only in the two least significant bits, is called a
+   4-byte group or a BYTE(0-3) group. Some, or all of the bytes in a 4-byte group can be
+   accessed simultaneously by a single DTB cycle and addressed by A02-A32.
+
+    BYTE(0) xxxxxx...xxxxxx00b
+	BYTE(1) xxxxxx...xxxxxx01b
+	BYTE(2) xxxxxx...xxxxxx10b
+	BYTE(3) xxxxxx...xxxxxx11b
+
+   BYTE(0) to BYTE(3) does not need to come from the same SLAVE device, multiple SLAVE:s can respond 
+   to a single 32bit read contributing one or more 8 bit parts. Of the 34 cycle types MAME currently supports:
+
+                  D24-D31    D16-D23    D8-D15    D0-D7
+   ADDRESS ONLY   --------------- none -------------------
+   SINGLE BYTE                          BYTE(0/2) BYTE(1/3) D8 transfers
+   DOUBLE BYTE                          BYTE(0/2) BYTE(1/3) D16 transfers
+   QUAD BYTE      BYTE(0)    BYTE(1)    BYTE(2)   BYTE(3)   D32 transfers (requires P2/J2 connector)
+*/
+
+READ32_MEMBER(vme_device::read32)
+{
+	uint16_t byte; // Needs room to be shifted left after being read
+	uint16_t word;
+	uint32_t dword;
+	uint32_t offs = offset << 2; // make byte pointer 
+	LOGVME("%s %s %08x %08x\n", tag(), FUNCNAME, offs, mem_mask);
+
+	switch (mem_mask)
+	{
+	case 0xff000000: // Single Even Byte(0) transfer, D8, DS1=low, DS0=high, A01=low, LWORD=high
+		{
+			byte = m_prgspace->read_byte(offs + 1);// << 8; <-- wrong! Needs understanding and a fix
+			//			byte = m_prgspace->read_byte(offs + 1) << 8;
+			LOGVME(" - Single Even Byte(0):%02x\n", byte);
+			return byte;
+		}
+		break;
+	case 0x00ff0000: // Single Odd Byte(1) transfer, D8, DS1=high, DS0=low, A01=low, LWORD=high
+		{
+			byte = m_prgspace->read_byte(offs + 1);
+			LOGVME(" - Single Odd Byte(1):%02x\n", byte);
+			return byte;
+		}
+		break;
+	case 0x0000ff00: // Single Even Byte(2) transfer, D8, DS1=low, DS0=high, A01=high, LWORD=high
+		{
+			byte = m_prgspace->read_byte(offs + 2) << 8;
+			LOGVME(" - Single Even Byte(2):%02x\n", byte);
+			return byte;
+		}
+		break;
+	case 0x000000ff: // Single Odd Byte(3) transfer, D8, DS1=high, DS0=low, A01=high, LWORD=high
+		{
+			byte = m_prgspace->read_byte(offs + 3);
+			LOGVME(" - Single Odd Byte(3):%02x\n", byte);
+			return byte;
+		}
+		break;
+	case 0xffff0000: // Double Byte(0-1) transfer, D16, DS1=low, DS0=low, A01=low, LWORD=high
+		{
+			word = m_prgspace->read_word(offs + 2);
+			return word;
+		}
+		break;
+	case 0x0000ffff: // Double Byte(2-3) transfer, D16, DS1=low, DS0=low, A01=high, LWORD=high
+		{
+			word = m_prgspace->read_word(offs);
+			return word;
+		}
+		break;
+	case 0xffffffff: // Quad Byte(0-3) transfer, D16, DS1=low, DS0=low, A01=low, LWORD=low
+		{
+			dword = m_prgspace->read_dword(offs);
+			return dword;
+		}
+		break;
+	default:
+		logerror("VME data transfer not implemented Offset:%08x Mask:%08x\n", offs, mem_mask);
+		LOGVME(" - Data transfer not implemented\n");
+	}
+	return 0;
+}
+
+WRITE32_MEMBER(vme_device::write32)
+{
+	uint8_t byte;
+	uint16_t word;
+	uint32_t dword;
+	uint32_t offs = offset << 2; // make byte pointer 
+	LOGVME("%s %s %08x %08x\n", tag(), FUNCNAME, offs, mem_mask);
+
+	switch (mem_mask)
+	{
+	case 0xff000000: // Single Even Byte(0) transfer, D8, DS1=low, DS0=high, A01=low, LWORD=high
+		{
+			byte = (data >> 24) & 0xff;
+			m_prgspace->write_byte(offs + 0, byte);
+		}
+		break;
+	case 0x00ff0000: // Single Odd Byte(1) transfer, D8, DS1=high, DS0=low, A01=low, LWORD=high
+		{
+			byte = (data >> 16) & 0xff;
+			m_prgspace->write_byte(offs + 1, byte);
+		}
+		break;
+	case 0x0000ff00: // Single Even Byte(2) transfer, D8, DS1=low, DS0=high, A01=high, LWORD=high
+		{
+			byte = (data >> 8) & 0xff;
+			m_prgspace->write_byte(offs + 2, byte);
+		}
+		break;
+	case 0x000000ff: // Single Odd Byte(3) transfer, D8, DS1=high, DS0=low, A01=high, LWORD=high
+		{
+			byte = (data >> 0) & 0xff;
+			m_prgspace->write_byte(offs + 3, byte);
+		}
+		break;
+	case 0xffff0000: // Double Byte(0-1) transfer, D16, DS1=low, DS0=low, A01=low, LWORD=high
+		{
+			word = (data >> 16) & 0xffff;
+			m_prgspace->write_word(offs + 2, word);
+		}
+		break;
+	case 0x0000ffff: // Double Byte(2-3) transfer, D16, DS1=low, DS0=low, A01=high, LWORD=high
+		{
+			word = (data >> 0) & 0xffff;
+			m_prgspace->write_word(offs, word);
+		}
+		break;
+	case 0xffffffff: // Quad Byte(0-3) transfer, D16, DS1=low, DS0=low, A01=low, LWORD=low
+		{
+			dword = (data >> 0) & 0xffffffff;
+			m_prgspace->write_dword(offs, dword);
+		}
+		break;
+	default:
+		logerror("VME data transfer not implemented Offset:%08x Mask:%08x\n", offs, mem_mask);
+		LOGVME(" - Data transfer type not implemented\n");
+	}
+}
+
+/* VME D8 accesses - remove? */
 READ8_MEMBER(device_vme_card_interface::read8)
 {
 	uint8_t result = 0x00;
