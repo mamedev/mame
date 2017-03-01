@@ -11,11 +11,11 @@
 
 #pragma once
 
+#include "bus/ti8x/ti8x.h"
 #include "imagedev/snapquik.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "sound/spkrdev.h"
 #include "video/t6a04.h"
 
 
@@ -56,22 +56,21 @@ class ti85_state : public driver_device
 {
 public:
 	ti85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_speaker(*this, "speaker"),
-//        m_serial(*this, "tiserial"),
-			m_nvram(*this, "nvram"),
-			m_flash(*this, "flash"),
-			m_membank1(*this, "membank1"),
-			m_membank2(*this, "membank2"),
-			m_membank3(*this, "membank3"),
-			m_membank4(*this, "membank4")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_link_port(*this, "linkport")
+		, m_nvram(*this, "nvram")
+		, m_flash(*this, "flash")
+		, m_membank1(*this, "membank1")
+		, m_membank2(*this, "membank2")
+		, m_membank3(*this, "membank3")
+		, m_membank4(*this, "membank4")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<speaker_sound_device> m_speaker;
-	//optional_device<> m_serial;
-	optional_shared_ptr<uint8_t>  m_nvram;
+	optional_device<ti8x_link_port_device> m_link_port;
+	optional_shared_ptr<uint8_t> m_nvram;
 	optional_device<intelfsh_device> m_flash;
 	optional_device<address_map_bank_device> m_membank1;
 	optional_device<address_map_bank_device> m_membank2;
@@ -104,8 +103,6 @@ public:
 	uint8_t m_ti81_port_7_data;
 	std::unique_ptr<uint8_t[]> m_ti8x_ram;
 	uint8_t m_PCR;
-	uint8_t m_red_out;
-	uint8_t m_white_out;
 	uint8_t m_ti8x_port2;
 	uint8_t m_ti83p_port4;
 	uint8_t m_ti83pse_port21;
@@ -150,24 +147,24 @@ public:
 	DECLARE_WRITE8_MEMBER(ti83p_port_0014_w);
 	DECLARE_WRITE8_MEMBER(ti83pse_port_0020_w);
 	DECLARE_WRITE8_MEMBER(ti83pse_port_0021_w);
-	DECLARE_READ8_MEMBER( ti85_port_0002_r );
-	DECLARE_READ8_MEMBER( ti85_port_0003_r );
-	DECLARE_READ8_MEMBER( ti85_port_0004_r );
-	DECLARE_READ8_MEMBER( ti85_port_0005_r );
-	DECLARE_READ8_MEMBER( ti86_port_0006_r );
-	DECLARE_READ8_MEMBER( ti82_port_0002_r );
-	DECLARE_READ8_MEMBER( ti83_port_0002_r );
-	DECLARE_READ8_MEMBER( ti83_port_0003_r );
-	DECLARE_READ8_MEMBER( ti83p_port_0002_r );
-	DECLARE_READ8_MEMBER( ti83p_port_0004_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0002_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0005_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0009_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0015_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0020_r );
-	DECLARE_READ8_MEMBER( ti83pse_port_0021_r );
-	DECLARE_READ8_MEMBER( ti84pse_port_0055_r );
-	DECLARE_READ8_MEMBER( ti84pse_port_0056_r );
+	DECLARE_READ8_MEMBER(ti85_port_0002_r);
+	DECLARE_READ8_MEMBER(ti85_port_0003_r);
+	DECLARE_READ8_MEMBER(ti85_port_0004_r);
+	DECLARE_READ8_MEMBER(ti85_port_0005_r);
+	DECLARE_READ8_MEMBER(ti86_port_0006_r);
+	DECLARE_READ8_MEMBER(ti82_port_0002_r);
+	DECLARE_READ8_MEMBER(ti83_port_0002_r);
+	DECLARE_READ8_MEMBER(ti83_port_0003_r);
+	DECLARE_READ8_MEMBER(ti83p_port_0002_r);
+	DECLARE_READ8_MEMBER(ti83p_port_0004_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0002_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0005_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0009_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0015_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0020_r);
+	DECLARE_READ8_MEMBER(ti83pse_port_0021_r);
+	DECLARE_READ8_MEMBER(ti84pse_port_0055_r);
+	DECLARE_READ8_MEMBER(ti84pse_port_0056_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ti85);
@@ -188,41 +185,41 @@ public:
 
 	//crystal timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void ti83pse_count( uint8_t timer, uint8_t data);
+	void ti83pse_count(uint8_t timer, uint8_t data);
 
 	emu_timer *m_crystal_timer1;
 	emu_timer *m_crystal_timer2;
 	emu_timer *m_crystal_timer3;
-	DECLARE_READ8_MEMBER( ti83pse_ctimer1_setup_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer1_setup_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer1_loop_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer1_loop_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer1_count_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer1_count_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer2_setup_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer2_setup_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer2_loop_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer2_loop_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer2_count_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer2_count_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer3_setup_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_setup_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer3_loop_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_loop_w );
-	DECLARE_READ8_MEMBER( ti83pse_ctimer3_count_r );
-	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_count_w );
+	DECLARE_READ8_MEMBER(ti83pse_ctimer1_setup_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer1_setup_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer1_loop_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer1_loop_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer1_count_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer1_count_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer2_setup_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer2_setup_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer2_loop_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer2_loop_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer2_count_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer2_count_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer3_setup_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_setup_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer3_loop_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
+	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
+	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
 
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
-	void update_ti85_memory ();
-	void update_ti83p_memory ();
-	void update_ti83pse_memory ();
-	void update_ti86_memory ();
-	void ti8x_snapshot_setup_registers (uint8_t * data);
-	void ti85_setup_snapshot (uint8_t * data);
-	void ti86_setup_snapshot (uint8_t * data);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( ti8x );
-	DECLARE_DIRECT_UPDATE_MEMBER( ti83p_direct_update_handler );
+	void update_ti85_memory();
+	void update_ti83p_memory();
+	void update_ti83pse_memory();
+	void update_ti86_memory();
+	void ti8x_snapshot_setup_registers(uint8_t *data);
+	void ti85_setup_snapshot(uint8_t *data);
+	void ti86_setup_snapshot(uint8_t *data);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
+	DECLARE_DIRECT_UPDATE_MEMBER(ti83p_direct_update_handler);
 
 	ti83pse_timer m_ctimer[3];
 
