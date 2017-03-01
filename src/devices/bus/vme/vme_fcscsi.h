@@ -24,6 +24,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ16_MEMBER (bootvect_r);
+	DECLARE_READ8_MEMBER (dpram_r);
+	DECLARE_WRITE8_MEMBER (dpram_w);
 	DECLARE_READ8_MEMBER (tcr_r);
 	DECLARE_WRITE8_MEMBER (tcr_w);
 	DECLARE_WRITE8_MEMBER (led_w);
@@ -67,6 +69,9 @@ private:
 
 	// Pointer to System ROMs needed by bootvect_r
 	uint16_t  *m_sysrom;
+
+	// Pointer to RAM area needed by dpram_r and dpram_w
+	uint8_t  *m_dpram;
 };
 
 #endif // VME_FCSCSI_H

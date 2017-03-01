@@ -11,53 +11,53 @@
  *
  *       ||
  * ||    ||
- * ||||--||
- * ||||--||
+ * ||||--|| LED colors
+ * ||||--|| g = green, r = red, (dual) g/r = green/red, y = yellow
  * ||    ||__________________________________________________________    ___
- *       ||                                                          |_|   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P1 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |
- *       ||                                                            |___
- *       ||                                                           _|   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |VME|
- *       ||                                                          | |   |
- *       ||                                                          | |P2 |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          | |   |
- *       ||                                                          |_|   |
- *       ||                                                            |___|
+ *       ||                                   +-----+                |_|   |
+ *   RUN C|g                             XTAL |     |                | |   |
+ *       ||                              16MHz| BIM |                | |   |
+ * R/L o-[|                                   |68153|                | |   |
+ *       ||                                   |     |                | |   |
+ * LOCAL C|r                                  |     |                | |   |
+ *  HALT E|g/r                                |     |                | |VME|
+ *       ||                                   |     |                | |   |
+ *       ||                                   |     |                | |P1 |
+ *       ||                                   |     |                | |   |
+ *   SEL C|y+---------+                       |     |                | |   |
+ *  FAIL C|y| D4361   |                       +-----+                | |   |
+ *       || +---------+                       +-----+                | |   |
+ *       || |16x64x1Kb|                       |     |                | |   |
+ *       || +---------+                       | PIT |      XTAL      | |   |
+ *       || | 128Kb   |                       |68230|      20MHz     |_|   |
+ *    S1 C|y+---------+                       |     |                  |___|
+ *    S2 C|y| DPRAM   |            +--------+ |     |                  |
+ *    S3 C|y+---------+            |CPU     | |     |                  |
+ *    S4 C|y| ...     |            | 68010  | |     |                  |
+ *       || +---------+            |        | |     |                  |
+ *       || | ...     |            |        | |     |                  |
+ *       || +---------+            +--------+ +-----+                  |
+ *       || | ...     |                                                |
+ *       || +---------+                       +-----+ +-----+          |
+ *       || | ...     |                       |ROM  | |FDC  |          |___
+ *       || +---------+                       |27128| |WD   |         _|   |
+ *       || | ...     |            +--------+ |     | | 1772|        | |   |
+ *       || +---------+            |DMA     | |     | |     |        | |   |
+ *       || | ...     |            | 68450  | |     | |     |        | |   |
+ *       || +---------+            |        | +-----+ +-----+        | |   |
+ *       || | ...     |            |        |          +-----++-----+| |VME|
+ *       || +---------+            +--------+          |SCSI ||BUSC || |   |
+ *       || | ...     |                                |NCR  ||NCR  || |P2 |
+ *       || +---------+                                | 5385|| 8310|| |   |
+ *       || | ...     |                                |     ||     || |   |
+ *       || +---------+                                |     ||     || |   |
+ *       || | ...     |                                |     ||     || |   |
+ *       || +---------+                                |     ||     || |   |
+ *       || | ...     |                                |     ||     || |   |
+ *       || +---------+                                |     ||     || |   |
+ *       || | ...     |                                |     ||     || |   |
+ *       || +---------+                                |     ||     ||_|   |
+ *       ||                                            +-----++-----+  |___|
  * ||    ||------------------------------------------------------------+-+
  * ||||--||
  * ||||--||
@@ -153,21 +153,19 @@
 #include "formats/pc_dsk.h"
 #include "vme_fcscsi.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_INT     (1U <<  2)
+#define LOG_RAM     (1U <<  3)
 
-#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_RAM)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGRAM(...)   LOGMASKED(LOG_RAM,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -307,14 +305,27 @@ void vme_fcscsi1_card_device::device_start()
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xe00000);
 
-#if 0 // TODO: Setup VME access handlers for shared memory area
-	uint32_t base = 0x00A00000;
-	m_vme->install_device(base + 0, base + 1, // Channel B - Data
-							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("pit")), 0x00ff);
-	m_vme->install_device(base + 2, base + 3, // Channel B - Control
-							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("pit")), 0x00ff);
-#endif
+	/* Setup pointer to dpram handlers dpram_r and dpram_w */
+	m_dpram = (uint8_t*)(memregion ("maincpu")->base () + 0x2000);
 
+	/* Setup r/w handlers for A24: D8 */
+	LOGSETUP("Installing dual ported RAM 0x00a02000-0x00a1ffff\n");
+	m_vme->install_device(vme_device::A24_SC, 0x00a02000, 0x00a1ffff, // Dual ported RAM A24:D8
+						  read8_delegate(FUNC(vme_fcscsi1_card_device::dpram_r), this),
+						  write8_delegate(FUNC(vme_fcscsi1_card_device::dpram_w), this), 0xffffffff);
+}
+
+READ8_MEMBER (vme_fcscsi1_card_device::dpram_r)
+{
+	LOGRAM("%s %08x:%08x[%02x]\n", FUNCNAME, offset, mem_mask, m_dpram[offset & 0x1ffff]);
+	return m_dpram[offset & 0x1ffff];
+}
+
+WRITE8_MEMBER (vme_fcscsi1_card_device::dpram_w)
+{
+	LOGRAM("%s %08x:%08x[] = %02x\n", FUNCNAME, offset, mem_mask, data);
+	m_dpram[offset & 0x1ffff] = data;
+	LOGRAM("%s\n", FUNCNAME);
 }
 
 void vme_fcscsi1_card_device::device_reset()
