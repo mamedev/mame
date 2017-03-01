@@ -3,18 +3,36 @@
 /* Hanaroku - Alba ZC HW */
 
 /*
-Payout:
- Once the "Payout" button is pressed, The game waits for a "Medal In" signal to indicate a Medal was dispensed.
- Once it receives the signal - The game decreases the credit count.
- (The payout dispenses only one medal per press)
- 
 TODO:
+- Hookup emulated hopper or popmessage for payout response.
 - colour decoding might not be perfect
 - Background color should be green, but current handling might be wrong.
 - some unknown sprite attributes
 - don't know what to do when the jackpot is displayed (missing controls ?)
 - according to the board pic, there should be one more 4-switches dip
   switch bank, and probably some NVRAM because there's a battery.
+
+Payout:
+ Once the "Payout" button is pressed, The game waits for a "Medal In" signal to indicate a Medal was dispensed.
+ Once it receives the signal - The game decreases the credit count. (The payout dispenses only one medal per press)
+ The hopper hookup address & values are labeled as best guess.
+
+ Activate Hopper: 0xC044
+ 00 = Idle
+ 01 = Dispense a Medal
+
+ Receive State: 0xC042
+ 20 = Idle
+ 60 = Expecting hopper signal
+ E0/A0 = Received hopper signal
+
+ Payout Status: 0xC06A
+ 00 = Idle
+ 01 = Waiting for hopper signal
+ 02 = Receiving hopper signal
+ 03 = Error (Medal Empty or Medal Stick)
+
+ The only important one would be Activate Hopper.
 */
 
 #include "emu.h"
