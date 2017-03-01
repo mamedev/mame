@@ -31,13 +31,13 @@ const device_type A2BUS_RAMCARD16K = device_creator<a2bus_ramcard_device>;
 
 a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_writecnt(0), m_dxxx_bank(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_last_access(0), m_dxxx_bank(0)
 {
 }
 
 a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_RAMCARD16K, "Apple II 16K Language Card", tag, owner, clock, "a2ram16k", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_writecnt(0), m_dxxx_bank(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_last_access(0), m_dxxx_bank(0)
 {
 }
 
@@ -55,64 +55,52 @@ void a2bus_ramcard_device::device_start()
 	save_item(NAME(m_inh_state));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_dxxx_bank));
-	save_item(NAME(m_writecnt));
+	save_item(NAME(m_last_offset));
+	save_item(NAME(m_last_access));
 }
 
 void a2bus_ramcard_device::device_reset()
 {
-	m_inh_state = INH_NONE;
+	m_inh_state = INH_WRITE;
 	m_dxxx_bank = 0;
-	m_writecnt = 0;
+	m_last_offset = -1;
+	m_last_access = 0;
 }
 
-void a2bus_ramcard_device::do_io(int offset, bool write)
+void a2bus_ramcard_device::do_io(int offset, int access)
 {
 	int old_inh_state = m_inh_state;
 
-	m_dxxx_bank = 0;
-	
-	switch (offset)
+	m_inh_state = INH_NONE;
+
+	switch (offset & 3)
 	{
-		case 0x0: case 0x8: case 0x4: case 0xc:
-			m_writecnt = 0;
+		case 0:
+		{
 			m_inh_state = INH_READ;
 			break;
-			
-		case 0x1: case 0x9: case 0x5: case 0xd:
-			if (write)
-			{
-				m_writecnt = 0;
-			}
-			else
-			{
-				m_writecnt++;
-			}		
-			m_inh_state &= ~INH_READ;
-			break;
+		}
 
-		case 0x2: case 0xa: case 0x6: case 0xe:
-			m_writecnt = 0;
-			m_inh_state = INH_NONE;
-			break;
-			
-		case 0x3: case 0xb: case 0x7: case 0xf:
-			if (write)
+		case 3:
+		{
+			m_inh_state = INH_READ;
+		} //fall through
+
+		case 1:
+		{
+			//if accessed twice, then write-enable
+			if (((m_last_offset & 1) == 1) && (access == m_last_access))
 			{
-				m_writecnt = 0;
+				m_inh_state |= INH_WRITE;
 			}
-			else
-			{
-				m_writecnt++;
-			}		
-			m_inh_state |= INH_READ;
+
 			break;
+		}
 	}
-	
-	if (m_writecnt >= 2)
-	{
-		m_inh_state |= INH_WRITE;
-		m_writecnt = 2;
-	}
+
+	m_last_offset = offset;
+	m_last_access = access;
+	m_dxxx_bank = 0;
 
 	if (!(offset & 8))
 	{
@@ -139,7 +127,7 @@ void a2bus_ramcard_device::do_io(int offset, bool write)
 
 uint8_t a2bus_ramcard_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	do_io(offset & 0xf, false);
+	do_io(offset & 0xf, 0);
 	return 0xff;
 }
 
@@ -150,7 +138,7 @@ uint8_t a2bus_ramcard_device::read_c0nx(address_space &space, uint8_t offset)
 
 void a2bus_ramcard_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
-	do_io(offset & 0xf, true);
+	do_io(offset & 0xf, 1);
 }
 
 uint8_t a2bus_ramcard_device::read_inh_rom(address_space &space, uint16_t offset)
