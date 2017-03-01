@@ -69,7 +69,6 @@ void a2bus_ramcard_device::do_io(int offset, bool write)
 {
 	int old_inh_state = m_inh_state;
 
-	m_inh_state = INH_NONE;
 	m_dxxx_bank = 0;
 	
 	switch (offset)
@@ -88,10 +87,12 @@ void a2bus_ramcard_device::do_io(int offset, bool write)
 			{
 				m_writecnt++;
 			}		
+			m_inh_state &= ~INH_READ;
 			break;
 
 		case 0x2: case 0xa: case 0x6: case 0xe:
 			m_writecnt = 0;
+			m_inh_state = INH_NONE;
 			break;
 			
 		case 0x3: case 0xb: case 0x7: case 0xf:
@@ -103,13 +104,14 @@ void a2bus_ramcard_device::do_io(int offset, bool write)
 			{
 				m_writecnt++;
 			}		
-			m_inh_state = INH_READ;
+			m_inh_state |= INH_READ;
 			break;
 	}
 	
 	if (m_writecnt >= 2)
 	{
 		m_inh_state |= INH_WRITE;
+		m_writecnt = 2;
 	}
 
 	if (!(offset & 8))
