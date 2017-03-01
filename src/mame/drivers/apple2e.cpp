@@ -1011,7 +1011,7 @@ void apple2e_state::update_slotrom_banks()
 
 void apple2e_state::lc_update(int offset, int access)
 {
-	int old_lcram = m_lcram;
+	bool old_lcram = m_lcram;
 
 	m_lcram = false;
 	m_lcwriteenable = false;
