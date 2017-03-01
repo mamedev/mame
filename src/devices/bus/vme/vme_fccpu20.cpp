@@ -194,14 +194,16 @@
 //#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
 #define LOG_INT     (1U <<  2)
+#define LOG_VME     (1U <<  3)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_INT)
+//#define VERBOSE (LOG_VME)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGVME(...)   LOGMASKED(LOG_VME,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -231,8 +233,22 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_device)
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
 	AM_RANGE (0x00000008, 0x0007ffff) AM_RAM /* Local SRAM */
 	AM_RANGE (0x00080000, 0x000fffff) AM_RAM /* SRAM-22 installed */
-	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM
-	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
+
+	AM_RANGE (0x00100000, 0xfaffffff) AM_READWRITE(vme_a32_r, vme_a32_w) /* VMEbus Extended A32: D32,D16,D8 - manual errornously mentions D24 */
+	AM_RANGE (0xfb000000, 0xfbfeffff) AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Standard A24: D32,D16,D8 - manual errornously mentions D24 */
+	AM_RANGE (0xfbff0000, 0xfbffffff) AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Short    A16: D32,D16,D8 - manual errornously mentions D24 */
+	AM_RANGE (0xfc000000, 0xfcfeffff) AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Standard A24: D16,D8 */
+	AM_RANGE (0xfcff0000, 0xfcffffff) AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Short    A16: D16,D8 */
+
+	AM_RANGE (0xfd000000, 0xfdffffff) AM_RAM /* VMXbus          A24: D32,D24?,D16,D8 */
+	AM_RANGE (0xfe000000, 0xfeffffff) AM_RAM /* VMXbus          A24: D32,D24?,D16,D8 */
+
+	AM_RANGE (0xff000000, 0xff03ffff) AM_ROM AM_REGION("roms", 0x00000)
+
+// For some reason the rom crashes if the following area isn't writable, possibly trying to boot it. 
+// TODO: figure out what is actually writable on real hw
+	AM_RANGE (0xff040000, 0xff07ffff) AM_RAM // AM_ROM AM_REGION("roms", 0x40000) 
+
 	AM_RANGE (0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800200, 0xff80021f) AM_DEVREADWRITE8("mpcc2", mpcc68561_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800600, 0xff80061f) AM_DEVREADWRITE8("mpcc3", mpcc68561_device, read, write, 0xffffffff)
@@ -423,13 +439,13 @@ vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig
 vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vme_fccpu21yb_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21YB CPU Board", tag, owner, clock, "fccpu21yb", __FILE__)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
+	LOGSETUP("%s %s\n", tag, FUNCNAME);
 }
 
 /* Start it up */
 void vme_fccpu20_device::device_start()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGSETUP("%s\n", FUNCNAME);
 
 	set_vme_device();
 
@@ -459,7 +475,7 @@ enum
 
 void vme_fccpu20_device::device_reset()
 {
-	LOG("%s\n", FUNCNAME);
+	LOGSETUP("%s\n", FUNCNAME);
 
 	/* We need to delay the static bus grant signal until we have it from the VME interface or MAME supports bus arbitration */
 	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
@@ -495,6 +511,43 @@ WRITE32_MEMBER (vme_fccpu20_device::bootvect_w)
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+}
+
+READ32_MEMBER (vme_fccpu20_device::vme_a16_r)
+{
+	LOGVME("%s %08x %08x\n", FUNCNAME, offset << 1, mem_mask);
+	return m_vme->read32(space, offset, mem_mask);
+}
+
+WRITE32_MEMBER (vme_fccpu20_device::vme_a16_w)
+{
+	LOGVME("%s %08x %08x: %08x\n", FUNCNAME, offset << 1, mem_mask, data);
+	m_vme->write32(space, offset, mem_mask, data);
+}
+
+READ32_MEMBER (vme_fccpu20_device::vme_a24_r)
+{
+	uint32_t val = m_vme->read32(space, offset, mem_mask);
+	LOGVME("%s %08x %08x: %08x\n", FUNCNAME, offset << 2, mem_mask, val);
+	return val;
+}
+
+WRITE32_MEMBER (vme_fccpu20_device::vme_a24_w)
+{
+	LOGVME("%s %08x %08x: %08x\n", FUNCNAME, offset << 2, mem_mask, data);
+	m_vme->write32(space, offset, mem_mask, data);
+}
+
+READ32_MEMBER (vme_fccpu20_device::vme_a32_r)
+{
+	LOGVME("%s %08x %08x\n", FUNCNAME, offset, mem_mask);
+	return m_vme->read32(space, offset, mem_mask);
+}
+
+WRITE32_MEMBER (vme_fccpu20_device::vme_a32_w)
+{
+	LOGVME("%s %08x %08x: %08x\n", FUNCNAME, offset, mem_mask, data);
+	m_vme->write32(space, offset, mem_mask, data);
 }
 
 WRITE_LINE_MEMBER(vme_fccpu20_device::bim_irq_callback)
@@ -588,7 +641,7 @@ READ8_MEMBER (vme_fccpu20_device::pitc_r)
 
 /* ROM definitions */
 ROM_START (fccpu20) /* This is an original rom dump */
-	ROM_REGION32_BE(0x10000, "roms", 0)
+	ROM_REGION32_BE(0x80000, "roms", 0)
 	ROM_LOAD32_BYTE("L.BIN",  0x000002, 0x4000, CRC (174ab801) SHA1 (0d7b8ed29d5fdd4bd2073005008120c5f20128dd))
 	ROM_LOAD32_BYTE("LL.BIN", 0x000003, 0x4000, CRC (9fd9e3e4) SHA1 (e5a7c87021e6be412dd5a8166d9f62b681169eda))
 	ROM_LOAD32_BYTE("U.BIN",  0x000001, 0x4000, CRC (d1afe4c0) SHA1 (b5baf9798d73632f7bb843cbc4b306c8c03f4296))
