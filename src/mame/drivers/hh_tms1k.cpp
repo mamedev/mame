@@ -59,9 +59,9 @@
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
- @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
+ @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
- *MP3300   TMS1000   1979, Milton Bradley Simon (newer)
+ @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
@@ -1629,14 +1629,27 @@ MACHINE_CONFIG_END
   * TMS1000NLL M32001-N2 (die label 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
   
-  This is a 4-player version of Quiz Wiz, the same cartridges and question
-  books can be used.
-  
-  known cartridge configurations:
+  This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
+  According to the manual, Quiz Wiz cartridges are compatible with it.
+  The question books are needed to play, as well as optional game pieces.
+
+  Cartridge pinout:
+  1 R4
+  2 R6
+  3 R7
+  4 K1
+  5 N/C
+  6 R8
+  7 R5
+  8 R9
+
+  The cartridge connects one or more of the R pins to K1. The game presumedly
+  generates a random seed from it. Until more cartridge configurations are known,
+  the port is simulated as a DIP switch. See list below for confirmed configs.
+
   #  config           to K1     title
   -----------------------------------------------
   1  1-2-3-4,5-6-7-8  1,2,3     1001 Questions
-  8  1-5,2-6,3-7,4-8  8         The Book of Lists
 
 ***************************************************************************/
 
@@ -1795,7 +1808,7 @@ MACHINE_CONFIG_END
   sold in a pack. Gameplay has emphasis on strategy, read the official manual
   on how to play. MAME external artwork is needed for the switchable overlays.
 
-  Cartridge socket:
+  Cartridge pinout:
   1 N/C
   2 9V+
   3 power switch
@@ -5583,16 +5596,17 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley Simon, created by Ralph Baer
-
-  Revision A hardware:
-  * TMS1000 (die label MP3226)
+  Milton Bradley Simon (model 4850), created by Ralph Baer
+  * TMS1000 (die label MP3226), or MP3300 (die label 1000C, MP3300)
   * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
-  Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
-  instead of the TMS1000. This one has been decapped too, but we couldn't
-  find an internal ROM. It is possibly a cost-reduced custom ASIC specifically
-  for Simon. The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
+  known revisions:
+  - 1978: Rev A: TMS1000(no label)
+  - 198?: Rev B: MB4850 SCUS0640(16-pin custom ASIC), PCB label REV.B,
+    cost-reduced, same hardware as Pocket Simon
+  - 1979: Rev F: TMS1000(MP3300), PCB label 4850 Rev F
+
+  The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
 
 ***************************************************************************/
 
@@ -8879,6 +8893,16 @@ ROM_START( simon )
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
 
+ROM_START( simonf )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
+
 
 ROM_START( ssimon )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -9200,7 +9224,8 @@ CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mat
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
 CONS( 1977, bshipb,    bship,    0, bshipb,    bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, simonf,    simon,    0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
