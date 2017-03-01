@@ -34403,6 +34403,10 @@ starfir2                        // (c) 1979 Exidy
 starfire                        // Exidy [1979?]
 starfirea                       // Exidy [1979?]
 
+@source:stargame.cpp
+spcship                         //
+whtforce                        //
+
 @source:starshp1.cpp
 starshp1                        // 007513-007531    1977/07 [6502]
 starshpp                        // 007513-007531    1977/07 [6502]
