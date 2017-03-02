@@ -261,7 +261,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 
 	// internal state
 	cpu_device   *m_maincpu;
@@ -399,7 +398,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 private:
 	// internal state

@@ -115,17 +115,6 @@ void isa8_device::static_set_custom_spaces(device_t &device)
 	isa.m_allocspaces = true;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void isa8_device::device_config_complete()
-{
-	m_maincpu = subdevice<cpu_device>(m_cputag);
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -473,17 +462,6 @@ isa16_device::isa16_device(const machine_config &mconfig, const char *tag, devic
 		m_out_drq6_cb(*this),
 		m_out_drq7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void isa16_device::device_config_complete()
-{
-	m_maincpu = mconfig().device<cpu_device>(m_cputag);
 }
 
 //-------------------------------------------------

@@ -70,8 +70,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_ted(0),
 	m_yb(0),
 	m_atni(0),
-	m_atna(0),
-	m_period(attotime::from_hz(clock))
+	m_atna(0)
 {
 	memset(&cur_live, 0x00, sizeof(cur_live));
 	cur_live.tm = attotime::never;
@@ -106,6 +105,17 @@ void c64h156_device::device_start()
 	save_item(NAME(m_yb));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called when the
+//  device clock is altered in any way
+//-------------------------------------------------
+
+void c64h156_device::device_clock_changed()
+{
+	m_period = attotime::from_hz(clock());
 }
 
 
