@@ -81,6 +81,7 @@ static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8, m52_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r) // result is ignored
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram") // bigger or mirrored?
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(alpha1v_flipscreen_w)
@@ -422,6 +423,8 @@ static MACHINE_CONFIG_DERIVED( alpha1v, m52 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alpha1v_map)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 16, 272)
 MACHINE_CONFIG_END
 
 
