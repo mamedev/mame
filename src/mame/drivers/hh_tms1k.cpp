@@ -141,10 +141,13 @@
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 
 #include "screen.h"
 #include "speaker.h"
 #include "rendlay.h"
+#include "softlist.h"
 
 // internal artwork
 #include "7in1ss.lh"
@@ -1820,20 +1823,18 @@ MACHINE_CONFIG_END
 
   The cartridge connects pin 8 with one of the K-pins.
 
-  Available cartridges:
-  - Football    (K8, confirmed)
-  - Hockey      (K4?)
-  - Soccer      (K2?)
-  - Basketball  (K1?)
-
 ***************************************************************************/
 
 class tc4_state : public hh_tms1k_state
 {
 public:
 	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_pinout(0)
 	{ }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	u8 m_pinout; // cartridge K pins
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1842,6 +1843,21 @@ public:
 };
 
 // handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge pinout R9 to K connections
+	std::string pinout(image.get_feature("pinout"));
+	m_pinout = std::stoi(pinout, nullptr, 0) & 0xf;
+
+	return image_init_result::PASS;
+}
 
 void tc4_state::prepare_display()
 {
@@ -1859,7 +1875,7 @@ WRITE16_MEMBER(tc4_state::write_r)
 
 	// R0-R5: input mux
 	// R9: to cartridge slot
-	m_inp_mux = (data & 0x3f) | (data >> 3 & 0x40);
+	m_inp_mux = data & 0x3f;
 
 	// R0-R4: select led
 	// R6: led 8 state
@@ -1877,8 +1893,8 @@ WRITE16_MEMBER(tc4_state::write_o)
 
 READ8_MEMBER(tc4_state::read_k)
 {
-	// K: multiplexed inputs
-	return read_inputs(7);
+	// K: multiplexed inputs, cartridge pins from R9
+	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
 }
 
 
@@ -1920,13 +1936,6 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 1") // left
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 2") // middle
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
-
-	PORT_START("IN.6") // R9
-	PORT_CONFNAME( 0x0f, 0x08, "Cartridge")
-	PORT_CONFSETTING(    0x01, "Basketball" )
-	PORT_CONFSETTING(    0x02, "Soccer" )
-	PORT_CONFSETTING(    0x04, "Hockey" )
-	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tc4, tc4_state )
@@ -1944,6 +1953,12 @@ static MACHINE_CONFIG_START( tc4, tc4_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tc4_cart")
+	MCFG_GENERIC_MANDATORY // system won't power on without cartridge
+	MCFG_GENERIC_LOAD(tc4_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tc4")
 MACHINE_CONFIG_END
 
 
