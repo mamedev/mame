@@ -377,7 +377,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 		for (ioport_field &field : port.second->fields())
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
-				has_input = true;				break;
+				has_input = true;
 				break;
 			}
 
