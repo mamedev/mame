@@ -98,7 +98,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_SLOT = &device_creator<vme_slot_device>;
+const device_type VME_SLOT = device_creator<vme_slot_device>;
 
 //-------------------------------------------------
 //  vme_slot_device - constructor
@@ -210,7 +210,7 @@ SLOT_INTERFACE_END
 // VME device P1
 //
 
-const device_type VME = &device_creator<vme_device>;
+const device_type VME = device_creator<vme_device>;
 
 // static_set_cputag - used to be able to lookup the CPU owning this VME bus
 void vme_device::static_set_cputag(device_t &device, const char *tag)

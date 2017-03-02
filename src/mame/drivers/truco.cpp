@@ -201,16 +201,20 @@
 
 *******************************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
-#define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
-#define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
-
 #include "emu.h"
 #include "includes/truco.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
+#define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
+#define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
 
 /*******************************************
 *           Read/Write Handlers            *

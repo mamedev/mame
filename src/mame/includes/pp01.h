@@ -6,15 +6,17 @@
  *
  ****************************************************************************/
 
-#ifndef PP01_H_
-#define PP01_H_
+#ifndef MAME_INCLUDES_PP01_H
+#define MAME_INCLUDES_PP01_H
+
+#pragma once
 
 #include "cpu/i8085/i8085.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 //#include "sound/wave.h"
 //#include "imagedev/cassette.h"
 
@@ -62,4 +64,4 @@ public:
 	void pp01_set_memory(uint8_t block, uint8_t data);
 };
 
-#endif
+#endif // MAME_INCLUDES_PP01_H

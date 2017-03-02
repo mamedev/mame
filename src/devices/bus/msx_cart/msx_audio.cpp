@@ -64,10 +64,12 @@ and/or http://ngs.no.coocan.jp/doc/wiki.cgi/datapack?page=4.2+MSX-AUDIO+%B3%C8%C
 #include "msx_audio.h"
 #include "bus/msx_cart/msx_audio_kb.h"
 
+#include "speaker.h"
 
-const device_type MSX_CART_MSX_AUDIO_HXMU900 = &device_creator<msx_cart_msx_audio_hxmu900>;
-const device_type MSX_CART_MSX_AUDIO_NMS1205 = &device_creator<msx_cart_msx_audio_nms1205>;
-const device_type MSX_CART_MSX_AUDIO_FSCA1 = &device_creator<msx_cart_msx_audio_fsca1>;
+
+const device_type MSX_CART_MSX_AUDIO_HXMU900 = device_creator<msx_cart_msx_audio_hxmu900>;
+const device_type MSX_CART_MSX_AUDIO_NMS1205 = device_creator<msx_cart_msx_audio_nms1205>;
+const device_type MSX_CART_MSX_AUDIO_FSCA1 = device_creator<msx_cart_msx_audio_fsca1>;
 
 
 msx_cart_msx_audio_hxmu900::msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

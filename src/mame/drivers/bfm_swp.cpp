@@ -104,6 +104,8 @@ TEST.TXT - suggests the content of a prototype version, which was expanded to ma
 #include "emu.h"
 #include "machine/68340.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
+#include "speaker.h"
 
 class bfm_swp_state : public driver_device
 {

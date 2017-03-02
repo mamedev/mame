@@ -19,7 +19,7 @@
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_CHESS = &device_creator<o2_chess_device>;
+const device_type O2_ROM_CHESS = device_creator<o2_chess_device>;
 
 
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

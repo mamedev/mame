@@ -15,8 +15,9 @@
 
 #include "emu.h"
 #include "wswan.h"
+#include "screen.h"
 
-const device_type WSWAN_VIDEO = &device_creator<wswan_video_device>;
+const device_type WSWAN_VIDEO = device_creator<wswan_video_device>;
 
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -14,7 +14,7 @@
 #include "machine/7200fifo.h"
 
 
-const device_type FIFO7200 = &device_creator<fifo7200_device>;
+const device_type FIFO7200 = device_creator<fifo7200_device>;
 
 //-------------------------------------------------
 //  fifo7200_device - constructor

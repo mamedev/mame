@@ -21,7 +21,7 @@
 
 
 // device type definition
-const device_type MSM58321 = &device_creator<msm58321_device>;
+const device_type MSM58321 = device_creator<msm58321_device>;
 
 
 //**************************************************************************

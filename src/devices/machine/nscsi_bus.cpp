@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
-const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;
-const device_type NSCSI_CONNECTOR = &device_creator<nscsi_connector>;
+const device_type NSCSI_BUS = device_creator<nscsi_bus_device>;
+const device_type NSCSI_CONNECTOR = device_creator<nscsi_connector>;
 
 nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)

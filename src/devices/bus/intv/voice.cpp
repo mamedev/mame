@@ -13,20 +13,21 @@
 
 #include "emu.h"
 #include "voice.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  intv_voice_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_VOICE = &device_creator<intv_voice_device>;
+const device_type INTV_ROM_VOICE = device_creator<intv_voice_device>;
 
 intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
-				m_speech(*this, "sp0256_speech"),
-				m_subslot(*this, "subslot"),
-				m_ramd0_enabled(false),
-				m_ram88_enabled(false)
+	: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
+	m_speech(*this, "sp0256_speech"),
+	m_subslot(*this, "subslot"),
+	m_ramd0_enabled(false),
+	m_ram88_enabled(false)
 {
 }
 

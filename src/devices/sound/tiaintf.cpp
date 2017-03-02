@@ -5,7 +5,7 @@
 #include "tiasound.h"
 
 // device type definition
-const device_type TIA = &device_creator<tia_device>;
+const device_type TIA = device_creator<tia_device>;
 
 
 //**************************************************************************

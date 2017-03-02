@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_ANALOG = &device_creator<saturn_analog_device>;
+const device_type SATURN_ANALOG = device_creator<saturn_analog_device>;
 
 
 static INPUT_PORTS_START( saturn_analog )

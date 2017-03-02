@@ -108,10 +108,13 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/baraduke.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
-#include "includes/baraduke.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(baraduke_state::inputport_select_w)

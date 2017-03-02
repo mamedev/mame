@@ -11,9 +11,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
-
 #include "gba_lcd.h"
+
+#include "rendlay.h"
+#include "screen.h"
+
 
 /* LCD I/O Registers */
 #define DISPCNT     HWLO(0x000)  /* 0x4000000  2  R/W   LCD Control */
@@ -138,7 +140,7 @@ private:
 	uint16_t m_attr2;
 };
 
-const device_type GBA_LCD = &device_creator<gba_lcd_device>;
+const device_type GBA_LCD = device_creator<gba_lcd_device>;
 
 gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__)

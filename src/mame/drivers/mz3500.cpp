@@ -35,6 +35,8 @@
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 

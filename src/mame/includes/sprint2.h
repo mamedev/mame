@@ -8,6 +8,7 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define SPRINT2_SKIDSND1_EN        NODE_01

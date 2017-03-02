@@ -8,14 +8,16 @@
 
 #include "emu.h"
 #include "amdrum.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_AMDRUM = &device_creator<cpc_amdrum_device>;
+const device_type CPC_AMDRUM = device_creator<cpc_amdrum_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_amdrum )

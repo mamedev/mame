@@ -634,4 +634,4 @@ ioport_constructor ti99_datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-const device_type DATAMUX = &device_creator<ti99_datamux_device>;
+const device_type DATAMUX = device_creator<ti99_datamux_device>;

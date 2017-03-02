@@ -137,6 +137,8 @@ Dip locations added based on the notes above.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ppmast93_state : public driver_device

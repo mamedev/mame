@@ -87,10 +87,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-device_type const M68705P3 = &device_creator<m68705p3_device>;
-device_type const M68705P5 = &device_creator<m68705p5_device>;
-device_type const M68705R3 = &device_creator<m68705r3_device>;
-device_type const M68705U3 = &device_creator<m68705u3_device>;
+device_type const M68705P3 = device_creator<m68705p3_device>;
+device_type const M68705P5 = device_creator<m68705p5_device>;
+device_type const M68705R3 = device_creator<m68705r3_device>;
+device_type const M68705U3 = device_creator<m68705u3_device>;
 
 
 /****************************************************************************

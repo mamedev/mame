@@ -90,7 +90,7 @@ ROM_START( nmk004 )
 ROM_END
 
 
-const device_type NMK004 = &device_creator<nmk004_device>;
+const device_type NMK004 = device_creator<nmk004_device>;
 
 nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK004, "NMK004", tag, owner, clock, "nmk004", __FILE__),

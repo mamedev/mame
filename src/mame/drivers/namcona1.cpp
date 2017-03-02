@@ -166,9 +166,10 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/namcona1.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/namcomcu.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_50_113MHz
 

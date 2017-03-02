@@ -23,18 +23,24 @@
  *  - data sheets from Intel and Motorola
  */
 
+#include "emu.h"
+
 #define VERBOSE 0
 
-#include "emu.h"
 #include "includes/apollo.h"
-#include "debugger.h"
+
 #include "cpu/m68000/m68kcpu.h"
 #include "sound/beep.h"
-#include "apollo_dsp.lh"
 
 // we use set_verbose
 #include "bus/isa/omti8621.h"
 #include "bus/isa/3c505.h"
+
+#include "debugger.h"
+#include "speaker.h"
+
+#include "apollo_dsp.lh"
+
 
 #define TERMINAL_TAG "terminal"
 

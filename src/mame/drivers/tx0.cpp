@@ -7,9 +7,11 @@
 */
 
 #include "emu.h"
-#include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
+
+#include "cpu/pdp1/tx0.h"
 #include "video/crt.h"
+#include "screen.h"
 
 
 /*
@@ -377,7 +379,7 @@ protected:
 	virtual void device_start() override { }
 };
 
-const device_type TX0_READTAPE = &device_creator<tx0_readtape_image_device>;
+const device_type TX0_READTAPE = device_creator<tx0_readtape_image_device>;
 
 tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_READTAPE, "TX0 Tape Reader", tag, owner, clock, "tx0_readtape_image", __FILE__),
@@ -410,7 +412,7 @@ protected:
 	virtual void device_start() override { }
 };
 
-const device_type TX0_PUNCHTAPE = &device_creator<tx0_punchtape_image_device>;
+const device_type TX0_PUNCHTAPE = device_creator<tx0_punchtape_image_device>;
 
 tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_PUNCHTAPE, "TX0 Tape Puncher", tag, owner, clock, "tx0_punchtape_image", __FILE__),
@@ -444,7 +446,7 @@ protected:
 	virtual void device_start() override { }
 };
 
-const device_type TX0_PRINTER = &device_creator<tx0_printer_image_device>;
+const device_type TX0_PRINTER = device_creator<tx0_printer_image_device>;
 
 tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_PRINTER, "TX0 Typewriter", tag, owner, clock, "tx0_printer_image", __FILE__),
@@ -477,7 +479,7 @@ protected:
 	virtual void device_start() override;
 };
 
-const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;
+const device_type TX0_MAGTAPE = device_creator<tx0_magtape_image_device>;
 
 tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX0_MAGTAPE, "TX0 Magnetic Tape", tag, owner, clock, "tx0_magtape_image", __FILE__),

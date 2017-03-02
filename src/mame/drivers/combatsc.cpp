@@ -121,11 +121,13 @@ Dip location and recommended settings verified with the US manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/combatsc.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/combatsc.h"
+#include "speaker.h"
 
 
 /*************************************

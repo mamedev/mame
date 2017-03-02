@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SWYFT = &device_creator<a2bus_swyft_device>;
+const device_type A2BUS_SWYFT = device_creator<a2bus_swyft_device>;
 
 #define SWYFT_ROM_REGION  "swyft_rom"
 

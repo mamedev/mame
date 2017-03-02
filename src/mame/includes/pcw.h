@@ -12,6 +12,7 @@
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
+#include "screen.h"
 
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8

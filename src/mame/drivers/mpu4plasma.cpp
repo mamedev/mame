@@ -7,7 +7,10 @@
 
 #include "emu.h"
 #include "includes/mpu4.h"
+
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
+
 #include "mpu4plasma.lh"
 
 

@@ -261,7 +261,7 @@ static const int pitch_vals[32] = {
 };
 
 
-const device_type DIGITALKER = &device_creator<digitalker_device>;
+const device_type DIGITALKER = device_creator<digitalker_device>;
 
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock, "digitalker", __FILE__),

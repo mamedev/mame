@@ -30,10 +30,15 @@
 
 #include "emu.h"
 #include "includes/hp9845.h"
-#include "softlist.h"
+
 #include "bus/hp_optroms/hp_optrom.h"
-#include "hp9845b.lh"
+
 #include "render.h"
+#include "softlist.h"
+#include "speaker.h"
+
+#include "hp9845b.lh"
+
 
 #define BIT_MASK(n) (1U << (n))
 

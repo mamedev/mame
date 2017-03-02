@@ -13,8 +13,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_MJCTRL_AC = &device_creator<neogeo_mjctrl_ac_device>;
-const device_type NEOGEO_MJCTRL    = &device_creator<neogeo_mjctrl_device>;
+const device_type NEOGEO_MJCTRL_AC = device_creator<neogeo_mjctrl_ac_device>;
+const device_type NEOGEO_MJCTRL    = device_creator<neogeo_mjctrl_device>;
 
 
 static INPUT_PORTS_START( neogeo_mj_ac )

@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "screen.h"
+
 
 /* oscillators and clocks */
 #define JEDI_MAIN_CPU_OSC       (XTAL_10MHz)
@@ -21,7 +23,7 @@ class jedi_state : public driver_device
 public:
 	jedi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram") ,
+		m_nvram(*this, "nvram") ,
 		m_foreground_bank(*this, "foreground_bank"),
 		m_video_off(*this, "video_off"),
 		m_backgroundram(*this, "backgroundram"),
@@ -33,7 +35,8 @@ public:
 		m_speech_data(*this, "speech_data"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	required_shared_ptr<uint8_t> m_nvram;
 

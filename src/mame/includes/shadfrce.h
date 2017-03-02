@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class shadfrce_state : public driver_device
 {

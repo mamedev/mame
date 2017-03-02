@@ -95,10 +95,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_DEVICES_ABCBUS_ABCBUS_H
+#define MAME_DEVICES_ABCBUS_ABCBUS_H
 
-#ifndef __ABCBUS__
-#define __ABCBUS__
+#pragma once
 
 
 
@@ -310,9 +310,9 @@ SLOT_INTERFACE_EXTERN( abcbus_cards );
 SLOT_INTERFACE_EXTERN( abc1600bus_cards );
 
 
-typedef device_type_iterator<&device_creator<abcbus_slot_t>, abcbus_slot_t> abcbus_slot_device_iterator;
+typedef device_type_iterator<ABCBUS_SLOT, abcbus_slot_t> abcbus_slot_device_iterator;
 
 
 
 
-#endif
+#endif // MAME_DEVICES_ABCBUS_ABCBUS_H

@@ -30,9 +30,9 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_STANDARD = &device_creator<kc_8k_device>;
-const device_type KC_M006     = &device_creator<kc_m006_device>;
-const device_type KC_M033     = &device_creator<kc_m033_device>;
+const device_type KC_STANDARD = device_creator<kc_8k_device>;
+const device_type KC_M006     = device_creator<kc_m006_device>;
+const device_type KC_M033     = device_creator<kc_m033_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -33,12 +33,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/taito_f3.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "includes/taito_f3.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 /******************************************************************************/

@@ -853,4 +853,4 @@ void tms9902_device::device_start()
 	m_sendtimer = timer_alloc(SENDTIMER);
 }
 
-const device_type TMS9902 = &device_creator<tms9902_device>;
+const device_type TMS9902 = device_creator<tms9902_device>;

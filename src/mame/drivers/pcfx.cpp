@@ -15,6 +15,7 @@
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
+#include "screen.h"
 
 struct pcfx_pad_t
 {
@@ -464,5 +465,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT      INIT    COMPANY                       FULLNAME                  FLAGS */
-CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx, driver_device,      0,      "NEC",  "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx, driver_device,      0,      "NEC",  "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

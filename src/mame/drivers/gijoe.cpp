@@ -105,12 +105,15 @@ Known Issues
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gijoe.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/gijoe.h"
+#include "speaker.h"
+
 
 #define JOE_DEBUG 0
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))

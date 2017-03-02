@@ -19,21 +19,22 @@
 
 #include "emu.h"
 #include "ecs.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  intv_ecs_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_ECS = &device_creator<intv_ecs_device>;
+const device_type INTV_ROM_ECS = device_creator<intv_ecs_device>;
 
 intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: intv_rom_device(mconfig, INTV_ROM_ECS, "Intellivision ECS Expansion", tag, owner, clock, "intv_ecs", __FILE__),
-					m_snd(*this, "ay8914"),
-					m_subslot(*this, "subslot"),
-					m_voice_enabled(false),
-					m_ramd0_enabled(false),
-					m_ram88_enabled(false)
+	: intv_rom_device(mconfig, INTV_ROM_ECS, "Intellivision ECS Expansion", tag, owner, clock, "intv_ecs", __FILE__),
+	m_snd(*this, "ay8914"),
+	m_subslot(*this, "subslot"),
+	m_voice_enabled(false),
+	m_ramd0_enabled(false),
+	m_ram88_enabled(false)
 {
 }
 

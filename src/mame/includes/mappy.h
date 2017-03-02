@@ -3,6 +3,7 @@
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
+#include "screen.h"
 
 class mappy_state : public driver_device
 {

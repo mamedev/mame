@@ -11,10 +11,11 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
+#include "speaker.h"
+
 
 #define TERMINAL_TAG "terminal"
 

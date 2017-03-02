@@ -26,7 +26,7 @@
 
 // device definitions
 
-const device_type TMS6100 = &device_creator<tms6100_device>;
+const device_type TMS6100 = device_creator<tms6100_device>;
 
 tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -44,7 +44,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-const device_type M58819 = &device_creator<m58819_device>;
+const device_type M58819 = device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)

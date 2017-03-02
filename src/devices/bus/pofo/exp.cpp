@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PORTFOLIO_EXPANSION_SLOT = &device_creator<portfolio_expansion_slot_t>;
+const device_type PORTFOLIO_EXPANSION_SLOT = device_creator<portfolio_expansion_slot_t>;
 
 
 

@@ -27,7 +27,7 @@ const uint8_t tms5501_device::rst_vector[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xe
 //**************************************************************************
 
 // device type definition
-const device_type TMS5501 = &device_creator<tms5501_device>;
+const device_type TMS5501 = device_creator<tms5501_device>;
 
 
 // I/O address map

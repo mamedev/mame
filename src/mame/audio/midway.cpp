@@ -31,10 +31,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type MIDWAY_SSIO = &device_creator<midway_ssio_device>;
-extern const device_type MIDWAY_SOUNDS_GOOD = &device_creator<midway_sounds_good_device>;
-extern const device_type MIDWAY_TURBO_CHEAP_SQUEAK = &device_creator<midway_turbo_cheap_squeak_device>;
-extern const device_type MIDWAY_SQUAWK_N_TALK = &device_creator<midway_squawk_n_talk_device>;
+const device_type MIDWAY_SSIO = device_creator<midway_ssio_device>;
+const device_type MIDWAY_SOUNDS_GOOD = device_creator<midway_sounds_good_device>;
+const device_type MIDWAY_TURBO_CHEAP_SQUEAK = device_creator<midway_turbo_cheap_squeak_device>;
+const device_type MIDWAY_SQUAWK_N_TALK = device_creator<midway_squawk_n_talk_device>;
 
 
 

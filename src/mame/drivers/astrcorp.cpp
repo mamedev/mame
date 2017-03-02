@@ -39,9 +39,12 @@ To do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class astrocorp_state : public driver_device
 {

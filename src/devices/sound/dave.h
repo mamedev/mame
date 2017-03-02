@@ -6,12 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_DEVICES_SOUND_DAVE_H
+#define MAME_DEVICES_SOUND_DAVE_H
+
 #pragma once
-
-#ifndef __DAVE__
-#define __DAVE__
-
-
 
 
 ///*************************************************************************
@@ -150,6 +148,4 @@ private:
 // device type definition
 extern const device_type DAVE;
 
-
-
-#endif
+#endif // MAME_DEVICES_SOUND_DAVE_H

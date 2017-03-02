@@ -183,8 +183,9 @@ MAIN BOARD:
 #include "emu.h"
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
-#include "audio/trackfld.h"
 #include "audio/hyprolyb.h"
+#include "audio/trackfld.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
@@ -193,6 +194,9 @@ MAIN BOARD:
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz

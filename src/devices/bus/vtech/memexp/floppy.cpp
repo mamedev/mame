@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type FLOPPY_CONTROLLER = &device_creator<floppy_controller_device>;
+const device_type FLOPPY_CONTROLLER = device_creator<floppy_controller_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, floppy_controller_device)
 	AM_RANGE(0, 0) AM_WRITE(latch_w)

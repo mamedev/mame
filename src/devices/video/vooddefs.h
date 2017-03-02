@@ -8,6 +8,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_VOODDEFS_H
+#define MAME_DEVICES_VIDEO_VOODDEFS_H
+
+#pragma once
+
+#include "video/rgbutil.h"
 
 
 
@@ -3194,3 +3200,5 @@ static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const ui
 		result.xor_imm_rgba(0xff, 0, 0, 0);
 	return result;
 }
+
+#endif // MAME_DEVICES_VIDEO_VOODDEFS_H

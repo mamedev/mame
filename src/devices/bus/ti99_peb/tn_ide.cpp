@@ -384,4 +384,4 @@ ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 	return INPUT_PORTS_NAME(tn_ide);
 }
 
-const device_type TI99_IDE = &device_creator<nouspikel_ide_interface_device>;
+const device_type TI99_IDE = device_creator<nouspikel_ide_interface_device>;

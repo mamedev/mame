@@ -2,10 +2,13 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/tmc1800.h"
+
 #include "cpu/cosmac/cosmac.h"
-#include "video/cdp1861.h"
-#include "sound/cdp1864.h"
 #include "machine/rescap.h"
+#include "sound/cdp1864.h"
+#include "video/cdp1861.h"
+#include "speaker.h"
+
 
 /* Telmac 2000 */
 

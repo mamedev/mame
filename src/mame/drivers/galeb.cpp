@@ -15,8 +15,12 @@
 
 #include "emu.h"
 #include "includes/galeb.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static GFXDECODE_START( galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )

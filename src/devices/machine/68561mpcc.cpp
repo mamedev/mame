@@ -86,11 +86,11 @@ FEATURES
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type MPCC       = &device_creator<mpcc_device>;
-const device_type MPCC68560  = &device_creator<mpcc68560_device>;
-const device_type MPCC68560A = &device_creator<mpcc68560A_device>;
-const device_type MPCC68561  = &device_creator<mpcc68561_device>;
-const device_type MPCC68561A = &device_creator<mpcc68561A_device>;
+const device_type MPCC       = device_creator<mpcc_device>;
+const device_type MPCC68560  = device_creator<mpcc68560_device>;
+const device_type MPCC68560A = device_creator<mpcc68560A_device>;
+const device_type MPCC68561  = device_creator<mpcc68561_device>;
+const device_type MPCC68561A = device_creator<mpcc68561A_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -16,10 +16,13 @@ pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump a
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/thoop2.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "includes/thoop2.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void thoop2_state::machine_start()

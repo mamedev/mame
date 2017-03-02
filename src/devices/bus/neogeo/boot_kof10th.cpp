@@ -16,7 +16,7 @@
 //  neogeo_kof10th_cart - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_KOF10TH_CART = &device_creator<neogeo_kof10th_cart>;
+const device_type NEOGEO_KOF10TH_CART = device_creator<neogeo_kof10th_cart>;
 
 
 neogeo_kof10th_cart::neogeo_kof10th_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :

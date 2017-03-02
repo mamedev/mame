@@ -213,13 +213,13 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCCPU20   = &device_creator<vme_fccpu20_card_device>;
-const device_type VME_FCCPU21S  = &device_creator<vme_fccpu21s_card_device>;
-const device_type VME_FCCPU21   = &device_creator<vme_fccpu21_card_device>;
-const device_type VME_FCCPU21A  = &device_creator<vme_fccpu21a_card_device>;
-const device_type VME_FCCPU21YA = &device_creator<vme_fccpu21ya_card_device>;
-const device_type VME_FCCPU21B  = &device_creator<vme_fccpu21b_card_device>;
-const device_type VME_FCCPU21YB = &device_creator<vme_fccpu21yb_card_device>;
+const device_type VME_FCCPU20   = device_creator<vme_fccpu20_card_device>;
+const device_type VME_FCCPU21S  = device_creator<vme_fccpu21s_card_device>;
+const device_type VME_FCCPU21   = device_creator<vme_fccpu21_card_device>;
+const device_type VME_FCCPU21A  = device_creator<vme_fccpu21a_card_device>;
+const device_type VME_FCCPU21YA = device_creator<vme_fccpu21ya_card_device>;
+const device_type VME_FCCPU21B  = device_creator<vme_fccpu21b_card_device>;
+const device_type VME_FCCPU21YB = device_creator<vme_fccpu21yb_card_device>;
 
 #define CLOCK50 XTAL_50MHz /* HCJ */
 #define CLOCK40 XTAL_40MHz /* HCJ */

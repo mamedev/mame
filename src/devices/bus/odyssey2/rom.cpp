@@ -17,9 +17,9 @@
 //  o2_rom_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_STD = &device_creator<o2_rom_device>;
-const device_type O2_ROM_12K = &device_creator<o2_rom12_device>;
-const device_type O2_ROM_16K = &device_creator<o2_rom16_device>;
+const device_type O2_ROM_STD = device_creator<o2_rom_device>;
+const device_type O2_ROM_12K = device_creator<o2_rom12_device>;
+const device_type O2_ROM_16K = device_creator<o2_rom16_device>;
 
 
 o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

@@ -34,7 +34,7 @@ ROM_END
 //**************************************************************************
 
 // device type definition
-const device_type SONY_LDP1450 = &device_creator<sony_ldp1450_device>;
+const device_type SONY_LDP1450 = device_creator<sony_ldp1450_device>;
 
 
 //**************************************************************************

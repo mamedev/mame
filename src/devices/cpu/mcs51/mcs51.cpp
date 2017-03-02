@@ -221,20 +221,20 @@ enum
 };
 
 
-const device_type I8031 = &device_creator<i8031_device>;
-const device_type I8032 = &device_creator<i8032_device>;
-const device_type I8051 = &device_creator<i8051_device>;
-const device_type I8751 = &device_creator<i8751_device>;
-const device_type I8052 = &device_creator<i8052_device>;
-const device_type I8752 = &device_creator<i8752_device>;
-const device_type I80C31 = &device_creator<i80c31_device>;
-const device_type I80C51 = &device_creator<i80c51_device>;
-const device_type I87C51 = &device_creator<i87c51_device>;
-const device_type I80C32 = &device_creator<i80c32_device>;
-const device_type I80C52 = &device_creator<i80c52_device>;
-const device_type I87C52 = &device_creator<i87c52_device>;
-const device_type AT89C4051 = &device_creator<at89c4051_device>;
-const device_type DS5002FP = &device_creator<ds5002fp_device>;
+const device_type I8031 = device_creator<i8031_device>;
+const device_type I8032 = device_creator<i8032_device>;
+const device_type I8051 = device_creator<i8051_device>;
+const device_type I8751 = device_creator<i8751_device>;
+const device_type I8052 = device_creator<i8052_device>;
+const device_type I8752 = device_creator<i8752_device>;
+const device_type I80C31 = device_creator<i80c31_device>;
+const device_type I80C51 = device_creator<i80c51_device>;
+const device_type I87C51 = device_creator<i87c51_device>;
+const device_type I80C32 = device_creator<i80c32_device>;
+const device_type I80C52 = device_creator<i80c52_device>;
+const device_type I87C52 = device_creator<i87c52_device>;
+const device_type AT89C4051 = device_creator<at89c4051_device>;
+const device_type DS5002FP = device_creator<ds5002fp_device>;
 
 
 /***************************************************************************

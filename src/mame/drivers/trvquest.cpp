@@ -37,11 +37,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/gameplan.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
-#include "sound/ay8910.h"
-#include "includes/gameplan.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(gameplan_state::trvquest_question_r)
 {

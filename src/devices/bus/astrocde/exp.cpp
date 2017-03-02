@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_EXP_SLOT = &device_creator<astrocade_exp_device>;
+const device_type ASTROCADE_EXP_SLOT = device_creator<astrocade_exp_device>;
 
 
 device_astrocade_card_interface::device_astrocade_card_interface(const machine_config &mconfig, device_t &device)

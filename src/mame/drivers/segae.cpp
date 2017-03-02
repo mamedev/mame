@@ -293,12 +293,14 @@ GND  8A 8B GND
 
 
 #include "emu.h"
+#include "includes/segaipt.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
 #include "machine/mc8123.h"
 #include "machine/segacrp2_device.h"
+#include "sound/sn76496.h"
 #include "video/315_5124.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 
 class systeme_state : public driver_device

@@ -80,10 +80,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/irobot.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/pokey.h"
 #include "machine/nvram.h"
-#include "includes/irobot.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK      XTAL_12_096MHz
 #define VIDEO_CLOCK     XTAL_20MHz

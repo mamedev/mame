@@ -65,7 +65,7 @@ WRITE16_MEMBER(keycus_c406_device::write)
 	logerror( "keycus_c406_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C406 = &device_creator<keycus_c406_device>;
+const device_type KEYCUS_C406 = device_creator<keycus_c406_device>;
 
 /* soul edge */
 
@@ -105,7 +105,7 @@ WRITE16_MEMBER(keycus_c409_device::write)
 	logerror( "keycus_c409_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C409 = &device_creator<keycus_c409_device>;
+const device_type KEYCUS_C409 = device_creator<keycus_c409_device>;
 
 /* dunk mania */
 
@@ -159,7 +159,7 @@ WRITE16_MEMBER(keycus_c410_device::write)
 	logerror( "keycus_c410_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C410 = &device_creator<keycus_c410_device>;
+const device_type KEYCUS_C410 = device_creator<keycus_c410_device>;
 
 /* prime goal ex */
 
@@ -215,7 +215,7 @@ WRITE16_MEMBER(keycus_c411_device::write)
 	logerror( "keycus_c411_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C411 = &device_creator<keycus_c411_device>;
+const device_type KEYCUS_C411 = device_creator<keycus_c411_device>;
 
 /* xevious 3d/g */
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(keycus_c430_device::write)
 	logerror( "keycus_c430_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C430 = &device_creator<keycus_c430_device>;
+const device_type KEYCUS_C430 = device_creator<keycus_c430_device>;
 
 /* dancing eyes */
 
@@ -332,7 +332,7 @@ WRITE16_MEMBER(keycus_c431_device::write)
 	logerror( "keycus_c431_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C431 = &device_creator<keycus_c431_device>;
+const device_type KEYCUS_C431 = device_creator<keycus_c431_device>;
 
 /* pocket racer */
 
@@ -392,7 +392,7 @@ WRITE16_MEMBER(keycus_c432_device::write)
 	logerror( "keycus_c432_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C432 = &device_creator<keycus_c432_device>;
+const device_type KEYCUS_C432 = device_creator<keycus_c432_device>;
 
 /* star sweep */
 
@@ -440,7 +440,7 @@ WRITE16_MEMBER(keycus_c442_device::write)
 	logerror( "keycus_c442_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C442 = &device_creator<keycus_c442_device>;
+const device_type KEYCUS_C442 = device_creator<keycus_c442_device>;
 
 /* kosodate quiz my angel 3 / point blank 2 */
 
@@ -486,4 +486,4 @@ WRITE16_MEMBER(keycus_c443_device::write)
 	logerror( "keycus_c443_device::write unexpected offset=%d data=%04x\n", offset, data );
 }
 
-const device_type KEYCUS_C443 = &device_creator<keycus_c443_device>;
+const device_type KEYCUS_C443 = device_creator<keycus_c443_device>;

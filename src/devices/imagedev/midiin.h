@@ -73,6 +73,6 @@ private:
 extern const device_type MIDIIN;
 
 // device iterator
-typedef device_type_iterator<&device_creator<midiin_device>, midiin_device> midiin_device_iterator;
+typedef device_type_iterator<MIDIIN, midiin_device> midiin_device_iterator;
 
 #endif /* __MIDIIN_H__ */

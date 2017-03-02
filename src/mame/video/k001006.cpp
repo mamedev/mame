@@ -12,7 +12,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-const device_type K001006 = &device_creator<k001006_device>;
+const device_type K001006 = device_creator<k001006_device>;
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001006, "K001006 Texel Unit", tag, owner, clock, "k001006", __FILE__),

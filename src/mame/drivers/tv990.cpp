@@ -30,13 +30,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/ins8250.h"
-#include "machine/8042kbdc.h"
 #include "bus/rs232/rs232.h"
-#include "machine/pc_lpt.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/8042kbdc.h"
+#include "machine/ins8250.h"
 #include "machine/nvram.h"
+#include "machine/pc_lpt.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define UART0_TAG       "ns16450_0"
 #define UART1_TAG       "ns16450_1"

@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_JOY = &device_creator<comx_joy_device>;
+const device_type COMX_JOY = device_creator<comx_joy_device>;
 
 
 //-------------------------------------------------

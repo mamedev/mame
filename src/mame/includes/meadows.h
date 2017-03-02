@@ -8,6 +8,7 @@
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class meadows_state : public driver_device
 {

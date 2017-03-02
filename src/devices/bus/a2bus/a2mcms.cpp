@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "a2mcms.h"
+#include "speaker.h"
 
 // the actual sound device (a slot device can't currently also be a sound device so we keep this private here)
 enum
@@ -22,7 +23,7 @@ enum
 };
 
 
-const device_type MCMS = &device_creator<mcms_device>;
+const device_type MCMS = device_creator<mcms_device>;
 
 /***************************************************************************
     PARAMETERS
@@ -32,8 +33,8 @@ const device_type MCMS = &device_creator<mcms_device>;
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MCMS1 = &device_creator<a2bus_mcms1_device>;
-const device_type A2BUS_MCMS2 = &device_creator<a2bus_mcms2_device>;
+const device_type A2BUS_MCMS1 = device_creator<a2bus_mcms1_device>;
+const device_type A2BUS_MCMS2 = device_creator<a2bus_mcms2_device>;
 
 #define ENGINE_TAG  "engine"
 

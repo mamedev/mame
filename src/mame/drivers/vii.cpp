@@ -74,13 +74,16 @@ Detailed list of bugs:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/unsp/unsp.h"
 #include "machine/i2cmem.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "screen.h"
 #include "softlist.h"
+
 
 #define PAGE_ENABLE_MASK        0x0008
 

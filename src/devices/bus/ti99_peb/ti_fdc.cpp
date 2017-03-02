@@ -478,4 +478,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-const device_type TI99_FDC = &device_creator<ti_fdc_device>;
+const device_type TI99_FDC = device_creator<ti_fdc_device>;

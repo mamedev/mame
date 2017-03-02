@@ -28,6 +28,7 @@
 #include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 #define KSM_COLUMNS 80  // or 132
 

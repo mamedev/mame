@@ -10,9 +10,9 @@
 #include "esq1by22.lh"
 #include "esq2by40.lh"
 
-const device_type ESQ1x22 = &device_creator<esq1x22_t>;
-const device_type ESQ2x40 = &device_creator<esq2x40_t>;
-const device_type ESQ2x40_SQ1 = &device_creator<esq2x40_sq1_t>;
+const device_type ESQ1x22 = device_creator<esq1x22_t>;
+const device_type ESQ2x40 = device_creator<esq2x40_t>;
+const device_type ESQ2x40_SQ1 = device_creator<esq2x40_sq1_t>;
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[]=

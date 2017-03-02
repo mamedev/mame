@@ -75,7 +75,7 @@ static const int16_t qtbl[128] =
 
 
 // device type definition
-const device_type SP0256 = &device_creator<sp0256_device>;
+const device_type SP0256 = device_creator<sp0256_device>;
 
 
 //**************************************************************************

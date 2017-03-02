@@ -79,10 +79,9 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
-#include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
-#include "video/mc6845.h"
+#include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
@@ -90,8 +89,10 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "machine/mm58167.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/wd_fdc.h"
 #include "machine/wd2010.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

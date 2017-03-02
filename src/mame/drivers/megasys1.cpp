@@ -117,20 +117,22 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "includes/megasys1.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/ym2151.h"
+#include "machine/jalcrpt.h"
+#include "speaker.h"
+
 #define SYS_A_CPU_CLOCK     (XTAL_12MHz / 2)    /* clock for main 68000 */
 #define SYS_B_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
 #define SYS_C_CPU_CLOCK     (XTAL_24MHz / 2)    /* clock for main 68000 */
 #define SYS_D_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
 #define SOUND_CPU_CLOCK     XTAL_7MHz       /* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK    XTAL_4MHz
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
-#include "machine/jalcrpt.h"
-#include "includes/megasys1.h"
 
 
 MACHINE_RESET_MEMBER(megasys1_state,megasys1)

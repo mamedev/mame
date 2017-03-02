@@ -16,6 +16,7 @@
 #include "machine/eepromser.h"
 #include "machine/steppers.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 
 /* The printer starts printing at x offset 44 and stops printing at x

@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_JOY = &device_creator<saturn_joy_device>;
+const device_type SATURN_JOY = device_creator<saturn_joy_device>;
 
 
 static INPUT_PORTS_START( saturn_joy )

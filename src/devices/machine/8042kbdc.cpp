@@ -191,7 +191,7 @@
 #define LOG_KEYBOARD    0
 #define LOG_ACCESSES    0
 
-const device_type KBDC8042 = &device_creator<kbdc8042_device>;
+const device_type KBDC8042 = device_creator<kbdc8042_device>;
 
 //-------------------------------------------------
 //  kbdc8042_device - constructor

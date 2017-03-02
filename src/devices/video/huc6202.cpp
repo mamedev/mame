@@ -11,7 +11,7 @@
 #include "huc6202.h"
 
 
-const device_type HUC6202 = &device_creator<huc6202_device>;
+const device_type HUC6202 = device_creator<huc6202_device>;
 
 
 huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

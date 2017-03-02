@@ -11,10 +11,13 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/quizdna.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/quizdna.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 16000000
 

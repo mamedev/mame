@@ -3,12 +3,16 @@
 
 
 #include "emu.h"
-#include "cpu/upd7810/upd7810.h"
-#include "sound/speaker.h"
-#include "bus/generic/carts.h"
 #include "includes/gamepock.h"
+
+#include "bus/generic/carts.h"
+#include "cpu/upd7810/upd7810.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH

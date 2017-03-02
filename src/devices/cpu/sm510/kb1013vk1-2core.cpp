@@ -11,7 +11,7 @@
 #include "debugger.h"
 
 // MCU types
-const device_type KB1013VK12 = &device_creator<kb1013vk12_device>;
+const device_type KB1013VK12 = device_creator<kb1013vk12_device>;
 
 
 // internal memory maps

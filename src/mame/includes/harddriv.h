@@ -17,6 +17,7 @@
 #include "machine/asic65.h"
 #include "machine/timekpr.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz

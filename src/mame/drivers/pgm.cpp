@@ -187,10 +187,9 @@ Notes:
 
 */
 
-#define PGMLOGERROR 0
-
 #include "emu.h"
 #include "includes/pgm.h"
+
 #include "machine/pgmprot_igs025_igs012.h"
 #include "machine/pgmprot_igs025_igs022.h"
 #include "machine/pgmprot_igs025_igs028.h"
@@ -198,6 +197,12 @@ Notes:
 #include "machine/pgmprot_igs027a_type2.h"
 #include "machine/pgmprot_igs027a_type3.h"
 #include "machine/pgmprot_orlegend.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#define PGMLOGERROR 0
+
 
 READ16_MEMBER(pgm_state::pgm_videoram_r)
 {

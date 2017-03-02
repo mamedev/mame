@@ -47,6 +47,8 @@ single plane board.
 
 #include "emu.h"
 #include "includes/tigeroad.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

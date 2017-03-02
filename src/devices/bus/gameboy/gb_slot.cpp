@@ -25,8 +25,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GB_CART_SLOT = &device_creator<gb_cart_slot_device>;
-const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device>;
+const device_type GB_CART_SLOT = device_creator<gb_cart_slot_device>;
+const device_type MEGADUCK_CART_SLOT = device_creator<megaduck_cart_slot_device>;
 
 //**************************************************************************
 //    GB cartridges Interface
@@ -263,12 +263,12 @@ image_init_result base_gb_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint32_t offset;
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint8_t *ROM;
 		int rambanks = 0;
 
 		// From fullpath, check for presence of a header and skip it + check filesize is valid
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if ((len % 0x4000) == 512)
 			{
@@ -288,7 +288,7 @@ image_init_result base_gb_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -298,7 +298,7 @@ image_init_result base_gb_cart_slot_device::call_load()
 		if (get_mmm01_candidate(ROM, len))
 			offset = len - 0x8000;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 			m_type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM + offset, len - offset);
@@ -312,7 +312,7 @@ image_init_result base_gb_cart_slot_device::call_load()
 			m_cart->set_additional_wirings(0x0f, -1);
 
 		// setup RAM/NVRAM/RTC/RUMBLE
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			// from softlist we only rely on xml
 			if (get_software_region("ram"))
@@ -413,11 +413,11 @@ image_init_result megaduck_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), len);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);

@@ -13,8 +13,8 @@
 #include "v53.h"
 
 
-const device_type V53 = &device_creator<v53_device>;
-const device_type V53A =&device_creator<v53a_device>;
+const device_type V53 = device_creator<v53_device>;
+const device_type V53A =device_creator<v53a_device>;
 
 WRITE8_MEMBER(v53_base_device::BSEL_w)
 {

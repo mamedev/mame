@@ -4,10 +4,12 @@
 
 
 #include "emu.h"
+#include "includes/bwidow.h"
+
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 
-#include "includes/bwidow.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "lpc-rtc.h"
 
-const device_type LPC_RTC = &device_creator<lpc_rtc_device>;
+const device_type LPC_RTC = device_creator<lpc_rtc_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, lpc_rtc_device)
 	AM_RANGE(0x70, 0x77) AM_READWRITE8(index_r,     index_w,     0x00ff00ff)

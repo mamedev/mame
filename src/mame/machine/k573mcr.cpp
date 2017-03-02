@@ -31,4 +31,4 @@ const tiny_rom_entry *k573mcr_device::device_rom_region() const
 	return ROM_NAME( k573mcr );
 }
 
-const device_type KONAMI_573_MEMORY_CARD_READER = &device_creator<k573mcr_device>;
+const device_type KONAMI_573_MEMORY_CARD_READER = device_creator<k573mcr_device>;

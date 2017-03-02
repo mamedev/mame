@@ -6,7 +6,7 @@
 #include "segaic16_road.h"
 #include "video/resnet.h"
 
-const device_type SEGAIC16_ROAD = &device_creator<segaic16_road_device>;
+const device_type SEGAIC16_ROAD = device_creator<segaic16_road_device>;
 
 segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGAIC16_ROAD, "Sega 16-bit Road Generator", tag, owner, clock, "segaic16_road", __FILE__)

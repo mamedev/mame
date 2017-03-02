@@ -11,15 +11,18 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/ram.h"
+#include "screen.h"
 
 
 class vt320_state : public driver_device
 {
 public:
 	vt320_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+	{
+	}
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

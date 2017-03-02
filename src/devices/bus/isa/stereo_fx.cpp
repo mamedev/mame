@@ -6,10 +6,13 @@
 
 #include "emu.h"
 #include "stereo_fx.h"
+
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
-const device_type ISA8_STEREO_FX = &device_creator<stereo_fx_device>;
+
+const device_type ISA8_STEREO_FX = device_creator<stereo_fx_device>;
 
 READ8_MEMBER( stereo_fx_device::dev_dsp_data_r )
 {

@@ -2,6 +2,7 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/othunder.h"
+#include "screen.h"
 
 
 void othunder_state::video_start()

@@ -9,12 +9,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "machine/ram.h"
 #include "includes/pecom.h"
+
+#include "sound/wave.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )

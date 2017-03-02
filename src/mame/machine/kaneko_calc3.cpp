@@ -27,7 +27,7 @@
 #include "kaneko_calc3.h"
 #include "machine/eepromser.h"
 
-const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
+const device_type KANEKO_CALC3 = device_creator<kaneko_calc3_device>;
 
 kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_CALC3, "Kaneko CALC3 MCU", tag, owner, clock, "kaneko_calc3", __FILE__),

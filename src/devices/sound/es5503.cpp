@@ -36,7 +36,7 @@
 #include "es5503.h"
 
 // device type definition
-const device_type ES5503 = &device_creator<es5503_device>;
+const device_type ES5503 = device_creator<es5503_device>;
 
 // useful constants
 static const uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };

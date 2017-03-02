@@ -152,9 +152,9 @@ enum
 #define PRE1        m_r[Z8_REGISTER_PRE1]
 
 
-const device_type Z8601 = &device_creator<z8601_device>;
-const device_type UB8830D = &device_creator<ub8830d_device>;
-const device_type Z8611 = &device_creator<z8611_device>;
+const device_type Z8601 = device_creator<z8601_device>;
+const device_type UB8830D = device_creator<ub8830d_device>;
+const device_type Z8611 = device_creator<z8611_device>;
 
 
 /***************************************************************************

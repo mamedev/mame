@@ -44,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC1600_MOVER = &device_creator<abc1600_mover_device>;
+const device_type ABC1600_MOVER = device_creator<abc1600_mover_device>;
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, abc1600_mover_device )

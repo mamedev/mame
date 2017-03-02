@@ -66,6 +66,7 @@ shuuz       1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0
 
 #include "emu.h"
 #include "atarimo.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -117,7 +118,7 @@ inline int atari_motion_objects_device::round_to_powerof2(int value)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_device>;
+const device_type ATARI_MOTION_OBJECTS = device_creator<atari_motion_objects_device>;
 
 //-------------------------------------------------
 //  atari_motion_objects_device - constructor

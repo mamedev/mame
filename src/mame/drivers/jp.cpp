@@ -19,9 +19,13 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "jp.lh"
+
 
 class jp_state : public genpin_class
 {

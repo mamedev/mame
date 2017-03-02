@@ -6,16 +6,16 @@
  *
  ****************************************************************************/
 
-#ifndef B2M_H_
-#define B2M_H_
+#ifndef MAME_INCLUDES_B2M_H
+#define MAME_INCLUDES_B2M_H
 
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/wd_fdc.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 class b2m_state : public driver_device
 {
@@ -78,4 +78,4 @@ public:
 	void b2m_set_bank(int bank);
 };
 
-#endif
+#endif // MAME_INCLUDES_B2M_H

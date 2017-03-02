@@ -169,10 +169,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/firetrap.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/3526intf.h"
-#include "includes/firetrap.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define FIRETRAP_XTAL XTAL_12MHz
 

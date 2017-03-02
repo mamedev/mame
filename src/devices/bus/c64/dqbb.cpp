@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DQBB = &device_creator<c64_dqbb_cartridge_device>;
+const device_type C64_DQBB = device_creator<c64_dqbb_cartridge_device>;
 
 
 

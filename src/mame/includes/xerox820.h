@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __XEROX820__
-#define __XEROX820__
+#ifndef MAME_INCLUDES_XEROX820_H
+#define MAME_INCLUDES_XEROX820_H
+
+#pragma once
 
 #include "bus/scsi/sa1403d.h"
 #include "bus/rs232/rs232.h"
@@ -17,7 +19,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/beep.h"
 
 #define SCREEN_TAG      "screen"
@@ -160,4 +162,4 @@ public:
 	void bankswitch(int bank) override;
 };
 
-#endif
+#endif // MAME_INCLUDES_XEROX820_H

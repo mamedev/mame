@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef KC_H_
-#define KC_H_
+#ifndef MAME_INCLUDES_KC_H
+#define MAME_INCLUDES_KC_H
 
 /* Devices */
 #include "imagedev/cassette.h"
@@ -22,15 +22,12 @@
 #include "machine/kc_keyb.h"
 #include "machine/rescap.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
 
 // Devices
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-
-// Formats
-#include "formats/kc_cas.h"
 
 // Expansions
 #include "bus/kc/kc.h"
@@ -38,6 +35,9 @@
 #include "bus/kc/rom.h"
 #include "bus/kc/d002.h"
 #include "bus/kc/d004.h"
+
+// Formats
+#include "formats/kc_cas.h"
 
 // from service manual
 #define KC85_3_CLOCK 1751938
@@ -185,4 +185,4 @@ public:
 	uint8_t *             m_display_video_ram;
 };
 
-#endif /* KC_H_ */
+#endif // MAME_INCLUDES_KC_H

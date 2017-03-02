@@ -50,6 +50,8 @@
 
 #include "emu.h"
 #include "includes/mpf1.h"
+#include "speaker.h"
+
 #include "mpf1.lh"
 #include "mpf1b.lh"
 #include "mpf1p.lh"

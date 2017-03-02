@@ -23,7 +23,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_BUS = &device_creator<sh7604_bus_device>;
+const device_type SH7604_BUS = device_creator<sh7604_bus_device>;
 
 
 //**************************************************************************

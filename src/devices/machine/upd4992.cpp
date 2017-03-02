@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type UPD4992 = &device_creator<upd4992_device>;
+const device_type UPD4992 = device_creator<upd4992_device>;
 
 
 //**************************************************************************

@@ -15,9 +15,14 @@ driver by Barry Rodewald
 */
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class rotaryf_state : public driver_device
 {
@@ -28,7 +33,8 @@ public:
 		m_samples(*this, "samples"),
 		m_sn(*this, "snsnd"),
 		m_videoram(*this, "videoram")
-	{ }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;

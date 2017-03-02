@@ -14,9 +14,12 @@
 
 
 #include "emu.h"
+#include "cpu/g65816/g65816.h"
 #include "cpu/m6502/m6502.h"
 //#include "sound/ay8910.h"
-#include "cpu/g65816/g65816.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_21_4772MHz
 

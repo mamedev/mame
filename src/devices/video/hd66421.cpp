@@ -65,7 +65,7 @@
 //**************************************************************************
 
 // devices
-const device_type HD66421 = &device_creator<hd66421_device>;
+const device_type HD66421 = device_creator<hd66421_device>;
 
 
 // default address map

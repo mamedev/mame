@@ -41,7 +41,7 @@ main ram and the buffer.
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type K053244 = &device_creator<k05324x_device>;
+const device_type K053244 = device_creator<k05324x_device>;
 
 const gfx_layout k05324x_device::spritelayout =
 {

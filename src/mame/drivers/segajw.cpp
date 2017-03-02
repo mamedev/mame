@@ -35,6 +35,8 @@ Also seem to be running on the same/similar hardware:
 #include "sound/2612intf.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "segajw.lh"
 

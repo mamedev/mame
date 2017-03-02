@@ -6,14 +6,16 @@
  *
  ****************************************************************************/
 
-#ifndef INTV_H_
-#define INTV_H_
+#ifndef MAME_INCLUDES_INTV_H
+#define MAME_INCLUDES_INTV_H
 
 #include "sound/ay8910.h"
 #include "video/stic.h"
+#include "video/tms9927.h"
+
+#include "bus/intv/ecs.h"
 #include "bus/intv/slot.h"
 #include "bus/intv/voice.h"
-#include "bus/intv/ecs.h"
 //#include "bus/intv/keycomp.h"
 
 #include "bus/intv_ctrl/ctrl.h"
@@ -133,4 +135,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* INTV_H_ */
+#endif // MAME_INCLUDES_INTV_H

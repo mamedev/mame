@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "machine/ataintf.h"
+#include "screen.h"
 
 
 class turrett_state : public driver_device
@@ -127,4 +128,4 @@ private:
 };
 
 // device type definition
-const device_type TURRETT = &device_creator<turrett_device>;
+extern const device_type TURRETT;

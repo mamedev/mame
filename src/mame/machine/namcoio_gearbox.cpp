@@ -33,7 +33,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type NAMCOIO_GEARBOX = &device_creator<namcoio_gearbox_device>;
+const device_type NAMCOIO_GEARBOX = device_creator<namcoio_gearbox_device>;
 
 
 //**************************************************************************

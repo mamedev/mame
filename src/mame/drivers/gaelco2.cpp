@@ -27,10 +27,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaelco2.h"
+
 #include "machine/eepromser.h"
 #include "sound/gaelco.h"
+
 #include "rendlay.h"
-#include "includes/gaelco2.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TILELAYOUT16(NUM) static const gfx_layout tilelayout16_##NUM =              \
 {                                                                                   \

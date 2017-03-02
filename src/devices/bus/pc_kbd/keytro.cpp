@@ -336,8 +336,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_KEYTRONIC_PC3270       = &device_creator<pc_kbd_keytronic_pc3270_device>;
-const device_type PC_KBD_KEYTRONIC_PC3270_AT    = &device_creator<pc_kbd_keytronic_pc3270_at_device>;
+const device_type PC_KBD_KEYTRONIC_PC3270       = device_creator<pc_kbd_keytronic_pc3270_device>;
+const device_type PC_KBD_KEYTRONIC_PC3270_AT    = device_creator<pc_kbd_keytronic_pc3270_at_device>;
 
 
 /*****************************************************************************

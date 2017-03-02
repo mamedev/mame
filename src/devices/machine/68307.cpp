@@ -5,6 +5,9 @@
 #include "emu.h"
 #include "68307.h"
 
+const device_type M68307 = device_creator<m68307cpu_device>;
+
+
 /* 68307 SERIAL Module */
 /* all ports on this are 8-bit? */
 

@@ -22,10 +22,13 @@ Sega PCB 834-5137
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/suprloco.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
-#include "includes/suprloco.h"
+#include "screen.h"
+#include "speaker.h"
 
 WRITE8_MEMBER(suprloco_state::soundport_w)
 {

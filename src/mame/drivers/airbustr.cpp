@@ -220,10 +220,13 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
+#include "includes/airbustr.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/airbustr.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 READ8_MEMBER(airbustr_state::devram_r)

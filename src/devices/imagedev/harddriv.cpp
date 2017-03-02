@@ -32,7 +32,7 @@ static const char *hd_option_spec =
 
 
 // device type definition
-const device_type HARDDISK = &device_creator<harddisk_image_device>;
+const device_type HARDDISK = device_creator<harddisk_image_device>;
 
 //-------------------------------------------------
 //  harddisk_image_device - constructor
@@ -244,7 +244,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 	}
 
 	/* open the CHD file */
-	if (software_entry() != nullptr)
+	if (loaded_through_softlist())
 	{
 		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
 	}

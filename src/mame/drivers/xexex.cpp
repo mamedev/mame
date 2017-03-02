@@ -132,15 +132,18 @@ Unresolved Issues:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/xexex.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
+#include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "sound/ym2151.h"
-#include "sound/flt_vol.h"
-#include "includes/xexex.h"
-#include "includes/konamipt.h"
+#include "speaker.h"
+
 
 #define XE_DEBUG      0
 #define XE_SKIPIDLE   1

@@ -59,6 +59,8 @@ Notes:
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cham24_state : public driver_device

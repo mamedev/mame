@@ -3,6 +3,7 @@
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
 
 
 class deco_mlc_state : public driver_device

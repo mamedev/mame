@@ -14,7 +14,7 @@
 //  EXPANSION SLOT DEVICE
 //**************************************************************************
 
-const device_type APRICOT_EXPANSION_SLOT = &device_creator<apricot_expansion_slot_device>;
+const device_type APRICOT_EXPANSION_SLOT = device_creator<apricot_expansion_slot_device>;
 
 //-------------------------------------------------
 //  apricot_expansion_slot_device - constructor
@@ -53,7 +53,7 @@ void apricot_expansion_slot_device::device_start()
 //  EXPANSION BUS DEVICE
 //**************************************************************************
 
-const device_type APRICOT_EXPANSION_BUS = &device_creator<apricot_expansion_bus_device>;
+const device_type APRICOT_EXPANSION_BUS = device_creator<apricot_expansion_bus_device>;
 
 //-------------------------------------------------
 //  apricot_expansion_bus_device - constructor

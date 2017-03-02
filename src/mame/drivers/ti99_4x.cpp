@@ -52,8 +52,10 @@
 #include "bus/ti99x/joyport.h"
 
 #include "bus/ti99_peb/peribox.h"
-#include "softlist.h"
 #include "machine/ram.h"
+
+#include "softlist.h"
+#include "speaker.h"
 
 // Debugging
 #define TRACE_READY 0

@@ -16,7 +16,7 @@ and a variable amount of ROM. Nothing is known about its external interface.
 
 #define K007420_SPRITERAM_SIZE 0x200
 
-const device_type K007420 = &device_creator<k007420_device>;
+const device_type K007420 = device_creator<k007420_device>;
 
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007420, "K007420 Sprite Generator", tag, owner, clock, "k007420", __FILE__)

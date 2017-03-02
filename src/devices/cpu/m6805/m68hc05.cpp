@@ -89,9 +89,9 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
  * Global variables
  ****************************************************************************/
 
-device_type const M68HC05C4     = &device_creator<m68hc05c4_device>;
-device_type const M68HC05C8     = &device_creator<m68hc05c8_device>;
-device_type const M68HC705C8A   = &device_creator<m68hc705c8a_device>;
+device_type const M68HC05C4     = device_creator<m68hc05c4_device>;
+device_type const M68HC05C8     = device_creator<m68hc05c8_device>;
+device_type const M68HC705C8A   = device_creator<m68hc705c8a_device>;
 
 
 

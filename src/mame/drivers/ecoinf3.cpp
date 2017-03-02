@@ -13,12 +13,16 @@
 // 2 of the sets contain program scrambled roms (where the last 0x2000 bytes match between games) why, badly dumped?
 
 #include "emu.h"
+
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "ecoinf3.lh"
 #include "machine/steppers.h" // stepper motor
-#include "video/awpvid.h" // drawing reels
 #include "sound/sn76496.h"
+#include "video/awpvid.h" // drawing reels
+#include "speaker.h"
+
+#include "ecoinf3.lh"
+
 
 class ecoinf3_state : public driver_device
 {

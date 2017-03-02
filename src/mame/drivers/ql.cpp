@@ -74,7 +74,7 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
+
 #include "bus/ql/exp.h"
 #include "bus/ql/rom.h"
 #include "bus/rs232/rs232.h"
@@ -84,8 +84,13 @@
 #include "machine/qimi.h"
 #include "machine/ram.h"
 #include "machine/zx8302.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/zx8301.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define SCREEN_TAG  "screen"
 

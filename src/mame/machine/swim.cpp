@@ -32,7 +32,7 @@ enum
     DEVICE
 ***************************************************************************/
 
-const device_type SWIM = &device_creator<swim_device>;
+const device_type SWIM = device_creator<swim_device>;
 
 //-------------------------------------------------
 //  ctor

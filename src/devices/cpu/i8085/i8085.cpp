@@ -177,9 +177,9 @@ M_CALL 8085    11        +7(18)   -2(9)
 */
 
 
-const device_type I8080 = &device_creator<i8080_cpu_device>;
-const device_type I8080A = &device_creator<i8080a_cpu_device>;
-const device_type I8085A = &device_creator<i8085a_cpu_device>;
+const device_type I8080 = device_creator<i8080_cpu_device>;
+const device_type I8080A = device_creator<i8080a_cpu_device>;
+const device_type I8085A = device_creator<i8085a_cpu_device>;
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

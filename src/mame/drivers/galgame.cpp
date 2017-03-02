@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "screen.h"
 
 
 #define MAX_POINTS 2048

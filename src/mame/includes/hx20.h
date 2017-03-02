@@ -1,18 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_HX20_H
+#define MAME_INCLUDES_HX20_H
+
 #pragma once
 
-#ifndef __HX20__
-#define __HX20__
-
-#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
-#include "bus/epson_sio/epson_sio.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"
+#include "sound/spkrdev.h"
 #include "video/upd7227.h"
-#include "sound/speaker.h"
+
+#include "bus/epson_sio/epson_sio.h"
+#include "bus/rs232/rs232.h"
+
 #include "rendlay.h"
 
 #define HD6301V1_MAIN_TAG   "8g"
@@ -136,4 +138,4 @@ public:
 	int m_sio_pin;
 };
 
-#endif
+#endif // MAME_INCLUDES_HX20_H

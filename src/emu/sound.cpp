@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "speaker.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"

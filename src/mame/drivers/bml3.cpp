@@ -14,19 +14,24 @@
 **************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/2203intf.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
+#include "video/mc6845.h"
+
 #include "bus/bml3/bml3bus.h"
 #include "bus/bml3/bml3mp1802.h"
 #include "bus/bml3/bml3mp1805.h"
 #include "bus/bml3/bml3kanji.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 

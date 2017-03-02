@@ -28,8 +28,8 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_PXROM = &device_creator<nes_pxrom_device>;
-const device_type NES_FXROM = &device_creator<nes_fxrom_device>;
+const device_type NES_PXROM = device_creator<nes_pxrom_device>;
+const device_type NES_FXROM = device_creator<nes_fxrom_device>;
 
 
 nes_pxrom_device::nes_pxrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

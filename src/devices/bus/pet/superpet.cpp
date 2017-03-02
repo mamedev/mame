@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SUPERPET = &device_creator<superpet_device>;
+const device_type SUPERPET = device_creator<superpet_device>;
 
 
 //-------------------------------------------------

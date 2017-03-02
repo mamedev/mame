@@ -20,6 +20,8 @@
 
 #include "emu.h"
 #include "includes/z88.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Assumption:

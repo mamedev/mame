@@ -89,10 +89,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/zodiack.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/zodiack.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define PIXEL_CLOCK         (XTAL_18_432MHz/3)
 

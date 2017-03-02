@@ -469,7 +469,7 @@ ioport_constructor ti99_handset_device::device_input_ports() const
 	return INPUT_PORTS_NAME( handset );
 }
 
-const device_type HANDSET = &device_creator<ti99_handset_device>;
+const device_type HANDSET = device_creator<ti99_handset_device>;
 
 /******************************************************************************
     Twin Joystick
@@ -535,4 +535,4 @@ ioport_constructor ti99_twin_joystick::device_input_ports() const
 	return INPUT_PORTS_NAME( joysticks );
 }
 
-const device_type TI99_JOYSTICK = &device_creator<ti99_twin_joystick>;
+const device_type TI99_JOYSTICK = device_creator<ti99_twin_joystick>;

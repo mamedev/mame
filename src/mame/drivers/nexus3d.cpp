@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/serflash.h"
+#include "screen.h"
 
 //#include "machine/i2cmem.h"
 
@@ -47,9 +48,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
-
 
 
 

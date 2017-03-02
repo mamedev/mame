@@ -27,7 +27,7 @@ ROM_END
 //**************************************************************************
 
 // device type definition
-const device_type SONY_LDP1000 = &device_creator<sony_ldp1000_device>;
+const device_type SONY_LDP1000 = device_creator<sony_ldp1000_device>;
 
 
 //**************************************************************************

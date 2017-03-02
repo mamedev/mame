@@ -93,10 +93,11 @@ Notes:
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/battlera.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/c6280.h"
-#include "includes/battlera.h"
+#include "speaker.h"
 
 
 void battlera_state::machine_start()

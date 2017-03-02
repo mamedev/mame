@@ -19,7 +19,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-const device_type AAKART = &device_creator<aakart_device>;
+const device_type AAKART = device_creator<aakart_device>;
 
 #define HRST 0xff
 #define RAK1 0xfe

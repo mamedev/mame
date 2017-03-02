@@ -121,6 +121,8 @@
 #include "emu.h"
 #include "machine/s2636.h"
 
+#include "screen.h"
+
 
 int const s2636_device::OFFS_OBJ[s2636_device::OBJ_COUNT] = { 0x000, 0x010, 0x020, 0x040 };
 
@@ -153,7 +155,7 @@ uint16_t const s2636_device::SCORE_FONT[16][5] =
  *
  *************************************/
 
-const device_type S2636 = &device_creator<s2636_device>;
+const device_type S2636 = device_creator<s2636_device>;
 
 s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__)

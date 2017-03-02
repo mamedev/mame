@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/flkatck.h"
+#include "screen.h"
 
 /***************************************************************************
 

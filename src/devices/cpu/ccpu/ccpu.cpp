@@ -15,7 +15,7 @@
 #include "ccpu.h"
 
 
-const device_type CCPU = &device_creator<ccpu_cpu_device>;
+const device_type CCPU = device_creator<ccpu_cpu_device>;
 
 
 /***************************************************************************

@@ -44,11 +44,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deniam.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "includes/deniam.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(deniam_state::sound_command_w)

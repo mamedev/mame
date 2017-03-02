@@ -9,13 +9,16 @@
 #include "emu.h"
 #include "video/pcd8544.h"
 
+#include "screen.h"
+
+
 #define LOG          0
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PCD8544 = &device_creator<pcd8544_device>;
+const device_type PCD8544 = device_creator<pcd8544_device>;
 
 
 //**************************************************************************

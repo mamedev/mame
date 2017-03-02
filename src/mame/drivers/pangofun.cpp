@@ -98,6 +98,7 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
+#include "screen.h"
 
 
 class pangofun_state : public pcat_base_state

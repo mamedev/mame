@@ -121,13 +121,14 @@
 
 
 #include "emu.h"
+#include "includes/gauntlet.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
-#include "includes/gauntlet.h"
+#include "speaker.h"
 
 
 

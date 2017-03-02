@@ -78,7 +78,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
+const device_type A2BUS_SLOT = device_creator<a2bus_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -121,7 +121,7 @@ void a2bus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS = &device_creator<a2bus_device>;
+const device_type A2BUS = device_creator<a2bus_device>;
 
 void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 {

@@ -41,7 +41,9 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 READ64_MEMBER( macpci_state::unk1_r )
 {

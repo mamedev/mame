@@ -28,10 +28,14 @@ TODO:
 
 #include "emu.h"
 #include "includes/tagteam.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void tagteam_state::machine_start()
 {

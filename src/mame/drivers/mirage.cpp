@@ -46,6 +46,8 @@ MR_01-.3A    [a0b758aa]
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 // mirage_state was also defined in mess/drivers/mirage.c
 class miragemj_state : public driver_device

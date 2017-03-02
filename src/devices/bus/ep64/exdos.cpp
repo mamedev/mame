@@ -62,7 +62,7 @@ This PCB plugs into the external expansion connector on the right side of the ma
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EP64_EXDOS = &device_creator<ep64_exdos_device>;
+const device_type EP64_EXDOS = device_creator<ep64_exdos_device>;
 
 
 //-------------------------------------------------

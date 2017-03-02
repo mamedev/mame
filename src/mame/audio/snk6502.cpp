@@ -128,7 +128,7 @@ DISCRETE_SOUND_START( fantasy )
 DISCRETE_SOUND_END
 
 
-const device_type SNK6502 = &device_creator<snk6502_sound_device>;
+const device_type SNK6502 = device_creator<snk6502_sound_device>;
 
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNK6502, "SNK6502 Audio Custom", tag, owner, clock, "snk6502_sound", __FILE__),

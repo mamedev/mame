@@ -8,10 +8,19 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_SOUND_SAMPLES_H
+#define MAME_DEVICES_SOUND_SAMPLES_H
+
 #pragma once
 
-#ifndef __SAMPLES_H__
-#define __SAMPLES_H__
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+extern const device_type SAMPLES;
+
 
 
 //**************************************************************************
@@ -123,7 +132,7 @@ protected:
 };
 
 // iterator, since lots of people are interested in these devices
-typedef device_type_iterator<&device_creator<samples_device>, samples_device> samples_device_iterator;
+typedef device_type_iterator<SAMPLES, samples_device> samples_device_iterator;
 
 
 // ======================> samples_iterator
@@ -133,8 +142,10 @@ class samples_iterator
 public:
 	// construction/destruction
 	samples_iterator(samples_device &device)
-		: m_samples(device),
-			m_current(-1) { }
+		: m_samples(device)
+		, m_current(-1)
+	{
+	}
 
 	// getters
 	const char *altbasename() const { return (m_samples.m_names != nullptr && m_samples.m_names[0] != nullptr && m_samples.m_names[0][0] == '*') ? &m_samples.m_names[0][1] : nullptr; }
@@ -175,13 +186,4 @@ private:
 };
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
-extern const device_type SAMPLES;
-
-
-#endif
+#endif // MAME_DEVICES_SOUND_SAMPLES_H

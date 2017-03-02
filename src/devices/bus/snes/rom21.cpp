@@ -15,8 +15,8 @@
 //  sns_rom_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_HIROM = &device_creator<sns_rom21_device>;
-const device_type SNS_HIROM_SRTC = &device_creator<sns_rom21_srtc_device>;
+const device_type SNS_HIROM = device_creator<sns_rom21_device>;
+const device_type SNS_HIROM_SRTC = device_creator<sns_rom21_srtc_device>;
 
 
 sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

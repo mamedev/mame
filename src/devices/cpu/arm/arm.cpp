@@ -224,8 +224,8 @@ enum
 
 /***************************************************************************/
 
-const device_type ARM = &device_creator<arm_cpu_device>;
-const device_type ARM_BE = &device_creator<arm_be_cpu_device>;
+const device_type ARM = device_creator<arm_cpu_device>;
+const device_type ARM_BE = device_creator<arm_be_cpu_device>;
 
 
 arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

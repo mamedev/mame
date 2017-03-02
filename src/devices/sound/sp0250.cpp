@@ -34,7 +34,7 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 */
 #define CLOCK_DIVIDER (7*6*8)
 
-const device_type SP0250 = &device_creator<sp0250_device>;
+const device_type SP0250 = device_creator<sp0250_device>;
 
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SP0250, "SP0250", tag, owner, clock, "sp0250", __FILE__),

@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/vector.h"
+#include "screen.h"
 
 class aztarac_state : public driver_device
 {

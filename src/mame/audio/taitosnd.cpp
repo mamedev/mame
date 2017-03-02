@@ -29,7 +29,7 @@
 
 
 // device type definition
-const device_type TC0140SYT = &device_creator<tc0140syt_device>;
+const device_type TC0140SYT = device_creator<tc0140syt_device>;
 
 
 //**************************************************************************

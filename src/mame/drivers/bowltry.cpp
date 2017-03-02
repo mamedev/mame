@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "cpu/h8/h83008.h"
+#include "screen.h"
 
 #define HACK_ENABLED 0
 

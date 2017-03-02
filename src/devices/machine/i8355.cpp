@@ -39,7 +39,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type I8355 = &device_creator<i8355_device>;
+const device_type I8355 = device_creator<i8355_device>;
 
 // default address map
 static ADDRESS_MAP_START( i8355, AS_0, 8, i8355_device )

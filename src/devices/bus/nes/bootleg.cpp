@@ -23,6 +23,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -38,27 +39,27 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_AX5705 = &device_creator<nes_ax5705_device>;
-const device_type NES_SC127 = &device_creator<nes_sc127_device>;
-const device_type NES_MARIOBABY = &device_creator<nes_mbaby_device>;
-const device_type NES_ASN = &device_creator<nes_asn_device>;
-const device_type NES_SMB3PIRATE = &device_creator<nes_smb3p_device>;
-const device_type NES_BTL_DNINJA = &device_creator<nes_btl_dn_device>;
-const device_type NES_WHIRLWIND_2706 = &device_creator<nes_whirl2706_device>;
-const device_type NES_SMB2J = &device_creator<nes_smb2j_device>;
-const device_type NES_SMB2JA = &device_creator<nes_smb2ja_device>;
-const device_type NES_SMB2JB = &device_creator<nes_smb2jb_device>;
-const device_type NES_09034A = &device_creator<nes_09034a_device>;
-const device_type NES_TOBIDASE = &device_creator<nes_tobidase_device>;
-const device_type NES_LH32 = &device_creator<nes_lh32_device>;
-const device_type NES_LH10 = &device_creator<nes_lh10_device>;
-const device_type NES_LH53 = &device_creator<nes_lh53_device>;
-const device_type NES_2708 = &device_creator<nes_2708_device>;
-const device_type NES_AC08 = &device_creator<nes_ac08_device>;
-const device_type NES_UNL_BB = &device_creator<nes_unl_bb_device>;
-const device_type NES_MMALEE = &device_creator<nes_mmalee_device>;
-const device_type NES_SHUIGUAN = &device_creator<nes_shuiguan_device>;
-const device_type NES_RT01 = &device_creator<nes_rt01_device>;
+const device_type NES_AX5705 = device_creator<nes_ax5705_device>;
+const device_type NES_SC127 = device_creator<nes_sc127_device>;
+const device_type NES_MARIOBABY = device_creator<nes_mbaby_device>;
+const device_type NES_ASN = device_creator<nes_asn_device>;
+const device_type NES_SMB3PIRATE = device_creator<nes_smb3p_device>;
+const device_type NES_BTL_DNINJA = device_creator<nes_btl_dn_device>;
+const device_type NES_WHIRLWIND_2706 = device_creator<nes_whirl2706_device>;
+const device_type NES_SMB2J = device_creator<nes_smb2j_device>;
+const device_type NES_SMB2JA = device_creator<nes_smb2ja_device>;
+const device_type NES_SMB2JB = device_creator<nes_smb2jb_device>;
+const device_type NES_09034A = device_creator<nes_09034a_device>;
+const device_type NES_TOBIDASE = device_creator<nes_tobidase_device>;
+const device_type NES_LH32 = device_creator<nes_lh32_device>;
+const device_type NES_LH10 = device_creator<nes_lh10_device>;
+const device_type NES_LH53 = device_creator<nes_lh53_device>;
+const device_type NES_2708 = device_creator<nes_2708_device>;
+const device_type NES_AC08 = device_creator<nes_ac08_device>;
+const device_type NES_UNL_BB = device_creator<nes_unl_bb_device>;
+const device_type NES_MMALEE = device_creator<nes_mmalee_device>;
+const device_type NES_SHUIGUAN = device_creator<nes_shuiguan_device>;
+const device_type NES_RT01 = device_creator<nes_rt01_device>;
 
 
 nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

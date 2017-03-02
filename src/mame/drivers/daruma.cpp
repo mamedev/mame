@@ -17,7 +17,8 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 //TODO: #include "ds348.lh"
 
 class daruma_state : public driver_device

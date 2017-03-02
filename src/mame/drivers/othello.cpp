@@ -38,14 +38,18 @@ Limit for help/undo (matta):
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/i8243.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define TILE_WIDTH 6

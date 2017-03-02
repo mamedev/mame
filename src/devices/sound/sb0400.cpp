@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "sb0400.h"
 
-const device_type SB0400 = &device_creator<sb0400_device>;
+const device_type SB0400 = device_creator<sb0400_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, sb0400_device)
 ADDRESS_MAP_END

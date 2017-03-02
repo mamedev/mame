@@ -54,15 +54,17 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "sound/upd1771.h"
+#include "machine/am9517a.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
 #include "machine/upd1990a.h"
-#include "machine/nvram.h"
+#include "machine/upd765.h"
+#include "sound/upd1771.h"
 #include "video/upd7220.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 //#include "sound/ay8910.h"
 
 #define MAIN_CLOCK XTAL_5MHz

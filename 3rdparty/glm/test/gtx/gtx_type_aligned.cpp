@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/type_aligned.hpp>
 #include <cstdio>
 
@@ -79,7 +78,7 @@ int test_decl()
 	return Error;
 }
 
-template<typename genType>
+template <typename genType>
 void print(genType const & Mat0)
 {
 	printf("mat4(\n");

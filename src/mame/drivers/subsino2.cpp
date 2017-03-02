@@ -44,11 +44,13 @@ To do:
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
-#include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
+#include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 enum tilesize_t

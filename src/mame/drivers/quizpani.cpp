@@ -48,9 +48,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/quizpani.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/quizpani.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM

@@ -22,7 +22,7 @@ The timer seems to follow these rules:
 //**************************************************************************
 
 // device type definition
-const device_type RIOT6532 = &device_creator<riot6532_device>;
+const device_type RIOT6532 = device_creator<riot6532_device>;
 
 enum
 {

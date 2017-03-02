@@ -8,7 +8,7 @@
 #include "mas3507d.h"
 
 // device type definition
-const device_type MAS3507D = &device_creator<mas3507d_device>;
+const device_type MAS3507D = device_creator<mas3507d_device>;
 
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, "MAS3507D", tag, owner, clock, "mas3507d", __FILE__),

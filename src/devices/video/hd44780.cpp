@@ -19,8 +19,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HD44780 = &device_creator<hd44780_device>;
-const device_type KS0066_F05 = &device_creator<ks0066_f05_device>;
+const device_type HD44780 = device_creator<hd44780_device>;
+const device_type KS0066_F05 = device_creator<ks0066_f05_device>;
 
 
 //-------------------------------------------------

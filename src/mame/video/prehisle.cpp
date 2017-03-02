@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/prehisle.h"
+#include "screen.h"
 
 
 WRITE16_MEMBER(prehisle_state::fg_vram_w)

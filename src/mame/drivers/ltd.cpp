@@ -42,9 +42,13 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "ltd.lh"
+
 
 class ltd_state : public genpin_class
 {

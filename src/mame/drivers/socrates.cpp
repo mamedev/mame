@@ -83,11 +83,16 @@ TODO:
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "audio/socrates.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/z80/z80.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class socrates_state : public driver_device
 {

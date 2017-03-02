@@ -3724,11 +3724,11 @@ const address_space_config *z80_device::memory_space_config(address_spacenum spa
 	}
 }
 
-const device_type Z80 = &device_creator<z80_device>;
+const device_type Z80 = device_creator<z80_device>;
 
 nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, NSC800, "NSC800", tag, owner, clock, "nsc800", __FILE__)
 {
 }
 
-const device_type NSC800 = &device_creator<nsc800_device>;
+const device_type NSC800 = device_creator<nsc800_device>;

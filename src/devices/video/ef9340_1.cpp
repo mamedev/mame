@@ -13,9 +13,11 @@
 #include "ef9340_1.h"
 #include "ef9341_chargen.h"
 
+#include "screen.h"
+
 
 // device type definition
-const device_type EF9340_1 = &device_creator<ef9340_1_device>;
+const device_type EF9340_1 = device_creator<ef9340_1_device>;
 
 
 static const uint8_t bgr2rgb[8] =

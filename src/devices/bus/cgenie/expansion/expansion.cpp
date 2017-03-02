@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EXPANSION_SLOT = &device_creator<expansion_slot_device>;
+const device_type EXPANSION_SLOT = device_creator<expansion_slot_device>;
 
 
 //**************************************************************************

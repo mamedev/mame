@@ -153,6 +153,7 @@ Notes:
 #include "video/abc802.h"
 #include "video/abc806.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

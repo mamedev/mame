@@ -10,21 +10,21 @@
 
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/idectrl.h"
-#include "machine/idehd.h"
-#include "machine/atapicdr.h"
-#include "video/poly.h"
-#include "bitmap.h"
-#include "debug/debugcon.h"
-#include "debug/debugcmd.h"
-#include "debugger.h"
-#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
-#include "includes/xbox_usb.h"
+
+#include "cpu/i386/i386.h"
+#include "machine/atapicdr.h"
+#include "machine/idehd.h"
+#include "machine/lpci.h"
+#include "machine/pit8253.h"
+
+#include "debug/debugcmd.h"
+#include "debug/debugcon.h"
+#include "debugger.h"
+#include "speaker.h"
+
+#include "bitmap.h"
+
 
 #define CPU_DIV 64
 

@@ -63,7 +63,7 @@ const char *const ptm6840_device::opmode[] =
 ***************************************************************************/
 
 // device type definition
-const device_type PTM6840 = &device_creator<ptm6840_device>;
+const device_type PTM6840 = device_creator<ptm6840_device>;
 
 //-------------------------------------------------
 //  ptm6840_device - constructor

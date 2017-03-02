@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "a2videoterm.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -35,12 +36,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_VIDEOTERM = &device_creator<a2bus_videoterm_device>;
-const device_type A2BUS_IBSAP16 = &device_creator<a2bus_ap16_device>;
-const device_type A2BUS_IBSAP16ALT = &device_creator<a2bus_ap16alt_device>;
-const device_type A2BUS_VTC1 = &device_creator<a2bus_vtc1_device>;
-const device_type A2BUS_VTC2 = &device_creator<a2bus_vtc2_device>;
-const device_type A2BUS_AEVIEWMASTER80 = &device_creator<a2bus_aevm80_device>;
+const device_type A2BUS_VIDEOTERM = device_creator<a2bus_videoterm_device>;
+const device_type A2BUS_IBSAP16 = device_creator<a2bus_ap16_device>;
+const device_type A2BUS_IBSAP16ALT = device_creator<a2bus_ap16alt_device>;
+const device_type A2BUS_VTC1 = device_creator<a2bus_vtc1_device>;
+const device_type A2BUS_VTC2 = device_creator<a2bus_vtc2_device>;
+const device_type A2BUS_AEVIEWMASTER80 = device_creator<a2bus_aevm80_device>;
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
 #define VIDEOTERM_GFX_REGION  "vterm_gfx"

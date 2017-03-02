@@ -35,11 +35,13 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/speaker.h"
-#include "video/mc6845.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class dim68k_state : public driver_device
 {

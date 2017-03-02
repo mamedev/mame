@@ -51,12 +51,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tutankhm.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "audio/timeplt.h"
-#include "includes/tutankhm.h"
+#include "screen.h"
 
 
 /*************************************

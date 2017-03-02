@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP620 = &device_creator<vp620_device>;
+const device_type VP620 = device_creator<vp620_device>;
 
 
 //-------------------------------------------------

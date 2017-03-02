@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "tia.h"
 #include "sound/tiaintf.h"
+#include "screen.h"
 
 static const int nusiz[8][3] =
 {
@@ -361,7 +362,7 @@ tia_video_device::tia_video_device(const machine_config &mconfig, device_type ty
 }
 
 // device type definition
-const device_type TIA_PAL_VIDEO = &device_creator<tia_pal_video_device>;
+const device_type TIA_PAL_VIDEO = device_creator<tia_pal_video_device>;
 
 //-------------------------------------------------
 //  tia_pal_video_device - constructor
@@ -388,7 +389,7 @@ machine_config_constructor tia_pal_video_device::device_mconfig_additions() cons
 }
 
 // device type definition
-const device_type TIA_NTSC_VIDEO = &device_creator<tia_ntsc_video_device>;
+const device_type TIA_NTSC_VIDEO = device_creator<tia_ntsc_video_device>;
 
 //-------------------------------------------------
 //  tia_ntsc_video_device - constructor

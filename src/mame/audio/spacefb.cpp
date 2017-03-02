@@ -8,10 +8,12 @@
 
 #include "emu.h"
 #include "includes/spacefb.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(spacefb_state::audio_p2_r)

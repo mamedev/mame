@@ -73,16 +73,17 @@
 ***************************************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/i86/i186.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "screen.h"
+
+
 #define MAIN_CLOCK        XTAL_40MHz          // Pletronics 40.000 MHz. Crystal. Used for CPU clock.
 #define VIDEO_CLOCK       XTAL_14_31818MHz    // Pletronics MP49 14.31818 MHz. Crystal. Used in common VGA ISA cards.
 
 #define UART_CLOCK        XTAL_1_8432MHz      // Seems UART clock, since allows integer division to common baud rates.
 												// (16 * 115200 baud, 192 * 9600 baud, 1536 * 1200 baud, etc...)
-
-
-#include "emu.h"
-#include "cpu/i86/i186.h"
-#include "cpu/adsp2100/adsp2100.h"
 
 
 class wms_state : public driver_device

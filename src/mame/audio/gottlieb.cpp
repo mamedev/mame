@@ -25,10 +25,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type GOTTLIEB_SOUND_REV0 = &device_creator<gottlieb_sound_r0_device>;
-extern const device_type GOTTLIEB_SOUND_REV1 = &device_creator<gottlieb_sound_r1_device>;
-extern const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX = &device_creator<gottlieb_sound_r1_with_votrax_device>;
-extern const device_type GOTTLIEB_SOUND_REV2 = &device_creator<gottlieb_sound_r2_device>;
+const device_type GOTTLIEB_SOUND_REV0 = device_creator<gottlieb_sound_r0_device>;
+const device_type GOTTLIEB_SOUND_REV1 = device_creator<gottlieb_sound_r1_device>;
+const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX = device_creator<gottlieb_sound_r1_with_votrax_device>;
+const device_type GOTTLIEB_SOUND_REV2 = device_creator<gottlieb_sound_r2_device>;
 
 
 //**************************************************************************

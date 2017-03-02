@@ -44,7 +44,10 @@
 
 #include "emu.h"
 
+#include "machine/68340.h"
 #include "machine/sec.h"
+#include "speaker.h"
+
 #include "mpu5.lh"
 
 // MFME2MAME layouts:
@@ -195,8 +198,6 @@
 #include "m5xchn.lh"
 #include "m5xfact11.lh"
 
-
-#include "machine/68340.h"
 
 class mpu5_state : public driver_device
 {

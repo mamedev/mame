@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "video32.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -40,7 +41,7 @@ static const gfx_layout iq151_video32_charlayout =
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_VIDEO32 = &device_creator<iq151_video32_device>;
+const device_type IQ151_VIDEO32 = device_creator<iq151_video32_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

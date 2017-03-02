@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_SUBORKEYBOARD = &device_creator<nes_suborkey_device>;
+const device_type NES_SUBORKEYBOARD = device_creator<nes_suborkey_device>;
 
 
 static INPUT_PORTS_START( fc_suborkey )

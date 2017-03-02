@@ -69,11 +69,12 @@
 
 
 #include "emu.h"
+#include "includes/arcadecl.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
-#include "includes/arcadecl.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_14_31818MHz

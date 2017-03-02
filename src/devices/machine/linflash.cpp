@@ -34,7 +34,7 @@ WRITE16_MEMBER( linear_flash_pccard_device::write_memory )
 }
 
 
-const device_type LINEAR_FLASH_PCCARD_16MB = &device_creator<linear_flash_pccard_16mb_device>;
+const device_type LINEAR_FLASH_PCCARD_16MB = device_creator<linear_flash_pccard_16mb_device>;
 
 static ADDRESS_MAP_START(linear_flash_pccard_16mb, AS_0, 16, linear_flash_pccard_16mb_device)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -71,7 +71,7 @@ machine_config_constructor linear_flash_pccard_16mb_device::device_mconfig_addit
 }
 
 
-const device_type LINEAR_FLASH_PCCARD_32MB = &device_creator<linear_flash_pccard_32mb_device>;
+const device_type LINEAR_FLASH_PCCARD_32MB = device_creator<linear_flash_pccard_32mb_device>;
 
 static ADDRESS_MAP_START(linear_flash_pccard_32mb, AS_0, 16, linear_flash_pccard_32mb_device)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -124,7 +124,7 @@ machine_config_constructor linear_flash_pccard_32mb_device::device_mconfig_addit
 }
 
 
-const device_type LINEAR_FLASH_PCCARD_64MB = &device_creator<linear_flash_pccard_64mb_device>;
+const device_type LINEAR_FLASH_PCCARD_64MB = device_creator<linear_flash_pccard_64mb_device>;
 
 static ADDRESS_MAP_START(linear_flash_pccard_64mb, AS_0, 16, linear_flash_pccard_64mb_device)
 	ADDRESS_MAP_UNMAP_HIGH

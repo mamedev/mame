@@ -51,11 +51,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/homerun.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
-#include "includes/homerun.h"
+#include "speaker.h"
 
 
 /***************************************************************************

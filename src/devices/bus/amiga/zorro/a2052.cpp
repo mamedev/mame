@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A2052 = &device_creator<a2052_device>;
+const device_type A2052 = device_creator<a2052_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

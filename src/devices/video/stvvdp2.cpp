@@ -2,10 +2,6 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /* Sega Saturn VDP2 */
 
-#define DEBUG_MODE 0
-#define TEST_FUNCTIONS 0
-#define POPMESSAGE_DEBUG 0
-
 /*
 
 the dirty marking stuff and tile decoding will probably be removed in the end anyway as we'll need custom
@@ -105,7 +101,15 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
+#include "screen.h"
+
+
+#define DEBUG_MODE 0
+#define TEST_FUNCTIONS 0
+#define POPMESSAGE_DEBUG 0
+
 
 enum
 {

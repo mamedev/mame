@@ -194,6 +194,7 @@ Notes:
 #include "imagedev/chd_cd.h"
 #include "machine/terminal.h"
 #include "softlist.h"
+#include "screen.h"
 
 struct CDE_DMA
 {

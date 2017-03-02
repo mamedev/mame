@@ -21,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_PRINTER = &device_creator<cgenie_printer_device>;
+const device_type CGENIE_PRINTER = device_creator<cgenie_printer_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

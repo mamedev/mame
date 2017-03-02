@@ -14,8 +14,8 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type GENERIC_LATCH_8 = &device_creator<generic_latch_8_device>;
-const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
+const device_type GENERIC_LATCH_8 = device_creator<generic_latch_8_device>;
+const device_type GENERIC_LATCH_16 = device_creator<generic_latch_16_device>;
 
 
 //**************************************************************************

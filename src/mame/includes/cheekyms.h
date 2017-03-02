@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/dac.h"
+#include "screen.h"
 
 class cheekyms_state : public driver_device
 {

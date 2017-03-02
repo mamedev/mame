@@ -31,7 +31,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type SCREEN = &device_creator<screen_device>;
+const device_type SCREEN = device_creator<screen_device>;
+
+template class device_finder<screen_device, false>;
+template class device_finder<screen_device, true>;
 
 const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRAME_RATE));
 

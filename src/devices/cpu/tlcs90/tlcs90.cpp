@@ -21,11 +21,11 @@ static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-const device_type TMP90840 = &device_creator<tmp90840_device>;
-const device_type TMP90841 = &device_creator<tmp90841_device>;
-const device_type TMP90845 = &device_creator<tmp90845_device>;
-const device_type TMP91640 = &device_creator<tmp91640_device>;
-const device_type TMP91641 = &device_creator<tmp91641_device>;
+const device_type TMP90840 = device_creator<tmp90840_device>;
+const device_type TMP90841 = device_creator<tmp90841_device>;
+const device_type TMP90845 = device_creator<tmp90845_device>;
+const device_type TMP91640 = device_creator<tmp91640_device>;
+const device_type TMP91641 = device_creator<tmp91641_device>;
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)

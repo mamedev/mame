@@ -29,12 +29,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bladestl.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/konamipt.h"
-#include "includes/bladestl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)

@@ -27,6 +27,7 @@ PCB has a single OSC at 24MHz
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 class ertictac_state : public archimedes_state

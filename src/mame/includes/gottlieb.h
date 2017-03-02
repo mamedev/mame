@@ -11,6 +11,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
 #include "machine/ldpr8210.h"
+#include "screen.h"
 
 
 #define GOTTLIEB_VIDEO_HCOUNT   318

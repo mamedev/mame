@@ -51,8 +51,10 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class wallc_state : public driver_device

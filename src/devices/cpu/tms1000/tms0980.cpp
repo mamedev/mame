@@ -20,13 +20,13 @@
 //     TDO, SBIT, RETN, SETR, REAC, XDA, SAL, RBIT, ..., OFF, SBL, LDP, redir(------00- + R0^BL)
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
+const device_type TMS0980 = device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
 // - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
-const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
+const device_type TMS1980 = device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
 // internal memory maps

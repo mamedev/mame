@@ -1,9 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
+#ifndef MAME_INCLUDES_XBOX_H
+#define MAME_INCLUDES_XBOX_H
 
 #pragma once
 
+#include "xbox_nv2a.h"
 #include "xbox_usb.h"
+
+#include "machine/idectrl.h"
+#include "machine/pic8259.h"
+
 
 class xbox_base_state : public driver_device
 {
@@ -147,3 +154,5 @@ private:
 ADDRESS_MAP_EXTERN(xbox_base_map, 32);
 ADDRESS_MAP_EXTERN(xbox_base_map_io, 32);
 MACHINE_CONFIG_EXTERN(xbox_base);
+
+#endif // MAME_INCLUDES_XBOX_H

@@ -71,13 +71,14 @@
 
 *******************************************************************************/
 
-#define MASTER_CLOCK    XTAL_8MHz   /* guess */
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "screen.h"
+
+#define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
 
 class jokrwild_state : public driver_device

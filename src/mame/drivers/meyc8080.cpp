@@ -60,6 +60,8 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "wldarrow.lh"
 #include "mdrawpkr.lh"
@@ -70,12 +72,13 @@ class meyc8080_state : public driver_device
 {
 public:
 	meyc8080_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram_0(*this, "vram0"),
-		m_videoram_1(*this, "vram1"),
-		m_videoram_2(*this, "vram2"),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		: driver_device(mconfig, type, tag)
+		, m_videoram_0(*this, "vram0")
+		, m_videoram_1(*this, "vram1")
+		, m_videoram_2(*this, "vram2")
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram_0;
 	required_shared_ptr<uint8_t> m_videoram_1;

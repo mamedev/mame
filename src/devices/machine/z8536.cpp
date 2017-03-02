@@ -26,7 +26,7 @@
 
 
 // device type definition
-const device_type Z8536 = &device_creator<z8536_device>;
+const device_type Z8536 = device_creator<z8536_device>;
 
 
 //**************************************************************************

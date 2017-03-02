@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SUPER_EXPLODE = &device_creator<c64_super_explode_cartridge_device>;
+const device_type C64_SUPER_EXPLODE = device_creator<c64_super_explode_cartridge_device>;
 
 
 

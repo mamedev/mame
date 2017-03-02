@@ -34,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_ISKR_1030 = &device_creator<iskr_1030_keyboard_device>;
+const device_type PC_KBD_ISKR_1030 = device_creator<iskr_1030_keyboard_device>;
 
 
 //-------------------------------------------------

@@ -16,9 +16,13 @@
 #include "cpu/lc8670/lc8670.h"
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "svmu.lh"
+
 
 #define     PIXEL_SIZE          7
 #define     PIXEL_DISTANCE      1

@@ -49,7 +49,7 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
+const device_type ATARI_SOUND_COMM = device_creator<atari_sound_comm_device>;
 
 //-------------------------------------------------
 //  atari_sound_comm_device - constructor
@@ -342,7 +342,7 @@ void atari_sound_comm_device::delayed_6502_write(int data)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_VAD = &device_creator<atari_vad_device>;
+const device_type ATARI_VAD = device_creator<atari_vad_device>;
 
 //-------------------------------------------------
 //  atari_vad_device - constructor
@@ -819,8 +819,8 @@ void atari_vad_device::eof_update(emu_timer &timer)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_EEPROM_2804 = &device_creator<atari_eeprom_2804_device>;
-const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
+const device_type ATARI_EEPROM_2804 = device_creator<atari_eeprom_2804_device>;
+const device_type ATARI_EEPROM_2816 = device_creator<atari_eeprom_2816_device>;
 
 //-------------------------------------------------
 //  atari_eeprom_device - constructor

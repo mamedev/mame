@@ -14,8 +14,8 @@
 extern CPU_DISASSEMBLE(tms32082_mp);
 extern CPU_DISASSEMBLE(tms32082_pp);
 
-const device_type TMS32082_MP = &device_creator<tms32082_mp_device>;
-const device_type TMS32082_PP = &device_creator<tms32082_pp_device>;
+const device_type TMS32082_MP = device_creator<tms32082_mp_device>;
+const device_type TMS32082_PP = device_creator<tms32082_pp_device>;
 
 
 

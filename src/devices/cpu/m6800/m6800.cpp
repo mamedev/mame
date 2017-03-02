@@ -520,16 +520,16 @@ const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
 }
 
 
-const device_type M6800 = &device_creator<m6800_cpu_device>;
-const device_type M6801 = &device_creator<m6801_cpu_device>;
-const device_type M6802 = &device_creator<m6802_cpu_device>;
-const device_type M6803 = &device_creator<m6803_cpu_device>;
-const device_type M6808 = &device_creator<m6808_cpu_device>;
-const device_type HD6301 = &device_creator<hd6301_cpu_device>;
-const device_type HD63701 = &device_creator<hd63701_cpu_device>;
-const device_type NSC8105 = &device_creator<nsc8105_cpu_device>;
-const device_type HD6303R = &device_creator<hd6303r_cpu_device>;
-const device_type HD6303Y = &device_creator<hd6303y_cpu_device>;
+const device_type M6800 = device_creator<m6800_cpu_device>;
+const device_type M6801 = device_creator<m6801_cpu_device>;
+const device_type M6802 = device_creator<m6802_cpu_device>;
+const device_type M6803 = device_creator<m6803_cpu_device>;
+const device_type M6808 = device_creator<m6808_cpu_device>;
+const device_type HD6301 = device_creator<hd6301_cpu_device>;
+const device_type HD63701 = device_creator<hd63701_cpu_device>;
+const device_type NSC8105 = device_creator<nsc8105_cpu_device>;
+const device_type HD6303R = device_creator<hd6303r_cpu_device>;
+const device_type HD6303Y = device_creator<hd6303y_cpu_device>;
 
 
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

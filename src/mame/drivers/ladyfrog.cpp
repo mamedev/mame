@@ -49,9 +49,12 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/ladyfrog.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/ladyfrog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(ladyfrog_state::from_snd_r)

@@ -8,8 +8,11 @@
 
 #include "emu.h"
 #include "ide.h"
-#include "machine/idectrl.h"
+
 #include "imagedev/harddriv.h"
+#include "machine/idectrl.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(isa16_ide_device::ide16_alt_r )
 {
@@ -70,7 +73,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_IDE = &device_creator<isa16_ide_device>;
+const device_type ISA16_IDE = device_creator<isa16_ide_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

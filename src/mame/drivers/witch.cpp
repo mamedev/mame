@@ -219,20 +219,25 @@ TODO :
     - Hook up the OKI M5202
 */
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "sound/2203intf.h"
+#include "sound/es8712.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK        XTAL_12MHz
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/es8712.h"
-#include "sound/2203intf.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "machine/ticket.h"
 
 
 class witch_state : public driver_device

@@ -15,14 +15,20 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "video/apple2.h"
+
+#include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
-#include "video/apple2.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_BUS_TAG "a2bus"

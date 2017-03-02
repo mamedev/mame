@@ -167,7 +167,7 @@ enum {
 #define CONTROLLER_ADDR         0x1e    // PHI always has this address when it's a controller
 
 // Device type definition
-const device_type PHI = &device_creator<phi_device>;
+const device_type PHI = device_creator<phi_device>;
 
 // Constructors
 phi_device::phi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)

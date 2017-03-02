@@ -96,9 +96,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type Z80SIO = &device_creator<z80sio_device>;
-const device_type Z80SIO_CHANNEL = &device_creator<z80sio_channel>;
-const device_type UPD7201N = &device_creator<upd7201N_device>; // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+const device_type Z80SIO = device_creator<z80sio_device>;
+const device_type Z80SIO_CHANNEL = device_creator<z80sio_channel>;
+const device_type UPD7201N = device_creator<upd7201N_device>; // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
 
 //-------------------------------------------------
 //  device_mconfig_additions -

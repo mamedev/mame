@@ -21,14 +21,18 @@
 
 #include "emu.h"
 #include "cpu/hd61700/hd61700.h"
-#include "video/hd44352.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
-#include "rendlay.h"
+#include "video/hd44352.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 
 class pb1000_state : public driver_device
 {

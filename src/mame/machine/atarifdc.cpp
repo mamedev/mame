@@ -144,7 +144,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	//m_drv[id].image = (uint8_t*)image.image_realloc(m_drv[id].image, size);
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype returns "" :/
-	bool is_softlist_entry = image.software_entry() != nullptr;
+	bool is_softlist_entry = image.loaded_through_softlist();
 
 	/* no extension: assume XFD format (no header) */
 	if (image.is_filetype("") && !is_softlist_entry)
@@ -749,7 +749,7 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 	return nullptr;
 }
 
-const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
+const device_type ATARI_FDC = device_creator<atari_fdc_device>;
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock, "atari_fdc", __FILE__),

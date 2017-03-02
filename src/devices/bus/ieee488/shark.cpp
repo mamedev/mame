@@ -27,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SHARK = &device_creator<mshark_device>;
+const device_type SHARK = device_creator<mshark_device>;
 
 
 //-------------------------------------------------

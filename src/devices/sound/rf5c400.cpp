@@ -54,7 +54,7 @@ enum
 
 
 // device type definition
-const device_type RF5C400 = &device_creator<rf5c400_device>;
+const device_type RF5C400 = device_creator<rf5c400_device>;
 
 
 //**************************************************************************

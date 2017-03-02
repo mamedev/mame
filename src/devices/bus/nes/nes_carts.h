@@ -58,6 +58,7 @@
 #include "tengen.h"
 #include "txc.h"
 #include "waixing.h"
+#include "zemina.h"
 // misc unlicensed/bootleg/pirate PCBs
 #include "bootleg.h"
 #include "multigame.h"

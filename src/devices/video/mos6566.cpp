@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "mos6566.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -213,13 +215,13 @@ static const rgb_t PALETTE_MOS[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6566 = &device_creator<mos6566_device>;
-const device_type MOS6567 = &device_creator<mos6567_device>;
-const device_type MOS8562 = &device_creator<mos8562_device>;
-const device_type MOS8564 = &device_creator<mos8564_device>;
-const device_type MOS6569 = &device_creator<mos6569_device>;
-const device_type MOS8565 = &device_creator<mos8565_device>;
-const device_type MOS8566 = &device_creator<mos8566_device>;
+const device_type MOS6566 = device_creator<mos6566_device>;
+const device_type MOS6567 = device_creator<mos6567_device>;
+const device_type MOS8562 = device_creator<mos8562_device>;
+const device_type MOS8564 = device_creator<mos8564_device>;
+const device_type MOS6569 = device_creator<mos6569_device>;
+const device_type MOS8565 = device_creator<mos8565_device>;
+const device_type MOS8566 = device_creator<mos8566_device>;
 
 
 // default address maps

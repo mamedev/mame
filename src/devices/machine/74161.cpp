@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "74161.h"
 
-const device_type TTL74160 = &device_creator<ttl74160_device>;
-const device_type TTL74161 = &device_creator<ttl74161_device>;
-const device_type TTL74162 = &device_creator<ttl74162_device>;
-const device_type TTL74163 = &device_creator<ttl74163_device>;
+const device_type TTL74160 = device_creator<ttl74160_device>;
+const device_type TTL74161 = device_creator<ttl74161_device>;
+const device_type TTL74162 = device_creator<ttl74162_device>;
+const device_type TTL74163 = device_creator<ttl74163_device>;
 
 ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool synchronous_reset, uint8_t limit)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

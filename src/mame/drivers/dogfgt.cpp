@@ -10,9 +10,11 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/dogfgt.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(dogfgt_state::sharedram_r)

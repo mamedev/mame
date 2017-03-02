@@ -152,16 +152,19 @@
 
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
+
 #include "rendlay.h"
+#include "screen.h"
+
 
 class pitagjr_state : public driver_device
 {
 public:
 	pitagjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_rombank(*this, "rombank")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rombank(*this, "rombank")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;

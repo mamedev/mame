@@ -32,7 +32,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_PADDLE = &device_creator<sms_paddle_device>;
+const device_type SMS_PADDLE = device_creator<sms_paddle_device>;
 
 // time interval not verified
 // Player 2 of Galactic Protector is the most sensible to this timming.

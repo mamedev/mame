@@ -13,11 +13,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/srumbler.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/srumbler.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(srumbler_state::bankswitch_w)

@@ -105,9 +105,9 @@ static const uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
 static const uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 
 
-const device_type SEGA315_5124 = &device_creator<sega315_5124_device>;
-const device_type SEGA315_5246 = &device_creator<sega315_5246_device>;
-const device_type SEGA315_5378 = &device_creator<sega315_5378_device>;
+const device_type SEGA315_5124 = device_creator<sega315_5124_device>;
+const device_type SEGA315_5246 = device_creator<sega315_5246_device>;
+const device_type SEGA315_5378 = device_creator<sega315_5378_device>;
 
 
 PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)

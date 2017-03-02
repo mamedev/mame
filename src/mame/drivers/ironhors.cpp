@@ -9,12 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/ironhors.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/discrete.h"
-#include "includes/konamipt.h"
-#include "includes/ironhors.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *

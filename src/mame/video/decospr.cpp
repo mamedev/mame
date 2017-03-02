@@ -132,6 +132,7 @@ passing offs+2 which lacks the extra priority bit
 
 #include "emu.h"
 #include "decospr.h"
+#include "screen.h"
 
 DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 {
@@ -145,7 +146,7 @@ void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 //  printf("decospr_device::set_gfx_region()\n");
 }
 
-const device_type DECO_SPRITE = &device_creator<decospr_device>;
+const device_type DECO_SPRITE = device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_SPRITE, "DECO 52 Sprite", tag, owner, clock, "decospr", __FILE__),

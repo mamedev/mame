@@ -410,26 +410,30 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/sparc/sparc.h"
-#include "machine/timekpr.h"
-#include "machine/ram.h"
-#include "machine/z80scc.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
+
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
-#include "machine/timekpr.h"
+#include "cpu/sparc/sparc.h"
+#include "machine/bankdev.h"
+#include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
-#include "machine/ncr5390.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/timekpr.h"
 #include "machine/upd765.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+#include "machine/z80scc.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
+#include "screen.h"
+
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 #define SUN4_LOG_FCODES (0)
 

@@ -10,7 +10,7 @@
 #define OMTI_READ_DATA_BUFFER 0xec
 #define OMTI_ASSIGN_DISK_PARAM 0xc2
 
-const device_type OMTI5100 = &device_creator<omti5100_device>;
+const device_type OMTI5100 = device_creator<omti5100_device>;
 
 #if 0
 ROM_START( omti5100 )

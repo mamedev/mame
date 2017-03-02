@@ -3,6 +3,7 @@
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh2/sh2.h"
+#include "screen.h"
 
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
@@ -27,7 +28,7 @@ class psikyosh_state : public driver_device
 public:
 	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+		m_spriteram(*this, "spriteram") ,
 		m_bgram(*this, "bgram"),
 		m_zoomram(*this, "zoomram"),
 		m_vidregs(*this, "vidregs"),

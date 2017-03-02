@@ -12,10 +12,13 @@
 #include "emu.h"
 #include "i8244.h"
 
+#include "screen.h"
+
+
 
 // device type definition
-const device_type I8244 = &device_creator<i8244_device>;
-const device_type I8245 = &device_creator<i8245_device>;
+const device_type I8244 = device_creator<i8244_device>;
+const device_type I8245 = device_creator<i8245_device>;
 
 
 // Kevtris verified that the data below matches a dump

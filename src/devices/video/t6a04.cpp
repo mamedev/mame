@@ -15,7 +15,7 @@
 #include "video/t6a04.h"
 
 // devices
-const device_type T6A04 = &device_creator<t6a04_device>;
+const device_type T6A04 = device_creator<t6a04_device>;
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks

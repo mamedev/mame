@@ -103,10 +103,13 @@ Vsync : 60.58hz
 
 
 #include "emu.h"
+#include "includes/vastar.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/vastar.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void vastar_state::machine_start()

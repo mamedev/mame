@@ -3,10 +3,12 @@
 /* */
 
 /* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */
+#ifndef MAME_INCLUDES_K053246_K053247_K055673_H
+#define MAME_INCLUDES_K053246_K053247_K055673_H
 
 #pragma once
-#ifndef __K05324x_H__
-#define __K05324x_H__
+
+#include "screen.h"
 
 #define NORMAL_PLANE_ORDER 4
 
@@ -505,4 +507,4 @@ extern const device_type K055673;
 #define MCFG_K055673_PALETTE MCFG_GFX_PALETTE
 
 
-#endif
+#endif // MAME_INCLUDES_K053246_K053247_K055673_H

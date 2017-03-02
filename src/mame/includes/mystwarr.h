@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 
+#include "includes/konamigx.h"
+#include "video/k053246_k053247_k055673.h"
+
 #include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/k055555.h"
 #include "video/k054000.h"
-#include "video/k053246_k053247_k055673.h"
 
 class mystwarr_state : public konamigx_state
 {

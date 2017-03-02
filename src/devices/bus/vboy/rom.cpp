@@ -17,8 +17,8 @@
 //  vboy_rom_device - constructor
 //-------------------------------------------------
 
-const device_type VBOY_ROM_STD = &device_creator<vboy_rom_device>;
-const device_type VBOY_ROM_EEPROM = &device_creator<vboy_eeprom_device>;
+const device_type VBOY_ROM_STD = device_creator<vboy_rom_device>;
+const device_type VBOY_ROM_EEPROM = device_creator<vboy_eeprom_device>;
 
 
 vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

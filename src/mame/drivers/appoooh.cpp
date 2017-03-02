@@ -164,10 +164,13 @@ Language
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/appoooh.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/segacrp2_device.h"
 #include "sound/sn76496.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE_LINE_MEMBER(appoooh_state::adpcm_int)

@@ -30,9 +30,12 @@ YM2151:
 
 ***************************************************************************/
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/mustache.h"
 #include "audio/t5182.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
+
 
 #define XTAL1  14318180
 #define XTAL2  18432000

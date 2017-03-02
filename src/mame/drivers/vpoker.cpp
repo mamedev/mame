@@ -101,6 +101,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vpoker_state : public driver_device

@@ -17,12 +17,14 @@
 
 #include "emu.h"
 #include "includes/segahang.h"
+#include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 
 

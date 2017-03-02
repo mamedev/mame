@@ -10,9 +10,10 @@
 
 #pragma once
 
-#ifndef __LASERDSC_H__
-#define __LASERDSC_H__
+#ifndef MAME_DEVICES_MACHINE_LASERDSC_H
+#define MAME_DEVICES_MACHINE_LASERDSC_H
 
+#include "screen.h"
 #include "vbiparse.h"
 #include "avhuff.h"
 
@@ -412,4 +413,4 @@ inline int laserdisc_device::chapter_from_metadata(const vbi_metadata &metadata)
 }
 
 
-#endif
+#endif // MAME_DEVICES_MACHINE_LASERDSC_H

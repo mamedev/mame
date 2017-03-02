@@ -39,17 +39,20 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/microtan.h"
 
 /* Components */
-#include "sound/ay8910.h"
-#include "sound/wave.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
 
 /* Devices */
 #include "imagedev/cassette.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )

@@ -190,7 +190,7 @@ machine_config_constructor sc499_device::device_mconfig_additions() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_SC499 = &device_creator<sc499_device>;
+const device_type ISA8_SC499 = device_creator<sc499_device>;
 
 //**************************************************************************
 //  CONSTANTS
@@ -309,7 +309,7 @@ const device_type ISA8_SC499 = &device_creator<sc499_device>;
 ***************************************************************************/
 
 // device type definition
-const device_type SC499 = &device_creator<sc499_device>;
+const device_type SC499 = device_creator<sc499_device>;
 
 //-------------------------------------------------
 // sc499_device - constructor
@@ -1301,7 +1301,7 @@ void sc499_device::block_set_filemark()
 
 //##########################################################################
 
-const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
+const device_type SC499_CTAPE = device_creator<sc499_ctape_image_device>;
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock, "sc499_ctape", __FILE__),
@@ -1352,7 +1352,7 @@ void sc499_ctape_image_device::call_unload()
 {
 	m_ctape_data.resize(0);
 	// TODO: add save tape on exit?
-	//if (software_entry() == nullptr)
+	//if (!loaded_through_softlist())
 	//{
 	//    fseek(0, SEEK_SET);
 	//    fwrite(m_ctape_data, m_ctape_data.size);

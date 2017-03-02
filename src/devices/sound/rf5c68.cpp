@@ -9,7 +9,7 @@
 
 
 // device type definition
-const device_type RF5C68 = &device_creator<rf5c68_device>;
+const device_type RF5C68 = device_creator<rf5c68_device>;
 
 
 //**************************************************************************

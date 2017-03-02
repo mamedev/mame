@@ -147,12 +147,16 @@ NEP-16
 */
 
 #include "emu.h"
-#include "sound/ymz280b.h"
-#include "cpu/sh2/sh2.h"
-#include "machine/nvram.h"
-#include "video/sknsspr.h"
 #include "includes/suprnova.h"
+
+#include "cpu/sh2/sh2.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
+#include "sound/ymz280b.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 static void hit_calc_orig(uint16_t p, uint16_t s, uint16_t org, uint16_t *l, uint16_t *r)
 {

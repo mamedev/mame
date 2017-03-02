@@ -42,7 +42,7 @@ ROM_START( namco_62xx )
 ROM_END
 
 
-const device_type NAMCO_62XX = &device_creator<namco_62xx_device>;
+const device_type NAMCO_62XX = device_creator<namco_62xx_device>;
 
 namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_62XX, "Namco 62xx", tag, owner, clock, "namco62", __FILE__),

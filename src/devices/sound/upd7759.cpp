@@ -179,7 +179,7 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	{
 	}
 
-const device_type UPD7759 = &device_creator<upd7759_device>;
+const device_type UPD7759 = device_creator<upd7759_device>;
 
 upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__)
@@ -195,7 +195,7 @@ upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, 
 }
 
 
-const device_type UPD7756 = &device_creator<upd7756_device>;
+const device_type UPD7756 = device_creator<upd7756_device>;
 
 upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd775x_device(mconfig, UPD7756, "uPD7756", tag, owner, clock, "upd7756", __FILE__)

@@ -39,7 +39,7 @@ enum
 
 
 // device type definition
-const device_type CRT = &device_creator<crt_device>;
+const device_type CRT = device_creator<crt_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -41,7 +41,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K210 = &device_creator<dmv_k210_device>;
+const device_type DMV_K210 = device_creator<dmv_k210_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

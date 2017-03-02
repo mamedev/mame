@@ -423,35 +423,41 @@ test1f diagnostic hacks:
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "cpu/sh2/sh2.h"
-#include "cpu/scudsp/scudsp.h"
-#include "sound/scsp.h"
-#include "sound/cdda.h"
-#include "machine/smpc.h"
-#include "machine/nvram.h"
 #include "includes/saturn.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/scudsp/scudsp.h"
+#include "cpu/sh2/sh2.h"
 #include "imagedev/chd_cd.h"
-#include "coreutil.h"
+#include "machine/eepromser.h"
+#include "machine/nvram.h"
+#include "machine/smpc.h"
+#include "machine/stvcd.h"
+#include "sound/cdda.h"
+#include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
-#include "machine/stvcd.h"
 
-#include "bus/saturn/sat_slot.h"
-#include "bus/saturn/rom.h"
-#include "bus/saturn/dram.h"
 #include "bus/saturn/bram.h"
+#include "bus/saturn/dram.h"
+#include "bus/saturn/rom.h"
+#include "bus/saturn/sat_slot.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 
 class sat_console_state : public saturn_state
 {
 public:
 	sat_console_state(const machine_config &mconfig, device_type type, const char *tag)
-				: saturn_state(mconfig, type, tag)
-				, m_exp(*this, "exp")
-				, m_nvram(*this, "nvram")
-				, m_smpc_nv(*this, "smpc_nv")
+		: saturn_state(mconfig, type, tag)
+		, m_exp(*this, "exp")
+		, m_nvram(*this, "nvram")
+		, m_smpc_nv(*this, "smpc_nv")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);

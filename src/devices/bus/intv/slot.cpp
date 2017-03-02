@@ -86,7 +86,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
+const device_type INTV_CART_SLOT = device_creator<intv_cart_slot_device>;
 
 //**************************************************************************
 //    Intellivision Cartridges Interface
@@ -391,7 +391,7 @@ image_init_result intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			return load_fullpath();
 		else
 		{

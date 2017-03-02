@@ -44,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CS4031 = &device_creator<cs4031_device>;
+const device_type CS4031 = device_creator<cs4031_device>;
 
 const char* cs4031_device::m_register_names[] =
 {

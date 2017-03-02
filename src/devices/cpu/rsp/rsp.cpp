@@ -14,7 +14,7 @@
 #include "rspcp2d.h"
 
 
-const device_type RSP = &device_creator<rsp_device>;
+const device_type RSP = device_creator<rsp_device>;
 
 
 #define LOG_INSTRUCTION_EXECUTION       0

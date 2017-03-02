@@ -47,6 +47,7 @@
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "speaker.h"
 
 // the layouts are very similar to eachother
 #include "newufo.lh"

@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K051960_H
+#define MAME_VIDEO_K051960_H
+
 #pragma once
-#ifndef __K051960_H__
-#define __K051960_H__
+
+#include "screen.h"
 
 enum
 {
@@ -110,4 +113,4 @@ private:
 
 extern const device_type K051960;
 
-#endif
+#endif // MAME_VIDEO_K051960_H

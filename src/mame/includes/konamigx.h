@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
+#ifndef MAME_INCLUDES_KONAMIGX_H
+#define MAME_INCLUDES_KONAMIGX_H
+
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
@@ -10,6 +13,7 @@
 #include "video/k055555.h"
 #include "video/k054338.h"
 #include "video/k053936.h"
+#include "screen.h"
 
 class konamigx_state : public driver_device
 {
@@ -300,3 +304,5 @@ public:
 #define GXSUB_4BPP      0x04    //  16 colors
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
+
+#endif // MAME_INCLUDES_KONAMIGX_H

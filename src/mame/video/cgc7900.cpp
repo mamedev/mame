@@ -2,6 +2,7 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/cgc7900.h"
+#include "screen.h"
 
 /***************************************************************************
     PARAMETERS

@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "ncr5380n.h"
 
-const device_type NCR5380N = &device_creator<ncr5380n_device>;
+const device_type NCR5380N = device_creator<ncr5380n_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(scsidata_r, outdata_w)

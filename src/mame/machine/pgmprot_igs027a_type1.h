@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
+#include "includes/pgm.h"
 
 class pgm_arm_type1_state : public pgm_state
 {
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_arm7_shareram(*this, "arm7_shareram"),
-			m_prot(*this, "prot") {
+		: pgm_state(mconfig, type, tag)
+		, m_arm7_shareram(*this, "arm7_shareram")
+		, m_prot(*this, "prot")
+	{
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
 	}

@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // device type definition
-const device_type AT28C16 = &device_creator<at28c16_device>;
+const device_type AT28C16 = device_creator<at28c16_device>;
 
 //-------------------------------------------------
 //  at28c16_device - constructor

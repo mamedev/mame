@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_SUPERSCOPE = &device_creator<snes_sscope_device>;
+const device_type SNES_SUPERSCOPE = device_creator<snes_sscope_device>;
 
 
 static INPUT_PORTS_START( snes_sscope )

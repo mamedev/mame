@@ -757,10 +757,10 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 }
 
 /***************************************************************************/
-const device_type PERIBOX = &device_creator<peribox_device>;
-const device_type PERIBOX_SLOT = &device_creator<peribox_slot_device>;
+const device_type PERIBOX = device_creator<peribox_device>;
+const device_type PERIBOX_SLOT = device_creator<peribox_slot_device>;
 
-const device_type PERIBOX_EV = &device_creator<peribox_ev_device>;
-const device_type PERIBOX_SG = &device_creator<peribox_sg_device>;
-const device_type PERIBOX_GEN = &device_creator<peribox_gen_device>;
-const device_type PERIBOX_998 = &device_creator<peribox_998_device>;
+const device_type PERIBOX_EV = device_creator<peribox_ev_device>;
+const device_type PERIBOX_SG = device_creator<peribox_sg_device>;
+const device_type PERIBOX_GEN = device_creator<peribox_gen_device>;
+const device_type PERIBOX_998 = device_creator<peribox_998_device>;

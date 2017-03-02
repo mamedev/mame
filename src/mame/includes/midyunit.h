@@ -7,9 +7,10 @@
 
 **************************************************************************/
 
-#include "machine/gen_latch.h"
-#include "cpu/tms34010/tms34010.h"
 #include "audio/williams.h"
+
+#include "cpu/tms34010/tms34010.h"
+#include "machine/gen_latch.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"

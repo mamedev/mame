@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HPC102 = &device_creator<hpc102_t>;
+const device_type HPC102 = device_creator<hpc102_t>;
 
 
 //-------------------------------------------------

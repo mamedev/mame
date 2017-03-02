@@ -89,7 +89,7 @@
 
 
 // device type definition
-const device_type L7A1045 = &device_creator<l7a1045_sound_device>;
+const device_type L7A1045 = device_creator<l7a1045_sound_device>;
 
 
 //**************************************************************************

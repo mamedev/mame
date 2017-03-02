@@ -81,15 +81,19 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/tms9928a.h"
-#include "sound/sn76496.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "sound/sn76496.h"
 #include "sound/wave.h"
+#include "video/tms9928a.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 class pencil2_state : public driver_device
 {

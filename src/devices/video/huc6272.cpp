@@ -20,7 +20,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type huc6272 = &device_creator<huc6272_device>;
+const device_type huc6272 = device_creator<huc6272_device>;
 
 static ADDRESS_MAP_START( microprg_map, AS_PROGRAM, 16, huc6272_device )
 	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")

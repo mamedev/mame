@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "nubus_wsportrait.h"
+#include "screen.h"
 
 #define WSPORTRAIT_SCREEN_NAME  "wsport_screen"
 #define WSPORTRAIT_ROM_REGION  "wsport_rom"
@@ -38,7 +39,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_WSPORTRAIT = &device_creator<nubus_wsportrait_device>;
+const device_type NUBUS_WSPORTRAIT = device_creator<nubus_wsportrait_device>;
 
 
 //-------------------------------------------------

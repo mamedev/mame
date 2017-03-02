@@ -7,13 +7,14 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+#include "cage.h"
+#include "cpu/tms32031/tms32031.h"
+#include "speaker.h"
+
+
 #define LOG_COMM            (0)
 #define LOG_32031_IOPORTS   (0)
-
-
-#include "emu.h"
-#include "cpu/tms32031/tms32031.h"
-#include "cage.h"
 
 
 
@@ -105,7 +106,7 @@ static const char *const register_names[] =
  *
  *************************************/
 
-const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
+const device_type ATARI_CAGE = device_creator<atari_cage_device>;
 
 
 //-------------------------------------------------
@@ -683,7 +684,7 @@ machine_config_constructor atari_cage_device::device_mconfig_additions() const
 }
 
 
-const device_type ATARI_CAGE_SEATTLE = &device_creator<atari_cage_seattle_device>;
+const device_type ATARI_CAGE_SEATTLE = device_creator<atari_cage_seattle_device>;
 
 
 //-------------------------------------------------

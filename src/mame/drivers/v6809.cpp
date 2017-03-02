@@ -52,13 +52,16 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
-#include "machine/clock.h"
-#include "video/mc6845.h"
 #include "machine/6850acia.h"
-#include "machine/mm58274c.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "sound/speaker.h"
+#include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class v6809_state : public driver_device
 {

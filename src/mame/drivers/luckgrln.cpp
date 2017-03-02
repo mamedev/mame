@@ -82,6 +82,9 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "luckgrln.lh"
 
 

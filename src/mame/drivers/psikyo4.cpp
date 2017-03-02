@@ -131,7 +131,10 @@ ROMs -
 
 #include "emu.h"
 #include "includes/psikyo4.h"
+
 #include "rendlay.h"
+#include "speaker.h"
+
 
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 

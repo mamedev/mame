@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "naomirom.h"
 
-const device_type NAOMI_ROM_BOARD = &device_creator<naomi_rom_board>;
+const device_type NAOMI_ROM_BOARD = device_creator<naomi_rom_board>;
 
 naomi_rom_board::naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_ROM_BOARD, "Sega NAOMI ROM Board", tag, owner, clock, "naomi_rom_board", __FILE__),

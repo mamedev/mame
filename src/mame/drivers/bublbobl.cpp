@@ -274,12 +274,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/bublbobl.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/bublbobl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_XTAL   XTAL_24MHz

@@ -299,7 +299,10 @@ void mame_machine_manager::create_custom(running_machine& machine)
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
+}
 
+void mame_machine_manager::load_cheatfiles(running_machine& machine)
+{
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }

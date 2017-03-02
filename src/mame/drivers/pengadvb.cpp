@@ -30,6 +30,8 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pengadvb_state : public driver_device

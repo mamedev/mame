@@ -190,17 +190,20 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 
 ***************************************************************************/
 
-//#define USE_MCU
-
-
 #include "emu.h"
 #include "includes/nycaptor.h"
+#include "includes/taitoipt.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+//#define USE_MCU
 
 
 WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)

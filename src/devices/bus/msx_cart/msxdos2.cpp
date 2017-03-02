@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "msxdos2.h"
 
-const device_type MSX_CART_MSXDOS2 = &device_creator<msx_cart_msxdos2>;
+const device_type MSX_CART_MSXDOS2 = device_creator<msx_cart_msxdos2>;
 
 
 msx_cart_msxdos2::msx_cart_msxdos2(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

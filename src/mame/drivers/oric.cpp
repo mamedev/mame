@@ -20,18 +20,24 @@
 *********************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/oricext/oricext.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/floppy.h"
-#include "imagedev/cassette.h"
 #include "machine/wd_fdc.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
+
 
 class oric_state : public driver_device
 {

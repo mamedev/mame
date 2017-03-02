@@ -133,4 +133,4 @@ void sams_memory_expansion_device::device_reset()
 	for (auto & elem : m_mapper) elem = 0;
 }
 
-const device_type TI99_SAMSMEM = &device_creator<sams_memory_expansion_device>;
+const device_type TI99_SAMSMEM = device_creator<sams_memory_expansion_device>;

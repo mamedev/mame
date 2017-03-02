@@ -14,11 +14,12 @@
 #include "emu.h"
 #include "includes/alesis.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define LOG 1
 
 // device type definition
-const device_type ALESIS_DM3AG = &device_creator<alesis_dm3ag_device>;
+const device_type ALESIS_DM3AG = device_creator<alesis_dm3ag_device>;
 
 /***************************************************************************
     IMPLEMENTATION

@@ -17,7 +17,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 // device type definition
-const device_type CASSETTE = &device_creator<cassette_image_device>;
+const device_type CASSETTE = device_creator<cassette_image_device>;
 
 //-------------------------------------------------
 //  cassette_image_device - constructor

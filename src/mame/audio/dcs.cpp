@@ -154,6 +154,7 @@
 
 #include "emu.h"
 #include "dcs.h"
+#include "speaker.h"
 
 
 #define LOG_DCS_TRANSFERS           (0)
@@ -2487,7 +2488,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	return result;
 }
 
-const device_type DCS_AUDIO_2K = &device_creator<dcs_audio_2k_device>;
+const device_type DCS_AUDIO_2K = device_creator<dcs_audio_2k_device>;
 
 //-------------------------------------------------
 //  dcs_audio_2k_device - constructor
@@ -2503,7 +2504,7 @@ machine_config_constructor dcs_audio_2k_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( dcs_audio_2k );
 }
 
-const device_type DCS_AUDIO_2K_UART = &device_creator<dcs_audio_2k_uart_device>;
+const device_type DCS_AUDIO_2K_UART = device_creator<dcs_audio_2k_uart_device>;
 
 //-------------------------------------------------
 //  dcs_audio_2k_uart_device - constructor
@@ -2519,7 +2520,7 @@ machine_config_constructor dcs_audio_2k_uart_device::device_mconfig_additions() 
 	return MACHINE_CONFIG_NAME( dcs_audio_2k_uart );
 }
 
-const device_type DCS_AUDIO_8K = &device_creator<dcs_audio_8k_device>;
+const device_type DCS_AUDIO_8K = device_creator<dcs_audio_8k_device>;
 
 //-------------------------------------------------
 //  dcs_audio_8k_device - constructor
@@ -2535,7 +2536,7 @@ machine_config_constructor dcs_audio_8k_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( dcs_audio_8k );
 }
 
-const device_type DCS_AUDIO_WPC = &device_creator<dcs_audio_wpc_device>;
+const device_type DCS_AUDIO_WPC = device_creator<dcs_audio_wpc_device>;
 
 //-------------------------------------------------
 //  dcs_audio_wpc_device - constructor
@@ -2563,7 +2564,7 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 }
 
 
-const device_type DCS2_AUDIO_2115 = &device_creator<dcs2_audio_2115_device>;
+const device_type DCS2_AUDIO_2115 = device_creator<dcs2_audio_2115_device>;
 
 //-------------------------------------------------
 //  dcs2_audio_2115_device - constructor
@@ -2579,7 +2580,7 @@ machine_config_constructor dcs2_audio_2115_device::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( dcs2_audio_2115 );
 }
 
-const device_type DCS2_AUDIO_2104 = &device_creator<dcs2_audio_2104_device>;
+const device_type DCS2_AUDIO_2104 = device_creator<dcs2_audio_2104_device>;
 
 //-------------------------------------------------
 //  dcs2_audio_2104_device - constructor
@@ -2596,7 +2597,7 @@ machine_config_constructor dcs2_audio_2104_device::device_mconfig_additions() co
 }
 
 
-const device_type DCS2_AUDIO_DSIO = &device_creator<dcs2_audio_dsio_device>;
+const device_type DCS2_AUDIO_DSIO = device_creator<dcs2_audio_dsio_device>;
 
 //-------------------------------------------------
 //  dcs2_audio_dsio_device - constructor
@@ -2612,7 +2613,7 @@ machine_config_constructor dcs2_audio_dsio_device::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( dcs2_audio_dsio );
 }
 
-const device_type DCS2_AUDIO_DENVER = &device_creator<dcs2_audio_denver_device>;
+const device_type DCS2_AUDIO_DENVER = device_creator<dcs2_audio_denver_device>;
 
 //-------------------------------------------------
 //  dcs2_audio_denver_device - constructor

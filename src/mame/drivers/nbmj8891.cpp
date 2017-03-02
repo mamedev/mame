@@ -42,12 +42,14 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8891.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)

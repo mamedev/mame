@@ -408,7 +408,7 @@ void SDD1_emu::SDD1emu_decompress(uint8_t *ROM, uint32_t *mmc, uint32_t in_buf, 
 //  sns_rom_sdd1_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SDD1 = &device_creator<sns_rom_sdd1_device>;
+const device_type SNS_LOROM_SDD1 = device_creator<sns_rom_sdd1_device>;
 
 
 sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

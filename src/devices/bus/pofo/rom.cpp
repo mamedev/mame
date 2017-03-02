@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PORTFOLIO_ROM_CARD = &device_creator<portfolio_rom_card_t>;
+const device_type PORTFOLIO_ROM_CARD = device_creator<portfolio_rom_card_t>;
 
 
 //**************************************************************************

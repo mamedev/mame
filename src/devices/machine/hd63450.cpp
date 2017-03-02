@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "hd63450.h"
 
-const device_type HD63450 = &device_creator<hd63450_device>;
+const device_type HD63450 = device_creator<hd63450_device>;
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock, "hd63450", __FILE__),

@@ -124,7 +124,7 @@ actually used, since the priority is taken from the external ports.
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K053251 = &device_creator<k053251_device>;
+const device_type K053251 = device_creator<k053251_device>;
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053251, "K053251 Priority Encoder", tag, owner, clock, "k053251", __FILE__),

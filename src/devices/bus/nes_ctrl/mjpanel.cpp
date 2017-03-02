@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_MJPANEL = &device_creator<nes_mjpanel_device>;
+const device_type NES_MJPANEL = device_creator<nes_mjpanel_device>;
 
 
 static INPUT_PORTS_START( nes_mjpanel )

@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPC1000_EXP_SLOT = &device_creator<spc1000_exp_device>;
+const device_type SPC1000_EXP_SLOT = device_creator<spc1000_exp_device>;
 
 
 device_spc1000_card_interface::device_spc1000_card_interface(const machine_config &mconfig, device_t &device)

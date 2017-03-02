@@ -19,10 +19,14 @@
 
 #include "emu.h"
 #include "includes/advision.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Memory Maps */
 

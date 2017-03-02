@@ -13,7 +13,7 @@
 #include "unsp.h"
 
 
-const device_type UNSP = &device_creator<unsp_device>;
+const device_type UNSP = device_creator<unsp_device>;
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

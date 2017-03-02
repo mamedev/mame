@@ -69,17 +69,18 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 Dip locations and factory settings verified with China Gate US manual.
 */
 
-
-
 #include "emu.h"
+#include "includes/ddragon.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/ym2151.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/ddragon.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK      XTAL_12MHz
 #define PIXEL_CLOCK     MAIN_CLOCK / 2

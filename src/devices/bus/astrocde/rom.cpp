@@ -17,9 +17,9 @@
 //  astrocade_rom_device - constructor
 //-------------------------------------------------
 
-const device_type ASTROCADE_ROM_STD = &device_creator<astrocade_rom_device>;
-const device_type ASTROCADE_ROM_256K = &device_creator<astrocade_rom_256k_device>;
-const device_type ASTROCADE_ROM_512K = &device_creator<astrocade_rom_512k_device>;
+const device_type ASTROCADE_ROM_STD = device_creator<astrocade_rom_device>;
+const device_type ASTROCADE_ROM_256K = device_creator<astrocade_rom_256k_device>;
+const device_type ASTROCADE_ROM_512K = device_creator<astrocade_rom_512k_device>;
 
 
 astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

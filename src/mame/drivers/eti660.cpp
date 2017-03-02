@@ -38,6 +38,8 @@
 
 #include "emu.h"
 #include "includes/eti660.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 

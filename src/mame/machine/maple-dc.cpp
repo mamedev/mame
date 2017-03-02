@@ -5,7 +5,7 @@
 #include "maple-dc.h"
 #include "mie.h"
 
-const device_type MAPLE_DC = &device_creator<maple_dc_device>;
+const device_type MAPLE_DC = device_creator<maple_dc_device>;
 
 DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)

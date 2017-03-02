@@ -127,16 +127,19 @@
 
 ==================================================================================*/
 
-#define MASTER_CLOCK    XTAL_14MHz
-#define CPU_CLOCK      (MASTER_CLOCK/4)
-#define SND_CLOCK      (MASTER_CLOCK/8)
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_14MHz
+#define CPU_CLOCK      (MASTER_CLOCK/4)
+#define SND_CLOCK      (MASTER_CLOCK/8)
 
 
 class coinmstr_state : public driver_device

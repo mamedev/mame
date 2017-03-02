@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISBC_218A = &device_creator<isbc_218a_device>;
+const device_type ISBC_218A = device_creator<isbc_218a_device>;
 
 
 //-------------------------------------------------

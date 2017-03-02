@@ -27,6 +27,7 @@ Chess 2001:
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "cxg_ch2001.lh" // clickable

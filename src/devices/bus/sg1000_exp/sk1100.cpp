@@ -27,7 +27,7 @@ TODO:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SEGA_SK1100 = &device_creator<sega_sk1100_device>;
+const device_type SEGA_SK1100 = device_creator<sega_sk1100_device>;
 
 
 /*-------------------------------------------------

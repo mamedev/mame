@@ -19,7 +19,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
+const device_type ISA8_VGA = device_creator<isa8_vga_device>;
 
 
 //-------------------------------------------------

@@ -18,11 +18,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
 #include "machine/i8251.h"
-#include "sound/speaker.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 class irisha_state : public driver_device
 {

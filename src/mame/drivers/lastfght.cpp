@@ -67,6 +67,8 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
+#include "screen.h"
+
 
 class lastfght_state : public driver_device
 {

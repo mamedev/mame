@@ -25,17 +25,23 @@
 ********************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+//#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
-#include "formats/xdf_dsk.h"
-//#include "machine/upd71071.h"
-#include "machine/am9517a.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/xdf_dsk.h"
+
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0
@@ -1912,6 +1918,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA3", MACHINE_NOT_WORKING )
+COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "NEC",  "PC-88VA3", MACHINE_NOT_WORKING )

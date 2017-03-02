@@ -5,7 +5,10 @@
 #include "emu.h"
 #include "ssi2001.h"
 
-const device_type ISA8_SSI2001 = &device_creator<ssi2001_device>;
+#include "speaker.h"
+
+
+const device_type ISA8_SSI2001 = device_creator<ssi2001_device>;
 
 static MACHINE_CONFIG_FRAGMENT( ssi2001 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")

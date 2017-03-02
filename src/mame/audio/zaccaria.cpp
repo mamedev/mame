@@ -13,8 +13,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-device_type const ZACCARIA_1B11107 = &device_creator<zac1b11107_audio_device>;
-device_type const ZACCARIA_1B11142 = &device_creator<zac1b11142_audio_device>;
+device_type const ZACCARIA_1B11107 = device_creator<zac1b11107_audio_device>;
+device_type const ZACCARIA_1B11142 = device_creator<zac1b11142_audio_device>;
 
 
 

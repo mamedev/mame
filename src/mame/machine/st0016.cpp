@@ -4,8 +4,10 @@
 
 #include "emu.h"
 #include "st0016.h"
+#include "speaker.h"
 
-const device_type ST0016_CPU = &device_creator<st0016_cpu_device>;
+
+const device_type ST0016_CPU = device_creator<st0016_cpu_device>;
 
 static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_device)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)

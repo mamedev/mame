@@ -14,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_BUS = &device_creator<s100_bus_t>;
-const device_type S100_SLOT = &device_creator<s100_slot_t>;
+const device_type S100_BUS = device_creator<s100_bus_t>;
+const device_type S100_SLOT = device_creator<s100_slot_t>;
 
 
 

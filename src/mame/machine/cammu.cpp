@@ -39,9 +39,9 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
 	AM_RANGE(0x000, 0xfff) AM_READWRITE(cammu_r, cammu_w)
 ADDRESS_MAP_END
 
-const device_type CAMMU_C4T = &device_creator<cammu_c4t_device>;
-const device_type CAMMU_C4I = &device_creator<cammu_c4i_device>;
-const device_type CAMMU_C3 = &device_creator<cammu_c3_device>;
+const device_type CAMMU_C4T = device_creator<cammu_c4t_device>;
+const device_type CAMMU_C4I = device_creator<cammu_c4i_device>;
+const device_type CAMMU_C3 = device_creator<cammu_c3_device>;
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cammu_device(mconfig, CAMMU_C4T, "C4E/C4T CAMMU", tag, owner, clock, "C4T", __FILE__) { }

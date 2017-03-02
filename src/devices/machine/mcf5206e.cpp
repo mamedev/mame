@@ -822,7 +822,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
 //**************************************************************************
 
 // device type definition
-const device_type MCF5206E_PERIPHERAL = &device_creator<mcf5206e_peripheral_device>;
+const device_type MCF5206E_PERIPHERAL = device_creator<mcf5206e_peripheral_device>;
 
 //-------------------------------------------------
 //  mcf5206e_peripheral_device - constructor

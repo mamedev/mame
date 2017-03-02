@@ -174,10 +174,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/n64.h"
+
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class aleck64_state : public n64_state
 {

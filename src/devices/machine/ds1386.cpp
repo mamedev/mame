@@ -27,8 +27,8 @@
 #define HOURS_12_24     (0x40)
 #define HOURS_AM_PM     (0x20)
 
-const device_type DS1386_8K = &device_creator<ds1386_8k_device>;
-const device_type DS1386_32K = &device_creator<ds1386_32k_device>;
+const device_type DS1386_8K = device_creator<ds1386_8k_device>;
+const device_type DS1386_32K = device_creator<ds1386_32k_device>;
 
 ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

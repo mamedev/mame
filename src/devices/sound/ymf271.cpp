@@ -1744,7 +1744,7 @@ void ymf271_device::device_reset()
 		m_irq_handler(0);
 }
 
-const device_type YMF271 = &device_creator<ymf271_device>;
+const device_type YMF271 = device_creator<ymf271_device>;
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__)

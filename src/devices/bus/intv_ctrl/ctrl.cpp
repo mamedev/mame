@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CONTROL_PORT = &device_creator<intv_control_port_device>;
+const device_type INTV_CONTROL_PORT = device_creator<intv_control_port_device>;
 
 
 //**************************************************************************

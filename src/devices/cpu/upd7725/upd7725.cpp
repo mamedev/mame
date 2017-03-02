@@ -21,8 +21,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type UPD7725 = &device_creator<upd7725_device>;
-const device_type UPD96050 = &device_creator<upd96050_device>;
+const device_type UPD7725 = device_creator<upd7725_device>;
+const device_type UPD96050 = device_creator<upd96050_device>;
 
 necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),

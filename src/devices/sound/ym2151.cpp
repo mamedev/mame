@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ym2151.h"
 
-const device_type YM2151 = &device_creator<ym2151_device>;
+const device_type YM2151 = device_creator<ym2151_device>;
 
 
 #define FREQ_SH         16  /* 16.16 fixed point (frequency calculations) */

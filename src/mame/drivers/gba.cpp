@@ -12,12 +12,15 @@
 
 #include "emu.h"
 #include "includes/gba.h"
+
 #include "bus/gba/rom.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Sound Registers */
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */

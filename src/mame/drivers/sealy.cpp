@@ -27,12 +27,14 @@ Notes:
 
 ***************************************************************************/
 
-// 13.0 MHz? PCB is labeled with 13.5M
-#define MAIN_CLOCK  13000000
-
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+// 13.0 MHz? PCB is labeled with 13.5M
+#define MAIN_CLOCK  13000000
 
 class sealy_state : public driver_device
 {

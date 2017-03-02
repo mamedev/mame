@@ -42,7 +42,7 @@ machine_config_constructor spc1000_vdp_exp_device::device_mconfig_additions() co
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPC1000_VDP_EXP = &device_creator<spc1000_vdp_exp_device>;
+const device_type SPC1000_VDP_EXP = device_creator<spc1000_vdp_exp_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

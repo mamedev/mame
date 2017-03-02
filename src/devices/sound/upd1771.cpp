@@ -230,7 +230,7 @@ static unsigned char noise_tbl[]=
 #define STATE_ADPCM   3
 
 
-const device_type UPD1771C = &device_creator<upd1771c_device>;
+const device_type UPD1771C = device_creator<upd1771c_device>;
 
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

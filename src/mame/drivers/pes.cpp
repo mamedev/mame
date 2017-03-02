@@ -53,17 +53,20 @@ Address map:
   port 3.7: write, /RD (general) and /OE (pin 22) for unpopulated 6164 SRAM
 
 */
+#include "emu.h"
+#include "includes/pes.h"
+
+#include "cpu/mcs51/mcs51.h"
+#include "sound/tms5220.h"
+#include "speaker.h"
+
+
 #define CPU_CLOCK       XTAL_10_245MHz
 
 #undef DEBUG_FIFO
 #undef DEBUG_SERIAL_CB
 #undef DEBUG_PORTS
 
-/* Core includes */
-#include "emu.h"
-#include "includes/pes.h"
-#include "cpu/mcs51/mcs51.h"
-#include "sound/tms5220.h"
 
 /* Devices */
 WRITE8_MEMBER(pes_state::pes_kbd_input)

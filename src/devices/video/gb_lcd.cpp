@@ -158,6 +158,9 @@ TODO:
 #include "emu.h"
 #include "video/gb_lcd.h"
 
+#include "screen.h"
+
+
 #define ENABLE_LOGGING 0
 #define LOG(x) do { if (ENABLE_LOGGING) logerror x; } while(0)
 
@@ -309,10 +312,10 @@ static const uint8_t ags_oam_fingerprint[0x100] = {
 #endif
 
 
-const device_type DMG_PPU = &device_creator<dmg_ppu_device>;
-const device_type MGB_PPU = &device_creator<mgb_ppu_device>;
-const device_type SGB_PPU = &device_creator<sgb_ppu_device>;
-const device_type CGB_PPU = &device_creator<cgb_ppu_device>;
+const device_type DMG_PPU = device_creator<dmg_ppu_device>;
+const device_type MGB_PPU = device_creator<mgb_ppu_device>;
+const device_type SGB_PPU = device_creator<sgb_ppu_device>;
+const device_type CGB_PPU = device_creator<cgb_ppu_device>;
 
 
 

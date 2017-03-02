@@ -12,13 +12,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
-#include "video/i8244.h"
 #include "machine/i8243.h"
 #include "video/ef9340_1.h"
+#include "video/i8244.h"
 
 #include "bus/odyssey2/slot.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class odyssey2_state : public driver_device
 {

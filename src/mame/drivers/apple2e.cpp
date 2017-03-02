@@ -97,23 +97,20 @@ Address bus A0-A11 is Y0-Y11
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/bankdev.h"
-#include "machine/ram.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "formats/ap2_dsk.h"
+#include "video/apple2.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "formats/ap_dsk35.h"
-#include "machine/sonydriv.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/appldriv.h"
-#include "bus/rs232/rs232.h"
+#include "machine/bankdev.h"
+#include "machine/kb3600.h"
 #include "machine/mos6551.h"
-#include "video/apple2.h"
+#include "machine/ram.h"
+#include "machine/sonydriv.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2diskii.h"
@@ -150,7 +147,15 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
 
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap2_dsk.h"
+#include "formats/ap_dsk35.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -365,6 +370,7 @@ private:
 	bool m_altzp;
 	bool m_ramrd, m_ramwrt;
 	bool m_lcram, m_lcram2, m_lcwriteenable;
+	int m_last_offset, m_last_access;
 	bool m_ioudis;
 	bool m_romswitch;
 	bool m_mockingboard4c;
@@ -395,7 +401,7 @@ private:
 	void do_io(address_space &space, int offset, bool is_iic);
 	uint8_t read_floatingbus();
 	void update_slotrom_banks();
-	void lc_update(int offset);
+	void lc_update(int offset, int access);
 	uint8_t read_slot_rom(address_space &space, int slotbias, int offset);
 	void write_slot_rom(address_space &space, int slotbias, int offset, uint8_t data);
 	uint8_t read_int_rom(address_space &space, int slotbias, int offset);
@@ -696,6 +702,8 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_lcram));
 	save_item(NAME(m_lcram2));
 	save_item(NAME(m_lcwriteenable));
+	save_item(NAME(m_last_offset));
+	save_item(NAME(m_last_access));
 	save_item(NAME(m_mockingboard4c));
 }
 
@@ -750,11 +758,13 @@ void apple2e_state::machine_reset()
 	m_lcram = false;
 	m_lcram2 = true;
 	m_lcwriteenable = true;
+	m_last_offset = -1;
+	m_last_access = 0;
 
 	m_exp_bankhior = 0xf0;
 
 	// sync up the banking with the variables.
-	// RESEARCH: how does RESET affect LC state and aux banking states?
+	// Understanding the Apple IIe: RESET on the IIe always resets LC state, doesn't on II/II+ with discrete LC
 	auxbank_update();
 	update_slotrom_banks();
 }
@@ -999,33 +1009,48 @@ void apple2e_state::update_slotrom_banks()
 	}
 }
 
-void apple2e_state::lc_update(int offset)
+void apple2e_state::lc_update(int offset, int access)
 {
-	bool m_last_lcram = m_lcram;
+	bool old_lcram = m_lcram;
 
 	m_lcram = false;
-	m_lcram2 = false;
 	m_lcwriteenable = false;
 
-	if (offset & 1)
+	switch (offset & 3)
 	{
-		m_lcwriteenable = true;
-	}
-
-	switch(offset & 0x03)
-	{
-		case 0x00:
-		case 0x03:
+		case 0:
+		{
 			m_lcram = true;
 			break;
+		}
+
+		case 3:
+		{
+			m_lcram = true;
+		} //fall through
+
+		case 1:
+		{
+			//if accessed twice, then write-enable
+			if (((m_last_offset & 1) == 1) && (access == m_last_access))
+			{
+				m_lcwriteenable = true;
+			}
+
+			break;
+		}
 	}
+
+	m_last_offset = offset;
+	m_last_access = access;
+	m_lcram2 = false;
 
 	if (!(offset & 8))
 	{
 		m_lcram2 = true;
 	}
 
-	if (m_lcram != m_last_lcram)
+	if (m_lcram != old_lcram)
 	{
 		if (m_lcram)
 		{
@@ -1837,7 +1862,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 
 		if (slot == 0)
 		{
-			lc_update(offset & 0xf);
+			lc_update(offset & 0xf, 0);
 		}
 		else
 		{
@@ -1860,7 +1885,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 
 	if (slot == 0)
 	{
-		lc_update(offset & 0xf);
+		lc_update(offset & 0xf, 1);
 	}
 	else
 	{

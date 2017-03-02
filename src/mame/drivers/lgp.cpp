@@ -67,8 +67,9 @@ Dumping Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "machine/ldv1000.h"
+#include "render.h"
+#include "speaker.h"
 
 
 class lgp_state : public driver_device

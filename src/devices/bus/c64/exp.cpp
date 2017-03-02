@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device>;
+const device_type C64_EXPANSION_SLOT = device_creator<c64_expansion_slot_device>;
 
 
 
@@ -120,7 +120,7 @@ image_init_result c64_expansion_slot_device::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 

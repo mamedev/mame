@@ -10,9 +10,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "machine/nvram.h"
 #include "machine/i8255.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK XTAL_10MHz
 
@@ -25,7 +27,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_i8255(*this, "i8255"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;

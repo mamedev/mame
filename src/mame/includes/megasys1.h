@@ -11,6 +11,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
+#include "screen.h"
 
 
 class megasys1_state : public driver_device

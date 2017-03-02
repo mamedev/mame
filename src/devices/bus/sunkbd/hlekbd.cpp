@@ -4,6 +4,7 @@
 #include "hlekbd.h"
 
 #include "machine/keyboard.ipp"
+#include "speaker.h"
 
 
 /*
@@ -135,12 +136,12 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-device_type const SUN_TYPE3_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type3_device>;
-device_type const SUN_TYPE4_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type4_device>;
-device_type const SUN_TYPE5_HLE_KEYBOARD    = &device_creator<bus::sunkbd::hle_type5_device>;
-device_type const SUN_TYPE5_GB_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_gb_device>;
-device_type const SUN_TYPE5_SE_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_se_device>;
-device_type const SUN_TYPE5_JP_HLE_KEYBOARD = &device_creator<bus::sunkbd::hle_type5_jp_device>;
+device_type const SUN_TYPE3_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type3_device>;
+device_type const SUN_TYPE4_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type4_device>;
+device_type const SUN_TYPE5_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type5_device>;
+device_type const SUN_TYPE5_GB_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_gb_device>;
+device_type const SUN_TYPE5_SE_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_se_device>;
+device_type const SUN_TYPE5_JP_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_jp_device>;
 
 
 

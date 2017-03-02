@@ -38,8 +38,10 @@ Port 82 in - upper byte = 0 thru 7
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
 #include "machine/z80pio.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "sc1.lh"
 
 
@@ -47,9 +49,9 @@ class sc1_state : public driver_device
 {
 public:
 	sc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

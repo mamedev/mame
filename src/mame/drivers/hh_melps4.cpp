@@ -8,9 +8,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
+
 #include "cpu/melps4/m58846.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
@@ -298,7 +302,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN.2") // K3
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 

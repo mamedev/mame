@@ -9,17 +9,18 @@
 ***************************************************************************/
 
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define GRIDLEE_MASTER_CLOCK    (20000000)
 #define GRIDLEE_CPU_CLOCK       (GRIDLEE_MASTER_CLOCK / 16)
-#define GRIDLEE_PIXEL_CLOCK (GRIDLEE_MASTER_CLOCK / 4)
+#define GRIDLEE_PIXEL_CLOCK	    (GRIDLEE_MASTER_CLOCK / 4)
 #define GRIDLEE_HTOTAL          (0x140)
 #define GRIDLEE_HBEND           (0x000)
-#define GRIDLEE_HBSTART     (0x100)
+#define GRIDLEE_HBSTART         (0x100)
 #define GRIDLEE_VTOTAL          (0x108)
 #define GRIDLEE_VBEND           (0x010)
-#define GRIDLEE_VBSTART     (0x100)
+#define GRIDLEE_VBSTART         (0x100)
 
 
 class gridlee_state : public driver_device

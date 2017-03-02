@@ -152,8 +152,9 @@ Notes:
 *********************************************************************/
 
 #include "emu.h"
-#include "machine/nvram.h"
 #include "cpu/e132xs/e132xs.h"
+#include "machine/nvram.h"
+#include "screen.h"
 
 
 class dgpix_state : public driver_device

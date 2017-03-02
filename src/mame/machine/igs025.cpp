@@ -356,4 +356,4 @@ void igs025_device::killbld_protection_calculate_hilo()
 
 
 
-const device_type IGS025 = &device_creator<igs025_device>;
+const device_type IGS025 = device_creator<igs025_device>;

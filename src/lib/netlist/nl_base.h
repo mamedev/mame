@@ -320,11 +320,15 @@ namespace netlist
 		//! Copy Constructor.
 		state_var(const state_var &rhs) NL_NOEXCEPT = default;
 		//! Move Constructor.
-		state_var(state_var &&rhs) NL_NOEXCEPT = default;
+		state_var(state_var &&rhs) NL_NOEXCEPT { std::swap(m_value, rhs.m_value); }
 		//! Assignment operator to assign value of a state var.
-		state_var &operator=(const state_var &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
+		state_var &operator=(const state_var &rhs) NL_NOEXCEPT { m_value = rhs.m_value; return *this; }
+		//! Assignment move operator to assign value of a state var.
+		state_var &operator=(state_var &&rhs) NL_NOEXCEPT { std::swap(m_value, rhs.m_value); return *this; }
 		//! Assignment operator to assign value of type T.
 		state_var &operator=(const T &rhs) NL_NOEXCEPT { m_value = rhs; return *this; }
+		//! Assignment move operator to assign value of type T.
+		state_var &operator=(T &&rhs) NL_NOEXCEPT { std::swap(m_value, rhs); return *this; }
 		//! Return value of state variable.
 		operator T & () NL_NOEXCEPT { return m_value; }
 		//! Return const value of state variable.
@@ -636,11 +640,8 @@ namespace netlist
 				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
-		netlist_sig_t Q() const NL_NOEXCEPT;
-
 		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
-			nl_assert(state() != STATE_INP_PASSIVE);
 			return Q();
 		}
 
@@ -648,7 +649,8 @@ namespace netlist
 		void activate() NL_NOEXCEPT;
 		void activate_hl() NL_NOEXCEPT;
 		void activate_lh() NL_NOEXCEPT;
-
+	private:
+		netlist_sig_t Q() const NL_NOEXCEPT;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -718,8 +720,8 @@ namespace netlist
 
 		void update_devs() NL_NOEXCEPT;
 
-		netlist_time time() const NL_NOEXCEPT { return m_time; }
-		void set_time(const netlist_time ntime) NL_NOEXCEPT { m_time = ntime; }
+		const netlist_time &time() const NL_NOEXCEPT { return m_time; }
+		void set_time(const netlist_time &ntime) NL_NOEXCEPT { m_time = ntime; }
 
 		bool isRailNet() const { return !(m_railterminal == nullptr); }
 		core_terminal_t & railterminal() const { return *m_railterminal; }
@@ -745,10 +747,10 @@ namespace netlist
 	protected:
 		state_var<netlist_sig_t> m_new_Q;
 		state_var<netlist_sig_t> m_cur_Q;
+		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 		state_var<netlist_time>  m_time;
 		state_var_s32            m_active;
-		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
 		state_var<nl_double>     m_cur_Analog;
 
@@ -768,7 +770,6 @@ namespace netlist
 		virtual ~logic_net_t();
 
 		netlist_sig_t Q() const NL_NOEXCEPT { return m_cur_Q; }
-		netlist_sig_t new_Q() const NL_NOEXCEPT { return m_new_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
 		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
@@ -1059,9 +1060,7 @@ namespace netlist
 
 		void update_dev() NL_NOEXCEPT
 		{
-			m_stat_total_time.start();
 			do_update();
-			m_stat_total_time.stop();
 		}
 
 		void do_inc_active() NL_NOEXCEPT
@@ -1179,11 +1178,12 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	class detail::queue_t :
-			public timed_queue<net_t *, netlist_time>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
 	public:
+		typedef pqentry_t<net_t *, netlist_time> entry_t;
 		explicit queue_t(netlist_t &nl);
 
 	protected:
@@ -1219,7 +1219,7 @@ namespace netlist
 		nl_double gmin() const;
 
 		void process_queue(const netlist_time &delta) NL_NOEXCEPT;
-		void abort_current_queue_slice() { m_queue.retime(nullptr, m_time); }
+		void abort_current_queue_slice() { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
 		/* Control functions */
 
@@ -1438,6 +1438,7 @@ namespace netlist
 
 	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
 	{
+		nl_assert(state() != STATE_INP_PASSIVE);
 		return net().Q();
 	}
 

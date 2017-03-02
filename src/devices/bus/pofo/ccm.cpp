@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PORTFOLIO_MEMORY_CARD_SLOT = &device_creator<portfolio_memory_card_slot_t>;
+const device_type PORTFOLIO_MEMORY_CARD_SLOT = device_creator<portfolio_memory_card_slot_t>;
 
 
 
@@ -72,7 +72,7 @@ image_init_result portfolio_memory_card_slot_t::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			fread(m_card->m_rom, length());
 		}

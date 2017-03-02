@@ -5,6 +5,8 @@
     Bellfruit dotmatrix driver, (under heavy construction !!!)
 
 *************************************************************************************/
+#include "screen.h"
+
 #ifndef BFM_DM01
 #define BFM_DM01
 

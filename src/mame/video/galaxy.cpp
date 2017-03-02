@@ -12,7 +12,9 @@
 
 #include "emu.h"
 #include "includes/galaxy.h"
+
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)

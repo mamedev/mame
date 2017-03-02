@@ -70,11 +70,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gunsmoke.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/gunsmoke.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Read/Write Handlers */

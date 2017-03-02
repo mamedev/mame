@@ -152,11 +152,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaplus.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/namco62.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "includes/gaplus.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)

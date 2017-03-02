@@ -532,7 +532,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 	uint32_t *ROM32;
 	int i;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		length = image.length();
 		temp_copy.resize(length);

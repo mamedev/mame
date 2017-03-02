@@ -10,6 +10,7 @@
 #include "audio/dcs.h"
 #include "machine/midwayic.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
 

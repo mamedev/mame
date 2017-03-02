@@ -16,6 +16,10 @@
 #include "emu.h"
 #include "tms3556.h"
 
+#include "screen.h"
+
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -29,7 +33,7 @@
 //**************************************************************************
 
 // devices
-const device_type TMS3556 = &device_creator<tms3556_device>;
+const device_type TMS3556 = device_creator<tms3556_device>;
 
 
 // default address map

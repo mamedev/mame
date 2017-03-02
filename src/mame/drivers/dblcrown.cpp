@@ -50,6 +50,8 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "dblcrown.lh"
 #define DEBUG_VRAM

@@ -22,29 +22,29 @@
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
-const device_type TMS7000 = &device_creator<tms7000_device>;
-const device_type TMS7020 = &device_creator<tms7020_device>;
-const device_type TMS7040 = &device_creator<tms7040_device>;
+const device_type TMS7000 = device_creator<tms7000_device>;
+const device_type TMS7020 = device_creator<tms7020_device>;
+const device_type TMS7040 = device_creator<tms7040_device>;
 
 // Exelvision (spinoff of TI) TMS7020 added one custom opcode.
-const device_type TMS7020_EXL = &device_creator<tms7020_exl_device>;
+const device_type TMS7020_EXL = device_creator<tms7020_exl_device>;
 
 // CMOS devices biggest difference in a 'real world' setting is that the power
 // requirements are much lower. This obviously has no use in software emulation.
-const device_type TMS70C00 = &device_creator<tms70c00_device>;
-const device_type TMS70C20 = &device_creator<tms70c20_device>;
-const device_type TMS70C40 = &device_creator<tms70c40_device>;
+const device_type TMS70C00 = device_creator<tms70c00_device>;
+const device_type TMS70C20 = device_creator<tms70c20_device>;
+const device_type TMS70C40 = device_creator<tms70c40_device>;
 
 // TMS70x1 features more peripheral I/O, the main addition being a serial port.
 // TMS70x2 is the same, just with twice more RAM (256 bytes)
-const device_type TMS7001 = &device_creator<tms7001_device>;
-const device_type TMS7041 = &device_creator<tms7041_device>;
-const device_type TMS7002 = &device_creator<tms7002_device>;
-const device_type TMS7042 = &device_creator<tms7042_device>;
+const device_type TMS7001 = device_creator<tms7001_device>;
+const device_type TMS7041 = device_creator<tms7041_device>;
+const device_type TMS7002 = device_creator<tms7002_device>;
+const device_type TMS7042 = device_creator<tms7042_device>;
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
-const device_type TMS70C46 = &device_creator<tms70c46_device>;
+const device_type TMS70C46 = device_creator<tms70c46_device>;
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
 // in peripheral file I/O, it is not backward compatible to TMS70x2.

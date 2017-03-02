@@ -12,12 +12,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ultraman.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/ultraman.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {

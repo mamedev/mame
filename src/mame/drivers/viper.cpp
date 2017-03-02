@@ -348,11 +348,14 @@ some other components. It will be documented at a later date.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/lpci.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
+#include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "video/voodoo.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define VIPER_DEBUG_LOG
 #define VIPER_DEBUG_EPIC_INTS       0

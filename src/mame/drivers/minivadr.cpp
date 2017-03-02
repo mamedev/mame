@@ -36,6 +36,7 @@ Notes: (all ICs shown)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class minivadr_state : public driver_device

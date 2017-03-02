@@ -39,11 +39,11 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_GS2015 = &device_creator<nes_gs2015_device>;
-const device_type NES_GS2004 = &device_creator<nes_gs2004_device>;
-const device_type NES_GS2013 = &device_creator<nes_gs2013_device>;
-const device_type NES_TF9IN1 = &device_creator<nes_tf9_device>;
-const device_type NES_3DBLOCK = &device_creator<nes_3dblock_device>;
+const device_type NES_GS2015 = device_creator<nes_gs2015_device>;
+const device_type NES_GS2004 = device_creator<nes_gs2004_device>;
+const device_type NES_GS2013 = device_creator<nes_gs2013_device>;
+const device_type NES_TF9IN1 = device_creator<nes_tf9_device>;
+const device_type NES_3DBLOCK = device_creator<nes_3dblock_device>;
 
 
 nes_gs2015_device::nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

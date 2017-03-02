@@ -900,7 +900,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 
 
-const device_type K055673 = &device_creator<k055673_device>;
+const device_type K055673 = device_creator<k055673_device>;
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
@@ -1035,7 +1035,7 @@ void k055673_device::device_start()
 
 
 
-const device_type K053246 = &device_creator<k053247_device>;
+const device_type K053246 = device_creator<k053247_device>;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),

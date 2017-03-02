@@ -32,12 +32,17 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "machine/74157.h"
+#include "machine/7474.h"
 #include "machine/i8255.h"
 #include "sound/msm5205.h"
-#include "machine/7474.h"
-#include "machine/74157.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class spinb_state : public genpin_class
 {

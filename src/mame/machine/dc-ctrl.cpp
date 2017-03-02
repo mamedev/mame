@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "dc-ctrl.h"
 
-const device_type DC_CONTROLLER = &device_creator<dc_controller_device>;
+const device_type DC_CONTROLLER = device_creator<dc_controller_device>;
 
 void dc_controller_device::static_set_port_tag(device_t &device, int port, const char *tag)
 {

@@ -10,6 +10,7 @@ enable / disable tilemap bits might be wrong
 
 #include "emu.h"
 #include "includes/angelkds.h"
+#include "screen.h"
 
 
 /*** Text Layer Tilemap

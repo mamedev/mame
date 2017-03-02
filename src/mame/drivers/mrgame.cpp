@@ -31,7 +31,6 @@ ToDo:
 
 *****************************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -41,6 +40,9 @@ ToDo:
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mrgame_state : public driver_device
 {

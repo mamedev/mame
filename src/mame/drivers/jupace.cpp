@@ -44,7 +44,6 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "formats/ace_tap.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "bus/centronics/ctronics.h"
@@ -53,9 +52,15 @@ Ports:
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ace_tap.h"
+
 
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"

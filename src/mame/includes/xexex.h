@@ -16,6 +16,7 @@
 #include "video/k054338.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "screen.h"
 
 class xexex_state : public driver_device
 {

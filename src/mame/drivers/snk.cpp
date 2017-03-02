@@ -270,13 +270,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/snk.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/8950intf.h"
+#include "speaker.h"
 
 
 /*********************************************************************/

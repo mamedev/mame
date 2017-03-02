@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "znmcu.h"
 
-const device_type ZNMCU = &device_creator<znmcu_device>;
+const device_type ZNMCU = device_creator<znmcu_device>;
 
 znmcu_device::znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ZNMCU, "Sony ZN MCU", tag, owner, clock, "znmcu", __FILE__),

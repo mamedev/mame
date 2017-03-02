@@ -30,22 +30,27 @@ ToDo:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
-#include "bus/rs232/rs232.h"
-//#include "machine/clock.h"
-#include "machine/pit8253.h"
-#include "machine/i8255.h"
+
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "machine/z80dma.h"
-#include "machine/rescap.h"
 #include "machine/74123.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80dma.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/excali64_dsk.h"
+
 
 class excali64_state : public driver_device
 {

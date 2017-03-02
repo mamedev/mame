@@ -61,11 +61,14 @@ Verification still needed for the other PCBs.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/aerofgt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
-#include "includes/aerofgt.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(aerofgt_state::sound_command_w)

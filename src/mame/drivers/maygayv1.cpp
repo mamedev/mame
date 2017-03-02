@@ -127,15 +127,19 @@ Find lamps/reels after UPD changes.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/i8279.h"
 #include "machine/6821pia.h"
+#include "machine/i8279.h"
 #include "machine/mc68681.h"
-#include "sound/ym2413.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "sound/upd7759.h"
+#include "sound/ym2413.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

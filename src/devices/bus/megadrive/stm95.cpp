@@ -172,7 +172,7 @@ void stm95_eeprom_device::set_sck_line(int state)
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_EEPROM_STM95 = &device_creator<md_eeprom_stm95_device>;
+const device_type MD_EEPROM_STM95 = device_creator<md_eeprom_stm95_device>;
 
 
 md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

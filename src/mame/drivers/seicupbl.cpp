@@ -15,11 +15,14 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/seicop.h"
 #include "sound/okim6295.h"
-#include "machine/gen_latch.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_8MHz
 

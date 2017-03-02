@@ -9,20 +9,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i186.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "machine/mm58167.h"
-#include "machine/pic8259.h"
-#include "machine/i8255.h"
-#include "video/i82730.h"
-#include "sound/speaker.h"
-#include "sound/sn76496.h"
-#include "machine/keyboard.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "machine/keyboard.h"
+#include "machine/mm58167.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "video/i82730.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************

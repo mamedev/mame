@@ -28,10 +28,13 @@ Pleiads:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/phoenix.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "includes/phoenix.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( phoenix_memory_map, AS_PROGRAM, 8, phoenix_state )

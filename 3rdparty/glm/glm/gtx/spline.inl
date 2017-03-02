@@ -3,7 +3,7 @@
 
 namespace glm
 {
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_QUALIFIER genType catmullRom
 	(
 		genType const & v1, 
@@ -26,7 +26,7 @@ namespace glm
 
 	}
 
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_QUALIFIER genType hermite
 	(
 		genType const & v1, 
@@ -48,7 +48,7 @@ namespace glm
 		return f1 * v1 + f2 * v2 + f3 * t1 + f4 * t2;
 	}
 
-	template<typename genType>
+	template <typename genType>
 	GLM_FUNC_QUALIFIER genType cubic
 	(
 		genType const & v1, 

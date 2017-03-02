@@ -5,6 +5,8 @@
 
 #include "emu.h"
 #include "includes/wpc_dot.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wpc_dot_map, AS_PROGRAM, 8, wpc_dot_state )

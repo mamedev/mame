@@ -32,8 +32,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type UPD1990A = &device_creator<upd1990a_device>;
-const device_type UPD4990A = &device_creator<upd4990a_device>;
+const device_type UPD1990A = device_creator<upd1990a_device>;
+const device_type UPD4990A = device_creator<upd4990a_device>;
 
 
 

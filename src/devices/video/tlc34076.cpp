@@ -35,7 +35,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type TLC34076 = &device_creator<tlc34076_device>;
+const device_type TLC34076 = device_creator<tlc34076_device>;
 
 
 //-------------------------------------------------

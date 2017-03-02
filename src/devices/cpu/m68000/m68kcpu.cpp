@@ -2271,7 +2271,7 @@ void m68000_base_device::m68ki_exception_interrupt(m68000_base_device *m68k, uin
 }
 
 
-const device_type M68K = &device_creator<m68000_base_device>;
+const device_type M68K = device_creator<m68000_base_device>;
 
 //-------------------------------------------------
 //  h6280_device - constructor
@@ -2495,24 +2495,24 @@ const address_space_config *m68000_base_device::memory_space_config(address_spac
 
 
 
-const device_type M68000 = &device_creator<m68000_device>;
-const device_type M68301 = &device_creator<m68301_device>;
-const device_type M68008 = &device_creator<m68008_device>;
-const device_type M68008PLCC = &device_creator<m68008plcc_device>;
-const device_type M68010 = &device_creator<m68010_device>;
-const device_type M68EC020 = &device_creator<m68ec020_device>;
-const device_type M68020 = &device_creator<m68020_device>;
-const device_type M68020FPU = &device_creator<m68020fpu_device>;
-const device_type M68020PMMU = &device_creator<m68020pmmu_device>;
-const device_type M68020HMMU = &device_creator<m68020hmmu_device>;
-const device_type M68EC030 = &device_creator<m68ec030_device>;
-const device_type M68030 = &device_creator<m68030_device>;
-const device_type M68EC040 = &device_creator<m68ec040_device>;
-const device_type M68LC040 = &device_creator<m68lc040_device>;
-const device_type M68040 = &device_creator<m68040_device>;
-const device_type SCC68070 = &device_creator<scc68070_device>;
-const device_type FSCPU32 = &device_creator<fscpu32_device>;
-const device_type MCF5206E = &device_creator<mcf5206e_device>;
+const device_type M68000 = device_creator<m68000_device>;
+const device_type M68301 = device_creator<m68301_device>;
+const device_type M68008 = device_creator<m68008_device>;
+const device_type M68008PLCC = device_creator<m68008plcc_device>;
+const device_type M68010 = device_creator<m68010_device>;
+const device_type M68EC020 = device_creator<m68ec020_device>;
+const device_type M68020 = device_creator<m68020_device>;
+const device_type M68020FPU = device_creator<m68020fpu_device>;
+const device_type M68020PMMU = device_creator<m68020pmmu_device>;
+const device_type M68020HMMU = device_creator<m68020hmmu_device>;
+const device_type M68EC030 = device_creator<m68ec030_device>;
+const device_type M68030 = device_creator<m68030_device>;
+const device_type M68EC040 = device_creator<m68ec040_device>;
+const device_type M68LC040 = device_creator<m68lc040_device>;
+const device_type M68040 = device_creator<m68040_device>;
+const device_type SCC68070 = device_creator<scc68070_device>;
+const device_type FSCPU32 = device_creator<fscpu32_device>;
+const device_type MCF5206E = device_creator<mcf5206e_device>;
 
 m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_base_device(mconfig, "M68000", tag, owner, clock, M68000, 16,24, "m68000", __FILE__)

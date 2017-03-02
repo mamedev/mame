@@ -10,16 +10,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/psx/psx.h"
-#include "cpu/m6805/m6805.h"
-#include "video/psx.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/chd_cd.h"
-#include "sound/spu.h"
-#include "debugger.h"
-#include "machine/psxcd.h"
+
 #include "bus/psx/ctlrport.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/psx/psx.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/snapquik.h"
+#include "machine/psxcd.h"
+#include "machine/ram.h"
+#include "sound/spu.h"
+#include "video/psx.h"
+
+#include "debugger.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define PSXCD_TAG   "psxcd"
 

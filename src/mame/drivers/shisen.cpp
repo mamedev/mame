@@ -10,9 +10,13 @@ driver by Nicola Salmoria
 
 #include "emu.h"
 #include "includes/shisen.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(shisen_state::dsw1_r)
 {

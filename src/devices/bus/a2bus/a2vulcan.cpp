@@ -62,8 +62,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_VULCAN = &device_creator<a2bus_vulcan_device>;
-const device_type A2BUS_VULCANGOLD = &device_creator<a2bus_vulcangold_device>;
+const device_type A2BUS_VULCAN = device_creator<a2bus_vulcan_device>;
+const device_type A2BUS_VULCANGOLD = device_creator<a2bus_vulcangold_device>;
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"

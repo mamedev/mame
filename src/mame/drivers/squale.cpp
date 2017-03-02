@@ -55,15 +55,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
 #include "cpu/m6809/m6809.h"
-#include "video/ef9365.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "sound/ay8910.h"
 #include "machine/wd_fdc.h"
-#include "bus/generic/carts.h"
+#include "sound/ay8910.h"
+#include "video/ef9365.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK           XTAL_14MHz
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */

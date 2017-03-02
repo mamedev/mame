@@ -12,7 +12,7 @@
 
 
 
-const device_type K056800 = &device_creator<k056800_device>;
+const device_type K056800 = device_creator<k056800_device>;
 
 
 

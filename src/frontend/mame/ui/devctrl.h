@@ -44,7 +44,8 @@ protected:
 
 private:
 	// device iterator
-	typedef device_type_iterator<&device_creator<DeviceType>, DeviceType> iterator;
+		static constexpr device_type TYPE = device_creator<DeviceType>;
+	typedef device_type_iterator<TYPE, DeviceType> iterator;
 
 	DeviceType *    m_device;
 	int             m_count;

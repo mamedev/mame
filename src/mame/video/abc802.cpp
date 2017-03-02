@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/abc80x.h"
+#include "screen.h"
 
 
 

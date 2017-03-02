@@ -528,17 +528,22 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/ram.h"
+#include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
-#include "machine/upd765.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+
 #include "formats/imd_dsk.h"
+
 
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"

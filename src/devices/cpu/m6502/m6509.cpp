@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "m6509.h"
 
-const device_type M6509 = &device_creator<m6509_device>;
+const device_type M6509 = device_creator<m6509_device>;
 
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6509, "M6509", tag, owner, clock, "m6509", __FILE__), XPC(0), bank_i(0), bank_y(0)

@@ -28,7 +28,7 @@
 
 
 
-const device_type MB86235 = &device_creator<mb86235_device>;
+const device_type MB86235 = device_creator<mb86235_device>;
 
 
 static ADDRESS_MAP_START(internal_abus, AS_DATA, 32, mb86235_device)

@@ -45,18 +45,18 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NROM = &device_creator<nes_nrom_device>;
-const device_type NES_NROM368 = &device_creator<nes_nrom368_device>;
-const device_type NES_FCBASIC = &device_creator<nes_fcbasic_device>;
-const device_type NES_AXROM = &device_creator<nes_axrom_device>;
-const device_type NES_BXROM = &device_creator<nes_bxrom_device>;
-const device_type NES_CNROM = &device_creator<nes_cnrom_device>;
-const device_type NES_CPROM = &device_creator<nes_cprom_device>;
-const device_type NES_GXROM = &device_creator<nes_gxrom_device>;
-const device_type NES_UXROM = &device_creator<nes_uxrom_device>;
-const device_type NES_UXROM_CC = &device_creator<nes_uxrom_cc_device>;
-const device_type NES_UN1ROM = &device_creator<nes_un1rom_device>;
-const device_type NES_NOCHR = &device_creator<nes_nochr_device>;
+const device_type NES_NROM = device_creator<nes_nrom_device>;
+const device_type NES_NROM368 = device_creator<nes_nrom368_device>;
+const device_type NES_FCBASIC = device_creator<nes_fcbasic_device>;
+const device_type NES_AXROM = device_creator<nes_axrom_device>;
+const device_type NES_BXROM = device_creator<nes_bxrom_device>;
+const device_type NES_CNROM = device_creator<nes_cnrom_device>;
+const device_type NES_CPROM = device_creator<nes_cprom_device>;
+const device_type NES_GXROM = device_creator<nes_gxrom_device>;
+const device_type NES_UXROM = device_creator<nes_uxrom_device>;
+const device_type NES_UXROM_CC = device_creator<nes_uxrom_cc_device>;
+const device_type NES_UN1ROM = device_creator<nes_un1rom_device>;
+const device_type NES_NOCHR = device_creator<nes_nochr_device>;
 
 
 nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

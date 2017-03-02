@@ -7,16 +7,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/ram.h"
-#include "machine/cs4031.h"
 #include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/cs4031.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "sound/speaker.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

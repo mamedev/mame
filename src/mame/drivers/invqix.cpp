@@ -122,6 +122,8 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "cpu/h8/h8s2357.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+#include "speaker.h"
 
 class invqix_state : public driver_device
 {

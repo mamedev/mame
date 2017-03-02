@@ -62,7 +62,7 @@ void t1000_mb_device::device_start()
 {
 }
 
-const device_type T1000_MOTHERBOARD = &device_creator<t1000_mb_device>;
+const device_type T1000_MOTHERBOARD = device_creator<t1000_mb_device>;
 
 class tandy1000_state : public driver_device
 {

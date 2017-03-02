@@ -15,12 +15,12 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC890 = &device_creator<abc890_t>;
-const device_type ABC_EXPANSION_UNIT = &device_creator<abc_expansion_unit_t>;
-const device_type ABC894 = &device_creator<abc894_t>;
-const device_type ABC850 = &device_creator<abc850_t>;
-const device_type ABC852 = &device_creator<abc852_t>;
-const device_type ABC856 = &device_creator<abc856_t>;
+const device_type ABC890 = device_creator<abc890_t>;
+const device_type ABC_EXPANSION_UNIT = device_creator<abc_expansion_unit_t>;
+const device_type ABC894 = device_creator<abc894_t>;
+const device_type ABC850 = device_creator<abc850_t>;
+const device_type ABC852 = device_creator<abc852_t>;
+const device_type ABC856 = device_creator<abc856_t>;
 
 
 //-------------------------------------------------

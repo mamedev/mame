@@ -22,7 +22,7 @@ files {
 -- DACs
 --@src/devices/sound/dac.h,SOUNDS["DAC"] = true
 --@src/devices/sound/dmadac.h,SOUNDS["DMADAC"] = true
---@src/devices/sound/speaker.h,SOUNDS["SPEAKER"] = true
+--@src/devices/sound/spkrdev.h,SOUNDS["SPEAKER"] = true
 --@src/devices/sound/beep.h,SOUNDS["BEEP"] = true
 ---------------------------------------------------
 
@@ -42,8 +42,8 @@ end
 
 if (SOUNDS["SPEAKER"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/speaker.cpp",
-		MAME_DIR .. "src/devices/sound/speaker.h",
+		MAME_DIR .. "src/devices/sound/spkrdev.cpp",
+		MAME_DIR .. "src/devices/sound/spkrdev.h",
 	}
 end
 

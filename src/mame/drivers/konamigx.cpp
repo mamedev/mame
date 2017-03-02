@@ -97,14 +97,17 @@
  */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms57002/tms57002.h"
-#include "machine/eepromser.h"
-#include "sound/k056800.h"
-#include "sound/k054539.h"
 #include "includes/konamigx.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/tms57002/tms57002.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "sound/k054539.h"
+#include "sound/k056800.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 
 // TODO: check on PCB
 #define MASTER_CLOCK XTAL_24MHz

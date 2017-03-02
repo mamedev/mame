@@ -22,9 +22,12 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mrdo.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/mrdo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_CLOCK      XTAL_8_2MHz

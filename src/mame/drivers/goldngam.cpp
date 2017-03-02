@@ -230,13 +230,15 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
-#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
+#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
 
 
 class goldngam_state : public driver_device

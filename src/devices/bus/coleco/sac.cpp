@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECO_SUPER_ACTION_CONTROLLER = &device_creator<coleco_super_action_controller_t>;
+const device_type COLECO_SUPER_ACTION_CONTROLLER = device_creator<coleco_super_action_controller_t>;
 
 
 CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )

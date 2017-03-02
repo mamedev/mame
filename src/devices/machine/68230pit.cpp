@@ -58,7 +58,7 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type PIT68230 = &device_creator<pit68230_device>;
+const device_type PIT68230 = device_creator<pit68230_device>;
 
 //-------------------------------------------------
 //  pit68230_device - constructors

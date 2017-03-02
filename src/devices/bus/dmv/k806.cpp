@@ -65,7 +65,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K806 = &device_creator<dmv_k806_device>;
+const device_type DMV_K806 = device_creator<dmv_k806_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

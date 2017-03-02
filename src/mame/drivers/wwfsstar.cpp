@@ -154,11 +154,14 @@ Notes:
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/wwfsstar.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/wwfsstar.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_20MHz
 #define CPU_CLOCK       MASTER_CLOCK / 2

@@ -52,10 +52,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/brkthru.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/brkthru.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_12MHz

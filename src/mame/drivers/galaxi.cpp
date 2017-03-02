@@ -33,14 +33,17 @@
 
 ***************************************************************************/
 
-#define CPU_CLOCK       (XTAL_10MHz)
-#define SND_CLOCK       (XTAL_16MHz)/16
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "galaxi.lh"
+
+#define CPU_CLOCK       (XTAL_10MHz)
+#define SND_CLOCK       (XTAL_16MHz)/16
 
 class galaxi_state : public driver_device
 {

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "video/k007121.h"
+#include "screen.h"
 
 class contra_state : public driver_device
 {

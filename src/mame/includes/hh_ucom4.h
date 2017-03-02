@@ -6,12 +6,13 @@
 
 */
 
-#ifndef _HH_UCOM4_H_
-#define _HH_UCOM4_H_
+#ifndef MAME_INCLUDES_HH_UCOM4_H
+#define MAME_INCLUDES_HH_UCOM4_H
+
+#include "cpu/ucom4/ucom4.h"
+#include "sound/spkrdev.h"
 
 #include "rendlay.h"
-#include "cpu/ucom4/ucom4.h"
-#include "sound/speaker.h"
 
 
 class hh_ucom4_state : public driver_device
@@ -66,4 +67,4 @@ protected:
 };
 
 
-#endif /* _HH_UCOM4_H_ */
+#endif // MAME_INCLUDES_HH_UCOM4_H

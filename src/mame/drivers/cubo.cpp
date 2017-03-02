@@ -314,6 +314,7 @@ routines :
 #include "includes/amiga.h"
 #include "imagedev/chd_cd.h"
 #include "machine/microtch.h"
+#include "speaker.h"
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */

@@ -43,9 +43,9 @@
 /* a position of waveform sample */
 #define WAVEFORM_POSITION(n)    (((n) >> m_f_fracbits) & 0x1f)
 
-const device_type NAMCO = &device_creator<namco_device>;
-const device_type NAMCO_15XX = &device_creator<namco_15xx_device>;
-const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
+const device_type NAMCO = device_creator<namco_device>;
+const device_type NAMCO_15XX = device_creator<namco_15xx_device>;
+const device_type NAMCO_CUS30 = device_creator<namco_cus30_device>;
 
 namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

@@ -16,10 +16,10 @@
 #include "emu.h"
 #include "sed1200.h"
 
-const device_type SED1200D0A = &device_creator<sed1200d0a_device>;
-const device_type SED1200F0A = &device_creator<sed1200f0a_device>;
-const device_type SED1200D0B = &device_creator<sed1200d0b_device>;
-const device_type SED1200F0B = &device_creator<sed1200f0b_device>;
+const device_type SED1200D0A = device_creator<sed1200d0a_device>;
+const device_type SED1200F0A = device_creator<sed1200f0a_device>;
+const device_type SED1200D0B = device_creator<sed1200d0b_device>;
+const device_type SED1200F0B = device_creator<sed1200f0b_device>;
 
 ROM_START( sed1200x0a )
 	ROM_REGION( 0x800, "cgrom", 0 )

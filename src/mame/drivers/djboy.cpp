@@ -139,11 +139,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/djboy.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/djboy.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* KANEKO BEAST state */

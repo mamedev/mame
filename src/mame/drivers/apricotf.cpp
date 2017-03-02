@@ -25,17 +25,18 @@
 */
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80daisy.h"
+#include "formats/apridisk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
+#include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "machine/input_merger.h"
-#include "formats/apridisk.h"
+#include "screen.h"
 
 
 //**************************************************************************

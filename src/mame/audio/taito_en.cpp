@@ -14,9 +14,10 @@
 
 #include "emu.h"
 #include "taito_en.h"
+#include "speaker.h"
 
 
-const device_type TAITO_EN = &device_creator<taito_en_device>;
+const device_type TAITO_EN = device_creator<taito_en_device>;
 
 taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO_EN, "Taito Ensoniq Sound System", tag, owner, clock, "taito_en", __FILE__),

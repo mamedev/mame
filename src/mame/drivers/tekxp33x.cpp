@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/tms34010/tms34010.h"
+#include "screen.h"
+
 
 #define SCREEN_TAG "screen"
 

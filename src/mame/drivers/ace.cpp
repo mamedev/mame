@@ -41,6 +41,7 @@ A1                   2101            2101
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 #include "ace.lh"
 

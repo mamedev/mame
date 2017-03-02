@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_MPF1_H
+#define MAME_INCLUDES_MPF1_H
 
-#ifndef __MPF1__
-#define __MPF1__
+#pragma once
 
 
 #include "machine/spchrom.h"
@@ -13,7 +13,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/tms5220.h"
 
 #define Z80_TAG         "u1"
@@ -74,4 +74,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
 };
 
-#endif
+#endif // MAME_INCLUDES_MPF1_H

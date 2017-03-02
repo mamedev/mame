@@ -449,18 +449,24 @@
 
 **********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "majorpkr.lh"
+
+
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK / 2)   // 6 MHz, measured.
 #define OKI_CLOCK       (MASTER_CLOCK / 8)   // 1.5 MHz, measured.
 #define CRTC_CLOCK      (MASTER_CLOCK / 16)  // 750 kHz, measured.
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/okim6295.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
-#include "majorpkr.lh"
 
 
 class majorpkr_state : public driver_device

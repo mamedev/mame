@@ -28,9 +28,9 @@
 #define LOG_INTERRUPT(...)
 #endif
 
-const device_type CLIPPER_C100 = &device_creator<clipper_c100_device>;
-const device_type CLIPPER_C300 = &device_creator<clipper_c300_device>;
-const device_type CLIPPER_C400 = &device_creator<clipper_c400_device>;
+const device_type CLIPPER_C100 = device_creator<clipper_c100_device>;
+const device_type CLIPPER_C300 = device_creator<clipper_c300_device>;
+const device_type CLIPPER_C400 = device_creator<clipper_c400_device>;
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C100, "C100 CLIPPER", tag, owner, clock, "C100", __FILE__) { }

@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VCS_CART_SLOT = &device_creator<vcs_cart_slot_device>;
+const device_type VCS_CART_SLOT = device_creator<vcs_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -189,7 +189,7 @@ image_init_result vcs_cart_slot_device::call_load()
 		uint8_t *ROM;
 		uint32_t len;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 			len = get_software_region_length("rom");
 		else
 			len = length();
@@ -219,7 +219,7 @@ image_init_result vcs_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? true : false;

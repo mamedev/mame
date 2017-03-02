@@ -71,17 +71,21 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
+#include "speaker.h"
+
+#include "re900.lh"
+
 
 #define MAIN_CLOCK      XTAL_11_0592MHz
 #define VDP_CLOCK       XTAL_10_730MHz
 #define TMS_CLOCK       VDP_CLOCK / 24
-
-#include "emu.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/tms9928a.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "re900.lh"
 
 
 class re900_state : public driver_device

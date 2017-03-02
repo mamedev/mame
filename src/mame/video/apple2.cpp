@@ -668,7 +668,7 @@ uint32_t apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 
     New implementation
 */
 
-const device_type APPLE2_VIDEO = &device_creator<a2_video_device>;
+const device_type APPLE2_VIDEO = device_creator<a2_video_device>;
 
 //-------------------------------------------------
 //  a2_video_device - constructor

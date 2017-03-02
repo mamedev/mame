@@ -30,6 +30,7 @@ Todo:
 #include "machine/ldv1000.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+#include "speaker.h"
 
 
 class esh_state : public driver_device

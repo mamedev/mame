@@ -67,6 +67,7 @@ ___________________________________________________________________________
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
+#include "speaker.h"
 
 #include "bfmsys85.lh"
 

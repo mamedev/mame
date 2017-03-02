@@ -52,7 +52,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-
+#include "screen.h"
 
 
 class cavepc_state : public driver_device

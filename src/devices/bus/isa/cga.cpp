@@ -273,7 +273,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_CGA = &device_creator<isa8_cga_device>;
+const device_type ISA8_CGA = device_creator<isa8_cga_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -439,7 +439,7 @@ uint32_t isa8_cga_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 }
 
 
-const device_type ISA8_CGA_POISK2 = &device_creator<isa8_cga_poisk2_device>;
+const device_type ISA8_CGA_POISK2 = device_creator<isa8_cga_poisk2_device>;
 
 //-------------------------------------------------
 //  isa8_cga_poisk2_device - constructor
@@ -468,7 +468,7 @@ const tiny_rom_entry *isa8_cga_poisk2_device::device_rom_region() const
 
 
 /* for superimposing CGA over a different source video (i.e. tetriskr) */
-const device_type ISA8_CGA_SUPERIMPOSE = &device_creator<isa8_cga_superimpose_device>;
+const device_type ISA8_CGA_SUPERIMPOSE = device_creator<isa8_cga_superimpose_device>;
 
 //-------------------------------------------------
 //  isa8_cga_superimpose_device - constructor
@@ -1538,7 +1538,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::vram_w )
 }
 
 
-const device_type ISA8_CGA_PC1512 = &device_creator<isa8_cga_pc1512_device>;
+const device_type ISA8_CGA_PC1512 = device_creator<isa8_cga_pc1512_device>;
 
 const offs_t isa8_cga_pc1512_device::vram_offset[4]= { 0x0000, 0x4000, 0x8000, 0xC000 };
 const uint8_t isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
@@ -1673,7 +1673,7 @@ READ8_MEMBER( isa8_wyse700_device::io_read )
 }
 
 
-const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
+const device_type ISA8_WYSE700 = device_creator<isa8_wyse700_device>;
 
 
 //-------------------------------------------------
@@ -1762,7 +1762,7 @@ uint32_t isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 
 }
 
 
-const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
+const device_type ISA8_EC1841_0002 = device_creator<isa8_ec1841_0002_device>;
 
 //-------------------------------------------------
 //  isa8_ec1841_0002_device - constructor
@@ -1848,7 +1848,7 @@ READ8_MEMBER( isa8_ec1841_0002_device::io_read )
 	return data;
 }
 
-const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
+const device_type ISA8_CGA_MC1502 = device_creator<isa8_cga_mc1502_device>;
 
 //-------------------------------------------------
 //  isa8_cga_mc1502_device - constructor
@@ -1877,7 +1877,7 @@ const tiny_rom_entry *isa8_cga_iskr1031_device::device_rom_region() const
 	return ROM_NAME( cga_iskr1031 );
 }
 
-const device_type ISA8_CGA_ISKR1031 = &device_creator<isa8_cga_iskr1031_device>;
+const device_type ISA8_CGA_ISKR1031 = device_creator<isa8_cga_iskr1031_device>;
 
 //-------------------------------------------------
 //  isa8_cga_iskr1031_device - constructor
@@ -1902,7 +1902,7 @@ const tiny_rom_entry *isa8_cga_iskr1030m_device::device_rom_region() const
 	return ROM_NAME( cga_iskr1030m );
 }
 
-const device_type ISA8_CGA_ISKR1030M = &device_creator<isa8_cga_iskr1030m_device>;
+const device_type ISA8_CGA_ISKR1030M = device_creator<isa8_cga_iskr1030m_device>;
 
 //-------------------------------------------------
 //  isa8_cga_iskr1030m_device - constructor
@@ -1926,7 +1926,7 @@ const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 	return ROM_NAME( mc1502 );
 }
 
-const device_type ISA8_CGA_M24 = &device_creator<isa8_cga_m24_device>;
+const device_type ISA8_CGA_M24 = device_creator<isa8_cga_m24_device>;
 
 static MACHINE_CONFIG_DERIVED( m24, cga )
 	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)

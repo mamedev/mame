@@ -110,6 +110,7 @@ www.multitech.com
 #include "sound/es1373.h"
 #include "machine/iteagle_fpga.h"
 #include "machine/pci-ide.h"
+#include "screen.h"
 
 
 //*************************************

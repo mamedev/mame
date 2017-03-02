@@ -15,11 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pcktgal.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "includes/pcktgal.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************/
 

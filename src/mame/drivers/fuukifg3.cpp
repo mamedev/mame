@@ -157,10 +157,12 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fuukifg3.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "includes/fuukifg3.h"
+#include "speaker.h"
 
 
 /***************************************************************************

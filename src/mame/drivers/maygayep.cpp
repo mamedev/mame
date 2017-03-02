@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "cpu/h8/h83002.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
 class maygayep_state : public driver_device

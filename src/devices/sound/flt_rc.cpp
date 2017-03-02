@@ -5,7 +5,7 @@
 
 
 // device type definition
-const device_type FILTER_RC = &device_creator<filter_rc_device>;
+const device_type FILTER_RC = device_creator<filter_rc_device>;
 
 
 //**************************************************************************

@@ -49,29 +49,35 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "formats/vg5k_cas.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "sound/volt_reg.h"
+#include "sound/wave.h"
 #include "video/ef9345.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/vg5k_cas.h"
+
 
 class vg5k_state : public driver_device
 {
 public:
 	vg5k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ef9345(*this, "ef9345"),
-			m_dac(*this, "dac"),
-			m_printer(*this, "printer"),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_printer(*this, "printer")
+		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;

@@ -11,27 +11,29 @@
 #ifndef _THOMSON_H_
 #define _THOMSON_H_
 
-#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "machine/mc6846.h"
-#include "machine/6850acia.h"
-#include "machine/mos6551.h"
-#include "sound/dac.h"
-#include "sound/mea8000.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/cassette.h"
-#include "machine/mc6843.h"
-#include "machine/mc6846.h"
-#include "machine/mc6854.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
-#include "machine/thomflop.h"
+#include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/mc6843.h"
+#include "machine/mc6846.h"
+#include "machine/mc6846.h"
+#include "machine/mc6854.h"
+#include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/thomflop.h"
+#include "sound/dac.h"
+#include "sound/mea8000.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 
 
 /* 6821 PIAs */

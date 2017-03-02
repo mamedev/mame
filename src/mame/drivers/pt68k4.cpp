@@ -54,18 +54,24 @@ TODO: 68230 device
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/pc_fdc.h"
 #include "machine/timekpr.h"
 #include "machine/wd_fdc.h"
-#include "machine/pc_fdc.h"
-#include "formats/imd_dsk.h"
+#include "sound/spkrdev.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
-#include "sound/speaker.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/imd_dsk.h"
+
 
 #define M68K_TAG "maincpu"
 #define DUART1_TAG  "duart1"
