@@ -36,13 +36,13 @@ public:
 private:
 	// internal helper
 	void output_one();
-	void output_sampleof();
+	void output_sampleof(device_t &device);
 	void output_bios();
 	void output_rom(device_t &device);
 	void output_device_roms();
 	void output_sample(device_t &device);
 	void output_chips(device_t &device, const char *root_tag);
-	void output_display(device_t &device, const char *root_tag);
+	void output_display(device_t &device, u32 const *flags, const char *root_tag);
 	void output_sound(device_t &device);
 	void output_input(const ioport_list &portlist);
 	void output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag);
@@ -50,11 +50,11 @@ private:
 	void output_adjusters(const ioport_list &portlist);
 	void output_driver();
 	void output_images(device_t &device, const char *root_tag);
-	void output_slots(device_t &device, const char *root_tag);
+	void output_slots(machine_config &config, device_t &device, const char *root_tag);
 	void output_software_list();
 	void output_ramoptions();
 
-	void output_one_device(device_t &device, const char *devtag);
+	void output_one_device(machine_config &config, device_t &device, const char *devtag);
 	void output_devices();
 
 	const char *get_merge_name(const util::hash_collection &romhashes);

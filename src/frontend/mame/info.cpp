@@ -90,7 +90,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ELEMENT display EMPTY>\n"
 "\t\t\t<!ATTLIST display tag CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>\n"
-"\t\t\t<!ATTLIST display rotate (0|90|180|270) #REQUIRED>\n"
+"\t\t\t<!ATTLIST display rotate (0|90|180|270) #IMPLIED>\n"
 "\t\t\t<!ATTLIST display flipx (yes|no) \"no\">\n"
 "\t\t\t<!ATTLIST display width CDATA #IMPLIED>\n"
 "\t\t\t<!ATTLIST display height CDATA #IMPLIED>\n"
@@ -189,9 +189,9 @@ const char info_xml_creator::s_dtd_string[] =
 //-------------------------------------------------
 
 info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
-	: m_output(nullptr),
-		m_drivlist(drivlist),
-		m_lookup_options(m_drivlist.options())
+	: m_output(nullptr)
+	, m_drivlist(drivlist)
+	, m_lookup_options(m_drivlist.options())
 {
 	mame_options::remove_device_options(m_lookup_options);
 }
@@ -316,7 +316,7 @@ void info_xml_creator::output_one()
 		fprintf(m_output, " romof=\"%s\"", util::xml::normalize_string(m_drivlist.driver(clone_of).name));
 
 	// display sample information and close the game tag
-	output_sampleof();
+	output_sampleof(config->root_device());
 	fprintf(m_output, ">\n");
 
 	// output game description
@@ -337,7 +337,7 @@ void info_xml_creator::output_one()
 	output_device_roms();
 	output_sample(config->root_device());
 	output_chips(config->root_device(), "");
-	output_display(config->root_device(), "");
+	output_display(config->root_device(), &m_drivlist.driver().flags, "");
 	output_sound(config->root_device());
 	output_input(portlist);
 	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
@@ -346,7 +346,7 @@ void info_xml_creator::output_one()
 	output_adjusters(portlist);
 	output_driver();
 	output_images(config->root_device(), "");
-	output_slots(config->root_device(), "");
+	output_slots(*config, config->root_device(), "");
 	output_software_list();
 	output_ramoptions();
 
@@ -360,7 +360,7 @@ void info_xml_creator::output_one()
 //  a single device
 //-------------------------------------------------
 
-void info_xml_creator::output_one_device(device_t &device, const char *devtag)
+void info_xml_creator::output_one_device(machine_config &config, device_t &device, const char *devtag)
 {
 	bool has_speaker = false, has_input = false;
 	// check if the device adds speakers to the system
@@ -389,17 +389,17 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(src.c_str()));
 	fprintf(m_output, " isdevice=\"yes\"");
 	fprintf(m_output, " runnable=\"no\"");
-	output_sampleof();
+	output_sampleof(device);
 	fprintf(m_output, ">\n");
 	fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(device.name()));
 
 	output_rom(device);
 
-	samples_device *samples = dynamic_cast<samples_device*>(&device);
-	if (samples==nullptr) output_sample(device); // ignore samples_device itself
+	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
+		output_sample(device);
 
 	output_chips(device, devtag);
-	output_display(device, devtag);
+	output_display(device, nullptr, devtag);
 	if (has_speaker)
 		output_sound(device);
 	if (has_input)
@@ -408,7 +408,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "confsetting");
 	output_adjusters(portlist);
 	output_images(device, devtag);
-	output_slots(device, devtag);
+	output_slots(config, device, devtag);
 	fprintf(m_output, "\t</%s>\n", XML_TOP);
 }
 
@@ -427,16 +427,14 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 void info_xml_creator::output_devices()
 {
-	// get config for some arbitrary machine
-	m_drivlist.reset();
-	m_drivlist.next();
-	std::shared_ptr<machine_config> config = m_drivlist.config();
+	// get config for empty machine
+	machine_config config(GAME_NAME(___empty), m_drivlist.options());
 
 	// run through devices
 	for (device_type type : registered_device_types)
 	{
 		// add it at the root of the machine config
-		device_t *const dev = config->device_add(&config->root_device(), "_tmp", type, 0);
+		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
 
 		// notify this device and all its subdevices that they are now configured
 		for (device_t &device : device_iterator(*dev))
@@ -444,8 +442,8 @@ void info_xml_creator::output_devices()
 				device.config_complete();
 
 		// print details and remove it
-		output_one_device(*dev, dev->tag());
-		config->device_remove(&config->root_device(), "_tmp");
+		output_one_device(config, *dev, dev->tag());
+		config.device_remove(&config.root_device(), "_tmp");
 	}
 }
 
@@ -468,12 +466,12 @@ void info_xml_creator::output_device_roms()
 //  attribute, if appropriate
 //-------------------------------------------------
 
-void info_xml_creator::output_sampleof()
+void info_xml_creator::output_sampleof(device_t &device)
 {
 	// iterate over sample devices
-	for (samples_device &device : samples_device_iterator(m_drivlist.config()->root_device()))
+	for (samples_device &samples : samples_device_iterator(device))
 	{
-		samples_iterator sampiter(device);
+		samples_iterator sampiter(samples);
 		if (sampiter.altbasename() != nullptr)
 		{
 			fprintf(m_output, " sampleof=\"%s\"", util::xml::normalize_string(sampiter.altbasename()));
@@ -551,10 +549,9 @@ void info_xml_creator::output_rom(device_t &device)
 
 				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
 				util::hash_collection hashes(ROM_GETHASHDATA(rom));
-				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				if (dynamic_cast<driver_device *>(&device) &&!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 					merge_name = get_merge_name(hashes);
-				if (&device != &m_drivlist.config()->root_device())
-					merge_name = nullptr;
+
 				// scan for a BIOS name
 				bios_name[0] = 0;
 				if (!is_disk && is_bios)
@@ -695,7 +692,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 //  displays
 //-------------------------------------------------
 
-void info_xml_creator::output_display(device_t &device, const char *root_tag)
+void info_xml_creator::output_display(device_t &device, u32 const *flags, const char *root_tag)
 {
 	// iterate over screens
 	for (const screen_device &screendev : screen_device_iterator(device))
@@ -717,8 +714,10 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 			}
 
 			// output the orientation as a string
-			switch (m_drivlist.driver().flags & ORIENTATION_MASK)
+			if (flags)
 			{
+				switch (*flags & ORIENTATION_MASK)
+				{
 				case ORIENTATION_FLIP_X:
 					fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
 					break;
@@ -743,6 +742,7 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 				default:
 					fprintf(m_output, " rotate=\"0\"");
 					break;
+				}
 			}
 
 			// output width and height only for games that are not vector
@@ -1379,44 +1379,45 @@ void info_xml_creator::output_driver()
 	/* some minor issues, games marked as status=preliminary */
 	/* don't work or have major emulation problems. */
 
-	if (m_drivlist.driver().flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_MECHANICAL))
+	u32 const flags = m_drivlist.driver().flags;
+	if (flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_MECHANICAL))
 		fprintf(m_output, " status=\"preliminary\"");
-	else if (m_drivlist.driver().flags & (MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS))
+	else if (flags & (MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS))
 		fprintf(m_output, " status=\"imperfect\"");
 	else
 		fprintf(m_output, " status=\"good\"");
 
-	if (m_drivlist.driver().flags & MACHINE_NOT_WORKING)
+	if (flags & MACHINE_NOT_WORKING)
 		fprintf(m_output, " emulation=\"preliminary\"");
 	else
 		fprintf(m_output, " emulation=\"good\"");
 
-	if (m_drivlist.driver().flags & MACHINE_WRONG_COLORS)
+	if (flags & MACHINE_WRONG_COLORS)
 		fprintf(m_output, " color=\"preliminary\"");
-	else if (m_drivlist.driver().flags & MACHINE_IMPERFECT_COLORS)
+	else if (flags & MACHINE_IMPERFECT_COLORS)
 		fprintf(m_output, " color=\"imperfect\"");
 	else
 		fprintf(m_output, " color=\"good\"");
 
-	if (m_drivlist.driver().flags & MACHINE_NO_SOUND)
+	if (flags & MACHINE_NO_SOUND)
 		fprintf(m_output, " sound=\"preliminary\"");
-	else if (m_drivlist.driver().flags & MACHINE_IMPERFECT_SOUND)
+	else if (flags & MACHINE_IMPERFECT_SOUND)
 		fprintf(m_output, " sound=\"imperfect\"");
 	else
 		fprintf(m_output, " sound=\"good\"");
 
-	if (m_drivlist.driver().flags & MACHINE_IMPERFECT_GRAPHICS)
+	if (flags & MACHINE_IMPERFECT_GRAPHICS)
 		fprintf(m_output, " graphic=\"imperfect\"");
 	else
 		fprintf(m_output, " graphic=\"good\"");
 
-	if (m_drivlist.driver().flags & MACHINE_NO_COCKTAIL)
+	if (flags & MACHINE_NO_COCKTAIL)
 		fprintf(m_output, " cocktail=\"preliminary\"");
 
-	if (m_drivlist.driver().flags & MACHINE_UNEMULATED_PROTECTION)
+	if (flags & MACHINE_UNEMULATED_PROTECTION)
 		fprintf(m_output, " protection=\"preliminary\"");
 
-	if (m_drivlist.driver().flags & MACHINE_SUPPORTS_SAVE)
+	if (flags & MACHINE_SUPPORTS_SAVE)
 		fprintf(m_output, " savestate=\"supported\"");
 	else
 		fprintf(m_output, " savestate=\"unsupported\"");
@@ -1492,7 +1493,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 //  output_images - prints all info about slots
 //-------------------------------------------------
 
-void info_xml_creator::output_slots(device_t &device, const char *root_tag)
+void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag)
 {
 	for (const device_slot_interface &slot : slot_interface_iterator(device))
 	{
@@ -1515,7 +1516,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			{
 				if (option.second->selectable())
 				{
-					device_t *dev = m_drivlist.config()->device_add(&m_drivlist.config()->root_device(), "dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&device, "_dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
@@ -1525,7 +1526,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 					if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");
-					m_drivlist.config()->device_remove(&m_drivlist.config()->root_device(), "dummy");
+					config.device_remove(&device, "_dummy");
 				}
 			}
 
