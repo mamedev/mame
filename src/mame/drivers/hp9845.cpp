@@ -41,6 +41,7 @@
 #include "includes/hp9845.h"
 
 #include "bus/hp_optroms/hp_optrom.h"
+#include "bus/hp9845_io/hp9845_io.h"
 
 #include "render.h"
 #include "softlist.h"
@@ -409,6 +410,36 @@ void hp9845_base_state::machine_reset()
 	m_lpu->halt_w(1);
 	m_ppu->halt_w(0);
 
+	// First, unmap every r/w handler in 1..12 select codes
+	for (unsigned sc = 1; sc < 13; sc++) {
+		m_ppu->space(AS_IO).unmap_readwrite(sc * 4 , sc * 4 + 3);
+	}
+
+	// Then, set r/w handlers of all installed I/O slot cards
+	int sc;
+	read16_delegate rhandler;
+	write16_delegate whandler;
+	if ((sc = m_io_slot0->get_rw_handlers(rhandler , whandler)) >= 0) {
+		logerror("Install R/W handlers for slot 0 @ SC = %d\n" , sc);
+		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+	}
+	if ((sc = m_io_slot1->get_rw_handlers(rhandler , whandler)) >= 0) {
+		logerror("Install R/W handlers for slot 1 @ SC = %d\n" , sc);
+		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+	}
+	if ((sc = m_io_slot2->get_rw_handlers(rhandler , whandler)) >= 0) {
+		logerror("Install R/W handlers for slot 2 @ SC = %d\n" , sc);
+		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+	}
+	if ((sc = m_io_slot3->get_rw_handlers(rhandler , whandler)) >= 0) {
+		logerror("Install R/W handlers for slot 3 @ SC = %d\n" , sc);
+		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+	}
+
+	{
+		device_execute_interface *dei = dynamic_cast<device_execute_interface *>(&(*m_ppu));
+		logerror("ppu %p\n" , dei);
+	}
 	// Some sensible defaults
 	m_video_load_mar = false;
 	m_video_first_mar = false;
@@ -474,6 +505,11 @@ void hp9845_base_state::update_irq(void)
 		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
 }
 
+WRITE8_MEMBER(hp9845_base_state::irq_w)
+{
+	irq_w((uint8_t)offset , data != 0);
+}
+
 void hp9845_base_state::irq_w(uint8_t sc , int state)
 {
 	unsigned bit_n = sc % 8;
@@ -502,6 +538,11 @@ void hp9845_base_state::update_flg_sts(void)
 	m_ppu->flag_w(flg);
 }
 
+WRITE8_MEMBER(hp9845_base_state::sts_w)
+{
+	sts_w((uint8_t)offset , data != 0);
+}
+
 void hp9845_base_state::sts_w(uint8_t sc , int state)
 {
 	if (state) {
@@ -514,6 +555,11 @@ void hp9845_base_state::sts_w(uint8_t sc , int state)
 	}
 }
 
+WRITE8_MEMBER(hp9845_base_state::flg_w)
+{
+	flg_w((uint8_t)offset , data != 0);
+}
+
 void hp9845_base_state::flg_w(uint8_t sc , int state)
 {
 	if (state) {
@@ -524,12 +570,6 @@ void hp9845_base_state::flg_w(uint8_t sc , int state)
 	if (sc == m_pa) {
 		update_flg_sts();
 	}
-}
-
-void hp9845_base_state::install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler)
-{
-	// Install r/w handlers to cover all I/O addresses of PPU belonging to "sc" select code
-	m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
@@ -2558,9 +2598,21 @@ static MACHINE_CONFIG_FRAGMENT(hp9845_base)
 
 	// I/O slots
 	MCFG_HP9845_IO_SLOT_ADD("slot0")
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot1")
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot2")
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot3")
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
 
 	// LPU memory options
 	MCFG_RAM_ADD(RAM_TAG)

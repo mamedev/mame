@@ -30,11 +30,13 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq(void);
+	DECLARE_WRITE8_MEMBER(irq_w);
 	void irq_w(uint8_t sc , int state);
 	void update_flg_sts(void);
+	DECLARE_WRITE8_MEMBER(sts_w);
 	void sts_w(uint8_t sc , int state);
+	DECLARE_WRITE8_MEMBER(flg_w);
 	void flg_w(uint8_t sc , int state);
-	void install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
