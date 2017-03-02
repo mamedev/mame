@@ -167,7 +167,7 @@ private:
 public:
 	device_type_impl(std::nullptr_t)
 		: m_creator(nullptr)
-		, m_type(typeid(nullptr_t))
+		, m_type(typeid(std::nullptr_t))
 		, m_next(nullptr)
 	{
 	}
