@@ -4,40 +4,21 @@
 
 /*
 TODO:
-- Hookup emulated hopper or popmessage for payout response.
 - colour decoding might not be perfect
 - Background color should be green, but current handling might be wrong.
 - some unknown sprite attributes
 - don't know what to do when the jackpot is displayed (missing controls ?)
 - according to the board pic, there should be one more 4-switches dip
   switch bank, and probably some NVRAM because there's a battery.
-
-Payout:
- Once the "Payout" button is pressed, The game waits for a "Medal In" signal to indicate a Medal was dispensed.
- Once it receives the signal - The game decreases the credit count. (The payout dispenses only one medal per press)
- The hopper hookup address & values are labeled as best guess.
-
- Activate Hopper: 0xC044
- 00 = Idle
- 01 = Dispense a Medal
-
- Receive State: 0xC042
- 20 = Idle
- 60 = Expecting hopper signal
- E0/A0 = Received hopper signal
-
- Payout Status: 0xC06A
- 00 = Idle
- 01 = Waiting for hopper signal
- 02 = Receiving hopper signal
- 03 = Error (Medal Empty or Medal Stick)
-
- The only important one would be Activate Hopper.
 */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class albazc_state : public driver_device
 {
@@ -49,7 +30,8 @@ public:
 		m_spriteram3(*this, "spriteram3"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper") { }
 
 	/* video-related */
 	required_shared_ptr<uint8_t> m_spriteram1;
@@ -67,6 +49,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
 };
 
 
@@ -162,6 +145,8 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
 	     6      ?
 	     7      ?
 	*/
+
+	m_hopper->motor_w(BIT(data, 0));
 }
 
 WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
@@ -198,7 +183,7 @@ static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)   // ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM         // main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM         // ???
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
@@ -232,8 +217,8 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_START("IN2")   /* 0xe002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Medal In")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // "Medal In"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -291,6 +276,10 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(hanaroku_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
