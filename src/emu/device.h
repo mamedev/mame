@@ -94,6 +94,8 @@ private:
 	class const_iterator_helper;
 
 public:
+	device_registrar() { }
+
 	class const_iterator
 	{
 	public:
