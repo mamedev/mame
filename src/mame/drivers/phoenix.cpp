@@ -831,6 +831,29 @@ ROM_START( phoenixc4 )
 	ROM_RELOAD(               0x0000, 0x0100 )  /* the dump had 2 identical proms with different names */
 ROM_END
 
+ROM_START( phoenixi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0201.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
+	ROM_LOAD( "0202.bin",  0x0800, 0x0800, CRC(440d56e8) SHA1(b3147d5416cec8c00c7df40b878b826434121737) )
+	ROM_LOAD( "0203.bin",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
+	ROM_LOAD( "0204.bin",  0x1800, 0x0800, CRC(e2d3271f) SHA1(4bf01aa5104bdc84066f8267766d397a39af7b3e) )
+	ROM_LOAD( "0205.bin",  0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) )
+	ROM_LOAD( "0206.bin",  0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "0207.bin",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "cond08c.bin",  0x3800, 0x0800, BAD_DUMP CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) ) // 0208.bin wasn't readable, but very probably matches the one from condor
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "0209.bin",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "0210.bin",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "0211.bin",  0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
+	ROM_LOAD( "0212.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(a7d73fba) SHA1(ed7355c8ea86fb14c91dd0b5c5fb048a3c05cdfc) )
+ROM_END
+
 ROM_START( condor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cond01c.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
@@ -1446,6 +1469,7 @@ GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT
 GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixi, phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
 GAME( 1981, condor,   phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condorn,  phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in england & france respectively
