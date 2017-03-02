@@ -35,9 +35,9 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_JCART = &device_creator<md_jcart_device>;
-const device_type MD_SEPROM_CODEMAST = &device_creator<md_seprom_codemast_device>;
-const device_type MD_SEPROM_MM96 = &device_creator<md_seprom_mm96_device>;
+const device_type MD_JCART = device_creator<md_jcart_device>;
+const device_type MD_SEPROM_CODEMAST = device_creator<md_seprom_codemast_device>;
+const device_type MD_SEPROM_MM96 = device_creator<md_seprom_mm96_device>;
 
 // Sampras, Super Skidmarks?
 md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

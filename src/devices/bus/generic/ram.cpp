@@ -26,12 +26,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type GENERIC_RAM_32K_PLAIN = &device_creator<generic_ram_32k_plain_device>;
-const device_type GENERIC_RAM_64K_PLAIN = &device_creator<generic_ram_64k_plain_device>;
-const device_type GENERIC_RAM_128K_PLAIN = &device_creator<generic_ram_128k_plain_device>;
-const device_type GENERIC_RAM_32K_LINEAR = &device_creator<generic_ram_32k_linear_device>;
-const device_type GENERIC_RAM_64K_LINEAR = &device_creator<generic_ram_64k_linear_device>;
-const device_type GENERIC_RAM_128K_LINEAR = &device_creator<generic_ram_128k_linear_device>;
+const device_type GENERIC_RAM_32K_PLAIN = device_creator<generic_ram_32k_plain_device>;
+const device_type GENERIC_RAM_64K_PLAIN = device_creator<generic_ram_64k_plain_device>;
+const device_type GENERIC_RAM_128K_PLAIN = device_creator<generic_ram_128k_plain_device>;
+const device_type GENERIC_RAM_32K_LINEAR = device_creator<generic_ram_32k_linear_device>;
+const device_type GENERIC_RAM_64K_LINEAR = device_creator<generic_ram_64k_linear_device>;
+const device_type GENERIC_RAM_128K_LINEAR = device_creator<generic_ram_128k_linear_device>;
 
 
 generic_ram_plain_device::generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t size, const char *shortname, const char *source)

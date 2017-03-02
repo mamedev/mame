@@ -121,6 +121,7 @@ How the architecture works:
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
 
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -138,16 +139,16 @@ class sun2_state : public driver_device
 {
 public:
 	sun2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_rom(*this, "bootprom"),
-	m_idprom(*this, "idprom"),
-	m_ram(*this, RAM_TAG),
-	m_type0space(*this, "type0"),
-	m_type1space(*this, "type1"),
-	m_type2space(*this, "type2"),
-	m_type3space(*this, "type3"),
-	m_bw2_vram(*this, "bw2_vram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "bootprom")
+		, m_idprom(*this, "idprom")
+		, m_ram(*this, RAM_TAG)
+		, m_type0space(*this, "type0")
+		, m_type1space(*this, "type1")
+		, m_type2space(*this, "type2")
+		, m_type3space(*this, "type3")
+		, m_bw2_vram(*this, "bw2_vram")
 	{ }
 
 	required_device<m68010_device> m_maincpu;

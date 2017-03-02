@@ -21,10 +21,14 @@ Cart sizes: 1MB, 2MB, 4MB
 ********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tlcs90/tlcs90.h"
-#include "softlist.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
+#include "softlist.h"
 
 
 class pockchalv1_state : public driver_device
@@ -34,7 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
-		{ }
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

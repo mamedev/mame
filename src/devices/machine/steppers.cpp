@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "steppers.h"
 
-const device_type STEPPER = &device_creator<stepper_device>;
+const device_type STEPPER = device_creator<stepper_device>;
 
 stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),

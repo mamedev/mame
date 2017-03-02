@@ -846,18 +846,23 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/seibuspi.h"
+
 #include "cpu/i386/i386.h"
+#include "cpu/z80/z80.h"
+#include "machine/7200fifo.h"
 #include "machine/ds2404.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "machine/7200fifo.h"
+#include "machine/seibuspi.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "machine/seibuspi.h"
 #include "video/seibu_crtc.h"
-#include "includes/seibuspi.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 // default values written to CRTC (note: SYS386F does not have this chip)
 #define PIXEL_CLOCK  (XTAL_28_63636MHz/4)

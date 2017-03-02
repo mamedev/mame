@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "includes/mw8080bw.h"
+#include "speaker.h"
 
 
 /*************************************

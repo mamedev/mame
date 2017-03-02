@@ -117,19 +117,21 @@
 
 ***************************************************************************************************/
 
-
-#define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
-#define HOPPER_PULSE        50 // guessed
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/ay8910.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include <algorithm>
+
+
+#define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
+#define HOPPER_PULSE        50 // guessed
 
 
 class skylncr_state : public driver_device

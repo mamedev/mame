@@ -89,12 +89,15 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 */
 
 #include "emu.h"
+#include "includes/ms32.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "rendlay.h"
 #include "sound/ymf271.h"
-#include "includes/ms32.h"
 #include "machine/jalcrpt.h"
+
+#include "rendlay.h"
+#include "speaker.h"
 
 
 class bnstars_state : public ms32_state

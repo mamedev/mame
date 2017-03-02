@@ -9,9 +9,10 @@ Control Data Corporation CDC 721 Terminal (Viking)
 
 *************************************************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
+
 
 class cdc721_state : public driver_device
 {
@@ -21,7 +22,8 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{
+	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(cdc721);

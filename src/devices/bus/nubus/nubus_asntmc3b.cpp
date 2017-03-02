@@ -40,8 +40,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_ASNTMC3NB = &device_creator<nubus_asntmc3nb_device>;
-const device_type NUBUS_APPLEENET = &device_creator<nubus_appleenet_device>;
+const device_type NUBUS_ASNTMC3NB = device_creator<nubus_asntmc3nb_device>;
+const device_type NUBUS_APPLEENET = device_creator<nubus_appleenet_device>;
 
 
 //-------------------------------------------------

@@ -81,6 +81,8 @@ Component Side   A   B   Solder Side
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 class popobear_state : public driver_device
 {

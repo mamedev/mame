@@ -235,11 +235,15 @@ Custom: GX61A01
 
 #include "emu.h"
 #include "includes/homedata.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {

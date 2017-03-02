@@ -43,6 +43,7 @@
 #include "bus/centronics/digiblst.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 
 
 /****************************

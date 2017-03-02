@@ -190,6 +190,17 @@ ToDo:
 
 ****************************************************************************/
 
+#include "emu.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
+#include "machine/mc68681.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -220,15 +231,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA0 1
 #define DEBUG_SWYFT_VIA1 1
 
-
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/mc68681.h"
-#include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
 
 class cat_state : public driver_device
 {

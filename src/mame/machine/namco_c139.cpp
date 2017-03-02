@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type NAMCO_C139 = &device_creator<namco_c139_device>;
+const device_type NAMCO_C139 = device_creator<namco_c139_device>;
 
 
 //**************************************************************************

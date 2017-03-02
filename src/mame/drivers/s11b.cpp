@@ -22,10 +22,14 @@
 
 #include "emu.h"
 #include "includes/s11b.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s11b.lh"
+
 
 static ADDRESS_MAP_START( s11b_main_map, AS_PROGRAM, 8, s11b_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")

@@ -121,8 +121,8 @@ machine_manager::~machine_manager()
 {
 	if (options().http())
 		m_server->stop();
-        if (m_server_thread.joinable())
-            m_server_thread.join();
+	if (m_server_thread.joinable())
+		m_server_thread.join();
 }
 
 void machine_manager::start_http_server()

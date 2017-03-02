@@ -28,11 +28,13 @@
 
 #include "emu.h"
 #include "includes/esripsys.h"
+
 #include "cpu/esrip/esrip.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/20pacgal.h"
+#include "screen.h"
 
 
 #define SCREEN_HEIGHT   (224)

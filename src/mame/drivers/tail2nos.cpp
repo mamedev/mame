@@ -11,10 +11,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tail2nos.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
-#include "includes/tail2nos.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(tail2nos_state::sound_command_w)

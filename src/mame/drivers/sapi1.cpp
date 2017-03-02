@@ -33,10 +33,11 @@ Unable to proceed due to no info available (& in English).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "machine/keyboard.h"
+#include "machine/ram.h"
 #include "machine/terminal.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class sapi1_state : public driver_device
 {

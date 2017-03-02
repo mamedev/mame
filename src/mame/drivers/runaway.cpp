@@ -13,10 +13,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/runaway.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
-#include "includes/runaway.h"
+#include "speaker.h"
 
 
 TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)

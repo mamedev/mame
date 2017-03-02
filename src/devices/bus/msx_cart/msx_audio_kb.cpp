@@ -4,7 +4,7 @@
 #include "msx_audio_kb.h"
 
 
-const device_type MSX_AUDIO_KBDC_PORT = &device_creator<msx_audio_kbdc_port_device>;
+const device_type MSX_AUDIO_KBDC_PORT = device_creator<msx_audio_kbdc_port_device>;
 
 
 msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -305,8 +305,8 @@ ioport_constructor msx_nms1160::device_input_ports() const
 
 
 
-const device_type MSX_AUDIO_KB_HXMU901 = &device_creator<msx_hxmu901>;
-const device_type MSX_AUDIO_KB_NMS1160 = &device_creator<msx_nms1160>;
+const device_type MSX_AUDIO_KB_HXMU901 = device_creator<msx_hxmu901>;
+const device_type MSX_AUDIO_KB_NMS1160 = device_creator<msx_nms1160>;
 
 
 SLOT_INTERFACE_START( msx_audio_keyboards )

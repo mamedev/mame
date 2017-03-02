@@ -41,9 +41,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_BF9093 = &device_creator<nes_bf9093_device>;
-const device_type NES_BF9096 = &device_creator<nes_bf9096_device>;
-const device_type NES_GOLDEN5 = &device_creator<nes_golden5_device>;
+const device_type NES_BF9093 = device_creator<nes_bf9093_device>;
+const device_type NES_BF9096 = device_creator<nes_bf9096_device>;
+const device_type NES_GOLDEN5 = device_creator<nes_golden5_device>;
 
 
 nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -768,4 +768,4 @@ machine_config_constructor hp98035_io_card::device_mconfig_additions() const
 }
 
 // device type definition
-const device_type HP98035_IO_CARD = &device_creator<hp98035_io_card>;
+const device_type HP98035_IO_CARD = device_creator<hp98035_io_card>;

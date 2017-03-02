@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_JOYSTICK = &device_creator<cgenie_joystick_device>;
+const device_type CGENIE_JOYSTICK = device_creator<cgenie_joystick_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

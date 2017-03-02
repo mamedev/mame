@@ -28,11 +28,14 @@
 
 #include "emu.h"
 #include "includes/coolpool.h"
+
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

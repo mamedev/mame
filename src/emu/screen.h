@@ -7,17 +7,12 @@
     Core MAME screen device.
 
 ***************************************************************************/
-
-#include <utility>
+#ifndef MAME_EMU_SCREEN_H
+#define MAME_EMU_SCREEN_H
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef MAME_EMU_SCREEN_H
-#define MAME_EMU_SCREEN_H
+#include <utility>
 
 
 //**************************************************************************
@@ -370,7 +365,10 @@ private:
 extern const device_type SCREEN;
 
 // iterator helper
-typedef device_type_iterator<&device_creator<screen_device>, screen_device> screen_device_iterator;
+typedef device_type_iterator<SCREEN, screen_device> screen_device_iterator;
+
+extern template class device_finder<screen_device, false>;
+extern template class device_finder<screen_device, true>;
 
 /*!
  @defgroup Screen device configuration macros

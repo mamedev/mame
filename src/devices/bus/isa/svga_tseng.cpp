@@ -10,6 +10,9 @@
 #include "svga_tseng.h"
 #include "video/pc_vga.h"
 
+#include "screen.h"
+
+
 ROM_START( et4000 )
 	ROM_REGION(0x8000,"et4000", 0)
 	ROM_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
@@ -19,7 +22,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SVGA_ET4K = &device_creator<isa8_svga_et4k_device>;
+const device_type ISA8_SVGA_ET4K = device_creator<isa8_svga_et4k_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_tseng )

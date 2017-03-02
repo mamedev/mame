@@ -78,38 +78,38 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
-const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
-const device_type SHARP_LH28F016S_16BIT = &device_creator<sharp_lh28f016s_16bit_device>;
-const device_type ATMEL_29C010 = &device_creator<atmel_29c010_device>;
-const device_type AMD_29F010 = &device_creator<amd_29f010_device>;
-const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
-const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
-const device_type AMD_29F400T = &device_creator<amd_29f400t_device>;
-const device_type AMD_29F800T = &device_creator<amd_29f800t_device>;
-const device_type AMD_29LV200T = &device_creator<amd_29lv200t_device>;
-const device_type FUJITSU_29F160T = &device_creator<fujitsu_29f160t_device>;
-const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
-const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
-const device_type INTEL_E28F400B = &device_creator<intel_e28f400b_device>;
-const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
-const device_type MACRONIX_29LV160TMC = &device_creator<macronix_29lv160tmc_device>;
-const device_type TMS_29F040 = &device_creator<tms_29f040_device>;
+const device_type INTEL_28F016S5 = device_creator<intel_28f016s5_device>;
+const device_type SHARP_LH28F016S = device_creator<sharp_lh28f016s_device>;
+const device_type SHARP_LH28F016S_16BIT = device_creator<sharp_lh28f016s_16bit_device>;
+const device_type ATMEL_29C010 = device_creator<atmel_29c010_device>;
+const device_type AMD_29F010 = device_creator<amd_29f010_device>;
+const device_type AMD_29F040 = device_creator<amd_29f040_device>;
+const device_type AMD_29F080 = device_creator<amd_29f080_device>;
+const device_type AMD_29F400T = device_creator<amd_29f400t_device>;
+const device_type AMD_29F800T = device_creator<amd_29f800t_device>;
+const device_type AMD_29LV200T = device_creator<amd_29lv200t_device>;
+const device_type FUJITSU_29F160T = device_creator<fujitsu_29f160t_device>;
+const device_type FUJITSU_29F016A = device_creator<fujitsu_29f016a_device>;
+const device_type FUJITSU_29DL16X = device_creator<fujitsu_29dl16x_device>;
+const device_type INTEL_E28F400B = device_creator<intel_e28f400b_device>;
+const device_type MACRONIX_29L001MC = device_creator<macronix_29l001mc_device>;
+const device_type MACRONIX_29LV160TMC = device_creator<macronix_29lv160tmc_device>;
+const device_type TMS_29F040 = device_creator<tms_29f040_device>;
 
-const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
-const device_type SANYO_LE26FV10N1TS = &device_creator<sanyo_le26fv10n1ts_device>;
-const device_type SST_28SF040 = &device_creator<sst_28sf040_device>;
-const device_type SST_39VF020 = &device_creator<sst_39vf020_device>;
+const device_type PANASONIC_MN63F805MNP = device_creator<panasonic_mn63f805mnp_device>;
+const device_type SANYO_LE26FV10N1TS = device_creator<sanyo_le26fv10n1ts_device>;
+const device_type SST_28SF040 = device_creator<sst_28sf040_device>;
+const device_type SST_39VF020 = device_creator<sst_39vf020_device>;
 
-const device_type SHARP_LH28F400 = &device_creator<sharp_lh28f400_device>;
-const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
-const device_type INTEL_TE28F160 = &device_creator<intel_te28f160_device>;
-const device_type INTEL_TE28F320 = &device_creator<intel_te28f320_device>;
-const device_type SHARP_UNK128MBIT = &device_creator<sharp_unk128mbit_device>;
-const device_type INTEL_28F320J3D = &device_creator<intel_28f320j3d_device>;
-const device_type INTEL_28F320J5 = &device_creator<intel_28f320j5_device>;
+const device_type SHARP_LH28F400 = device_creator<sharp_lh28f400_device>;
+const device_type INTEL_E28F008SA = device_creator<intel_e28f008sa_device>;
+const device_type INTEL_TE28F160 = device_creator<intel_te28f160_device>;
+const device_type INTEL_TE28F320 = device_creator<intel_te28f320_device>;
+const device_type SHARP_UNK128MBIT = device_creator<sharp_unk128mbit_device>;
+const device_type INTEL_28F320J3D = device_creator<intel_28f320j3d_device>;
+const device_type INTEL_28F320J5 = device_creator<intel_28f320j5_device>;
 
-const device_type SST_39VF400A = &device_creator<sst_39vf400a_device>;
+const device_type SST_39VF400A = device_creator<sst_39vf400a_device>;
 
 
 //**************************************************************************

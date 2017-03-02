@@ -17,11 +17,12 @@ Notes:
 *******************************************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
-#include "bus/rs232/rs232.h"
-#include "machine/clock.h"
+#include "screen.h"
 
 class tim100_state : public driver_device
 {

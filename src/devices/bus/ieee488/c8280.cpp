@@ -36,7 +36,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C8280 = &device_creator<c8280_t>;
+const device_type C8280 = device_creator<c8280_t>;
 
 
 //-------------------------------------------------

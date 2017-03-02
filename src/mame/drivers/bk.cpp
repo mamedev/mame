@@ -10,14 +10,18 @@
 
 
 #include "emu.h"
+#include "includes/bk.h"
+
 #include "cpu/t11/t11.h"
 #include "sound/wave.h"
-#include "includes/bk.h"
-#include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
-#include "softlist.h"
 
-	/* Address maps */
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
+
+/* Address maps */
 static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM

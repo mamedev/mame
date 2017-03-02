@@ -70,10 +70,13 @@ of save-state is also needed.
 
 #include "emu.h"
 #include "includes/williams.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK        (XTAL_12MHz)
 #define SOUND_CLOCK         (XTAL_3_579545MHz)

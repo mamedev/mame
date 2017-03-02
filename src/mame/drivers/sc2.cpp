@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "machine/z80pio.h"
+#include "speaker.h"
+
 #include "sc2.lh"
 
 class sc2_state : public driver_device

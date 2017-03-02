@@ -129,20 +129,24 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6847.h"
-#include "imagedev/cassette.h"
-#include "formats/spc1000_cas.h"
-#include "bus/centronics/ctronics.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/spc1000/exp.h"
 #include "bus/spc1000/fdd.h"
 #include "bus/spc1000/vdp.h"
 
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/spc1000_cas.h"
+
 
 class spc1000_state : public driver_device
 {

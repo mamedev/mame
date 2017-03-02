@@ -25,8 +25,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6530n = &device_creator<mos6530_t>;
-const device_type MOS6532n = &device_creator<mos6532_t>;
+const device_type MOS6530n = device_creator<mos6530_t>;
+const device_type MOS6532n = device_creator<mos6532_t>;
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 8, mos6530_t )

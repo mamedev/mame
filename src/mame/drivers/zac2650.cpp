@@ -15,10 +15,12 @@
  */
 
 #include "emu.h"
+#include "includes/zac2650.h"
+
 #include "cpu/s2650/s2650.h"
+#include "speaker.h"
 
 #include "tinv2650.lh"
-#include "includes/zac2650.h"
 
 
 /***********************************************************************************************/

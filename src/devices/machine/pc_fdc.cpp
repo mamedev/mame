@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 
-const device_type PC_FDC_XT = &device_creator<pc_fdc_xt_device>;
-const device_type PC_FDC_AT = &device_creator<pc_fdc_at_device>;
+const device_type PC_FDC_XT = device_creator<pc_fdc_xt_device>;
+const device_type PC_FDC_AT = device_creator<pc_fdc_at_device>;
 
 static MACHINE_CONFIG_FRAGMENT( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)

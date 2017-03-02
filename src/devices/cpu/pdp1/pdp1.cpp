@@ -377,7 +377,7 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-const device_type PDP1 = &device_creator<pdp1_device>;
+const device_type PDP1 = device_creator<pdp1_device>;
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_DDP = &device_creator<adam_digital_data_pack_device>;
+const device_type ADAM_DDP = device_creator<adam_digital_data_pack_device>;
 
 
 //-------------------------------------------------

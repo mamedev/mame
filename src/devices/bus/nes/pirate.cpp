@@ -19,6 +19,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -34,23 +35,23 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_AGCI_50282 = &device_creator<nes_agci_device>;
-const device_type NES_DREAMTECH01 = &device_creator<nes_dreamtech_device>;
-const device_type NES_FUKUTAKE = &device_creator<nes_fukutake_device>;
-const device_type NES_FUTUREMEDIA = &device_creator<nes_futuremedia_device>;
-const device_type NES_MAGSERIES = &device_creator<nes_magseries_device>;
-const device_type NES_DAOU306 = &device_creator<nes_daou306_device>;
-const device_type NES_SUBOR0 = &device_creator<nes_subor0_device>;
-const device_type NES_SUBOR1 = &device_creator<nes_subor1_device>;
-const device_type NES_CC21 = &device_creator<nes_cc21_device>;
-const device_type NES_XIAOZY = &device_creator<nes_xiaozy_device>;
-const device_type NES_EDU2K = &device_creator<nes_edu2k_device>;
-const device_type NES_T230 = &device_creator<nes_t230_device>;
-const device_type NES_MK2 = &device_creator<nes_mk2_device>;
-const device_type NES_WHERO = &device_creator<nes_whero_device>;
-const device_type NES_43272 = &device_creator<nes_43272_device>;
-const device_type NES_TF1201 = &device_creator<nes_tf1201_device>;
-const device_type NES_CITYFIGHT = &device_creator<nes_cityfight_device>;
+const device_type NES_AGCI_50282 = device_creator<nes_agci_device>;
+const device_type NES_DREAMTECH01 = device_creator<nes_dreamtech_device>;
+const device_type NES_FUKUTAKE = device_creator<nes_fukutake_device>;
+const device_type NES_FUTUREMEDIA = device_creator<nes_futuremedia_device>;
+const device_type NES_MAGSERIES = device_creator<nes_magseries_device>;
+const device_type NES_DAOU306 = device_creator<nes_daou306_device>;
+const device_type NES_SUBOR0 = device_creator<nes_subor0_device>;
+const device_type NES_SUBOR1 = device_creator<nes_subor1_device>;
+const device_type NES_CC21 = device_creator<nes_cc21_device>;
+const device_type NES_XIAOZY = device_creator<nes_xiaozy_device>;
+const device_type NES_EDU2K = device_creator<nes_edu2k_device>;
+const device_type NES_T230 = device_creator<nes_t230_device>;
+const device_type NES_MK2 = device_creator<nes_mk2_device>;
+const device_type NES_WHERO = device_creator<nes_whero_device>;
+const device_type NES_43272 = device_creator<nes_43272_device>;
+const device_type NES_TF1201 = device_creator<nes_tf1201_device>;
+const device_type NES_CITYFIGHT = device_creator<nes_cityfight_device>;
 
 
 nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -18,12 +18,16 @@ TODO:
 *******************************************************************************************/
 
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/ay8910.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 

@@ -9,10 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/madalien.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "includes/madalien.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define SOUND_CLOCK XTAL_4MHz

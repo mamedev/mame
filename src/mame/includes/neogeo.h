@@ -19,6 +19,8 @@
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
 
+#include "screen.h"
+
 
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
 // Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.

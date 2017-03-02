@@ -8,6 +8,7 @@ Namco System 86 Video Hardware
 
 #include "emu.h"
 #include "includes/namcos86.h"
+#include "screen.h"
 
 
 /***************************************************************************

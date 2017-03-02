@@ -20,7 +20,7 @@
 
 
 // device type definition
-const device_type HD64610 = &device_creator<hd64610_device>;
+const device_type HD64610 = device_creator<hd64610_device>;
 
 
 //**************************************************************************

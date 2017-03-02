@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "pt554.h"
+#include "speaker.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -31,7 +32,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_BANDAI_PT554 = &device_creator<nes_bandai_pt554_device>;
+const device_type NES_BANDAI_PT554 = device_creator<nes_bandai_pt554_device>;
 
 
 nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

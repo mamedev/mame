@@ -19,9 +19,12 @@ To do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tankbust.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/tankbust.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void tankbust_state::machine_start()

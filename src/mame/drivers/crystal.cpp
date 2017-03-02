@@ -184,10 +184,12 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "video/vrender0.h"
 #include "machine/ds1302.h"
-#include "sound/vrender0.h"
 #include "machine/nvram.h"
+#include "sound/vrender0.h"
+#include "video/vrender0.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define IDLE_LOOP_SPEEDUP
 
@@ -206,7 +208,7 @@ public:
 		m_vr0(*this, "vr0"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
-		{ }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_sysregs;

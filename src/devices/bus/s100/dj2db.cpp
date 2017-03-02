@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_DJ2DB = &device_creator<s100_dj2db_device>;
+const device_type S100_DJ2DB = device_creator<s100_dj2db_device>;
 
 
 //-------------------------------------------------

@@ -4,11 +4,11 @@
 #include "ascii.h"
 
 
-const device_type MSX_CART_ASCII8 = &device_creator<msx_cart_ascii8>;
-const device_type MSX_CART_ASCII16 = &device_creator<msx_cart_ascii16>;
-const device_type MSX_CART_ASCII8_SRAM = &device_creator<msx_cart_ascii8_sram>;
-const device_type MSX_CART_ASCII16_SRAM = &device_creator<msx_cart_ascii16_sram>;
-const device_type MSX_CART_MSXWRITE = &device_creator<msx_cart_msxwrite>;
+const device_type MSX_CART_ASCII8 = device_creator<msx_cart_ascii8>;
+const device_type MSX_CART_ASCII16 = device_creator<msx_cart_ascii16>;
+const device_type MSX_CART_ASCII8_SRAM = device_creator<msx_cart_ascii8_sram>;
+const device_type MSX_CART_ASCII16_SRAM = device_creator<msx_cart_ascii16_sram>;
+const device_type MSX_CART_MSXWRITE = device_creator<msx_cart_msxwrite>;
 
 
 msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

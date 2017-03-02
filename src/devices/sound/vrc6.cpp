@@ -19,7 +19,7 @@
 #define DISABLE_VRC6_SOUND      // not ready yet
 
 // device type definition
-const device_type VRC6 = &device_creator<vrc6snd_device>;
+const device_type VRC6 = device_creator<vrc6snd_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -77,8 +77,8 @@ Package: 132-pin PGA, 200-pin QFP
 #include "debugger.h"
 #include "v60.h"
 
-const device_type V60 = &device_creator<v60_device>;
-const device_type V70 = &device_creator<v70_device>;
+const device_type V60 = device_creator<v60_device>;
+const device_type V70 = device_creator<v70_device>;
 
 
 v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

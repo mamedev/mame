@@ -63,9 +63,12 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bagman.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/bagman.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void bagman_state::machine_start()

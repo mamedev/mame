@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sfx_sound_expander.h"
+#include "speaker.h"
 
 
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SFX_SOUND_EXPANDER = &device_creator<c64_sfx_sound_expander_cartridge_device>;
+const device_type C64_SFX_SOUND_EXPANDER = device_creator<c64_sfx_sound_expander_cartridge_device>;
 
 
 //-------------------------------------------------

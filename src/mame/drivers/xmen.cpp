@@ -16,15 +16,17 @@ likewise a 2 screen game
 
 ***************************************************************************/
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "rendlay.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "rendlay.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

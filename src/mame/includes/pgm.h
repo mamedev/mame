@@ -1,18 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
+#ifndef MAME_INCLUDES_PGM_H
+#define MAME_INCLUDES_PGM_H
 
-#include "machine/v3021.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/arm7/arm7.h"
-#include "sound/ics2115.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/nvram.h"
-#include "machine/pgmcrypt.h"
-#include "machine/gen_latch.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"
+#include "machine/pgmcrypt.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/v3021.h"
+#include "sound/ics2115.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -130,3 +133,5 @@ ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
 ADDRESS_MAP_EXTERN( pgm_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
+
+#endif // MAME_INCLUDES_PGM_H

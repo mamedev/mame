@@ -38,7 +38,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2040_FDC = &device_creator<c2040_fdc_t>;
+const device_type C2040_FDC = device_creator<c2040_fdc_t>;
 
 
 //-------------------------------------------------

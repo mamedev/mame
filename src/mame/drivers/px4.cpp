@@ -10,19 +10,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/epson_sio/epson_sio.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "bus/epson_sio/epson_sio.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "coreutil.h"
+#include "machine/ram.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 #include "px4.lh"
 
 

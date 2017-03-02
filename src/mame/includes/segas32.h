@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
+#include "screen.h"
 
 
 

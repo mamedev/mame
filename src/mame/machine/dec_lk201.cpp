@@ -107,6 +107,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 #include "emu.h"
 #include "dec_lk201.h"
 #include "cpu/m6805/m6805.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -176,7 +177,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LK201 = &device_creator<lk201_device>;
+const device_type LK201 = device_creator<lk201_device>;
 
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)

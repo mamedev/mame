@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
+
+#include "sound/cdp1869.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER( tmc600_state::vismac_register_w )
 {

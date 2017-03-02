@@ -43,13 +43,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
 #include "bus/generic/carts.h"
-#include "machine/pit8253.h"
+#include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
 #include "machine/i8279.h"
-#include "sound/speaker.h"
+#include "machine/pit8253.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class i7000_state : public driver_device
 {

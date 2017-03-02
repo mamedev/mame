@@ -24,7 +24,11 @@
 
 #include "emu.h"
 #include "includes/tiki100.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Memory Banking */
 

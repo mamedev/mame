@@ -170,7 +170,7 @@ WRITE8_MEMBER( ym3526_device::control_port_w ) { write(space, 0, data); }
 WRITE8_MEMBER( ym3526_device::write_port_w ) { write(space, 1, data); }
 
 
-const device_type YM3526 = &device_creator<ym3526_device>;
+const device_type YM3526 = device_creator<ym3526_device>;
 
 ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock, "ym3526", __FILE__),

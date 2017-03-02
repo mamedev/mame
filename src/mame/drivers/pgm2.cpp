@@ -53,6 +53,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
 #include "machine/igs036crypt.h"
+#include "screen.h"
+#include "speaker.h"
 
 class pgm2_state : public driver_device
 {

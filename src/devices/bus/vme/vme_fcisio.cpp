@@ -161,7 +161,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCISIO1 = &device_creator<vme_fcisio1_card_device>;
+const device_type VME_FCISIO1 = device_creator<vme_fcisio1_card_device>;
 
 #define CPU_CLOCK XTAL_20MHz /* HCJ */
 #define DUSCC_CLOCK XTAL_14_7456MHz /* HCJ */

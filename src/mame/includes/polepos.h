@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "sound/namco.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 struct filter2_context
 {

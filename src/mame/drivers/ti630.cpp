@@ -38,6 +38,8 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "cpu/mcs51/mcs51.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 class ti630_state : public driver_device
 {

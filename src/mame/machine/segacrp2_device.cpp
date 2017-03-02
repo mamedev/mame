@@ -85,18 +85,18 @@ static void decode(uint8_t *rom, uint8_t *decrypted,
 }
 
 
-const device_type SEGACRP2_Z80 = &device_creator<segacrp2_z80_device>;
+const device_type SEGACRP2_Z80 = device_creator<segacrp2_z80_device>;
 
-const device_type SEGA_315_5179 = &device_creator<sega_315_5179_device>;
-const device_type SEGA_315_5178 = &device_creator<sega_315_5178_device>;
-const device_type SEGA_315_5177 = &device_creator<sega_315_5177_device>; // also seen as 317-5000
-const device_type SEGA_315_5176 = &device_creator<sega_315_5176_device>; // TODO!
-const device_type SEGA_315_5162 = &device_creator<sega_315_5162_device>;
+const device_type SEGA_315_5179 = device_creator<sega_315_5179_device>;
+const device_type SEGA_315_5178 = device_creator<sega_315_5178_device>;
+const device_type SEGA_315_5177 = device_creator<sega_315_5177_device>; // also seen as 317-5000
+const device_type SEGA_315_5176 = device_creator<sega_315_5176_device>; // TODO!
+const device_type SEGA_315_5162 = device_creator<sega_315_5162_device>;
 
-const device_type SEGA_317_0004 = &device_creator<sega_317_0004_device>;
-const device_type SEGA_317_0005 = &device_creator<sega_317_0005_device>;
-const device_type SEGA_317_0006 = &device_creator<sega_317_0006_device>;
-const device_type SEGA_317_0007 = &device_creator<sega_317_0007_device>;
+const device_type SEGA_317_0004 = device_creator<sega_317_0004_device>;
+const device_type SEGA_317_0005 = device_creator<sega_317_0005_device>;
+const device_type SEGA_317_0006 = device_creator<sega_317_0006_device>;
+const device_type SEGA_317_0007 = device_creator<sega_317_0007_device>;
 
 
 

@@ -38,6 +38,8 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/votrax.h"
+#include "speaker.h"
+
 #include "votrtnt.lh"
 
 

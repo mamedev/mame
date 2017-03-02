@@ -65,6 +65,8 @@ To Do:
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -89,7 +91,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
-		{ }
+	{ }
 
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;

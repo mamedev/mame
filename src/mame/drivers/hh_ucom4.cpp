@@ -69,6 +69,8 @@ TODO:
 #include "emu.h"
 #include "includes/hh_ucom4.h"
 #include "video/hlcd0515.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "efball.lh"
@@ -334,7 +336,7 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("IN.1") // port B
-	PORT_CONFNAME( 0x07, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
@@ -607,10 +609,10 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // port B
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, "Players" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Display/Banana Shoot")
@@ -712,7 +714,7 @@ WRITE8_MEMBER(bmsafari_state::speaker_w)
 
 static INPUT_PORTS_START( bmsafari )
 	PORT_START("IN.0") // port A
-	PORT_CONFNAME( 0x07, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x07, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x01, "3" )
@@ -863,10 +865,10 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port A
-	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
@@ -1291,7 +1293,7 @@ static INPUT_PORTS_START( efball )
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
-	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Down-Field")
@@ -1852,8 +1854,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - Japan: Game Robot 9
-  - USA: Fabulous Fred - The Ultimate Electronic Game, distributed by Mego
-  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
+  - USA: Fabulous Fred - The Ultimate Electronic Game, published by Mego
+  - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     12-button version, a clone of Tandy-12)
 
   Accessories were included for some of the minigames.
@@ -2018,7 +2020,7 @@ WRITE8_MEMBER(tccombat_state::plate_w)
 static INPUT_PORTS_START( tccombat )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -2152,7 +2154,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_CONFSETTING(     0x001, "Practice" )
 	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
-	PORT_CONFNAME( 0x02, 0x00, "Players" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P2 Button 1")
@@ -2617,7 +2619,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
 
 	PORT_START("IN.2") // port B
-	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )

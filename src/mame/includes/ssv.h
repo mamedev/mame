@@ -4,6 +4,7 @@
 #include "video/st0020.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
+#include "screen.h"
 
 class ssv_state : public driver_device
 {

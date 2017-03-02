@@ -11,12 +11,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/labyrunr.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 
-#include "includes/konamipt.h"
-#include "includes/labyrunr.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)

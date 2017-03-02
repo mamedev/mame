@@ -197,11 +197,14 @@ A Note about Best Bet Products.
 ***********************************************************************************/
 
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "peplus.lh"
 #include "pe_schip.lh"

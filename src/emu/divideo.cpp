@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 
 
 const char device_video_interface::s_unconfigured_screen_tag[] = "!!UNCONFIGURED!!";

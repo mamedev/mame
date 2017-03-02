@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type JOYSTICK_INTERFACE = &device_creator<joystick_interface_device>;
+const device_type JOYSTICK_INTERFACE = device_creator<joystick_interface_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

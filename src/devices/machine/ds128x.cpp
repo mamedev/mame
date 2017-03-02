@@ -5,7 +5,7 @@
 
 /// TODO: Only DV2/DV1/DV0 == 0/1/0 is supported as the chip only has a 15 stage divider and not 22.
 
-const device_type DS12885 = &device_creator<ds12885_device>;
+const device_type DS12885 = device_creator<ds12885_device>;
 
 //-------------------------------------------------
 //  ds12885_device - constructor

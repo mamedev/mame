@@ -24,7 +24,7 @@ they are internally.
 #include "sm8500.h"
 
 
-const device_type SM8500 = &device_creator<sm8500_cpu_device>;
+const device_type SM8500 = device_creator<sm8500_cpu_device>;
 
 
 static const uint8_t sm8500_b2w[8] = {

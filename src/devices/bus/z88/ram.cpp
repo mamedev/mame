@@ -19,10 +19,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88_32K_RAM =  &device_creator<z88_32k_ram_device>;
-const device_type Z88_128K_RAM = &device_creator<z88_128k_ram_device>;
-const device_type Z88_512K_RAM = &device_creator<z88_512k_ram_device>;
-const device_type Z88_1024K_RAM = &device_creator<z88_1024k_ram_device>;
+const device_type Z88_32K_RAM =  device_creator<z88_32k_ram_device>;
+const device_type Z88_128K_RAM = device_creator<z88_128k_ram_device>;
+const device_type Z88_512K_RAM = device_creator<z88_512k_ram_device>;
+const device_type Z88_1024K_RAM = device_creator<z88_1024k_ram_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

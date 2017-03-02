@@ -446,6 +446,9 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 #include "emu.h"
 #include "ega.h"
 
+#include "screen.h"
+
+
 #define VERBOSE_EGA     1
 
 #define EGA_SCREEN_NAME "ega_screen"
@@ -535,7 +538,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_EGA = &device_creator<isa8_ega_device>;
+const device_type ISA8_EGA = device_creator<isa8_ega_device>;
 
 
 //-------------------------------------------------

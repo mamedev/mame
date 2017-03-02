@@ -32,7 +32,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type E0516 = &device_creator<e0516_device>;
+const device_type E0516 = device_creator<e0516_device>;
 
 //-------------------------------------------------
 //  e0516_device - constructor

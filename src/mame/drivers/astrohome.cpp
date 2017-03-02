@@ -7,24 +7,29 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "sound/astrocde.h"
+
 #include "bus/astrocde/slot.h"
 #include "bus/astrocde/rom.h"
 #include "bus/astrocde/exp.h"
 #include "bus/astrocde/ram.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class astrocde_mess_state : public astrocde_state
 {
 public:
 	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag),
-		m_cart(*this, "cartslot"),
-		m_exp(*this, "exp")
-		{ }
+		: astrocde_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_exp(*this, "exp")
+	{ }
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;

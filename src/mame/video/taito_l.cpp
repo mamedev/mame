@@ -2,6 +2,7 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "includes/taito_l.h"
+#include "screen.h"
 
 /***************************************************************************
 

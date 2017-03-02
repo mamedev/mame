@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_USER_PORT = &device_creator<cbm2_user_port_device>;
+const device_type CBM2_USER_PORT = device_creator<cbm2_user_port_device>;
 
 
 

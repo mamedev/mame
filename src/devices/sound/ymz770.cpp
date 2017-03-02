@@ -24,7 +24,7 @@ TODO:
 #include "mpeg_audio.h"
 
 // device type definition
-const device_type YMZ770 = &device_creator<ymz770_device>;
+const device_type YMZ770 = device_creator<ymz770_device>;
 
 //-------------------------------------------------
 //  ymz770_device - constructor

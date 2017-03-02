@@ -225,6 +225,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_43272",        NES_43272)    // used in Gaau Hok Gwong Cheung
 	SLOT_INTERFACE_INTERNAL("tf1201",           NES_TF1201)
 	SLOT_INTERFACE_INTERNAL("unl_cfight",       NES_CITYFIGHT) //  used by City Fighter IV
+	SLOT_INTERFACE_INTERNAL("zemina",           NES_ZEMINA)    // mapper 190 - Magic Kid GooGoo
 // misc bootleg boards
 	SLOT_INTERFACE_INTERNAL("ax5705",           NES_AX5705)
 	SLOT_INTERFACE_INTERNAL("sc127",            NES_SC127)

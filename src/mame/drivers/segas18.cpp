@@ -32,11 +32,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nvram.h"
 #include "includes/segas18.h"
+#include "includes/segaipt.h"
+
+#include "machine/nvram.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 /*************************************
  *

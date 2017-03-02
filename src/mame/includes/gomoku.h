@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, David Haywood
+#include "screen.h"
 
 class gomoku_state : public driver_device
 {

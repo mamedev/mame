@@ -28,8 +28,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/segacrpt_device.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define JONGKYO_CLOCK 18432000
 

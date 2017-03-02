@@ -1921,6 +1921,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/txc.h",
 		MAME_DIR .. "src/devices/bus/nes/waixing.cpp",
 		MAME_DIR .. "src/devices/bus/nes/waixing.h",
+		MAME_DIR .. "src/devices/bus/nes/zemina.cpp",
+		MAME_DIR .. "src/devices/bus/nes/zemina.h",
 	}
 end
 
@@ -2288,6 +2290,26 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/ti8x/ti8x.h,BUSES["TI8X"] = true
+---------------------------------------------------
+
+if (BUSES["TI8X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.h",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.h",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.h",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.h",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true
@@ -2317,6 +2339,7 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/joyport.h",
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.h",
+		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
 	}
 end

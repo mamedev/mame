@@ -101,8 +101,8 @@ enum {
 // Part of r32-r37 that is actually output as address extension (6 bits of "BSC": block select code)
 #define BSC_REG_MASK    0x3f
 
-const device_type HP_5061_3001 = &device_creator<hp_5061_3001_cpu_device>;
-const device_type HP_5061_3011 = &device_creator<hp_5061_3011_cpu_device>;
+const device_type HP_5061_3001 = device_creator<hp_5061_3001_cpu_device>;
+const device_type HP_5061_3011 = device_creator<hp_5061_3011_cpu_device>;
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {

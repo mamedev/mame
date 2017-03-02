@@ -15,8 +15,9 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
 #include "machine/am9517a.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 

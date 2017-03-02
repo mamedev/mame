@@ -18,8 +18,8 @@
 #include "machine/tms1024.h"
 
 
-const device_type TMS1024 = &device_creator<tms1024_device>;
-const device_type TMS1025 = &device_creator<tms1025_device>;
+const device_type TMS1024 = device_creator<tms1024_device>;
+const device_type TMS1025 = device_creator<tms1025_device>;
 
 //-------------------------------------------------
 //  constructor

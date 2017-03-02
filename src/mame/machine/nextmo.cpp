@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nextmo.h"
 
-const device_type NEXTMO = &device_creator<nextmo_device>;
+const device_type NEXTMO = device_creator<nextmo_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(r4_r, r4_w)

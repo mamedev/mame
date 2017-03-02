@@ -13,21 +13,25 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "audio/tvc.h"
-#include "bus/centronics/ctronics.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "formats/tvc_cas.h"
+#include "machine/ram.h"
+#include "video/mc6845.h"
 
-#include "bus/tvc/tvc.h"
-#include "bus/tvc/hbf.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/tvc/tvc.h"
+#include "bus/tvc/hbf.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/tvc_cas.h"
 
 #define TVC_RAM_BANK    1
 #define TVC_ROM_BANK    2

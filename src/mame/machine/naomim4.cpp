@@ -21,7 +21,7 @@
 // the algorithm is a 32-bits key stored in the PIC16C621A. The hardware auto-reset the feed value
 // to the cart-based IV every 16 blocks (32 bytes); that reset is not address-based, but index-based.
 
-const device_type NAOMI_M4_BOARD = &device_creator<naomi_m4_board>;
+const device_type NAOMI_M4_BOARD = device_creator<naomi_m4_board>;
 
 const uint8_t naomi_m4_board::k_sboxes[4][16] = {
 	{9,8,2,11,1,14,5,15,12,6,0,3,7,13,10,4},

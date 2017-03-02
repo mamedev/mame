@@ -81,12 +81,17 @@ Preliminary COP MCU memory map
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/legionna.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/seicop.h"
-#include "includes/legionna.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 /*****************************************************************************/
 

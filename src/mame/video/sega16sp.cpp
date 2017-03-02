@@ -17,14 +17,14 @@
 //****************************************************************************
 
 // device type definition
-const device_type SEGA_HANGON_SPRITES = &device_creator<sega_hangon_sprite_device>;
-const device_type SEGA_SHARRIER_SPRITES = &device_creator<sega_sharrier_sprite_device>;
-const device_type SEGA_OUTRUN_SPRITES = &device_creator<sega_outrun_sprite_device>;
-const device_type SEGA_SYS16A_SPRITES = &device_creator<sega_sys16a_sprite_device>;
-const device_type BOOTLEG_SYS16A_SPRITES = &device_creator<bootleg_sys16a_sprite_device>;
-const device_type SEGA_SYS16B_SPRITES = &device_creator<sega_sys16b_sprite_device>;
-const device_type SEGA_XBOARD_SPRITES = &device_creator<sega_xboard_sprite_device>;
-const device_type SEGA_YBOARD_SPRITES = &device_creator<sega_yboard_sprite_device>;
+const device_type SEGA_HANGON_SPRITES = device_creator<sega_hangon_sprite_device>;
+const device_type SEGA_SHARRIER_SPRITES = device_creator<sega_sharrier_sprite_device>;
+const device_type SEGA_OUTRUN_SPRITES = device_creator<sega_outrun_sprite_device>;
+const device_type SEGA_SYS16A_SPRITES = device_creator<sega_sys16a_sprite_device>;
+const device_type BOOTLEG_SYS16A_SPRITES = device_creator<bootleg_sys16a_sprite_device>;
+const device_type SEGA_SYS16B_SPRITES = device_creator<sega_sys16b_sprite_device>;
+const device_type SEGA_XBOARD_SPRITES = device_creator<sega_xboard_sprite_device>;
+const device_type SEGA_YBOARD_SPRITES = device_creator<sega_yboard_sprite_device>;
 
 
 

@@ -23,7 +23,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MB3773 = &device_creator<mb3773_device>;
+const device_type MB3773 = device_creator<mb3773_device>;
 
 //-------------------------------------------------
 //  mb3773_device - constructor

@@ -8,12 +8,12 @@
  * switches are only read on startup.  The row select outputs are
  * decoded by a 74159 so only one row can be driven at a time.
  *
- * The keyboard has an unpopulated PCB location for the DIP switches,
- * but they're unpopulated so all the switches are always off unless you
- * add them or solder in wire links.  The keyclick/bell beeper also
- * appears to be unpopulated.  The 300 Baud option is probably to allow
- * the MCU program to be used with other CP/M systems (e.g. Kaypro
- * expects this Baud rate).
+ * The keyboard has a PCB location for the DIP switches, but they're
+ * unpopulated so all the switches are always off unless you add them or
+ * solder in wire links.  The keyclick/bell beeper also appears to be
+ * unpopulated.  The 300 Baud option is probably to allow the same MCU
+ * program to be used with other CP/M systems (e.g. Kaypro expects this
+ * Baud rate).
  *
  * In addition to the asynchronous serial output, the program supports
  * synchronous output.  If enabled with DIP switches, characters are
@@ -74,6 +74,7 @@
 #include "zorbakbd.h"
 
 #include "cpu/m6805/m68705.h"
+#include "speaker.h"
 
 
 namespace {
@@ -259,7 +260,7 @@ ROM_END
 } // anonymous namespace
 
 
-device_type const ZORBA_KEYBOARD = &device_creator<zorba_keyboard_device>;
+device_type const ZORBA_KEYBOARD = device_creator<zorba_keyboard_device>;
 
 
 zorba_keyboard_device::zorba_keyboard_device(

@@ -117,15 +117,21 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
 #include "imagedev/cassette.h"
-#include "sound/dac.h"
-#include "sound/wave.h"
-#include "sound/volt_reg.h"
-#include "formats/camplynx_cas.h"
 #include "machine/wd_fdc.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "formats/camplynx_cas.h"
 #include "formats/camplynx_dsk.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class camplynx_state : public driver_device
 {

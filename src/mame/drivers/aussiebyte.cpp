@@ -33,6 +33,9 @@
 #include "emu.h"
 #include "includes/aussiebyte.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 /***********************************************************
 

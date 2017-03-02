@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TTL74181 = &device_creator<ttl74181_device>;
+const device_type TTL74181 = device_creator<ttl74181_device>;
 
 
 //**************************************************************************

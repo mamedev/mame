@@ -85,9 +85,13 @@ Noted added by ClawGrip 28-Mar-2008:
 */
 
 #include "emu.h"
+#include "includes/wc90b.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/wc90b.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 

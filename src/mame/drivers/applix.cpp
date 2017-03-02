@@ -35,18 +35,23 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "video/mc6845.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "sound/volt_reg.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/applix_dsk.h"
-#include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
 
 
 

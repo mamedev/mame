@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
+const device_type COCOCART_SLOT = device_creator<cococart_slot_device>;
 
 
 
@@ -327,7 +327,7 @@ image_init_result cococart_slot_device::call_load()
 	if (m_cart)
 	{
 		offs_t read_length;
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);
 		}

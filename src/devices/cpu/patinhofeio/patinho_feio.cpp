@@ -49,7 +49,7 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 	}
 }
 
-const device_type PATO_FEIO_CPU = &device_creator<patinho_feio_cpu_device>;
+const device_type PATO_FEIO_CPU = device_creator<patinho_feio_cpu_device>;
 
 //Internal 4kbytes of RAM
 static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)

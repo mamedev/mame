@@ -20,27 +20,28 @@
 
 #include "emu.h"
 #include "rom.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_ROM = &device_creator<a78_rom_device>;
-const device_type A78_ROM_SG = &device_creator<a78_rom_sg_device>;
-const device_type A78_ROM_POKEY = &device_creator<a78_rom_pokey_device>;
-const device_type A78_ROM_SG_POKEY = &device_creator<a78_rom_sg_pokey_device>;
-const device_type A78_ROM_SG_RAM = &device_creator<a78_rom_sg_ram_device>;
-const device_type A78_ROM_SG9 = &device_creator<a78_rom_sg9_device>;
-const device_type A78_ROM_MRAM = &device_creator<a78_rom_mram_device>;
-const device_type A78_ROM_ABSOLUTE = &device_creator<a78_rom_abs_device>;
-const device_type A78_ROM_ACTIVISION = &device_creator<a78_rom_act_device>;
+const device_type A78_ROM = device_creator<a78_rom_device>;
+const device_type A78_ROM_SG = device_creator<a78_rom_sg_device>;
+const device_type A78_ROM_POKEY = device_creator<a78_rom_pokey_device>;
+const device_type A78_ROM_SG_POKEY = device_creator<a78_rom_sg_pokey_device>;
+const device_type A78_ROM_SG_RAM = device_creator<a78_rom_sg_ram_device>;
+const device_type A78_ROM_SG9 = device_creator<a78_rom_sg9_device>;
+const device_type A78_ROM_MRAM = device_creator<a78_rom_mram_device>;
+const device_type A78_ROM_ABSOLUTE = device_creator<a78_rom_abs_device>;
+const device_type A78_ROM_ACTIVISION = device_creator<a78_rom_act_device>;
 
 
-const device_type A78_ROM_P450 = &device_creator<a78_rom_p450_device>;
-const device_type A78_ROM_P450_POKEY = &device_creator<a78_rom_p450_pokey_device>;
-const device_type A78_ROM_P450_SG_RAM = &device_creator<a78_rom_p450_sg_ram_device>;
-const device_type A78_ROM_P450_SG9 = &device_creator<a78_rom_p450_sg9_device>;
+const device_type A78_ROM_P450 = device_creator<a78_rom_p450_device>;
+const device_type A78_ROM_P450_POKEY = device_creator<a78_rom_p450_pokey_device>;
+const device_type A78_ROM_P450_SG_RAM = device_creator<a78_rom_p450_sg_ram_device>;
+const device_type A78_ROM_P450_SG9 = device_creator<a78_rom_p450_sg9_device>;
 
 
 a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

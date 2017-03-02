@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type OKIM9810 = &device_creator<okim9810_device>;
+const device_type OKIM9810 = device_creator<okim9810_device>;
 
 // volume lookup table. The manual lists a full 16 steps, 2dB per step.
 // Given the dB values, that seems to map to a 7-bit volume control.

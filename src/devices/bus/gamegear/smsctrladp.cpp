@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_CTRL_ADAPTOR = &device_creator<sms_ctrl_adaptor_device>;
+const device_type SMS_CTRL_ADAPTOR = device_creator<sms_ctrl_adaptor_device>;
 
 
 //**************************************************************************

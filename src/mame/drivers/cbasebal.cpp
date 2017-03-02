@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cbasebal.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
-#include "includes/cbasebal.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

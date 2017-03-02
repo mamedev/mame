@@ -97,12 +97,17 @@ Game is V30 based, with rom banking (2Mb)
 *************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
+
 #include "cpu/i86/i186.h"
-#include "sound/okim6376.h"
+#include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "fashion.lh"
+#include "sound/okim6376.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "fashion.lh"
 
 
 class highvdeo_state : public driver_device

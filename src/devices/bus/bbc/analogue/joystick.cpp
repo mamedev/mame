@@ -18,8 +18,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_ACORNJOY = &device_creator<bbc_acornjoy_device>;
-const device_type BBC_VOLTMACE3B = &device_creator<bbc_voltmace3b_device>;
+const device_type BBC_ACORNJOY = device_creator<bbc_acornjoy_device>;
+const device_type BBC_VOLTMACE3B = device_creator<bbc_voltmace3b_device>;
 
 
 static INPUT_PORTS_START( acornjoy )

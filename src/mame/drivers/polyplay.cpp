@@ -132,10 +132,16 @@ this.)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/polyplay.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "includes/polyplay.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "polyplay.lh"
+
 
 static const z80_daisy_config daisy_chain_zre[] =
 {

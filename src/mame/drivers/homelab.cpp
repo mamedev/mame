@@ -40,6 +40,8 @@ MB7051 - fuse programmed prom.
 #include "sound/mea8000.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

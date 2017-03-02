@@ -58,7 +58,11 @@ and two large (paddles pretending to be) guns.
 
 #include "emu.h"
 #include "includes/m79amb.h"
+
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {

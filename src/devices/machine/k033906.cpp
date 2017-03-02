@@ -15,7 +15,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type K033906 = &device_creator<k033906_device>;
+const device_type K033906 = device_creator<k033906_device>;
 
 //-------------------------------------------------
 //  k033906_device - constructor

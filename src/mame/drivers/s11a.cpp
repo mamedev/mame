@@ -22,10 +22,14 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 
 #include "emu.h"
 #include "includes/s11a.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s11a.lh"
+
 
 static ADDRESS_MAP_START( s11a_main_map, AS_PROGRAM, 8, s11a_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")

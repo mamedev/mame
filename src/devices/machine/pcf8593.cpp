@@ -40,7 +40,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCF8593 = &device_creator<pcf8593_device>;
+const device_type PCF8593 = device_creator<pcf8593_device>;
 
 
 //-------------------------------------------------

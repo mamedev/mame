@@ -177,7 +177,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M2COMM = &device_creator<m2comm_device>;
+const device_type M2COMM = device_creator<m2comm_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

@@ -123,6 +123,8 @@ Dip locations verified for:
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 class m63_state : public driver_device
 {

@@ -337,16 +337,19 @@ Boards:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/pacman.h"
+#include "machine/epos.h"
+#include "machine/jumpshot.h"
+#include "machine/pacplus.h"
+
 #include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "machine/epos.h"
-#include "machine/jumpshot.h"
-#include "machine/pacplus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -1174,7 +1177,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 
 	/* vanvan: probably a leftover from development: the Sanritsu version writes
-	   the color lookup table here, while the Karateko version writes garbage. */
+	   the color lookup table here, while the Karateco version writes garbage. */
 	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
 ADDRESS_MAP_END
 

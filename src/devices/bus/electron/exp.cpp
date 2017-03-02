@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_EXPANSION_SLOT = &device_creator<electron_expansion_slot_device>;
+const device_type ELECTRON_EXPANSION_SLOT = device_creator<electron_expansion_slot_device>;
 
 
 //**************************************************************************

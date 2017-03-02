@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VBOY_CART_SLOT = &device_creator<vboy_cart_slot_device>;
+const device_type VBOY_CART_SLOT = device_creator<vboy_cart_slot_device>;
 
 //**************************************************************************
 //    vboy cartridges Interface
@@ -163,8 +163,8 @@ image_init_result vboy_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint8_t *ROM;
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		bool has_eeprom = (software_entry() != nullptr) && get_software_region("eeprom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		bool has_eeprom = loaded_through_softlist() && get_software_region("eeprom");
 
 		if (len > 0x200000)
 		{
@@ -180,7 +180,7 @@ image_init_result vboy_cart_slot_device::call_load()
 
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -189,7 +189,7 @@ image_init_result vboy_cart_slot_device::call_load()
 		if (len < 0x100000) { memcpy(ROM + 0x080000, ROM, 0x080000); }
 		if (len < 0x200000) { memcpy(ROM + 0x100000, ROM, 0x100000); }
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			m_type = vboy_get_pcb_id("vb_rom");
 		else
 		{

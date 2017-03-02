@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "video/igs017_igs031.h"
+#include "screen.h"
 
 class igs_m027_state : public driver_device
 {

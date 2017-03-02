@@ -20,10 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/toobin.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "machine/atarigen.h"
-#include "includes/toobin.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_32MHz
 

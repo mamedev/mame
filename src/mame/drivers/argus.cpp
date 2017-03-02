@@ -120,10 +120,12 @@ Known issues :
 
 
 #include "emu.h"
+#include "includes/argus.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/argus.h"
+#include "speaker.h"
 
 
 void argus_state::machine_start()

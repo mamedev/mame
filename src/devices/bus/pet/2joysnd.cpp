@@ -48,14 +48,16 @@ Connections
 
 #include "emu.h"
 #include "2joysnd.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE = &device_creator<pet_userport_joystick_and_sound_device>;
+const device_type PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE = device_creator<pet_userport_joystick_and_sound_device>;
 
 MACHINE_CONFIG_FRAGMENT( 2joysnd )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

@@ -14,7 +14,7 @@
 #include "fmt_icmem.h"
 
 // device type definition
-const device_type FMT_ICMEM = &device_creator<fmt_icmem_device>;
+const device_type FMT_ICMEM = device_creator<fmt_icmem_device>;
 
 //-------------------------------------------------
 //  fmt_icmem_device - constructor

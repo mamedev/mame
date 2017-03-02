@@ -76,13 +76,16 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 *********************************************************/
 
 #include "emu.h"
+#include "audio/cliffhgr.h"
+
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "machine/ldpr8210.h"
 #include "video/tms9928a.h"
-#include "sound/discrete.h"
 #include "machine/nvram.h"
-#include "audio/cliffhgr.h"
+
+#include "render.h"
+#include "speaker.h"
+
 
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02

@@ -32,6 +32,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8688.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
@@ -39,6 +40,9 @@ TODO:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "nbmj8688.lh"
 
 

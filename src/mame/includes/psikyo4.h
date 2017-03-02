@@ -6,11 +6,12 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK 57272700   // main oscillator frequency
-
 #include "cpu/sh2/sh2.h"
 #include "sound/ymf278b.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+
+#define MASTER_CLOCK 57272700   // main oscillator frequency
 
 class psikyo4_state : public driver_device
 {

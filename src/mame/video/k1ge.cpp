@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "k1ge.h"
+#include "screen.h"
 
 
 PALETTE_INIT_MEMBER(k1ge_device, k1ge)
@@ -861,7 +862,7 @@ void k1ge_device::device_reset()
 }
 
 
-const device_type K1GE = &device_creator<k1ge_device>;
+const device_type K1GE = device_creator<k1ge_device>;
 
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
@@ -895,7 +896,7 @@ machine_config_constructor k1ge_device::device_mconfig_additions() const
 }
 
 
-const device_type K2GE = &device_creator<k2ge_device>;
+const device_type K2GE = device_creator<k2ge_device>;
 
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)

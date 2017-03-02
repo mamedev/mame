@@ -17,7 +17,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_MCD = &device_creator<mcd_isa_device>;
+const device_type ISA16_MCD = device_creator<mcd_isa_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

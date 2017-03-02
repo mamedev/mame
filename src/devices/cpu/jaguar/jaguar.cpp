@@ -136,8 +136,8 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
 #define ROPCODE(pc)           (m_direct->read_word(pc, WORD_XOR_BE(0)))
 
 
-const device_type JAGUARGPU = &device_creator<jaguargpu_cpu_device>;
-const device_type JAGUARDSP = &device_creator<jaguardsp_cpu_device>;
+const device_type JAGUARGPU = device_creator<jaguargpu_cpu_device>;
+const device_type JAGUARDSP = device_creator<jaguardsp_cpu_device>;
 
 
 jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool isdsp)

@@ -117,8 +117,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_D004 = &device_creator<kc_d004_device>;
-const device_type KC_D004_GIDE = &device_creator<kc_d004_gide_device>;
+const device_type KC_D004 = device_creator<kc_d004_device>;
+const device_type KC_D004_GIDE = device_creator<kc_d004_gide_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

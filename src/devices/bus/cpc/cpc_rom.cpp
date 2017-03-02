@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpc_rom.h"
 
-const device_type CPC_ROM = &device_creator<cpc_rom_device>;
+const device_type CPC_ROM = device_creator<cpc_rom_device>;
 
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
@@ -73,7 +73,7 @@ void cpc_rom_device::device_reset()
 /*** ROM image device ***/
 
 // device type definition
-const device_type ROMSLOT = &device_creator<rom_image_device>;
+const device_type ROMSLOT = device_creator<rom_image_device>;
 
 //-------------------------------------------------
 //  rom_image_device - constructor

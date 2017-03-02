@@ -155,13 +155,15 @@ JC-301-00  W11 9510K7059    23C16000        U85
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "screen.h"
+#include "speaker.h"
 
 class jchan_state : public driver_device
 {
@@ -180,7 +182,7 @@ public:
 		m_sprregs_2(*this, "sprregs_2"),
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
 		m_ctrl(*this, "ctrl")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

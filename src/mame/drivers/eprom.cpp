@@ -26,9 +26,11 @@
 
 
 #include "emu.h"
+#include "includes/eprom.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "includes/eprom.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

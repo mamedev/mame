@@ -135,11 +135,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/segag80v.h"
+#include "machine/segag80.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "machine/segag80.h"
-#include "includes/segag80v.h"
+#include "speaker.h"
 
 
 /*************************************

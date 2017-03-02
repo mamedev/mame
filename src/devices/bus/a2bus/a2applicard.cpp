@@ -24,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_APPLICARD = &device_creator<a2bus_applicard_device>;
+const device_type A2BUS_APPLICARD = device_creator<a2bus_applicard_device>;
 
 #define Z80_TAG         "z80"
 #define Z80_ROM_REGION  "z80_rom"

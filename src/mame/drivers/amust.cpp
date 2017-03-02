@@ -82,13 +82,15 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/upd765.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/pit8253.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class amust_state : public driver_device

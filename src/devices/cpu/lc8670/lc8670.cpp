@@ -31,7 +31,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const device_type LC8670 = &device_creator<lc8670_cpu_device>;
+const device_type LC8670 = device_creator<lc8670_cpu_device>;
 
 
 //**************************************************************************

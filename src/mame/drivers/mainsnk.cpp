@@ -110,9 +110,12 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 */
 
 #include "emu.h"
+#include "includes/mainsnk.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/mainsnk.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void mainsnk_state::machine_start()

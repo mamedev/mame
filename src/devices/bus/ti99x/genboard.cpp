@@ -1508,7 +1508,7 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-const device_type GENEVE_MAPPER = &device_creator<geneve_mapper_device>;
+const device_type GENEVE_MAPPER = device_creator<geneve_mapper_device>;
 
 /****************************************************************************
     Keyboard support
@@ -2009,7 +2009,7 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
+const device_type GENEVE_KEYBOARD = device_creator<geneve_keyboard_device>;
 
 /****************************************************************************
     Mouse support
@@ -2089,4 +2089,4 @@ ioport_constructor geneve_mouse_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genmouse );
 }
 
-const device_type GENEVE_MOUSE = &device_creator<geneve_mouse_device>;
+const device_type GENEVE_MOUSE = device_creator<geneve_mouse_device>;

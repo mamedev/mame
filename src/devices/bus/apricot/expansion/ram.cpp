@@ -14,9 +14,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_256K_RAM = &device_creator<apricot_256k_ram_device>;
-const device_type APRICOT_128K_RAM = &device_creator<apricot_128k_ram_device>;
-const device_type APRICOT_512K_RAM = &device_creator<apricot_512k_ram_device>;
+const device_type APRICOT_256K_RAM = device_creator<apricot_256k_ram_device>;
+const device_type APRICOT_128K_RAM = device_creator<apricot_128k_ram_device>;
+const device_type APRICOT_512K_RAM = device_creator<apricot_512k_ram_device>;
 
 
 //**************************************************************************

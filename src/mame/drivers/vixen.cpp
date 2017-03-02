@@ -55,7 +55,10 @@ Notes:
 
 #include "emu.h"
 #include "includes/vixen.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

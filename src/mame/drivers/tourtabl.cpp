@@ -14,6 +14,8 @@
 #include "machine/watchdog.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tourtabl_state : public driver_device

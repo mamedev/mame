@@ -20,12 +20,14 @@
 
 
 #include "emu.h"
+#include "includes/relief.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "machine/atarigen.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "includes/relief.h"
+#include "speaker.h"
 
 
 /*************************************

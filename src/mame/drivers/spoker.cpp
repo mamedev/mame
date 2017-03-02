@@ -34,6 +34,8 @@
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class spoker_state : public driver_device

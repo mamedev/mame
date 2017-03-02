@@ -20,10 +20,12 @@
 
 
 #include "emu.h"
+#include "includes/xybots.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "machine/atarigen.h"
-#include "includes/xybots.h"
+#include "speaker.h"
 
 
 

@@ -276,12 +276,18 @@ SamRam
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/spectrum.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
-#include "includes/spectrum.h"
-#include "formats/tzx_cas.h"
 #include "machine/spec_snqk.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/tzx_cas.h"
+
 
 /****************************************************************************************************/
 /* Spectrum 48k functions */

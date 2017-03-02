@@ -115,12 +115,17 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "cpu/h8/h8s2655.h"
-#include "video/hd44780.h"
-#include "rendlay.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
+#include "cpu/h8/h8s2655.h"
+#include "video/hd44780.h"
+
+#include "debugger.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( mu100 )
 	PORT_START("P7")

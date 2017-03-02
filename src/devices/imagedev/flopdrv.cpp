@@ -641,6 +641,10 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 
 		/* update track 0 line with new status */
 		//m_out_tk00_func(m_tk00);
+
+		/* inform disk image of step operation so it can cache information */
+		if (exists())
+			m_track = m_current_track;
 	}
 
 	m_stp = state;
@@ -690,7 +694,7 @@ READ_LINE_MEMBER( legacy_floppy_image_device::floppy_ready_r )
 }
 
 // device type definition
-const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
+const device_type LEGACY_FLOPPY = device_creator<legacy_floppy_image_device>;
 
 //-------------------------------------------------
 //  legacy_floppy_image_device - constructor

@@ -40,11 +40,13 @@
 
 ************************************************************************/
 
-#define MAIN_CLOCK  XTAL_16MHz
-
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+#define MAIN_CLOCK  XTAL_16MHz
 
 
 class itgambl3_state : public driver_device

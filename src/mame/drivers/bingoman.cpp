@@ -241,6 +241,8 @@
 
 #include "emu.h"
 #include "cpu/h8/h83002.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bingoman_state : public driver_device

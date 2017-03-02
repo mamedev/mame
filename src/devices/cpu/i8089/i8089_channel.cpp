@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
+const device_type I8089_CHANNEL = device_creator<i8089_channel>;
 
 
 //**************************************************************************

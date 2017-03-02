@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type ADC0808 = &device_creator<adc0808_device>;
+const device_type ADC0808 = device_creator<adc0808_device>;
 
 //-------------------------------------------------
 //  adc0808_device - constructor

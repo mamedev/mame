@@ -49,7 +49,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type TTL7474 = &device_creator<ttl7474_device>;
+const device_type TTL7474 = device_creator<ttl7474_device>;
 
 //-------------------------------------------------
 //  ttl7474_device - constructor

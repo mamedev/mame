@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_PAGEFOX = &device_creator<c64_pagefox_cartridge_device>;
+const device_type C64_PAGEFOX = device_creator<c64_pagefox_cartridge_device>;
 
 
 

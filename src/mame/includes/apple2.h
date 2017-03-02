@@ -8,21 +8,25 @@
 
 ***************************************************************************/
 
-#ifndef APPLE2_H_
-#define APPLE2_H_
+#ifndef MAME_INCLUDES_APPLE2_H
+#define MAME_INCLUDES_APPLE2_H
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
+
+#include "imagedev/cassette.h"
+
+#include "machine/applefdc.h"
+#include "machine/kb3600.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+
+#include "sound/spkrdev.h"
+
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2eauxslot.h"
-#include "machine/applefdc.h"
-#include "machine/ram.h"
-#include "imagedev/cassette.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 #include "bus/rs232/rs232.h"
-#include "machine/mos6551.h"
+
 
 #define AUXSLOT_TAG "auxbus"
 
@@ -380,4 +384,4 @@ INPUT_PORTS_EXTERN( apple2ep );
 /*----------- defined in machine/apple2.c -----------*/
 extern const applefdc_interface apple2_fdc_interface;
 
-#endif /* APPLE2_H_ */
+#endif // MAME_INCLUDES_APPLE2_H

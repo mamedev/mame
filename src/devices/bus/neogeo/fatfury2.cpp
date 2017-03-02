@@ -16,7 +16,7 @@
 //  neogeo_fatfury2_cart - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_FATFURY2_CART = &device_creator<neogeo_fatfury2_cart>;
+const device_type NEOGEO_FATFURY2_CART = device_creator<neogeo_fatfury2_cart>;
 
 
 neogeo_fatfury2_cart::neogeo_fatfury2_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :

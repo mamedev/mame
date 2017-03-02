@@ -156,18 +156,20 @@
 
 *******************************************************************************/
 
+#include "emu.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/ay8910.h"
+//#include "video/hd63484.h"
+#include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK  XTAL_12MHz
 #define AY_CLOCK    MAIN_CLOCK / 8
 #define SEC_CLOCK   XTAL_3.6864MHz
 #define AUX1_CLOCK  XTAL_26MHz
 #define AUX2_CLOCK  XTAL_24MHz
-
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-//#include "video/hd63484.h"
-#include "video/ramdac.h"
-#include "sound/ay8910.h"
 
 
 class wildpkr_state : public driver_device

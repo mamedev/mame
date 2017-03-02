@@ -13,13 +13,17 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/orao.h"
-#include "imagedev/cassette.h"
-#include "formats/orao_cas.h"
+
+#include "cpu/m6502/m6502.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/orao_cas.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8, orao_state )

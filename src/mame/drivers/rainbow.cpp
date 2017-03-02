@@ -340,6 +340,39 @@ WIRE CONNECTORS - SEEN ON SCHEMATICS - NOT PRESENT ON DEC-100 B (-A only?):
 W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
 W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
+#include "emu.h"
+
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "video/vtvideo.h"
+#include "video/upd7220.h"
+
+#include "machine/wd_fdc.h"
+#include "formats/rx50_dsk.h"
+#include "formats/pc_dsk.h" // PC Formats
+#include "imagedev/flopdrv.h"
+
+#include "imagedev/harddriv.h"
+#include "machine/wd2010.h"
+#include "machine/corvushd.h"
+
+#include "machine/z80dart.h"
+#include "bus/rs232/rs232.h"
+#include "imagedev/bitbngr.h"
+#include "machine/com8116.h"
+
+#include "machine/i8251.h"
+#include "machine/clock.h"
+#include "machine/dec_lk201.h"
+#include "machine/nvram.h"
+
+#include "machine/ds1315.h"
+#include "softlist.h"
+#include "screen.h"
+
+#include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
+
+
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
 #define RD51_SECTORS_PER_TRACK 17
@@ -442,36 +475,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define DUAL_MONITOR  0x03
 
 // ----------------------------------------------------------------------------------------------
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "cpu/z80/z80.h"
-#include "video/vtvideo.h"
-#include "video/upd7220.h"
-
-#include "machine/wd_fdc.h"
-#include "formats/rx50_dsk.h"
-#include "formats/pc_dsk.h" // PC Formats
-#include "imagedev/flopdrv.h"
-
-#include "imagedev/harddriv.h"
-#include "machine/wd2010.h"
-#include "machine/corvushd.h"
-
-#include "machine/z80dart.h"
-#include "bus/rs232/rs232.h"
-#include "imagedev/bitbngr.h"
-#include "machine/com8116.h"
-
-#include "machine/i8251.h"
-#include "machine/clock.h"
-#include "machine/dec_lk201.h"
-#include "machine/nvram.h"
-
-#include "machine/ds1315.h"
-#include "softlist.h"
-
-#include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
-
 #define LK201_TAG   "lk201"
 #define FD1793_TAG  "fd1793x"
 

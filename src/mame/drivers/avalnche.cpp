@@ -31,10 +31,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/avalnche.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "includes/avalnche.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "avalnche.lh"
 

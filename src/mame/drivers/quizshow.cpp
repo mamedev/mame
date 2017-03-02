@@ -18,6 +18,8 @@ TODO:
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 #include "quizshow.lh"
 
 

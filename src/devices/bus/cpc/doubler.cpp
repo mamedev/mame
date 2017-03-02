@@ -14,7 +14,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DOUBLER = &device_creator<cpc_doubler_device>;
+const device_type CPC_DOUBLER = device_creator<cpc_doubler_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_doubler )

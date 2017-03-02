@@ -15,7 +15,7 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type DS75161A = &device_creator<ds75161a_device>;
+const device_type DS75161A = device_creator<ds75161a_device>;
 
 
 

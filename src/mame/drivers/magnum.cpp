@@ -6,10 +6,12 @@
 // http://www.eevblog.com/forum/blog/eevblog-949-vintage-australian-made-laptop-teardown/msg1080508/#msg1080508
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/i86/i186.h"
 #include "machine/cdp1879.h"
 #include "sound/beep.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class magnum_state : public driver_device
 {

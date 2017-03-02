@@ -163,7 +163,10 @@ NOTES (2016-06-06)
 
 #include "emu.h"
 #include "includes/sorcerer.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH

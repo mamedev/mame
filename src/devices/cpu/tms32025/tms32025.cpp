@@ -183,8 +183,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define IND     m_AR[ARP]                       /* address used in indirect memory access operations */
 
 
-const device_type TMS32025 = &device_creator<tms32025_device>;
-const device_type TMS32026 = &device_creator<tms32026_device>;
+const device_type TMS32025 = device_creator<tms32025_device>;
+const device_type TMS32026 = device_creator<tms32026_device>;
 
 static ADDRESS_MAP_START( tms32025_data, AS_DATA, 16, tms32025_device )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)

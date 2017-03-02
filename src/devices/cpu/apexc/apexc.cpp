@@ -330,7 +330,7 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "apexc.h"
 
 
-const device_type APEXC = &device_creator<apexc_cpu_device>;
+const device_type APEXC = device_creator<apexc_cpu_device>;
 
 
 /* decrement ICount by n */

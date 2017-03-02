@@ -95,6 +95,7 @@ public:
 
 	virtual ui_manager* create_ui(running_machine& machine) { return nullptr;  }
 	virtual void create_custom(running_machine& machine) { }
+	virtual void load_cheatfiles(running_machine& machine) { }
 	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }

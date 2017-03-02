@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "includes/exidy.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 

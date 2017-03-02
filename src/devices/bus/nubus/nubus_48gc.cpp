@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "nubus_48gc.h"
+#include "screen.h"
 
 #define VRAM_SIZE  (0x200000)  // 2 megs, maxed out
 
@@ -40,8 +41,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_48GC = &device_creator<nubus_48gc_device>;
-const device_type NUBUS_824GC = &device_creator<nubus_824gc_device>;
+const device_type NUBUS_48GC = device_creator<nubus_48gc_device>;
+const device_type NUBUS_824GC = device_creator<nubus_824gc_device>;
 
 
 //-------------------------------------------------

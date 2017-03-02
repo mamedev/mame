@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type UPD7227 = &device_creator<upd7227_device>;
+const device_type UPD7227 = device_creator<upd7227_device>;
 
 
 static ADDRESS_MAP_START( upd7227_map, AS_PROGRAM, 8, upd7227_device )

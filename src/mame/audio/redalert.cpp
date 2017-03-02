@@ -10,13 +10,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/redalert.h"
+
+#include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
-#include "cpu/i8085/i8085.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "includes/redalert.h"
+#include "speaker.h"
 
 
 

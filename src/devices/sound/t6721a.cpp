@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type T6721A = &device_creator<t6721a_device>;
+const device_type T6721A = device_creator<t6721a_device>;
 
 
 

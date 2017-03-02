@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_PDS = &device_creator<cpc_pds_device>;
+const device_type CPC_PDS = device_creator<cpc_pds_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_pds )

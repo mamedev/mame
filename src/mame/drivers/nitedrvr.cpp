@@ -37,11 +37,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/nitedrvr.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "includes/nitedrvr.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Memory Map */
 

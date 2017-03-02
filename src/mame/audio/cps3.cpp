@@ -11,7 +11,7 @@
 
 
 // device type definition
-const device_type CPS3 = &device_creator<cps3_sound_device>;
+const device_type CPS3 = device_creator<cps3_sound_device>;
 
 
 //**************************************************************************

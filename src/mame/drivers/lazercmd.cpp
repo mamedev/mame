@@ -236,6 +236,8 @@
 #include "emu.h"
 #include "includes/lazercmd.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 // color overlays, bbonk does not have an overlay
 #include "lazercmd.lh"

@@ -32,19 +32,23 @@
 
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/z80dart.h"
-#include "machine/mc146818.h"
-#include "machine/i8255.h"
 #include "machine/am9517a.h"
-#include "video/upd7220.h"
-#include "machine/upd765.h"
-#include "machine/ram.h"
+#include "machine/i8255.h"
+#include "machine/mc146818.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/qx10kbd.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80dart.h"
+#include "video/upd7220.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 #define MAIN_CLK    15974400
 

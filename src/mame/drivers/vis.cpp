@@ -2,14 +2,16 @@
 // copyright-holders:Carl
 
 #include "emu.h"
+#include "bus/isa/isa_cards.h"
 #include "cpu/i86/i286.h"
+#include "machine/8042kbdc.h"
 #include "machine/at.h"
 #include "sound/262intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
-#include "bus/isa/isa_cards.h"
-#include "machine/8042kbdc.h"
+#include "speaker.h"
+
 
 class vis_audio_device : public device_t,
 						 public device_isa16_card_interface
@@ -39,7 +41,7 @@ private:
 	emu_timer *m_pcm;
 };
 
-const device_type VIS_AUDIO = &device_creator<vis_audio_device>;
+const device_type VIS_AUDIO = device_creator<vis_audio_device>;
 
 vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIS_AUDIO, "vis_pcm", tag, owner, clock, "vis_pcm", __FILE__),
@@ -250,7 +252,7 @@ private:
 	uint8_t m_crtc_regs[0x31];
 };
 
-const device_type VIS_VGA = &device_creator<vis_vga_device>;
+const device_type VIS_VGA = device_creator<vis_vga_device>;
 
 vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, VIS_VGA, "vis_vga", tag, owner, clock, "vis_vga", __FILE__),

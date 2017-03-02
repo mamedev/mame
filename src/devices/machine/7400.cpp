@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "7400.h"
 
-const device_type TTL7400 = &device_creator<ttl7400_device>;
+const device_type TTL7400 = device_creator<ttl7400_device>;
 
 ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL7400, "7400 Quad 2-Input NAND Gate", tag, owner, clock, "7400", __FILE__)

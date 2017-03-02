@@ -179,6 +179,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "speaker.h"
 
 class pluto5_state : public driver_device
 {

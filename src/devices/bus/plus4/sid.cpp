@@ -20,6 +20,8 @@
 #include "emu.h"
 #include "sid.h"
 
+#include "speaker.h"
+
 
 
 //**************************************************************************
@@ -35,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PLUS4_SID = &device_creator<plus4_sid_cartridge_device>;
+const device_type PLUS4_SID = device_creator<plus4_sid_cartridge_device>;
 
 
 //-------------------------------------------------

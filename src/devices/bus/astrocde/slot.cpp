@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_CART_SLOT = &device_creator<astrocade_cart_slot_device>;
+const device_type ASTROCADE_CART_SLOT = device_creator<astrocade_cart_slot_device>;
 
 //**************************************************************************
 //    Astrocade Cartridges Interface
@@ -150,15 +150,15 @@ image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			m_type = ASTROCADE_STD;
 

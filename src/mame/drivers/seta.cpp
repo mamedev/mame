@@ -1360,21 +1360,26 @@ Note: on screen copyright is (c)1998 Coinmaster.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m65c02.h"
 #include "includes/seta.h"
+
+#include "cpu/m6502/m65c02.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #if __uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark

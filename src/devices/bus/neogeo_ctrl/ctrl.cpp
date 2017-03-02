@@ -30,8 +30,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEOGEO_CONTROL_PORT = &device_creator<neogeo_control_port_device>;
-const device_type NEOGEO_CTRL_EDGE_CONNECTOR = &device_creator<neogeo_ctrl_edge_port_device>;
+const device_type NEOGEO_CONTROL_PORT = device_creator<neogeo_control_port_device>;
+const device_type NEOGEO_CTRL_EDGE_CONNECTOR = device_creator<neogeo_ctrl_edge_port_device>;
 
 
 //**************************************************************************

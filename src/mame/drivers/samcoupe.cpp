@@ -28,15 +28,16 @@
 /* core includes */
 #include "emu.h"
 #include "includes/samcoupe.h"
-#
-/* components */
+
 #include "cpu/z80/z80.h"
 #include "sound/saa1099.h"
 
-/* devices */
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include "formats/tzx_cas.h"
 #include "formats/coupedsk.h"
-#include "softlist.h"
 
 /***************************************************************************
     CONSTANTS

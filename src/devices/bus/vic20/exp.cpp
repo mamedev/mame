@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_EXPANSION_SLOT = &device_creator<vic20_expansion_slot_device>;
+const device_type VIC20_EXPANSION_SLOT = device_creator<vic20_expansion_slot_device>;
 
 
 
@@ -112,7 +112,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if (is_filetype("20")) fread(m_card->m_blk1, 0x2000);
 			else if (is_filetype("40")) fread(m_card->m_blk2, 0x2000);

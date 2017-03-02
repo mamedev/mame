@@ -14,6 +14,9 @@
 #include "emu.h"
 #include "ef9345.h"
 
+#include "screen.h"
+
+
 #define MODE24x40   0
 #define MODEVAR40   1
 #define MODE8x80    2
@@ -25,7 +28,7 @@
 //**************************************************************************
 
 // devices
-const device_type EF9345 = &device_creator<ef9345_device>;
+const device_type EF9345 = device_creator<ef9345_device>;
 
 // default address map
 static ADDRESS_MAP_START( ef9345, AS_0, 8, ef9345_device )

@@ -21,14 +21,16 @@ lamps?
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/deco104.h"
 #include "machine/decocrpt.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
-#include "machine/eepromser.h"
-#include "machine/deco104.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dreambal_state : public driver_device
 {

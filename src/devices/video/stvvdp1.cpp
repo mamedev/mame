@@ -16,7 +16,8 @@ Framebuffer todo:
 
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
 
 #define VDP1_LOG 0
 

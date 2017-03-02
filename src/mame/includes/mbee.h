@@ -6,22 +6,29 @@
  *
  ****************************************************************************/
 
-#ifndef MBEE_H_
-#define MBEE_H_
+#ifndef MAME_INCLUDES_MBEE_H
+#define MAME_INCLUDES_MBEE_H
 
-#include "imagedev/snapquik.h"
-#include "machine/z80pio.h"
-#include "machine/8530scc.h"
-#include "imagedev/cassette.h"
-#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/mc146818.h"
-#include "video/mc6845.h"
-#include "sound/speaker.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+
+#include "machine/8530scc.h"
+#include "machine/buffer.h"
+#include "machine/mc146818.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80pio.h"
+
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "video/mc6845.h"
+
+#include "screen.h"
 
 
 class mbee_state : public driver_device
@@ -167,4 +174,4 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-#endif /* MBEE_H_ */
+#endif /* MAME_INCLUDES_MBEE_H */

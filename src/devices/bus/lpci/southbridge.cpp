@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
 #include "southbridge.h"
+
 #include "bus/pc_kbd/keyboards.h"
+#include "cpu/i386/i386.h"
+#include "speaker.h"
 
 
 static SLOT_INTERFACE_START(pc_isa_onboard)

@@ -98,6 +98,9 @@ dumped by sayu
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_18_432MHz
 

@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SOFTCARD = &device_creator<a2bus_softcard_device>;
+const device_type A2BUS_SOFTCARD = device_creator<a2bus_softcard_device>;
 
 #define Z80_TAG         "z80"
 

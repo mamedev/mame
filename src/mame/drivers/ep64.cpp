@@ -150,17 +150,21 @@ Notes: (All IC's shown)
 */
 
 #include "emu.h"
-#include "softlist.h"
-#include "sound/dave.h"
-#include "bus/rs232/rs232.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/ep64/exp.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 #include "machine/ram.h"
+#include "sound/dave.h"
 #include "video/nick.h"
+
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define Z80_TAG         "u1"
 #define DAVE_TAG        "u3"

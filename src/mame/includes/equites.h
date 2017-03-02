@@ -11,6 +11,7 @@
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 
 class equites_state : public driver_device

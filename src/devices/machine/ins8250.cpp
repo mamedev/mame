@@ -87,10 +87,10 @@ History:
 #include "emu.h"
 #include "machine/ins8250.h"
 
-const device_type INS8250 = &device_creator<ins8250_device>;
-const device_type NS16450 = &device_creator<ns16450_device>;
-const device_type NS16550 = &device_creator<ns16550_device>;
-const device_type PC16552D = &device_creator<pc16552_device>;
+const device_type INS8250 = device_creator<ins8250_device>;
+const device_type NS16450 = device_creator<ns16450_device>;
+const device_type NS16550 = device_creator<ns16550_device>;
+const device_type PC16552D = device_creator<pc16552_device>;
 
 ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),

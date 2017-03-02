@@ -28,7 +28,9 @@
 
 #include "emu.h"
 #include "includes/hx20.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

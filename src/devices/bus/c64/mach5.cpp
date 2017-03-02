@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MACH5 = &device_creator<c64_mach5_cartridge_device>;
+const device_type C64_MACH5 = device_creator<c64_mach5_cartridge_device>;
 
 
 //-------------------------------------------------

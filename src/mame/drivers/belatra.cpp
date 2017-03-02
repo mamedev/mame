@@ -44,6 +44,7 @@ Viking?s Fun Mill
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "speaker.h"
 
 class belatra_state : public driver_device
 {

@@ -265,8 +265,6 @@ void ti85_state::machine_start()
 
 MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
-	m_red_out = 0x00;
-	m_white_out = 0x00;
 	m_PCR = 0xc0;
 }
 
@@ -286,9 +284,7 @@ DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
-	m_red_out = 0x00;
-	m_white_out = 0x00;
-	m_PCR = 0xc0;
+	m_PCR = 0x00;
 
 
 	m_ti8x_memory_page_1 = 0;
@@ -520,13 +516,19 @@ READ8_MEMBER(ti85_state::ti85_port_0006_r)
 
 READ8_MEMBER(ti85_state::ti8x_serial_r)
 {
-	//ti85_update_serial(m_serial);
-	return (m_white_out<<3)
-		| (m_red_out<<2)
-		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
-		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03  // no link cable
-		| m_PCR;
+	// 7: unknown (ROM always sets to 1)
+	// 6: unknown (ROM always sets to 1)
+	// 5: enable ring output
+	// 4: enable tip output
+	// 3: ring output
+	// 2: tip output
+	// 1: ring input
+	// 0: tip input
+	// If the calculator is driving a line low it will always read low
+
+	uint8_t const tip_in((!m_link_port || m_link_port->tip_r()) ? 0x03 : 0x02);
+	uint8_t const ring_in((!m_link_port || m_link_port->ring_r()) ? 0x03 : 0x01);
+	return (~((m_PCR >> 2) & (m_PCR >> 4)) & tip_in & ring_in) | (m_PCR & 0xfc);
 }
 
 READ8_MEMBER(ti85_state::ti82_port_0002_r )
@@ -575,13 +577,19 @@ READ8_MEMBER(ti85_state::ti83_port_0003_r )
 
 READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 {
-	//ti85_update_serial(m_serial);
-	return (m_white_out<<3)
-		| (m_red_out<<2)
-		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
-		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03  // no link cable
-		| m_PCR;
+	// 7: unknown
+	// 6: byte receive in progress (TI-83+ only)
+	// 5: ring output
+	// 4: tip output
+	// 3: received byte ready (cleared by reading port 0x05, TI-83+ only)
+	// 2: enable byte receive (TI-83+ only)
+	// 1: ring input
+	// 0: tip input
+	// Note that tip/ring outputs are inverted by an NPN transistor
+
+	uint8_t const tip_in((!m_link_port || m_link_port->tip_r()) ? 0x03 : 0x02);
+	uint8_t const ring_in((!m_link_port || m_link_port->ring_r()) ? 0x03 : 0x01);
+	return (~(m_PCR >> 4) & tip_in & ring_in) | (m_PCR & 0xfc);
 }
 
 READ8_MEMBER(ti85_state::ti83p_port_0002_r )
@@ -682,13 +690,23 @@ WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 {
-	m_speaker->level_w(BIT(data, 2) | BIT(data, 3));
-	m_red_out = BIT(data, 2);
-	m_white_out = BIT(data, 3);
-	//ti85serial_red_out( m_serial, 0, m_red_out );
-	//ti85serial_white_out( m_serial, 0, m_white_out );
-	//ti85_update_serial(m_serial);
-	m_PCR = data & 0xf0;
+	// 7: unknown (ROM always sets to 1)
+	// 6: unknown (ROM always sets to 1)
+	// 5: enable ring output
+	// 4: enable tip output
+	// 3: ring output
+	// 2: tip output
+	// 1: unused
+	// 0: unused
+	// Note that tip/ring outputs are inverted by an NPN transistor
+	// In practice, the ROM only uses values 0xc0, 0xd4 and 0xe8
+
+	m_PCR = data & 0xfc;
+	if (m_link_port)
+	{
+		m_link_port->tip_w(BIT(~data, 2) | BIT(~data, 4));
+		m_link_port->ring_w(BIT(~data, 3) | BIT(~data, 5));
+	}
 }
 
 WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
@@ -725,22 +743,31 @@ WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
 
 WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 {
-		if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
-		m_ON_interrupt_mask = data&0x01;
-		//m_timer_interrupt_mask = data&0x04;
-		m_LCD_mask = data&0x02;
-		m_LCD_status = data&0x08;
+	if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
+	m_ON_interrupt_mask = data&0x01;
+	//m_timer_interrupt_mask = data&0x04;
+	m_LCD_mask = data&0x02;
+	m_LCD_status = data&0x08;
 }
 
 WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 {
-	m_speaker->level_w(BIT(data, 0) | BIT(data, 1));
-	m_red_out = BIT(data, 0);
-	m_white_out = BIT(data, 1);
-	//ti85serial_red_out( m_serial, 0, m_red_out );
-	//ti85serial_white_out( m_serial, 0, m_white_out );
-	//ti85_update_serial(m_serial);
-	m_PCR = data & 0xf0;
+	// 7: unknown
+	// 6: unknown
+	// 5: unknown
+	// 4: unknown
+	// 3: unknown
+	// 2: enable byte receive (TI-83+ only)
+	// 1: ring output
+	// 0: tip output
+	// Note that tip/ring outputs are inverted by an NPN transistor
+
+	m_PCR = (m_PCR & 0xc8) | (data & 0x04) | ((data << 4) & 0x30);
+	if (m_link_port)
+	{
+		m_link_port->tip_w(BIT(~data, 2) | BIT(~data, 4));
+		m_link_port->ring_w(BIT(~data, 3) | BIT(~data, 5));
+	}
 }
 
 WRITE8_MEMBER(ti85_state::ti83pse_int_ack_w)

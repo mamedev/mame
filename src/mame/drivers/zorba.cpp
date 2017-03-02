@@ -66,7 +66,9 @@ ToDo:
 #include "machine/latch.h"
 #include "machine/pit8253.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 namespace {

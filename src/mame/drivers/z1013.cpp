@@ -52,9 +52,11 @@ Due to no input checking, misuse of commands can crash the system.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class z1013_state : public driver_device
@@ -66,7 +68,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
 	DECLARE_READ8_MEMBER(port_b_r);

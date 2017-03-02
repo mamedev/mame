@@ -96,7 +96,7 @@ static const char *const reg16p[] = {
 
 
 
-const device_type TMP87PH40AN = &device_creator<tmp87ph40an_device>;
+const device_type TMP87PH40AN = device_creator<tmp87ph40an_device>;
 
 static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 #if 0

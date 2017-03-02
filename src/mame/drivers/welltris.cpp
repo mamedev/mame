@@ -312,14 +312,17 @@ TODO:
 
 *******************************************************************************/
 
-#define WELLTRIS_4P_HACK 0
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/welltris.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define WELLTRIS_4P_HACK 0
 
 
 WRITE8_MEMBER(welltris_state::sound_bankswitch_w)

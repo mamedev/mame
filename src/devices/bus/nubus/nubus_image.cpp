@@ -62,9 +62,7 @@ public:
 
 
 // device type definition
-extern const device_type MESSIMG_DISK;
-
-const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
+const device_type MESSIMG_DISK = device_creator<messimg_disk_image_device>;
 
 messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
@@ -141,7 +139,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_IMAGE = &device_creator<nubus_image_device>;
+const device_type NUBUS_IMAGE = device_creator<nubus_image_device>;
 
 
 //-------------------------------------------------

@@ -41,10 +41,10 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TC0190FMC = &device_creator<nes_tc0190fmc_device>;
-const device_type NES_TC0190FMC_PAL16R4 = &device_creator<nes_tc0190fmc_pal16r4_device>;
-const device_type NES_X1_005 = &device_creator<nes_x1_005_device>;
-const device_type NES_X1_017 = &device_creator<nes_x1_017_device>;
+const device_type NES_TC0190FMC = device_creator<nes_tc0190fmc_device>;
+const device_type NES_TC0190FMC_PAL16R4 = device_creator<nes_tc0190fmc_pal16r4_device>;
+const device_type NES_X1_005 = device_creator<nes_x1_005_device>;
+const device_type NES_X1_017 = device_creator<nes_x1_017_device>;
 
 
 nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

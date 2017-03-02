@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COCO_DWSOCK = &device_creator<beckerport_device>;
+const device_type COCO_DWSOCK = device_creator<beckerport_device>;
 
 //-------------------------------------------------
 //  INPUT_PORTS( coco_drivewire )

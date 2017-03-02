@@ -280,10 +280,13 @@ Stephh's notes (based on the games M6502 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "sound/samples.h"
 #include "includes/snk6502.h"
+
+#include "cpu/m6502/m6502.h"
+#include "sound/samples.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL_11_289MHz

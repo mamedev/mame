@@ -11,12 +11,14 @@ TODO:
 #include "emu.h"
 #include "moonsound.h"
 
+#include "speaker.h"
+
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type MSX_CART_MOONSOUND = &device_creator<msx_cart_moonsound>;
+const device_type MSX_CART_MOONSOUND = device_creator<msx_cart_moonsound>;
 
 
 msx_cart_moonsound::msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -37,7 +37,7 @@
 ***************************************************************************/
 
 // device type definition
-const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
+const device_type MICRODRIVE = device_creator<microdrive_image_device>;
 
 //-------------------------------------------------
 //  microdrive_image_device - constructor

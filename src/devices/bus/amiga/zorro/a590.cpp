@@ -18,8 +18,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A590 = &device_creator<a590_device>;
-const device_type A2091 = &device_creator<a2091_device>;
+const device_type A590 = device_creator<a590_device>;
+const device_type A2091 = device_creator<a2091_device>;
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

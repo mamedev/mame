@@ -40,6 +40,8 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "screen.h"
+#include "speaker.h"
 
 /***************************************************************************
 
@@ -113,7 +115,7 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_CART = &device_creator<galgames_cart_device>;
+const device_type GALGAMES_CART = device_creator<galgames_cart_device>;
 
 #define MCFG_GALGAMES_CART_INDEX(_cart) \
 	galgames_cart_device::static_set_cart(*device, _cart);
@@ -145,7 +147,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(bios); }
 };
 
-const device_type GALGAMES_BIOS_CART = &device_creator<galgames_bios_cart_device>;
+const device_type GALGAMES_BIOS_CART = device_creator<galgames_bios_cart_device>;
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -175,7 +177,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak2); }
 };
 
-const device_type GALGAMES_STARPAK2_CART = &device_creator<galgames_starpak2_cart_device>;
+const device_type GALGAMES_STARPAK2_CART = device_creator<galgames_starpak2_cart_device>;
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -207,7 +209,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak3); }
 };
 
-const device_type GALGAMES_STARPAK3_CART = &device_creator<galgames_starpak3_cart_device>;
+const device_type GALGAMES_STARPAK3_CART = device_creator<galgames_starpak3_cart_device>;
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
@@ -289,7 +291,7 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_SLOT = &device_creator<galgames_slot_device>;
+const device_type GALGAMES_SLOT = device_creator<galgames_slot_device>;
 
 #define MCFG_GALGAMES_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_SLOT, 0)

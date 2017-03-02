@@ -7,21 +7,28 @@
     Phill Harvey-Smith
     2011-01-29.
 */
+#ifndef MAME_INCLUDES_MBC55X_H
+#define MAME_INCLUDES_MBC55X_H
 
-#include "cpu/i86/i86.h"
-#include "machine/ram.h"
+#pragma once
+
 #include "bus/centronics/ctronics.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/wd_fdc.h"
-#include "machine/i8251.h"
-#include "sound/speaker.h"
-#include "video/mc6845.h"
+#include "cpu/i86/i86.h"
 #include "imagedev/flopdrv.h"
-#include "formats/pc_dsk.h"
-#include "debugger.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+
 #include "debug/debugcon.h"
+#include "debugger.h"
+
+#include "formats/pc_dsk.h"
+
 
 #define MAINCPU_TAG "maincpu"
 
@@ -220,3 +227,5 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
+
+#endif // MAME_INCLUDES_MBC55X_H

@@ -4,7 +4,7 @@
 #include "fs_sr022.h"
 
 
-const device_type MSX_CART_FS_SR022 = &device_creator<msx_cart_fs_sr022>;
+const device_type MSX_CART_FS_SR022 = device_creator<msx_cart_fs_sr022>;
 
 
 msx_cart_fs_sr022::msx_cart_fs_sr022(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

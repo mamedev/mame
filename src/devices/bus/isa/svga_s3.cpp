@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "svga_s3.h"
 
+#include "screen.h"
+
+
 ROM_START( s3_764 )
 	ROM_REGION(0x8000,"s3_764", 0)
 	ROM_DEFAULT_BIOS("9fxv330")
@@ -30,7 +33,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SVGA_S3 = &device_creator<isa16_svga_s3_device>;
+const device_type ISA16_SVGA_S3 = device_creator<isa16_svga_s3_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_s3 )
@@ -142,7 +145,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_S3VIRGE = &device_creator<isa16_s3virge_device>;
+const device_type ISA16_S3VIRGE = device_creator<isa16_s3virge_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_s3virge )
@@ -239,7 +242,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_S3VIRGEDX = &device_creator<isa16_s3virgedx_device>;
+const device_type ISA16_S3VIRGEDX = device_creator<isa16_s3virgedx_device>;
 
 
 //-------------------------------------------------
@@ -327,7 +330,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_DMS3D2KPRO = &device_creator<isa16_stealth3d2kpro_device>;
+const device_type ISA16_DMS3D2KPRO = device_creator<isa16_stealth3d2kpro_device>;
 
 
 //-------------------------------------------------

@@ -35,13 +35,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "video/mc6845.h"
-#include "sound/speaker.h"
-#include "formats/pyldin_dsk.h"
-#include "machine/upd765.h"
 #include "machine/ram.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+
 #include "softlist.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/pyldin_dsk.h"
+
 
 class pyl601_state : public driver_device
 {

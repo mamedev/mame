@@ -137,9 +137,7 @@ private:
 	// internal state
 };
 
-extern const device_type APOLLO_CONF;
-
-const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
+const device_type APOLLO_CONF = device_creator<apollo_config_device>;
 
 apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
@@ -811,7 +809,7 @@ WRITE8_MEMBER( apollo_sio::write )
 }
 
 // device type definition
-const device_type APOLLO_SIO = &device_creator<apollo_sio>;
+const device_type APOLLO_SIO = device_creator<apollo_sio>;
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -864,7 +862,7 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 /*** Apollo Node ID device ***/
 
 // device type definition
-const device_type APOLLO_NI = &device_creator<apollo_ni> ;
+const device_type APOLLO_NI = device_creator<apollo_ni> ;
 
 //-------------------------------------------------
 //  apollo_ni - constructor
@@ -1270,7 +1268,7 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
  ***************************************************************************/
 
 // device type definition
-const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
+const device_type APOLLO_STDIO = device_creator<apollo_stdio_device> ;
 
 //-------------------------------------------------
 // apollo_stdio_device - constructor

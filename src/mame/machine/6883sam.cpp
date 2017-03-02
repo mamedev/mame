@@ -59,7 +59,7 @@
 
 #define LOG_SAM     0
 
-const device_type SAM6883 = &device_creator<sam6883_device>;
+const device_type SAM6883 = device_creator<sam6883_device>;
 
 
 

@@ -8,8 +8,8 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
 #include "includes/midyunit.h"
+#include "screen.h"
 
 
 /* compile-time options */

@@ -363,4 +363,4 @@ int tmc0430_device::debug_get_address()
 	return m_address;
 }
 
-const device_type TMC0430 = &device_creator<tmc0430_device>;
+const device_type TMC0430 = device_creator<tmc0430_device>;

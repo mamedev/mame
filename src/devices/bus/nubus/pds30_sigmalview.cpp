@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "pds30_sigmalview.h"
+#include "screen.h"
 
 #define LVIEW_SCREEN_NAME "lview_screen"
 #define LVIEW_ROM_REGION  "lview_rom"
@@ -31,7 +32,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_LVIEW = &device_creator<nubus_lview_device>;
+const device_type PDS030_LVIEW = device_creator<nubus_lview_device>;
 
 
 //-------------------------------------------------

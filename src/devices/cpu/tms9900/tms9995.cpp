@@ -3556,5 +3556,5 @@ offs_t tms9995_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 }
 
 
-const device_type TMS9995 = &device_creator<tms9995_device>;
-const device_type TMS9995_MP9537 = &device_creator<tms9995_mp9537_device>;
+const device_type TMS9995 = device_creator<tms9995_device>;
+const device_type TMS9995_MP9537 = device_creator<tms9995_mp9537_device>;

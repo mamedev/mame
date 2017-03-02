@@ -15,9 +15,11 @@
 
 #include "emu.h"
 #include "includes/gamate.h"
-#include "ui/uimain.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class gamate_state : public driver_device
 {
@@ -208,7 +210,7 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 		return 0;
 	uint8_t data = video.bitmap.data[video.bitmap.page2][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
 //  if (m_maincpu->pc()<0xf000)
-//    machine().ui().popup_time(2, "lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
+//    popmessage("lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
 	if (video.y_increment)
 		video.y++;
 	else
@@ -220,7 +222,7 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 READ8_MEMBER( gamate_state::gamate_nmi_r )
 {
 	uint8_t data=0;
-	machine().ui().popup_time(2, "nmi/4800 read\n");
+	popmessage("nmi/4800 read\n");
 	return data;
 }
 

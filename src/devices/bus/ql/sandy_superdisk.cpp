@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SANDY_SUPER_DISK = &device_creator<sandy_super_disk_t>;
+const device_type SANDY_SUPER_DISK = device_creator<sandy_super_disk_t>;
 
 
 //-------------------------------------------------

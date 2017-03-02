@@ -122,9 +122,9 @@
 #define COMPILE_MAX_SEQUENCE            64
 
 
-const device_type SH1 = &device_creator<sh1_device>;
-const device_type SH2 = &device_creator<sh2_device>;
-const device_type SH2A = &device_creator<sh2a_device>;
+const device_type SH1 = device_creator<sh1_device>;
+const device_type SH2 = device_creator<sh2_device>;
+const device_type SH2A = device_creator<sh2a_device>;
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for

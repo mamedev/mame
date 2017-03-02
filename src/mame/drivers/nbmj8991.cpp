@@ -32,12 +32,14 @@ Notes:
 
 #include "emu.h"
 #include "includes/nbmj8991.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(nbmj8991_state::soundbank_w)

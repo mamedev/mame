@@ -73,7 +73,7 @@ GFXDECODE_MEMBER( igs017_igs031_device::gfxinfo )
 GFXDECODE_END
 
 
-const device_type IGS017_IGS031 = &device_creator<igs017_igs031_device>;
+const device_type IGS017_IGS031 = device_creator<igs017_igs031_device>;
 
 igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS017_IGS031, "IGS017_IGS031", tag, owner, clock, "igs017_igs031", __FILE__),

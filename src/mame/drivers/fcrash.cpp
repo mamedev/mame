@@ -86,14 +86,17 @@ slampic: no sound. A priority problem between sprites and crowd.
 */
 
 #include "emu.h"
+#include "includes/cps1.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/cps1.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER( cps_state::fcrash_soundlatch_w )
 {

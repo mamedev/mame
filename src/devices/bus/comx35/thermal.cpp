@@ -21,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_THM = &device_creator<comx_thm_device>;
+const device_type COMX_THM = device_creator<comx_thm_device>;
 
 
 //-------------------------------------------------

@@ -724,7 +724,7 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	const char  *pcb_name;
 	uint32_t size = slot->common_get_size("rom");
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		return image_init_result::FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);

@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normalize_dot.hpp>
 
 int main()

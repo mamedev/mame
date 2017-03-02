@@ -44,10 +44,13 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vulgus.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/vulgus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)

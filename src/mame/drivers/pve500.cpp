@@ -45,13 +45,15 @@
 #define DEBUGGING_INDUCE_SELFDIAGNOSE 0
 
 #include "emu.h"
-#include "cpu/z80/tmpz84c015.h"
-#include "cpu/mb88xx/mb88xx.h"
-#include "sound/beep.h"
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
-#include "pve500.lh"
-#include "machine/mb8421.h"
+#include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "machine/eepromser.h"
+#include "machine/mb8421.h"
+#include "sound/beep.h"
+#include "speaker.h"
+
+#include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1

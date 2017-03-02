@@ -61,13 +61,16 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/okim6295.h"
 #include "includes/playmark.h"
-#include "machine/ticket.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "screen.h"
+#include "sound/okim6295.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(playmark_state::coinctrl_w)

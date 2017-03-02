@@ -45,14 +45,16 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "video/mc6845.h"
+#include "machine/i8255.h"
+#include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
-#include "sound/speaker.h"
-#include "machine/keyboard.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class mbc200_state : public driver_device
 {

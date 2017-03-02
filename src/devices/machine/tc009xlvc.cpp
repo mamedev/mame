@@ -14,7 +14,10 @@
 #include "emu.h"
 #include "machine/tc009xlvc.h"
 
-const device_type TC0091LVC = &device_creator<tc0091lvc_device>;
+#include "screen.h"
+
+
+const device_type TC0091LVC = device_creator<tc0091lvc_device>;
 
 
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)

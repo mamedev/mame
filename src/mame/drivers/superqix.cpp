@@ -172,6 +172,8 @@ code at z80:0093:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 SAMPLES_START_CB_MEMBER(hotsmash_state::pbillian_sh_start)

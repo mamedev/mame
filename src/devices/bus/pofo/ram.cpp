@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PORTFOLIO_RAM_CARD = &device_creator<portfolio_ram_card_t>;
+const device_type PORTFOLIO_RAM_CARD = device_creator<portfolio_ram_card_t>;
 
 
 //**************************************************************************

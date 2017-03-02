@@ -9,10 +9,14 @@ driver by Allard van der Bas
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/shaolins.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/shaolins.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_18_432MHz
 

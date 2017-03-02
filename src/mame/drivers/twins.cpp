@@ -65,19 +65,22 @@ this requires the -joystick_contradictory switch on the commandline.
 #include "sound/ay8910.h"
 #include "machine/i2cmem.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class twins_state : public driver_device
 {
 public:
 	twins_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_paletteram(*this, "paletteram"),
-		m_palette(*this, "palette"),
-		m_i2cmem(*this, "i2cmem"),
-		m_spritesinit(0),
-		m_videorambank(0)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_paletteram(*this, "paletteram")
+		, m_palette(*this, "palette")
+		, m_i2cmem(*this, "i2cmem")
+		, m_spritesinit(0)
+		, m_videorambank(0)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint16_t> m_paletteram;

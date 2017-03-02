@@ -10,11 +10,14 @@
 
 #include "emu.h"
 #include "mameopts.h"
+
 #include "drivenum.h"
+#include "screen.h"
 #include "softlist_dev.h"
 
 #include <ctype.h>
 #include <stack>
+
 
 int mame_options::m_slot_options = 0;
 int mame_options::m_device_options = 0;
@@ -220,18 +223,22 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	auto value_specifier = [&softlist_opts, &args, &error_string](emu_options &options, const std::string &arg)
 	{
 		// first find within the command line
-		std::string arg_value = options.pluck_from_command_line(args, arg);
+		std::string arg_value;
+		bool success = options.pluck_from_command_line(args, arg, arg_value);
 
 		// next try to find within softlist-specified options
-		if (arg_value.empty())
+		if (!success)
 		{
 			auto iter = softlist_opts.find(arg);
 			if (iter != softlist_opts.end())
+			{
 				arg_value = iter->second;
+				success = true;
+			}
 		}
 
 		// did we find something?
-		if (!arg_value.empty())
+		if (success)
 			options.set_value(arg.c_str(), arg_value.c_str(), OPTION_PRIORITY_MAXIMUM, error_string);
 	};
 

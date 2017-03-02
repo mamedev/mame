@@ -11,8 +11,8 @@
 
 const uint32_t prom82s129_base_device::PROM_SIZE = 256;
 
-const device_type PROM82S126 = &device_creator<prom82s126_device>;
-const device_type PROM82S129 = &device_creator<prom82s129_device>;
+const device_type PROM82S126 = device_creator<prom82s126_device>;
+const device_type PROM82S129 = device_creator<prom82s129_device>;
 
 prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

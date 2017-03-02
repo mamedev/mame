@@ -33,12 +33,15 @@ ToDo:
 *********************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/scmp/scmp.h"
 #include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mk14.lh"
 
 

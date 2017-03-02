@@ -14,8 +14,11 @@
 
 #include "emu.h"
 #include "machine/pc9801_118.h"
+
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK_X2 XTAL_2_4576MHz
 
@@ -24,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_118 = &device_creator<pc9801_118_device>;
+const device_type PC9801_118 = device_creator<pc9801_118_device>;
 
 
 READ8_MEMBER(pc9801_118_device::opn_porta_r)

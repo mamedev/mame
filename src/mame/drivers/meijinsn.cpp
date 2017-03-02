@@ -66,6 +66,8 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/gen_latch.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class meijinsn_state : public driver_device
 {

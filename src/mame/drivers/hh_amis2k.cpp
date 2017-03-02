@@ -25,7 +25,8 @@
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "wildfire.lh" // this is a test layout, use external artwork
 

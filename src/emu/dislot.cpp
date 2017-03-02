@@ -77,6 +77,17 @@ device_t* device_slot_interface::get_card_device()
 	return dev;
 }
 
+bool device_slot_interface::has_selectable_options() const
+{
+	if (!fixed())
+	{
+		for (auto &option : option_list())
+			if (option.second->selectable())
+				return true;
+	}
+	return false;
+}
+
 
 device_slot_card_interface::device_slot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "slot")

@@ -33,7 +33,7 @@
 //**************************************************************************
 
 // devices
-const device_type AY3600 = &device_creator<ay3600_device>;
+const device_type AY3600 = device_creator<ay3600_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

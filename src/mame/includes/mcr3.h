@@ -5,6 +5,7 @@
     Midway MCR-3 system
 
 **************************************************************************/
+#include "screen.h"
 
 class mcr3_state : public mcr_state
 {

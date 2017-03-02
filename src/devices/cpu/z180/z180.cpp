@@ -78,7 +78,7 @@ Hitachi HD647180 series:
 /* register is calculated as follows: refresh=(Regs.R&127)|(Regs.R2&128)    */
 /****************************************************************************/
 
-const device_type Z180 = &device_creator<z180_device>;
+const device_type Z180 = device_creator<z180_device>;
 
 
 z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

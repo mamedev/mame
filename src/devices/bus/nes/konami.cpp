@@ -28,6 +28,8 @@
 #include "konami.h"
 
 #include "cpu/m6502/m6502.h"
+#include "speaker.h"
+
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -43,12 +45,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_VRC1 = &device_creator<nes_konami_vrc1_device>;
-const device_type NES_VRC2 = &device_creator<nes_konami_vrc2_device>;
-const device_type NES_VRC3 = &device_creator<nes_konami_vrc3_device>;
-const device_type NES_VRC4 = &device_creator<nes_konami_vrc4_device>;
-const device_type NES_VRC6 = &device_creator<nes_konami_vrc6_device>;
-const device_type NES_VRC7 = &device_creator<nes_konami_vrc7_device>;
+const device_type NES_VRC1 = device_creator<nes_konami_vrc1_device>;
+const device_type NES_VRC2 = device_creator<nes_konami_vrc2_device>;
+const device_type NES_VRC3 = device_creator<nes_konami_vrc3_device>;
+const device_type NES_VRC4 = device_creator<nes_konami_vrc4_device>;
+const device_type NES_VRC6 = device_creator<nes_konami_vrc6_device>;
+const device_type NES_VRC7 = device_creator<nes_konami_vrc7_device>;
 
 
 nes_konami_vrc1_device::nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

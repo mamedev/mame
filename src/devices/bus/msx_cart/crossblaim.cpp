@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "crossblaim.h"
 
-const device_type MSX_CART_CROSSBLAIM = &device_creator<msx_cart_crossblaim>;
+const device_type MSX_CART_CROSSBLAIM = device_creator<msx_cart_crossblaim>;
 
 
 msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

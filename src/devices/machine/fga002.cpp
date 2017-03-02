@@ -64,7 +64,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type FGA002   = &device_creator<fga002_device>;
+const device_type FGA002   = device_creator<fga002_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -36,10 +36,12 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
-#include "machine/nvram.h"
-#include "machine/eepromser.h"
+#include "screen.h"
+#include "speaker.h"
 
 class konendev_state : public driver_device
 {

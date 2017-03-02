@@ -7,10 +7,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_DEVICES_CPU_PSX_PSX_H
+#define MAME_DEVICES_CPU_PSX_PSX_H
 
-#ifndef __PSXCPU_H__
-#define __PSXCPU_H__
+#pragma once
 
 #include "machine/ram.h"
 #include "dma.h"
@@ -137,7 +137,7 @@ enum
 class psxcpu_state
 {
 public:
-	virtual ~psxcpu_state() {};
+	virtual ~psxcpu_state() { }
 
 	virtual uint32_t pc() = 0;
 	virtual uint32_t delayr() = 0;
@@ -147,13 +147,9 @@ public:
 
 // ======================> psxcpu_device
 
-class psxcpu_device : public cpu_device,
-	psxcpu_state
+class psxcpu_device : public cpu_device, psxcpu_state
 {
 public:
-	// construction/destruction
-	virtual ~psxcpu_device() {};
-
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_gpu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_gpu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(object); }
@@ -523,4 +519,4 @@ extern const device_type CXD8606CQ;
 
 extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 
-#endif /* __PSXCPU_H__ */
+#endif // MAME_DEVICES_CPU_PSX_PSX_H

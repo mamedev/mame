@@ -260,6 +260,6 @@ void octopus_keyboard_device::device_timer(emu_timer &timer, device_timer_id id,
 }
 
 
-const device_type OCTOPUS_KEYBOARD = &device_creator<octopus_keyboard_device>;
+const device_type OCTOPUS_KEYBOARD = device_creator<octopus_keyboard_device>;
 
 

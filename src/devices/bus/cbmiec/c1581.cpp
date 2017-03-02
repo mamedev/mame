@@ -33,8 +33,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1563 = &device_creator<c1563_t>;
-const device_type C1581 = &device_creator<c1581_t>;
+const device_type C1563 = device_creator<c1563_t>;
+const device_type C1581 = device_creator<c1581_t>;
 
 
 //-------------------------------------------------

@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "includes/channelf.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0

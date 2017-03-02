@@ -33,9 +33,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type AT45DB041 = &device_creator<at45db041_device>;
-const device_type AT45DB081 = &device_creator<at45db081_device>;
-const device_type AT45DB161 = &device_creator<at45db161_device>;
+const device_type AT45DB041 = device_creator<at45db041_device>;
+const device_type AT45DB081 = device_creator<at45db081_device>;
+const device_type AT45DB161 = device_creator<at45db161_device>;
 
 
 //**************************************************************************

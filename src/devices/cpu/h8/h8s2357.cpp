@@ -3,12 +3,12 @@
 #include "emu.h"
 #include "h8s2357.h"
 
-const device_type H8S2357 = &device_creator<h8s2357_device>;
-const device_type H8S2352 = &device_creator<h8s2352_device>;
-const device_type H8S2398 = &device_creator<h8s2398_device>;
-const device_type H8S2394 = &device_creator<h8s2394_device>;
-const device_type H8S2392 = &device_creator<h8s2392_device>;
-const device_type H8S2390 = &device_creator<h8s2390_device>;
+const device_type H8S2357 = device_creator<h8s2357_device>;
+const device_type H8S2352 = device_creator<h8s2352_device>;
+const device_type H8S2398 = device_creator<h8s2398_device>;
+const device_type H8S2394 = device_creator<h8s2394_device>;
+const device_type H8S2392 = device_creator<h8s2392_device>;
+const device_type H8S2390 = device_creator<h8s2390_device>;
 
 h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2357_device::map), this)),

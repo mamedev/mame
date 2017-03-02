@@ -188,10 +188,10 @@ void favorite_manager::add_favorite_game()
 	auto software_avail = false;
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		if (image.exists() && image.software_entry())
+		if (image.exists() && image.loaded_through_softlist())
 		{
-			auto swinfo = image.software_entry();
-			auto part = image.part_entry();
+			const software_info *swinfo = image.software_entry();
+			const software_part *part = image.part_entry();
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = swinfo->shortname();
 			tmpmatches.longname = image.longname();

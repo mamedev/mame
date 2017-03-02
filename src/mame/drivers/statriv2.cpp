@@ -72,24 +72,26 @@ quaquiz2 - no inputs, needs NVRAM
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
-#include "video/tms9927.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9927.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class statriv2_state : public driver_device
 {
 public:
 	statriv2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_tms(*this, "tms"),
-		m_videoram(*this, "videoram"),
-		m_question_offset(*this, "question_offset"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_tms(*this, "tms")
+		, m_videoram(*this, "videoram")
+		, m_question_offset(*this, "question_offset")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;

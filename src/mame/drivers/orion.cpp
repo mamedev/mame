@@ -12,10 +12,15 @@
 
 #include "emu.h"
 #include "includes/orion.h"
+
 #include "imagedev/cassette.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include "formats/smx_dsk.h"
 #include "formats/rk_cas.h"
-#include "softlist.h"
+
 
 /* Address maps */
 

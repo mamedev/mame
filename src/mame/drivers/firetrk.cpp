@@ -7,9 +7,10 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/firetrk.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "superbug.lh"
 

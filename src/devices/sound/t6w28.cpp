@@ -347,7 +347,7 @@ void t6w28_device::set_enable(bool enable)
 	m_enabled = enable;
 }
 
-const device_type T6W28 = &device_creator<t6w28_device>;
+const device_type T6W28 = device_creator<t6w28_device>;
 
 t6w28_device::t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, T6W28, "T6W28", tag, owner, clock, "t6w28", __FILE__),

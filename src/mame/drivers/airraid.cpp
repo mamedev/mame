@@ -149,23 +149,26 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "audio/seibu.h"
 #include "video/airraid_dev.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 class airraid_state : public driver_device
 {
 public:
 	airraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_mainram(*this, "mainram"),
-		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_airraid_video(*this,"airraid_vid")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_mainram(*this, "mainram")
+		, m_palette(*this, "palette")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_airraid_video(*this,"airraid_vid")
+	{ }
 
 
 	required_device<cpu_device> m_maincpu;

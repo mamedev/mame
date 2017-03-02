@@ -76,7 +76,9 @@ Notes:
 
 #include "emu.h"
 #include "includes/abc80.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

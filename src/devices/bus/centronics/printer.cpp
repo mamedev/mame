@@ -8,7 +8,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_PRINTER = &device_creator<centronics_printer_device>;
+const device_type CENTRONICS_PRINTER = device_creator<centronics_printer_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( centronics_printer )

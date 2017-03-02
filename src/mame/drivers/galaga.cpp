@@ -699,23 +699,26 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/bosco.h"
+#include "includes/digdug.h"
+#include "includes/galaga.h"
+#include "includes/xevious.h"
+#include "audio/namco52.h"
+#include "audio/namco54.h"
+
 #include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/z80.h"
 #include "machine/atari_vg.h"
 #include "machine/namco06.h"
 #include "machine/namco50.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "includes/galaga.h"
-#include "includes/xevious.h"
-#include "includes/bosco.h"
-#include "includes/digdug.h"
-#include "audio/namco52.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "audio/namco54.h"
+
+#include "speaker.h"
+
 
 #define MASTER_CLOCK (XTAL_18_432MHz)
 

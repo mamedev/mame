@@ -120,6 +120,7 @@
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"
+
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "machine/8530scc.h"
@@ -127,7 +128,9 @@
 #include "cpu/g65816/g65816.h"
 #include "sound/es5503.h"
 #include "machine/ram.h"
+
 #include "debugger.h"
+#include "screen.h"
 
 #define LOG_C0XX            0
 #define LOG_ADB             0

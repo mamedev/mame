@@ -11,6 +11,7 @@ Awesome tossem u21 = 27c512
 
 #include "emu.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 class awetoss_state : public driver_device

@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS_SLOT = &device_creator<macpds_slot_device>;
+const device_type MACPDS_SLOT = device_creator<macpds_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -61,7 +61,7 @@ void macpds_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS = &device_creator<macpds_device>;
+const device_type MACPDS = device_creator<macpds_device>;
 
 void macpds_device::static_set_cputag(device_t &device, const char *tag)
 {

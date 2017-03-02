@@ -63,6 +63,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "screen.h"
 
 
 class quakeat_state : public pcat_base_state

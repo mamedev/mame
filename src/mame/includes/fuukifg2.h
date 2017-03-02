@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
+#include "screen.h"
 
 class fuuki16_state : public driver_device
 {

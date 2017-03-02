@@ -34,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_FDC = &device_creator<adam_fdc_device>;
+const device_type ADAM_FDC = device_creator<adam_fdc_device>;
 
 
 //-------------------------------------------------

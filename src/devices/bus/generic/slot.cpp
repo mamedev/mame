@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GENERIC_SOCKET = &device_creator<generic_slot_device>;
+const device_type GENERIC_SOCKET = device_creator<generic_slot_device>;
 
 
 //-------------------------------------------------
@@ -189,9 +189,9 @@ std::string generic_slot_device::get_default_card_software()
 uint32_t generic_slot_device::common_get_size(const char *region)
 {
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == nullptr) || (region != nullptr));
+	assert(!loaded_through_softlist() || (region != nullptr));
 
-	return (software_entry() == nullptr) ? length() : get_software_region_length(region);
+	return !loaded_through_softlist() ? length() : get_software_region_length(region);
 }
 
 /*-------------------------------------------------
@@ -205,9 +205,9 @@ void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char
 	assert((ROM != nullptr) && (len > 0));
 
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == nullptr) || (region != nullptr));
+	assert(!loaded_through_softlist() || (region != nullptr));
 
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 		fread(ROM, len);
 	else
 		memcpy(ROM, get_software_region(region), len);

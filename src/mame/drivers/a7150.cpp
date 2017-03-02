@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
 
 
 class a7150_state : public driver_device

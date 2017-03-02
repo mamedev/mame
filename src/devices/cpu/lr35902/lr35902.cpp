@@ -60,7 +60,7 @@ enum lr35902_flag
 //  LR35902 DEVICE
 //**************************************************************************
 
-const device_type LR35902 = &device_creator<lr35902_cpu_device>;
+const device_type LR35902 = device_creator<lr35902_cpu_device>;
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

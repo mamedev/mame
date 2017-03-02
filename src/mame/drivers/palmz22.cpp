@@ -68,6 +68,7 @@ end
 #include "machine/s3c2410.h"
 #include "machine/smartmed.h"
 #include "rendlay.h"
+#include "screen.h"
 
 #define PALM_Z22_BATTERY_LEVEL  75
 

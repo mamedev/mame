@@ -103,8 +103,8 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type M6809 = &device_creator<m6809_device>;
-const device_type M6809E = &device_creator<m6809e_device>;
+const device_type M6809 = device_creator<m6809_device>;
+const device_type M6809E = device_creator<m6809e_device>;
 
 
 //-------------------------------------------------

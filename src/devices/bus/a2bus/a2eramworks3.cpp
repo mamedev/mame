@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUX_RAMWORKS3 = &device_creator<a2eaux_ramworks3_device>;
+const device_type A2EAUX_RAMWORKS3 = device_creator<a2eaux_ramworks3_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -675,9 +675,9 @@ void mos6560_device::sound_start()
 }
 
 
-const device_type MOS6560 = &device_creator<mos6560_device>;
-const device_type MOS6561 = &device_creator<mos6561_device>;
-const device_type MOS656X_ATTACK_UFO = &device_creator<mos656x_attack_ufo_device>;
+const device_type MOS6560 = device_creator<mos6560_device>;
+const device_type MOS6561 = device_creator<mos6561_device>;
+const device_type MOS656X_ATTACK_UFO = device_creator<mos656x_attack_ufo_device>;
 
 // default address maps
 static ADDRESS_MAP_START( mos6560_videoram_map, AS_0, 8, mos6560_device )

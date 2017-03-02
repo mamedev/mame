@@ -26,12 +26,12 @@
 
 
 // uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set
-const device_type NEC_D553 = &device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 96x4 RAM
-const device_type NEC_D557L = &device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O, Open Drain output, 96x4 RAM
-const device_type NEC_D650 = &device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 96x4 RAM
+const device_type NEC_D553 = device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 96x4 RAM
+const device_type NEC_D557L = device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O, Open Drain output, 96x4 RAM
+const device_type NEC_D650 = device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 96x4 RAM
 
 // uCOM-44 products: 1000x8 ROM, 64x4 RAM, does not support external interrupt
-const device_type NEC_D552 = &device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output
+const device_type NEC_D552 = device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output
 
 // uCOM-45 products: ROM size custom, 32x4 RAM
 //..

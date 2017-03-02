@@ -98,10 +98,10 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K801 = &device_creator<dmv_k801_device>;
-const device_type DMV_K211 = &device_creator<dmv_k211_device>;
-const device_type DMV_K212 = &device_creator<dmv_k212_device>;
-const device_type DMV_K213 = &device_creator<dmv_k213_device>;
+const device_type DMV_K801 = device_creator<dmv_k801_device>;
+const device_type DMV_K211 = device_creator<dmv_k211_device>;
+const device_type DMV_K212 = device_creator<dmv_k212_device>;
+const device_type DMV_K213 = device_creator<dmv_k213_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

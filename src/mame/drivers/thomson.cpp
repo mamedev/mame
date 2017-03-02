@@ -78,17 +78,21 @@
 
 #include "emu.h"
 #include "includes/thomson.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "formats/cd90_640_dsk.h"
-#include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/basicdsk.h"
+#include "formats/cd90_640_dsk.h"
 
 
 /**************************** common *******************************/

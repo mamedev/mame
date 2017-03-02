@@ -191,10 +191,12 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pacland.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
-#include "includes/pacland.h"
+#include "speaker.h"
 
 
 void pacland_state::machine_start()

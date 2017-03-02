@@ -3,10 +3,14 @@
 /* Mogura Desse */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/konamipt.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mogura_state : public driver_device
 {

@@ -10,8 +10,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms34010.h"
+
+#include "debugger.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -25,8 +27,8 @@
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type TMS34010 = &device_creator<tms34010_device>;
-const device_type TMS34020 = &device_creator<tms34020_device>;
+const device_type TMS34010 = device_creator<tms34010_device>;
+const device_type TMS34020 = device_creator<tms34020_device>;
 
 
 /***************************************************************************

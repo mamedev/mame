@@ -38,6 +38,9 @@
 #include "emu.h"
 #include "evpc.h"
 
+#include "speaker.h"
+
+
 #define EVPC_CRU_BASE 0x1400
 
 #define TRACE_ADDRESS 0
@@ -477,4 +480,4 @@ machine_config_constructor snug_enhanced_video_device::device_mconfig_additions(
 	return MACHINE_CONFIG_NAME( ti99_evpc );
 }
 
-const device_type TI99_EVPC = &device_creator<snug_enhanced_video_device>;
+const device_type TI99_EVPC = device_creator<snug_enhanced_video_device>;

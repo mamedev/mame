@@ -27,12 +27,17 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/v810/v810.h"
 #include "audio/vboy.h"
+
+#include "cpu/v810/v810.h"
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "vboy.lh"
+
 
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]
 #define READ_WORLD(wldoffs)   READ_BGMAP((0x1d800 >> 1) + wldoffs)

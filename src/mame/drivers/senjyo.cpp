@@ -79,10 +79,14 @@ I/O read/write
 
 #include "emu.h"
 #include "includes/senjyo.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void senjyo_state::machine_start()
 {

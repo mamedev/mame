@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MM58167 = &device_creator<mm58167_device>;
+const device_type MM58167 = device_creator<mm58167_device>;
 
 // registers (0-7 are the live data, 8-f are the setting for the compare IRQ)
 typedef enum

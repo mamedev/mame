@@ -54,7 +54,7 @@ protected:
 extern const device_type BARCODE_READER;
 
 // device type iterator
-typedef device_type_iterator<&device_creator<barcode_reader_device>, barcode_reader_device> barcode_reader_device_iterator;
+typedef device_type_iterator<BARCODE_READER, barcode_reader_device> barcode_reader_device_iterator;
 
 
 #endif

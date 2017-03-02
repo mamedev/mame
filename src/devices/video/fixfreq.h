@@ -11,10 +11,12 @@
 
 ***************************************************************************/
 
-#ifndef FIXFREQ_H
-#define FIXFREQ_H
+#ifndef MAME_DEVICES_VIDEO_FIXFREQ_H
+#define MAME_DEVICES_VIDEO_FIXFREQ_H
 
 #include "machine/netlist.h"
+#include "screen.h"
+
 
 #define FIXFREQ_INTERFACE(name) \
 	const fixedfreq_interface (name) =
@@ -156,4 +158,4 @@ private:
 // device type definition
 extern const device_type FIXFREQ;
 
-#endif /* FIXFREQ_H */
+#endif // MAME_DEVICES_VIDEO_FIXFREQ_H

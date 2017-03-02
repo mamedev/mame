@@ -49,14 +49,19 @@ stepstag:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "sound/ymz280b.h"
-#include "rocknms.lh"
-#include "stepstag.lh"
 #include "includes/tetrisp2.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/okim6295.h"
+#include "sound/ymz280b.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "rocknms.lh"
+#include "stepstag.lh"
 
 
 /***************************************************************************

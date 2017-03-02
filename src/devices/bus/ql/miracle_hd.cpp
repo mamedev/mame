@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MIRACLE_HARD_DISK = &device_creator<miracle_hard_disk_t>;
+const device_type MIRACLE_HARD_DISK = device_creator<miracle_hard_disk_t>;
 
 
 //-------------------------------------------------

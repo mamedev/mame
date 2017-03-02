@@ -244,7 +244,7 @@ void rocvfd_t::shift_clock(int state)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-const device_type ROC10937 = &device_creator<roc10937_t>;
+const device_type ROC10937 = device_creator<roc10937_t>;
 
 roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_t(mconfig, ROC10937, "Rockwell 10937 VFD controller and compatible", tag, owner, clock, "roc10937", __FILE__)
@@ -252,7 +252,7 @@ roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t 
 	m_port_val=0;
 }
 
-const device_type MSC1937 = &device_creator<msc1937_t>;
+const device_type MSC1937 = device_creator<msc1937_t>;
 
 msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_t(mconfig, MSC1937, "OKI MSC1937 VFD controller", tag, owner, clock, "msc1937", __FILE__)
@@ -260,7 +260,7 @@ msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_port_val=0;
 }
 
-const device_type MIC10937 = &device_creator<mic10937_t>;
+const device_type MIC10937 = device_creator<mic10937_t>;
 
 mic10937_t::mic10937_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_t(mconfig, MIC10937, "Micrel MIC10937 VFD controller", tag, owner, clock, "mic10937", __FILE__)
@@ -268,7 +268,7 @@ mic10937_t::mic10937_t(const machine_config &mconfig, const char *tag, device_t 
 	m_port_val=0;
 }
 
-const device_type S16LF01 = &device_creator<s16lf01_t>;
+const device_type S16LF01 = device_creator<s16lf01_t>;
 
 s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
@@ -327,7 +327,7 @@ void rocvfd_t::write_char(int data)
 	}
 }
 
-const device_type ROC10957 = &device_creator<roc10957_t>;
+const device_type ROC10957 = device_creator<roc10957_t>;
 
 roc10957_t::roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rocvfd_t(mconfig, ROC10957, "Rockwell 10957 VFD controller and compatible", tag, owner, clock, "roc10957", __FILE__)

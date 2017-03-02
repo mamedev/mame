@@ -13,12 +13,16 @@
 
 
 #include "emu.h"
+#include "machine/ie15_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/ie15/ie15.h"
-#include "machine/ie15_kbd.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "ie15.lh"
+
 
 #define SCREEN_PAGE (80*48)
 

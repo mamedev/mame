@@ -68,6 +68,6 @@ private:
 extern const device_type MIDIOUT;
 
 // device iterator
-typedef device_type_iterator<&device_creator<midiout_device>, midiout_device> midiout_device_iterator;
+typedef device_type_iterator<MIDIOUT, midiout_device> midiout_device_iterator;
 
 #endif /* __MIDIOUT_H__ */

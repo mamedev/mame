@@ -14,7 +14,7 @@
 
 #define LOG_WPCSND (0)
 
-const device_type WPCSND = &device_creator<wpcsnd_device>;
+const device_type WPCSND = device_creator<wpcsnd_device>;
 
 wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,WPCSND,"Williams WPC Sound",tag,owner,clock, "wpcsnd", __FILE__),

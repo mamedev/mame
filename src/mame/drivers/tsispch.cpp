@@ -112,6 +112,7 @@
 /* Core includes */
 #include "emu.h"
 #include "includes/tsispch.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/upd7725/upd7725.h"
 #include "machine/i8251.h"
@@ -119,6 +120,8 @@
 #include "machine/terminal.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 // defines
 #define DEBUG_PARAM 1

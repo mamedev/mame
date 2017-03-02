@@ -16,7 +16,7 @@
 //  ZORRO SLOT DEVICE
 //**************************************************************************
 
-const device_type ZORRO_SLOT = &device_creator<zorro_slot_device>;
+const device_type ZORRO_SLOT = device_creator<zorro_slot_device>;
 
 //-------------------------------------------------
 //  zorro_slot_device - constructor
@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER( zorro_device::int6_w ) { m_int6_handler(state); }
 //  EXPANSION SLOT DEVICE
 //**************************************************************************
 
-const device_type EXP_SLOT = &device_creator<exp_slot_device>;
+const device_type EXP_SLOT = device_creator<exp_slot_device>;
 
 //-------------------------------------------------
 //  exp_slot_device - constructor
@@ -181,7 +181,7 @@ void exp_slot_device::fc_w(int code) { if (m_dev) m_dev->fc_w(code); }
 //  ZORRO2 DEVICE
 //**************************************************************************
 
-const device_type ZORRO2 = &device_creator<zorro2_device>;
+const device_type ZORRO2 = device_creator<zorro2_device>;
 
 //-------------------------------------------------
 //  zorro2_device - constructor

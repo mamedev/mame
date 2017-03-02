@@ -72,17 +72,22 @@
 */
 
 #include "emu.h"
-
-#include "imagedev/cassette.h"
-#include "formats/hect_tap.h"
-#include "imagedev/printer.h"
-#include "sound/wave.h"      /* for K7 sound*/
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
-#include "cpu/z80/z80.h"
-#include "formats/hect_dsk.h"
-#include "formats/hector_minidisc.h"
 #include "includes/hec2hrp.h"
+
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
+#include "sound/discrete.h"  /* for 1 Bit sound*/
+#include "sound/wave.h"      /* for K7 sound*/
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/hect_dsk.h"
+#include "formats/hect_tap.h"
+#include "formats/hector_minidisc.h"
+
 
 /*****************************************************************************/
 static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )

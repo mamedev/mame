@@ -15,8 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VC4000_CART_SLOT = &device_creator<vc4000_cart_slot_device>;
-const device_type H21_CART_SLOT = &device_creator<h21_cart_slot_device>;
+const device_type VC4000_CART_SLOT = device_creator<vc4000_cart_slot_device>;
+const device_type H21_CART_SLOT = device_creator<h21_cart_slot_device>;
 
 //**************************************************************************
 //    VC4000 Cartridges Interface
@@ -174,7 +174,7 @@ image_init_result vc4000_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x1800)
 		{
@@ -184,12 +184,12 @@ image_init_result vc4000_cart_slot_device::call_load()
 
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			m_type = VC4000_STD;
 			// attempt to identify the non-standard types

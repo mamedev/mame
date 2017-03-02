@@ -368,7 +368,7 @@ p8098_device::p8098_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-const device_type C8095 = &device_creator<c8095_device>;
-const device_type P8098 = &device_creator<p8098_device>;
+const device_type C8095 = device_creator<c8095_device>;
+const device_type P8098 = device_creator<p8098_device>;
 
 #include "cpu/mcs96/i8x9x.hxx"

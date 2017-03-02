@@ -9,10 +9,13 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
-#include "audio/lynx.h"
 #include "includes/lynx.h"
+#include "audio/lynx.h"
+
+#include "cpu/m6502/m65sc02.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "lynx.lh"
 

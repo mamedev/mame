@@ -13,7 +13,7 @@
 #include "ng_memcard.h"
 
 // device type definition
-const device_type NG_MEMCARD = &device_creator<ng_memcard_device>;
+const device_type NG_MEMCARD = device_creator<ng_memcard_device>;
 
 //-------------------------------------------------
 //  ng_memcard_device - constructor

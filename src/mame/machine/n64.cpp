@@ -10,7 +10,7 @@
 #include "video/n64.h"
 
 // device type definition
-const device_type N64PERIPH = &device_creator<n64_periphs>;
+const device_type N64PERIPH = device_creator<n64_periphs>;
 
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock, "n64_periphs", __FILE__)

@@ -1,22 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 
-#include <functional>
-
 #include "emu.h"
+#include "includes/xbox.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
-#include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/idectrl.h"
-#include "video/poly.h"
-#include "bitmap.h"
-#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "includes/xbox_nv2a.h"
-#include "includes/xbox.h"
-#include "includes/xbox_usb.h"
+
+#include "debugger.h"
+
+#include "bitmap.h"
+
+#include <functional>
 
 #define LOG_PCI
 //#define LOG_AUDIO

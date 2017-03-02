@@ -300,6 +300,18 @@
 **************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "re800.lh"
+#include "luckyrlt.lh"
+
+
 #define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
 #define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
 #define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
@@ -307,15 +319,6 @@
 #define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
 #define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 #define VIDEOBUF_SIZE       512*512
-
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "machine/gen_latch.h"
-#include "machine/nvram.h"
-#include "re800.lh"
-#include "luckyrlt.lh"
 
 
 class corona_state : public driver_device

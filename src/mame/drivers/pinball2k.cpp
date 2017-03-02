@@ -20,11 +20,14 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
+#include "machine/pcshare.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class pinball2k_state : public pcat_base_state
 {

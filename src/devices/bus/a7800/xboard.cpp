@@ -46,14 +46,15 @@
 #include "emu.h"
 #include "xboard.h"
 #include "a78_carts.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_XBOARD = &device_creator<a78_xboard_device>;
-const device_type A78_XM = &device_creator<a78_xm_device>;
+const device_type A78_XBOARD = device_creator<a78_xboard_device>;
+const device_type A78_XM = device_creator<a78_xm_device>;
 
 
 a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

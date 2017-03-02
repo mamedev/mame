@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MOS6529 = &device_creator<mos6529_device>;
+const device_type MOS6529 = device_creator<mos6529_device>;
 
 
 

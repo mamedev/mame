@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_CARTRIDGE_SLOT = &device_creator<colecovision_cartridge_slot_device>;
+const device_type COLECOVISION_CARTRIDGE_SLOT = device_creator<colecovision_cartridge_slot_device>;
 
 
 
@@ -79,10 +79,10 @@ image_init_result colecovision_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		size_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_card->rom_alloc(size);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			fread(m_card->m_rom, size);
 		}

@@ -27,11 +27,11 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_BASIC6 = &device_creator<iq151_basic6_device>;
-const device_type IQ151_BASICG = &device_creator<iq151_basicg_device>;
-const device_type IQ151_AMOS1 = &device_creator<iq151_amos1_device>;
-const device_type IQ151_AMOS2 = &device_creator<iq151_amos2_device>;
-const device_type IQ151_AMOS3 = &device_creator<iq151_amos3_device>;
+const device_type IQ151_BASIC6 = device_creator<iq151_basic6_device>;
+const device_type IQ151_BASICG = device_creator<iq151_basicg_device>;
+const device_type IQ151_AMOS1 = device_creator<iq151_amos1_device>;
+const device_type IQ151_AMOS2 = device_creator<iq151_amos2_device>;
+const device_type IQ151_AMOS3 = device_creator<iq151_amos3_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

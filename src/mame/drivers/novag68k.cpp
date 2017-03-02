@@ -26,9 +26,12 @@ Diablo 68000:
 
 #include "emu.h"
 #include "includes/novagbase.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "novag_diablo68k.lh" // clickable

@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "screen.h"
 
 class unico_state : public driver_device
 {

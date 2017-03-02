@@ -7,15 +7,10 @@
     Speaker output sound device.
 
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -50,8 +45,7 @@ extern const device_type SPEAKER;
 
 // ======================> speaker_device
 
-class speaker_device : public device_t,
-						public device_mixer_interface
+class speaker_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -83,7 +77,10 @@ protected:
 
 
 // speaker device iterator
-typedef device_type_iterator<&device_creator<speaker_device>, speaker_device> speaker_device_iterator;
+typedef device_type_iterator<SPEAKER, speaker_device> speaker_device_iterator;
+
+extern template class device_finder<speaker_device, false>;
+extern template class device_finder<speaker_device, true>;
 
 
 #endif  /* MAME_EMU_SPEAKER_H */

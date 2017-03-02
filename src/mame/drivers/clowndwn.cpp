@@ -10,6 +10,7 @@ can't find any info on this?
 */
 
 #include "emu.h"
+#include "speaker.h"
 
 
 class clowndwn_state : public driver_device

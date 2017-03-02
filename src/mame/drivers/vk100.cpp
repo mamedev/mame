@@ -125,6 +125,20 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 Not sure exactly what this tests, likely tries firing the vector generator
 state machine and sees if the GO bit ever finishes and goes back to 0
 */
+#include "emu.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "machine/com8116.h"
+#include "machine/i8251.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "vk100.lh"
+
 
 // named timer IDs
 #define TID_I8251_RX 1
@@ -147,15 +161,6 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
-
-#include "emu.h"
-#include "bus/rs232/rs232.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/beep.h"
-#include "video/mc6845.h"
-#include "machine/com8116.h"
-#include "machine/i8251.h"
-#include "vk100.lh"
 
 #define RS232_TAG       "rs232"
 #define COM5016T_TAG    "com5016t"

@@ -125,7 +125,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
+const device_type COCO_MULTIPAK = device_creator<coco_multipak_device>;
 
 
 

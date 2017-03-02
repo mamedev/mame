@@ -13,6 +13,7 @@
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "screen.h"
 
 #define SOUND_CHANNELS  4
 

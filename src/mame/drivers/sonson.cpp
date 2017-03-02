@@ -51,10 +51,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sonson.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/sonson.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)

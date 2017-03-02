@@ -7,14 +7,17 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/sc61860/sc61860.h"
-
 #include "includes/pocketc.h"
 #include "includes/pc1401.h"
 #include "includes/pc1251.h"
 #include "includes/pc1350.h"
 #include "includes/pc1403.h"
+
+#include "cpu/sc61860/sc61860.h"
 #include "machine/ram.h"
+
+#include "screen.h"
+
 
 /* pc1430 no peek poke operations! */
 

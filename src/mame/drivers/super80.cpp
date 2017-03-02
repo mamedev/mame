@@ -217,9 +217,14 @@ ToDo:
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "super80.lh"
 #include "includes/super80.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "super80.lh"
+
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)

@@ -5,7 +5,7 @@
 #include "jasmin.h"
 #include "microdisc.h"
 
-const device_type ORICEXT_CONNECTOR = &device_creator<oricext_connector>;
+const device_type ORICEXT_CONNECTOR = device_creator<oricext_connector>;
 
 oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ORICEXT_CONNECTOR, "ORIC extension connector", tag, owner, clock, "oricext_connector", __FILE__),

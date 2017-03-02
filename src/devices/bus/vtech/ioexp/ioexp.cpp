@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IOEXP_SLOT = &device_creator<ioexp_slot_device>;
+const device_type IOEXP_SLOT = device_creator<ioexp_slot_device>;
 
 
 //**************************************************************************

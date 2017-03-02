@@ -179,14 +179,19 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/ram.h"
-#include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"

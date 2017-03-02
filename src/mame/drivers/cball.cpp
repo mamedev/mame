@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "screen.h"
 
 
 class cball_state : public driver_device

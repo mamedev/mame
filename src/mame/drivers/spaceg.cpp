@@ -165,7 +165,9 @@ Notes:
 
 #include "emu.h"
 #include "includes/mw8080bw.h"
+
 #include "cpu/z80/z80.h"
+#include "speaker.h"
 
 
 /*************************************

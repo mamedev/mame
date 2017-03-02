@@ -491,6 +491,7 @@ expect that the software reads these once on startup only.
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
@@ -498,6 +499,7 @@ expect that the software reads these once on startup only.
 #include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "fidel_cc.lh" // clickable
@@ -1422,8 +1424,8 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.10") // hardwired (2 diodes)
-	PORT_CONFNAME( 0x01, 0x00, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -1434,8 +1436,8 @@ static INPUT_PORTS_START( vscg )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 
@@ -1525,7 +1527,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vsc_ppi_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vsc_ppi_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3900000)
 	MCFG_Z80PIO_IN_PA_CB(READ8(fidelz80_state, vsc_pio_porta_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))

@@ -379,7 +379,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type FD1094 = &device_creator<fd1094_device>;
+const device_type FD1094 = device_creator<fd1094_device>;
 
 /*
 317-0162 CPU also needs to mask:

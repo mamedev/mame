@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 class mgolf_state : public driver_device
 {

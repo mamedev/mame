@@ -15,7 +15,7 @@
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type METERS = &device_creator<meters_device>;
+const device_type METERS = device_creator<meters_device>;
 
 meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, METERS, "Electro mechanical meters", tag, owner, clock, "meters", __FILE__),

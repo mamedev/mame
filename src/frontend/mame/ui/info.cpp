@@ -411,7 +411,7 @@ void menu_image_info::image_info(device_image_interface *image)
 		item_append(image->brief_instance_name(), image->basename(), 0, nullptr);
 
 		// if image has been loaded through softlist, let's add some more info
-		if (image->software_entry())
+		if (image->loaded_through_softlist())
 		{
 			// display long filename
 			item_append(image->longname(), "", FLAG_DISABLE, nullptr);

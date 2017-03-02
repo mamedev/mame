@@ -137,18 +137,23 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/ataintf.h"
-#include "machine/intelfsh.h"
-#include "machine/rtc65271.h"
-#include "machine/ins8250.h"
-#include "machine/midikbd.h"
 #include "machine/atapicdr.h"
-#include "sound/ymz280b.h"
+#include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/midikbd.h"
+#include "machine/rtc65271.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "sound/ymz280b.h"
 #include "video/k057714.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "firebeat.lh"
 
 

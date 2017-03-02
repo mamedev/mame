@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "bfm_bda.h"
 
-const device_type BFM_BDA = &device_creator<bfm_bda_t>;
+const device_type BFM_BDA = device_creator<bfm_bda_t>;
 
 
 //I currently use the BDA character set, until a suitable image can be programmed

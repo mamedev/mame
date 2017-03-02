@@ -36,7 +36,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type INS8154 = &device_creator<ins8154_device>;
+const device_type INS8154 = device_creator<ins8154_device>;
 
 //-------------------------------------------------
 //  ins8154_device - constructor

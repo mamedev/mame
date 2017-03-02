@@ -212,4 +212,4 @@ void igs028_device::IGS028_handle()
 }
 
 
-const device_type IGS028 = &device_creator<igs028_device>;
+const device_type IGS028 = device_creator<igs028_device>;

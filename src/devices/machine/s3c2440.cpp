@@ -9,9 +9,12 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "machine/s3c2440.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/s3c2440.h"
+#include "screen.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -21,10 +24,10 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 	{
 		va_list v;
 		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		device.logerror( "%s: %s", device.machine().describe_context( ), buf);
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		device.logerror("%s: %s", device.machine().describe_context( ), buf);
 	}
 }
 
@@ -38,7 +41,7 @@ uint32_t s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return s3c24xx_video_update( screen, bitmap, cliprect);
 }
 
-const device_type S3C2440 = &device_creator<s3c2440_device>;
+const device_type S3C2440 = device_creator<s3c2440_device>;
 
 s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, S3C2440, "Samsung S3C2440", tag, owner, clock, "s3c2440", __FILE__),

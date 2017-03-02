@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "machine/pc9801_86.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 #define QUEUE_SIZE 32768
@@ -27,7 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_86 = &device_creator<pc9801_86_device>;
+const device_type PC9801_86 = device_creator<pc9801_86_device>;
 
 
 READ8_MEMBER(pc9801_86_device::opn_porta_r)

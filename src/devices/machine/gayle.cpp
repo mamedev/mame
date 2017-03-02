@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type GAYLE = &device_creator<gayle_device>;
+const device_type GAYLE = device_creator<gayle_device>;
 
 
 //**************************************************************************

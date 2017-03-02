@@ -363,7 +363,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 	offs_t size;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -383,7 +383,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread( pos, size ) != size )
 		{
@@ -593,7 +593,7 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
+const device_type TO7_IO_LINE = device_creator<to7_io_line_device>;
 
 //-------------------------------------------------
 //  to7_io_line_device - constructor
@@ -1473,7 +1473,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	int j;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -1493,7 +1493,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread(pos, size ) != size )
 		{

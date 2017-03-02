@@ -24,6 +24,7 @@ References:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
@@ -32,6 +33,9 @@ References:
 #include "machine/netlist.h"
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
+
+#include "screen.h"
+
 
 #define CPU_TAG         "maincpu"
 #define NETLIST_TAG     "videobrd"

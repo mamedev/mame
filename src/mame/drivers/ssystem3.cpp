@@ -36,9 +36,10 @@ backup of playfield rom and picture/description of its board
 */
 
 #include "emu.h"
-
 #include "includes/ssystem3.h"
+
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons
@@ -327,5 +328,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
-CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "NOVAG Industries Ltd",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "SciSys / Novag",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany

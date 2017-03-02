@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GBA_CART_SLOT = &device_creator<gba_cart_slot_device>;
+const device_type GBA_CART_SLOT = device_creator<gba_cart_slot_device>;
 
 //**************************************************************************
 //    GBA cartridges Interface
@@ -181,7 +181,7 @@ image_init_result gba_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint8_t *ROM;
-		uint32_t size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x4000000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
@@ -191,7 +191,7 @@ image_init_result gba_cart_slot_device::call_load()
 		m_cart->rom_alloc(size, tag());
 		ROM = (uint8_t *)m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			fread(ROM, size);
 			m_type = get_cart_type(ROM, size);

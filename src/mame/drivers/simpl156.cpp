@@ -91,12 +91,16 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 */
 
 #include "emu.h"
+#include "includes/simpl156.h"
+
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "cpu/arm/arm.h"
-#include "includes/simpl156.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( simpl156 )
 	PORT_START("IN0")

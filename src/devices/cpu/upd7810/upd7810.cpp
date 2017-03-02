@@ -374,11 +374,11 @@ STOP            01001000  10111011          12  stop
 #include "upd7810_macros.h"
 
 
-const device_type UPD7810 = &device_creator<upd7810_device>;
-const device_type UPD7807 = &device_creator<upd7807_device>;
-const device_type UPD7801 = &device_creator<upd7801_device>;
-const device_type UPD78C05 = &device_creator<upd78c05_device>;
-const device_type UPD78C06 = &device_creator<upd78c06_device>;
+const device_type UPD7810 = device_creator<upd7810_device>;
+const device_type UPD7807 = device_creator<upd7807_device>;
+const device_type UPD7801 = device_creator<upd7801_device>;
+const device_type UPD78C05 = device_creator<upd78c05_device>;
+const device_type UPD78C06 = device_creator<upd78c06_device>;
 
 
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

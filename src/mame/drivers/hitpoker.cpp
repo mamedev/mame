@@ -46,9 +46,11 @@ Some debug tricks (let's test this CPU as more as possible):
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class hitpoker_state : public driver_device

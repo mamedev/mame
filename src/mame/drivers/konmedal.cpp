@@ -24,11 +24,13 @@ Inputs:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/eepromser.h"
-#include "video/konami_helper.h"
-#include "video/k054156_k054157_k056832.h"
+#include "machine/gen_latch.h"
 #include "sound/ymz280b.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/konami_helper.h"
+#include "screen.h"
+#include "speaker.h"
 
 class konmedal_state : public driver_device
 {
@@ -39,7 +41,7 @@ public:
 		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;

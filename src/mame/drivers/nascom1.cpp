@@ -9,16 +9,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "machine/z80pio.h"
-#include "machine/ay31015.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/ay31015.h"
+#include "machine/ram.h"
+#include "machine/z80pio.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/nasbus/nasbus.h"
+
 #include "softlist.h"
+#include "screen.h"
+
 
 //**************************************************************************
 //  CONSTANTS/MACROS
@@ -261,7 +266,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
 	// loading directly from file
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if (slot->length() > 0x1000)
 		{

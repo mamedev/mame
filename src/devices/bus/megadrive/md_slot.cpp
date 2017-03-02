@@ -51,9 +51,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MD_CART_SLOT = &device_creator<md_cart_slot_device>;
-const device_type PICO_CART_SLOT = &device_creator<pico_cart_slot_device>;
-const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
+const device_type MD_CART_SLOT = device_creator<md_cart_slot_device>;
+const device_type PICO_CART_SLOT = device_creator<pico_cart_slot_device>;
+const device_type COPERA_CART_SLOT = device_creator<copera_cart_slot_device>;
 
 //**************************************************************************
 //    MD cartridges Interface
@@ -332,7 +332,7 @@ image_init_result base_md_cart_slot_device::call_load()
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
 		// The two steps are carried out differently if we are loading from a list or not
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			res = load_nonlist();
 		else
 			res = load_list();
@@ -1008,7 +1008,7 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	logerror("FILE DETAILS\n");
 	logerror("============\n");
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", !loaded_through_softlist() ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
 	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");

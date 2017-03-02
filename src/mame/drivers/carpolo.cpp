@@ -19,10 +19,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/carpolo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74153.h"
 #include "machine/6821pia.h"
-#include "includes/carpolo.h"
+#include "screen.h"
 
 
 

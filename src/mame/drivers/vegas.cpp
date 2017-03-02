@@ -275,14 +275,16 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "audio/dcs.h"
+
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "audio/dcs.h"
-#include "machine/timekpr.h"
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
+#include "machine/timekpr.h"
 #include "video/voodoo.h"
+#include "screen.h"
 
 
 /*************************************

@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "includes/bloodbro.h"
+#include "screen.h"
 
 
 /***************************************************************************

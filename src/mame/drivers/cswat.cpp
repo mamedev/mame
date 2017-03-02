@@ -22,9 +22,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/namco52.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "audio/namco52.h"
+#include "screen.h"
 
 
 class cswat_state : public driver_device

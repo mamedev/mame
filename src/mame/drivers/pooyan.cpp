@@ -11,12 +11,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pooyan.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "audio/timeplt.h"
-#include "includes/pooyan.h"
-#include "includes/konamipt.h"
+#include "screen.h"
 
 
 #define MASTER_CLOCK        XTAL_18_432MHz

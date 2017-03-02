@@ -16,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type I8243 = &device_creator<i8243_device>;
+const device_type I8243 = device_creator<i8243_device>;
 
 //-------------------------------------------------
 //  i8243_device - constructor

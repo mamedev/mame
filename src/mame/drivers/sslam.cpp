@@ -83,9 +83,12 @@ Notes:
 
 
 #include "emu.h"
+#include "includes/sslam.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/sslam.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define oki_time_base 0x08

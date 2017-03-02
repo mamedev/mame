@@ -44,11 +44,14 @@ More notes about Funny Strip protection issues at the bottom of source file (DRI
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/splash.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "includes/splash.h"
+#include "screen.h"
+#include "speaker.h"
 
 WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
 {

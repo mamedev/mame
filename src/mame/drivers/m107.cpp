@@ -26,13 +26,16 @@ confirmed for m107 games as well.
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "includes/m107.h"
 #include "includes/iremipt.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "speaker.h"
+
 
 // this is the hacky code from m92.c, but better than per-game irq vector hacks.
 #define USE_HACKED_IRQS

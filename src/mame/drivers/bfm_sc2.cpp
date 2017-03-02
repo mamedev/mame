@@ -142,6 +142,7 @@ Adder hardware:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 
 #include "machine/nvram.h"
@@ -154,10 +155,13 @@ Adder hardware:
 
 /* fruit machines only */
 #include "video/awpvid.h"
-#include "machine/steppers.h" // stepper motor
+#include "video/bfm_dm01.h"
+#include "machine/steppers.h"
 
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
+
+#include "speaker.h"
 
 #include "sc2_vid.lh"
 #include "gldncrwn.lh"
@@ -169,8 +173,6 @@ Adder hardware:
 #include "sltblgtk.lh"
 #include "slots.lh"
 
-/* fruit machines only */
-#include "video/bfm_dm01.h"
 #include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
 #include "drwho.lh"
