@@ -377,7 +377,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 		for (ioport_field &field : port.second->fields())
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
-				has_input = true;
+				has_input = true;				break;
 				break;
 			}
 
@@ -427,51 +427,25 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 void info_xml_creator::output_devices()
 {
+	// get config for some arbitrary machine
 	m_drivlist.reset();
-	std::unordered_set<std::string> shortnames;
+	m_drivlist.next();
+	std::shared_ptr<machine_config> config = m_drivlist.config();
 
-	while (m_drivlist.next())
+	// run through devices
+	for (device_type type : registered_device_types)
 	{
-		// first, run through devices with roms which belongs to the default configuration
-		for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
-		{
-			if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0]!='\0')
-			{
-				if (shortnames.insert(device.shortname()).second)
-					output_one_device(device, device.tag());
-			}
-		}
+		// add it at the root of the machine config
+		device_t *const dev = config->device_add(&config->root_device(), "_tmp", type, 0);
 
-		// then, run through slot devices
-		for (const device_slot_interface &slot : slot_interface_iterator(m_drivlist.config()->root_device()))
-		{
-			for (auto &option : slot.option_list())
-			{
-				std::string temptag("_");
-				temptag.append(option.second->name());
-				device_t *dev = m_drivlist.config()->device_add(&m_drivlist.config()->root_device(), temptag.c_str(), option.second->devtype(), 0);
+		// notify this device and all its subdevices that they are now configured
+		for (device_t &device : device_iterator(*dev))
+			if (!device.configured())
+				device.config_complete();
 
-				// notify this device and all its subdevices that they are now configured
-				for (device_t &device : device_iterator(*dev))
-					if (!device.configured())
-						device.config_complete();
-
-				if (shortnames.insert(dev->shortname()).second)
-					output_one_device(*dev, temptag.c_str());
-
-				// also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
-				for (device_t &device : device_iterator(*dev))
-				{
-					if (device.owner() == dev && device.shortname() != nullptr && device.shortname()[0]!='\0')
-					{
-						if (shortnames.insert(device.shortname()).second)
-							output_one_device(device, device.tag());
-					}
-				}
-
-				m_drivlist.config()->device_remove(&m_drivlist.config()->root_device(), temptag.c_str());
-			}
-		}
+		// print details and remove it
+		output_one_device(*dev, dev->tag());
+		config->device_remove(&config->root_device(), "_tmp");
 	}
 }
 

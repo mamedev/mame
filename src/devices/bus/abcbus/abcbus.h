@@ -310,9 +310,7 @@ SLOT_INTERFACE_EXTERN( abcbus_cards );
 SLOT_INTERFACE_EXTERN( abc1600bus_cards );
 
 
-typedef device_type_iterator<ABCBUS_SLOT, abcbus_slot_t> abcbus_slot_device_iterator;
-
-
+typedef device_type_iterator<abcbus_slot_t> abcbus_slot_device_iterator;
 
 
 #endif // MAME_DEVICES_ABCBUS_ABCBUS_H

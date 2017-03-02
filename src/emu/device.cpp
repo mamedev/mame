@@ -16,6 +16,62 @@
 
 
 //**************************************************************************
+//  DEVICE TYPE REGISTRATION
+//**************************************************************************
+
+namespace emu { namespace detail {
+
+namespace {
+
+struct device_registrations
+{
+	device_type_impl *first = nullptr;
+	device_type_impl *last = nullptr;
+	device_type_impl *unsorted = nullptr;
+};
+
+device_registrations &device_registration_data()
+{
+	// this is necessary to avoid issues with static initialisation order across units being indeterminate
+	// thread safety issues are avoided by always calling this function during static initialisation before the app can go threaded
+	static device_registrations instance;
+	return instance;
+}
+
+} // anonymous namespace
+
+
+device_registrar::const_iterator device_registrar::cbegin() const
+{
+	return const_iterator_helper(device_registration_data().first);
+}
+
+
+device_registrar::const_iterator device_registrar::cend() const
+{
+	return const_iterator_helper(nullptr);
+}
+
+
+device_type_impl *device_registrar::register_device(device_type_impl &type)
+{
+	device_registrations &data(device_registration_data());
+
+	if (!data.first) data.first = &type;
+	if (data.last) data.last->m_next = &type;
+	if (!data.unsorted) data.unsorted = &type;
+	data.last = &type;
+
+	return nullptr;
+}
+
+} } // namespace emu::detail
+
+emu::detail::device_registrar const registered_device_types;
+
+
+
+//**************************************************************************
 //  LIVE DEVICE MANAGEMENT
 //**************************************************************************
 

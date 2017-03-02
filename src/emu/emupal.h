@@ -523,7 +523,7 @@ private:
 };
 
 // device type iterator
-typedef device_type_iterator<PALETTE, palette_device> palette_device_iterator;
+typedef device_type_iterator<palette_device> palette_device_iterator;
 
 
 #endif  // MAME_EMU_EMUPAL_H

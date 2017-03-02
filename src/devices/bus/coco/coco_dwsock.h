@@ -67,6 +67,6 @@ private:
 extern const device_type COCO_DWSOCK;
 
 // device iterator
-typedef device_type_iterator<COCO_DWSOCK, beckerport_device> beckerport_device_iterator;
+typedef device_type_iterator<beckerport_device> beckerport_device_iterator;
 
 #endif // MAME_DEVICES_BUS_COCO_DWSOCKH_H

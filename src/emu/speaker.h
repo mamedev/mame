@@ -77,7 +77,7 @@ protected:
 
 
 // speaker device iterator
-typedef device_type_iterator<SPEAKER, speaker_device> speaker_device_iterator;
+typedef device_type_iterator<speaker_device> speaker_device_iterator;
 
 extern template class device_finder<speaker_device, false>;
 extern template class device_finder<speaker_device, true>;

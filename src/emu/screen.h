@@ -365,7 +365,7 @@ private:
 extern const device_type SCREEN;
 
 // iterator helper
-typedef device_type_iterator<SCREEN, screen_device> screen_device_iterator;
+typedef device_type_iterator<screen_device> screen_device_iterator;
 
 extern template class device_finder<screen_device, false>;
 extern template class device_finder<screen_device, true>;

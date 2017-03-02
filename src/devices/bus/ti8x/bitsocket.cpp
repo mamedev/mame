@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
+#include "emu.h"
 #include "bitsocket.h"
 
 

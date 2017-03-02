@@ -1321,8 +1321,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	}
 	else
 	{
-		m_instance_name = inst_name;
-		m_brief_instance_name = brief_name;
+		m_instance_name = inst_name ? inst_name : "";
+		m_brief_instance_name = brief_name ? brief_name : "";
 	}
 }
 
