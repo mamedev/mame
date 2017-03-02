@@ -18,7 +18,7 @@
 #include "coreutil.h"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #define BIT_MASK(n) (1U << (n))

@@ -173,6 +173,9 @@
 #define PEN_CURSOR	3	// Graphic cursor
 #define PEN_LP		4	// Light pen cursor
 
+// Peripheral Addresses (PA)
+#define IO_SLOT_FIRST_PA	1
+#define IO_SLOT_LAST_PA		12
 #define T15_PA                  15
 
 #define KEY_SCAN_OSCILLATOR     327680
@@ -411,11 +414,11 @@ void hp9845_base_state::machine_reset()
 	m_ppu->halt_w(0);
 
 	// First, unmap every r/w handler in 1..12 select codes
-	for (unsigned sc = 1; sc < 13; sc++) {
+	for (unsigned sc = IO_SLOT_FIRST_PA; sc < (IO_SLOT_LAST_PA + 1); sc++) {
 		m_ppu->space(AS_IO).unmap_readwrite(sc * 4 , sc * 4 + 3);
 	}
 
-	// Then, set r/w handlers of all installed I/O slot cards
+	// Then, set r/w handlers of all installed I/O cards
 	int sc;
 	read16_delegate rhandler;
 	write16_delegate whandler;
@@ -436,10 +439,6 @@ void hp9845_base_state::machine_reset()
 		m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
 	}
 
-	{
-		device_execute_interface *dei = dynamic_cast<device_execute_interface *>(&(*m_ppu));
-		logerror("ppu %p\n" , dei);
-	}
 	// Some sensible defaults
 	m_video_load_mar = false;
 	m_video_first_mar = false;
@@ -1561,13 +1560,6 @@ void hp9845ct_state::update_graphic_bits(void)
 
 	m_ppu->dmar_w(dmar);
 }
-
-#if 0
-bool hp9845ct_state::extra_gv_irqs(void)
-{
-	return m_gv_lp_status || m_gv_sk_status;
-}
-#endif
 
 void hp9845ct_state::lp_r4_w(uint16_t data)
 {
