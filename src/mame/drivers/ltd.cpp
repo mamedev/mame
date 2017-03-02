@@ -553,11 +553,31 @@ static MACHINE_CONFIG_START( ltd4, ltd_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
+/ Arizona
+/-------------------------------------------------------------------*/
+ROM_START(arizona)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("arizltd.bin", 0x0000, 0x0400, CRC(908f00d8) SHA1(98f28f1aedbad43e0e096959fdef45e038405473))
+	ROM_RELOAD(0x0400, 0x0400)
+	ROM_RELOAD(0x0800, 0x0400)
+	ROM_RELOAD(0x0c00, 0x0400)
+ROM_END
+
+/*-------------------------------------------------------------------
 / Atlantis
 /-------------------------------------------------------------------*/
 ROM_START(atla_ltd)
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD("atlantis.bin", 0x0000, 0x0800, CRC(c61be043) SHA1(e6c4463f59a5743fa34aa55beeb6f536ad9f1b56))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Disco Dancing
+/-------------------------------------------------------------------*/
+ROM_START(discodan)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("disco.bin", 0x0000, 0x0800, CRC(83c79157) SHA1(286fd0c984870639fcd7d7b8f6a5a5ddabcddcf5))
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 
@@ -615,7 +635,9 @@ ROM_START(columbia)
 ROM_END
 
 // system 3
+GAME(1981, arizona,  0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Arizona",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, discodan, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              MACHINE_IS_SKELETON_MECHANICAL)
 
