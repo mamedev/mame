@@ -30,6 +30,7 @@
 #define XML_ROOT                "mame"
 #define XML_TOP                 "machine"
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -188,9 +189,10 @@ const char info_xml_creator::s_dtd_string[] =
 //  info_xml_creator - constructor
 //-------------------------------------------------
 
-info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
+info_xml_creator::info_xml_creator(driver_enumerator &drivlist, bool filter_devices)
 	: m_output(nullptr)
 	, m_drivlist(drivlist)
+	, m_filter_devices(filter_devices)
 	, m_lookup_options(m_drivlist.options())
 {
 	mame_options::remove_device_options(m_lookup_options);
@@ -227,13 +229,15 @@ void info_xml_creator::output(FILE *out, bool nodevices)
 		CONFIG_VERSION
 	);
 
+	std::unique_ptr<device_type_set> devfilter((m_filter_devices && !nodevices) ? new device_type_set : nullptr);
+
 	// iterate through the drivers, outputting one at a time
 	while (m_drivlist.next())
-		output_one();
+		output_one(devfilter.get());
 
 	// output devices (both devices with roms and slot devices)
 	if (!nodevices)
-		output_devices();
+		output_devices(devfilter.get());
 
 	// close the top level tag
 	fprintf(m_output, "</%s>\n",XML_ROOT);
@@ -245,20 +249,26 @@ void info_xml_creator::output(FILE *out, bool nodevices)
 //  for one particular game driver
 //-------------------------------------------------
 
-void info_xml_creator::output_one()
+void info_xml_creator::output_one(device_type_set *devtypes)
 {
 	// no action if not a game
 	const game_driver &driver = m_drivlist.driver();
 	if (driver.flags & MACHINE_NO_STANDALONE)
 		return;
 
+	std::shared_ptr<machine_config> const config(m_drivlist.config());
+	device_iterator iter(config->root_device());
+
 	// allocate input ports
-	std::shared_ptr<machine_config> config = m_drivlist.config();
 	ioport_list portlist;
 	std::string errors;
-	device_iterator iter(config->root_device());
 	for (device_t &device : iter)
+	{
 		portlist.append(device, errors);
+
+		if (devtypes && device.owner() && device.shortname() && *device.shortname())
+			devtypes->insert(&device.type());
+	}
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
@@ -288,17 +298,16 @@ void info_xml_creator::output_one()
 		if (new_kbd) kbd_offset++;
 	}
 
-	// print the header and the game name
+	// print the header and the machine name
 	fprintf(m_output, "\t<%s",XML_TOP);
 	fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
 	const char *start = strrchr(driver.source_file, '/');
-	if (start == nullptr)
+	if (!start)
 		start = strrchr(driver.source_file, '\\');
-	if (start == nullptr)
-		start = driver.source_file - 1;
-	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(start + 1));
+	start = start ? (start + 1) : driver.source_file;
+	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(start));
 
 	// append bios and runnable flags
 	if (driver.flags & MACHINE_IS_BIOS_ROOT)
@@ -346,7 +355,7 @@ void info_xml_creator::output_one()
 	output_adjusters(portlist);
 	output_driver();
 	output_images(config->root_device(), "");
-	output_slots(*config, config->root_device(), "");
+	output_slots(*config, config->root_device(), "", devtypes);
 	output_software_list();
 	output_ramoptions();
 
@@ -408,7 +417,7 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "confsetting");
 	output_adjusters(portlist);
 	output_images(device, devtag);
-	output_slots(config, device, devtag);
+	output_slots(config, device, devtag, nullptr);
 	fprintf(m_output, "\t</%s>\n", XML_TOP);
 }
 
@@ -425,25 +434,34 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 //  directly to a driver as device or sub-device)
 //-------------------------------------------------
 
-void info_xml_creator::output_devices()
+void info_xml_creator::output_devices(device_type_set const *filter)
 {
 	// get config for empty machine
-	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config config(GAME_NAME(___empty), m_lookup_options);
+
+	auto const action = [this, &config] (device_type type)
+			{
+				// add it at the root of the machine config
+				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+
+				// notify this device and all its subdevices that they are now configured
+				for (device_t &device : device_iterator(*dev))
+					if (!device.configured())
+						device.config_complete();
+
+				// print details and remove it
+				output_one_device(config, *dev, dev->tag());
+				config.device_remove(&config.root_device(), "_tmp");
+			};
 
 	// run through devices
-	for (device_type type : registered_device_types)
+	if (filter)
 	{
-		// add it at the root of the machine config
-		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
-
-		// notify this device and all its subdevices that they are now configured
-		for (device_t &device : device_iterator(*dev))
-			if (!device.configured())
-				device.config_complete();
-
-		// print details and remove it
-		output_one_device(config, *dev, dev->tag());
-		config.device_remove(&config.root_device(), "_tmp");
+		for (std::add_pointer_t<device_type> type : *filter) action(*type);
+	}
+	else
+	{
+		for (device_type type : registered_device_types) action(type);
 	}
 }
 
@@ -1493,44 +1511,54 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 //  output_images - prints all info about slots
 //-------------------------------------------------
 
-void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag)
+void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
 	for (const device_slot_interface &slot : slot_interface_iterator(device))
 	{
-		if (slot.fixed()) continue;    // or shall we list these as non-configurable?
+		// shall we list fixed slots as non-configurable?
+		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
 
-		if (strcmp(slot.device().tag(), device.tag()))
+		if (devtypes || listed)
 		{
 			std::string newtag(slot.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
-			fprintf(m_output, "\t\t<slot name=\"%s\">\n", util::xml::normalize_string(newtag.c_str()));
+			if (listed)
+				fprintf(m_output, "\t\t<slot name=\"%s\">\n", util::xml::normalize_string(newtag.c_str()));
 
 			/*
-			 if (slot.slot_interface()[0])
+			 if (listed && slot.slot_interface()[0])
 			 fprintf(m_output, " interface=\"%s\"", util::xml::normalize_string(slot.slot_interface()));
 			 */
 
 			for (auto &option : slot.option_list())
 			{
-				if (option.second->selectable())
+				if (devtypes || (listed && option.second->selectable()))
 				{
 					device_t *const dev = config.device_add(&device, "_dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
-					fprintf(m_output, "\t\t\t<slotoption");
-					fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(option.second->name()));
-					fprintf(m_output, " devname=\"%s\"", util::xml::normalize_string(dev->shortname()));
-					if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
-						fprintf(m_output, " default=\"yes\"");
-					fprintf(m_output, "/>\n");
+					if (devtypes)
+						for (device_t &device : device_iterator(*dev)) devtypes->insert(&device.type());
+
+					if (listed && option.second->selectable())
+					{
+						fprintf(m_output, "\t\t\t<slotoption");
+						fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(option.second->name()));
+						fprintf(m_output, " devname=\"%s\"", util::xml::normalize_string(dev->shortname()));
+						if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
+							fprintf(m_output, " default=\"yes\"");
+						fprintf(m_output, "/>\n");
+					}
+
 					config.device_remove(&device, "_dummy");
 				}
 			}
 
-			fprintf(m_output, "\t\t</slot>\n");
+			if (listed)
+				fprintf(m_output, "\t\t</slot>\n");
 		}
 	}
 }

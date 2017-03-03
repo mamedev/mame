@@ -327,7 +327,7 @@ void cli_frontend::listxml(const char *gamename)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// create the XML and print it to stdout
-	info_xml_creator creator(drivlist);
+	info_xml_creator creator(drivlist, gamename && *gamename);
 	creator.output(stdout);
 }
 
