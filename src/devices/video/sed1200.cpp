@@ -37,22 +37,22 @@ sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, 
 }
 
 sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0A, "sed1200d-0a", tag, owner, clock, "sed1200", __FILE__)
+	sed1200_device(mconfig, SED1200D0A, "sed1200d-0a", tag, owner, clock, "sed1200da", __FILE__)
 {
 }
 
 sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0A, "sed1200f-0a", tag, owner, clock, "sed1200", __FILE__)
+	sed1200_device(mconfig, SED1200F0A, "sed1200f-0a", tag, owner, clock, "sed1200fa", __FILE__)
 {
 }
 
 sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0B, "sed1200d-0b", tag, owner, clock, "sed1200", __FILE__)
+	sed1200_device(mconfig, SED1200D0B, "sed1200d-0b", tag, owner, clock, "sed1200db", __FILE__)
 {
 }
 
 sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0B, "sed1200f-0b", tag, owner, clock, "sed1200", __FILE__)
+	sed1200_device(mconfig, SED1200F0B, "sed1200f-0b", tag, owner, clock, "sed1200fb", __FILE__)
 {
 }
 

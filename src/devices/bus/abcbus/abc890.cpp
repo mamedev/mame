@@ -194,8 +194,7 @@ abc890_t::abc890_t(const machine_config &mconfig, device_type type, const char *
 }
 
 abc890_t::abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ABC890, "ABC 890", tag, owner, clock, "abc890", __FILE__),
-	device_abcbus_card_interface(mconfig, *this)
+	abc890_t(mconfig, ABC890, "ABC 890", tag, owner, clock, "abc890", __FILE__)
 {
 }
 

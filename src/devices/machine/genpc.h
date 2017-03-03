@@ -32,6 +32,7 @@ class ibm5160_mb_device : public device_t
 public:
 	// construction/destruction
 	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
@@ -41,19 +42,21 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
+	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 public:
-	required_device<cpu_device>  m_maincpu;
-	required_device<pic8259_device>  m_pic8259;
-	required_device<am9517a_device>  m_dma8237;
-	required_device<pit8253_device>  m_pit8253;
-	optional_device<i8255_device>  m_ppi8255;
-	required_device<speaker_sound_device>  m_speaker;
-	required_device<isa8_device>  m_isabus;
-	optional_device<pc_kbdc_device>  m_pc_kbdc;
-	required_device<ram_device> m_ram;
+	required_device<cpu_device>             m_maincpu;
+	required_device<pic8259_device>         m_pic8259;
+	required_device<am9517a_device>         m_dma8237;
+	required_device<pit8253_device>         m_pit8253;
+	optional_device<i8255_device>           m_ppi8255;
+	required_device<speaker_sound_device>   m_speaker;
+	required_device<isa8_device>            m_isabus;
+	optional_device<pc_kbdc_device>         m_pc_kbdc;
+	required_device<ram_device>             m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */

@@ -379,24 +379,33 @@ void omti8621_device::device_reset()
 const device_type ISA16_OMTI8621 = device_creator<omti8621_pc_device>;
 
 omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: omti8621_device(mconfig, ISA16_OMTI8621, tag, owner, clock)
+	: omti8621_device(mconfig, ISA16_OMTI8621, "OMTI 8621 ESDI/floppy controller (ISA)", tag, owner, clock, "omti8621isa", __FILE__)
 {
 }
 
 const device_type ISA16_OMTI8621_APOLLO = device_creator<omti8621_apollo_device>;
 
 omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, tag, owner, clock)
+	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, "OMTI 8621 ESDI/floppy controller (Apollo)", tag, owner, clock, "omti8621ap", __FILE__)
 {
 }
 
-omti8621_device::omti8621_device(const machine_config &mconfig, device_type type,const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, "OMTI 8621 ESDI/floppy controller", tag, owner, clock, "omti8621", __FILE__),
-	device_isa16_card_interface(mconfig, *this),
-	m_fdc(*this, OMTI_FDC_TAG),
-	m_iobase(*this, "IO_BASE"),
-	m_biosopts(*this, "BIOS_OPTS"), jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr),
-	data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_installed(false)
+omti8621_device::omti8621_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *name,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const char *shortname,
+		const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_fdc(*this, OMTI_FDC_TAG)
+	, m_iobase(*this, "IO_BASE")
+	, m_biosopts(*this, "BIOS_OPTS")
+	, jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr)
+	, data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_installed(false)
 {
 }
 

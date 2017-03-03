@@ -1496,13 +1496,15 @@ void cli_frontend::execute_commands(const char *exename)
 
 	// find the command
 	for (auto & info_command : info_commands)
+	{
 		if (strcmp(m_options.command(), info_command.option) == 0)
 		{
 			// parse any relevant INI files before proceeding
 			const char *sysname = m_options.system_name();
-			(this->*info_command.function)((sysname[0] == 0) ? "*" : sysname);
+			(this->*info_command.function)((sysname[0] == 0) ? nullptr : sysname);
 			return;
 		}
+	}
 
 	if (!m_osd.execute_command(m_options.command()))
 		// if we get here, we don't know what has been requested

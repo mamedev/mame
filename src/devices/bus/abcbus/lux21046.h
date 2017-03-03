@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_LUX21046_H
+#define MAME_BUS_ABCBUS_LUX21046_H
 
-#ifndef __LUXOR_55_21046__
-#define __LUXOR_55_21046__
+#pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
@@ -52,7 +52,6 @@ class luxor_55_21046_t :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21046_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	luxor_55_21046_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -80,6 +79,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	luxor_55_21046_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -196,4 +197,4 @@ extern const device_type ABC850_FLOPPY;
 
 
 
-#endif
+#endif // MAME_BUS_ABCBUS_LUX21046_H

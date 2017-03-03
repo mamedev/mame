@@ -75,7 +75,6 @@ class gottlieb_sound_r1_device : public device_t, public device_mixer_interface
 public:
 	// construction/destruction
 	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool populate_votrax);
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
@@ -88,6 +87,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( votrax_request );
 
 protected:
+	gottlieb_sound_r1_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;

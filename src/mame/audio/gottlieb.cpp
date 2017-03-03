@@ -165,24 +165,25 @@ void gottlieb_sound_r0_device::device_start()
 //-------------------------------------------------
 
 gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
-		device_mixer_interface(mconfig, *this),
-		m_audiocpu(*this, "audiocpu"),
-		m_riot(*this, "riot"),
-		m_votrax(*this, "votrax"),
-		//m_populate_votrax(false),
-		m_last_speech_clock(0)
+	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__)
 {
 }
 
-gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool populate_votrax)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__),
-		device_mixer_interface(mconfig, *this),
-		m_audiocpu(*this, "audiocpu"),
-		m_riot(*this, "riot"),
-		m_votrax(*this, "votrax"),
-		//m_populate_votrax(populate_votrax),
-		m_last_speech_clock(0)
+gottlieb_sound_r1_device::gottlieb_sound_r1_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *name,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const char *shortname,
+		const char *source)
+	: device_t(mconfig, type, "Gottlieb Sound rev. 1", tag, owner, clock, shortname, source)
+	, device_mixer_interface(mconfig, *this)
+	, m_audiocpu(*this, "audiocpu")
+	, m_riot(*this, "riot")
+	, m_votrax(*this, "votrax")
+	, m_last_speech_clock(0)
 {
 }
 
@@ -388,7 +389,7 @@ void gottlieb_sound_r1_device::device_start()
 //-------------------------------------------------
 
 gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gottlieb_sound_r1_device(mconfig, tag, owner, clock, true)
+	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_WITH_VOTRAX, "Gottlieb Sound rev. 1 with Votrax", tag, owner, clock, "gotsndr1vt", __FILE__)
 {
 }
 

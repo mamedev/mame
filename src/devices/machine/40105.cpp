@@ -33,7 +33,7 @@
 //**************************************************************************
 
 const device_type CD40105 = device_creator<cmos_40105_device>;
-const device_type HC40105 = device_creator<cmos_40105_device>;
+const device_type HC40105 = CD40105;
 
 
 //**************************************************************************

@@ -20,7 +20,7 @@
 
 // device type definitions
 const device_type I8155 = device_creator<i8155_device>;
-const device_type I8156 = device_creator<i8155_device>;
+const device_type I8156 = I8155;
 
 
 //**************************************************************************

@@ -744,25 +744,7 @@ ioport_constructor abc850_floppy_t::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_21046_t::luxor_55_21046_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock, "lux21046", __FILE__),
-	device_abcbus_card_interface(mconfig, *this),
-	m_maincpu(*this, Z80_TAG),
-	m_dma(*this, Z80DMA_TAG),
-	m_fdc(*this, SAB1793_TAG),
-	m_floppy0(*this, SAB1793_TAG":0"),
-	m_floppy1(*this, SAB1793_TAG":1"),
-	m_floppy(nullptr),
-	m_sw1(*this, "SW1"),
-	m_sw2(*this, "SW2"),
-	m_sw3(*this, "SW3"),
-	m_cs(false),
-	m_status(0),
-	m_out(0),
-	m_inp(0),
-	m_fdc_irq(0),
-	m_dma_irq(0),
-	m_busy(0),
-	m_force_busy(0)
+	luxor_55_21046_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock, "lux21046", __FILE__)
 {
 }
 
@@ -810,7 +792,7 @@ abc838_device::abc838_device(const machine_config &mconfig, const char *tag, dev
 }
 
 abc850_floppy_t::abc850_floppy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	luxor_55_21046_t(mconfig, ABC850_FLOPPY, "ABC 850 floppy", tag, owner, clock, "lux21046", __FILE__)
+	luxor_55_21046_t(mconfig, ABC850_FLOPPY, "ABC 850 floppy", tag, owner, clock, "abc850flop", __FILE__)
 {
 }
 

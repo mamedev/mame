@@ -21,9 +21,6 @@
 class neosprite_base_device : public device_t
 {
 public:
-	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,  device_type type);
-//  neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(uint8_t* sprdata, uint32_t mask);
 
@@ -80,6 +77,16 @@ public:
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)
 
 protected:
+	neosprite_base_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	uint32_t get_region_mask(uint8_t* rgn, uint32_t rgn_size);
