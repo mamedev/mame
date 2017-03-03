@@ -191,9 +191,6 @@ private:
 	attotime            m_avi_next_frame_time;      // time of next frame
 	u32                 m_avi_frame;                // current movie frame number
 
-	// movie recording - dummy
-	bool                m_dummy_recording;          // indicates if snapshot should be created of every frame
-
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
