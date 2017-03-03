@@ -25,13 +25,13 @@ public:
 	debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console);
 
 	/* validates a parameter as a boolean value */
-	bool validate_boolean_parameter(const char *param, bool *result);
+	bool validate_boolean_parameter(const std::string &param, bool &result);
 
 	/* validates a parameter as a numeric value */
-	bool validate_number_parameter(const char *param, u64 *result);
+	bool validate_number_parameter(const std::string &param, u64 &result);
 
 	/* validates a parameter as a cpu */
-	bool validate_cpu_parameter(const char *param, device_t **result);
+	bool validate_cpu_parameter(const char *param, device_t *&result);
 
 	/* validates a parameter as a cpu and retrieves the given address space */
 	bool validate_cpu_space_parameter(const char *param, int spacenum, address_space *&result);
@@ -73,7 +73,7 @@ private:
 		u8          disabled;
 	};
 
-	bool debug_command_parameter_expression(const char *param, parsed_expression &result);
+	bool debug_command_parameter_expression(const std::string &param, parsed_expression &result);
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
@@ -90,75 +90,75 @@ private:
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
 
-	void execute_trace_internal(int ref, int params, const char *param[], bool trace_over);
+	void execute_trace_internal(int ref, const std::vector<std::string> &params, bool trace_over);
 
-	void execute_help(int ref, int params, const char **param);
-	void execute_print(int ref, int params, const char **param);
-	void execute_printf(int ref, int params, const char **param);
-	void execute_logerror(int ref, int params, const char **param);
-	void execute_tracelog(int ref, int params, const char **param);
-	void execute_tracesym(int ref, int params, const char **param);
-	void execute_quit(int ref, int params, const char **param);
-	void execute_do(int ref, int params, const char **param);
-	void execute_step(int ref, int params, const char **param);
-	void execute_over(int ref, int params, const char **param);
-	void execute_out(int ref, int params, const char **param);
-	void execute_go(int ref, int params, const char **param);
-	void execute_go_vblank(int ref, int params, const char **param);
-	void execute_go_interrupt(int ref, int params, const char **param);
-	void execute_go_time(int ref, int params, const char *param[]);
-	void execute_focus(int ref, int params, const char **param);
-	void execute_ignore(int ref, int params, const char **param);
-	void execute_observe(int ref, int params, const char **param);
-	void execute_next(int ref, int params, const char **param);
-	void execute_comment_add(int ref, int params, const char **param);
-	void execute_comment_del(int ref, int params, const char **param);
-	void execute_comment_save(int ref, int params, const char **param);
-	void execute_comment_list(int ref, int params, const char **param);
-	void execute_comment_commit(int ref, int params, const char **param);
-	void execute_bpset(int ref, int params, const char **param);
-	void execute_bpclear(int ref, int params, const char **param);
-	void execute_bpdisenable(int ref, int params, const char **param);
-	void execute_bplist(int ref, int params, const char **param);
-	void execute_wpset(int ref, int params, const char **param);
-	void execute_wpclear(int ref, int params, const char **param);
-	void execute_wpdisenable(int ref, int params, const char **param);
-	void execute_wplist(int ref, int params, const char **param);
-	void execute_rpset(int ref, int params, const char **param);
-	void execute_rpclear(int ref, int params, const char **param);
-	void execute_rpdisenable(int ref, int params, const char **param);
-	void execute_rplist(int ref, int params, const char **param);
-	void execute_hotspot(int ref, int params, const char **param);
-	void execute_statesave(int ref, int params, const char **param);
-	void execute_stateload(int ref, int params, const char **param);
-	void execute_save(int ref, int params, const char **param);
-	void execute_load(int ref, int params, const char **param);
-	void execute_dump(int ref, int params, const char **param);
-	void execute_cheatinit(int ref, int params, const char **param);
-	void execute_cheatnext(int ref, int params, const char **param);
-	void execute_cheatlist(int ref, int params, const char **param);
-	void execute_cheatundo(int ref, int params, const char **param);
-	void execute_dasm(int ref, int params, const char **param);
-	void execute_find(int ref, int params, const char **param);
-	void execute_trace(int ref, int params, const char **param);
-	void execute_traceover(int ref, int params, const char **param);
-	void execute_traceflush(int ref, int params, const char **param);
-	void execute_history(int ref, int params, const char **param);
-	void execute_trackpc(int ref, int params, const char **param);
-	void execute_trackmem(int ref, int params, const char **param);
-	void execute_pcatmem(int ref, int params, const char **param);
-	void execute_snap(int ref, int params, const char **param);
-	void execute_source(int ref, int params, const char **param);
-	void execute_map(int ref, int params, const char **param);
-	void execute_memdump(int ref, int params, const char **param);
-	void execute_symlist(int ref, int params, const char **param);
-	void execute_softreset(int ref, int params, const char **param);
-	void execute_hardreset(int ref, int params, const char **param);
-	void execute_images(int ref, int params, const char **param);
-	void execute_mount(int ref, int params, const char **param);
-	void execute_unmount(int ref, int params, const char **param);
-	void execute_input(int ref, int params, const char **param);
-	void execute_dumpkbd(int ref, int params, const char **param);
+	void execute_help(int ref, const std::vector<std::string> &params);
+	void execute_print(int ref, const std::vector<std::string> &params);
+	void execute_printf(int ref, const std::vector<std::string> &params);
+	void execute_logerror(int ref, const std::vector<std::string> &params);
+	void execute_tracelog(int ref, const std::vector<std::string> &params);
+	void execute_tracesym(int ref, const std::vector<std::string> &params);
+	void execute_quit(int ref, const std::vector<std::string> &params);
+	void execute_do(int ref, const std::vector<std::string> &params);
+	void execute_step(int ref, const std::vector<std::string> &params);
+	void execute_over(int ref, const std::vector<std::string> &params);
+	void execute_out(int ref, const std::vector<std::string> &params);
+	void execute_go(int ref, const std::vector<std::string> &params);
+	void execute_go_vblank(int ref, const std::vector<std::string> &params);
+	void execute_go_interrupt(int ref, const std::vector<std::string> &params);
+	void execute_go_time(int ref, const std::vector<std::string> &params);
+	void execute_focus(int ref, const std::vector<std::string> &params);
+	void execute_ignore(int ref, const std::vector<std::string> &params);
+	void execute_observe(int ref, const std::vector<std::string> &params);
+	void execute_next(int ref, const std::vector<std::string> &params);
+	void execute_comment_add(int ref, const std::vector<std::string> &params);
+	void execute_comment_del(int ref, const std::vector<std::string> &params);
+	void execute_comment_save(int ref, const std::vector<std::string> &params);
+	void execute_comment_list(int ref, const std::vector<std::string> &params);
+	void execute_comment_commit(int ref, const std::vector<std::string> &params);
+	void execute_bpset(int ref, const std::vector<std::string> &params);
+	void execute_bpclear(int ref, const std::vector<std::string> &params);
+	void execute_bpdisenable(int ref, const std::vector<std::string> &params);
+	void execute_bplist(int ref, const std::vector<std::string> &params);
+	void execute_wpset(int ref, const std::vector<std::string> &params);
+	void execute_wpclear(int ref, const std::vector<std::string> &params);
+	void execute_wpdisenable(int ref, const std::vector<std::string> &params);
+	void execute_wplist(int ref, const std::vector<std::string> &params);
+	void execute_rpset(int ref, const std::vector<std::string> &params);
+	void execute_rpclear(int ref, const std::vector<std::string> &params);
+	void execute_rpdisenable(int ref, const std::vector<std::string> &params);
+	void execute_rplist(int ref, const std::vector<std::string> &params);
+	void execute_hotspot(int ref, const std::vector<std::string> &params);
+	void execute_statesave(int ref, const std::vector<std::string> &params);
+	void execute_stateload(int ref, const std::vector<std::string> &params);
+	void execute_save(int ref, const std::vector<std::string> &params);
+	void execute_load(int ref, const std::vector<std::string> &params);
+	void execute_dump(int ref, const std::vector<std::string> &params);
+	void execute_cheatinit(int ref, const std::vector<std::string> &params);
+	void execute_cheatnext(int ref, const std::vector<std::string> &params);
+	void execute_cheatlist(int ref, const std::vector<std::string> &params);
+	void execute_cheatundo(int ref, const std::vector<std::string> &params);
+	void execute_dasm(int ref, const std::vector<std::string> &params);
+	void execute_find(int ref, const std::vector<std::string> &params);
+	void execute_trace(int ref, const std::vector<std::string> &params);
+	void execute_traceover(int ref, const std::vector<std::string> &params);
+	void execute_traceflush(int ref, const std::vector<std::string> &params);
+	void execute_history(int ref, const std::vector<std::string> &params);
+	void execute_trackpc(int ref, const std::vector<std::string> &params);
+	void execute_trackmem(int ref, const std::vector<std::string> &params);
+	void execute_pcatmem(int ref, const std::vector<std::string> &params);
+	void execute_snap(int ref, const std::vector<std::string> &params);
+	void execute_source(int ref, const std::vector<std::string> &params);
+	void execute_map(int ref, const std::vector<std::string> &params);
+	void execute_memdump(int ref, const std::vector<std::string> &params);
+	void execute_symlist(int ref, const std::vector<std::string> &params);
+	void execute_softreset(int ref, const std::vector<std::string> &params);
+	void execute_hardreset(int ref, const std::vector<std::string> &params);
+	void execute_images(int ref, const std::vector<std::string> &params);
+	void execute_mount(int ref, const std::vector<std::string> &params);
+	void execute_unmount(int ref, const std::vector<std::string> &params);
+	void execute_input(int ref, const std::vector<std::string> &params);
+	void execute_dumpkbd(int ref, const std::vector<std::string> &params);
 
 	running_machine&    m_machine;
 	debugger_cpu&       m_cpu;
