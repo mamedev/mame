@@ -20,6 +20,8 @@ through the softwarelist.
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
 			<feature name="pinout" value="0x01" />
+			<dataarea name="nodata" size="0x10">
+			</dataarea>
 		</part>
 	</software>
 
@@ -29,6 +31,8 @@ through the softwarelist.
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
 			<feature name="pinout" value="0x08" />
+			<dataarea name="nodata" size="0x10">
+			</dataarea>
 		</part>
 	</software>
 
@@ -38,6 +42,8 @@ through the softwarelist.
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
 			<feature name="pinout" value="0x04" />
+			<dataarea name="nodata" size="0x10">
+			</dataarea>
 		</part>
 	</software>
 
@@ -47,6 +53,8 @@ through the softwarelist.
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
 			<feature name="pinout" value="0x02" />
+			<dataarea name="nodata" size="0x10">
+			</dataarea>
 		</part>
 	</software>
 
