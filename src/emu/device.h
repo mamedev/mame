@@ -120,7 +120,8 @@ public:
 		pointer m_type = nullptr;
 	};
 
-	device_registrar() = default;
+	// explicit constructor is required for const variable initialization
+	constexpr device_registrar() { }
 
 	const_iterator begin() const { return cbegin(); }
 	const_iterator end() const { return cend(); }
