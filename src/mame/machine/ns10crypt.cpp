@@ -129,8 +129,8 @@ const device_type STARTRGN_DECRYPTER = device_creator<startrgn_decrypter_device>
 
 // base class
 
-ns10_decrypter_device::ns10_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, "Namco System 10 Decrypter", tag, owner, clock, "ns10_crypto", __FILE__)
+ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 {
 	_active = false;
 }
@@ -163,8 +163,8 @@ constexpr int U {UNKNOWN};
 // this could perfectly be part of the per-game logic but, with only one known type-1 game, we cannot say anything definitive
 const int ns10_type1_decrypter_device::initSbox[16] {U,U,U,0,4,9,U,U,U,8,U,1,U,9,U,5};
 
-ns10_type1_decrypter_device::ns10_type1_decrypter_device(device_type type, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_decrypter_device(type, mconfig, tag, owner, clock)
+ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: ns10_decrypter_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -213,8 +213,8 @@ void ns10_type1_decrypter_device::device_start()
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
 const int ns10_type2_decrypter_device::initSbox[16] {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
 
-ns10_type2_decrypter_device::ns10_type2_decrypter_device(device_type type, const ns10_crypto_logic &logic, const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_decrypter_device(type, mconfig, tag, owner, clock)
+ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, const ns10_type2_decrypter_device::ns10_crypto_logic &logic)
+	: ns10_decrypter_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, _logic(logic)
 {
 }
@@ -455,41 +455,41 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic startrgn_crypto_
 // game-specific devices
 
 mrdrilr2_decrypter_device::mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type1_decrypter_device(MRDRILR2_DECRYPTER,mconfig, tag, owner, clock)
+	: ns10_type1_decrypter_device(mconfig, MRDRILR2_DECRYPTER, "Mr Driller 2 decrypter", tag, owner, clock, "mrdrilr2_decrypter", __FILE__)
 {
 }
 
 chocovdr_decrypter_device::chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(CHOCOVDR_DECRYPTER, chocovdr_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, CHOCOVDR_DECRYPTER, "Chocovader Contactee decrypter", tag, owner, clock, "chocovdr_decrypter", __FILE__, chocovdr_crypto_logic)
 {
 }
 
 gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(GAMSHARA_DECRYPTER, gamshara_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, GAMSHARA_DECRYPTER, "Gamshara decrypter", tag, owner, clock, "gamshara_decrypter", __FILE__, gamshara_crypto_logic)
 {
 }
 
 gjspace_decrypter_device::gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(GJSPACE_DECRYPTER, gjspace_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, GJSPACE_DECRYPTER, "Gekitoride-Jong Space decrypter", tag, owner, clock, "gjspace_decrypter", __FILE__, gjspace_crypto_logic)
 {
 }
 
 knpuzzle_decrypter_device::knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(KNPUZZLE_DECRYPTER, knpuzzle_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, KNPUZZLE_DECRYPTER, "Kotoba no Puzzle Mojipittan decrypter", tag, owner, clock, "knpuzzle_decrypter", __FILE__, knpuzzle_crypto_logic)
 {
 }
 
 konotako_decrypter_device::konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(KONOTAKO_DECRYPTER, konotako_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, KONOTAKO_DECRYPTER, "Kono Tako decrypter", tag, owner, clock, "konotako_decrypter", __FILE__, konotako_crypto_logic)
 {
 }
 
 nflclsfb_decrypter_device::nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(NFLCLSFB_DECRYPTER, nflclsfb_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, NFLCLSFB_DECRYPTER, "NFL Classic Football decrypter", tag, owner, clock, "nflclsfb_decrypter", __FILE__, nflclsfb_crypto_logic)
 {
 }
 
 startrgn_decrypter_device::startrgn_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(STARTRGN_DECRYPTER, startrgn_crypto_logic, mconfig, tag, owner, clock)
+	: ns10_type2_decrypter_device(mconfig, STARTRGN_DECRYPTER, "Star Trigon decrypter", tag, owner, clock, "startrgn_decrypter", __FILE__, startrgn_crypto_logic)
 {
 }
