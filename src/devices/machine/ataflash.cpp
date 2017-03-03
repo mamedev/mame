@@ -211,7 +211,7 @@ bool taito_pccard1_device::is_ready()
 const device_type TAITO_PCCARD2 = device_creator<taito_pccard2_device>;
 
 taito_pccard2_device::taito_pccard2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ata_flash_pccard_device(mconfig, TAITO_PCCARD1, "Taito PC-CARD (Type 2)", tag, owner, clock, "taito_pccard2", __FILE__),
+	ata_flash_pccard_device(mconfig, TAITO_PCCARD2, "Taito PC-CARD (Type 2)", tag, owner, clock, "taito_pccard2", __FILE__),
 	m_locked(false)
 {
 }

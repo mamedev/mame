@@ -87,7 +87,7 @@ vc4000_cart_slot_device::vc4000_cart_slot_device(
 		uint32_t clock,
 		const char *shortname,
 		const char *source)
-	: device_t(mconfig, VC4000_CART_SLOT, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
 	, m_type(VC4000_STD)

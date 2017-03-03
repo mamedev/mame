@@ -33,13 +33,13 @@ const device_type CLIPPER_C300 = device_creator<clipper_c300_device>;
 const device_type CLIPPER_C400 = device_creator<clipper_c400_device>;
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C100, "C100 CLIPPER", tag, owner, clock, "C100", __FILE__) { }
+	: clipper_device(mconfig, CLIPPER_C100, "C100 CLIPPER", tag, owner, clock, "c100", __FILE__) { }
 
 clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C300, "C300 CLIPPER", tag, owner, clock, "C300", __FILE__) { }
+	: clipper_device(mconfig, CLIPPER_C300, "C300 CLIPPER", tag, owner, clock, "c300", __FILE__) { }
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C400, "C400 CLIPPER", tag, owner, clock, "C400", __FILE__) { }
+	: clipper_device(mconfig, CLIPPER_C400, "C400 CLIPPER", tag, owner, clock, "c400", __FILE__) { }
 
 clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
