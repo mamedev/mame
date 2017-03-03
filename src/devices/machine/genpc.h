@@ -140,6 +140,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
+	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 
 	required_device<cassette_image_device>  m_cassette;
@@ -190,6 +192,9 @@ public:
 	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
 	DECLARE_ADDRESS_MAP(map, 8);
+
+protected:
+	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;

@@ -48,12 +48,14 @@ Tandy 1000 (80386) variations:
 #include "cpu/i86/i286.h"
 #include "softlist.h"
 
+extern const device_type T1000_MOTHERBOARD;
+
 class t1000_mb_device : public pc_noppi_mb_device
 {
 public:
 	// construction/destruction
 	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: pc_noppi_mb_device(mconfig, tag, owner, clock) { }
+		: pc_noppi_mb_device(mconfig, T1000_MOTHERBOARD, "T1000_MOTHERBOARD", tag, owner, clock, "t1000_mb", __FILE__) { }
 protected:
 	virtual void device_start() override;
 };

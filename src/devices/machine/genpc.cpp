@@ -524,7 +524,7 @@ ibm5160_mb_device::ibm5160_mb_device(
 		uint32_t clock,
 		const char *shortname,
 		const char *source)
-	: device_t(mconfig, IBM5160_MOTHERBOARD, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_maincpu(*owner, "maincpu")
 	, m_pic8259(*this, "pic8259")
 	, m_dma8237(*this, "dma8237")
@@ -628,7 +628,12 @@ machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ibm5160_mb_device(mconfig, IBM5150_MOTHERBOARD, "IBM5150_MOTHERBOARD", tag, owner, clock, "ibm5150_mb", __FILE__)
+	: ibm5150_mb_device(mconfig, IBM5150_MOTHERBOARD, "IBM5150_MOTHERBOARD", tag, owner, clock, "ibm5150_mb", __FILE__)
+{
+}
+
+ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: ibm5160_mb_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_cassette(*this, "cassette")
 {
 }
@@ -893,7 +898,12 @@ READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
 }
 
 pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ibm5160_mb_device(mconfig, PCNOPPI_MOTHERBOARD, "PCNOPPI_MOTHERBOARD", tag, owner, clock, "pcnoppi_mb", __FILE__)
+	: pc_noppi_mb_device(mconfig, PCNOPPI_MOTHERBOARD, "PCNOPPI_MOTHERBOARD", tag, owner, clock, "pcnoppi_mb", __FILE__)
+{
+}
+
+pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: ibm5160_mb_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
