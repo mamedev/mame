@@ -223,8 +223,8 @@ public:
 
 	const char *image_type_name()  const { return device_typename(image_type()); }
 
-	const char *instance_name() const { return m_instance_name.c_str(); }
-	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
+	const std::string &instance_name() const { return m_instance_name; }
+	const std::string &brief_instance_name() const { return m_brief_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 

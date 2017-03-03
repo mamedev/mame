@@ -305,7 +305,7 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 //  of an option
 //-------------------------------------------------
 
-void core_options::set_default_value(const char *name, const char *defvalue)
+void core_options::set_default_value(const std::string &name, const char *defvalue)
 {
 	// find the entry and bail if we can't
 	auto curentry = m_entrymap.find(name);
@@ -322,7 +322,7 @@ void core_options::set_default_value(const char *name, const char *defvalue)
 //  of an option
 //-------------------------------------------------
 
-void core_options::set_description(const char *name, const char *description)
+void core_options::set_description(const std::string &name, const char *description)
 {
 	// find the entry and bail if we can't
 	auto curentry = m_entrymap.find(name);
@@ -634,7 +634,7 @@ std::string core_options::output_help() const
 //  value - return the raw option value
 //-------------------------------------------------
 
-const char *core_options::value(const char *name) const
+const char *core_options::value(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second->value() : "";
@@ -645,7 +645,7 @@ const char *core_options::value(const char *name) const
 //  description - return description of option
 //-------------------------------------------------
 
-const char *core_options::description(const char *name) const
+const char *core_options::description(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second->description() : "";
@@ -656,7 +656,7 @@ const char *core_options::description(const char *name) const
 //  priority - return the priority of option
 //-------------------------------------------------
 
-int core_options::priority(const char *name) const
+int core_options::priority(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second->priority() : 0;
@@ -667,7 +667,7 @@ int core_options::priority(const char *name) const
 //  seqid - return the seqid for a given option
 //-------------------------------------------------
 
-uint32_t core_options::seqid(const char *name) const
+uint32_t core_options::seqid(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second->seqid() : 0;
@@ -677,7 +677,7 @@ uint32_t core_options::seqid(const char *name) const
 //  exists - return if option exists in list
 //-------------------------------------------------
 
-bool core_options::exists(const char *name) const
+bool core_options::exists(const std::string &name) const
 {
 	return (m_entrymap.find(name) != m_entrymap.end());
 }
@@ -687,7 +687,7 @@ bool core_options::exists(const char *name) const
 //  changed
 //-------------------------------------------------
 
-bool core_options::is_changed(const char *name) const
+bool core_options::is_changed(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
 	return (curentry != m_entrymap.end()) ? curentry->second->is_changed() : false;
@@ -696,7 +696,7 @@ bool core_options::is_changed(const char *name) const
 //  set_value - set the raw option value
 //-------------------------------------------------
 
-bool core_options::set_value(const char *name, const char *value, int priority, std::string &error_string)
+bool core_options::set_value(const std::string &name, const char *value, int priority, std::string &error_string)
 {
 	// find the entry first
 	auto curentry = m_entrymap.find(name);
@@ -710,18 +710,18 @@ bool core_options::set_value(const char *name, const char *value, int priority, 
 	return validate_and_set_data(*curentry->second, value, priority, error_string);
 }
 
-bool core_options::set_value(const char *name, int value, int priority, std::string &error_string)
+bool core_options::set_value(const std::string &name, int value, int priority, std::string &error_string)
 {
 	return set_value(name, string_format("%d", value).c_str(), priority, error_string);
 }
 
-bool core_options::set_value(const char *name, float value, int priority, std::string &error_string)
+bool core_options::set_value(const std::string &name, float value, int priority, std::string &error_string)
 {
 	return set_value(name, string_format("%f", value).c_str(), priority, error_string);
 }
 
 
-void core_options::set_flag(const char *name, uint32_t mask, uint32_t flag)
+void core_options::set_flag(const std::string &name, uint32_t mask, uint32_t flag)
 {
 	// find the entry first
 	auto curentry = m_entrymap.find(name);
@@ -732,7 +732,7 @@ void core_options::set_flag(const char *name, uint32_t mask, uint32_t flag)
 	curentry->second->set_flag(mask, flag);
 }
 
-void core_options::mark_changed(const char* name)
+void core_options::mark_changed(const std::string &name)
 {
 	// find the entry first
 	auto curentry = m_entrymap.find(name);

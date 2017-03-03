@@ -540,7 +540,7 @@ void menu_select_software::build_software_list()
 					const char *interface = image.image_interface();
 					if (interface != nullptr && part.matches_interface(interface))
 					{
-						instance_name = image.instance_name();
+						instance_name = image.instance_name().c_str();
 						if (instance_name != nullptr)
 							tmpmatches.instance = image.instance_name();
 

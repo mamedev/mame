@@ -142,8 +142,8 @@ public:
 	void add_entry(const char *name, const char *description, uint32_t flags = 0, const char *defvalue = nullptr, bool override_existing = false);
 	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
-	void set_default_value(const char *name, const char *defvalue);
-	void set_description(const char *name, const char *description);
+	void set_default_value(const std::string &name, const char *defvalue);
+	void set_description(const std::string &name, const char *description);
 	void remove_entry(entry &delentry);
 
 	// parsing/input
@@ -159,22 +159,22 @@ public:
 	std::string output_help() const;
 
 	// reading
-	const char *value(const char *option) const;
-	const char *description(const char *option) const;
-	int priority(const char *option) const;
-	bool bool_value(const char *name) const { return (atoi(value(name)) != 0); }
-	int int_value(const char *name) const { return atoi(value(name)); }
-	float float_value(const char *name) const { return atof(value(name)); }
-	uint32_t seqid(const char *name) const;
-	bool exists(const char *name) const;
-	bool is_changed(const char *name) const;
+	const char *value(const std::string &option) const;
+	const char *description(const std::string &option) const;
+	int priority(const std::string &option) const;
+	bool bool_value(const std::string &name) const { return (atoi(value(name)) != 0); }
+	int int_value(const std::string &name) const { return atoi(value(name)); }
+	float float_value(const std::string &name) const { return atof(value(name)); }
+	uint32_t seqid(const std::string &name) const;
+	bool exists(const std::string &name) const;
+	bool is_changed(const std::string &name) const;
 
 	// setting
-	bool set_value(const char *name, const char *value, int priority, std::string &error_string);
-	bool set_value(const char *name, int value, int priority, std::string &error_string);
-	bool set_value(const char *name, float value, int priority, std::string &error_string);
-	void set_flag(const char *name, uint32_t mask, uint32_t flags);
-	void mark_changed(const char *name);
+	bool set_value(const std::string &name, const char *value, int priority, std::string &error_string);
+	bool set_value(const std::string &name, int value, int priority, std::string &error_string);
+	bool set_value(const std::string &name, float value, int priority, std::string &error_string);
+	void set_flag(const std::string &name, uint32_t mask, uint32_t flags);
+	void mark_changed(const std::string &name);
 
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS)]; }

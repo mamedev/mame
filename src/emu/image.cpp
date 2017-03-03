@@ -107,7 +107,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name()))
+					if (!strcmp(dev_instance, image.instance_name().c_str()))
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -131,7 +131,7 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	{
 		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		{
-			const char *const dev_instance = image.instance_name();
+			const char *const dev_instance = image.instance_name().c_str();
 
 			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)

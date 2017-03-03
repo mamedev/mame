@@ -3021,7 +3021,7 @@ void debugger_commands::execute_mount(int ref, int params, const char **param)
 	bool done = false;
 	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
 	{
-		if (strcmp(img.brief_instance_name(),param[0]) == 0)
+		if (strcmp(img.brief_instance_name().c_str(), param[0]) == 0)
 		{
 			if (img.load(param[1]) != image_init_result::PASS)
 				m_console.printf("Unable to mount file %s on %s\n",param[1],param[0]);
@@ -3044,7 +3044,7 @@ void debugger_commands::execute_unmount(int ref, int params, const char **param)
 	bool done = false;
 	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
 	{
-		if (strcmp(img.brief_instance_name(),param[0]) == 0)
+		if (strcmp(img.brief_instance_name().c_str(), param[0]) == 0)
 		{
 			img.unload();
 			m_console.printf("Unmounted file from : %s\n",param[0]);
