@@ -55,13 +55,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	DECLARE_READ8_MEMBER( step_r );
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpf1_direct_update_handler);
 
 	int m_break;
 	int m_m1;
@@ -69,6 +69,8 @@ public:
 	uint8_t m_lednum;
 
 	emu_timer *m_led_refresh_timer;
+	address_space *m_program;
+
 	DECLARE_DRIVER_INIT(mpf1);
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
