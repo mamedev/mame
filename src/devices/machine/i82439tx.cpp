@@ -26,7 +26,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
 ADDRESS_MAP_END
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439TX_NEW, "i82439tx northbridge", tag, owner, clock, "i82439tx", __FILE__)
+	: pci_host_device(mconfig, I82439TX_NEW, "i82439tx northbridge", tag, owner, clock, "i82439tx_new", __FILE__)
 {
 }
 

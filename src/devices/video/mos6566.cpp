@@ -613,7 +613,7 @@ mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, d
 	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock, TYPE_8564, "mos8564", __FILE__) { }
 
 mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
+	:mos6566_device(mconfig, MOS6569, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
 
 mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }

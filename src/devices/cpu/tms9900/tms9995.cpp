@@ -179,29 +179,13 @@ enum
 ****************************************************************************/
 
 tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock, "tms9995", __FILE__),
-		m_state_any(0),
-		PC(0),
-		PC_debug(0),
-		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
-		m_prgspace(nullptr),
-		m_cru(nullptr),
-		m_external_operation(*this),
-		m_iaq_line(*this),
-		m_clock_out_line(*this),
-		m_holda_line(*this),
-		m_dbin_line(*this)
+	: tms9995_device(mconfig, TMS9995, "TMS9995", tag, owner, clock, "tms9995", __FILE__)
 {
 	m_mp9537 = false;
-	m_check_overflow = false;
 }
 
-/*
-    Called from subclass.
-*/
 tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: cpu_device(mconfig, TMS9995, name, tag, owner, clock, shortname, source),
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),
