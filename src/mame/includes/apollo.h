@@ -371,6 +371,8 @@ public:
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
+	virtual const char *custom_instance_name() const override { return "node_id"; }
+	virtual const char *custom_brief_instance_name() const override { return "ni"; }
 
 	void set_node_id_from_disk();
 

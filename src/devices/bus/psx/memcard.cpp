@@ -106,7 +106,7 @@ void psxcard_device::device_reset()
 
 void psxcard_device::device_config_complete()
 {
-	update_names(PSXCARD, "memcard", "mc");
+	update_names();
 }
 
 //

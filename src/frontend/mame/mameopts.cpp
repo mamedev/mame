@@ -58,9 +58,7 @@ bool mame_options::add_slot_options(emu_options &options, std::function<void(emu
 
 			// allow opportunity to specify this value
 			if (value_specifier)
-			{
 				value_specifier(options, name);
-			}
 		}
 	}
 	return (options.options_count() != starting_count);

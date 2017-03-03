@@ -133,7 +133,7 @@ const image_device_type_info *device_image_interface::find_device_type(iodevice_
 const char *device_image_interface::device_typename(iodevice_t type)
 {
 	const image_device_type_info *info = find_device_type(type);
-	return (info != nullptr) ? info->m_name : nullptr;
+	return (info != nullptr) ? info->m_name : "unknown";
 }
 
 //-------------------------------------------------
@@ -144,7 +144,7 @@ const char *device_image_interface::device_typename(iodevice_t type)
 const char *device_image_interface::device_brieftypename(iodevice_t type)
 {
 	const image_device_type_info *info = find_device_type(type);
-	return (info != nullptr) ? info->m_shortname : nullptr;
+	return (info != nullptr) ? info->m_shortname : "unk";
 }
 
 //-------------------------------------------------
@@ -1301,7 +1301,7 @@ const util::option_guide &device_image_interface::create_option_guide() const
 //  update_names - update brief and instance names
 //-------------------------------------------------
 
-void device_image_interface::update_names(const device_type device_type, const char *inst, const char *brief)
+void device_image_interface::update_names()
 {
 	int count = 0;
 	int index = -1;
@@ -1309,11 +1309,17 @@ void device_image_interface::update_names(const device_type device_type, const c
 	{
 		if (this == &image)
 			index = count;
-		if ((image.image_type() == image_type() && device_type == nullptr) || (device_type == image.device().type()))
+		if ((image.image_type() == image_type() && custom_instance_name() == nullptr) || (device().type() == image.device().type()))
 			count++;
 	}
-	const char *inst_name = (device_type!=nullptr) ? inst : device_typename(image_type());
-	const char *brief_name = (device_type!=nullptr) ? brief : device_brieftypename(image_type());
+
+	const char *inst_name = custom_instance_name();
+	const char *brief_name = custom_brief_instance_name();
+	if (inst_name == nullptr)
+		inst_name = device_typename(image_type());
+	if (brief_name == nullptr)
+		brief_name = device_brieftypename(image_type());
+
 	if (count > 1)
 	{
 		m_instance_name = string_format("%s%d", inst_name, index + 1);
@@ -1321,8 +1327,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	}
 	else
 	{
-		m_instance_name = inst_name ? inst_name : "";
-		m_brief_instance_name = brief_name ? brief_name : "";
+		m_instance_name = inst_name;
+		m_brief_instance_name = brief_name;
 	}
 }
 

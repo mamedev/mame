@@ -1018,7 +1018,7 @@ hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, co
 
 void hp48_port_image_device::device_config_complete()
 {
-	update_names(HP48_PORT, "port", "p");
+	update_names();
 }
 
 /***************************************************************************

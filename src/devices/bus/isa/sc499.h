@@ -43,6 +43,8 @@ public:
 	virtual bool support_command_line_image_creation() const override { return 1; }
 	virtual const char *image_interface() const override { return "sc499_cass"; }
 	virtual const char *file_extensions() const override { return "act,ct"; }
+	virtual const char *custom_instance_name() const override { return "ctape"; }
+	virtual const char *custom_brief_instance_name() const override { return "ct"; }
 
 	uint8_t *read_block(int block_num);
 	void write_block(int block_num, uint8_t *ptr);

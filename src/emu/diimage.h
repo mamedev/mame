@@ -162,6 +162,8 @@ public:
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
 	virtual const util::option_guide &create_option_guide() const;
+	virtual const char *custom_instance_name() const { return nullptr; }
+	virtual const char *custom_brief_instance_name() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
@@ -272,7 +274,7 @@ protected:
 
 	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
-	void update_names(device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
+	void update_names();
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	bool load_software_part(const std::string &identifier);
