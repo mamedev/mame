@@ -23,7 +23,9 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_DIRECT_UPDATE_MEMBER(scorpion_direct);
+	DECLARE_READ8_MEMBER(beta_neutral_r);
+	DECLARE_READ8_MEMBER(beta_enable_r);
+	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
@@ -37,6 +39,7 @@ protected:
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 private:
+	address_space *m_program;
 	uint8_t *m_p_ram;
 	void scorpion_update_memory();
 
@@ -107,37 +110,6 @@ WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 	}
 }
 
-
-DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
-{
-	uint16_t pc = m_maincpu->device_t::safe_pcbase(); // works, but...
-
-	m_ram_disabled_by_beta = 0;
-	if (m_beta->is_active() && (pc >= 0x4000))
-	{
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
-		m_beta->disable();
-		m_ram_disabled_by_beta = 1;
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-	}
-	else
-	if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
-	{
-		m_ROMSelection = 3;
-		m_beta->enable();
-	}
-
-	if(address<=0x3fff)
-	{
-		m_ram_disabled_by_beta = 1;
-		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-		return ~0;
-	}
-
-	return address;
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 {
 	if ((m_io_nmi->read() & 1)==1)
@@ -167,6 +139,36 @@ WRITE8_MEMBER(scorpion_state::scorpion_port_1ffd_w)
 	scorpion_update_memory();
 }
 
+READ8_MEMBER(scorpion_state::beta_neutral_r)
+{
+	return m_program->read_byte(offset);
+}
+
+READ8_MEMBER(scorpion_state::beta_enable_r)
+{
+	if(m_ROMSelection == 1) {
+		m_ROMSelection = 3;
+		if (m_beta->started()) {
+			m_beta->enable();
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+			m_ram_disabled_by_beta = 1;
+		}
+	}
+	return m_program->read_byte(offset + 0x3d00);
+}
+
+READ8_MEMBER(scorpion_state::beta_disable_r)
+{
+	if (m_beta->started() && m_beta->is_active()) {
+		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_beta->disable();
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+		m_ram_disabled_by_beta = 1;
+	} else
+		m_ram_disabled_by_beta = 0;
+	return m_program->read_byte(offset + 0x4000);
+}
+
 static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
@@ -181,19 +183,23 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	AM_RANGE(0x0021, 0x0021) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x3fdc)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START (scorpion_switch, AS_DECRYPTED_OPCODES, 8, scorpion_state)
+	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
+	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
 	uint8_t *messram = m_ram->pointer();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
 	m_ram_0000 = nullptr;
-	space.install_read_bank(0x0000, 0x3fff, "bank1");
-	space.install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
+	m_program->install_read_bank(0x0000, 0x3fff, "bank1");
+	m_program->install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 
 	m_beta->disable();
-	space.set_direct_update_handler(direct_update_delegate(&scorpion_state::scorpion_direct, this));
 
 	memset(messram,0,256*1024);
 
@@ -269,6 +275,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(scorpion_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(scorpion_switch)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
