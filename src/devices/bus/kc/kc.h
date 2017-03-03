@@ -88,9 +88,6 @@ public:
 	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kccart_slot_device();
 
-	// device-level overrides
-	virtual void device_config_complete() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }

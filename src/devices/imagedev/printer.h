@@ -52,7 +52,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	devcb_write_line m_online_cb;
 };

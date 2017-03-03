@@ -883,11 +883,6 @@ apollo_ni::~apollo_ni()
 {
 }
 
-void apollo_ni::device_config_complete()
-{
-	update_names();
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

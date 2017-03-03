@@ -46,7 +46,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	DECLARE_READ8_MEMBER(static_mem_read);
 	DECLARE_WRITE8_MEMBER(static_mem_write);

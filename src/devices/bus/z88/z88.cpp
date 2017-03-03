@@ -86,18 +86,6 @@ void z88cart_slot_device::device_start()
 	m_flp_timer->reset();
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z88cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  device_timer - handler timer events

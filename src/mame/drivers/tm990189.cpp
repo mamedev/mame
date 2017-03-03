@@ -453,7 +453,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 };
 
@@ -463,11 +462,6 @@ tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config 
 	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
-}
-
-void tm990_189_rs232_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void tm990_189_rs232_image_device::device_start()

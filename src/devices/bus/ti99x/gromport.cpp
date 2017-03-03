@@ -1530,7 +1530,6 @@ bool ti99_cartridge_device::is_grom_idle()
 
 void ti99_cartridge_device::device_config_complete()
 {
-	update_names();
 	m_connector = static_cast<ti99_cartridge_connector_device*>(owner());
 }
 

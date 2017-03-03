@@ -100,18 +100,6 @@ void vc4000_cart_slot_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vc4000_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-//-------------------------------------------------
 //  trq h-21 slot
 //-------------------------------------------------
 

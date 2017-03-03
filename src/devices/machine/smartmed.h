@@ -220,9 +220,6 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-
 	image_init_result smartmedia_format_1();
 	image_init_result smartmedia_format_2();
 	int detect_geometry( uint8_t id1, uint8_t id2);

@@ -260,9 +260,6 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 floppy_image_format_t *floppy_image_device::get_formats() const
@@ -273,11 +270,6 @@ floppy_image_format_t *floppy_image_device::get_formats() const
 floppy_image_format_t *floppy_image_device::get_load_format() const
 {
 	return input_format;
-}
-
-void floppy_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void floppy_image_device::set_rpm(float _rpm)

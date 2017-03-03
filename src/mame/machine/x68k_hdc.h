@@ -100,7 +100,6 @@ public:
 	DECLARE_READ16_MEMBER( hdc_r );
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:

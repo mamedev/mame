@@ -380,13 +380,6 @@ READ_LINE_MEMBER(hp_taco_device::sts_r)
 		return m_sts;
 }
 
-// device_config_complete
-void hp_taco_device::device_config_complete()
-{
-		LOG(("device_config_complete"));
-	update_names();
-}
-
 // device_start
 void hp_taco_device::device_start()
 {

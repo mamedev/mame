@@ -47,18 +47,6 @@ snapshot_image_device::~snapshot_image_device()
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snapshot_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 /*-------------------------------------------------
     TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload)
 -------------------------------------------------*/

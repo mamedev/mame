@@ -312,18 +312,6 @@ kccart_slot_device::~kccart_slot_device()
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kccart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 /*-------------------------------------------------
     call load
 -------------------------------------------------*/

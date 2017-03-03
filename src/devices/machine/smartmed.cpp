@@ -784,8 +784,3 @@ smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, 
 		device_image_interface(mconfig, *this)
 {
 }
-
-void smartmedia_image_device::device_config_complete()
-{
-	update_names();
-}

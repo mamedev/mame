@@ -52,7 +52,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override { };
 
 	std::vector<uint8_t> m_ctape_data;

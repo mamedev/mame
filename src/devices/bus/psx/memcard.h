@@ -61,7 +61,6 @@ private:
 public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 
 	void clock_w(bool state) { if(!m_clock && !m_sel && state && !m_pad) do_card(); m_clock = state; }
 	void sel_w(bool state);

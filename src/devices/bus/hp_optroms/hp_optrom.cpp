@@ -53,11 +53,6 @@ void hp_optrom_slot_device::device_start()
 		m_cart = dynamic_cast<hp_optrom_cart_device *>(get_card_device());
 }
 
-void hp_optrom_slot_device::device_config_complete()
-{
-		update_names();
-}
-
 image_init_result hp_optrom_slot_device::call_load()
 {
 		logerror("hp_optrom: call_load\n");

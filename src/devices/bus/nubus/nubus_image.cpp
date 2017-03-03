@@ -53,7 +53,6 @@ public:
 
 	protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 public:
@@ -70,11 +69,6 @@ messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconf
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
 		device_image_interface(mconfig, *this), m_size(0), m_data(nullptr), m_ejected(false)
 {
-}
-
-void messimg_disk_image_device::device_config_complete()
-{
-	update_names();
 }
 
 

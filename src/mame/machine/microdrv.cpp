@@ -58,18 +58,6 @@ microdrive_image_device::~microdrive_image_device()
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void microdrive_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 void microdrive_image_device::device_start()
 {

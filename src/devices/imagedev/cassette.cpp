@@ -60,9 +60,6 @@ void cassette_image_device::device_config_complete()
 	m_extension_list[0] = '\0';
 	for (int i = 0; m_formats[i]; i++ )
 		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );
-
-	// set brief and instance name
-	update_names();
 }
 
 
