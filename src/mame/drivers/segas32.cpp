@@ -567,6 +567,32 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_z80_shared_ram(*this,"z80_shared_ram"),
+		m_ga2_dpram(*this,"ga2_dpram"),
+		m_system32_workram(*this,"workram"),
+		m_system32_videoram(*this,"videoram", 0),
+		m_system32_spriteram(*this,"spriteram", 0),
+		m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0)),
+		m_ports_a(*this, {"P1_A", "P2_A", "PORTC_A", "PORTD_A", "SERVICE12_A", "SERVICE34_A", "PORTG_A", "PORTH_A"}),
+		m_ports_b(*this, {"P1_B", "P2_B", "PORTC_B", "PORTD_B", "SERVICE12_B", "SERVICE34_B", "PORTG_B", "PORTH_B"}),
+		m_analog_ports(*this, {"ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8"}),
+		m_extra_ports(*this, {"EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4"}),
+		m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"}),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_multipcm(*this, "sega"),
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_irq_timer_0(*this, "v60_irq0"),
+		m_irq_timer_1(*this, "v60_irq1"),
+		m_s32comm(*this, "s32comm")
+{
+}
+
 
 /*************************************
  *
@@ -2519,7 +2545,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_S32_REGULAR_DEVICE = device_creator<segas32_regular_state>;
 
 segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, "Sega System 32 regular PCB", tag, owner, clock, "sega32_pcb_regular", __FILE__)
 {
 }
 
@@ -2543,7 +2569,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_S32_V25_DEVICE = device_creator<segas32_v25_state>;
 
 segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_V25_DEVICE, "Sega System 32 V25 PCB", tag, owner, clock, "sega32_pcb_v25", __FILE__)
 {
 }
 
@@ -2606,7 +2632,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_MULTI32_DEVICE = device_creator<sega_multi32_state>;
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_MULTI32_DEVICE, "Sega Multi 32 PCB", tag, owner, clock, "sega32_pcb_multi", __FILE__)
 {
 }
 
