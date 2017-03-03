@@ -129,7 +129,6 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
-  - quizwizc cartridge configs
 
 ***************************************************************************/
 
@@ -143,11 +142,10 @@
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-
+#include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
 #include "rendlay.h"
-#include "softlist.h"
 
 // internal artwork
 #include "7in1ss.lh"

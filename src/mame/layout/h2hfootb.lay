@@ -67,9 +67,6 @@
 
 	<view name="Internal Layout">
 		<bounds left="-9" right="393" top="-130" bottom="156" />
-		<bezel element="static_black">
-			<bounds left="-9" right="393" top="-130" bottom="156" />
-		</bezel>
 
 	<!-- bezel -->
 
@@ -229,7 +226,6 @@
 		<bezel name="8.6" element="seg"><bounds x="358" y="18" width="20" height="5" /></bezel>
 		<bezel name="8.3" element="seg"><bounds x="358" y="36" width="20" height="5" /></bezel>
 		<bezel name="8.7" element="seg"><bounds x="358" y="54" width="20" height="5" /></bezel>
-
 
 	</view>
 </mamelayout>

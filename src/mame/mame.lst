@@ -14340,7 +14340,7 @@ tbaskb                          // Tandy Radio Shack
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
-usfball                         // US Games
+us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
