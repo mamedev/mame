@@ -185,7 +185,7 @@ ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, dev
 }
 
 st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		xt_hdc_device(mconfig, EC1841_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
+		xt_hdc_device(mconfig, ST11M_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
 		m_irq_handler(*this),
 		m_drq_handler(*this)
 {

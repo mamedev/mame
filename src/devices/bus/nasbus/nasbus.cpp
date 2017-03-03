@@ -71,7 +71,7 @@ const device_type NASBUS = device_creator<nasbus_device>;
 //-------------------------------------------------
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NASBUS_SLOT, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
+	device_t(mconfig, NASBUS, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
 	m_program(nullptr),
 	m_io(nullptr),
 	m_ram_disable_handler(*this)

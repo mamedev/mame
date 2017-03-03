@@ -421,7 +421,7 @@ vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
 vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vme_fccpu21yb_card_device( mconfig, VME_FCCPU21B, "Force Computer SYS68K/CPU-21YB CPU Board", tag, owner, clock, "fccpu21yb", __FILE__)
+	: vme_fccpu21yb_card_device( mconfig, VME_FCCPU21YB, "Force Computer SYS68K/CPU-21YB CPU Board", tag, owner, clock, "fccpu21yb", __FILE__)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }

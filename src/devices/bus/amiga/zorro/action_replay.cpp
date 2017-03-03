@@ -112,12 +112,12 @@ action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig
 }
 
 action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-II", "amiga_ar2")
+	action_replay_device(mconfig, ACTION_REPLAY_MK2, tag, owner, clock, "Datel Action Replay MK-II", "amiga_ar2")
 {
 }
 
 action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-III", "amiga_ar3")
+	action_replay_device(mconfig, ACTION_REPLAY_MK3, tag, owner, clock, "Datel Action Replay MK-III", "amiga_ar3")
 {
 }
 

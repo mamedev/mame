@@ -127,7 +127,7 @@ a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const ch
 }
 
 a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, "Applied Engineering Vulcan Gold IDE controller", tag, owner, clock, "a2vulgld", __FILE__)
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCANGOLD, "Applied Engineering Vulcan Gold IDE controller", tag, owner, clock, "a2vulgld", __FILE__)
 {
 }
 
