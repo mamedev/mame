@@ -1922,7 +1922,7 @@ void floppy_8_dsdd::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, EPSON_SD_165, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+	floppy_image_device(mconfig, EPSON_SMD_165, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
 {
 }
 
