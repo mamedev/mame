@@ -27,12 +27,9 @@ struct kan_tempsprite
 
 
 
-class kaneko16_sprite_device : public device_t,
-								public device_video_interface
+class kaneko16_sprite_device : public device_t, public device_video_interface
 {
 public:
-	kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,  device_type type);
-
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_fliptype(device_t &device, int fliptype);
@@ -56,6 +53,16 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
 
 protected:
+	kaneko16_sprite_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

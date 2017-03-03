@@ -34,7 +34,7 @@ public:
 	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
-	int validate_all() const { return m_validate_all; }
+	bool validate_all() const { return m_validate_all; }
 
 	// setter
 	void set_verbose(bool verbose) { m_print_verbose = verbose; }
@@ -82,6 +82,7 @@ private:
 	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
 	void validate_inputs();
 	void validate_devices();
+	void validate_device_types();
 
 	// output helpers
 	void build_output_prefix(std::string &str);

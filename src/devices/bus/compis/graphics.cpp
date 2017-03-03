@@ -39,7 +39,7 @@ device_compis_graphics_card_interface::device_compis_graphics_card_interface(con
 //-------------------------------------------------
 
 compis_graphics_slot_t::compis_graphics_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMPIS_GRAPHICS_SLOT, "Compis graphics slot", tag, owner, clock, "isbx_slot", __FILE__),
+	device_t(mconfig, COMPIS_GRAPHICS_SLOT, "Compis graphics slot", tag, owner, clock, "compisgfx_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_dma_request(*this),
 	m_card(nullptr)
