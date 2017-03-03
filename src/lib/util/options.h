@@ -177,7 +177,7 @@ public:
 	void mark_changed(const char *name);
 
 	// misc
-	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS)]; }
+	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS - 1)]; }
 	int options_count() const { return m_entrylist.count(); }
 
 protected:
