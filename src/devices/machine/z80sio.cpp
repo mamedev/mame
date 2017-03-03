@@ -183,7 +183,7 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 }
 
 upd7201N_device::upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80sio_device(mconfig, UPD7201N, "UPD 7201", tag, owner, clock, TYPE_UPD7201, "upd7201", __FILE__){ }
+	: z80sio_device(mconfig, UPD7201N, "UPD 7201", tag, owner, clock, TYPE_UPD7201, "upd7201n", __FILE__){ }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
