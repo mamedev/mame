@@ -292,7 +292,7 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 }
 
 hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, HP_TACO, "HP TACO", tag, owner, clock, "TACO", __FILE__),
+		: device_t(mconfig, HP_TACO, "HP TACO", tag, owner, clock, "hp_taco", __FILE__),
 			device_image_interface(mconfig , *this),
 			m_irq_handler(*this),
 			m_flg_handler(*this),
