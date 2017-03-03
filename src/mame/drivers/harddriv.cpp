@@ -340,10 +340,8 @@ Notes:
  *
  *************************************/
 
-const device_type HARDDRIV_DEVICE = device_creator<harddriv_state>;
-
-harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HARDDRIV_DEVICE, "Hard Drivin' PCB Family", tag, owner, clock, "harddriv_pcb", __FILE__),
+harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 /*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
 			m_gsp(*this, "gsp"),
@@ -1754,7 +1752,7 @@ MACHINE_CONFIG_END
 const device_type HARDDRIV_BOARD_DEVICE = device_creator<harddriv_board_device_state>;
 
 harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, HARDDRIV_BOARD_DEVICE, "Hard Drivin' Board Device", tag, owner, clock, "harddriv_board_device", __FILE__)
 {
 }
 
@@ -1780,7 +1778,7 @@ void harddrivc_board_device_state::device_start()
 const device_type HARDDRIVC_BOARD_DEVICE = device_creator<harddrivc_board_device_state>;
 
 harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, HARDDRIVC_BOARD_DEVICE, "Hard Drivin' C Board Device", tag, owner, clock, "harddrivc_board_device", __FILE__)
 {
 }
 
@@ -1808,7 +1806,17 @@ const device_type RACEDRIV_BOARD_DEVICE = device_creator<racedriv_board_device_s
 const device_type RACEDRIVB1_BOARD_DEVICE = device_creator<racedrivb1_board_device_state>;
 
 racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, RACEDRIV_BOARD_DEVICE, "Race Drivin' Board Device", tag, owner, clock, "racedriv_board_device", __FILE__)
+{
+}
+
+racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+racedrivb1_board_device_state::racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: racedriv_board_device_state(mconfig, RACEDRIVB1_BOARD_DEVICE, "Race Drivin' B1 Board Device", tag, owner, clock, "racedrivb1_board_device", __FILE__)
 {
 }
 
@@ -1845,7 +1853,22 @@ const device_type RACEDRIVC1_BOARD_DEVICE = device_creator<racedrivc1_board_devi
 const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE = device_creator<racedrivc_panorama_side_board_device_state>;
 
 racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, RACEDRIVC_BOARD_DEVICE, "Race Drivin' C Board Device", tag, owner, clock, "racedrivc_board_device", __FILE__)
+{
+}
+
+racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+racedrivc1_board_device_state::racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: racedrivc_board_device_state(mconfig, RACEDRIVC1_BOARD_DEVICE, "Race Drivin' C1 Board Device", tag, owner, clock, "racedrivc1_board_device", __FILE__)
+{
+}
+
+racedrivc_panorama_side_board_device_state::racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: racedrivc_board_device_state(mconfig, RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, "Race Drivin' C Panorama Board Device", tag, owner, clock, "racedrivc_panorama_side_board_device", __FILE__)
 {
 }
 
@@ -1871,7 +1894,7 @@ void stunrun_board_device_state::device_start()
 const device_type STUNRUN_BOARD_DEVICE = device_creator<stunrun_board_device_state>;
 
 stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, STUNRUN_BOARD_DEVICE, "Stun Runner Board Device", tag, owner, clock, "stunrun_board_device", __FILE__)
 {
 }
 
@@ -1905,7 +1928,22 @@ const device_type STEELTAL1_BOARD_DEVICE = device_creator<steeltal1_board_device
 const device_type STEELTALP_BOARD_DEVICE = device_creator<steeltalp_board_device_state>;
 
 steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, STEELTAL_BOARD_DEVICE, "Steel Talons Board Device", tag, owner, clock, "steeltal_board_device", __FILE__)
+{
+}
+
+steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+steeltal1_board_device_state::steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: steeltal_board_device_state(mconfig, STEELTAL1_BOARD_DEVICE, "Steel Talons 1 Board Device", tag, owner, clock, "steeltal1_board_device", __FILE__)
+{
+}
+
+steeltalp_board_device_state::steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: steeltal_board_device_state(mconfig, STEELTALP_BOARD_DEVICE, "Steel Talons P Board Device", tag, owner, clock, "steeltalp_board_device", __FILE__)
 {
 }
 
@@ -1925,7 +1963,7 @@ void strtdriv_board_device_state::device_start()
 const device_type STRTDRIV_BOARD_DEVICE = device_creator<strtdriv_board_device_state>;
 
 strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, STRTDRIV_BOARD_DEVICE, "Street Drivin' Board Device", tag, owner, clock, "strtdriv_board_device", __FILE__)
 {
 }
 
@@ -1952,7 +1990,17 @@ const device_type HDRIVAIR_BOARD_DEVICE = device_creator<hdrivair_board_device_s
 const device_type HDRIVAIRP_BOARD_DEVICE = device_creator<hdrivairp_board_device_state>;
 
 hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, tag, owner, clock)
+	: harddriv_state(mconfig, HDRIVAIR_BOARD_DEVICE, "Hard Drivin' Airborne Board Device", tag, owner, clock, "hdrivair_board_device", __FILE__)
+{
+}
+
+hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+hdrivairp_board_device_state::hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hdrivair_board_device_state(mconfig, HDRIVAIRP_BOARD_DEVICE, "Hard Drivin' Airborne P Board Device", tag, owner, clock, "hrdrvairp_board_device", __FILE__)
 {
 }
 
