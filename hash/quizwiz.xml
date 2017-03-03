@@ -20,6 +20,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="00001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -29,6 +30,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="10001110" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -38,6 +40,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="10001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -47,6 +50,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="11001110" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -56,6 +60,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="01101011" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -65,6 +70,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="10001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
@@ -78,6 +84,7 @@ for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="quizwiz_cart">
 			<feature name="pinout" value="00001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
 
