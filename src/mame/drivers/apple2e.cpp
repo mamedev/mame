@@ -369,8 +369,7 @@ private:
 	bool m_slotc3rom;
 	bool m_altzp;
 	bool m_ramrd, m_ramwrt;
-	bool m_lcram, m_lcram2, m_lcwriteenable;
-	int m_last_offset, m_last_access;
+	bool m_lcram, m_lcram2, m_lcprewrite, m_lcwriteenable;
 	bool m_ioudis;
 	bool m_romswitch;
 	bool m_mockingboard4c;
@@ -402,7 +401,7 @@ private:
 	void do_io(address_space &space, int offset, bool is_iic);
 	uint8_t read_floatingbus();
 	void update_slotrom_banks();
-	void lc_update(int offset, int access);
+	void lc_update(int offset, bool writing);
 	uint8_t read_slot_rom(address_space &space, int slotbias, int offset);
 	void write_slot_rom(address_space &space, int slotbias, int offset, uint8_t data);
 	uint8_t read_int_rom(address_space &space, int slotbias, int offset);
@@ -702,9 +701,8 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_exp_addrmask));
 	save_item(NAME(m_lcram));
 	save_item(NAME(m_lcram2));
+	save_item(NAME(m_lcprewrite));
 	save_item(NAME(m_lcwriteenable));
-	save_item(NAME(m_last_offset));
-	save_item(NAME(m_last_access));
 	save_item(NAME(m_mockingboard4c));
 	save_item(NAME(m_intc8rom));
 }
@@ -760,9 +758,8 @@ void apple2e_state::machine_reset()
 	// LC default state: read ROM, write enabled, Dxxx bank 2
 	m_lcram = false;
 	m_lcram2 = true;
+	m_lcprewrite = false;
 	m_lcwriteenable = true;
-	m_last_offset = -1;
-	m_last_access = 0;
 
 	m_exp_bankhior = 0xf0;
 
@@ -1012,40 +1009,53 @@ void apple2e_state::update_slotrom_banks()
 	}
 }
 
-void apple2e_state::lc_update(int offset, int access)
+void apple2e_state::lc_update(int offset, bool writing)
 {
 	bool old_lcram = m_lcram;
 
-	m_lcram = false;
-	m_lcwriteenable = false;
+	//any even access disables pre-write and writing
+	if ((offset & 1) == 0)
+	{
+		m_lcprewrite = false;
+		m_lcwriteenable = false;
+	}
+
+	//any write disables pre-write
+	//has no effect on write-enable if writing was enabled already
+	if (writing == true)
+	{
+		m_lcprewrite = false;
+	}
+	//first odd read enables pre-write, second one enables writing
+	else if ((offset & 1) == 1)
+	{
+		if (m_lcprewrite == false)
+		{
+			m_lcprewrite = true;
+		}
+		else
+		{
+			m_lcwriteenable = true;
+		}
+	}
 
 	switch (offset & 3)
 	{
 		case 0:
+		case 3:
 		{
 			m_lcram = true;
 			break;
 		}
 
-		case 3:
-		{
-			m_lcram = true;
-		} //fall through
-
 		case 1:
+		case 2:
 		{
-			//if accessed twice, then write-enable
-			if (((m_last_offset & 1) == 1) && (access == m_last_access))
-			{
-				m_lcwriteenable = true;
-			}
-
+			m_lcram = false;
 			break;
 		}
 	}
 
-	m_last_offset = offset;
-	m_last_access = access;
 	m_lcram2 = false;
 
 	if (!(offset & 8))
@@ -1865,7 +1875,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 
 		if (slot == 0)
 		{
-			lc_update(offset & 0xf, 0);
+			lc_update(offset & 0xf, false);
 		}
 		else
 		{
@@ -1888,7 +1898,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 
 	if (slot == 0)
 	{
-		lc_update(offset & 0xf, 1);
+		lc_update(offset & 0xf, true);
 	}
 	else
 	{
