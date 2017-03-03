@@ -273,36 +273,8 @@ ROMs:
 const device_type SEGA_XBD_PCB = device_creator<segaxbd_state>;
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_soundcpu2(*this, "soundcpu2"),
-			m_mcu(*this, "mcu"),
-			m_watchdog(*this, "watchdog"),
-			m_cmptimer_1(*this, "cmptimer_main"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_soundlatch(*this, "soundlatch"),
-			m_subram0(*this, "subram0"),
-			m_road_priority(1),
-			m_scanline_timer(nullptr),
-			m_timer_irq_state(0),
-			m_vblank_irq_state(0),
-			m_loffire_sync(nullptr),
-			m_lastsurv_mux(0),
-			m_paletteram(*this, "paletteram"),
-			m_gprider_hack(false),
-			m_palette_entries(0),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
-			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
+		: segaxbd_state(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__)
 {
-	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
-	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
-	palette_init();
 }
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
