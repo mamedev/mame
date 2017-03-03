@@ -2524,6 +2524,11 @@ m68000_device::m68000_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+m68000_device::m68000_device(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: m68000_base_device(mconfig, name, tag, owner, clock, type, 16,24, shortname, source)
+{
+}
+
 void m68000_device::device_start()
 {
 	init_cpu_m68000();

@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: m68000_device(mconfig, tag, owner, clock, shortname, source),
+	: m68000_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_region(*this, DEVICE_SELF),
 		m_key(*this, "key"),
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
