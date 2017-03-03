@@ -2574,7 +2574,7 @@ void m68008_device::device_start()
 
 
 m68008plcc_device::m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, "M68008PLCC", tag, owner, clock, M68008, 8,22, "m68008plcc", __FILE__)
+	: m68000_base_device(mconfig, "M68008PLCC", tag, owner, clock, M68008PLCC, 8,22, "m68008plcc", __FILE__)
 {
 }
 
@@ -2609,7 +2609,7 @@ void m68020_device::device_start()
 
 
 m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020, 32,32, "m68020fpu", __FILE__)
+	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020FPU, 32,32, "m68020fpu", __FILE__)
 {
 }
 

@@ -81,7 +81,7 @@ nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, 
 }
 
 nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUNSOFT_4, "NES Cart Sunsoft FME7 PCB", tag, owner, clock, "nes_fme7", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
+					: nes_nrom_device(mconfig, NES_SUNSOFT_FME7, "NES Cart Sunsoft FME7 PCB", tag, owner, clock, "nes_fme7", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
 				{
 }
 

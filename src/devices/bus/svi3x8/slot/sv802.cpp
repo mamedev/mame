@@ -43,7 +43,7 @@ machine_config_constructor sv802_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv802_device::sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV805, "SV-802 Centronics Printer Interface", tag, owner, clock, "sv802", __FILE__),
+	device_t(mconfig, SV802, "SV-802 Centronics Printer Interface", tag, owner, clock, "sv802", __FILE__),
 	device_svi_slot_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),
 	m_cent_data_out(*this, "cent_data_out"),

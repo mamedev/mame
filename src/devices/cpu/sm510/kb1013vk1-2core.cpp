@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 // device definitions
 kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm500_device(mconfig, KB1013VK12, "KB1013VK1-2", tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4), "kb1013vk1-2", __FILE__)
+	: sm500_device(mconfig, KB1013VK12, "KB1013VK1-2", tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4), "kb1013vk1_2", __FILE__)
 { }
 
 

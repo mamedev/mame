@@ -135,7 +135,7 @@ nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *
 }
 
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+					: nes_nrom_device(mconfig, NES_CITYFIGHT, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
