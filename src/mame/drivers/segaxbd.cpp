@@ -305,6 +305,39 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 	palette_init();
 }
 
+segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+			m_maincpu(*this, "maincpu"),
+			m_subcpu(*this, "subcpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_soundcpu2(*this, "soundcpu2"),
+			m_mcu(*this, "mcu"),
+			m_watchdog(*this, "watchdog"),
+			m_cmptimer_1(*this, "cmptimer_main"),
+			m_sprites(*this, "sprites"),
+			m_segaic16vid(*this, "segaic16vid"),
+			m_segaic16road(*this, "segaic16road"),
+			m_soundlatch(*this, "soundlatch"),
+			m_subram0(*this, "subram0"),
+			m_road_priority(1),
+			m_scanline_timer(nullptr),
+			m_timer_irq_state(0),
+			m_vblank_irq_state(0),
+			m_loffire_sync(nullptr),
+			m_lastsurv_mux(0),
+			m_paletteram(*this, "paletteram"),
+			m_gprider_hack(false),
+			m_palette_entries(0),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
+			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
+			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
+{
+	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
+	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
+	palette_init();
+}
+
 
 void segaxbd_state::device_start()
 {
@@ -1872,7 +1905,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_REGULAR_DEVICE = device_creator<segaxbd_regular_state>;
 
 segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_REGULAR_DEVICE, "Sega X-Board PCB regular", tag, owner, clock, "segakbd_pcb_regular", __FILE__)
 {
 }
 
@@ -1898,7 +1931,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_FD1094_DEVICE = device_creator<segaxbd_fd1094_state>;
 
 segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_FD1094_DEVICE, "Sega X-Board PCB FD1094", tag, owner, clock, "segakbd_pcb_fd1094", __FILE__)
 {
 }
 
@@ -1940,7 +1973,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = device_creator<segaxbd_lastsurv_fd1094_state>;
 
 segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_FD1094_DEVICE, "Sega X-Board Last Survivor PCB FD1094", tag, owner, clock, "segakbd_pcb_lastsurv_fd1094", __FILE__)
 {
 }
 
@@ -1970,7 +2003,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_LASTSURV_DEVICE = device_creator<segaxbd_lastsurv_state>;
 
 segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_DEVICE, "Sega X-Board Last Survivor PCB", tag, owner, clock, "segakbd_pcb_lastsurv", __FILE__)
 {
 }
 
@@ -2013,7 +2046,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_SMGP_FD1094_DEVICE = device_creator<segaxbd_smgp_fd1094_state>;
 
 segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP_FD1094_DEVICE, "Sega X-Board SMGP PCB FD1094", tag, owner, clock, "segakbd_pcb_smgp_fd1094", __FILE__)
 {
 }
 
@@ -2056,7 +2089,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_SMGP_DEVICE = device_creator<segaxbd_smgp_state>;
 
 segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP_DEVICE, "Sega X-Board SMGP PCB", tag, owner, clock, "segakbd_pcb_smgp", __FILE__)
 {
 }
 
@@ -2082,7 +2115,7 @@ MACHINE_CONFIG_END
 const device_type SEGA_XBD_RASCOT_DEVICE = device_creator<segaxbd_rascot_state>;
 
 segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_RASCOT_DEVICE, "Sega X-Board Royal Ascot PCB", tag, owner, clock, "segakbd_pcb_rascot", __FILE__)
 {
 }
 
