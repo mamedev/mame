@@ -807,7 +807,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //-------------------------------------------------
 
 sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
+	: device_t(mconfig, SEGA_315_5249_DIVIDER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
 {
 }
 

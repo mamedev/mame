@@ -186,7 +186,7 @@ class galgames_starpak2_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, "Galaxy Games StarPak 3 Cartridge", tag, owner, clock, "starpak2_cart", __FILE__)
+		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, "Galaxy Games StarPak 2 Cartridge", tag, owner, clock, "starpak2_cart", __FILE__)
 	{ }
 protected:
 	// device-level overrides
