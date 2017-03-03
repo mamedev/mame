@@ -220,6 +220,6 @@ public:
 	} m_nimbus_mouse;
 
 private:
-	void debug_command(int ref, int params, const char *param[]);
-	void video_debug(int ref, int params, const char *param[]);
+	void debug_command(int ref, const std::vector<std::string> &params);
+	void video_debug(int ref, const std::vector<std::string> &params);
 };

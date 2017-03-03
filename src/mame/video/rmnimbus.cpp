@@ -470,12 +470,12 @@ void rmnimbus_state::change_palette(uint8_t bank, uint16_t colours)
 	}
 }
 
-void rmnimbus_state::video_debug(int ref, int params, const char *param[])
+void rmnimbus_state::video_debug(int ref, const std::vector<std::string> &params)
 {
-	if (params > 0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp);
+		sscanf(params[0].c_str(), "%d", &temp);
 		m_debug_video = temp;
 	}
 	else
@@ -494,7 +494,7 @@ void rmnimbus_state::video_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2, _3));
+		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2));
 	}
 }
 

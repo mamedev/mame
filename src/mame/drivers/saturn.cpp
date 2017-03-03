@@ -597,7 +597,7 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
-void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
+void saturn_state::debug_scuirq_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 	const char *const irqnames[16] = {
@@ -608,7 +608,7 @@ void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
 		con.printf("%s irq enabled: %s\n",irqnames[irq_lv],(m_scu.ism & (1 << irq_lv)) == 0 ? "1" : "0");
 }
 
-void saturn_state::debug_scudma_command(int ref, int params, const char **param)
+void saturn_state::debug_scudma_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 
@@ -621,7 +621,7 @@ void saturn_state::debug_scudma_command(int ref, int params, const char **param)
 	}
 }
 
-void saturn_state::debug_help_command(int ref, int params, const char **param)
+void saturn_state::debug_help_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 
@@ -632,17 +632,17 @@ void saturn_state::debug_help_command(int ref, int params, const char **param)
 }
 
 
-void saturn_state::debug_commands(int ref, int params, const char **param)
+void saturn_state::debug_commands(int ref, const std::vector<std::string> &params)
 {
-	if (params < 1)
+	if (params.size() < 1)
 		return;
 
-	if (strcmp("scudma", param[0]) == 0)
-		debug_scudma_command(ref, params - 1, param + 1);
-	else if(strcmp("scuirq", param[0]) == 0)
-		debug_scuirq_command(ref, params - 1, param + 1);
-	else if(strcmp("help", param[0]) == 0)
-		debug_help_command(ref, params - 1, param + 1);
+	if (params[0] == "scudma")
+		debug_scudma_command(ref, params);
+	else if (params[0] == "scuirq")
+		debug_scuirq_command(ref, params);
+	else if (params[0] == "help")
+		debug_help_command(ref, params);
 }
 
 
@@ -654,7 +654,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
+		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2));
 	}
 
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
