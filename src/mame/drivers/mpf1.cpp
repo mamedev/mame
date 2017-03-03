@@ -291,8 +291,6 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	/* bit 6, monitor break control */
 	m_break = BIT(data, 6);
 
-	if(!m_break)
-		fprintf(stderr, "mb=%d\n", m_break);
 	if (m_break)
 	{
 		m_m1 = 0;
@@ -312,10 +310,7 @@ READ8_MEMBER(mpf1_state::step_r)
 		m_m1++;
 
 		if (m_m1 == 5)
-		{
-			fprintf(stderr, "yay!\n");
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
 	}
 
 	return m_program->read_byte(offset);
