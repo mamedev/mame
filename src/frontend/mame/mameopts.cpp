@@ -133,7 +133,7 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 			util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
 
 		// add the option
-		if (!options.exists(image.instance_name()))
+		if (!options.exists(image.instance_name().c_str()))
 		{
 			// first device? add the header as to be pretty
 			if (m_device_options++ == 0)

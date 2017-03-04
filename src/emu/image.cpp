@@ -38,7 +38,7 @@ image_manager::image_manager(running_machine &machine)
 			continue;
 
 		// is an image specified for this image
-		const char *image_name_ptr = machine.options().value(image.instance_name());
+		const char *image_name_ptr = machine.options().value(image.instance_name().c_str());
 		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
 		{
 			image_init_result result = image_init_result::FAIL;
@@ -188,7 +188,7 @@ void image_manager::options_extract()
 
 			/* and set the option */
 			std::string error;
-			machine().options().set_value(image.instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
+			machine().options().set_value(image.instance_name().c_str(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
 
 			index++;
 		}

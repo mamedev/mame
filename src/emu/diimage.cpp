@@ -1171,7 +1171,7 @@ image_init_result device_image_interface::load_software(const std::string &softw
 
 bool device_image_interface::open_image_file(emu_options &options)
 {
-	const char* path = options.value(instance_name());
+	const char* path = options.value(instance_name().c_str());
 	if (*path != 0)
 	{
 		set_init_phase();
@@ -1498,7 +1498,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 
 std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
-	const char *path = device().mconfig().options().value(instance_name());
+	const char *path = device().mconfig().options().value(instance_name().c_str());
 	std::string result;
 	if (*path != '\0')
 	{
