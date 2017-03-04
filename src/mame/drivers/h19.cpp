@@ -159,6 +159,26 @@ static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+//#define APPROACH_1
+//#define APPROACH_2
+#if defined(APPROACH_1)
+static ADDRESS_MAP_START(ssh19_mem, AS_PROGRAM, 8, h19_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+
+#elif defined(APPROACH_2)
+static ADDRESS_MAP_START(ssh19_mem, AS_PROGRAM, 8, h19_state)
+	ADDRESS_MAP_UNMAP_HIGH
+        AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0x2000)
+        AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("roms", 0x6000)
+	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+#endif
+
 static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -565,6 +585,12 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+#if defined(APPROACH_1) || defined(APPROACH_2)
+static MACHINE_CONFIG_DERIVED( ssh19, h19 )
+	MCFG_CPU_PROGRAM_MAP(ssh19_mem)
+MACHINE_CONFIG_END
+#endif
+
 /* ROM definition */
 ROM_START( h19 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -608,9 +634,26 @@ ROM_START( watz19 )
 ROM_END
 
 ROM_START( ssh19 ) // Superset for H19
+#if defined(APPROACH_1)
+	// reserve an extra 16k outside of addressable space to hide the empty blocks of ram
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	// Superset ROM - although the ROM is 32K, only 16K is accessible - hide the first 8k
+	ROM_LOAD( "27256_101-402_superset_code.bin", 0x10000, 0x2000, CRC(a6896076) SHA1(a4e2d25028dc75a665c3f5a830a4e8cdecbd481c))
+	// load the 2nd 8k into low memory
+	ROM_CONTINUE(0x00000, 0x2000)
+	// hide the 3rd 8k
+	ROM_CONTINUE(0x12000, 0x2000)
+	// load the last 8k
+	ROM_CONTINUE(0x02000, 0x2000)
+#elif defined(APPROACH_2)
+        ROM_REGION( 0x10000, "roms", ROMREGION_ERASEFF )
+        // Superset ROM - although the ROM is 32K, only 16K is accessible - hide the first 8k
+        ROM_LOAD( "27256_101-402_superset_code.bin", 0x0000, 0x8000, CRC(a6896076) SHA1(a4e2d25028dc75a665c3f5a830a4e8cdecbd481c))
+#else
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// Superset ROM - TODO although the ROM is 32K, only 16K is accessible
 	ROM_LOAD( "27256_101-402_superset_code.bin", 0x0000, 0x8000, CRC(a6896076) SHA1(a4e2d25028dc75a665c3f5a830a4e8cdecbd481c))
+#endif
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Superset font - 32k
@@ -629,5 +672,9 @@ COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath I
 /*  TODO - verify the years for these third-party replacement ROMs. */
 COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
+#if defined(APPROACH_1) || defined(APPROACH_2)
+COMP( 1982, ssh19,   h19,     0,    ssh19,  h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ SuperSet ROM", MACHINE_NOT_WORKING )
+#else
 COMP( 1982, ssh19,   h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ SuperSet ROM", MACHINE_NOT_WORKING )
+#endif
 
