@@ -1482,8 +1482,8 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 			if (loadable)
 			{
-				const char *name = imagedev.instance_name();
-				const char *shortname = imagedev.brief_instance_name();
+				const char *name = imagedev.instance_name().c_str();
+				const char *shortname = imagedev.brief_instance_name().c_str();
 
 				fprintf(m_output, "\t\t\t<instance");
 				fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(name));

@@ -3013,7 +3013,7 @@ void debugger_commands::execute_mount(int ref, const std::vector<std::string> &p
 	bool done = false;
 	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
 	{
-		if (strcmp(img.brief_instance_name(), params[0].c_str()) == 0)
+		if (img.brief_instance_name() == params[0])
 		{
 			if (img.load(params[1]) != image_init_result::PASS)
 				m_console.printf("Unable to mount file %s on %s\n", params[1], params[0]);
@@ -3036,7 +3036,7 @@ void debugger_commands::execute_unmount(int ref, const std::vector<std::string> 
 	bool done = false;
 	for (device_image_interface &img : image_interface_iterator(m_machine.root_device()))
 	{
-		if (strcmp(img.brief_instance_name(), params[0].c_str()) == 0)
+		if (img.brief_instance_name() == params[0])
 		{
 			img.unload();
 			m_console.printf("Unmounted file from : %s\n", params[0]);
