@@ -249,7 +249,7 @@ arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, 
 
 
 arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm_cpu_device(mconfig, ARM_BE, "ARM (big endian)", tag, owner, clock, "arm be", __FILE__, ENDIANNESS_BIG)
+	: arm_cpu_device(mconfig, ARM_BE, "ARM (big endian)", tag, owner, clock, "arm_be", __FILE__, ENDIANNESS_BIG)
 {
 }
 

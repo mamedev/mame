@@ -129,7 +129,6 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
-  - quizwizc cartridge configs
 
 ***************************************************************************/
 
@@ -143,11 +142,10 @@
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-
+#include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
 #include "rendlay.h"
-#include "softlist.h"
 
 // internal artwork
 #include "7in1ss.lh"
@@ -1646,13 +1644,8 @@ MACHINE_CONFIG_END
   7 R5
   8 R9
 
-  The cartridge connects one or more of the R pins to K1. The game presumedly
-  generates a random seed from it. Until more cartridge configurations are known,
-  the port is simulated as a DIP switch. See list below for confirmed configs.
-
-  #  config           to K1     title
-  -----------------------------------------------
-  1  1-2-3-4,5-6-7-8  1,2,3     1001 Questions
+  The cartridge connects one or more of the R pins to K1. Together with the
+  question numbers, the game generates a pseudo-random answerlist.
 
 ***************************************************************************/
 
@@ -1660,8 +1653,12 @@ class quizwizc_state : public hh_tms1k_state
 {
 public:
 	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_pinout(0)
 	{ }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	u16 m_pinout; // cartridge R pins
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1670,6 +1667,22 @@ public:
 };
 
 // handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge pinout K1 to R connections
+	std::string pinout(image.get_feature("pinout"));
+	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
+	m_pinout = BITSWAP8(m_pinout,4,3,7,5,2,1,6,0) << 4;
+
+	return image_init_result::PASS;
+}
 
 void quizwizc_state::prepare_display()
 {
@@ -1686,8 +1699,8 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// R0-R5: input mux
-	// R4-R9: cartridge pins
-	m_inp_mux = data;
+	// R4-R9: to cartridge slot
+	m_inp_mux = data & 0x3f;
 
 	// R0-R3: led select
 	// R6-R9: digit select
@@ -1706,7 +1719,7 @@ READ8_MEMBER(quizwizc_state::read_k)
 {
 	// K: multiplexed inputs
 	// K1: cartridge pin 4 (pin 5 N/C)
-	return read_inputs(10);
+	return read_inputs(6) | ((m_r & m_pinout) ? 1 : 0);
 }
 
 
@@ -1738,45 +1751,16 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 	PORT_START("IN.4") // R4
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 1" ) PORT_DIPLOCATION(":1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Fast Forward")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Slow Forward")
 
 	PORT_START("IN.5") // R5
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 7" ) PORT_DIPLOCATION(":7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_CONFNAME( 0x02, 0x00, "Game Select")
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // R6
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 2" ) PORT_DIPLOCATION(":2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.7") // R7
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 3" ) PORT_DIPLOCATION(":3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.8") // R8
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 6" ) PORT_DIPLOCATION(":6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.9") // R9
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 8" ) PORT_DIPLOCATION(":8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
@@ -1794,6 +1778,11 @@ static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
+	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
 MACHINE_CONFIG_END
 
 
@@ -1854,7 +1843,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
 
 	// get cartridge pinout R9 to K connections
 	std::string pinout(image.get_feature("pinout"));
-	m_pinout = std::stoi(pinout, nullptr, 0) & 0xf;
+	m_pinout = std::stoul(pinout, nullptr, 0) & 0xf;
 
 	return image_init_result::PASS;
 }

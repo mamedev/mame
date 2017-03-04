@@ -14340,7 +14340,7 @@ tbaskb                          // Tandy Radio Shack
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
-usfball                         // US Games
+us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
@@ -17407,9 +17407,20 @@ atla_ltd                        //
 bhol_ltd                        //
 columbia                        //
 cowboy                          //
+cowboy2                         //
 discodan                        //
+force                           //
+hhotel                          //
+hustlerp                        //
+hustlerpa                       //
+kkongltd                        //
 pecmen                          //
+tmacltd2                        //
+tmacltd4                        //
+tricksht                        //
+vikngkng                        //
 zephy                           //
+zephya                          //
 
 @source:luckgrln.cpp
 7smash                          // (c) 1993 Sovic
@@ -17603,7 +17614,8 @@ bomblord                        // bootleg
 bombrman                        // (c) 1991 Irem (Japan)
 dynablst                        // (c) 1991 Irem (World)
 dynablstb                       // bootleg
-dynablstb2                      // bootleg (alt)
+dynablstb2                      // bootleg
+dynablstb3                      // bootleg
 gussun                          // (c) 1993 Irem (Japan)
 hasamu                          // (c) 1991 Irem (Japan)
 matchit2                        // (c) 1993 Tamtex

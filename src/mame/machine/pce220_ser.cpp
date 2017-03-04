@@ -85,19 +85,6 @@ void pce220_serial_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce220_serial_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 

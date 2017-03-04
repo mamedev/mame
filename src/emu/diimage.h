@@ -253,6 +253,9 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
+	// interface-level overrides
+	virtual void interface_config_complete() override;
+
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
@@ -274,7 +277,6 @@ protected:
 
 	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
-	void update_names();
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	bool load_software_part(const std::string &identifier);
@@ -310,6 +312,7 @@ private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	bool schedule_postload_hard_reset_if_needed();
 	std::vector<u32> determine_open_plan(bool is_create);
+	void update_names();
 
 	// creation info
 	formatlist_type m_formatlist;

@@ -322,7 +322,7 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 #define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
 	devcb = &apollo_sio::set_outport_cb(*device, DEVCB_##_cb);
 
-class apollo_sio: public mc68681_device
+class apollo_sio: public mc68681_base_device
 {
 public:
 	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -378,7 +378,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

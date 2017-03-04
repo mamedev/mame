@@ -29,45 +29,6 @@
 #include "softlist.h"
 
 //**************************************************************************
-//  MEMORY MANAGEMENT UNIT
-//**************************************************************************
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-READ8_MEMBER( sage2_state::read )
-{
-	uint8_t data = 0xff;
-
-	if (m_reset || (offset >= 0xfe0000 && offset < 0xff4000))
-	{
-		data = m_rom[offset & 0x1fff];
-	}
-	else if (offset < 0x080000)
-	{
-		data = m_ram->pointer()[offset];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-WRITE8_MEMBER( sage2_state::write )
-{
-	if (offset < 0x080000)
-	{
-		m_ram->pointer()[offset] = data;
-	}
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -77,7 +38,6 @@ WRITE8_MEMBER( sage2_state::write )
 
 static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xfeffff) AM_READWRITE8(read, write, 0xffff)
 	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8(I8253_1_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xffc010, 0xffc01f) AM_NOP //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
 	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
@@ -417,17 +377,27 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
-	// find memory regions
-	m_rom = memregion(M68000_TAG)->base();
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }
-
 
 void sage2_state::machine_reset()
 {
-	m_reset = 1;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.unmap_readwrite(0x000000, 0x07ffff);
+	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base());
+	program.install_read_handler(0xfe0000, 0xfe3fff, read16_delegate(FUNC(sage2_state::rom_r), this));
+	m_maincpu->reset();
 }
 
-
+READ16_MEMBER(sage2_state::rom_r)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.unmap_readwrite(0x000000, 0x07ffff);
+	program.install_ram(0, m_ram->size()-1, m_ram->pointer());
+	program.install_rom(0xfe0000, 0xfe1fff, 0x002000, m_rom->base());
+	return program.read_word(0xfe0000 | (offset*2));
+}
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -530,9 +500,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( sage2 )
-	ROM_REGION( 0x2000, M68000_TAG, 0 )
-	ROM_LOAD16_BYTE( "sage2.u18", 0x0000, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c) )
-	ROM_LOAD16_BYTE( "sage2.u17", 0x0001, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb) )
+	ROM_REGION16_BE( 0x2000, M68000_TAG, 0 )
+	ROM_LOAD16_BYTE( "sage2.u18", 0x0001, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c) )
+	ROM_LOAD16_BYTE( "sage2.u17", 0x0000, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb) )
 ROM_END
 
 
@@ -545,20 +515,8 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
-{
-	if (m_reset && address >= 0xfe0000)
-	{
-		m_reset = 0;
-	}
-
-	return address;
-}
-
 DRIVER_INIT_MEMBER(sage2_state,sage2)
 {
-	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(&sage2_state::sage2_direct_update_handler, this));
 }
 
 

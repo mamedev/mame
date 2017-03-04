@@ -64,7 +64,7 @@ enum
 //**************************************************************************
 
 const device_type I8255 = device_creator<i8255_device>;
-const device_type I8255A = device_creator<i8255_device>;
+const device_type I8255A = I8255;
 
 
 //**************************************************************************

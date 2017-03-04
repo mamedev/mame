@@ -153,18 +153,6 @@ void a800_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_a800_cart_interface  *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void a800_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------

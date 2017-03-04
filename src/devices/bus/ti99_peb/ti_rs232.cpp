@@ -151,16 +151,6 @@ void ti_pio_attached_device::device_start()
 {
 }
 
-void ti_rs232_attached_device::device_config_complete()
-{
-	update_names();
-}
-
-void ti_pio_attached_device::device_config_complete()
-{
-	update_names();
-}
-
 /*
     Find the index of the image name. We assume the format
     <name><number>, i.e. the number is the longest string from the right

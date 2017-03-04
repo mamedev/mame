@@ -98,63 +98,40 @@ const device_type AY31015 = device_creator<ay31015_device>;
 const device_type AY51013 = device_creator<ay51013_device>;
 
 ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-				m_control_reg(0),
-				m_status_reg(0),
-				m_second_stop_bit(0),
-				m_total_pulses(0),
-				m_internal_sample(0),
-				m_rx_data(0),
-				m_rx_buffer(0),
-				m_rx_bit_count(0),
-				m_rx_parity(0),
-				m_rx_pulses(0),
-				m_rx_clock(0),
-				m_rx_timer(nullptr),
-				m_tx_data(0),
-				m_tx_buffer(0),
-				m_tx_parity(0),
-				m_tx_pulses(0),
-				m_tx_clock(0),
-				m_tx_timer(nullptr),
-				m_read_si_cb(*this),
-				m_write_so_cb(*this),
-				m_status_changed_cb(*this)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_control_reg(0),
+	m_status_reg(0),
+	m_second_stop_bit(0),
+	m_total_pulses(0),
+	m_internal_sample(0),
+	m_rx_data(0),
+	m_rx_buffer(0),
+	m_rx_bit_count(0),
+	m_rx_parity(0),
+	m_rx_pulses(0),
+	m_rx_clock(0),
+	m_rx_timer(nullptr),
+	m_tx_data(0),
+	m_tx_buffer(0),
+	m_tx_parity(0),
+	m_tx_pulses(0),
+	m_tx_clock(0),
+	m_tx_timer(nullptr),
+	m_read_si_cb(*this),
+	m_write_so_cb(*this),
+	m_status_changed_cb(*this)
 {
 	for (auto & elem : m_pins)
 		elem = 0;
 }
 
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__),
-				m_control_reg(0),
-				m_status_reg(0),
-				m_second_stop_bit(0),
-				m_total_pulses(0),
-				m_internal_sample(0),
-				m_rx_data(0),
-				m_rx_buffer(0),
-				m_rx_bit_count(0),
-				m_rx_parity(0),
-				m_rx_pulses(0),
-				m_rx_clock(0),
-				m_rx_timer(nullptr),
-				m_tx_data(0),
-				m_tx_buffer(0),
-				m_tx_parity(0),
-				m_tx_pulses(0),
-				m_tx_clock(0),
-				m_tx_timer(nullptr),
-				m_read_si_cb(*this),
-				m_write_so_cb(*this),
-				m_status_changed_cb(*this)
+	: ay31015_device(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__)
 {
-	for (auto & elem : m_pins)
-		elem = 0;
 }
 
 ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: ay31015_device(mconfig, AY31015, "AY-5-1013", tag, owner, clock, "ay51013", __FILE__)
+	: ay31015_device(mconfig, AY51013, "AY-5-1013", tag, owner, clock, "ay51013", __FILE__)
 {
 }
 

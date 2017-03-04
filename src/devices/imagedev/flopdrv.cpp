@@ -834,9 +834,6 @@ void legacy_floppy_image_device::device_config_complete()
 			image_specify_extension(m_extension_list, 256, floppy_options[i].extensions);
 		}
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)

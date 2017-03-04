@@ -18,7 +18,7 @@
 //**************************************************************************
 
 const device_type HD61830 = device_creator<hd61830_device>;
-const device_type HD61830B = device_creator<hd61830_device>;
+const device_type HD61830B = HD61830;
 
 
 // default address map

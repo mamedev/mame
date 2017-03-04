@@ -110,6 +110,20 @@ device_image_interface::~device_image_interface()
 {
 }
 
+
+//-------------------------------------------------
+//  interface_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void device_image_interface::interface_config_complete()
+{
+	// set brief and instance name
+	update_names();
+}
+
+
 //-------------------------------------------------
 //  find_device_type - search trough list of
 //  device types to extract data
@@ -1303,6 +1317,7 @@ const util::option_guide &device_image_interface::create_option_guide() const
 
 void device_image_interface::update_names()
 {
+	// count instances of the general image type, or device type if custom
 	int count = 0;
 	int index = -1;
 	for (const device_image_interface &image : image_interface_iterator(device().mconfig().root_device()))

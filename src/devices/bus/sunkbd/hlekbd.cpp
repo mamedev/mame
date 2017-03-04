@@ -1211,7 +1211,7 @@ hle_type5_gb_device::hle_type5_gb_device(
 		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
-			SUN_TYPE5_HLE_KEYBOARD,
+			SUN_TYPE5_GB_HLE_KEYBOARD,
 			"Sun Type 5 Keyboard (Great Britain - HLE)",
 			tag,
 			owner,
@@ -1250,7 +1250,7 @@ hle_type5_se_device::hle_type5_se_device(
 		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
-			SUN_TYPE5_HLE_KEYBOARD,
+			SUN_TYPE5_SE_HLE_KEYBOARD,
 			"Sun Type 5 Keyboard (Sweden - HLE)",
 			tag,
 			owner,
@@ -1289,7 +1289,7 @@ hle_type5_jp_device::hle_type5_jp_device(
 		uint32_t clock)
 	: hle_type4_device_base(
 			mconfig,
-			SUN_TYPE5_HLE_KEYBOARD,
+			SUN_TYPE5_JP_HLE_KEYBOARD,
 			"Sun Type 5 Keyboard (Japan - HLE)",
 			tag,
 			owner,

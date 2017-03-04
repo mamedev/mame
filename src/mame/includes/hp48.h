@@ -200,7 +200,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 private:
 	void hp48_fill_port();

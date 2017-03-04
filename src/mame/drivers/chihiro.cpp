@@ -558,9 +558,9 @@ public:
 
 private:
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(int ref, int params, const char **param);
-	void chihiro_help_command(int ref, int params, const char **param);
-	void debug_commands(int ref, int params, const char **param);
+	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
+	void chihiro_help_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(int ref, const std::vector<std::string> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -676,21 +676,21 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(int ref, int params, const char **param)
+void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
 
-	if (params < 2)
+	if (params.size() < 3)
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(param[1], &size))
+	if (!machine().debugger().commands().validate_number_parameter(params[2], size))
 		return;
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
+void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -699,14 +699,14 @@ void chihiro_state::chihiro_help_command(int ref, int params, const char **param
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(int ref, int params, const char **param)
+void chihiro_state::debug_commands(int ref, const std::vector<std::string> &params)
 {
-	if (params < 1)
+	if (params.size() < 1)
 		return;
-	if (strcmp("jamdis", param[0]) == 0)
-		jamtable_disasm_command(ref, params - 1, param + 1);
+	if (params[0] == "jamdis")
+		jamtable_disasm_command(ref, params);
 	else
-		chihiro_help_command(ref, params - 1, param + 1);
+		chihiro_help_command(ref, params);
 }
 
 void chihiro_state::hack_eeprom()
@@ -1579,7 +1579,7 @@ void chihiro_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2, _3));
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
 	}
 	usbhack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)

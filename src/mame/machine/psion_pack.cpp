@@ -95,9 +95,6 @@ void datapack_device::device_start()
 void datapack_device::device_config_complete()
 {
 	add_format("opk", "Psion Datapack image", "opk", datapack_option_spec);
-
-	// set brief and instance name
-	update_names();
 }
 
 

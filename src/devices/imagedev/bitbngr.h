@@ -41,7 +41,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 private:
 	char const *m_interface;

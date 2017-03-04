@@ -10,10 +10,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_BUS_ISA_OMTI8621_H
+#define MAME_BUS_ISA_OMTI8621_H
 
-#ifndef ISA_OMTI8621_H_
-#define ISA_OMTI8621_H_
+#pragma once
 
 #include "isa.h"
 #include "machine/pc_fdc.h"
@@ -32,9 +32,6 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	~omti8621_device() {}
-
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
@@ -49,8 +46,17 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	omti8621_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -154,4 +160,4 @@ extern const device_type ISA16_OMTI8621_APOLLO;
 
 //###############################################################
 
-#endif /* OMTI8621_H_ */
+#endif // MAME_BUS_ISA_OMTI8621_H

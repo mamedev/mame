@@ -26,18 +26,6 @@ printer_image_device::printer_image_device(const machine_config &mconfig, const 
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void printer_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
