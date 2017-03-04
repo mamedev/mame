@@ -1302,11 +1302,11 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 
 	/* param 4 is the condition */
 	parsed_expression condition(&space->device().debug()->symtable());
-	if (!debug_command_parameter_expression(params[3], condition))
+	if (params.size() > 3 && !debug_command_parameter_expression(params[3], condition))
 		return;
 
 	/* param 5 is the action */
-	if (!debug_command_parameter_command(action = params[4].c_str()))
+	if (params.size() > 4 && !debug_command_parameter_command(action = params[4].c_str()))
 		return;
 
 	/* set the watchpoint */
@@ -1444,11 +1444,11 @@ void debugger_commands::execute_rpset(int ref, const std::vector<std::string> &p
 
 	/* param 1 is the condition */
 	parsed_expression condition(&cpu->debug()->symtable());
-	if (!debug_command_parameter_expression(params[0], condition))
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
 		return;
 
 	/* param 2 is the action */
-	if (!debug_command_parameter_command(action = params[1].c_str()))
+	if (params.size() > 1 && !debug_command_parameter_command(action = params[1].c_str()))
 		return;
 
 	/* set the breakpoint */
