@@ -1144,11 +1144,11 @@ void debugger_commands::execute_bpset(int ref, const std::vector<std::string> &p
 
 	/* param 2 is the condition */
 	parsed_expression condition(&cpu->debug()->symtable());
-	if (!debug_command_parameter_expression(params[1], condition))
+	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
 		return;
 
 	/* param 3 is the action */
-	if (!debug_command_parameter_command(action = params[2].c_str()))
+	if (params.size() > 2 && !debug_command_parameter_command(action = params[2].c_str()))
 		return;
 
 	/* set the breakpoint */
