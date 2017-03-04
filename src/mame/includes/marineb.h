@@ -24,7 +24,6 @@ public:
 	uint8_t     m_column_scroll;
 	uint8_t     m_flipscreen_x;
 	uint8_t     m_flipscreen_y;
-	uint8_t     m_marineb_active_low_flipscreen;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -33,20 +32,19 @@ public:
 	required_device<palette_device> m_palette;
 
 	uint8_t     m_irq_mask;
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(marineb_videoram_w);
 	DECLARE_WRITE8_MEMBER(marineb_colorram_w);
 	DECLARE_WRITE8_MEMBER(marineb_column_scroll_w);
 	DECLARE_WRITE8_MEMBER(marineb_palette_bank_0_w);
 	DECLARE_WRITE8_MEMBER(marineb_palette_bank_1_w);
-	DECLARE_WRITE8_MEMBER(marineb_flipscreen_x_w);
-	DECLARE_WRITE8_MEMBER(marineb_flipscreen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(marineb);
-	DECLARE_MACHINE_RESET(springer);
 	uint32_t screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

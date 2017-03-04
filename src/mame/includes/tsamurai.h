@@ -56,15 +56,16 @@ public:
 	int m_key_count; //debug only
 
 	// common
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(textbank1_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(textbank1_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 
 	// tsamurai and m660 specific
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(fg_colorram_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(scrollx_w);
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
@@ -80,7 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(tsamurai_unknown_d803_r);
 
 	// m660 specific
-	DECLARE_WRITE8_MEMBER(m660_textbank2_w);
+	DECLARE_WRITE_LINE_MEMBER(textbank2_w);
 	DECLARE_READ8_MEMBER(m660_unknown_d803_r);
 	DECLARE_WRITE8_MEMBER(m660_sound_command3_w);
 	DECLARE_READ8_MEMBER(m660_sound_command3_r);

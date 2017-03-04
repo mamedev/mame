@@ -54,6 +54,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -103,55 +104,40 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 }
 
 
-WRITE16_MEMBER(nemesis_state::gx400_irq1_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::irq_enable_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_irq1_on = data & 0x0001;
-
-	if (ACCESSING_BITS_8_15)
-		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
+	m_irq_on = state;
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::irq1_enable_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_irq2_on = data & 0x0001;
-
-	if (ACCESSING_BITS_8_15)
-		machine().bookkeeping().coin_lockout_w(0, data & 0x0100);
+	m_irq1_on = state;
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_irq4_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::irq2_enable_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_irq4_on = data & 0x0100;
+	m_irq2_on = state;
 }
 
-WRITE16_MEMBER(nemesis_state::nemesis_irq_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::irq4_enable_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_irq_on = data & 0xff;
-
-	if (ACCESSING_BITS_8_15)
-		machine().bookkeeping().coin_lockout_global_w(data & 0x0100);
+	m_irq4_on = state;
 }
 
-WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::coin1_lockout_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_irq_on = data & 0xff;
-
-	if (ACCESSING_BITS_8_15)
-		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
+	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
+WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_irq2_on = data & 0xff;
+	machine().bookkeeping().coin_lockout_w(1, state);
+}
 
-	if (ACCESSING_BITS_8_15)
-		machine().bookkeeping().coin_lockout_w(0, data & 0x0100);
+WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
+{
+	if (state)
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
@@ -286,12 +272,8 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
 	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(nemesis_irq_enable_word_w)
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITENOP        /* not used irq */
-	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
-	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* not used irq */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 ADDRESS_MAP_END
 
@@ -320,12 +302,8 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w) /* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w) /* ?? */
-	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
-	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w) /* ?? */
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x060000, 0x07ffff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
@@ -352,12 +330,8 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
 	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(konamigt_irq2_enable_word_w)
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(konamigt_irq_enable_word_w)
-	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
-	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* not used irq */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
@@ -386,12 +360,8 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w) /* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w) /* ?? */
-	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
-	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP    /* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w) /* ?? */
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
+	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
@@ -606,9 +576,7 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x0c0008, 0x0c0009) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* watchdog probably */
 	AM_RANGE(0x0c000a, 0x0c000b) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c2000, 0x0c2001) AM_READ(konamigt_input_word_r) /* Konami GT control */
-	AM_RANGE(0x0c2800, 0x0c2801) AM_WRITENOP
-	AM_RANGE(0x0c2802, 0x0c2803) AM_WRITE(gx400_irq2_enable_word_w) // or at 0x0c2804 ?
-	AM_RANGE(0x0c2804, 0x0c2805) AM_WRITENOP
+	AM_RANGE(0x0c2800, 0x0c280f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff) // ???
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ_PORT("IN1") AM_WRITE(selected_ip_word_w)
 	AM_RANGE(0x0c4002, 0x0c4003) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control. latches the value read previously */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")       /* VRAM */
@@ -1468,9 +1436,6 @@ void nemesis_state::machine_start()
 void nemesis_state::machine_reset()
 {
 	m_irq_on = 0;
-	m_irq1_on = 0;
-	m_irq2_on = 0;
-	m_irq4_on = 0;
 	m_gx400_irq1_cnt = 0;
 	m_frame_counter = 1;
 	m_selected_ip = 0;
@@ -1490,6 +1455,16 @@ static MACHINE_CONFIG_START( nemesis )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map) /* fixed */
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13J
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(nemesis_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0) // 11K
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1547,6 +1522,18 @@ static MACHINE_CONFIG_START( gx400 )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1608,6 +1595,17 @@ static MACHINE_CONFIG_START( konamigt )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -1664,6 +1662,18 @@ static MACHINE_CONFIG_START( rf2_gx400 )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1921,6 +1931,11 @@ static MACHINE_CONFIG_START( hcrash )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ?
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w)) // or at 0x0c2804 ?
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2671,6 +2686,18 @@ static MACHINE_CONFIG_START( bubsys )
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state, nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+
+	MCFG_DEVICE_ADD("intlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

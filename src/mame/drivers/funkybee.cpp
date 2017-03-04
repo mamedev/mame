@@ -77,6 +77,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/funkybee.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -88,9 +89,14 @@ READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 	return ioport("IN0")->read();
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)
+WRITE_LINE_MEMBER(funkybee_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(funkybee_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
@@ -99,9 +105,7 @@ static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(funkybee_flipscreen_w)
-	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(funkybee_gfx_bank_w)
+	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xf000, 0xf000) AM_READNOP /* IRQ Ack */
 	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
@@ -275,10 +279,7 @@ GFXDECODE_END
 void funkybee_state::machine_start()
 {
 	save_item(NAME(m_gfx_bank));
-}
 
-void funkybee_state::machine_reset()
-{
 	m_gfx_bank = 0;
 }
 
@@ -289,6 +290,12 @@ static MACHINE_CONFIG_START( funkybee )
 	MCFG_CPU_PROGRAM_MAP(funkybee_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(funkybee_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(funkybee_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(funkybee_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(funkybee_state, gfx_bank_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

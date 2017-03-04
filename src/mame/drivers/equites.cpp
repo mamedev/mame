@@ -592,7 +592,7 @@ CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
 
 WRITE16_MEMBER(equites_state::gekisou_unknown_bit_w)
 {
-	// data bit is A16 (offset)
+	// data bit is A17 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
@@ -603,6 +603,12 @@ READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 		return 0;
 	else
 		return m_spriteram[0];
+}
+
+WRITE8_MEMBER(equites_state::mainlatch_w)
+{
+	// data bit is A17; address bits are A16(?)-A14 (offset is shifted by 1 here)
+	m_mainlatch->write_bit((offset & 0xe000) >> 13, BIT(offset, 16));
 }
 
 READ8_MEMBER(equites_state::mcu_ram_r)
@@ -621,20 +627,18 @@ WRITE8_MEMBER(equites_state::mcu_ram_w)
 		m_mcuram[offset] = data;
 }
 
-WRITE16_MEMBER(equites_state::mcu_start_w)
+WRITE_LINE_MEMBER(equites_state::mcu_start_w)
 {
-	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)
-		m_alpha_8201->mcu_start_w(offset != 0);
+		m_alpha_8201->mcu_start_w(state != 0);
 	else
-		m_fakemcu->set_input_line(INPUT_LINE_HALT, (offset != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_fakemcu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(equites_state::mcu_switch_w)
+WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 {
-	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)
-		m_alpha_8201->bus_dir_w(offset == 0);
+		m_alpha_8201->bus_dir_w(state == 0);
 }
 
 
@@ -653,9 +657,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x184000, 0x184001) AM_SELECT(0x020000) AM_WRITE(equites_flipw_w)
-	AM_RANGE(0x188000, 0x188001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x18c000, 0x18c001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
+	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_WRITE8(mainlatch_w, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
 	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -675,10 +677,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_flipb_w, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x0c8000, 0x0c8001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
-	AM_RANGE(0x0cc000, 0x0cc001) AM_SELECT(0x020000) AM_WRITE(splndrbt_selchar_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x03c000) AM_WRITE8(mainlatch_w, 0x00ff)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
@@ -1130,7 +1129,6 @@ void equites_state::machine_start()
 
 void equites_state::machine_reset()
 {
-	flip_screen_set(0);
 }
 
 
@@ -1140,6 +1138,11 @@ static MACHINE_CONFIG_START( equites )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
@@ -1185,6 +1188,12 @@ static MACHINE_CONFIG_START( splndrbt )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, splndrbt_selchar_w))
 
 	MCFG_FRAGMENT_ADD(common_sound)
 

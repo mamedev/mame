@@ -32,8 +32,10 @@ public:
 	uint8_t *m_current_bitmap_videoram_displayed;
 	std::unique_ptr<uint16_t[]>  m_palette_ram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(cloak_led_w);
-	DECLARE_WRITE8_MEMBER(cloak_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(start_led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(start_led_2_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_l_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_r_w);
 	DECLARE_WRITE8_MEMBER(cloak_custom_w);
 	DECLARE_WRITE8_MEMBER(cloak_irq_reset_0_w);
 	DECLARE_WRITE8_MEMBER(cloak_irq_reset_1_w);
@@ -43,7 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(graph_processor_r);
 	DECLARE_WRITE8_MEMBER(graph_processor_w);
 	DECLARE_WRITE8_MEMBER(cloak_videoram_w);
-	DECLARE_WRITE8_MEMBER(cloak_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(cocktail_w);
 	void set_current_bitmap_videoram_pointer();
 	void adjust_xy(int offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

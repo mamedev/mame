@@ -43,7 +43,7 @@
     3200-327F: (W) Color RAM, Address bit 6 becomes the 9th bit of color RAM
 
     3800: (W) Right Coin Counter
-    3801: (W) Left Coint Counter
+    3801: (W) Left Coin Counter
     3803: (W) Cocktail Output
     3806: (W) Start 2 LED
     3807: (W) Start 1 LED
@@ -121,6 +121,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
@@ -132,14 +133,24 @@
  *
  *************************************/
 
-WRITE8_MEMBER(cloak_state::cloak_led_w)
+WRITE_LINE_MEMBER(cloak_state::start_led_1_w)
 {
-	output().set_led_value(1 - offset, ~data & 0x80);
+	output().set_led_value(0, !state);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_coin_counter_w)
+WRITE_LINE_MEMBER(cloak_state::start_led_2_w)
 {
-	machine().bookkeeping().coin_counter_w(1 - offset, data & 0x80);
+	output().set_led_value(1, !state);
+}
+
+WRITE_LINE_MEMBER(cloak_state::coin_counter_l_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(cloak_state::coin_counter_r_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(cloak_state::cloak_custom_w)
@@ -183,10 +194,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x2f00, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3200, 0x327f) AM_WRITE(cloak_paletteram_w)
-	AM_RANGE(0x3800, 0x3801) AM_WRITE(cloak_coin_counter_w)
-	AM_RANGE(0x3803, 0x3803) AM_WRITE(cloak_flipscreen_w)
-	AM_RANGE(0x3805, 0x3805) AM_WRITENOP    // ???
-	AM_RANGE(0x3806, 0x3807) AM_WRITE(cloak_led_w)
+	AM_RANGE(0x3800, 0x3807) AM_DEVWRITE("outlatch", ls259_device, write_d7)
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(cloak_irq_reset_0_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(cloak_nvram_enable_w)
@@ -327,6 +335,14 @@ static MACHINE_CONFIG_START( cloak )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 10B
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cloak_state, coin_counter_r_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cloak_state, coin_counter_l_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cloak_state, cocktail_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ???
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cloak_state, start_led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cloak_state, start_led_1_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

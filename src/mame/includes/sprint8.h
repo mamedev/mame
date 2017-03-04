@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
 
@@ -16,8 +17,7 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_pos_h_ram(*this, "pos_h_ram"),
 		m_pos_v_ram(*this, "pos_v_ram"),
-		m_pos_d_ram(*this, "pos_d_ram"),
-		m_team(*this, "team") { }
+		m_pos_d_ram(*this, "pos_d_ram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -29,13 +29,14 @@ public:
 	required_shared_ptr<uint8_t> m_pos_h_ram;
 	required_shared_ptr<uint8_t> m_pos_v_ram;
 	required_shared_ptr<uint8_t> m_pos_d_ram;
-	required_shared_ptr<uint8_t> m_team;
 
 	int m_steer_dir[8];
 	int m_steer_flag[8];
 	int m_collision_reset;
 	int m_collision_index;
 	uint8_t m_dial[8];
+	int m_team;
+
 	tilemap_t* m_tilemap1;
 	tilemap_t* m_tilemap2;
 	bitmap_ind16 m_helper1;
@@ -45,12 +46,9 @@ public:
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(lockout_w);
-	DECLARE_WRITE8_MEMBER(int_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(int_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(team_w);
 	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(crash_w);
-	DECLARE_WRITE8_MEMBER(screech_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(motor_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -70,4 +68,5 @@ public:
 };
 
 /*----------- defined in audio/sprint8.c -----------*/
+MACHINE_CONFIG_EXTERN( sprint8_audio );
 DISCRETE_SOUND_EXTERN( sprint8 );

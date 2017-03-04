@@ -17,6 +17,7 @@
 #pragma once
 
 #include "peribox.h"
+#include "machine/74259.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 
@@ -48,8 +49,15 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+	DECLARE_WRITE_LINE_MEMBER(dskpgena_w);
+	DECLARE_WRITE_LINE_MEMBER(kaclk_w);
+	DECLARE_WRITE_LINE_MEMBER(waiten_w);
+	DECLARE_WRITE_LINE_MEMBER(hlt_w);
+	DECLARE_WRITE_LINE_MEMBER(dsel_w);
+	DECLARE_WRITE_LINE_MEMBER(sidsel_w);
 
 	// For debugger access
 	void debug_read(offs_t offset, uint8_t* value);
@@ -69,8 +77,8 @@ private:
 	// Holds the status of the DRQ and IRQ lines.
 	int  m_DRQ, m_IRQ;
 
-	// Needed for triggering the motor monoflop
-	uint8_t   m_lastval;
+	// Latched CRU outputs
+	required_device<ls259_device> m_crulatch;
 
 	// Signal DVENA. When true, makes some drive turning.
 	int  m_DVENA;

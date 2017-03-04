@@ -15,6 +15,7 @@
 
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"
+#include "machine/74259.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,6 +28,7 @@ class wozfdc_device:
 public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -40,7 +42,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void control(int offset);
-	void phase(int ph, bool on);
+	DECLARE_WRITE8_MEMBER(set_phase);
 	uint64_t time_to_cycles(const attotime &tm);
 	attotime cycles_to_time(uint64_t cycles);
 	void a3_update_drive_sel();
@@ -55,6 +57,8 @@ protected:
 	floppy_connector *floppy0, *floppy1, *floppy2, *floppy3;
 	floppy_image_device *floppy;
 
+	required_device<addressable_latch_device> m_phaselatch;
+
 	uint64_t cycles;
 	uint8_t data_reg, address;
 	attotime write_start_time;
@@ -66,7 +70,6 @@ protected:
 	uint8_t last_6502_write;
 	bool mode_write, mode_load;
 	int active;
-	uint8_t phases;
 	emu_timer *timer, *delay_timer;
 	bool external_drive_select;
 	bool external_io_select;

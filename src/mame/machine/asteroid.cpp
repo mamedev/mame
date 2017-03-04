@@ -105,16 +105,14 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 }
 
 
-WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
+WRITE_LINE_MEMBER(asteroid_state::start1_led_w)
 {
-	int bank = BIT(data, 7);
-	m_ram1->set_entry(bank);
-	m_ram2->set_entry(bank);
+	output().set_led_value(0, state ? 0 : 1);
 }
 
-WRITE8_MEMBER(asteroid_state::astdelux_led_w)
+WRITE_LINE_MEMBER(asteroid_state::start2_led_w)
 {
-	output().set_led_value(offset, (data & 0x80) ? 0 : 1);
+	output().set_led_value(1, state ? 0 : 1);
 }
 
 void asteroid_state::machine_start()

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/namco.h"
 #include "sound/discrete.h"
@@ -49,6 +50,7 @@ public:
 		m_sound_z80(*this, "soundz80bl"),
 		m_soundlatch(*this, "soundlatch"),
 		m_namco_sound(*this, "namco"),
+		m_latch(*this, "latch"),
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
@@ -63,6 +65,7 @@ public:
 	optional_device<cpu_device> m_sound_z80;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<namco_device> m_namco_sound;
+	required_device<ls259_device> m_latch;
 	uint8_t m_steer_last;
 	uint8_t m_steer_delta;
 	int16_t m_steer_accum;
@@ -85,12 +88,15 @@ public:
 	tilemap_t *m_tx_tilemap;
 	int m_chacl;
 	uint16_t m_scroll;
-	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	DECLARE_READ16_MEMBER(polepos2_ic25_r);
 	DECLARE_READ8_MEMBER(polepos_adc_r);
 	DECLARE_READ8_MEMBER(polepos_ready_r);
-	DECLARE_WRITE8_MEMBER(polepos_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(iosel_w);
+	DECLARE_WRITE_LINE_MEMBER(clson_w);
+	DECLARE_WRITE_LINE_MEMBER(gasel_w);
+	DECLARE_WRITE_LINE_MEMBER(sb0_w);
+	DECLARE_WRITE_LINE_MEMBER(chacl_w);
 	DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
 	DECLARE_READ16_MEMBER(polepos_sprite16_r);
 	DECLARE_WRITE16_MEMBER(polepos_sprite16_w);

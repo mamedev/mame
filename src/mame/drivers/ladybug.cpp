@@ -64,6 +64,7 @@ TODO:
 #include "includes/ladybug.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
@@ -78,7 +79,7 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("videolatch", ls259_device, write_d0)
 	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76489_device, write)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_SHARE("videoram")
@@ -534,6 +535,9 @@ static MACHINE_CONFIG_START( ladybug )
 	MCFG_PALETTE_ADD("palette", 4*8+4*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
+
+	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ladybug_state, flipscreen_w)) // no other outputs used
 
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
 

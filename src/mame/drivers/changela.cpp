@@ -14,6 +14,7 @@ Tomasz Slanina
 #include "includes/changela.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -132,24 +133,29 @@ READ8_MEMBER(changela_state::changela_2d_r)
 	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
 }
 
-WRITE8_MEMBER(changela_state::mcu_pc_0_w)
+WRITE_LINE_MEMBER(changela_state::mcu_pc_0_w)
 {
-	m_mcu->pc_w(space, 0, 0xfe | (data & 0x01));
+	m_mcu->pc_w(machine().dummy_space(), 0, 0xfe | state);
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_0)
+WRITE_LINE_MEMBER(changela_state::collision_reset_0_w)
 {
-	m_collision_reset = data & 0x01;
+	m_collision_reset = state;
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_1)
+WRITE_LINE_MEMBER(changela_state::collision_reset_1_w)
 {
-	m_tree_collision_reset = data & 0x01;
+	m_tree_collision_reset = state;
 }
 
-WRITE8_MEMBER(changela_state::changela_coin_counter_w)
+WRITE_LINE_MEMBER(changela_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(changela_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -172,14 +178,11 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0xd010, 0xd011) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 
 	/* LS259 - U44 */
-	AM_RANGE(0xd020, 0xd020) AM_WRITE(changela_collision_reset_0)
-	AM_RANGE(0xd021, 0xd022) AM_WRITE(changela_coin_counter_w)
-//AM_RANGE(0xd023, 0xd023) AM_WRITENOP
+	AM_RANGE(0xd020, 0xd027) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 
 	/* LS139 - U24 */
-	AM_RANGE(0xd024, 0xd024) AM_READWRITE(changela_24_r, mcu_pc_0_w)
-	AM_RANGE(0xd025, 0xd025) AM_READWRITE(changela_25_r, changela_collision_reset_1)
-	AM_RANGE(0xd026, 0xd026) AM_WRITENOP
+	AM_RANGE(0xd024, 0xd024) AM_READ(changela_24_r)
+	AM_RANGE(0xd025, 0xd025) AM_READ(changela_25_r)
 	AM_RANGE(0xd028, 0xd028) AM_READ(mcu_r)
 	AM_RANGE(0xd02c, 0xd02c) AM_READ(changela_2c_r)
 	AM_RANGE(0xd02d, 0xd02d) AM_READ(changela_2d_r)
@@ -418,6 +421,13 @@ static MACHINE_CONFIG_START( changela )
 	MCFG_M68705_PORTA_W_CB(WRITE8(changela_state, changela_68705_port_a_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(changela_state, changela_68705_port_c_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(changela_state, collision_reset_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(changela_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(changela_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(changela_state, mcu_pc_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(changela_state, collision_reset_1_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

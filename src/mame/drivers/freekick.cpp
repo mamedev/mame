@@ -45,6 +45,7 @@ TODO:
 #include "includes/freekick.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -58,27 +59,38 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(freekick_state::flipscreen_xy_w)
+WRITE_LINE_MEMBER(freekick_state::flipscreen_x_w)
 {
-	/* flip Y/X could be the other way round... */
-	if (offset)
-		flip_screen_y_set(~data & 1);
-	else
-		flip_screen_x_set(~data & 1);
+	flip_screen_x_set(!state);
 }
 
-WRITE8_MEMBER(freekick_state::flipscreen_w)
+WRITE_LINE_MEMBER(freekick_state::flipscreen_y_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_y_set(!state);
+}
+
+WRITE_LINE_MEMBER(freekick_state::flipscreen_w)
+{
+	flip_screen_set(!state);
 }
 
 
-WRITE8_MEMBER(freekick_state::coin_w)
+WRITE_LINE_MEMBER(freekick_state::coin1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(freekick_state::spinner_select_w)
+WRITE_LINE_MEMBER(freekick_state::coin2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(freekick_state::spinner_select_w)
+{
+	m_spinner = state;
+}
+
+WRITE8_MEMBER(freekick_state::gigas_spinner_select_w)
 {
 	m_spinner = data & 1;
 }
@@ -95,9 +107,9 @@ WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)
 		m_bank1d->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(freekick_state::nmi_enable_w)
+WRITE_LINE_MEMBER(freekick_state::nmi_enable_w)
 {
-	m_nmi_en = data & 1;
+	m_nmi_en = state;
 }
 
 INTERRUPT_GEN_MEMBER(freekick_state::freekick_irqgen)
@@ -184,10 +196,8 @@ static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITENOP
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
+	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITENOP //bankswitch ?
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
@@ -205,9 +215,7 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(flipscreen_xy_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITE(pbillrd_bankswitch_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
@@ -229,13 +237,11 @@ static ADDRESS_MAP_START( freekick_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("spriteram")   // sprites
 	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
 	AM_RANGE(0xf802, 0xf802) AM_READNOP //MUST return bit 0 = 0, otherwise game resets
 	AM_RANGE(0xf803, 0xf803) AM_READ(spinner_r)
-	AM_RANGE(0xf802, 0xf803) AM_WRITE(coin_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(spinner_select_w)
+	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -248,10 +254,8 @@ static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITENOP
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
+	AM_RANGE(0xe000, 0xe007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("IN1")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1") AM_WRITENOP //bankswitch ?
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
@@ -263,19 +267,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( omega_io_map, AS_IO, 8, freekick_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_io_map, AS_IO, 8, freekick_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8, freekick_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 	AM_RANGE(0x02, 0x02) AM_READ(oigas_2_r)
 	AM_RANGE(0x03, 0x03) AM_READ(oigas_3_r)
@@ -682,7 +686,6 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 {
 	m_romaddr = 0;
 	m_spinner = 0;
-	m_nmi_en = 0;
 	m_ff_data = 0;
 
 	machine().bookkeeping().coin_counter_w(0, 0);
@@ -722,6 +725,13 @@ static MACHINE_CONFIG_START( omega )
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 3M
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(freekick_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(freekick_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(freekick_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
@@ -755,6 +765,11 @@ static MACHINE_CONFIG_START( base )
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(freekick_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(freekick_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(freekick_state, nmi_enable_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
@@ -781,8 +796,11 @@ static MACHINE_CONFIG_START( base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbillrd, base )
+	MCFG_DEVICE_MODIFY("outlatch") // 10K
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
+	/* flip Y/X could be the other way round... */
 
-	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
@@ -801,6 +819,10 @@ static MACHINE_CONFIG_DERIVED( freekick, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(freekick_map)
 	MCFG_CPU_IO_MAP(freekick_io_map)
+
+	MCFG_DEVICE_MODIFY("outlatch") // 5C
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(freekick_state, spinner_select_w))
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
@@ -828,6 +850,10 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_CPU_IO_MAP(gigas_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
+
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
@@ -845,6 +871,10 @@ static MACHINE_CONFIG_DERIVED( gigasm, base )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)

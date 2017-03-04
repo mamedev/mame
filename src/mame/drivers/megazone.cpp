@@ -15,6 +15,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
@@ -75,21 +76,24 @@ WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_coin_counter_w)
+WRITE_LINE_MEMBER(megazone_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(1 - offset, data);        /* 1-offset, because coin counters are in reversed order */
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(megazone_state::irq_mask_w)
+WRITE_LINE_MEMBER(megazone_state::coin_counter_2_w)
 {
-	m_irq_mask = data & 1;
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(megazone_state::irq_mask_w)
+{
+	m_irq_mask = state;
 }
 
 
 static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_SHARE("scrolly")
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_SHARE("scrollx")
@@ -224,7 +228,6 @@ void megazone_state::machine_start()
 
 void megazone_state::machine_reset()
 {
-	m_flipscreen = 0;
 	m_i8039_status = 0;
 }
 
@@ -254,6 +257,12 @@ static MACHINE_CONFIG_START( megazone )
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(megazone_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 13A
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(megazone_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(megazone_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(megazone_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(megazone_state, irq_mask_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

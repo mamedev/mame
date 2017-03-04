@@ -74,10 +74,10 @@ public:
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_irq_mask;
 
-	void common_latch_w(uint32_t offset);
-	DECLARE_WRITE8_MEMBER(superpac_latch_w);
-	DECLARE_WRITE8_MEMBER(phozon_latch_w);
-	DECLARE_WRITE8_MEMBER(mappy_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(int_on_w);
+	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);
+	DECLARE_WRITE_LINE_MEMBER(int_on_3_w);
+	DECLARE_WRITE_LINE_MEMBER(mappy_flip_w);
 	DECLARE_WRITE8_MEMBER(superpac_videoram_w);
 	DECLARE_WRITE8_MEMBER(mappy_videoram_w);
 	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
@@ -90,13 +90,10 @@ public:
 	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
 	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
 	DECLARE_MACHINE_START(mappy);
-	DECLARE_MACHINE_RESET(superpac);
 	DECLARE_VIDEO_START(superpac);
 	DECLARE_PALETTE_INIT(superpac);
-	DECLARE_MACHINE_RESET(phozon);
 	DECLARE_VIDEO_START(phozon);
 	DECLARE_PALETTE_INIT(phozon);
-	DECLARE_MACHINE_RESET(mappy);
 	DECLARE_VIDEO_START(mappy);
 	DECLARE_PALETTE_INIT(mappy);
 	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

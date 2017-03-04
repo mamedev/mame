@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
 
@@ -32,14 +33,16 @@ public:
 		m_discrete(*this, "discrete"),
 		m_bg_tilemap(nullptr),
 		m_flip_screen(0),
-		m_misc_flags(0),
+		m_latch(*this, "latch"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(orbit_misc_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(heat_rst_led_w);
+	DECLARE_WRITE_LINE_MEMBER(hyper_led_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -69,10 +72,8 @@ protected:
 	tilemap_t  *m_bg_tilemap;
 	int        m_flip_screen;
 
-	/* misc */
-	uint8_t      m_misc_flags;
-
 	/* devices */
+	required_device<f9334_device> m_latch;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

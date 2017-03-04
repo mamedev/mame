@@ -69,28 +69,33 @@ MACHINE_CONFIG_MEMBER( cclimber_audio_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-WRITE8_MEMBER( cclimber_audio_device::sample_select_w )
+WRITE8_MEMBER(cclimber_audio_device::sample_select_w)
 {
 	m_sample_num = data;
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_rate_w )
+WRITE8_MEMBER(cclimber_audio_device::sample_rate_w)
 {
 	/* calculate the sampling frequency */
 	m_sample_freq = SND_CLOCK / 4 / (256 - data);
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_volume_w )
+WRITE8_MEMBER(cclimber_audio_device::sample_volume_w)
 {
 	m_sample_volume = data & 0x1f;    /* range 0-31 */
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_trigger_w )
+WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger_w)
 {
-	if (data == 0)
+	if (state == 0)
 		return;
 
 	play_sample(32 * m_sample_num,m_sample_freq,m_sample_volume);
+}
+
+WRITE8_MEMBER(cclimber_audio_device::sample_trigger_w)
+{
+	sample_trigger_w(data != 0);
 }
 
 

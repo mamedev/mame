@@ -54,6 +54,7 @@ Games by Nihon Game/Culture Brain:
 #include "includes/shangkid.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -63,31 +64,21 @@ Games by Nihon Game/Culture Brain:
 
 /***************************************************************************************/
 
-WRITE8_MEMBER(shangkid_state::maincpu_bank_w)
+WRITE_LINE_MEMBER(shangkid_state::cpu_reset_w)
 {
-	membank("bank1")->set_entry(data & 1);
-}
-
-WRITE8_MEMBER(shangkid_state::bbx_enable_w)
-{
-	m_bbx->set_input_line(INPUT_LINE_HALT, data?0:1 );
-}
-
-WRITE8_MEMBER(shangkid_state::cpu_reset_w)
-{
-	if( data == 0 )
+	if (!state)
 	{
-		m_bbx->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		//m_bbx->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
-	else if( data == 1 )
+	else
 	{
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
-WRITE8_MEMBER(shangkid_state::sound_enable_w)
+WRITE_LINE_MEMBER(shangkid_state::sound_enable_w)
 {
-	m_bbx_sound_enable = data;
+	m_bbx_sound_enable = state;
 }
 
 WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
@@ -150,14 +141,10 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 
 MACHINE_RESET_MEMBER(shangkid_state,chinhero)
 {
-	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
 }
 
 MACHINE_RESET_MEMBER(shangkid_state,shangkid)
 {
-	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
-
-	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 }
 
@@ -244,12 +231,7 @@ GFXDECODE_END
 static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -264,13 +246,7 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(maincpu_bank_w)
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -286,12 +262,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chinhero_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -304,13 +275,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(maincpu_bank_w)
+	AM_RANGE(0xb000, 0xb007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -365,6 +330,14 @@ static MACHINE_CONFIG_START( chinhero )
 	MCFG_CPU_PROGRAM_MAP(chinhero_sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("bbx", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(shangkid_state, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP)        /* main CPU interrupt-related */
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)        /* BBX interrupt-related */
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(shangkid_state, cpu_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)        /* coin counter */
+
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,chinhero)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -408,6 +381,9 @@ static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(shangkid_sound_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 

@@ -91,22 +91,16 @@ WRITE8_MEMBER(tsamurai_state::bgcolor_w)
 	m_bgcolor = data;
 }
 
-WRITE8_MEMBER(tsamurai_state::textbank1_w)
+WRITE_LINE_MEMBER(tsamurai_state::textbank1_w)
 {
-	if( m_textbank1!=data )
-	{
-		m_textbank1 = data;
-		m_foreground ->mark_all_dirty();
-	}
+	m_textbank1 = state;
+	m_foreground->mark_all_dirty();
 }
 
-WRITE8_MEMBER(tsamurai_state::m660_textbank2_w)
+WRITE_LINE_MEMBER(tsamurai_state::textbank2_w)
 {
-	if( m_textbank2!=data )
-	{
-		m_textbank2 = data;
-		m_foreground ->mark_all_dirty();
-	}
+	m_textbank2 = state;
+	m_foreground->mark_all_dirty();
 }
 
 WRITE8_MEMBER(tsamurai_state::bg_videoram_w)

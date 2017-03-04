@@ -203,42 +203,52 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 
 
 /* Layers Palettes (High Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palbank_w)
+WRITE_LINE_MEMBER(dynax_state::blit_palbank_w)
 {
-	m_blit_palbank = data;
-	LOG(("PB=%02X ", data));
+	m_blit_palbank = state;
+	LOG(("PB=%d ", state));
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_palbank_w)
+WRITE_LINE_MEMBER(dynax_state::blit2_palbank_w)
 {
-	m_blit2_palbank = data;
-	LOG(("PB'=%02X ", data));
+	m_blit2_palbank = state;
+	LOG(("PB'=%d ", state));
+}
+
+WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
+{
+	m_palbank = data & 0x0f;
+	m_blit_palbank = data; // ???
 }
 
 
 /* Which half of the layers to write to (interleaved games only) */
-WRITE8_MEMBER(dynax_state::hanamai_layer_half_w)
+WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 {
-	m_hanamai_layer_half = (~data) & 1;
-	LOG(("H=%02X ", data));
+	m_hanamai_layer_half = !state;
+	LOG(("H=%d ", state));
 }
 
 
 /* Write to both halves of the layers (interleaved games only) */
-WRITE8_MEMBER(dynax_state::hnoridur_layer_half2_w)
+WRITE_LINE_MEMBER(dynax_state::layer_half2_w)
 {
-	m_hnoridur_layer_half2 = (~data) & 1;
-	LOG(("H2=%02X ", data));
+	m_hnoridur_layer_half2 = !state;
+	LOG(("H2=%d ", state));
 }
 
-WRITE8_MEMBER(dynax_state::mjdialq2_blit_dest_w)
+WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest0_w)
 {
-	int mask = (2 >> offset);   /* 1 or 2 */
+	m_blit_dest &= ~1;
+	if (!state)
+		m_blit_dest |= 1;
+}
 
-	m_blit_dest &= ~mask;
-
-	if (~data & 1)
-		m_blit_dest |= mask;
+WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest1_w)
+{
+	m_blit_dest &= ~2;
+	if (!state)
+		m_blit_dest |= 2;
 }
 
 
@@ -256,22 +266,25 @@ WRITE8_MEMBER(dynax_state::jantouki_layer_enable_w)
 	m_layer_enable |= 1;
 }
 
-WRITE8_MEMBER(dynax_state::mjdialq2_layer_enable_w)
+WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer0_enable_w)
 {
-	int mask = (2 >> offset);   /* 1 or 2 */
+	m_layer_enable &= ~1;
+	if (!state)
+		m_layer_enable |= 1;
+}
 
-	m_layer_enable &= ~mask;
-	if (~data & 1)
-		m_layer_enable |= mask;
+WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer1_enable_w)
+{
+	m_layer_enable &= ~2;
+	if (!state)
+		m_layer_enable |= 2;
 }
 
 
-WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
+WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
 {
-	m_flipscreen = data & 1;
-	if (data & ~1)
-		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", space.device().safe_pc(), data);
-	LOG(("F=%02X ", data));
+	m_flipscreen = state;
+	LOG(("F=%d ", state));
 }
 
 
@@ -747,12 +760,12 @@ WRITE8_MEMBER(dynax_state::cdracula_blitter_rev2_w)
 
 			if (data & 0xf0)
 			{
-				hanamai_layer_half_w(space, offset, 0, mem_mask);
+				layer_half_w(0);
 				dynax_blit_dest_w(space, offset, data >> 4, mem_mask);
 			}
 			if (data & 0x0f)
 			{
-				hanamai_layer_half_w(space, offset, 1, mem_mask);
+				layer_half_w(1);
 				dynax_blit_dest_w(space, offset, data & 0x0f, mem_mask);
 			}
 			break;

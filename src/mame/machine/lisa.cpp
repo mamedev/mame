@@ -1607,61 +1607,67 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 
 void lisa_state::cpu_board_control_access(offs_t offset)
 {
-	switch ((offset & 0x03ff) << 1)
-	{
-	case 0x0002:    /* Set DIAG1 Latch */
-	case 0x0000:    /* Reset DIAG1 Latch */
-		break;
-	case 0x0006:    /* Set Diag2 Latch */
-		m_diag2 = 1;
-		break;
-	case 0x0004:    /* ReSet Diag2 Latch */
-		m_diag2 = 0;
-		break;
-	case 0x000A:    /* SEG1 Context Selection bit SET */
-		/*logerror("seg bit 0 set\n");*/
+	m_latch->write_bit(offset >> 1, offset & 1);
+}
+
+WRITE_LINE_MEMBER(lisa_state::diag1_w)
+{
+	// Set/reset DIAG1
+}
+
+WRITE_LINE_MEMBER(lisa_state::diag2_w)
+{
+	// Set/reset DIAG2
+	m_diag2 = state;
+}
+
+WRITE_LINE_MEMBER(lisa_state::seg1_w)
+{
+	// Set/reset SEG1 Context Selection bit
+	//logerror("seg bit 0 %s\n", state ? "set" : "clear");
+	if (state)
 		m_seg |= 1;
-		break;
-	case 0x0008:    /* SEG1 Context Selection bit RESET */
-		/*logerror("seg bit 0 clear\n");*/
+	else
 		m_seg &= ~1;
-		break;
-	case 0x000E:    /* SEG2 Context Selection bit SET */
-		/*logerror("seg bit 1 set\n");*/
+}
+
+WRITE_LINE_MEMBER(lisa_state::seg2_w)
+{
+	// Set/reset SEG2 Context Selection bit
+	//logerror("seg bit 1 %s\n", state ? "set" : "clear");
+	if (state)
 		m_seg |= 2;
-		break;
-	case 0x000C:    /* SEG2 Context Selection bit RESET */
-		/*logerror("seg bit 1 clear\n");*/
+	else
 		m_seg &= ~2;
-		break;
-	case 0x0010:    /* SETUP register SET */
-		logerror("setup SET %s\n", machine().describe_context());
-		m_setup = 1;
-		break;
-	case 0x0012:    /* SETUP register RESET */
-		logerror("setup UNSET %s\n", machine().describe_context());
-		m_setup = 0;
-		break;
-	case 0x001A:    /* Enable Vertical Retrace Interrupt */
-		logerror("enable retrace %s\n", machine().describe_context());
-		m_VTMSK = 1;
-		break;
-	case 0x0018:    /* Disable Vertical Retrace Interrupt */
-		logerror("disable retrace %s\n", machine().describe_context());
-		m_VTMSK = 0;
+}
+
+WRITE_LINE_MEMBER(lisa_state::setup_w)
+{
+	// Reset/set SETUP register
+	logerror("setup %s %s\n", state ? "UNSET" : "SET", machine().describe_context());
+	m_setup = !state;
+}
+
+WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
+{
+	// Enable/disable Vertical Retrace Interrupt
+	logerror("%s retrace %s\n", state ? "enable" : "disable", machine().describe_context());
+	m_VTMSK = state;
+	if (!state)
 		set_VTIR(2);
-		break;
-	case 0x0016:    /* Enable Soft Error Detect. */
-	case 0x0014:    /* Disable Soft Error Detect. */
-		break;
-	case 0x001E:    /* Enable Hard Error Detect */
-		m_test_parity = 1;
-		break;
-	case 0x001C:    /* Disable Hard Error Detect */
-		m_test_parity = 0;
+}
+
+WRITE_LINE_MEMBER(lisa_state::sfmsk_w)
+{
+	// Enable/disable Soft Error Detect
+}
+
+WRITE_LINE_MEMBER(lisa_state::hdmsk_w)
+{
+	// Enable/disable Hard Error Detect
+	m_test_parity = state;
+	if (!state)
 		set_parity_error_pending(0);
-		break;
-	}
 }
 
 READ16_MEMBER(lisa_state::lisa_IO_r)

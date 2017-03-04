@@ -225,6 +225,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "machine/74259.h"
 #include "machine/namco06.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
@@ -289,51 +290,34 @@ READ8_MEMBER(polepos_state::polepos_ready_r)
 }
 
 
-WRITE8_MEMBER(polepos_state::polepos_latch_w)
+WRITE_LINE_MEMBER(polepos_state::iosel_w)
 {
-	int bit = data & 1;
-
-	switch (offset)
-	{
-		case 0x00:  /* IRQON */
-			m_main_irq_mask = bit;
-			if (!bit)
-				m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
-
-		case 0x01:  /* IOSEL */
 //          polepos_mcu_enable_w(offset,data);
-			break;
+}
 
-		case 0x02:  /* CLSON */
-			m_namco_sound->polepos_sound_enable(bit);
-			if (!bit)
-			{
-				machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_lsb_w(space, 0, 0);
-				machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_msb_w(space, 0, 0);
-			}
-			break;
-
-		case 0x03:  /* GASEL */
-			m_adc_input = bit;
-			break;
-
-		case 0x04:  /* RESB */
-			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		case 0x05:  /* RESA */
-			m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		case 0x06:  /* SB0 */
-			m_auto_start_mask = !bit;
-			break;
-
-		case 0x07:  /* CHACL */
-			polepos_chacl_w(space,offset,data);
-			break;
+WRITE_LINE_MEMBER(polepos_state::clson_w)
+{
+	m_namco_sound->polepos_sound_enable(state);
+	if (!state)
+	{
+		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_lsb_w(machine().dummy_space(), 0, 0);
+		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_msb_w(machine().dummy_space(), 0, 0);
 	}
+}
+
+WRITE_LINE_MEMBER(polepos_state::gasel_w)
+{
+	m_adc_input = state;
+}
+
+WRITE_LINE_MEMBER(polepos_state::sb0_w)
+{
+	m_auto_start_mask = !state;
+}
+
+WRITE_LINE_MEMBER(polepos_state::chacl_w)
+{
+	polepos_chacl_w(machine().dummy_space(), 0, state);
 }
 
 WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
@@ -414,7 +398,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 {
 	int scanline = param;
 
-	if (((scanline == 64) || (scanline == 192)) && m_main_irq_mask) // 64V
+	if (((scanline == 64) || (scanline == 192)) && m_latch->q0_r()) // 64V
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
@@ -427,13 +411,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 
 MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-
-	/* Reset all latches */
-	for (i = 0; i < 8; i++)
-		polepos_latch_w(space, i, 0);
-
 	/* set the interrupt vectors (this shouldn't be needed) */
 	m_subcpu->set_input_line_vector(0, Z8000_NVI);
 	m_subcpu2->set_input_line_vector(0, Z8000_NVI);
@@ -459,7 +436,7 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_device, data_r, data_w)
 	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_device, ctrl_r, ctrl_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ(polepos_ready_r)                 /* READY */
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE(polepos_latch_w)                /* misc latches */
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_DEVWRITE("latch", ls259_device, write_d0)
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x0cff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_sound_device, polepos_engine_sound_lsb_w)    /* Car Sound ( Lower Nibble ) */
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_sound_device, polepos_engine_sound_msb_w)    /* Car Sound ( Upper Nibble ) */
@@ -920,6 +897,16 @@ static MACHINE_CONFIG_START( polepos )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("latch", LS259, 0) // at 8E on polepos
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(polepos_state, sb0_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(polepos_state, chacl_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
@@ -1017,6 +1004,16 @@ static MACHINE_CONFIG_START( topracern )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(polepos_state, sb0_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(polepos_state, chacl_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

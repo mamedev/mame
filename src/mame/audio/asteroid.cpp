@@ -48,28 +48,6 @@ static const discrete_555_cc_desc asteroid_thump_555cc =
 	0.8     // VBE 2N3906 (Si)
 };
 
-#define ASTEROID_SAUCER_SND_EN      NODE_01
-#define ASTEROID_SAUCER_FIRE_EN     NODE_02
-#define ASTEROID_SAUCER_SEL         NODE_03
-#define ASTEROID_THRUST_EN          NODE_04
-#define ASTEROID_SHIP_FIRE_EN       NODE_05
-#define ASTEROID_LIFE_EN            NODE_06
-#define ASTEROID_NOISE_RESET        NODE_07
-
-#define ASTEROID_THUMP_EN           NODE_08
-#define ASTEROID_THUMP_DATA         NODE_09
-#define ASTEROID_EXPLODE_DATA       NODE_10
-#define ASTEROID_EXPLODE_PITCH      NODE_11
-
-#define ASTEROID_NOISE              NODE_20
-#define ASTEROID_THUMP_SND          NODE_21
-#define ASTEROID_SAUCER_SND         NODE_22
-#define ASTEROID_LIFE_SND           NODE_23
-#define ASTEROID_SAUCER_FIRE_SND    NODE_24
-#define ASTEROID_SHIP_FIRE_SND      NODE_25
-#define ASTEROID_EXPLODE_SND        NODE_26
-#define ASTEROID_THRUST_SND         NODE_27
-
 DISCRETE_SOUND_START(asteroid)
 	/************************************************/
 	/* Asteroid Effects Relataive Gain Table        */
@@ -306,17 +284,6 @@ WRITE8_MEMBER(asteroid_state::asteroid_thump_w)
 {
 	m_discrete->write(space, ASTEROID_THUMP_EN,   data & 0x10);
 	m_discrete->write(space, ASTEROID_THUMP_DATA, data & 0x0f);
-}
-
-WRITE8_MEMBER(asteroid_state::asteroid_sounds_w)
-{
-	m_discrete->write(space, NODE_RELATIVE(ASTEROID_SAUCER_SND_EN, offset), data & 0x80);
-}
-
-WRITE8_MEMBER(asteroid_state::astdelux_sounds_w)
-{
-	/* Only ever activates the thrusters in Astdelux */
-	m_discrete->write(space, ASTEROID_THRUST_EN, data & 0x80);
 }
 
 WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)

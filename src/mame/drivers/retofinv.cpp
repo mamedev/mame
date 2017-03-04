@@ -107,6 +107,7 @@ Notes:
 #include "includes/retofinv.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -118,21 +119,6 @@ void retofinv_state::machine_start()
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_cpu2_m6000));
-}
-
-WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
-{
-	m_subcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE8_MEMBER(retofinv_state::mcu_reset_w)
-{
-	m_68705->reset_w(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
@@ -151,16 +137,16 @@ WRITE8_MEMBER(retofinv_state::soundcommand_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::irq0_ack_w)
+WRITE_LINE_MEMBER(retofinv_state::irq0_ack_w)
 {
-	m_main_irq_mask = data & 1;
+	m_main_irq_mask = state;
 	if (!m_main_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::irq1_ack_w)
+WRITE_LINE_MEMBER(retofinv_state::irq1_ack_w)
 {
-	m_sub_irq_mask = data & 1;
+	m_sub_irq_mask = state;
 	if (!m_sub_irq_mask)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
@@ -170,9 +156,9 @@ WRITE8_MEMBER(retofinv_state::coincounter_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE8_MEMBER(retofinv_state::coinlockout_w)
+WRITE_LINE_MEMBER(retofinv_state::coinlockout_w)
 {
-	machine().bookkeeping().coin_lockout_w(0,~data & 1);
+	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
 READ8_MEMBER(retofinv_state::mcu_status_r)
@@ -205,11 +191,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(irq0_ack_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(coinlockout_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(cpu2_reset_w)
-//  AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)   // presumably (meaning memory map is shared with cpu 1)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
+	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
@@ -218,7 +200,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_IMPORT_FROM(bootleg_map)
 	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(mcu_reset_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("68705", taito68705_mcu_device, data_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("68705", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
@@ -228,7 +209,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
+	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
@@ -447,6 +428,14 @@ static MACHINE_CONFIG_START( retofinv )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC72 - probably shared between CPUs
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(retofinv_state, irq0_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(retofinv_state, coinlockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("68705", taito68705_mcu_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(retofinv_state, irq1_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -485,6 +474,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinvb )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END

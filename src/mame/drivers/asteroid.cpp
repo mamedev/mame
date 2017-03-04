@@ -189,6 +189,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "includes/asteroid.h"
 #include "audio/llander.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "machine/atari_vg.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
@@ -209,9 +210,19 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
  *
  *************************************/
 
-WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_left_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_center_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
+{
+	machine().bookkeeping().coin_counter_w(2, state);
 }
 
 
@@ -253,7 +264,7 @@ static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(asteroid_thump_w)
-	AM_RANGE(0x3c00, 0x3c05) AM_WRITE(asteroid_sounds_w)
+	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("audiolatch", ls259_device, write_d7)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM                     /* vector rom */
@@ -276,10 +287,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_WRITE(astdelux_sounds_w)
-	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
-	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
+	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("audiolatch", ls259_device, write_d7)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM                     /* vector rom */
@@ -651,6 +659,14 @@ static MACHINE_CONFIG_START( asteroid )
 	MCFG_CPU_PROGRAM_MAP(asteroid_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
 
+	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -686,6 +702,17 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(astdelux_map)
 
+	MCFG_DEVICE_MODIFY("audiolatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(asteroid_state, start1_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(asteroid_state, start2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP)
+	// Q3 still activates the thrusters
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1"))
+	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(asteroid_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(asteroid_state, coin_counter_center_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(asteroid_state, coin_counter_right_w))
+
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
@@ -706,6 +733,8 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(llander_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
+
+	MCFG_DEVICE_REMOVE("audiolatch")
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)

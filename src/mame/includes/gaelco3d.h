@@ -10,6 +10,7 @@
 
 #include "sound/dmadac.h"
 #include "video/poly.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -69,6 +70,8 @@ public:
 		m_tms(*this, "tms"),
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
+		m_mainlatch(*this, "mainlatch"),
+		m_outlatch(*this, "outlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
 		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
@@ -85,6 +88,8 @@ public:
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_outlatch;
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
 	optional_ioport_array<4> m_analog;
@@ -107,35 +112,34 @@ public:
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE32_MEMBER(irq_ack32_w);
 	DECLARE_WRITE16_MEMBER(sound_data_w);
 	DECLARE_READ16_MEMBER(sound_data_r);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
-	DECLARE_WRITE16_MEMBER(analog_port_clock_w);
-	DECLARE_WRITE16_MEMBER(analog_port_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(analog_port_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(analog_port_latch_w);
 	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
 	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
 	DECLARE_WRITE8_MEMBER(tms_iack_w);
-	DECLARE_WRITE16_MEMBER(tms_reset_w);
-	DECLARE_WRITE16_MEMBER(tms_irq_w);
-	DECLARE_WRITE16_MEMBER(tms_control3_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(tms_control3_w);
 	DECLARE_WRITE16_MEMBER(tms_comm_w);
 	DECLARE_WRITE16_MEMBER(adsp_control_w);
 	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
-	DECLARE_WRITE32_MEMBER(radikalb_lamp_w);
-	DECLARE_WRITE32_MEMBER(unknown_137_w);
-	DECLARE_WRITE32_MEMBER(unknown_13a_w);
+	DECLARE_WRITE_LINE_MEMBER(radikalb_lamp_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_137_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_13a_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
 	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
 	DECLARE_READ16_MEMBER(eeprom_data_r);
-	DECLARE_READ32_MEMBER(eeprom_data32_r);
-	DECLARE_WRITE16_MEMBER(eeprom_data_w);
-	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
-	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
+	DECLARE_WRITE8_MEMBER(mainlatch_68000_w);
+	DECLARE_WRITE8_MEMBER(outlatch_68000_w);
+	DECLARE_WRITE8_MEMBER(mainlatch_68020_w);
+	DECLARE_WRITE8_MEMBER(outlatch_68020_w);
 	DECLARE_DRIVER_INIT(gaelco3d);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

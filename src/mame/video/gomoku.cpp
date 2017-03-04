@@ -86,14 +86,14 @@ WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
 	m_bgram[offset] = data;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_flipscreen_w)
+WRITE_LINE_MEMBER(gomoku_state::flipscreen_w)
 {
-	m_flipscreen = (data & 0x02) ? 0 : 1;
+	m_flipscreen = state ? 0 : 1;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
+WRITE_LINE_MEMBER(gomoku_state::bg_dispsw_w)
 {
-	m_bg_dispsw = (data & 0x02) ? 0 : 1;
+	m_bg_dispsw = state ? 0 : 1;
 }
 
 

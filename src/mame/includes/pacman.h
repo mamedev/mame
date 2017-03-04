@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "machine/watchdog.h"
 #include "sound/namco.h"
 
 /*************************************************************************
@@ -15,6 +16,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_namco_sound(*this, "namco"),
+		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_s2650_spriteram(*this, "s2650_spriteram"),
@@ -29,6 +31,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<namco_device> m_namco_sound;
+	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_spriteram2;
 	optional_shared_ptr<uint8_t> m_s2650_spriteram;
@@ -59,9 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(nmouse_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(pacman_leds_w);
-	DECLARE_WRITE8_MEMBER(pacman_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(pacman_coin_lockout_global_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_global_w);
 	DECLARE_WRITE8_MEMBER(alibaba_sound_w);
 	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
 	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
@@ -94,24 +98,24 @@ public:
 	DECLARE_WRITE8_MEMBER(mspacman_disable_decode_w);
 	DECLARE_READ8_MEMBER(mspacman_enable_decode_r_0x3ff8);
 	DECLARE_WRITE8_MEMBER(mspacman_enable_decode_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_READ8_MEMBER(mspacii_protection_r);
 	DECLARE_READ8_MEMBER(cannonbp_protection_r);
 	DECLARE_WRITE8_MEMBER(pacman_videoram_w);
 	DECLARE_WRITE8_MEMBER(pacman_colorram_w);
-	DECLARE_WRITE8_MEMBER(pacman_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(pengo_palettebank_w);
-	DECLARE_WRITE8_MEMBER(pengo_colortablebank_w);
-	DECLARE_WRITE8_MEMBER(pengo_gfxbank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(pengo_palettebank_w);
+	DECLARE_WRITE_LINE_MEMBER(pengo_colortablebank_w);
+	DECLARE_WRITE_LINE_MEMBER(pengo_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(s2650games_videoram_w);
 	DECLARE_WRITE8_MEMBER(s2650games_colorram_w);
 	DECLARE_WRITE8_MEMBER(s2650games_scroll_w);
 	DECLARE_WRITE8_MEMBER(s2650games_tilesbank_w);
 	DECLARE_WRITE8_MEMBER(jrpacman_videoram_w);
-	DECLARE_WRITE8_MEMBER(jrpacman_charbank_w);
-	DECLARE_WRITE8_MEMBER(jrpacman_spritebank_w);
+	DECLARE_WRITE_LINE_MEMBER(jrpacman_charbank_w);
+	DECLARE_WRITE_LINE_MEMBER(jrpacman_spritebank_w);
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
-	DECLARE_WRITE8_MEMBER(jrpacman_bgpriority_w);
+	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
 	DECLARE_WRITE8_MEMBER(superabc_bank_w);
 	DECLARE_DRIVER_INIT(maketrax);
 	DECLARE_DRIVER_INIT(drivfrcp);

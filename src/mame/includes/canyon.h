@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 
@@ -26,6 +27,7 @@ public:
 	canyon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_outlatch(*this, "outlatch"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
@@ -35,13 +37,16 @@ public:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
+	required_device<f9334_device> m_outlatch;
 	required_device<discrete_device> m_discrete;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(canyon_switches_r);
 	DECLARE_READ8_MEMBER(canyon_options_r);
-	DECLARE_WRITE8_MEMBER(canyon_led_w);
+	DECLARE_WRITE8_MEMBER(output_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
@@ -49,8 +54,6 @@ public:
 	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(canyon_motor_w);
 	DECLARE_WRITE8_MEMBER(canyon_explode_w);
-	DECLARE_WRITE8_MEMBER(canyon_attract_w);
-	DECLARE_WRITE8_MEMBER(canyon_whistle_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_bombs( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

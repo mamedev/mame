@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                        /* DSW #2 + Input 2P */
 	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP                                                                /* Sound muting? */
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                       /* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                   /* Coin lockout + counters */
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(alighunt_coin_w)                                                  /* Coin lockout + counters */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM */
 ADDRESS_MAP_END
@@ -272,10 +272,7 @@ static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, bang_state )
 	AM_RANGE(0x218008, 0x218009) AM_WRITENOP                                                                /* CLR INT Video */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
 	AM_RANGE(0x300002, 0x300003) AM_READNOP                                                                 /* Random number generator? */
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)                                                  /* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)                                            /* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)                                              /* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)                                              /* EEPROM chip select */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)                  /* Coin Counters & serial EEPROM */
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
 	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
 	AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)                             /* Gun 1P X */ /* CLR INT Gun */
@@ -323,6 +320,13 @@ static MACHINE_CONFIG_START( bang )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -472,7 +476,7 @@ static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")                                                            /* DSW #1 + Input 1P */
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                            /* DSW #2 + Input 2P */
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")                                                           /* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)                                                       /* Coin lockout + counters */
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(alighunt_coin_w)                                                      /* Coin lockout + counters */
 	AM_RANGE(0x500006, 0x500007) AM_WRITENOP                                                                    /* ??? */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
@@ -689,7 +693,7 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                            /* DSW #2 + Input 2P */
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                            /* COINSW + Input 3P */
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                            /* SERVICESW + Input 4P */
-	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)                                                       /* Coin counters */
+	AM_RANGE(0x500000, 0x500001) AM_SELECT(0x0038) AM_WRITE(wrally2_latch_w)                                    /* Coin counters */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
@@ -808,6 +812,12 @@ static MACHINE_CONFIG_START( touchgo )
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)         /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC6
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin3_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco2_state, coin4_counter_w))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1003,10 +1013,7 @@ static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x212000, 0x213fff) AM_RAM                                                                         /* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")                                                       /* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)                                                      /* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)                                                /* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)                                                  /* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)                                                  /* EEPROM chip select */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)                      /* Coin Counters & serial EEPROM */
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
 	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
 	AM_RANGE(0x310000, 0x31ffff) AM_READWRITE(snowboar_protection_r,snowboar_protection_w) AM_SHARE("snowboar_prot")    /* Protection */
@@ -1053,6 +1060,13 @@ static MACHINE_CONFIG_START( snowboar )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1187,9 +1201,7 @@ static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, wrally2_state )
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")                                                        /* DIPSW #1 */
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")                                                        /* Inputs 2P + COINSW */
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")                                                        /* SERVICESW */
-	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)                                                   /* Coin Counters */
-	AM_RANGE(0x400028, 0x400029) AM_WRITE(wrally2_adc_clk)                                                  /* ADCs clock-in line */
-	AM_RANGE(0x400030, 0x400031) AM_WRITE(wrally2_adc_cs)                                                   /* ADCs chip select line */
+	AM_RANGE(0x400000, 0x400001) AM_SELECT(0x0038) AM_WRITE(wrally2_latch_w)                                /* Coin counters, etc. */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                     /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
@@ -1292,6 +1304,12 @@ static MACHINE_CONFIG_START( wrally2 )
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
