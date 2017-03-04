@@ -31,7 +31,7 @@
           GND  41  42  GND
 
     TODO:
-    - According to the schematics the audio CPU ROM should be 0x2000
+    - According to the schematics the sub CPU ROM should be 0x2000
     - Verify dip switch defaults
     - Verify screen raw parameters
     - Finish driver
@@ -56,11 +56,12 @@ public:
 	popper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "subcpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ay{ {*this, "ay1"}, {*this, "ay2"} },
 		m_ram(*this, "ram"),
+		m_inputs{ {*this, "in1"}, {*this, "in0"}, {*this, "dsw2"}, {*this, "dsw1"} },
 		m_scanline_timer(nullptr),
 		m_tilemap(nullptr),
 		m_nmi_enable(0), m_vram_page(0)
@@ -75,8 +76,8 @@ public:
 	DECLARE_WRITE8_MEMBER(back_color_select_w);
 	DECLARE_WRITE8_MEMBER(vram_page_select_w);
 	DECLARE_WRITE8_MEMBER(intcycle_w);
-	DECLARE_READ8_MEMBER(audiocpu_nmi_r);
-	DECLARE_READ8_MEMBER(audiocpu_reset_r);
+	DECLARE_READ8_MEMBER(subcpu_nmi_r);
+	DECLARE_READ8_MEMBER(subcpu_reset_r);
 	template <unsigned N> DECLARE_WRITE8_MEMBER(ay_w);
 	DECLARE_READ8_MEMBER(watchdog_clear_r);
 	DECLARE_READ8_MEMBER(inputs_r);
@@ -88,11 +89,12 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
-	required_device<z80_device> m_audiocpu;
+	required_device<z80_device> m_subcpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ay8910_device> m_ay[2];
 	required_shared_ptr<uint8_t> m_ram;
+	required_ioport m_inputs[4];
 
 	emu_timer *m_scanline_timer;
 	tilemap_t *m_tilemap;
@@ -116,13 +118,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_WRITE(back_color_select_w)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITE(vram_page_select_w)
 	AM_RANGE(0xe004, 0xe007) AM_MIRROR(0x1ff8) AM_WRITE(intcycle_w)
-	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ(audiocpu_nmi_r)
+	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ(subcpu_nmi_r)
 	AM_RANGE(0xe800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03ff) AM_READ(audiocpu_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03ff) AM_READ(subcpu_reset_r)
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x03ff) AM_READ(watchdog_clear_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, popper_state )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay_w<0>)
@@ -137,49 +139,69 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 static INPUT_PORTS_START( popper )
-	PORT_START("dipsw1")
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Coin_A ))      PORT_DIPLOCATION("DIPSW1:1,2")
+	PORT_START("in0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)                  PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_COCKTAIL  PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SERVICE1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)                    PORT_8WAY
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_COCKTAIL  PORT_8WAY
+
+	PORT_START("in1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)                 PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_COCKTAIL
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_COCKTAIL  PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)                  PORT_8WAY
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)   PORT_COCKTAIL  PORT_8WAY
+
+	PORT_START("dsw1")
+	PORT_DIPNAME(0x03, 0x00, DEF_STR( Coin_A ))      PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(   0x01, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(   0x02, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 3C_1C ))
 	PORT_DIPSETTING(   0x03, DEF_STR( 1C_2C ))
-	PORT_DIPNAME(0x0c, 0x00, DEF_STR( Coin_B ))      PORT_DIPLOCATION("DIPSW1:3,4")
+	PORT_DIPNAME(0x0c, 0x00, DEF_STR( Coin_B ))      PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(   0x00, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(   0x01, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(   0x02, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(   0x03, DEF_STR( 1C_6C ))
-	PORT_DIPNAME(0x30, 0x00, DEF_STR( Lives ))       PORT_DIPLOCATION("DIPSW1:5,6")
+	PORT_DIPSETTING(   0x08, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(   0x04, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_6C ))
+	PORT_DIPNAME(0x30, 0x00, DEF_STR( Lives ))       PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(   0x00, "2")
-	PORT_DIPSETTING(   0x10, "3")
-	PORT_DIPSETTING(   0x20, "4")
+	PORT_DIPSETTING(   0x20, "3")
+	PORT_DIPSETTING(   0x10, "4")
 	PORT_DIPSETTING(   0x30, "5")
-	PORT_DIPNAME(0xc0, 0x00, DEF_STR( Bonus_Life ))  PORT_DIPLOCATION("DIPSW1:7,8")
+	PORT_DIPNAME(0xc0, 0x00, DEF_STR( Bonus_Life ))  PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(   0x00, "20,000 Points")
-	PORT_DIPSETTING(   0x40, "30,000 Points")
-	PORT_DIPSETTING(   0x80, "40,000 Points")
+	PORT_DIPSETTING(   0x80, "30,000 Points")
+	PORT_DIPSETTING(   0x40, "40,000 Points")
 	PORT_DIPSETTING(   0xc0, "50,000 Points")
 
-	PORT_START("dipsw2")
-	PORT_DIPNAME(0x01, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("DIPSW2:1")
+	PORT_START("dsw2")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "DIPSW2:2")
-	PORT_DIPNAME(0x04, 0x00, DEF_STR( Free_Play ))   PORT_DIPLOCATION("DIPSW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "DSW2:2")
+	PORT_DIPNAME(0x04, 0x00, DEF_STR( Free_Play ))   PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x04, DEF_STR( On ))
-	PORT_DIPNAME(0x08, 0x00, "Invulnerability")      PORT_DIPLOCATION("DIPSW2:4")
+	PORT_DIPNAME(0x08, 0x00, "Invulnerability")      PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x08, DEF_STR( On ))
-	PORT_DIPNAME(0x10, 0x00, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("DIPSW2:5")
+	PORT_DIPNAME(0x10, 0x00, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x10, DEF_STR( On ))
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Cabinet ))     PORT_DIPLOCATION("DIPSW2:6")
+	PORT_DIPNAME(0x20, 0x20, DEF_STR( Cabinet ))     PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(   0x00, DEF_STR( Cocktail ))
 	PORT_DIPSETTING(   0x20, DEF_STR( Upright ))
-	PORT_DIPNAME(0x40, 0x00, "Game Repeating")       PORT_DIPLOCATION("DIPSW2:7")
+	PORT_DIPNAME(0x40, 0x00, "Game Repeating")       PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x40, DEF_STR( On ))
-	PORT_DIPNAME(0x80, 0x00, DEF_STR( Pause ))       PORT_DIPLOCATION("DIPSW2:8")
+	PORT_DIPNAME(0x80, 0x00, DEF_STR( Pause ))       PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x80, DEF_STR( On ))
 INPUT_PORTS_END
@@ -191,8 +213,18 @@ INPUT_PORTS_END
 
 READ8_MEMBER( popper_state::inputs_r )
 {
-//	logerror("inputs_r: %d\n", offset);
-	return 0;
+	uint8_t data = 0;
+
+	data |= BIT(m_inputs[3]->read(), offset + 4) << 7;
+	data |= BIT(m_inputs[3]->read(), offset + 0) << 6;
+	data |= BIT(m_inputs[2]->read(), offset + 4) << 5;
+	data |= BIT(m_inputs[2]->read(), offset + 0) << 4;
+	data |= BIT(m_inputs[1]->read(), offset + 4) << 3;
+	data |= BIT(m_inputs[1]->read(), offset + 0) << 2;
+	data |= BIT(m_inputs[0]->read(), offset + 4) << 1;
+	data |= BIT(m_inputs[0]->read(), offset + 0) << 0;
+
+	return data;
 }
 
 
@@ -244,15 +276,15 @@ void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	// the maincpu gets an nmi when we enter vblank (when enabled)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_nmi_enable && y == 240) ? ASSERT_LINE : CLEAR_LINE);
 
-	// the audiocpu gets an interrupt each 16 lines
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, y & 16 ? ASSERT_LINE : CLEAR_LINE);
+	// the subcpu gets an interrupt each 16 lines
+	m_subcpu->set_input_line(INPUT_LINE_IRQ0, y & 16 ? ASSERT_LINE : CLEAR_LINE);
 
 	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
 }
 
 WRITE8_MEMBER( popper_state::crt_direction_w )
 {
-//	logerror("crt_direction_w: %02x\n", data);
+	flip_screen_set(data);
 }
 
 WRITE8_MEMBER( popper_state::back_color_select_w )
@@ -262,7 +294,6 @@ WRITE8_MEMBER( popper_state::back_color_select_w )
 
 WRITE8_MEMBER( popper_state::vram_page_select_w )
 {
-	logerror("vram_page_select_w: %02x\n", data);
 	m_vram_page = data & 1;
 }
 
@@ -322,21 +353,21 @@ TILE_GET_INFO_MEMBER( popper_state::tile_info )
 
 
 //**************************************************************************
-//  AUDIO
+//  SUBCPU
 //**************************************************************************
 
-READ8_MEMBER( popper_state::audiocpu_nmi_r )
+READ8_MEMBER( popper_state::subcpu_nmi_r )
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
 
-READ8_MEMBER( popper_state::audiocpu_reset_r )
+READ8_MEMBER( popper_state::subcpu_reset_r )
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	return 0;
 }
@@ -404,8 +435,8 @@ static MACHINE_CONFIG_START( popper, popper_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL_18_432MHz/3/2)
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -441,7 +472,7 @@ ROM_START( popper )
 	ROM_LOAD("p2", 0x2000, 0x2000, CRC(a054d9d2) SHA1(fcd86e7247b40cf07ea595a64c104b99b0e93ced))
 	ROM_LOAD("p3", 0x4000, 0x2000, CRC(6201928a) SHA1(53b571b9f2c0568f10cd974641863c2e00777b46))
 
-	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_REGION(0x2000, "subcpu", 0)
 	ROM_LOAD("p0", 0x0000, 0x1000, CRC(ef5f7c5b) SHA1(c63a3d9ef2868ad7eaacddec810d62d2e124dc15))
 
 	ROM_REGION(0x2000, "tiles", 0)
