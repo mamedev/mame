@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
@@ -31,6 +32,7 @@ public:
 	triplhnt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_latch(*this, "latch"),
 		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
@@ -44,6 +46,7 @@ public:
 		m_code_ram(*this, "code_ram") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<f9334_device> m_latch;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_device<samples_device> m_samples;
@@ -59,7 +62,6 @@ public:
 
 	uint8_t m_cmos[16];
 	uint8_t m_da_latch;
-	uint8_t m_misc_flags;
 	uint8_t m_cmos_latch;
 	uint8_t m_hit_code;
 	int m_sprite_zoom;
@@ -68,7 +70,13 @@ public:
 	emu_timer *m_hit_timer;
 	tilemap_t* m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE_LINE_MEMBER(ram_2_w);
+	DECLARE_WRITE_LINE_MEMBER(sprite_zoom_w);
+	DECLARE_WRITE_LINE_MEMBER(sprite_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
+
 	DECLARE_READ8_MEMBER(cmos_r);
 	DECLARE_READ8_MEMBER(input_port_4_r);
 	DECLARE_READ8_MEMBER(misc_r);
@@ -82,7 +90,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int code);
-	void update_misc(address_space &space, int offset);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

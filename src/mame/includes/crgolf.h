@@ -18,10 +18,6 @@ public:
 
 		m_videoram_a(*this, "vrama"),
 		m_videoram_b(*this, "vramb"),
-		m_color_select(*this, "color_select"),
-		m_screen_flip(*this, "screen_flip"),
-		m_screenb_enable(*this, "screenb_enable"),
-		m_screena_enable(*this, "screena_enable"),
 
 		m_vrambank(*this, "vrambank"),
 		m_maincpu(*this, "maincpu"),
@@ -36,10 +32,10 @@ public:
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
 
-	required_shared_ptr<uint8_t> m_color_select;
-	required_shared_ptr<uint8_t> m_screen_flip;
-	required_shared_ptr<uint8_t> m_screenb_enable;
-	required_shared_ptr<uint8_t> m_screena_enable;
+	bool m_color_select;
+	bool m_screen_flip;
+	bool m_screena_enable;
+	bool m_screenb_enable;
 
 	/* misc */
 	uint8_t    m_port_select;
@@ -63,7 +59,11 @@ public:
 	DECLARE_READ8_MEMBER(main_to_sound_r);
 	DECLARE_WRITE8_MEMBER(sound_to_main_w);
 	DECLARE_READ8_MEMBER(sound_to_main_r);
-	DECLARE_WRITE8_MEMBER(screen_select_w);
+	DECLARE_WRITE_LINE_MEMBER(color_select_w);
+	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
+	DECLARE_WRITE_LINE_MEMBER(screen_select_w);
+	DECLARE_WRITE_LINE_MEMBER(screena_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(screenb_enable_w);
 	DECLARE_WRITE8_MEMBER(crgolfhi_sample_w);
 	DECLARE_READ8_MEMBER(unk_sub_02_r);
 	DECLARE_READ8_MEMBER(unk_sub_05_r);

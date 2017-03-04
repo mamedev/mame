@@ -5,6 +5,8 @@
       Dynax hardware
 
 ***************************************************************************/
+
+#include "machine/74259.h"
 #include "machine/msm6242.h"
 #include "sound/ym2413.h"
 #include "sound/msm5205.h"
@@ -24,6 +26,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_rtc(*this, "rtc")
+		, m_mainlatch(*this, "mainlatch")
 		, m_gfx_region1(*this, "gfx1")
 		, m_gfx_region2(*this, "gfx2")
 		, m_gfx_region3(*this, "gfx3")
@@ -45,6 +48,7 @@ public:
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<msm6242_device> m_rtc;
+	optional_device<ls259_device> m_mainlatch;
 	optional_region_ptr<uint8_t> m_gfx_region1;
 	optional_region_ptr<uint8_t> m_gfx_region2;
 	optional_region_ptr<uint8_t> m_gfx_region3;
@@ -136,13 +140,13 @@ public:
 	uint8_t *m_hnoridur_ptr;
 
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(blitter_ack_w);
 	DECLARE_WRITE8_MEMBER(jantouki_vblank_ack_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blitter_ack_w);
-	DECLARE_WRITE8_MEMBER(jantouki_blitter2_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_blitter2_ack_w);
 	DECLARE_WRITE8_MEMBER(jantouki_sound_vblank_ack_w);
-	DECLARE_WRITE8_MEMBER(dynax_coincounter_0_w);
-	DECLARE_WRITE8_MEMBER(dynax_coincounter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coincounter_0_w);
+	DECLARE_WRITE_LINE_MEMBER(coincounter_1_w);
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_READ8_MEMBER(hanamai_keyboard_0_r);
 	DECLARE_READ8_MEMBER(hanamai_keyboard_1_r);
@@ -156,19 +160,16 @@ public:
 	DECLARE_WRITE8_MEMBER(yarunara_palette_w);
 	DECLARE_WRITE8_MEMBER(nanajign_palette_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(yarunara_layer_half_w);
-	DECLARE_WRITE8_MEMBER(yarunara_layer_half2_w);
+	DECLARE_WRITE8_MEMBER(yarunara_mainlatch_w);
 	DECLARE_WRITE8_MEMBER(hjingi_bank_w);
-	DECLARE_WRITE8_MEMBER(hjingi_lockout_w);
-	DECLARE_WRITE8_MEMBER(hjingi_hopper_w);
+	DECLARE_WRITE_LINE_MEMBER(hjingi_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(hjingi_hopper_w);
 	uint8_t hjingi_hopper_bit();
 	DECLARE_READ8_MEMBER(hjingi_keyboard_0_r);
 	DECLARE_READ8_MEMBER(hjingi_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(yarunara_input_w);
 	DECLARE_READ8_MEMBER(yarunara_input_r);
 	DECLARE_WRITE8_MEMBER(yarunara_rombank_w);
-	DECLARE_WRITE8_MEMBER(yarunara_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(yarunara_flipscreen_inv_w);
 	DECLARE_WRITE8_MEMBER(yarunara_blit_romregion_w);
 	DECLARE_READ8_MEMBER(jantouki_soundlatch_ack_r);
 	DECLARE_WRITE8_MEMBER(jantouki_soundlatch_w);
@@ -195,9 +196,10 @@ public:
 	DECLARE_READ8_MEMBER(tenkai_p8_r);
 	DECLARE_READ8_MEMBER(tenkai_8000_r);
 	DECLARE_WRITE8_MEMBER(tenkai_8000_w);
-	DECLARE_WRITE8_MEMBER(tenkai_6c_w);
-	DECLARE_WRITE8_MEMBER(tenkai_70_w);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_6c_w);
+	DECLARE_WRITE_LINE_MEMBER(tenkai_70_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_romregion_w);
+	DECLARE_WRITE8_MEMBER(tenkai_mainlatch_w);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_0_r);
 	DECLARE_READ8_MEMBER(gekisha_keyboard_1_r);
 	DECLARE_WRITE8_MEMBER(gekisha_hopper_w);
@@ -221,15 +223,17 @@ public:
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(mjembase_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette67_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit_palbank_w);
-	DECLARE_WRITE8_MEMBER(dynax_blit2_palbank_w);
-	DECLARE_WRITE8_MEMBER(hanamai_layer_half_w);
-	DECLARE_WRITE8_MEMBER(hnoridur_layer_half2_w);
-	DECLARE_WRITE8_MEMBER(mjdialq2_blit_dest_w);
+	DECLARE_WRITE_LINE_MEMBER(blit_palbank_w);
+	DECLARE_WRITE_LINE_MEMBER(blit2_palbank_w);
+	DECLARE_WRITE_LINE_MEMBER(layer_half_w);
+	DECLARE_WRITE_LINE_MEMBER(layer_half2_w);
+	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest0_w);
+	DECLARE_WRITE_LINE_MEMBER(mjdialq2_blit_dest1_w);
 	DECLARE_WRITE8_MEMBER(dynax_layer_enable_w);
 	DECLARE_WRITE8_MEMBER(jantouki_layer_enable_w);
-	DECLARE_WRITE8_MEMBER(mjdialq2_layer_enable_w);
-	DECLARE_WRITE8_MEMBER(dynax_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer0_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(mjdialq2_layer1_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_romregion_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_scroll_w);
@@ -247,7 +251,6 @@ public:
 	DECLARE_DRIVER_INIT(mjelct3);
 	DECLARE_DRIVER_INIT(blktouch);
 	DECLARE_DRIVER_INIT(mjelct3a);
-	DECLARE_DRIVER_INIT(mjreach);
 	DECLARE_DRIVER_INIT(maya_common);
 	DECLARE_DRIVER_INIT(mayac);
 	DECLARE_DRIVER_INIT(maya);
@@ -280,6 +283,7 @@ public:
 
 	DECLARE_MACHINE_RESET(adpcm);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_reset_kludge_w);
 	DECLARE_MACHINE_START(gekisha);
 	DECLARE_MACHINE_RESET(gekisha);
 	DECLARE_MACHINE_START(tenkai);

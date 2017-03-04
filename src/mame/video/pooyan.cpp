@@ -140,9 +140,9 @@ WRITE8_MEMBER(pooyan_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(pooyan_state::flipscreen_w)
+WRITE_LINE_MEMBER(pooyan_state::flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	flip_screen_set(!state);
 }
 
 

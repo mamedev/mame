@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
+
 class glass_state : public driver_device
 {
 public:
@@ -14,6 +16,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -26,6 +29,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
@@ -50,6 +54,11 @@ public:
 	DECLARE_WRITE16_MEMBER(coin_w);
 	DECLARE_WRITE16_MEMBER(blitter_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
+
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 
 	DECLARE_DRIVER_INIT(glass);
 	virtual void machine_start() override;

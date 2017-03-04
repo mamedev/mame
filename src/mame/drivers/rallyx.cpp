@@ -194,6 +194,7 @@ TODO:
 #include "includes/rallyx.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
@@ -216,95 +217,63 @@ WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
 }
 
 
-WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
+WRITE_LINE_MEMBER(rallyx_state::bang_w)
 {
-	if (data == 0 && m_last_bang != 0)
+	if (state == 0 && m_last_bang != 0)
 		m_samples->start(0, 0);
 
-	m_last_bang = data;
-}
-
-WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
-{
-	int bit = data & 1;
-
-	switch (offset)
-	{
-		case 0x00:  /* BANG */
-			rallyx_bang_w(space, 0, bit);
-			break;
-
-		case 0x01:  /* INT ON */
-			m_main_irq_mask = bit;
-			if (!bit)
-				m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
-
-		case 0x02:  /* SOUND ON */
-			/* this doesn't work in New Rally X so I'm not supporting it */
-//          m_namco_sound->pacman_sound_enable_w(bit);
-			break;
-
-		case 0x03:  /* FLIP */
-			flip_screen_set(bit);
-			break;
-
-		case 0x04:
-			output().set_led_value(0, bit);
-			break;
-
-		case 0x05:
-			output().set_led_value(1, bit);
-			break;
-
-		case 0x06:
-			machine().bookkeeping().coin_lockout_w(0, !bit);
-			break;
-
-		case 0x07:
-			machine().bookkeeping().coin_counter_w(0, bit);
-			break;
-	}
+	m_last_bang = state;
 }
 
 
-WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
+WRITE_LINE_MEMBER(rallyx_state::irq_mask_w)
 {
-	int bit = data & 1;
+	m_main_irq_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
-	switch (offset)
-	{
-		case 0x00:  /* SOUNDON */
-			m_timeplt_audio->sh_irqtrigger_w(space,0,bit);
-			break;
 
-		case 0x01:  /* INTST */
-			m_main_irq_mask = bit;
-			break;
+WRITE_LINE_MEMBER(rallyx_state::sound_on_w)
+{
+	/* this doesn't work in New Rally X so I'm not supporting it */
+	//m_namco_sound->pacman_sound_enable_w(state);
+}
 
-		case 0x02:  /* MUT */
-//          sound disable
-			break;
 
-		case 0x03:  /* FLIP */
-			flip_screen_set(bit);
-			break;
+WRITE_LINE_MEMBER(rallyx_state::flip_screen_w)
+{
+	flip_screen_set(state);
+}
 
-		case 0x04:  /* OUT1 */
-			machine().bookkeeping().coin_counter_w(0, bit);
-			break;
 
-		case 0x05:  /* OUT2 */
-			break;
+WRITE_LINE_MEMBER(rallyx_state::led_0_w)
+{
+	output().set_led_value(0, state);
+}
 
-		case 0x06:  /* OUT3 */
-			machine().bookkeeping().coin_counter_w(1,bit);
-			break;
 
-		case 0x07:  /* STARSON */
-			tactcian_starson_w(space, offset, bit);
-			break;
-	}
+WRITE_LINE_MEMBER(rallyx_state::led_1_w)
+{
+	output().set_led_value(1, state);
+}
+
+
+WRITE_LINE_MEMBER(rallyx_state::coin_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+
+WRITE_LINE_MEMBER(rallyx_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(rallyx_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -327,7 +296,7 @@ static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
 	AM_RANGE(0xa170, 0xa170) AM_WRITENOP            /* ? */
-	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
+	AM_RANGE(0xa180, 0xa187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, rallyx_state )
@@ -349,7 +318,7 @@ static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa100, 0xa100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w) /* only jungler and tactcian */
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w) /* only jungler and tactcian */
-	AM_RANGE(0xa180, 0xa187) AM_WRITE(locomotn_latch_w)
+	AM_RANGE(0xa180, 0xa187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -834,12 +803,6 @@ MACHINE_START_MEMBER(rallyx_state,rallyx)
 	save_item(NAME(m_stars_enable));
 }
 
-MACHINE_RESET_MEMBER(rallyx_state,rallyx)
-{
-	m_last_bang = 0;
-	m_stars_enable = 0;
-}
-
 INTERRUPT_GEN_MEMBER(rallyx_state::rallyx_vblank_irq)
 {
 	if (m_main_irq_mask)
@@ -860,10 +823,19 @@ static MACHINE_CONFIG_START( rallyx )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, rallyx_vblank_irq)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 259 at 12M or 4099 at 11M on Logic Board I
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rallyx_state, bang_w)) // BANG
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, irq_mask_w)) // INT ON
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rallyx_state, sound_on_w)) // SOUND ON
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, led_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rallyx_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w))
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
-	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -903,10 +875,19 @@ static MACHINE_CONFIG_START( jungler )
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, jungler_vblank_irq)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1C on Loco-Motion
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)) // SOUNDON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, irq_mask_w)) // INTST
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w)) // MUT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w)) // OUT1
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // OUT2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_counter_2_w)) // OUT3
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, stars_enable_w)) // STARSON
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
-	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -12,6 +12,7 @@
 #define MAME_INCLUDES_LISA_H
 
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
@@ -109,6 +110,7 @@ public:
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
+		m_latch(*this, "latch"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -131,6 +133,7 @@ public:
 	required_device<scc8530_t> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
+	required_device<ls259_device> m_latch;
 
 	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;
@@ -196,6 +199,14 @@ public:
 	DECLARE_WRITE16_MEMBER(lisa_w);
 	DECLARE_READ16_MEMBER(lisa_IO_r);
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+	DECLARE_WRITE_LINE_MEMBER(diag1_w);
+	DECLARE_WRITE_LINE_MEMBER(diag2_w);
+	DECLARE_WRITE_LINE_MEMBER(seg1_w);
+	DECLARE_WRITE_LINE_MEMBER(seg2_w);
+	DECLARE_WRITE_LINE_MEMBER(setup_w);
+	DECLARE_WRITE_LINE_MEMBER(vtmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);

@@ -127,9 +127,9 @@ WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
+WRITE_LINE_MEMBER(kyugo_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(state);
 }
 
 

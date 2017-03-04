@@ -27,8 +27,8 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,9 +41,23 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 		membank("bank1")->set_entry((data & 0x03));
 }
 
-WRITE8_MEMBER(gng_state::gng_coin_counter_w)
+WRITE_LINE_MEMBER(gng_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(gng_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(gng_state::ym_reset_w)
+{
+	if (!state)
+	{
+		m_ym[0]->reset();
+		m_ym[1]->reset();
+	}
 }
 
 static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
@@ -62,9 +76,7 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_NOP /* watchdog? */
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(gng_flipscreen_w)
-//  { 0x3d01, 0x3d01, reset sound cpu?
-	AM_RANGE(0x3d02, 0x3d03) AM_WRITE(gng_coin_counter_w)
+	AM_RANGE(0x3d00, 0x3d07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -353,6 +365,12 @@ static MACHINE_CONFIG_START( gng )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9B on A board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gng_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gng_state, ym_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gng_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gng_state, coin_counter_2_w))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")

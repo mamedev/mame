@@ -20,6 +20,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL_12_096MHz
@@ -42,6 +43,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
 		m_playfield_ram(*this, "playfield_ram") { }
 
 	/* devices */
@@ -49,6 +51,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<f9334_device> m_outlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
@@ -79,6 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pitcher_vert_w);
 	DECLARE_WRITE8_MEMBER(pitcher_horz_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp_w);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -273,29 +277,13 @@ WRITE8_MEMBER(flyball_state::pitcher_horz_w)
 
 WRITE8_MEMBER(flyball_state::misc_w)
 {
-	int bit = ~data & 1;
+	// address and data lines passed through inverting buffers
+	m_outlatch->write_d0(space, ~offset, ~data);
+}
 
-	switch (offset)
-	{
-	case 0:
-		output().set_led_value(0, bit);
-		break;
-	case 1:
-		/* crowd very loud */
-		break;
-	case 2:
-		/* footstep off-on */
-		break;
-	case 3:
-		/* crowd off-on */
-		break;
-	case 4:
-		/* crowd soft-loud */
-		break;
-	case 5:
-		/* bat hit */
-		break;
-	}
+WRITE_LINE_MEMBER(flyball_state::lamp_w)
+{
+	output().set_led_value(0, state);
 }
 
 
@@ -467,6 +455,14 @@ static MACHINE_CONFIG_START( flyball )
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(flyball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flyball_state, nmi_line_pulse)
+
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(flyball_state, lamp_w)) // 1 player lamp
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // crowd soft-loud
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // bat hit
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -101,9 +101,19 @@ WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(targeth_state::coin_counter_w)
+WRITE16_MEMBER(targeth_state::output_latch_w)
 {
-	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(targeth_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(targeth_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(targeth_state::shareram_w)
@@ -139,10 +149,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("SYSTEM")             /* Coins, Start & Fire buttons */
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")            /* Service & Guns Reload? */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE(output_latch_w)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)    /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status register */
-	AM_RANGE(0x700010, 0x70001b) AM_WRITENOP                        /* ??? Guns reload related? */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(coin_counter_w)   /* Coin counters */
+	AM_RANGE(0x700010, 0x700011) AM_WRITENOP                        /* ??? Guns reload related? */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
@@ -252,6 +262,10 @@ static MACHINE_CONFIG_START( targeth )
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(targeth_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(targeth_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

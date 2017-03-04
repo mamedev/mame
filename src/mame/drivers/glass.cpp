@@ -79,19 +79,27 @@ WRITE16_MEMBER(glass_state::OKIM6295_bankswitch_w)
 
 WRITE16_MEMBER(glass_state::coin_w)
 {
-	switch (offset >> 3)
-	{
-		case 0x00:  /* Coin Lockouts */
-		case 0x01:
-			machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-			break;
-		case 0x02:  /* Coin Counters */
-		case 0x03:
-			machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-			break;
-		case 0x04:  /* Sound Muting (if bit 0 == 1, sound output stream = 0) */
-			break;
-	}
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(glass_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(glass_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -113,9 +121,9 @@ static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_WRITE(blitter_w)                                                      // serial blitter
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE(coin_w)                                     // Coin Counters/Lockout
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                          // OKI6295 bankswitch
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)            // OKI6295 status register
-	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(coin_w)                                                         // Coin Counters/Lockout
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                              // Work RAM (partially shared with DS5002FP)
 ADDRESS_MAP_END
 
@@ -225,6 +233,13 @@ static MACHINE_CONFIG_START( glass )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(glass_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(glass_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(glass_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(glass_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // Sound Muting (if bit 0 == 1, sound output stream = 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

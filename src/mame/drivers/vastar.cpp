@@ -106,6 +106,7 @@ Vsync : 60.58hz
 #include "includes/vastar.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -119,9 +120,6 @@ void vastar_state::machine_start()
 
 void vastar_state::machine_reset()
 {
-	/* we must start with the second CPU halted */
-	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_nmi_mask = 0;
 	m_sprite_priority[0] = 0;
 
 	m_spriteram1 = m_fgvideoram + 0x000;
@@ -131,20 +129,14 @@ void vastar_state::machine_reset()
 	m_spriteram3 = m_fgvideoram + 0x800;
 }
 
-WRITE8_MEMBER(vastar_state::hold_cpu2_w)
+WRITE_LINE_MEMBER(vastar_state::flip_screen_w)
 {
-	/* I'm not sure that this works exactly like this */
-	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(vastar_state::flip_screen_w)
+WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 {
-	flip_screen_set(data);
-}
-
-WRITE8_MEMBER(vastar_state::nmi_mask_w)
-{
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
 }
 
 
@@ -160,9 +152,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(hold_cpu2_w)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -437,6 +427,11 @@ static MACHINE_CONFIG_START( vastar )
 	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(vastar_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(vastar_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

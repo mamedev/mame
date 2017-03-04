@@ -126,12 +126,18 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/sauro.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+void sauro_state::machine_start()
+{
+	save_item(NAME(m_irq_enable));
+}
 
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
@@ -146,21 +152,32 @@ READ8_MEMBER(sauro_state::sauro_sound_command_r)
 	return ret;
 }
 
-WRITE8_MEMBER(sauro_state::coin1_w)
+WRITE_LINE_MEMBER(sauro_state::vblank_irq)
 {
-	machine().bookkeeping().coin_counter_w(0, data);
-	machine().bookkeeping().coin_counter_w(0, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	if (state && m_irq_enable)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(sauro_state::coin2_w)
+WRITE_LINE_MEMBER(sauro_state::irq_reset_w)
 {
-	machine().bookkeeping().coin_counter_w(1, data);
-	machine().bookkeeping().coin_counter_w(1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	m_irq_enable = !state;
+	if (m_irq_enable)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(sauro_state::flip_screen_w)
+WRITE_LINE_MEMBER(sauro_state::coin1_w)
 {
-	flip_screen_set(data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(sauro_state::coin2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
+{
+	flip_screen_set(state);
 }
 
 WRITE8_MEMBER(sauro_state::adpcm_w)
@@ -187,19 +204,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITENOP        /* coin reset */
-	AM_RANGE(0xc3, 0xc3) AM_WRITE(coin1_w)
-	AM_RANGE(0xc4, 0xc4) AM_WRITENOP        /* coin reset */
-	AM_RANGE(0xc5, 0xc5) AM_WRITE(coin2_w)
-	AM_RANGE(0xc6, 0xc7) AM_WRITENOP        /* same as 0x80 - verified with debugger */
-	AM_RANGE(0xc8, 0xc8) AM_WRITENOP        /* written every int: 0 written at end   of isr */
-	AM_RANGE(0xc9, 0xc9) AM_WRITENOP        /* written every int: 1 written at start of isr */
-	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w) /* 1 written upon death, cleared 2 vblanks later */
-														/* Sequence 3,2,1 written during intro screen */
-	AM_RANGE(0xcc, 0xcc) AM_WRITENOP        /* same as 0xca */
-	AM_RANGE(0xcd, 0xcd) AM_WRITENOP        /* same as 0xcb */
-	AM_RANGE(0xce, 0xce) AM_WRITENOP        /* only written at startup */
+	AM_RANGE(0xc0, 0xcf) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
 	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
@@ -238,12 +243,7 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf828, 0xf828) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(scroll_bg_w)
-	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */
-	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(coin1_w)
-	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(coin2_w)
-	AM_RANGE(0xf83c, 0xf83c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP                /* only written at startup */
+	AM_RANGE(0xf838, 0xf83f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -446,7 +446,9 @@ static MACHINE_CONFIG_START( tecfri )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sauro_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sauro_state, irq_reset_w))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -459,6 +461,7 @@ static MACHINE_CONFIG_START( tecfri )
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sauro_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
@@ -475,6 +478,11 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
 
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sauro_state, coin2_w))
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trckydoc)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
@@ -488,6 +496,14 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sauro_map)
 	MCFG_CPU_IO_MAP(sauro_io_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch") // Z3
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // sound IRQ trigger?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank1_w))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  // 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)

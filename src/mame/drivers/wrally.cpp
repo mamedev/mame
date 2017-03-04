@@ -153,13 +153,9 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(latch_w, 0x00ff)
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(okim6295_bankswitch_w)                                /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status/data register */
-	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(coin_lockout_w)                                /* Coin lockouts */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(coin_counter_w)                                /* Coin counters */
-	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP                                                /* Sound muting */
-	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(flipscreen_w)                                  /* Flip screen */
-	AM_RANGE(0x70006a, 0x70007b) AM_WRITENOP                                                /* ??? */
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                        /* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
@@ -283,6 +279,16 @@ static MACHINE_CONFIG_START( wrally )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wrally_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wrally_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wrally_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wrally_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                                                  /* Sound muting */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally_state, flipscreen_w))                 /* Flip screen */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)                                                  /* ??? */
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)                                                  /* ??? */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -9,6 +9,28 @@
 #include "sound/discrete.h"
 #include "video/avgdvg.h"
 
+#define ASTEROID_SAUCER_SND_EN      NODE_01
+#define ASTEROID_SAUCER_FIRE_EN     NODE_02
+#define ASTEROID_SAUCER_SEL         NODE_03
+#define ASTEROID_THRUST_EN          NODE_04
+#define ASTEROID_SHIP_FIRE_EN       NODE_05
+#define ASTEROID_LIFE_EN            NODE_06
+#define ASTEROID_NOISE_RESET        NODE_07
+
+#define ASTEROID_THUMP_EN           NODE_08
+#define ASTEROID_THUMP_DATA         NODE_09
+#define ASTEROID_EXPLODE_DATA       NODE_10
+#define ASTEROID_EXPLODE_PITCH      NODE_11
+
+#define ASTEROID_NOISE              NODE_20
+#define ASTEROID_THUMP_SND          NODE_21
+#define ASTEROID_SAUCER_SND         NODE_22
+#define ASTEROID_LIFE_SND           NODE_23
+#define ASTEROID_SAUCER_FIRE_SND    NODE_24
+#define ASTEROID_SHIP_FIRE_SND      NODE_25
+#define ASTEROID_EXPLODE_SND        NODE_26
+#define ASTEROID_THRUST_SND         NODE_27
+
 class asteroid_state : public driver_device
 {
 public:
@@ -29,19 +51,19 @@ public:
 	optional_memory_bank m_ram1;
 	optional_memory_bank m_ram2;
 
-	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE8_MEMBER(llander_led_w);
 	DECLARE_READ8_MEMBER(asteroid_IN0_r);
 	DECLARE_READ8_MEMBER(asterock_IN0_r);
 	DECLARE_READ8_MEMBER(asteroid_IN1_r);
 	DECLARE_READ8_MEMBER(asteroid_DSW1_r);
 	DECLARE_WRITE8_MEMBER(asteroid_bank_switch_w);
-	DECLARE_WRITE8_MEMBER(astdelux_bank_switch_w);
-	DECLARE_WRITE8_MEMBER(astdelux_led_w);
+	DECLARE_WRITE_LINE_MEMBER(start1_led_w);
+	DECLARE_WRITE_LINE_MEMBER(start2_led_w);
 	DECLARE_WRITE8_MEMBER(asteroid_explode_w);
 	DECLARE_WRITE8_MEMBER(asteroid_thump_w);
-	DECLARE_WRITE8_MEMBER(asteroid_sounds_w);
-	DECLARE_WRITE8_MEMBER(astdelux_sounds_w);
 	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_sounds_w);

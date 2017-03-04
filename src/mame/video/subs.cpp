@@ -10,9 +10,9 @@
 #include "includes/subs.h"
 #include "sound/discrete.h"
 
-WRITE8_MEMBER(subs_state::invert1_w)
+WRITE_LINE_MEMBER(subs_state::invert1_w)
 {
-	if ((offset & 0x01) == 1)
+	if (state)
 	{
 		m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 		m_palette->set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
@@ -24,9 +24,9 @@ WRITE8_MEMBER(subs_state::invert1_w)
 	}
 }
 
-WRITE8_MEMBER(subs_state::invert2_w)
+WRITE_LINE_MEMBER(subs_state::invert2_w)
 {
-	if ((offset & 0x01) == 1)
+	if (state)
 	{
 		m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
 		m_palette->set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));

@@ -270,24 +270,30 @@ READ8_MEMBER(gridlee_state::random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::led_0_w)
+WRITE8_MEMBER(gridlee_state::latch_w)
 {
-	output().set_led_value(0, data & 1);
-	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
+	m_latch->write_bit(offset >> 4, data);
 }
 
 
-WRITE8_MEMBER(gridlee_state::led_1_w)
+WRITE_LINE_MEMBER(gridlee_state::led_0_w)
 {
-	output().set_led_value(1, data & 1);
-	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
+	output().set_led_value(0, state);
+	logerror("LED 0 %s\n", state ? "on" : "off");
 }
 
 
-WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
+WRITE_LINE_MEMBER(gridlee_state::led_1_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	logerror("coin counter %s\n", (data & 1) ? "on" : "off");
+	output().set_led_value(1, state);
+	logerror("LED 1 %s\n", state ? "on" : "off");
+}
+
+
+WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+	logerror("coin counter %s\n", state ? "on" : "off");
 }
 
 
@@ -302,11 +308,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
-	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
-	AM_RANGE(0x9020, 0x9020) AM_WRITE(gridlee_coin_counter_w)
-/*  { 0x9060, 0x9060, unknown - only written to at startup */
-	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
+	AM_RANGE(0x9000, 0x9000) AM_SELECT(0x0070) AM_WRITE(latch_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
@@ -419,6 +421,13 @@ static MACHINE_CONFIG_START( gridlee )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gridlee_state, led_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gridlee_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gridlee_state, coin_counter_w))
+	// Q6 unknown - only written to at startup
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gridlee_state, cocktail_flip_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -78,6 +78,7 @@ PROM  : Type MB7051
 **************************************************************************/
 
 #include "emu.h"
+#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
@@ -95,6 +96,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
+		m_mainlatch(*this, "mainlatch"),
 		m_videoram(*this, "videoram")
 	{ }
 
@@ -102,14 +104,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
+	required_device<ls259_device> m_mainlatch;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t m_control[8];
 	uint8_t m_nmi_enabled;
 	int m_r;
 
 	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
 	DECLARE_PALETTE_INIT(shougi);
@@ -118,28 +121,18 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
 void shougi_state::machine_start()
 {
 	// zerofill
-	memset(m_control, 0, sizeof(m_control));
 	m_nmi_enabled = 0;
 	m_r = 0;
 
 	// register for savestates
-	save_item(NAME(m_control));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
-}
-
-void shougi_state::machine_reset()
-{
-	// 74LS259 is auto CLR on reset
-	for (int i = 0; i < 8; i++)
-		control_w(m_maincpu->space(), i, 0);
 }
 
 
@@ -241,40 +234,20 @@ WRITE8_MEMBER(shougi_state::control_w)
 {
 	// 4800-480f connected to the 74LS259, A3 is data line
 	// so 4800-4807 write 0, and 4808-480f write 1
-	data = offset >> 3 & 1;
-	offset &= 7;
+	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
+}
 
-	switch (offset)
+
+WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
+{
+	m_nmi_enabled = state;
+
+	// NMI lines are tied together on both CPUs and connected to the LS74 /Q output
+	if (!m_nmi_enabled)
 	{
-		case 1:
-			m_nmi_enabled = data;
-
-			// NMI lines are tied together on both CPUs and connected to the LS74 /Q output
-			if (!m_nmi_enabled)
-			{
-				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-				m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-			}
-			break;
-
-		case 3:
-			// start/halt ALPHA-8201
-			m_alpha_8201->mcu_start_w(data);
-			break;
-
-		case 4:
-			// ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
-			m_alpha_8201->bus_dir_w(!data);
-			break;
-
-		default:
-			// 0: 0: sharedram = sub, 1: sharedram = main (TODO!)
-			// 2: ?
-			// 7: nothing? connected to +5v via resistor
-			break;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
-
-	m_control[offset] = data;
 }
 
 
@@ -410,6 +383,14 @@ static MACHINE_CONFIG_START( shougi )
 	MCFG_CPU_IO_MAP(readport_sub)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(shougi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // nothing? connected to +5v via resistor
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

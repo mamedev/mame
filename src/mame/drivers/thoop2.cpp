@@ -32,30 +32,34 @@ void thoop2_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE16_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7){
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	membank("okibank")->set_entry(data & 0x0f);
 }
 
-WRITE16_MEMBER(thoop2_state::coin_w)
+WRITE8_MEMBER(thoop2_state::coin_w)
 {
-	if (ACCESSING_BITS_0_7){
-		switch ((offset >> 3)){
-			case 0x00:  /* Coin Lockouts */
-			case 0x01:
-				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
-				break;
-			case 0x02:  /* Coin Counters */
-			case 0x03:
-				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
-				break;
-		}
-	}
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
 
-	/* 04b unknown. Sound related? */
-	/* 05b unknown */
+WRITE_LINE_MEMBER(thoop2_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(thoop2_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+WRITE_LINE_MEMBER(thoop2_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(thoop2_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 WRITE8_MEMBER(thoop2_state::shareram_w)
@@ -88,9 +92,9 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000a, 0x70000b) AM_SELECT(0x000070) AM_WRITE8(coin_w, 0x00ff)          /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)               /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
@@ -223,6 +227,14 @@ static MACHINE_CONFIG_START( thoop2 )
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2)
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(thoop2_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(thoop2_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thoop2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(thoop2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // unknown. Sound related?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // unknown
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

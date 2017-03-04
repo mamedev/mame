@@ -67,6 +67,7 @@
 #include "includes/pacman.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/segacrpt_device.h"
 #include "screen.h"
 #include "speaker.h"
@@ -77,8 +78,9 @@ class pengo_state : public pacman_state
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(penta);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -115,14 +117,19 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
+WRITE_LINE_MEMBER(pengo_state::coin_counter_1_w)
 {
-	machine().bookkeeping().coin_counter_w(offset, data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(pengo_state::irq_mask_w)
+WRITE_LINE_MEMBER(pengo_state::coin_counter_2_w)
 {
-	m_irq_mask = data & 1;
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
+{
+	m_irq_mask = state;
 }
 
 static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
@@ -135,14 +142,8 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
-	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
-	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x9044, 0x9045) AM_WRITE(pengo_coin_counter_w)
-	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
-	AM_RANGE(0x9047, 0x9047) AM_WRITE(pengo_gfxbank_w)
-	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
+	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
+	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
 	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
@@ -164,15 +165,8 @@ static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
-	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
-	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x9044, 0x9044) AM_WRITE(jrpacman_bgpriority_w)
-	AM_RANGE(0x9045, 0x9045) AM_WRITE(jrpacman_spritebank_w)
-	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
-	AM_RANGE(0x9047, 0x9047) AM_WRITE(jrpacman_charbank_w)
-	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
+	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
+	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("P2")
 	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("P1")
 ADDRESS_MAP_END
@@ -380,6 +374,18 @@ static MACHINE_CONFIG_START( pengo )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
+	MCFG_DEVICE_ADD("latch", LS259, 0) // U27
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pengo_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pengo_state, pengo_palettebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pengo_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pengo_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pengo_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pengo_state, pengo_colortablebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pengo_state, pengo_gfxbank_w))
+
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
@@ -421,6 +427,11 @@ static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jrpacmbl_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
+
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pengo_state, jrpacman_bgpriority_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pengo_state, jrpacman_spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pengo_state, jrpacman_charbank_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END

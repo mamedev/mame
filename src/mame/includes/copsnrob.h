@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
 
@@ -40,7 +41,7 @@ public:
 	uint8_t          m_ic_h3_data;
 	DECLARE_READ8_MEMBER(copsnrob_misc_r);
 	DECLARE_WRITE8_MEMBER(copsnrob_misc2_w);
-	DECLARE_WRITE8_MEMBER(copsnrob_misc_w);
+	DECLARE_WRITE_LINE_MEMBER(one_start_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -51,4 +52,4 @@ public:
 };
 
 /*----------- defined in audio/copsnrob.c -----------*/
-DISCRETE_SOUND_EXTERN( copsnrob );
+MACHINE_CONFIG_EXTERN(copsnrob_audio);

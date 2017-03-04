@@ -429,6 +429,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74259.h,MACHINES["TTL74259"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74259"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74259.cpp",
+		MAME_DIR .. "src/devices/machine/74259.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/7474.h,MACHINES["TTL7474"] = true
 ---------------------------------------------------
 
@@ -766,20 +778,6 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/dm9334.h,MACHINES["DM9334"] = true
----------------------------------------------------
-
-if (MACHINES["DM9334"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/dm9334.cpp",
-		MAME_DIR .. "src/devices/machine/dm9334.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/ds1204.h,MACHINES["DS1204"] = true
 ---------------------------------------------------
 

@@ -161,7 +161,32 @@ READ8_MEMBER(gaelco2_state::shareram_r)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
+WRITE16_MEMBER(gaelco2_state::wrally2_latch_w)
+{
+	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(gaelco2_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(gaelco2_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(gaelco2_state::coin3_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(2, state);
+}
+
+WRITE_LINE_MEMBER(gaelco2_state::coin4_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(3, state);
+}
+
+WRITE16_MEMBER(gaelco2_state::alighunt_coin_w)
 {
 	/* Coin Lockouts */
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
@@ -170,28 +195,6 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
 	/* Coin Counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
-}
-
-WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
-{
-	/* coin counters */
-	machine().bookkeeping().coin_counter_w(offset & 0x01,  data & 0x01);
-}
-
-WRITE16_MEMBER(wrally2_state::wrally2_coin_w)
-{
-	/* coin counters */
-	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
-}
-
-WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
-{
-	if ((offset >> 2) == 0){
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		machine().bookkeeping().coin_counter_w(2, data & 0x04);
-		machine().bookkeeping().coin_counter_w(3, data & 0x08);
-	}
 }
 
 /***************************************************************************
@@ -248,59 +251,25 @@ CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
 }
 
 
-WRITE16_MEMBER(wrally2_state::wrally2_adc_clk)
+WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_clk)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
-	if (ACCESSING_BITS_0_7)
+	if (!state)
 	{
-		if (!(data & 0xff))
-		{
-			m_analog_ports[0] <<= 1;
-			m_analog_ports[1] <<= 1;
-		}
+		m_analog_ports[0] <<= 1;
+		m_analog_ports[1] <<= 1;
 	}
-	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 
-WRITE16_MEMBER(wrally2_state::wrally2_adc_cs)
+WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_cs)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
-	if (ACCESSING_BITS_0_7)
+	if (!state)
 	{
-		if (!(data & 0xff))
-		{
-			m_analog_ports[0] = m_analog0->read();
-			m_analog_ports[1] = m_analog1->read();
-		}
+		m_analog_ports[0] = m_analog0->read();
+		m_analog_ports[1] = m_analog1->read();
 	}
-	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-}
-
-/***************************************************************************
-
-    EEPROM (93C66)
-
-***************************************************************************/
-
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_cs_w)
-{
-	/* bit 0 is CS (active low) */
-	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_sk_w)
-{
-	/* bit 0 is SK (active high) */
-	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
-{
-	/* bit 0 is EEPROM data (DIN) */
-	m_eeprom->di_write(data & 0x01);
 }
 
 /***************************************************************************

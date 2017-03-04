@@ -36,7 +36,6 @@ public:
 	uint8_t *m_slapstic_source;
 	uint8_t *m_slapstic_base;
 	uint8_t m_slapstic_current_bank;
-	uint8_t m_is_esb;
 	uint8_t m_control_num;
 	int m_MPA;
 	int m_BIC;
@@ -57,10 +56,16 @@ public:
 	DECLARE_READ8_MEMBER(esb_slapstic_r);
 	DECLARE_WRITE8_MEMBER(esb_slapstic_w);
 	DECLARE_WRITE8_MEMBER(starwars_nstore_w);
-	DECLARE_WRITE8_MEMBER(starwars_out_w);
+	DECLARE_WRITE_LINE_MEMBER(recall_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
+	DECLARE_WRITE_LINE_MEMBER(led2_w);
+	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_READ8_MEMBER(starwars_adc_r);
 	DECLARE_WRITE8_MEMBER(starwars_adc_select_w);
 	DECLARE_READ8_MEMBER(starwars_prng_r);
+	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
 	DECLARE_READ8_MEMBER(starwars_div_reh_r);
 	DECLARE_READ8_MEMBER(starwars_div_rel_r);
 	DECLARE_WRITE8_MEMBER(starwars_math_w);

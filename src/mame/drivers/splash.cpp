@@ -74,22 +74,29 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
-WRITE16_MEMBER(splash_state::coin_w)
+WRITE8_MEMBER(splash_state::coin_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		switch ((offset >> 3))
-		{
-			case 0x00:  /* Coin Lockouts */
-			case 0x01:
-				machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, (data & 0x0400) >> 8);
-				break;
-			case 0x02:  /* Coin Counters */
-			case 0x03:
-				machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, (data & 0x0100) >> 8);
-				break;
-		}
-	}
+	m_outlatch->write_bit(offset >> 3, BIT(data, 0));
+}
+
+WRITE_LINE_MEMBER(splash_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(splash_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+WRITE_LINE_MEMBER(splash_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(splash_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
@@ -99,8 +106,8 @@ static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
+	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_WRITE8(coin_w, 0xff00)   /* Coin Counters + Coin Lockout */
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
@@ -172,8 +179,8 @@ static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
+	AM_RANGE(0x84000a, 0x84000b) AM_SELECT(0x000070) AM_WRITE8(coin_w, 0xff00)   /* Coin Counters + Coin Lockout */
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)                        /* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
@@ -501,6 +508,12 @@ static MACHINE_CONFIG_START( splash )
 	MCFG_CPU_PROGRAM_MAP(splash_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
 
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // A8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -556,6 +569,12 @@ static MACHINE_CONFIG_START( roldfrog )
 	MCFG_CPU_PROGRAM_MAP(roldfrog_sound_map)
 	MCFG_CPU_IO_MAP(roldfrog_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

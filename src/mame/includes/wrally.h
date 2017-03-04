@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "machine/74259.h"
+
 class wrally_state : public driver_device
 {
 public:
@@ -13,6 +15,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -24,10 +27,13 @@ public:
 	DECLARE_READ8_MEMBER(shareram_r);
 	DECLARE_WRITE8_MEMBER(shareram_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE16_MEMBER(okim6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_counter_w);
-	DECLARE_WRITE16_MEMBER(coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
@@ -44,6 +50,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;

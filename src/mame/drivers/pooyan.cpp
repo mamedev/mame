@@ -16,6 +16,7 @@
 #include "audio/timeplt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "screen.h"
@@ -37,11 +38,23 @@ INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
 }
 
 
-WRITE8_MEMBER(pooyan_state::irq_enable_w)
+WRITE_LINE_MEMBER(pooyan_state::irq_enable_w)
 {
-	m_irq_enable = data & 1;
+	m_irq_enable = state;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
+WRITE_LINE_MEMBER(pooyan_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -65,10 +78,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
-	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
-	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa180, 0xa187) AM_MIRROR(0x5e78) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -182,18 +192,21 @@ void pooyan_state::machine_start()
 }
 
 
-void pooyan_state::machine_reset()
-{
-	m_irq_enable = 0;
-}
-
-
 static MACHINE_CONFIG_START( pooyan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  interrupt)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pooyan_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pooyan_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pooyan_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // PAY OUT - not used
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pooyan_state, flipscreen_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

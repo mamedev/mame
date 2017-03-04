@@ -144,9 +144,9 @@ PALETTE_INIT_MEMBER(skydiver_state, skydiver)
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::nmion_w)
+WRITE_LINE_MEMBER(skydiver_state::nmion_w)
 {
-	m_nmion = offset;
+	m_nmion = state;
 }
 
 
@@ -168,24 +168,6 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 
 /*************************************
  *
- *  Sound handlers
- *
- *************************************/
-
-WRITE8_MEMBER(skydiver_state::sound_enable_w)
-{
-	m_discrete->write(space, SKYDIVER_SOUND_EN, offset);
-}
-
-WRITE8_MEMBER(skydiver_state::whistle_w)
-{
-	m_discrete->write(space, NODE_RELATIVE(SKYDIVER_WHISTLE1_EN, (offset >> 1)), offset & 0x01);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -195,19 +177,8 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(wram_r, wram_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM       /* RAM B1 */
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
-	AM_RANGE(0x0800, 0x0801) AM_MIRROR(0x47f0) AM_WRITE(lamp_s_w)
-	AM_RANGE(0x0802, 0x0803) AM_MIRROR(0x47f0) AM_WRITE(lamp_k_w)
-	AM_RANGE(0x0804, 0x0805) AM_MIRROR(0x47f0) AM_WRITE(start_lamp_1_w)
-	AM_RANGE(0x0806, 0x0807) AM_MIRROR(0x47f0) AM_WRITE(start_lamp_2_w)
-	AM_RANGE(0x0808, 0x0809) AM_MIRROR(0x47f0) AM_WRITE(lamp_y_w)
-	AM_RANGE(0x080a, 0x080b) AM_MIRROR(0x47f0) AM_WRITE(lamp_d_w)
-	AM_RANGE(0x080c, 0x080d) AM_MIRROR(0x47f0) AM_WRITE(sound_enable_w)
-	// AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x47f0) AM_WRITE(jump1_lamps_w)
-	AM_RANGE(0x1002, 0x1003) AM_MIRROR(0x47f0) AM_WRITE(coin_lockout_w)
-	// AM_RANGE(0x1006, 0x1007) AM_MIRROR(0x47f0) AM_WRITE(jump2_lamps_w)
-	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_WRITE(whistle_w)
-	AM_RANGE(0x100c, 0x100d) AM_MIRROR(0x47f0) AM_WRITE(nmion_w)
-	AM_RANGE(0x100e, 0x100f) AM_MIRROR(0x47f0) AM_WRITE(width_w)
+	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x47f0) AM_DEVWRITE("latch1", f9334_device, write_a0)
+	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x47f0) AM_DEVWRITE("latch2", f9334_device, write_a0)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x47e0) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_MIRROR(0x47e0) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_MIRROR(0x47e0) AM_READ_PORT("IN2")
@@ -222,7 +193,7 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	AM_RANGE(0x180b, 0x180b) AM_MIRROR(0x47e4) AM_READ_PORT("IN11")
 	AM_RANGE(0x1810, 0x1810) AM_MIRROR(0x47e4) AM_READ_PORT("IN12")
 	AM_RANGE(0x1811, 0x1811) AM_MIRROR(0x47e4) AM_READ_PORT("IN13")
-	AM_RANGE(0x2000, 0x201f) AM_MIRROR(0x47e0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(_2000_201F_w)
+	AM_RANGE(0x2000, 0x201f) AM_MIRROR(0x47e0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(latch3_watchdog_w)
 	AM_RANGE(0x2800, 0x2fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_ROM
@@ -385,6 +356,30 @@ static MACHINE_CONFIG_START( skydiver )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
 
+	MCFG_DEVICE_ADD("latch1", F9334, 0) // F12
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skydiver_state, lamp_s_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, lamp_k_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(skydiver_state, start_lamp_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, start_lamp_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skydiver_state, lamp_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(skydiver_state, lamp_d_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_SOUND_EN>))
+	MCFG_DEVICE_ADD("latch2", F9334, 0) // H12
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skydiver_state, jump1_lamps_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, coin_lockout_w))
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, jump2_lamps_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(skydiver_state, nmion_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(skydiver_state, width_w))
+	MCFG_DEVICE_ADD("latch3", F9334, 0) // A11
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, lamp_i_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(skydiver_state, lamp_v_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, lamp_e_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skydiver_state, lamp_r_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_NOISE_RST>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
