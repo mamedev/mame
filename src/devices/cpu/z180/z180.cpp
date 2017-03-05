@@ -627,9 +627,9 @@ offs_t z180_device::disasm_disassemble(std::ostream &stream, offs_t pc, const ui
 #define Z180_DSTAT_WMASK        0xcc
 
 /* 31 DMA mode register */
-#define Z180_DMODE_DM           0x30
-#define Z180_DMODE_SM           0x0c
-#define Z180_DMODE_MMOD         0x04
+#define Z180_DMODE_DM           0x30    /* DMA ch 1/0 destination select */
+#define Z180_DMODE_SM           0x0c    /* DMA ch 1/0 source select */
+#define Z180_DMODE_MMOD         0x02    /* DMA cycle steal/burst mode select */
 
 #define Z180_DMODE_RESET        0x00
 #define Z180_DMODE_RMASK        0x3e
