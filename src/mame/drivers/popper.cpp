@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write_bc1_bc2)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xe000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -380,7 +380,7 @@ WRITE8_MEMBER( popper_state::ay1_w )
 		m_ay[1]->reset();
 	}
 
-	m_ay[0]->write(space, offset, data);
+	m_ay[0]->write_bc1_bc2(space, offset, data);
 }
 
 

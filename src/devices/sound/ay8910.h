@@ -1,4 +1,4 @@
- // license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 #pragma once
 
@@ -127,7 +127,7 @@ public:
 	DECLARE_WRITE8_MEMBER( address_data_w );
 
 	// bc1=a0, bc2=a1
-	virtual DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE8_MEMBER(write_bc1_bc2);
 
 	void set_volume(int channel,int volume);
 	void ay_set_clock(int clock);
@@ -230,7 +230,7 @@ public:
 
 	/* AY8914 handlers needed due to different register map */
 	DECLARE_READ8_MEMBER( read );
-	virtual DECLARE_WRITE8_MEMBER( write ) override;
+	DECLARE_WRITE8_MEMBER( write );
 };
 
 extern const device_type AY8914;

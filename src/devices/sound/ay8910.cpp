@@ -1119,7 +1119,8 @@ WRITE8_MEMBER( ay8910_device::data_w )
 #endif
 }
 
-WRITE8_MEMBER( ay8910_device::write )
+// here, BC1 is hooked up to A0 on the host and BC2 is hooked up to A1
+WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
 {
 	switch (offset & 3)
 	{
