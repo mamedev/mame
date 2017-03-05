@@ -1119,6 +1119,24 @@ WRITE8_MEMBER( ay8910_device::data_w )
 #endif
 }
 
+WRITE8_MEMBER( ay8910_device::write )
+{
+	switch (offset & 3)
+	{
+	case 0: // latch address
+		address_w(space, 0, data);
+		break;
+	case 1: // inactive
+		break;
+	case 2: // write to psg
+		data_w(space, 0, data);
+		break;
+	case 3: // latch address
+		address_w(space, 0, data);
+		break;
+	}
+}
+
 WRITE8_MEMBER( ay8910_device::reset_w )
 {
 	ay8910_reset_ym();

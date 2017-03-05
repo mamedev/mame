@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+ // license:BSD-3-Clause
 // copyright-holders:Couriersud
 #pragma once
 
@@ -126,6 +126,9 @@ public:
 	/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
 	DECLARE_WRITE8_MEMBER( address_data_w );
 
+	// bc1=a0, bc2=a1
+	virtual DECLARE_WRITE8_MEMBER(write);
+
 	void set_volume(int channel,int volume);
 	void ay_set_clock(int clock);
 
@@ -227,7 +230,7 @@ public:
 
 	/* AY8914 handlers needed due to different register map */
 	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	virtual DECLARE_WRITE8_MEMBER( write ) override;
 };
 
 extern const device_type AY8914;
