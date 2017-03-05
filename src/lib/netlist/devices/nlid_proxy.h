@@ -69,7 +69,7 @@ namespace netlist
 	public:
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
-		virtual ~nld_a_to_d_proxy();
+		virtual ~nld_a_to_d_proxy() override;
 
 		analog_input_t m_I;
 
@@ -105,7 +105,7 @@ namespace netlist
 	{
 	public:
 		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied);
-		virtual ~nld_d_to_a_proxy() {}
+		virtual ~nld_d_to_a_proxy() override {}
 
 	protected:
 

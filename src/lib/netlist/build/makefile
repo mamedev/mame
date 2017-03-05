@@ -142,7 +142,7 @@ VSBUILDS = \
 	$(VSBUILD/netlist.sln \
 
 DOCS = \
-	doxygen.conf
+	doxygen.conf \
 	$(DOC)/doc.css \
 	$(DOC)/mainpage.dox.h \
 	$(DOC)/primer_1.dox.h \

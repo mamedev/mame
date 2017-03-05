@@ -63,7 +63,7 @@ NETLIB_OBJECT(solver)
 		connect(m_fb_step, m_Q_step);
 	}
 
-	virtual ~NETLIB_NAME(solver)();
+	virtual ~NETLIB_NAME(solver)() override;
 
 	void post_start();
 	void stop();

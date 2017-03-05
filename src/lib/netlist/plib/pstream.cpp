@@ -62,7 +62,8 @@ pifilestream::pifilestream(const pstring &fname)
 {
 	if (m_file == nullptr)
 		throw file_open_e(fname);
-	init();
+	else
+		init();
 }
 
 pifilestream::pifilestream(void *file, const pstring &name, const bool do_close)

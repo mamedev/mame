@@ -126,7 +126,8 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 	}
 	catch (const plib::pexception &e)
 	{
-
+		if (dynamic_cast<const plib::file_open_e *>(&e) == nullptr )
+			throw;
 	}
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
@@ -140,7 +141,7 @@ public:
 	{
 	}
 
-	~netlist_tool_t()
+	virtual ~netlist_tool_t() override
 	{
 	}
 
@@ -775,5 +776,3 @@ int tool_app_t::execute()
 }
 
 PMAIN(tool_app_t)
-
-//plib::app *appconstructor() { return new tool_app_t(); }

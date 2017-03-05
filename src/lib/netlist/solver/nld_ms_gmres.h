@@ -37,7 +37,7 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_GMRES_t()
+	virtual ~matrix_solver_GMRES_t() override
 	{
 	}
 

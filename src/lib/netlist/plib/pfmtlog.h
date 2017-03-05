@@ -116,8 +116,6 @@ class pformat_base
 {
 public:
 
-	virtual ~pformat_base() { }
-
 	P &operator ()(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this); }
 	P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
 	P &          g(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
@@ -157,6 +155,7 @@ public:
 
 protected:
 
+	~pformat_base() { }
 	virtual void format_element(const char *f, const char *l, const char *fmt_spec, ...) = 0;
 
 };
@@ -190,7 +189,6 @@ class pfmt_writer_t : plib::nocopyassignmove
 {
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
-	virtual ~pfmt_writer_t() { }
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
@@ -242,6 +240,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
+	~pfmt_writer_t() { }
 	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:

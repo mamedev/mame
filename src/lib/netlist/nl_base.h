@@ -1128,7 +1128,7 @@ namespace netlist
 		device_t(netlist_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
-		virtual ~device_t();
+		virtual ~device_t() override;
 
 		setup_t &setup();
 
