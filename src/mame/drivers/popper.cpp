@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(intcycle_w);
 	DECLARE_READ8_MEMBER(subcpu_nmi_r);
 	DECLARE_READ8_MEMBER(subcpu_reset_r);
-	template <unsigned N> DECLARE_WRITE8_MEMBER(ay_w);
+	DECLARE_WRITE8_MEMBER(ay1_w);
 	DECLARE_READ8_MEMBER(watchdog_clear_r);
 	DECLARE_READ8_MEMBER(inputs_r);
 
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0x1ffc) AM_READ(inputs_r)
+	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0x03fc) AM_READ(inputs_r)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_WRITE(nmi_control_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_WRITE(crt_direction_w)
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_WRITE(back_color_select_w)
@@ -127,8 +127,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay_w<0>)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(ay_w<1>)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xe000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -276,10 +276,10 @@ void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	// the maincpu gets an nmi when we enter vblank (when enabled)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_nmi_enable && y == 240) ? ASSERT_LINE : CLEAR_LINE);
 
-	// the subcpu gets an interrupt each 16 lines
-	m_subcpu->set_input_line(INPUT_LINE_IRQ0, y & 16 ? ASSERT_LINE : CLEAR_LINE);
+	// the subcpu gets an interrupt each 32 lines
+	m_subcpu->set_input_line(INPUT_LINE_IRQ0, ((y & 31) == 0) ? ASSERT_LINE : CLEAR_LINE);
 
-	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, 0));
 }
 
 WRITE8_MEMBER( popper_state::crt_direction_w )
@@ -372,16 +372,16 @@ READ8_MEMBER( popper_state::subcpu_reset_r )
 	return 0;
 }
 
-template <unsigned N> WRITE8_MEMBER( popper_state::ay_w )
+WRITE8_MEMBER( popper_state::ay1_w )
 {
-	if (offset == 0)
-		m_ay[N]->reset();
+	if (offset == 3)
+	{
+		m_ay[0]->reset();
+		m_ay[1]->reset();
+	}
 
-	m_ay[N]->address_data_w(space, offset, data);
+	m_ay[0]->write(space, offset, data);
 }
-
-template WRITE8_MEMBER( popper_state::ay_w<0> );
-template WRITE8_MEMBER( popper_state::ay_w<1> );
 
 
 //**************************************************************************
