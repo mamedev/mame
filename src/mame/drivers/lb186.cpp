@@ -152,4 +152,4 @@ ROM_START( lb186 )
 	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
 ROM_END
 
-COMP( 1983, lb186, 0, 0, lb186, 0, driver_device, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1985, lb186, 0, 0, lb186, 0, driver_device, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
