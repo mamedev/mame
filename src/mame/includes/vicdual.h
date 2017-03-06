@@ -58,6 +58,7 @@ public:
 
 	uint8_t m_coin_status;
 	uint8_t m_palette_bank;
+	uint8_t m_gradient;
 	uint8_t m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
