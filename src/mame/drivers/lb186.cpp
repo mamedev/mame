@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-
+// TODO: SCSI, requires NCR5380 BSY IRQs
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/wd_fdc.h"
@@ -8,6 +8,9 @@
 #include "bus/rs232/rs232.h"
 #include "machine/nscsi_hd.h"
 #include "machine/ncr5380n.h"
+#include "imagedev/flopdrv.h"
+#include "formats/pc_dsk.h"
+#include "formats/naslite_dsk.h"
 
 class lb186_state : public driver_device
 {
@@ -27,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
 	DECLARE_READ8_MEMBER(scsi_dack_r);
 	DECLARE_WRITE8_MEMBER(scsi_dack_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 WRITE8_MEMBER(lb186_state::scsi_dack_w)
@@ -77,7 +81,7 @@ WRITE8_MEMBER(lb186_state::drive_sel_w)
 	sprintf(devname, "%d", drive);
 	floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
 	m_fdc->set_floppy(floppy);
-	floppy->ss_w(BIT(data, 6));
+	floppy->ss_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START( lb186_map, AS_PROGRAM, 16, lb186_state )
@@ -96,7 +100,6 @@ ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( lb186_floppies )
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( ncr5380 )
@@ -109,6 +112,11 @@ static SLOT_INTERFACE_START( scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
 SLOT_INTERFACE_END
+
+FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
+FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_START( lb186, lb186_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
@@ -129,10 +137,10 @@ static MACHINE_CONFIG_START( lb186, lb186_state )
 	MCFG_WD1772_ADD("fdc", XTAL_16MHz/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", lb186_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats)
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, "harddisk", false)
@@ -152,4 +160,4 @@ ROM_START( lb186 )
 	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
 ROM_END
 
-COMP( 1985, lb186, 0, 0, lb186, 0, driver_device, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1985, lb186, 0, 0, lb186, 0, driver_device, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )
