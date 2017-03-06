@@ -32,7 +32,6 @@
 
     TODO:
     - According to the schematics the sub CPU ROM should be 0x2000
-    - Verify dip switch defaults
     - Verify screen raw parameters
     - Finish driver
 
@@ -165,12 +164,12 @@ static INPUT_PORTS_START( popper )
 	PORT_DIPSETTING(   0x02, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(   0x01, DEF_STR( 3C_1C ))
 	PORT_DIPSETTING(   0x03, DEF_STR( 1C_2C ))
-	PORT_DIPNAME(0x0c, 0x00, DEF_STR( Coin_B ))      PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPNAME(0x0c, 0x04, DEF_STR( Coin_B ))      PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(   0x00, DEF_STR( 1C_3C ))
 	PORT_DIPSETTING(   0x08, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(   0x04, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_6C ))
-	PORT_DIPNAME(0x30, 0x00, DEF_STR( Lives ))       PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME(0x30, 0x20, DEF_STR( Lives ))       PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(   0x00, "2")
 	PORT_DIPSETTING(   0x20, "3")
 	PORT_DIPSETTING(   0x10, "4")
