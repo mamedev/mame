@@ -387,6 +387,11 @@ newoption {
 }
 
 newoption {
+	trigger = "NO_USE_LINENOISE",
+	description = "Avoid using linenoise for licensing reasons.",
+}
+
+newoption {
 	trigger = "PROJECT",
 	description = "Select projects to be built. Will look into project folder for files.",
 }

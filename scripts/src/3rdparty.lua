@@ -572,7 +572,7 @@ project "lualibs"
 	includedirs {
 		MAME_DIR .. "3rdparty",
 	}
-if (_OPTIONS["osd"] ~= "uwp") then
+if (_OPTIONS["osd"] ~= "uwp") and (not _OPTIONS["NO_USE_LINENOISE"]) then
 	includedirs {
 		MAME_DIR .. "3rdparty/linenoise-ng/include",
 	}
@@ -595,7 +595,7 @@ end
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 	}
-if (_OPTIONS["osd"] == "uwp") then
+if (_OPTIONS["osd"] == "uwp") or (_OPTIONS["NO_USE_LINENOISE"]) then
 	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
 	}
@@ -1621,7 +1621,7 @@ end
 --------------------------------------------------
 -- linenoise-ng library
 --------------------------------------------------
-if (_OPTIONS["osd"] ~= "uwp") then
+if (_OPTIONS["osd"] ~= "uwp") and (not _OPTIONS["NO_USE_LINENOISE"]) then
 project "linenoise-ng"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)

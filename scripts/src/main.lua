@@ -267,7 +267,7 @@ if (STANDALONE~=true) then
 		ext_lib("lua"),
 		"lualibs",
 	}
-if (_OPTIONS["osd"] ~= "uwp") then
+if (_OPTIONS["osd"] ~= "uwp") and (not _OPTIONS["NO_USE_LINENOISE"]) then
 	links {
 		"linenoise-ng",
 	}
