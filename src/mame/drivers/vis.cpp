@@ -265,7 +265,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 static MACHINE_CONFIG_FRAGMENT( vis_vga_config )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("visvga", vis_vga_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
