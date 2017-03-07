@@ -1468,13 +1468,20 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses for version numbers and missing roms:
-    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and maybe arkanoidjbl may actually be bootlegs of this undumped version, so it might be possible to 'restore' this version by 'de-bootlegging' those sets?)
+    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and
+               maybe arkanoidjbl may actually be bootlegs of this undumped
+               version, so it might be possible to 'restore' this version by
+              'de-bootlegging' those sets?)
     A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar and World
     A75 02   = Z80 code 2/2 v1.0 Japan (has 'Notice: This game is for use in Japan only' screen)
     A75 03   = GFX 1/3
     A75 04   = GFX 2/3
     A75 05   = GFX 3/3
-    A75 06   = MC68705P5 MCU code, v1.x Japan and v1.x USA/Romstar (DUMPED, verified to have crc&sha1 of 0be83647 and 625fd1e6061123df612f115ef14a06cd6009f5d1; the rom with crc&sha1 of 4e44b50a and c61e7d158dc8e2b003c8158053ec139b904599af is also probably legit as well, only differing due to a different fill in an unused area from the verified one )
+    A75 06   = MC68705P5 MCU code, v1.x Japan and v1.x USA/Romstar (DUMPED,
+               verified to have crc&sha1 of 0be83647 and 625fd1e6061123df612f115ef14a06cd6009f5d1;
+               the rom with crc&sha1 of 4e44b50a and c61e7d158dc8e2b003c8158053ec139b904599af
+               is also probably legit as well, only differing due to a
+               different fill in an unused area from the verified one )
     A75 07   = PROM red
     A75 08   = PROM green
     A75 09   = PROM blue
@@ -1523,9 +1530,21 @@ ROM_START( arkanoid ) // v1.0 World
 
 	// All of these MCUs work in place of A75 06, see comments for each.
 	ROM_REGION( 0x1800, "alt_mcus", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "arkanoid_mcu.ic14",       0x0000, 0x0800, CRC(4e44b50a) SHA1(c61e7d158dc8e2b003c8158053ec139b904599af) ) // Decapped: This matches the legitimate Taito rom, with a "Programmed By Yasu 1986" string in it, but has a 0x00 fill after the end of the code instead of 0xFF. This matches the legit rom otherwise and may itself be legit, perhaps an artifact of a 68705 programmer at Taito using a sparse s-record/ihex file and not clearing the ram in the chip programmer to 0xFF (or 0x00?) before programming the MCU.
-	ROM_LOAD( "a75-06__bootleg_68705.ic14",   0x0800, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) // NOT decapped: This came from an unprotected bootleg, and used to be used by the main set. It is definitely a bootleg mcu with no timer or int selftest, and completely different code altogether, probably implemented by pirates by blackbox-reverse engineering the real MCU.
-	ROM_LOAD( "arkanoid1_68705p3.ic14",  0x1000, 0x0800, CRC(1b68e2d8) SHA1(f642a7cb624ee14fb0e410de5ae1fc799d2fa1c2) ) // Decapped: This is the same as the bootleg 515d77b6 rom above except the bootrom (0x785-0x7f7) is intact. No other difference.
+	ROM_LOAD( "arkanoid_mcu.ic14", 0x0000, 0x0800, CRC(4e44b50a) SHA1(c61e7d158dc8e2b003c8158053ec139b904599af) ) // Decapped: See below
+	/* This matches the legitimate Taito rom, with a "Programmed By Yasu 1986"
+	   string in it, but has a 0x00 fill after the end of the code instead of
+	   0xFF. This matches the legit rom otherwise and may itself be legit,
+	   perhaps an artifact of a 68705 programmer at Taito using a sparse
+	   s-record/ihex file and not clearing the ram in the chip programmer to
+	   0xFF (or 0x00?) before programming the MCU.*/
+	ROM_LOAD( "a75-06__bootleg_68705.ic14", 0x0800, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) // NOT decapped: See below
+	/* This came from an unprotected bootleg, and used to be used by the main
+	   set. It is definitely a bootleg mcu with no timer or int selftest, and
+	   completely different code altogether, probably implemented by pirates
+	   by black-box reverse engineering the real MCU. */
+	ROM_LOAD( "arkanoid1_68705p3.ic14", 0x1000, 0x0800, CRC(1b68e2d8) SHA1(f642a7cb624ee14fb0e410de5ae1fc799d2fa1c2) ) // Decapped: See below
+	/* This is the same as the bootleg 515d77b6 rom above except the bootrom
+	   (0x785-0x7f7) is intact. No other difference. */
 ROM_END
 
 ROM_START( arkanoidu ) // V2.0 US/Romstar
@@ -1567,7 +1586,12 @@ ROM_START( arkanoiduo ) // V1.0 USA/Romstar
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* Chip Silkscreen: "A75-09"; blue component */
 
 	ROM_REGION( 0x8000, "altgfx", 0 )
-	ROM_LOAD( "a75__03(alternate).ic64",   0x00000, 0x8000, CRC(983d4485) SHA1(603a8798d1f531a70a527a5c6122f0ffd6adcfb6) ) // this was found on a legit v1.0 Romstar USA pcb with serial number 29342; the only difference seems to be the first 32 tiles are all 0xFF instead of 0x00. Those tiles don't seem to be used by the game at all. This is likely another incidence of "Taito forgot to clear programmer ram before burning a rom from a sparse s-record/ihex file"
+	ROM_LOAD( "a75__03(alternate).ic64",   0x00000, 0x8000, CRC(983d4485) SHA1(603a8798d1f531a70a527a5c6122f0ffd6adcfb6) ) // See below
+	/* This was found on a legit v1.0 Romstar USA pcb with serial number 29342;
+	   the only difference seems to be the first 32 tiles are all 0xFF instead
+	   of 0x00. Those tiles don't seem to be used by the game at all. This is
+	   likely another incident of "Taito forgot to clear programmer ram before
+	   burning a rom from a sparse s-record/ihex file" */
 ROM_END
 
 ROM_START( arkanoidj ) // V2.1 Japan
@@ -1656,7 +1680,12 @@ ROM_START( arkanoidjbl ) // bootleg with MCU copied from real Taito code, but no
 	ROM_LOAD( "e2.6f",        0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) ) /* == A75-02.IC16 */
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) ) // This set had an unprotected mcu with a bootlegged copy of the real Taito a75__06.ic14 code, unlike the other bootlegs. It has the bootstrap code missing and the security bit cleared, the area after the rom filled with 0x00, and the verify mode disable jump removed. Otherwise it matches a75__06.ic14
+	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) ) // See below
+	/* This set had an unprotected mcu with a bootlegged copy of the real Taito
+	   a75__06.ic14 code, unlike the other bootlegs. It has the bootstrap code
+	   missing and the security bit cleared, the area after the rom filled with
+	   0x00, and the verify mode disable jump removed. Otherwise it matches
+	   a75__06.ic14 */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.rom",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
