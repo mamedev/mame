@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VC4000_SLOT_H
-#define __VC4000_SLOT_H
+#ifndef MAME_BUS_VC4000_SLOT_H
+#define MAME_BUS_VC4000_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -66,7 +66,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -96,9 +95,18 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 protected:
+	vc4000_cart_slot_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
 
 	int m_type;
-	device_vc4000_cart_interface*       m_cart;
+	device_vc4000_cart_interface *m_cart;
 };
 
 class h21_cart_slot_device : public vc4000_cart_slot_device
@@ -130,4 +138,4 @@ extern const device_type H21_CART_SLOT;
 	MCFG_DEVICE_ADD(_tag, H21_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#endif
+#endif // MAME_BUS_VC4000_SLOT_H

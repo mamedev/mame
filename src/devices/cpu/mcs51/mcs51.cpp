@@ -350,7 +350,7 @@ i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, co
 }
 
 i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80C52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
+	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80c52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 

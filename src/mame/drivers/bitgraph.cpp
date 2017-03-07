@@ -2,40 +2,40 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.
+	BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.
 
-    Apparently had at least four hardware revisions, A-D, but which ROM
-    revisions support which hardware is unclear.  A Versabus slot, and
-    various hardware and software options are mentioned in the docs.  Best
-    guesses follow.
+	Apparently had at least four hardware revisions, A-D, but which ROM
+	revisions support which hardware is unclear.  A Versabus slot, and
+	various hardware and software options are mentioned in the docs.  Best
+	guesses follow.
 
-    Onboard hardware (common to all revisions) is
-    - 32K ROM
-    - 128K RAM (includes frame buffer)
-    - 3 serial ports, each driven by 6850 ACIA
-    - some kind of baud rate generator, possibly COM8016
-    - sync serial port, driven by 6854 but apparently never supported by ROM
-    - 682x PIA
-    - AY-3-891x PSG
-    - ER2055 EAROM
-    - DEC VT100 keyboard interface
+	Onboard hardware (common to all revisions) is
+	- 32K ROM
+	- 128K RAM (includes frame buffer)
+	- 3 serial ports, each driven by 6850 ACIA
+	- some kind of baud rate generator, possibly COM8016
+	- sync serial port, driven by 6854 but apparently never supported by ROM
+	- 682x PIA
+	- AY-3-891x PSG
+	- ER2055 EAROM
+	- DEC VT100 keyboard interface
 
-    Rev A has additional 4th serial port for mouse (not supported by ROM 1.25).
-    Rev A has 40 hz realtime clock, the rest use 1040 hz.
-    Rev A-C use AY-3-8912 (with one external PIO port, to connect the EAROM).
-    Rev D uses AY-3-8913 (no external ports; EAROM is wired to TBD).
-    Rev B-D have onboard 8035 to talk to parallel printer and mouse.
-    Rev B-D have more memory (at least up to 512K).
+	Rev A has additional 4th serial port for mouse (not supported by ROM 1.25).
+	Rev A has 40 hz realtime clock, the rest use 1040 hz.
+	Rev A-C use AY-3-8912 (with one external PIO port, to connect the EAROM).
+	Rev D uses AY-3-8913 (no external ports; EAROM is wired to TBD).
+	Rev B-D have onboard 8035 to talk to parallel printer and mouse.
+	Rev B-D have more memory (at least up to 512K).
 
-    ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
+	ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
 
-    Missing/incorrect emulation:
-        Bidirectional keyboard interface (to drive LEDs and speaker).
-        8035.
-        EAROM.
-        1.25 only -- clksync() is dummied out -- causes watchdog resets.
-        Selectable memory size.
-        Video enable/reverse video switch.
+	Missing/incorrect emulation:
+		Bidirectional keyboard interface (to drive LEDs and speaker).
+		8035.
+		EAROM.
+		1.25 only -- clksync() is dummied out -- causes watchdog resets.
+		Selectable memory size.
+		Video enable/reverse video switch.
 
 ****************************************************************************/
 
@@ -57,9 +57,6 @@
 
 #include "screen.h"
 #include "speaker.h"
-
-#include "bitgrpha.lh"
-#include "bitgrphb.lh"
 
 #define M68K_TAG "maincpu"
 #define PPU_TAG "ppu"
@@ -112,33 +109,33 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
-	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	DECLARE_READ8_MEMBER(pia_r);
+	DECLARE_WRITE8_MEMBER(pia_w);
+	DECLARE_READ8_MEMBER(pia_pa_r);
+	DECLARE_READ8_MEMBER(pia_pb_r);
+	DECLARE_WRITE8_MEMBER(pia_pa_w);
+	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	DECLARE_READ_LINE_MEMBER(pia_ca1_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 
-	DECLARE_WRITE16_MEMBER( baud_write );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
+	DECLARE_WRITE16_MEMBER(baud_write);
+	DECLARE_WRITE_LINE_MEMBER(com8116_a_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(com8116_a_ft_w);
+	DECLARE_WRITE_LINE_MEMBER(com8116_b_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(com8116_b_ft_w);
 
-	DECLARE_READ8_MEMBER( adlc_r );
-	DECLARE_WRITE8_MEMBER( adlc_w );
+	DECLARE_READ8_MEMBER(adlc_r);
+	DECLARE_WRITE8_MEMBER(adlc_w);
 
-	DECLARE_WRITE8_MEMBER( earom_write );
-	DECLARE_WRITE8_MEMBER( misccr_write );
-	DECLARE_WRITE_LINE_MEMBER( system_clock_write );
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(misccr_write);
+	DECLARE_WRITE_LINE_MEMBER(system_clock_write);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( ppu_read );
-	DECLARE_WRITE8_MEMBER( ppu_write );
-	DECLARE_WRITE8_MEMBER( ppu_i8243_w );
+	DECLARE_READ8_MEMBER(ppu_read);
+	DECLARE_WRITE8_MEMBER(ppu_write);
+	DECLARE_WRITE8_MEMBER(ppu_i8243_w);
 
 private:
 	virtual void machine_start() override;
@@ -195,24 +192,35 @@ static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
 	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
 	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
 	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
-//  AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
-//  AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
+//	AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
+	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
 	AM_RANGE(0x380000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
+DEVICE_INPUT_DEFAULTS_END
+
+
 READ8_MEMBER(bitgraph_state::pia_r)
 {
-	DBG_LOG(3,"PIA", ("R %d\n", offset));
-	return m_pia->read(space, 3-offset);
+	DBG_LOG(3, "PIA", ("R %d\n", offset));
+	return m_pia->read(space, 3 - offset);
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_w)
 {
-	DBG_LOG(3,"PIA", ("W %d < %02X\n", offset, data));
-	return m_pia->write(space, 3-offset, data);
+	DBG_LOG(3, "PIA", ("W %d < %02X\n", offset, data));
+	return m_pia->write(space, 3 - offset, data);
 }
 
 READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
@@ -228,80 +236,93 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 READ8_MEMBER(bitgraph_state::pia_pa_r)
 {
 	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
-	DBG_LOG(2,"PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
+	DBG_LOG(2, "PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 {
-	DBG_LOG(2,"PIA", ("A <- %02X\n", data));
+	DBG_LOG(2, "PIA", ("A <- %02X\n", data));
 	m_pia_a = data;
 }
 
 /*
-        B0          O: BC1  to noisemaker.
-        B1          O: BDIR to noisemaker.
-        B2          O: Clock for EAROM.
-        B3          O: CS1   for EAROM.
-        B4          O: Enable HDLC Xmt interrupt.
-        B5          O: Enable HDLC Rcv interrupt.
-        B6          O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
-        B7          I: EVEN field ??
+	B0	O: BC1  to noisemaker.
+	B1	O: BDIR to noisemaker.
+	B2	O: Clock for EAROM.
+	B3	O: CS1   for EAROM.
+	B4	O: Enable HDLC Xmt interrupt.
+	B5	O: Enable HDLC Rcv interrupt.
+	B6	O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
+	B7	I: EVEN field ??
 */
 READ8_MEMBER(bitgraph_state::pia_pb_r)
 {
-	DBG_LOG(2,"PIA", ("B == %02X\n", m_pia_b));
+	DBG_LOG(2, "PIA", ("B == %02X\n", m_pia_b));
 	return m_pia_b;
 }
 
 WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 {
-	DBG_LOG(2,"PIA", ("B <- %02X\n", data));
+	DBG_LOG(2, "PIA", ("B <- %02X\n", data));
 	m_pia_b = data;
 
-	switch (m_pia_b & 0x03) {
-		case 2: m_psg->data_w(space, 0, m_pia_a); break;
-		case 3: m_psg->address_w(space, 0, m_pia_a); break;
+	switch (m_pia_b & 0x03)
+	{
+	case 2:
+		m_psg->data_w(space, 0, m_pia_a);
+		break;
+	case 3:
+		m_psg->address_w(space, 0, m_pia_a);
+		break;
 	}
 
-	if (BIT(m_pia_b, 3)) {
-		DBG_LOG(2,"EAROM", ("data <- %02X\n", m_pia_a));
+	if (BIT(m_pia_b, 3))
+	{
+		DBG_LOG(2, "EAROM", ("data <- %02X\n", m_pia_a));
 		m_earom->set_data(m_pia_a);
 	}
 	// CS1, ~CS2, C1, C2, CK
 	m_earom->set_control(BIT(m_pia_b, 3), BIT(m_pia_b, 3), BIT(m_pia_a, 6), BIT(m_pia_a, 7), BIT(m_pia_b, 2));
 
-	if (!BIT(m_pia_b, 6)) {
+	if (!BIT(m_pia_b, 6))
+	{
 		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 
 WRITE8_MEMBER(bitgraph_state::earom_write)
 {
-	DBG_LOG(2,"EAROM", ("addr <- %02X (%02X)\n", data & 0x3f, data));
+	DBG_LOG(2, "EAROM", ("addr <- %02X (%02X)\n", data & 0x3f, data));
 	m_earom->set_address(data & 0x3f);
 }
 
 // written once and never changed
 WRITE8_MEMBER(bitgraph_state::misccr_write)
 {
-	DBG_LOG(1,"MISCCR", ("<- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3)));
+	DBG_LOG(1, "MISCCR", ("<- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3)));
 	m_misccr = data;
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 {
-	if (!BIT(m_pia_b, 6)) {
+	if (!BIT(m_pia_b, 6))
+	{
 		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 		return;
 	}
-	if (state) {
+	if (state)
+	{
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	} else {
+	}
+	else
+	{
 		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 
+// rev A writes EA5E -- 9600 HOST, 2400 PNT, 300 KBD, 9600 DBG
+// rev B writes EE5E -- 9600 HOST, 9600 PNT, 300 KBD, 9600 DBG
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
@@ -331,7 +352,8 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 {
-	if (m_acia3) {
+	if (m_acia3)
+	{
 		m_acia3->write_txc(state);
 		m_acia3->write_rxc(state);
 	}
@@ -339,28 +361,28 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 
 READ8_MEMBER(bitgraph_state::adlc_r)
 {
-	DBG_LOG(1,"ADLC", ("R %d\n", offset));
-	return m_adlc ? m_adlc->read(space, 3-offset) : 0xff;
+	DBG_LOG(1, "ADLC", ("R %d\n", offset));
+	return m_adlc ? m_adlc->read(space, 3 - offset) : 0xff;
 }
 
 WRITE8_MEMBER(bitgraph_state::adlc_w)
 {
-	DBG_LOG(1,"ADLC", ("W %d < %02X\n", offset, data));
-	if (m_adlc) return m_adlc->write(space, 3-offset, data);
+	DBG_LOG(1, "ADLC", ("W %d < %02X\n", offset, data));
+	if (m_adlc) return m_adlc->write(space, 3 - offset, data);
 }
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx=0;
-	int x,y;
+	uint8_t gfx = 0;
+	int x, y;
 
 	for (y = 0; y < 768; y++)
 	{
 		uint16_t *p = &bitmap.pix16(y);
 
-		for (x = 0; x < 1024/8; x+=2)
+		for (x = 0; x < 1024 / 8; x += 2)
 		{
-			gfx = m_videoram[ (x+1) | (y<<7)];
+			gfx = m_videoram[(x + 1) | (y << 7)];
 
 			*p++ = BIT(gfx, 7);
 			*p++ = BIT(gfx, 6);
@@ -371,7 +393,7 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			*p++ = BIT(gfx, 1);
 			*p++ = BIT(gfx, 0);
 
-			gfx = m_videoram[ x | (y<<7)];
+			gfx = m_videoram[x | (y << 7)];
 
 			*p++ = BIT(gfx, 7);
 			*p++ = BIT(gfx, 6);
@@ -389,58 +411,59 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 READ8_MEMBER(bitgraph_state::ppu_read)
 {
 	uint8_t data = m_ppu[offset];
-	DBG_LOG(1,"PPU", ("%d == %02X\n", offset, data));
+	DBG_LOG(2, "PPU", ("%d == %02X\n", offset, data));
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::ppu_write)
 {
-	DBG_LOG(1,"PPU", ("%d <- %02X\n", offset, data));
+	DBG_LOG(2, "PPU", ("%d <- %02X\n", offset, data));
 	m_ppu[offset] = data;
 }
 
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
-//  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
+//	AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
+//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 #endif
 
 /*
-    p4  O: Centronics data 3..0
-    p5  O: Centronics data 7..4
-    p6  O: Centronics control
-    p7  I: Centronics status
+	p4	O: Centronics data 3..0
+	p5	O: Centronics data 7..4
+	p6	O: Centronics control
+	p7	I: Centronics status
 */
 WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 {
-	DBG_LOG(1,"PPU", ("8243 %d <- %02X\n", offset + 4, data));
-	switch (offset) {
-		case 0:
-			m_centronics->write_data0(BIT(data, 0));
-			m_centronics->write_data1(BIT(data, 1));
-			m_centronics->write_data2(BIT(data, 2));
-			m_centronics->write_data3(BIT(data, 3));
-			break;
-		case 1:
-			m_centronics->write_data4(BIT(data, 0));
-			m_centronics->write_data5(BIT(data, 1));
-			m_centronics->write_data6(BIT(data, 2));
-			m_centronics->write_data7(BIT(data, 3));
-			break;
-		case 2:
-			m_centronics->write_strobe(BIT(data, 0));
-			// 1: Paper instruction
-			m_centronics->write_init(BIT(data, 2));
-			break;
-		case 3:
-			m_centronics->write_ack(BIT(data, 0));
-			m_centronics->write_busy(BIT(data, 1));
-			m_centronics->write_perror(BIT(data, 2));
-			m_centronics->write_select(BIT(data, 3));
-			break;
+	DBG_LOG(1, "PPU", ("8243 %d <- %02X\n", offset + 4, data));
+	switch (offset)
+	{
+	case 0:
+		m_centronics->write_data0(BIT(data, 0));
+		m_centronics->write_data1(BIT(data, 1));
+		m_centronics->write_data2(BIT(data, 2));
+		m_centronics->write_data3(BIT(data, 3));
+		break;
+	case 1:
+		m_centronics->write_data4(BIT(data, 0));
+		m_centronics->write_data5(BIT(data, 1));
+		m_centronics->write_data6(BIT(data, 2));
+		m_centronics->write_data7(BIT(data, 3));
+		break;
+	case 2:
+		m_centronics->write_strobe(BIT(data, 0));
+		// 1: Paper instruction
+		m_centronics->write_init(BIT(data, 2));
+		break;
+	case 3:
+		m_centronics->write_ack(BIT(data, 0));
+		m_centronics->write_busy(BIT(data, 1));
+		m_centronics->write_perror(BIT(data, 2));
+		m_centronics->write_select(BIT(data, 3));
+		break;
 	}
 }
 
@@ -490,6 +513,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
 	MCFG_DEVICE_ADD(ACIA2_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
@@ -564,8 +588,6 @@ static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_cts))
 
-	MCFG_DEFAULT_LAYOUT(layout_bitgrpha)
-
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
@@ -579,8 +601,6 @@ static MACHINE_CONFIG_START( bitgrphb, bitgraph_state )
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
-
-	MCFG_DEFAULT_LAYOUT(layout_bitgrphb)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -619,5 +639,5 @@ ROM_END
 
 /* Driver */
 /*       YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", MACHINE_IMPERFECT_KEYBOARD)
-COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)
+COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", ROT90 | MACHINE_IMPERFECT_KEYBOARD)
+COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)

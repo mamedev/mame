@@ -829,10 +829,9 @@ ROM_START( mk3p40 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u114_game_rom.u114",  0x1000003, 0x080000, CRC(a8d99922) SHA1(04ff8d85448701070672f44dbf5bcfd744f1bc8a) )
 ROM_END
 
-// TODO: we're currently using version 1.0 roms for sound for all sets, see MT #00751
 ROM_START( umk3 )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "l2.0_mortal_kombat_3_u2_ultimate.u2", 0x000000, 0x100000, BAD_DUMP CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) ) /* verified labeled as L2.0 */
+	ROM_LOAD16_BYTE( "l2.0_mortal_kombat_3_u2_ultimate.u2", 0x000000, 0x100000, CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) ) /* verified labeled as L2.0 */
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u3_music_spch.u3", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u4_music_spch.u4", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u5_music_spch.u5", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
@@ -842,7 +841,7 @@ ROM_START( umk3 )
 	ROM_LOAD16_BYTE( "l1.2_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(6d301faf) SHA1(18a8e29cc3e8ce5cc0e10f8386d43e7f44fd7b75) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -876,7 +875,7 @@ ROM_END
 
 ROM_START( umk3r11 )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "l2.0_mortal_kombat_3_u2_ultimate.u2", 0x000000, 0x100000, BAD_DUMP CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) ) /* verified labeled as L2.0 */
+	ROM_LOAD16_BYTE( "l2.0_mortal_kombat_3_u2_ultimate.u2", 0x000000, 0x100000, CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) ) /* verified labeled as L2.0 */
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u3_music_spch.u3", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u4_music_spch.u4", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "l1_mortal_kombat_3_u5_music_spch.u5", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
@@ -886,7 +885,7 @@ ROM_START( umk3r11 )
 	ROM_LOAD16_BYTE( "l1.1_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(ea731783) SHA1(2915626090650c4b5adf5b26e736c3ec91ce81a6) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -930,7 +929,7 @@ ROM_START( umk3r10 )
 	ROM_LOAD16_BYTE( "l1.0_mortal_kombat_3_u63_ultimate.u63",  0x00001, 0x80000, CRC(2dff0c83) SHA1(8942ffa3addf134085ea8d77d56e82593312e7a5) )
 
 	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
-	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+	ROM_LOAD( "463_MK3_Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_3_u133_game_rom.u133",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) ) /* all GAME ROMs here are also known to be labeled as P1.0 */
@@ -1334,9 +1333,9 @@ GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r20,
 GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
 GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )

@@ -41,7 +41,7 @@ public:
 		static const std::size_t npos = static_cast<std::size_t>(-1);
 
 		token_id_t() : m_id(npos) {}
-		token_id_t(const std::size_t id) : m_id(id) {}
+		explicit token_id_t(const std::size_t id) : m_id(id) {}
 		std::size_t id() const { return m_id; }
 	private:
 		std::size_t m_id;
@@ -49,7 +49,7 @@ public:
 
 	struct token_t
 	{
-		token_t(token_type type)
+		explicit token_t(token_type type)
 		: m_type(type), m_id(), m_token("")
 		{
 		}
@@ -57,7 +57,7 @@ public:
 		: m_type(type), m_id(), m_token(str)
 		{
 		}
-		token_t(const token_id_t id, const pstring &str)
+		token_t(const token_id_t &id, const pstring &str)
 		: m_type(TOKEN), m_id(id), m_token(str)
 		{
 		}
@@ -89,7 +89,7 @@ public:
 	long get_number_long();
 
 	void require_token(const token_id_t &token_num);
-	void require_token(const token_t tok, const token_id_t &token_num);
+	void require_token(const token_t &tok, const token_id_t &token_num);
 
 	token_id_t register_token(pstring token)
 	{
@@ -158,7 +158,7 @@ public:
 		pstring m_replace;
 	};
 
-	ppreprocessor(std::vector<define_t> *defines = nullptr);
+	explicit ppreprocessor(std::vector<define_t> *defines = nullptr);
 	virtual ~ppreprocessor() {}
 
 	void process(putf8_reader &istrm, putf8_writer &ostrm);

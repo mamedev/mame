@@ -647,8 +647,8 @@ private:
 
 	void start_timer(int num);
 
-	void l2p_command(int ref, int params, const char **param);
-	void fcodes_command(int ref, int params, const char **param);
+	void l2p_command(int ref, const std::vector<std::string> &params);
+	void fcodes_command(int ref, const std::vector<std::string> &params);
 };
 
 uint32_t sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -716,7 +716,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	}
 	else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -783,7 +783,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	uint32_t retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (space.debugger_access()) asi = 9;
+	if (machine().side_effect_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -862,7 +862,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!space.debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effect_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1007,7 +1007,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -1064,7 +1064,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	int page;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (space.debugger_access()) asi = 9;
+	if (machine().side_effect_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -1143,7 +1143,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effect_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1265,11 +1265,11 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 	printf("sun4: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
-void sun4_state::l2p_command(int ref, int params, const char **param)
+void sun4_state::l2p_command(int ref, const std::vector<std::string> &params)
 {
 	uint64_t addr, offset;
 
-	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr)) return;
+	if (!machine().debugger().commands().validate_number_parameter(params[0], addr)) return;
 
 	addr &= 0xffffffff;
 	offset = addr >> 2;
@@ -1302,14 +1302,14 @@ void sun4_state::l2p_command(int ref, int params, const char **param)
 	}
 }
 
-void sun4_state::fcodes_command(int ref, int params, const char **param)
+void sun4_state::fcodes_command(int ref, const std::vector<std::string> &params)
 {
 #if SUN4_LOG_FCODES
 	if (params < 1)
 		return;
 
-	bool is_on = strcmp(param[0], "on") == 0;
-	bool is_off = strcmp(param[0], "off") == 0;
+	bool is_on = (params[0] == "on");
+	bool is_off = (params[0] == "off");
 
 	if (!is_on && !is_off)
 	{
@@ -1360,9 +1360,9 @@ void sun4_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2));
 		#if SUN4_LOG_FCODES
-		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2));
 		#endif
 	}
 
@@ -1478,7 +1478,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( sun4_state::fdc_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	switch(offset)

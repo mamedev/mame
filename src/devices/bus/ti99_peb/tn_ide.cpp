@@ -128,7 +128,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::cruwrite)
 READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 {
 	uint8_t reply = 0;
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -194,7 +194,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 */
 WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{

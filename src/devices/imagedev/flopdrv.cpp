@@ -641,6 +641,10 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 
 		/* update track 0 line with new status */
 		//m_out_tk00_func(m_tk00);
+
+		/* inform disk image of step operation so it can cache information */
+		if (exists())
+			m_track = m_current_track;
 	}
 
 	m_stp = state;
@@ -817,19 +821,19 @@ void legacy_floppy_image_device::device_start()
 void legacy_floppy_image_device::device_config_complete()
 {
 	m_extension_list[0] = '\0';
-	const struct FloppyFormat *floppy_options = m_config->formats;
-	for (int i = 0; floppy_options[i].construct; i++)
+	if (m_config)
 	{
-		// only add if creatable
-		if (floppy_options[i].param_guidelines) {
-			// allocate a new format and append it to the list
-			add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
+		const struct FloppyFormat *floppy_options = m_config->formats;
+		for (int i = 0; floppy_options && floppy_options[i].construct; i++)
+		{
+			// only add if creatable
+			if (floppy_options[i].param_guidelines) {
+				// allocate a new format and append it to the list
+				add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
+			}
+			image_specify_extension(m_extension_list, 256, floppy_options[i].extensions);
 		}
-		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)

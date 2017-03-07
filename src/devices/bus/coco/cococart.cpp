@@ -91,20 +91,6 @@ void cococart_slot_device::device_start()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cococart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-
-
-//-------------------------------------------------
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 

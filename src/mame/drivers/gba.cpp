@@ -1144,8 +1144,9 @@ READ32_MEMBER(gba_state::gba_bios_r)
 			return 0;
 	}
 
-	if (m_maincpu->state_int(ARM7_PC) >= 0x4000)
+	if (m_maincpu->pc() >= 0x4000)
 	{
+		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
 		return 0;
 	}
 

@@ -417,7 +417,7 @@ redline_80186_sound_device::redline_80186_sound_device(const machine_config &mco
 const device_type ATAXX_80186 = device_creator<ataxx_80186_sound_device>;
 
 ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Ataxx)", tag, owner, clock, "ataxx_80186_sound", __FILE__)
+	: leland_80186_sound_device(mconfig, ATAXX_80186, "80186 DAC (Ataxx)", tag, owner, clock, "ataxx_80186_sound", __FILE__)
 {
 	m_type = TYPE_ATAXX;
 }
@@ -425,7 +425,7 @@ ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig
 const device_type WSF_80186 = device_creator<wsf_80186_sound_device>;
 
 wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (WSF)", tag, owner, clock, "wsf_80186_sound", __FILE__)
+	: leland_80186_sound_device(mconfig, WSF_80186, "80186 DAC (WSF)", tag, owner, clock, "wsf_80186_sound", __FILE__)
 {
 	m_type = TYPE_WSF;
 }

@@ -69,17 +69,6 @@ void bitbanger_device::device_start(void)
 
 
 /*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void bitbanger_device::device_config_complete(void)
-{
-	update_names(BITBANGER, "bitbngr", "bitb");
-}
-
-
-
-/*-------------------------------------------------
     call_load
 -------------------------------------------------*/
 

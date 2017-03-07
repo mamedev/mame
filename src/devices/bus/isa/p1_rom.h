@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 ROM cartridge device
+	Poisk-1 ROM cartridge device
 
 **********************************************************************/
 

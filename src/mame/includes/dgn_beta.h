@@ -224,8 +224,8 @@ public:
 	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 
 private:
-	void execute_beta_key_dump(int ref, int params, const char *param[]);
-	void execute_beta_dat_log(int ref, int params, const char *param[]);
+	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
+	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
 #endif /* DGN_BETA_H_ */

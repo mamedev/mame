@@ -59,9 +59,9 @@
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
- @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
+ @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
- *MP3300   TMS1000   1979, Milton Bradley Simon (newer)
+ @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
@@ -129,7 +129,6 @@
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
-  - quizwizc cartridge configs
 
 ***************************************************************************/
 
@@ -141,7 +140,9 @@
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
-
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
 #include "rendlay.h"
@@ -1629,14 +1630,22 @@ MACHINE_CONFIG_END
   * TMS1000NLL M32001-N2 (die label 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
   
-  This is a 4-player version of Quiz Wiz, the same cartridges and question
-  books can be used.
-  
-  known cartridge configurations:
-  #  config           to K1     title
-  -----------------------------------------------
-  1  1-2-3-4,5-6-7-8  1,2,3     1001 Questions
-  8  1-5,2-6,3-7,4-8  8         The Book of Lists
+  This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
+  According to the manual, Quiz Wiz cartridges are compatible with it.
+  The question books are needed to play, as well as optional game pieces.
+
+  Cartridge pinout:
+  1 R4
+  2 R6
+  3 R7
+  4 K1
+  5 N/C
+  6 R8
+  7 R5
+  8 R9
+
+  The cartridge connects one or more of the R pins to K1. Together with the
+  question numbers, the game generates a pseudo-random answerlist.
 
 ***************************************************************************/
 
@@ -1644,8 +1653,12 @@ class quizwizc_state : public hh_tms1k_state
 {
 public:
 	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_pinout(0)
 	{ }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	u16 m_pinout; // cartridge R pins
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1654,6 +1667,22 @@ public:
 };
 
 // handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge pinout K1 to R connections
+	std::string pinout(image.get_feature("pinout"));
+	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
+	m_pinout = BITSWAP8(m_pinout,4,3,7,5,2,1,6,0) << 4;
+
+	return image_init_result::PASS;
+}
 
 void quizwizc_state::prepare_display()
 {
@@ -1670,8 +1699,8 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// R0-R5: input mux
-	// R4-R9: cartridge pins
-	m_inp_mux = data;
+	// R4-R9: to cartridge slot
+	m_inp_mux = data & 0x3f;
 
 	// R0-R3: led select
 	// R6-R9: digit select
@@ -1690,7 +1719,7 @@ READ8_MEMBER(quizwizc_state::read_k)
 {
 	// K: multiplexed inputs
 	// K1: cartridge pin 4 (pin 5 N/C)
-	return read_inputs(10);
+	return read_inputs(6) | ((m_r & m_pinout) ? 1 : 0);
 }
 
 
@@ -1722,45 +1751,16 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 	PORT_START("IN.4") // R4
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 1" ) PORT_DIPLOCATION(":1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Fast Forward")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Slow Forward")
 
 	PORT_START("IN.5") // R5
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 7" ) PORT_DIPLOCATION(":7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_CONFNAME( 0x02, 0x00, "Game Select")
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.6") // R6
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 2" ) PORT_DIPLOCATION(":2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.7") // R7
-	PORT_DIPNAME( 0x01, 0x01, "Cartridge Pin 3" ) PORT_DIPLOCATION(":3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.8") // R8
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 6" ) PORT_DIPLOCATION(":6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.9") // R9
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Pin 8" ) PORT_DIPLOCATION(":8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
@@ -1778,6 +1778,11 @@ static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
+	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
 MACHINE_CONFIG_END
 
 
@@ -1795,7 +1800,7 @@ MACHINE_CONFIG_END
   sold in a pack. Gameplay has emphasis on strategy, read the official manual
   on how to play. MAME external artwork is needed for the switchable overlays.
 
-  Cartridge socket:
+  Cartridge pinout:
   1 N/C
   2 9V+
   3 power switch
@@ -1807,20 +1812,18 @@ MACHINE_CONFIG_END
 
   The cartridge connects pin 8 with one of the K-pins.
 
-  Available cartridges:
-  - Football    (K8, confirmed)
-  - Hockey      (K4?)
-  - Soccer      (K2?)
-  - Basketball  (K1?)
-
 ***************************************************************************/
 
 class tc4_state : public hh_tms1k_state
 {
 public:
 	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_pinout(0)
 	{ }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	u8 m_pinout; // cartridge K pins
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -1829,6 +1832,21 @@ public:
 };
 
 // handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge pinout R9 to K connections
+	std::string pinout(image.get_feature("pinout"));
+	m_pinout = std::stoul(pinout, nullptr, 0) & 0xf;
+
+	return image_init_result::PASS;
+}
 
 void tc4_state::prepare_display()
 {
@@ -1846,7 +1864,7 @@ WRITE16_MEMBER(tc4_state::write_r)
 
 	// R0-R5: input mux
 	// R9: to cartridge slot
-	m_inp_mux = (data & 0x3f) | (data >> 3 & 0x40);
+	m_inp_mux = data & 0x3f;
 
 	// R0-R4: select led
 	// R6: led 8 state
@@ -1864,8 +1882,8 @@ WRITE16_MEMBER(tc4_state::write_o)
 
 READ8_MEMBER(tc4_state::read_k)
 {
-	// K: multiplexed inputs
-	return read_inputs(7);
+	// K: multiplexed inputs, cartridge pins from R9
+	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
 }
 
 
@@ -1907,13 +1925,6 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 1") // left
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 2") // middle
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
-
-	PORT_START("IN.6") // R9
-	PORT_CONFNAME( 0x0f, 0x08, "Cartridge")
-	PORT_CONFSETTING(    0x01, "Basketball" )
-	PORT_CONFSETTING(    0x02, "Soccer" )
-	PORT_CONFSETTING(    0x04, "Hockey" )
-	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tc4, tc4_state )
@@ -1931,6 +1942,12 @@ static MACHINE_CONFIG_START( tc4, tc4_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tc4_cart")
+	MCFG_GENERIC_MANDATORY // system won't power on without cartridge
+	MCFG_GENERIC_LOAD(tc4_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tc4")
 MACHINE_CONFIG_END
 
 
@@ -5583,16 +5600,17 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley Simon, created by Ralph Baer
-
-  Revision A hardware:
-  * TMS1000 (die label MP3226)
+  Milton Bradley Simon (model 4850), created by Ralph Baer
+  * TMS1000 (die label MP3226), or MP3300 (die label 1000C, MP3300)
   * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
-  Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
-  instead of the TMS1000. This one has been decapped too, but we couldn't
-  find an internal ROM. It is possibly a cost-reduced custom ASIC specifically
-  for Simon. The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
+  known revisions:
+  - 1978: Rev A: TMS1000(no label)
+  - 198?: Rev B: MB4850 SCUS0640(16-pin custom ASIC), PCB label REV.B,
+    cost-reduced, same hardware as Pocket Simon
+  - 1979: Rev F: TMS1000(MP3300), PCB label 4850 Rev F
+
+  The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
 
 ***************************************************************************/
 
@@ -8879,6 +8897,16 @@ ROM_START( simon )
 	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
 
+ROM_START( simonf )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3300", 0x0000, 0x0400, CRC(b9fcf93a) SHA1(45960e4242a08495f2a99fc5d44728eabd93cd9f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_simon_micro.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1000_simon_output.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
+
 
 ROM_START( ssimon )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -9200,7 +9228,8 @@ CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mat
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1977, bship,     0,        0, bship,     bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
 CONS( 1977, bshipb,    bship,    0, bshipb,    bship,     driver_device, 0, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, simonf,    simon,    0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***

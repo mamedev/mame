@@ -75,12 +75,12 @@ nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device
 }
 
 nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NAMCOT175, "NES Cart Namcot 340 PCB", tag, owner, clock, "nes_namcot340", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+					: nes_nrom_device(mconfig, NES_NAMCOT340, "NES Cart Namcot 340 PCB", tag, owner, clock, "nes_namcot340", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
 nes_namcot175_device::nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_namcot340_device(mconfig, NES_NAMCOT340, "NES Cart Namcot 175 PCB", tag, owner, clock, "nes_namcot175", __FILE__), m_wram_protect(0)
+					: nes_namcot340_device(mconfig, NES_NAMCOT175, "NES Cart Namcot 175 PCB", tag, owner, clock, "nes_namcot175", __FILE__), m_wram_protect(0)
 				{
 }
 

@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 FDC device (model B504)
+	Poisk-1 FDC device (model B504)
 
 **********************************************************************/
 
@@ -72,7 +72,7 @@ ROM_END
 
 machine_config_constructor p1_fdc_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( fdc_b504 );
+	return MACHINE_CONFIG_NAME(fdc_b504);
 }
 
 //-------------------------------------------------
@@ -81,7 +81,7 @@ machine_config_constructor p1_fdc_device::device_mconfig_additions() const
 
 const tiny_rom_entry *p1_fdc_device::device_rom_region() const
 {
-	return ROM_NAME( p1_fdc );
+	return ROM_NAME(p1_fdc);
 }
 
 
@@ -91,7 +91,7 @@ const tiny_rom_entry *p1_fdc_device::device_rom_region() const
 
 uint8_t p1_fdc_device::p1_wd17xx_motor_r()
 {
-	DBG_LOG(1,"p1_fdc_motor_r",("R = $%02x\n", 0));
+	DBG_LOG(1, "p1_fdc_motor_r", ("R = $%02x\n", 0));
 	// XXX always on for now
 	return 0;
 }
@@ -100,7 +100,8 @@ uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
-	if (!m_fdc->drq_r() && !m_fdc->intrq_r()) {
+	if (!m_fdc->drq_r() && !m_fdc->intrq_r())
+	{
 		// fake cpu wait by resetting PC one insn back
 		maincpu->set_state_int(I8086_IP, maincpu->state_int(I8086_IP) - 2);
 		maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -121,14 +122,13 @@ uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 */
 void p1_fdc_device::p1_wd17xx_aux_w(int data)
 {
-	DBG_LOG(1,"p1_fdc_aux_w",("W $%02x\n", data));
+	DBG_LOG(1, "p1_fdc_aux_w", ("W $%02x\n", data));
 
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	floppy_image_device *floppy = ((data & 2)?floppy1:floppy0);
+	floppy_image_device *floppy = ((data & 2) ? floppy1 : floppy0);
 
-	if(!BIT(data, 6))
-		m_fdc->reset();
+	if (!BIT(data, 6)) m_fdc->reset();
 
 	m_fdc->set_floppy(floppy);
 
@@ -139,32 +139,37 @@ void p1_fdc_device::p1_wd17xx_aux_w(int data)
 	floppy1->mon_w(!(data & 8));
 }
 
-WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
+WRITE_LINE_MEMBER(p1_fdc_device::p1_fdc_irq_drq)
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
-	if(state)
-		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	if (state) maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ8_MEMBER( p1_fdc_device::p1_fdc_r )
+READ8_MEMBER(p1_fdc_device::p1_fdc_r)
 {
 	uint8_t data = 0xff;
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0: data = p1_wd17xx_aux_r();     break;
-		case 2: data = p1_wd17xx_motor_r();   break;
+	case 0:
+		data = p1_wd17xx_aux_r();
+		break;
+	case 2:
+		data = p1_wd17xx_motor_r();
+		break;
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
+WRITE8_MEMBER(p1_fdc_device::p1_fdc_w)
 {
-	switch( offset )
+	switch (offset)
 	{
-		case 0: p1_wd17xx_aux_w(data);    break;
+	case 0:
+		p1_wd17xx_aux_w(data);
+		break;
 	}
 }
 
@@ -172,10 +177,10 @@ WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
 //  p1_fdc_device - constructor
 //-------------------------------------------------
 
-p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, P1_FDC, "Poisk-1 floppy B504", tag, owner, clock, "p1_fdc", __FILE__),
-	device_isa8_card_interface( mconfig, *this ),
-	m_fdc(*this, "fdc")
+p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, P1_FDC, "Poisk-1 floppy B504", tag, owner, clock, "p1_fdc", __FILE__)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_fdc(*this, "fdc")
 {
 }
 

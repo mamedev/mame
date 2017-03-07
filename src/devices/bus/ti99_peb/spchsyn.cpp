@@ -47,7 +47,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_sbe)
 	{
@@ -66,7 +66,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 */
 WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_sbe)
 	{

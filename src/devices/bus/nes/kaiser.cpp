@@ -106,7 +106,7 @@ nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *
 }
 
 nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_KS7031, "NES Cart Kaiser KS-7016 PCB", tag, owner, clock, "nes_ks7016", __FILE__)
+					: nes_nrom_device(mconfig, NES_KS7016, "NES Cart Kaiser KS-7016 PCB", tag, owner, clock, "nes_ks7016", __FILE__)
 {
 }
 

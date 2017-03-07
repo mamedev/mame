@@ -20,8 +20,8 @@
  *081     1655A   19??, Ramtex Space Invaders/Block Buster
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
- @133     1650A   1980, U.S. Games Programmable Baseball/Tandy 2-Player Baseball
- @144     1650A   1980, U.S. Games Football/Tandy 2-Player Football
+ @133     1650A   1981, U.S. Games Programmable Baseball/Tandy 2-Player Baseball
+ @144     1650A   1981, U.S. Games/Tandy 2-Player Football
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
@@ -1339,8 +1339,8 @@ MACHINE_CONFIG_END
   * x
 
   known releases:
-  - USA(1): Half Court Computer Basketball
-  - USA(2): 2-Player Baseball (model 60-2157), published by Tandy
+  - USA(1): Programmable Baseball
+  - USA(2): Electronic 2-Player Baseball (model 60-2157), published by Tandy
 
 ***************************************************************************/
 
@@ -1365,7 +1365,7 @@ void uspbball_state::prepare_display()
 
 READ8_MEMBER(uspbball_state::read_a)
 {
-	return 0xf;
+	return 0xff;
 }
 
 WRITE8_MEMBER(uspbball_state::write_b)
@@ -1395,6 +1395,9 @@ static MACHINE_CONFIG_START( uspbball, uspbball_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(uspbball_state, write_b))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(uspbball_state, write_c))
 
+	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_uspbball)
 
@@ -1410,20 +1413,20 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  U.S. Games Football
+  U.S. Games Electronic 2-Player Football
   * PIC 1650A-144
-  * x
+  * 8 7seg LEDs + 2 other LEDs, 1-bit sound
 
   known releases:
-  - USA(1): Football
-  - USA(2): 2-Player Baseball (model 60-2157), published by Tandy
+  - USA(1): Electronic 2-Player Football
+  - USA(2): Electronic 2-Player Football (model 60-2156), published by Tandy
 
 ***************************************************************************/
 
-class usfball_state : public hh_pic16_state
+class us2pfball_state : public hh_pic16_state
 {
 public:
-	usfball_state(const machine_config &mconfig, device_type type, const char *tag)
+	us2pfball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
@@ -1435,27 +1438,27 @@ public:
 
 // handlers
 
-void usfball_state::prepare_display()
+void us2pfball_state::prepare_display()
 {
 }
 
-READ8_MEMBER(usfball_state::read_a)
+READ8_MEMBER(us2pfball_state::read_a)
 {
-	return 0xf;
+	return 0xff;
 }
 
-WRITE8_MEMBER(usfball_state::write_b)
+WRITE8_MEMBER(us2pfball_state::write_b)
 {
 }
 
-WRITE8_MEMBER(usfball_state::write_c)
+WRITE8_MEMBER(us2pfball_state::write_c)
 {
 }
 
 
 // config
 
-static INPUT_PORTS_START( usfball )
+static INPUT_PORTS_START( us2pfball )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1463,16 +1466,19 @@ static INPUT_PORTS_START( usfball )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( usfball, usfball_state )
+static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=39K, C=75pF
-	MCFG_PIC16C5x_READ_A_CB(READ8(usfball_state, read_a))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(usfball_state, write_b))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(usfball_state, write_c))
+	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=39K, C=75pF
+	MCFG_PIC16C5x_READ_A_CB(READ8(us2pfball_state, read_a))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(us2pfball_state, write_b))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(us2pfball_state, write_c))
+
+	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_usfball)
+	//MCFG_DEFAULT_LAYOUT(layout_us2pfball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1555,31 +1561,31 @@ ROM_START( uspbball )
 ROM_END
 
 
-ROM_START( usfball )
+ROM_START( us2pfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic_1650a-144", 0x0000, 0x0400, CRC(ef3677c9) SHA1(33f89c79e7e090710681dffe09eddaf66b5cb794) )
 ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, touchme,   0,        0, touchme,  touchme,  driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, touchme,   0,        0, touchme,   touchme,   driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,        0, pabball,  pabball,  driver_device, 0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, pabball,   0,        0, pabball,   pabball,   driver_device, 0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1980, melodym,   0,        0, melodym,  melodym,  driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, melodym,   0,        0, melodym,   melodym,   driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,        0, maniac,   maniac,   driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, maniac,    0,        0, maniac,    maniac,    driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,        0, leboom,   leboom,   driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, leboom,    0,        0, leboom,    leboom,    driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, tbaskb,    0,        0, tbaskb,   tbaskb,   driver_device, 0, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, tbaskb,    0,        0, tbaskb,    tbaskb,    driver_device, 0, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, rockpin,   0,        0, rockpin,  rockpin,  driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, hccbaskb,  0,        0, hccbaskb, hccbaskb, driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, rockpin,   0,        0, rockpin,   rockpin,   driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, hccbaskb,  0,        0, hccbaskb,  hccbaskb,  driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, ttfball,   0,        0, ttfball,  ttfball,  driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball,  0, ttfball,  ttfballa, driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ttfball,   0,        0, ttfball,   ttfball,   driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1979, ttfballa,  ttfball,  0, ttfball,   ttfballa,  driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, uspbball,  0,        0, uspbball, uspbball, driver_device, 0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1980, usfball,   0,        0, usfball,  usfball,  driver_device, 0, "U.S. Games", "Football (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, uspbball,  0,        0, uspbball,  uspbball,  driver_device, 0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, us2pfball, 0,        0, us2pfball, us2pfball, driver_device, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/ec184x.c
+	drivers/ec184x.c
 
-    Driver file for EC-184x series
+	Driver file for EC-184x series
 
 ***************************************************************************/
 
@@ -33,20 +33,21 @@
 	} while (0)
 
 
-
 class ec184x_state : public driver_device
 {
 public:
 	ec184x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_MACHINE_RESET(ec1841);
 	DECLARE_DRIVER_INIT(ec1841);
 
-	struct {
+	struct
+	{
 		uint8_t enable[4];
 		int boards;
 	} m_memory;
@@ -83,7 +84,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 		data = 0xff;
 	else
 		data = m_memory.enable[data];
-	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset+1, m_memory.boards, data ));
+	DBG_LOG(1, "ec1841_memboard", ("R (%d of %d) == %02X\n", offset + 1, m_memory.boards, data));
 
 	return data;
 }
@@ -96,71 +97,76 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 
 	current = m_memory.enable[offset];
 
-	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset+1, m_memory.boards, data, current));
+	DBG_LOG(1, "ec1841_memboard", ("W (%d of %d) <- %02X (%02X)\n", offset + 1, m_memory.boards, data, current));
 
-	if (offset >= m_memory.boards) {
+	if (offset >= m_memory.boards)
+	{
 		return;
 	}
 
-	if (BIT(current, 2) && !BIT(data, 2)) {
+	if (BIT(current, 2) && !BIT(data, 2))
+	{
 		// disable read access
-		program.unmap_read(0, EC1841_MEMBOARD_SIZE-1);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
+		program.unmap_read(0, EC1841_MEMBOARD_SIZE - 1);
+		DBG_LOG(1, "ec1841_memboard_w", ("unmap_read(%d)\n", offset));
 	}
 
-	if (BIT(current, 3) && !BIT(data, 3)) {
+	if (BIT(current, 3) && !BIT(data, 3))
+	{
 		// disable write access
-		program.unmap_write(0, EC1841_MEMBOARD_SIZE-1);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
+		program.unmap_write(0, EC1841_MEMBOARD_SIZE - 1);
+		DBG_LOG(1, "ec1841_memboard_w", ("unmap_write(%d)\n", offset));
 	}
 
-	if (!BIT(current, 2) && BIT(data, 2)) {
-		for(int i=0; i<4; i++)
+	if (!BIT(current, 2) && BIT(data, 2))
+	{
+		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xfb;
 		// enable read access
-		membank("bank10")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
-		program.install_read_bank(0, EC1841_MEMBOARD_SIZE-1, "bank10");
-		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
+		membank("bank10")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
+		program.install_read_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank10");
+		DBG_LOG(1, "ec1841_memboard_w", ("map_read(%d)\n", offset));
 	}
 
-	if (!BIT(current, 3) && BIT(data, 3)) {
-		for(int i=0; i<4; i++)
+	if (!BIT(current, 3) && BIT(data, 3))
+	{
+		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xf7;
 		// enable write access
-		membank("bank20")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
-		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
-		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
+		membank("bank20")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
+		program.install_write_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank20");
+		DBG_LOG(1, "ec1841_memboard_w", ("map_write(%d)\n", offset));
 	}
 
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
+DRIVER_INIT_MEMBER(ec184x_state, ec1841)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
-	m_memory.boards = m_ram->size()/EC1841_MEMBOARD_SIZE;
-	if (m_memory.boards > 4)
-		m_memory.boards = 4;
+	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
+	if (m_memory.boards > 4) m_memory.boards = 4;
 
 	program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
 	program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
 
-	membank( "bank10" )->set_base( m_ram->pointer() );
-	membank( "bank20" )->set_base( m_ram->pointer() );
+	membank("bank10")->set_base(m_ram->pointer());
+	membank("bank20")->set_base(m_ram->pointer());
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
 	// XXX verify this was actually the case
-	if (m_ram->size() == 640*1024) {
-		program.install_read_bank(EC1841_MEMBOARD_SIZE,  m_ram->size()-1, "bank11");
-		program.install_write_bank(EC1841_MEMBOARD_SIZE, m_ram->size()-1, "bank21");
-		membank( "bank11" )->set_base( m_ram->pointer() + EC1841_MEMBOARD_SIZE );
-		membank( "bank21" )->set_base( m_ram->pointer() + EC1841_MEMBOARD_SIZE );
+	if (m_ram->size() == 640 * 1024)
+	{
+		program.install_read_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank11");
+		program.install_write_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank21");
+		membank("bank11")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
+		membank("bank21")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
 	}
 }
 
-MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
+MACHINE_RESET_MEMBER(ec184x_state, ec1841)
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled

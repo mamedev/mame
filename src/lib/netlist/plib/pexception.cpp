@@ -21,16 +21,16 @@ namespace plib {
 //  Exceptions
 //============================================================
 
-pexception::pexception(const pstring text)
+pexception::pexception(const pstring &text)
+: m_text(text)
 {
-	m_text = text;
 }
 
 pexception::~pexception() noexcept
 {
 }
 
-file_e::file_e(const pstring fmt, const pstring &filename)
+file_e::file_e(const pstring &fmt, const pstring &filename)
 	: pexception(pfmt(fmt)(filename))
 {
 }

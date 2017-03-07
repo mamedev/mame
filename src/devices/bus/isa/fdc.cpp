@@ -133,7 +133,7 @@ machine_config_constructor isa8_fdc_at_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_at);
 }
 
-isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits SMC FDC hookup", tag, owner, clock, "isa8_fdc_smc", __FILE__)
+isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SMC, "ISA 8bits SMC FDC hookup", tag, owner, clock, "isa8_fdc_smc", __FILE__)
 {
 }
 

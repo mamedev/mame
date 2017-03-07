@@ -130,22 +130,22 @@ public:
 	const debugger_constants *debugc_bios;
 
 private:
-	void dump_string_command(int ref, int params, const char **param);
-	void dump_process_command(int ref, int params, const char **param);
-	void dump_list_command(int ref, int params, const char **param);
-	void dump_dpc_command(int ref, int params, const char **param);
-	void dump_timer_command(int ref, int params, const char **param);
-	void curthread_command(int ref, int params, const char **param);
-	void threadlist_command(int ref, int params, const char **param);
-	void generate_irq_command(int ref, int params, const char **param);
-	void nv2a_combiners_command(int ref, int params, const char **param);
-	void nv2a_wclipping_command(int ref, int params, const char **param);
-	void waitvblank_command(int ref, int params, const char **param);
-	void grab_texture_command(int ref, int params, const char **param);
-	void grab_vprog_command(int ref, int params, const char **param);
-	void vprogdis_command(int ref, int params, const char **param);
-	void help_command(int ref, int params, const char **param);
-	void xbox_debug_commands(int ref, int params, const char **param);
+	void dump_string_command(int ref, const std::vector<std::string> &params);
+	void dump_process_command(int ref, const std::vector<std::string> &params);
+	void dump_list_command(int ref, const std::vector<std::string> &params);
+	void dump_dpc_command(int ref, const std::vector<std::string> &params);
+	void dump_timer_command(int ref, const std::vector<std::string> &params);
+	void curthread_command(int ref, const std::vector<std::string> &params);
+	void threadlist_command(int ref, const std::vector<std::string> &params);
+	void generate_irq_command(int ref, const std::vector<std::string> &params);
+	void nv2a_combiners_command(int ref, const std::vector<std::string> &params);
+	void nv2a_wclipping_command(int ref, const std::vector<std::string> &params);
+	void waitvblank_command(int ref, const std::vector<std::string> &params);
+	void grab_texture_command(int ref, const std::vector<std::string> &params);
+	void grab_vprog_command(int ref, const std::vector<std::string> &params);
+	void vprogdis_command(int ref, const std::vector<std::string> &params);
+	void help_command(int ref, const std::vector<std::string> &params);
+	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
 	int find_bios_index(running_machine &mach);
 	bool find_bios_hash(running_machine &mach, int bios, uint32_t &crc32);
 	void find_debug_params(running_machine &mach);

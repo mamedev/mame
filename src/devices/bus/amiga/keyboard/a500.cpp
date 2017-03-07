@@ -242,7 +242,7 @@ a500_kbd_no_device::a500_kbd_no_device(const machine_config &mconfig, const char
 }
 
 a500_kbd_gb_device::a500_kbd_gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_NO, "Amiga 500 Keyboard (UK)", "a500_kbd_gb", __FILE__)
+	a500_kbd_device(mconfig, tag, owner, clock, A500_KBD_GB, "Amiga 500 Keyboard (UK)", "a500_kbd_gb", __FILE__)
 {
 }
 
@@ -450,7 +450,7 @@ WRITE8_MEMBER( a500_kbd_device::latch_w )
 
 READ8_MEMBER( a500_kbd_device::counter_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

@@ -51,9 +51,9 @@
     4800-4bff RAM Dream Shopper, Van Van Car only.  Pacman uses this block due to a bug in the routine to
          translate the internal pacman location to a screen address when in the right tunnel.
     4c00-4fff RAM
-    8000-bfff ROM Ms Pac-Man, Ponpoko, Lizard Wizard, Dream Shopper, Van Van Car, Woodpecker, Ali Babba all use
+    8000-bfff ROM Ms Pac-Man, Ponpoko, Lizard Wizard, Dream Shopper, Van Van Car, Woodpecker, Ali Baba all use
          portions of the upper memory area.  Pacman and most bootlegs don't have an A15 line to the cpu so most
-         boards that use upper memmory have an auxillary board that plugs into the cpu socket with a ribbon cable.
+         boards that use upper memory have an auxiliary board that plugs into the cpu socket with a ribbon cable.
          There is also a common Ms Pacman hack for pacman bootlegs to wire A15 from the cpu to the address decoder
          in place of the refresh line. The extra eproms are stacked on lower eproms or placed in unused sockets for
          2k roms.
@@ -72,7 +72,7 @@
     4ff0-4fff 8 pairs of two bytes:
               the first byte contains the sprite image number (bits 2-7), Y flip (bit 0),
               X flip (bit 1); the second byte the color.  Note: Only Ponpoko has 8 sprites
-              an original Midway Pacman board containls only the center 6 sprites.
+              an original Midway Pacman board contains only the center 6 sprites.
     5000      interrupt enable
     5001      sound enable
     5002      latch at location 8K has no connection for this address
@@ -254,11 +254,11 @@ notes:
 - maketrxb:  This board looked slightly different than the standard make trax.  The usual Red and Yellow jumper wires
   for sync inversion were smaller and white and the stickers were slightly different.
 
-- Pac and Paint: Even though this seems to be a unique game the marquee shows a paintbush.  The board has standard
+- Pac and Paint: Even though this seems to be a unique game the marquee shows a paintbrush.  The board has standard
   crush roller roms.  It is slightly different from a Make Trax board in that the sync inverter chip is missing and
   there are no jumper wires.
 
-- jumpshotp: This board was acquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
+- jumpshotp: This board was acquired by Pokemame from a former Midway employee.  The hardware is identical to normal boards
   except the daughterboard is missing the epoxy potting.  Board was labeled engineering sample. Code differences
   include dips, starting position and cheerleader text.
 
@@ -293,17 +293,17 @@ Boards:
 -------
 - puckman is the same as pacman except they are slotted to break a part and have ribbon cables to connect the halves.
 
-- All ms pacman boards are pacman boards with an auxillary cpu board installed on a ribbon cable and 5e,5f changed.
+- All ms pacman boards are pacman boards with an auxiliary cpu board installed on a ribbon cable and 5e,5f changed.
 
-- Pacman Plus, Shoot the Bull, Jumpshot are epoxy potted auxillary cpu boards.  The graphics and
+- Pacman Plus, Shoot the Bull, Jumpshot are epoxy potted auxiliary cpu boards.  The graphics and
   color proms are changed as well.  They are labeled Authorized Enhancement Kit Bally/Midway.   Jumpshot=B3172
 
 - The Eyes boards are similar to pacman boards except for the data swapping encryption.  The custom chips are integrated
-  into the board and there is no voltage regulator section.  There is an extra rom at row 6 so row 7 is equivilant to
+  into the board and there is no voltage regulator section.  There is an extra rom at row 6 so row 7 is equivalent to
   pacman row 6.  Program roms are 4k but graphics roms have unpopulated areas for optional 2k roms.
 
 - Piranha and Naughty Mouse use a board known as the GDP-01 bootleg.  It is similar to an eyes board with an extra row
-  of eproms in row 6 to enable 2k program roms. Thee GDP-01 does not requiree a SBC, but 5 SBC chips can be left unpopulated
+  of eproms in row 6 to enable 2k program roms. The GDP-01 does not require a SBC, but 5 SBC chips can be left unpopulated
   and a SBC card(GDP-02) can be installed.
 
 - Make Trax/Crush Roller boards are similar to pacman boards, the chip positions are even mostly the same.  There is no
@@ -312,27 +312,27 @@ Boards:
   offset to one side.  Make trax and Eyes pinouts are similar enough to test each other but are not playable.
 
 - Atlantic City Action, Boardwalk Casino, The Glob, Super Glob, Beastie Feastie, EEEK! all use identical Epos boards
-  with different pals.  Street heat, Drakton on Donkey Kong also use this board.  It is a cpu auxillary board.  It is
+  with different pals.  Street heat, Drakton on Donkey Kong also use this board.  It is a cpu auxiliary board.  It is
   not potted but all the chip labels are removed.
 
 - Porky and 8ball action use the same plug in board for pacman.  It is much larger than most and requires some soldering
   to install.  It includes a new cpu and sound hardware.  Driving force uses a similar board and requires a lot of
   soldering.
 
-- Lizard Wizard is a potted auxillary cpu board.
+- Lizard Wizard is a potted auxiliary cpu board.
 
-- Big Bucks is an auxillary cpu board.
+- Big Bucks is an auxiliary cpu board.
 
-- MTV Trivia is an auxillary cpu board.
+- MTV Trivia is an auxiliary cpu board.
 
-- Truco Clemente runs on a pac bootleg with a handwired cpu/graphics auxillary board.  This supports banking of the
+- Truco Clemente runs on a pac bootleg with a handwired cpu/graphics auxiliary board.  This supports banking of the
   roms and completely bypasses color proms and video output section of pacman.
 
 - Vanvanb was found on a low quality board assumed to be a bootleg of an original.  The 2 sound chips were on a
   daughterboard that plugged into a 40 pin socket. Physically it is very different from pacman, although the fact that
   it uses the same falcon pinout as every other pac boot is a little suspicious.
 
-- Ponpoko uses it's own board.
+- Ponpoko uses its own board.
 
 ****************************************************************************/
 
@@ -1177,7 +1177,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 
 	/* vanvan: probably a leftover from development: the Sanritsu version writes
-	   the color lookup table here, while the Karateko version writes garbage. */
+	   the color lookup table here, while the Karateco version writes garbage. */
 	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -7171,7 +7171,7 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 	save_item(NAME(m_rocktrv2_question_bank));
 }
 
-/* The encrpytion is provided by a 74298 sitting on top of the rom at 6f.
+/* The encryption is provided by a 74298 sitting on top of the rom at 6f.
 The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
 DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
@@ -7356,7 +7356,7 @@ GAME( 1981, crushbl,  crush,    pacman,   maketrax, driver_device, 0,        ROT
 GAME( 1981, crushbl2, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushs,   crush,    crushs,   crushs,   driver_device, 0,        ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
-GAME( 1981, mbrush,   crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mbrush,   crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    pacman,   paintrlr, driver_device, 0,        ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", MACHINE_SUPPORTS_SAVE )
@@ -7398,7 +7398,7 @@ GAME( 1983, acitya,   bwcasino, acitya,   acitya,   driver_device, 0,        ROT
 
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, driver_device, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) (German bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, driver_device, 0,        ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, beastfp,  suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Beastie Feastie (conversion kit)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, eeekk,    0,        eeekk,    eeekk,    driver_device, 0,        ROT90,  "Epos Corporation", "Eeekk!", MACHINE_SUPPORTS_SAVE )
 

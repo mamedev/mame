@@ -84,7 +84,7 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 /* Dummy catcher for any unknown r/w */
 READ8_MEMBER( next_state::io_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
 
 	if(offset == 0xc0)
@@ -95,21 +95,21 @@ READ8_MEMBER( next_state::io_r )
 
 WRITE8_MEMBER( next_state::io_w )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x ROM MAP?\n",space.device().safe_pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x\n",space.device().safe_pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
@@ -146,7 +146,7 @@ READ32_MEMBER( next_state::scr2_r )
 
 WRITE32_MEMBER( next_state::scr2_w )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
 	COMBINE_DATA(&scr2);
 

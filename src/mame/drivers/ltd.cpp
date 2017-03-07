@@ -553,6 +553,17 @@ static MACHINE_CONFIG_START( ltd4, ltd_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
+/ Arizona
+/-------------------------------------------------------------------*/
+ROM_START(arizona)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("arizltd.bin", 0x0000, 0x0400, CRC(908f00d8) SHA1(98f28f1aedbad43e0e096959fdef45e038405473))
+	ROM_RELOAD(0x0400, 0x0400)
+	ROM_RELOAD(0x0800, 0x0400)
+	ROM_RELOAD(0x0c00, 0x0400)
+ROM_END
+
+/*-------------------------------------------------------------------
 / Atlantis
 /-------------------------------------------------------------------*/
 ROM_START(atla_ltd)
@@ -560,6 +571,72 @@ ROM_START(atla_ltd)
 	ROM_LOAD("atlantis.bin", 0x0000, 0x0800, CRC(c61be043) SHA1(e6c4463f59a5743fa34aa55beeb6f536ad9f1b56))
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Disco Dancing
+/-------------------------------------------------------------------*/
+ROM_START(discodan)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("disco.bin", 0x0000, 0x0800, CRC(83c79157) SHA1(286fd0c984870639fcd7d7b8f6a5a5ddabcddcf5))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Hustler
+/-------------------------------------------------------------------*/
+ROM_START(hustlerp)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("hustler_1.bin", 0x0000, 0x0800, CRC(43f323f5) SHA1(086b81699bea08b10b4231e398f4f689395355b0))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+ROM_START(hustlerpa)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("hustler_2.bin", 0x0000, 0x0800, CRC(83c79157) SHA1(286fd0c984870639fcd7d7b8f6a5a5ddabcddcf5))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Martian Queen
+/-------------------------------------------------------------------*/
+
+// No good dump available
+
+/*-------------------------------------------------------------------
+/ King Kong
+/-------------------------------------------------------------------*/
+
+ROM_START(kkongltd)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("kong.bin", 0x0000, 0x0800, CRC(5b2a3123) SHA1(eee417d17d3272ee63c728915af84da33f1f73a2))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Viking King
+/-------------------------------------------------------------------*/
+
+ROM_START(vikngkng)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("vikking.bin", 0x0000, 0x0800, CRC(aa32d158) SHA1(b24294ae4ecb2ab3119ad7fe79ef567b19ac792a))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Force
+/-------------------------------------------------------------------*/
+
+ROM_START(force)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("forceltd.bin", 0x0000, 0x0800, CRC(48f9ebbe) SHA1(8aaab352fb21263b1b93ffefd9b5169284083beb))
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Space Poker
+/-------------------------------------------------------------------*/
+
+// No good dump available
 
 /*-------------------------------------------------------------------
 / Black Hole
@@ -571,6 +648,15 @@ ROM_START(bhol_ltd)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Cowboy Eight Ball
+/-------------------------------------------------------------------*/
+
+ROM_START(cowboy)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("cowboy3p.bin", 0x0000, 0x1000, CRC(5afa29af) SHA1(a5ccf5cd17c63d4292222b792535187b1bcfa786))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Zephy
 /-------------------------------------------------------------------*/
 ROM_START(zephy)
@@ -578,13 +664,27 @@ ROM_START(zephy)
 	ROM_LOAD("zephy.l2", 0x0000, 0x1000, CRC(8dd11287) SHA1(8133d0c797eb0fdb56d83fc55da91bfc3cddc9e3))
 ROM_END
 
+ROM_START(zephya)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD("zephy1.bin", 0x0000, 0x1000, CRC(ae189c8a) SHA1(c309b436ef94cd5c266c88fe5f222261e083e4eb))
+ROM_END
+
 /*-------------------------------------------------------------------
-/ Cowboy Eight Ball
+/ Cowboy Eight Ball 2
 /-------------------------------------------------------------------*/
-ROM_START(cowboy)
+ROM_START(cowboy2)
 	ROM_REGION(0x2000, "roms", 0)
 	ROM_LOAD("cowboy_l.bin", 0x0000, 0x1000, CRC(87befe2a) SHA1(93fdf40b10e53d7d95e5dc72923b6be887411fc0))
 	ROM_LOAD("cowboy_h.bin", 0x1000, 0x1000, CRC(105e5d7b) SHA1(75edeab8c8ba19f334479133802acbc25f405763))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Haunted Hotel
+/-------------------------------------------------------------------*/
+ROM_START(hhotel)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("hh1.bin", 0x0000, 0x1000, CRC(a107a683) SHA1(5bb79d9a0a6b33f067cdd54942784c67ab557909))
+	ROM_LOAD("hh2.bin", 0x1000, 0x1000, CRC(e0c2ebc1) SHA1(131240589162c7b3f44a2bb951945c7d64f89c8d))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -606,21 +706,64 @@ ROM_START(alcapone)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Alien Warrior
+/-------------------------------------------------------------------*/
+
+// No good dump available
+
+/*-------------------------------------------------------------------
 / Columbia
 /-------------------------------------------------------------------*/
 ROM_START(columbia)
 	ROM_REGION(0x2000, "roms", 0)
-	ROM_LOAD("columb-d.bin", 0x0000, 0x1000, NO_DUMP)
-	ROM_LOAD("columb-e.bin", 0x1000, 0x1000, CRC(013abca0) SHA1(269376af92368d214c3d09ec6d3eb653841666f3))
+	ROM_LOAD("columb-l.bin", 0x0000, 0x1000, CRC(ac345dee) SHA1(14f03fa8059de5cd69cc83638aa6533fbcead37e))
+	ROM_LOAD("columb-h.bin", 0x1000, 0x1000, CRC(acd2a85b) SHA1(30889ee4230ce05f6060f926b2137bbf5939db2d))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Time Machine
+/-------------------------------------------------------------------*/
+ROM_START(tmacltd4)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("tm4-h.bin", 0x1000, 0x1000, CRC(f5f97992) SHA1(ba31f71a600e7061b500e0750f50643503e52a80))
+ROM_END
+
+ROM_START(tmacltd2)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("tm4-h.bin", 0x1000, 0x1000, CRC(f717c9db) SHA1(9ca5819b707fa20edfc289734e1aa189ae242aa3))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Trick Shooter
+/-------------------------------------------------------------------*/
+ROM_START(tricksht)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD("tricks-l.bin", 0x0000, 0x1000, CRC(951413ff) SHA1(f4a28f7b41cb077377433dc7bfb6647e5d392481))
+	ROM_LOAD("tricks-h.bin", 0x1000, 0x1000, CRC(2e4efb51) SHA1(3dd20addecf4b47bd68b05d557c378d1dbbbd892))
 ROM_END
 
 // system 3
-GAME(1981, atla_ltd, 0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, bhol_ltd, 0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, zephy,    0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerpa, hustlerp,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler (alternate set)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, bhol_ltd,         0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, cowboy,           0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephy,            0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephya,       zephy,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1981, cowboy,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,   0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia, 0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,          0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hhotel,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd4,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd2,  tmacltd4,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, tricksht,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)

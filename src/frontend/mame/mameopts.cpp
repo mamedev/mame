@@ -58,9 +58,7 @@ bool mame_options::add_slot_options(emu_options &options, std::function<void(emu
 
 			// allow opportunity to specify this value
 			if (value_specifier)
-			{
 				value_specifier(options, name);
-			}
 		}
 	}
 	return (options.options_count() != starting_count);
@@ -131,11 +129,11 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 		// retrieve info about the device instance
 		std::ostringstream option_name;
 		util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
-		if (strcmp(image.device_typename(image.image_type()), image.instance_name()) == 0)
+		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
 			util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
 
 		// add the option
-		if (!options.exists(image.instance_name()))
+		if (!options.exists(image.instance_name().c_str()))
 		{
 			// first device? add the header as to be pretty
 			if (m_device_options++ == 0)
@@ -187,9 +185,7 @@ void mame_options::remove_device_options(emu_options &options)
 bool mame_options::parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
 {
 	// keep adding slot options until we stop seeing new stuff
-	while (add_slot_options(options, value_specifier))
-	{
-	}
+	while (add_slot_options(options, value_specifier)) { }
 
 	// add device options
 	add_device_options(options, value_specifier);

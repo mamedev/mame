@@ -23,7 +23,6 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t();
 	virtual ~nl_convert_base_t();
 
 	const pstringbuffer &result() { return m_buf.str(); }
@@ -31,6 +30,7 @@ public:
 	virtual void convert(const pstring &contents) = 0;
 
 protected:
+	nl_convert_base_t();
 
 	void add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias);
 
@@ -55,7 +55,7 @@ private:
 	struct net_t
 	{
 	public:
-		net_t(const pstring &aname)
+		explicit net_t(const pstring &aname)
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
@@ -140,7 +140,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	~nl_convert_spice_t()
+	virtual ~nl_convert_spice_t() override
 	{
 	}
 
@@ -159,7 +159,7 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	~nl_convert_eagle_t()
+	virtual ~nl_convert_eagle_t() override
 	{
 	}
 
@@ -195,7 +195,7 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	~nl_convert_rinf_t()
+	virtual ~nl_convert_rinf_t() override
 	{
 	}
 

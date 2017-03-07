@@ -899,7 +899,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 {
 	uint8_t result;
 
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -1674,7 +1674,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				if ((address & 0xfff) == 0xfff)
 				{
@@ -1708,7 +1708,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 	int slot;
 
 	// if CFFF accessed, reset C800 area to internal ROM
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		if ((address & 0xfff) == 0xfff)
 		{

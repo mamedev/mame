@@ -27,7 +27,7 @@ namespace netlist
 		typedef T type;
 
 		sbitset() : m_bs(0) { }
-		sbitset(T v) : m_bs(v) { }
+		/* explicit */ sbitset(T v) : m_bs(v) { }
 
 		sbitset &set() { *this = all_bits(); return *this; }
 		sbitset &set(const std::size_t bit) { m_bs |= (static_cast<T>(1) << bit); return *this; }
@@ -363,7 +363,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable, uint_least
 	if (*m_initialized)
 		return;
 
-	pstring ttline = truthtable[line];
+	pstring ttline(truthtable[line]);
 	line++;
 	ttline = truthtable[line];
 	line++;

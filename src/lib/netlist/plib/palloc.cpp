@@ -48,9 +48,10 @@ size_t mempool::new_block()
 size_t mempool::mininfosize()
 {
 	size_t sinfo = sizeof(mempool::info);
-	size_t ma = 8;
 #ifdef __APPLE__
-	ma = 16;
+	size_t ma = 16;
+#else
+	size_t ma = 8;
 #endif
 	return ((std::max(m_min_align, sinfo) + ma - 1) / ma) * ma;
 }

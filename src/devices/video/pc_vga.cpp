@@ -1988,7 +1988,7 @@ READ8_MEMBER(vga_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset)];
 			vga.gc.latch[1]=vga.memory[(offset)+0x10000];

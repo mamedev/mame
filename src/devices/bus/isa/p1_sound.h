@@ -2,10 +2,10 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 sound card
+	Poisk-1 sound card
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright MESS Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -34,7 +34,7 @@ public:
 	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Optional information overrides
-	virtual machine_config_constructor  device_mconfig_additions() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(d14_r);
 	DECLARE_READ8_MEMBER(d16_r);
@@ -53,12 +53,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t                           m_dac_data[16];
-	int                             m_dac_ptr;
+	uint8_t m_dac_data[16];
+	int m_dac_ptr;
 
 	required_device<dac_byte_interface> m_dac;
-	optional_device<filter_rc_device>   m_filter;
-	required_device<i8251_device>   m_midi;
+	optional_device<filter_rc_device> m_filter;
+	required_device<i8251_device> m_midi;
 	required_device<pit8253_device> m_d14;
 	required_device<pit8253_device> m_d16;
 	required_device<pit8253_device> m_d17;

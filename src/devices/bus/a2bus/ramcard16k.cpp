@@ -31,13 +31,13 @@ const device_type A2BUS_RAMCARD16K = device_creator<a2bus_ramcard_device>;
 
 a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_writecnt(0), m_dxxx_bank(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_prewrite(false), m_dxxx_bank(0)
 {
 }
 
 a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_RAMCARD16K, "Apple II 16K Language Card", tag, owner, clock, "a2ram16k", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_writecnt(0), m_dxxx_bank(0)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_prewrite(false), m_dxxx_bank(0)
 {
 }
 
@@ -55,64 +55,64 @@ void a2bus_ramcard_device::device_start()
 	save_item(NAME(m_inh_state));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_dxxx_bank));
-	save_item(NAME(m_writecnt));
+	save_item(NAME(m_prewrite));
 }
 
 void a2bus_ramcard_device::device_reset()
 {
-	m_inh_state = INH_NONE;
+	m_inh_state = INH_WRITE;
 	m_dxxx_bank = 0;
-	m_writecnt = 0;
+	m_prewrite = false;
 }
 
-void a2bus_ramcard_device::do_io(int offset, bool write)
+void a2bus_ramcard_device::do_io(int offset, bool writing)
 {
 	int old_inh_state = m_inh_state;
 
-	m_dxxx_bank = 0;
-	
-	switch (offset)
+	//any even access disables pre-write and writing
+	if ((offset & 1) == 0)
 	{
-		case 0x0: case 0x8: case 0x4: case 0xc:
-			m_writecnt = 0;
-			m_inh_state = INH_READ;
-			break;
-			
-		case 0x1: case 0x9: case 0x5: case 0xd:
-			if (write)
-			{
-				m_writecnt = 0;
-			}
-			else
-			{
-				m_writecnt++;
-			}		
-			m_inh_state &= ~INH_READ;
-			break;
+		m_prewrite = false;
+		m_inh_state &= ~INH_WRITE;
+	}
 
-		case 0x2: case 0xa: case 0x6: case 0xe:
-			m_writecnt = 0;
-			m_inh_state = INH_NONE;
-			break;
-			
-		case 0x3: case 0xb: case 0x7: case 0xf:
-			if (write)
-			{
-				m_writecnt = 0;
-			}
-			else
-			{
-				m_writecnt++;
-			}		
+	//any write disables pre-write
+	//has no effect on write-enable if writing was enabled already
+	if (writing == true)
+	{
+		m_prewrite = false;
+	}
+	//first odd read enables pre-write, second one enables writing
+	else if ((offset & 1) == 1)
+	{
+		if (m_prewrite == false)
+		{
+			m_prewrite = true;
+		}
+		else
+		{
+			m_inh_state |= INH_WRITE;
+		}
+	}
+
+	switch (offset & 3)
+	{
+		case 0:
+		case 3:
+		{
 			m_inh_state |= INH_READ;
 			break;
+		}
+
+		case 1:
+		case 2:
+		{
+			m_inh_state &= ~INH_READ;
+			break;
+		}
 	}
-	
-	if (m_writecnt >= 2)
-	{
-		m_inh_state |= INH_WRITE;
-		m_writecnt = 2;
-	}
+
+	m_dxxx_bank = 0;
 
 	if (!(offset & 8))
 	{

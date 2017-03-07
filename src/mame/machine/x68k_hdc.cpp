@@ -30,11 +30,6 @@ x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, cons
 {
 }
 
-void x68k_hdc_image_device::device_config_complete()
-{
-	update_names(X68KHDC, "sasihd", "sasi");
-}
-
 void x68k_hdc_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_req = 1;

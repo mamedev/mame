@@ -120,7 +120,7 @@ private:
 extern const device_type CASSETTE;
 
 // device iterator
-typedef device_type_iterator<CASSETTE, cassette_image_device> cassette_device_iterator;
+typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

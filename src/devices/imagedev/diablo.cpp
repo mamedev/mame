@@ -57,9 +57,6 @@ diablo_image_device::~diablo_image_device()
 void diablo_image_device::device_config_complete()
 {
 	add_format("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec);
-
-	// set brief and instance name
-	update_names();
 }
 
 const util::option_guide &diablo_image_device::create_option_guide() const

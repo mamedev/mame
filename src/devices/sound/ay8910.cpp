@@ -227,6 +227,28 @@ Envelope shapes:
 The envelope counter on the AY-3-8910 has 16 steps. On the YM2149 it
 has twice the steps, happening twice as fast.
 
+****************************************************************************
+
+    The bus control and chip selection signals of the AY PSGs and their
+    pin-compatible clones such as YM2149 are somewhat unconventional and
+    redundant, having been designed for compatibility with GI's CP1610
+    series of microprocessors. Much of the redundancy can be finessed by
+    tying BC2 to Vcc; AY-3-8913 and AY8930 do this internally.
+
+                            /A9   A8    /CS   BDIR  BC2   BC1
+                AY-3-8910   24    25    n/a   27    28    29
+                AY-3-8912   n/a   17    n/a   18    19    20
+                AY-3-8913   22    23    24    2     n/a   3
+                            ------------------------------------
+                Inactive            NACT      0     0     0
+                Latch address       ADAR      0     0     1
+                Inactive            IAB       0     1     0
+                Read from PSG       DTB       0     1     1
+                Latch address       BAR       1     0     0
+                Inactive            DW        1     0     1
+                Write to PSG        DWS       1     1     0
+                Latch address       INTAK     1     1     1
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -1117,6 +1139,25 @@ WRITE8_MEMBER( ay8910_device::data_w )
 #else
 	data_address_w(space, 0, data);
 #endif
+}
+
+// here, BC1 is hooked up to A0 on the host and BC2 is hooked up to A1
+WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
+{
+	switch (offset & 3)
+	{
+	case 0: // latch address
+		address_w(space, 0, data);
+		break;
+	case 1: // inactive
+		break;
+	case 2: // write to psg
+		data_w(space, 0, data);
+		break;
+	case 3: // latch address
+		address_w(space, 0, data);
+		break;
+	}
 }
 
 WRITE8_MEMBER( ay8910_device::reset_w )

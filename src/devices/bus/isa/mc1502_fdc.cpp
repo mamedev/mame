@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Electronika MC 1502 FDC device
+	Electronika MC 1502 FDC device
 
 **********************************************************************/
 
@@ -62,7 +62,7 @@ ROM_END
 
 machine_config_constructor mc1502_fdc_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( mc1502_fdc );
+	return MACHINE_CONFIG_NAME(mc1502_fdc);
 }
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ machine_config_constructor mc1502_fdc_device::device_mconfig_additions() const
 
 const tiny_rom_entry *mc1502_fdc_device::device_rom_region() const
 {
-	return ROM_NAME( mc1502_fdc );
+	return ROM_NAME(mc1502_fdc);
 }
 
 
@@ -99,26 +99,25 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	floppy_image_device *floppy = ((data & 0x10)?floppy1:floppy0);
+	floppy_image_device *floppy = ((data & 0x10) ? floppy1 : floppy0);
 
 	// master reset
-	if((data & 1) == 0)
-		m_fdc->reset();
+	if ((data & 1) == 0) m_fdc->reset();
 
 	m_fdc->set_floppy(floppy);
 
 	// SIDE ONE
-	floppy->ss_w((data & 2)?1:0);
+	floppy->ss_w((data & 2) ? 1 : 0);
 
 	// bits 2, 3 -- motor on (drive 0, 1)
 	floppy0->mon_w(!(data & 4));
 	floppy1->mon_w(!(data & 8));
 
-	if (data & 12) {
-		motor_timer->adjust(attotime::from_msec( 3000 ));
+	if (data & 12)
+	{
+		motor_timer->adjust(attotime::from_msec(3000));
 		motor_on = 1;
 	}
-
 }
 
 /*
@@ -128,7 +127,8 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
-	if (!m_fdc->drq_r() && !m_fdc->intrq_r()) {
+	if (!m_fdc->drq_r() && !m_fdc->intrq_r())
+	{
 		// fake cpu wait by resetting PC one insn back
 		maincpu->set_state_int(I8086_IP, maincpu->state_int(I8086_IP) - 1);
 		maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -142,47 +142,60 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
+WRITE_LINE_MEMBER(mc1502_fdc_device::mc1502_fdc_irq_drq)
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
-	if(state)
-		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	if (state) maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
+READ8_MEMBER(mc1502_fdc_device::mc1502_fdc_r)
 {
 	uint8_t data = 0xff;
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0: data = mc1502_wd17xx_aux_r();     break;
-		case 8: data = mc1502_wd17xx_drq_r();     break;
-		case 10: data = mc1502_wd17xx_motor_r();  break;
+	case 0:
+		data = mc1502_wd17xx_aux_r();
+		break;
+	case 8:
+		data = mc1502_wd17xx_drq_r();
+		break;
+	case 10:
+		data = mc1502_wd17xx_motor_r();
+		break;
 	}
 
 	return data;
 }
 
-READ8_MEMBER( mc1502_fdc_device::mc1502_fdcv2_r )
+READ8_MEMBER(mc1502_fdc_device::mc1502_fdcv2_r)
 {
 	uint8_t data = 0xff;
 
-	switch( offset )
+	switch (offset)
 	{
-		case 0: data = mc1502_wd17xx_aux_r();     break;
-		case 1: data = mc1502_wd17xx_motor_r();   break;
-		case 2: data = mc1502_wd17xx_drq_r();     break;
+	case 0:
+		data = mc1502_wd17xx_aux_r();
+		break;
+	case 1:
+		data = mc1502_wd17xx_motor_r();
+		break;
+	case 2:
+		data = mc1502_wd17xx_drq_r();
+		break;
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
+WRITE8_MEMBER(mc1502_fdc_device::mc1502_fdc_w)
 {
-	switch( offset )
+	switch (offset)
 	{
-		case 0: mc1502_wd17xx_aux_w(data);    break;
+	case 0:
+		mc1502_wd17xx_aux_w(data);
+		break;
 	}
 }
 
@@ -190,10 +203,12 @@ WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
 //  mc1502_fdc_device - constructor
 //-------------------------------------------------
 
-mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MC1502_FDC, "MC-1502 floppy", tag, owner, clock, "mc1502_fdc", __FILE__),
-	device_isa8_card_interface( mconfig, *this ),
-	m_fdc(*this, "fdc"), motor_on(0), motor_timer(nullptr)
+mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MC1502_FDC, "MC-1502 floppy", tag, owner, clock, "mc1502_fdc", __FILE__)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_fdc(*this, "fdc")
+	, motor_on(0)
+	, motor_timer(nullptr)
 {
 }
 

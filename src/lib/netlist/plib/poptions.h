@@ -107,8 +107,8 @@ class option_str_limit : public option
 public:
 	option_str_limit(options &parent, pstring ashort, pstring along, pstring defval, pstring limit, pstring help)
 	: option(parent, ashort, along, help, true), m_val(defval)
+	, m_limit(plib::psplit(limit, ":"))
 	{
-		m_limit = plib::psplit(limit, ":");
 	}
 
 	pstring operator ()() { return m_val; }

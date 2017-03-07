@@ -263,7 +263,7 @@ SOUNDS["L7A1045"] = true
 SOUNDS["AD1848"] = true
 --SOUNDS["UPD1771"] = true
 SOUNDS["VOLT_REG"] = true
---SOUNDS["MEA8000"] = true
+SOUNDS["MEA8000"] = true
 SOUNDS["DAC76"] = true
 SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
@@ -4276,6 +4276,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spinb.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
+	MAME_DIR .. "src/mame/drivers/stargame.cpp",
 	MAME_DIR .. "src/mame/drivers/taito.cpp",
 	MAME_DIR .. "src/mame/drivers/techno.cpp",
 	MAME_DIR .. "src/mame/drivers/vd.cpp",

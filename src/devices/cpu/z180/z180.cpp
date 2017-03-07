@@ -627,9 +627,9 @@ offs_t z180_device::disasm_disassemble(std::ostream &stream, offs_t pc, const ui
 #define Z180_DSTAT_WMASK        0xcc
 
 /* 31 DMA mode register */
-#define Z180_DMODE_DM           0x30
-#define Z180_DMODE_SM           0x0c
-#define Z180_DMODE_MMOD         0x04
+#define Z180_DMODE_DM           0x30    /* DMA ch 0 destination addressing mode */
+#define Z180_DMODE_SM           0x0c    /* DMA ch 0 source addressing mode */
+#define Z180_DMODE_MMOD         0x02    /* DMA cycle steal/burst mode select */
 
 #define Z180_DMODE_RESET        0x00
 #define Z180_DMODE_RMASK        0x3e
@@ -1479,9 +1479,13 @@ void z180_device::z180_writecontrol(offs_t port, uint8_t data)
 		LOG(("Z180 '%s' DSTAT  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DSTAT_WMASK));
 		IO_DSTAT = (IO_DSTAT & ~Z180_DSTAT_WMASK) | (data & Z180_DSTAT_WMASK);
 		if ((data & (Z180_DSTAT_DE1 | Z180_DSTAT_DWE1)) == Z180_DSTAT_DE1)
+		{
 			IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
+		}
 		if ((data & (Z180_DSTAT_DE0 | Z180_DSTAT_DWE0)) == Z180_DSTAT_DE0)
+		{
 			IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
+		}
 		break;
 
 	case Z180_DMODE:
@@ -1569,12 +1573,17 @@ int z180_device::z180_dma0(int max_cycles)
 	offs_t sar0 = 65536 * IO_SAR0B + 256 * IO_SAR0H + IO_SAR0L;
 	offs_t dar0 = 65536 * IO_DAR0B + 256 * IO_DAR0H + IO_DAR0L;
 	int bcr0 = 256 * IO_BCR0H + IO_BCR0L;
+	
+	if (bcr0 == 0) 
+	{
+		bcr0 = 0x10000;
+	}
+	
 	int count = (IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
 	int cycles = 0;
 
-	if (bcr0 == 0)
+	if (!(IO_DSTAT & Z180_DSTAT_DE0))
 	{
-		IO_DSTAT &= ~Z180_DSTAT_DE0;
 		return 0;
 	}
 
@@ -1701,15 +1710,19 @@ int z180_device::z180_dma1()
 	offs_t mar1 = 65536 * IO_MAR1B + 256 * IO_MAR1H + IO_MAR1L;
 	offs_t iar1 = 256 * IO_IAR1H + IO_IAR1L;
 	int bcr1 = 256 * IO_BCR1H + IO_BCR1L;
+	
+	if (bcr1 == 0) 
+	{
+		bcr1 = 0x10000;
+	}
+	
 	int cycles = 0;
 
 	if ((m_iol & Z180_DREQ1) == 0)
 		return 0;
 
-	/* counter is zero? */
-	if (bcr1 == 0)
+	if (!(IO_DSTAT & Z180_DSTAT_DE1))
 	{
-		IO_DSTAT &= ~Z180_DSTAT_DE1;
 		return 0;
 	}
 
@@ -2378,7 +2391,7 @@ again:
 		else
 		{
 			do
-			{
+			{		
 				curcycles = check_interrupts();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
@@ -2400,6 +2413,11 @@ again:
 				m_icount -= curcycles;
 
 				handle_io_timers(curcycles);
+				
+				/* if channel 0 was started in burst mode, go recheck the mode */
+				if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
+					(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
+					goto again;
 
 				/* FIXME:
 				 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
@@ -2416,7 +2434,7 @@ again:
 				curcycles = z180_dma1();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
-
+				
 				/* If DMA is done break out to the faster loop */
 				if ((IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
 					break;
@@ -2428,6 +2446,10 @@ again:
 	{
 		do
 		{
+			/* If DMA is started go to check the mode */
+			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
+				goto again;
+				
 			curcycles = check_interrupts();
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);
@@ -2448,10 +2470,6 @@ again:
 
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);
-
-			/* If DMA is started go to check the mode */
-			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
-				goto again;
 		} while( m_icount > 0 );
 	}
 }

@@ -506,7 +506,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 		{
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
 		}
@@ -516,7 +516,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			return m_port_ddr[offset / 2 - 2];
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
 			break;
 	}

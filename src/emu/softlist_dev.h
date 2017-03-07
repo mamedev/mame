@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __SOFTLIST_DEV_H_
-#define __SOFTLIST_DEV_H_
+#ifndef MAME_EMU_SOFTLIST_DEV
+#define MAME_EMU_SOFTLIST_DEV
 
 #include "softlist.h"
 
@@ -189,7 +189,7 @@ private:
 extern const device_type SOFTWARE_LIST;
 
 // device type iterator
-typedef device_type_iterator<SOFTWARE_LIST, software_list_device> software_list_device_iterator;
+typedef device_type_iterator<software_list_device> software_list_device_iterator;
 
 
-#endif // __SOFTLIST_DEV_H_
+#endif // MAME_EMU_SOFTLIST_DEV

@@ -36,12 +36,12 @@ public:
 			m_usart1(*this, I8251_1_TAG),
 			m_fdc(*this, UPD765_TAG),
 			m_ram(*this, RAM_TAG),
+			m_rom(*this, M68000_TAG),
 			m_floppy0(*this, UPD765_TAG ":0"),
 			m_floppy1(*this, UPD765_TAG ":1"),
 			m_floppy(nullptr),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ieee488(*this, IEEE488_TAG),
-			m_reset(1),
 			m_fdc_int(0),
 			m_fdie(0)
 	{ }
@@ -52,6 +52,7 @@ public:
 	required_device<i8251_device> m_usart1;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -63,20 +64,14 @@ public:
 
 	void update_fdc_int();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ16_MEMBER(rom_r);
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 
-	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
-
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-
-	const uint8_t *m_rom;
-	int m_reset;
 
 	// floppy state
 	int m_fdc_int;

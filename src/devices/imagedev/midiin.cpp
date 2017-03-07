@@ -59,15 +59,6 @@ void midiin_device::device_reset()
 }
 
 /*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void midiin_device::device_config_complete(void)
-{
-	update_names();
-}
-
-/*-------------------------------------------------
     device_timer
 -------------------------------------------------*/
 

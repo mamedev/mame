@@ -487,7 +487,7 @@ READ8_MEMBER(hd44780_device::control_read)
 {
 	if (m_data_len == 4)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			update_nibble(0, 1);
 
 		if (m_nibble)
@@ -549,7 +549,7 @@ READ8_MEMBER(hd44780_device::data_read)
 
 	if (m_data_len == 4)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			update_nibble(1, 1);
 
 		if (m_nibble)
@@ -558,7 +558,7 @@ READ8_MEMBER(hd44780_device::data_read)
 			data = (data << 4) & 0xf0;
 	}
 
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_ac(m_direction);
 		set_busy_flag(41);

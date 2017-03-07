@@ -301,6 +301,7 @@ kramermc.cpp
 kron.cpp
 kyocera.cpp
 laser3k.cpp
+lb186.cpp
 lc80.cpp
 lcmate2.cpp
 leapster.cpp
@@ -457,7 +458,6 @@ pes.cpp
 pet.cpp
 pg685.cpp
 phc25.cpp
-phantom.cpp
 phunsy.cpp
 pimps.cpp
 pipbug.cpp

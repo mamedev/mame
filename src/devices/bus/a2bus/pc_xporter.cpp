@@ -317,7 +317,7 @@ uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
 			case 0x703: // read with increment
 				rv = m_ram[m_offset];
 				// don't increment if the debugger's reading
-				if (!space.debugger_access())
+				if (!machine().side_effect_disabled())
 				{
 					m_offset++;
 				}

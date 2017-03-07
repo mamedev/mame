@@ -2247,7 +2247,11 @@ WRITE8_MEMBER(vicdual_state::nsub_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
-	if (offset & 0x04)  palette_bank_w(space, 0, data);
+	if (offset & 0x04)
+	{
+		palette_bank_w(space, 0, data);
+		m_gradient = data & 4;
+	}
 }
 
 
