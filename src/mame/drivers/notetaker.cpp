@@ -671,11 +671,14 @@ static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_st
     AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
     AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
+*/
 
 /* note everything in the emulatorcpu's io range is incompletely decoded; so if
    0x1800 is accessed it will write to both the debug 8255 AND the pic8259!
    I'm not sure the code abuses this or not, but it might do so to both write
    registers and clear parity at once, or something similar. */
+
+/*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
