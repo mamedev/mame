@@ -847,7 +847,7 @@ uint32_t taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0, cliprect);
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);
 	m_tc0150rod->draw(bitmap, cliprect, -3, m_road_palbank << 6, 1, 0, screen.priority(), 1, 2); // -6
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
