@@ -32,10 +32,11 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	: menu(mui, container)
 	, m_actual(0)
 	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
+	, m_swinfo(nullptr)
 	, m_issoft(false)
 
 {
-	for (device_image_interface &image : image_interface_iterator(mui.machine().root_device()))
+	for (device_image_interface& image : image_interface_iterator(mui.machine().root_device()))
 	{
 		if (image.filename())
 		{
@@ -46,10 +47,10 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 		}
 	}
 	std::vector<std::string> lua_list;
-	if(mame_machine_manager::instance()->lua()->call_plugin("data_list", driver ? driver->name : "", lua_list))
+	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", driver ? driver->name : "", lua_list))
 	{
 		int count = 0;
-		for(std::string &item : lua_list)
+		for (std::string& item : lua_list)
 		{
 			std::string version;
 			mame_machine_manager::instance()->lua()->call_plugin("data_version", count, version);
@@ -157,7 +158,7 @@ void menu_dats_view::draw(uint32_t flags)
 	draw_background();
 
 	hover = item.size() + 1;
-	visible_items = item.size() - 2;
+	int visible_items = item.size() - 2;
 	float extra_height = 2.0f * line_height;
 	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
