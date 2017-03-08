@@ -126,12 +126,6 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 		if (!image.user_loadable())
 			continue;
 
-		// retrieve info about the device instance
-		std::ostringstream option_name;
-		util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
-		if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
-			util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
-
 		// add the option
 		if (!options.exists(image.instance_name().c_str()))
 		{
@@ -140,13 +134,28 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 				options.add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
 
 			// add the option
-			options.add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			std::string option_name = get_full_option_name(image);
+			options.add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
 
 			// allow opportunity to specify this value
 			if (value_specifier)
 				value_specifier(options, image.instance_name());
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  remove_device_options - remove device options
+//-------------------------------------------------
+
+std::string mame_options::get_full_option_name(const device_image_interface &image)
+{
+	std::ostringstream option_name;
+	util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
+	if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
+		util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
+	return option_name.str();
 }
 
 
@@ -182,21 +191,73 @@ void mame_options::remove_device_options(emu_options &options)
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool mame_options::parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
+void mame_options::parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
 {
-	// keep adding slot options until we stop seeing new stuff
-	while (add_slot_options(options, value_specifier)) { }
+	bool still_adding = true;
+	while (still_adding)
+	{
+		// keep adding slot options until we stop seeing new stuff
+		still_adding = false;
+		while (add_slot_options(options, value_specifier))
+			still_adding = true;
 
-	// add device options
-	add_device_options(options, value_specifier);
+		// add device options
+		add_device_options(options, value_specifier);
 
-	int num;
-	do {
-		num = options.options_count();
-		update_slot_options(options);
-	} while (num != options.options_count());
+		if (reevaluate_slot_options(options))
+			still_adding = true;
+	}
+}
 
-	return true;
+
+//-------------------------------------------------
+//  reevaluate_slot_options - based on recent changes
+//	in what images are mounted, give drivers a chance
+//	to specify new default slot options
+//-------------------------------------------------
+
+bool mame_options::reevaluate_slot_options(emu_options &options)
+{
+	bool result = false;
+
+	// look up the system configured by name; if no match, do nothing
+	const game_driver *cursystem = system(options);
+	if (cursystem == nullptr)
+		return result;
+	machine_config config(*cursystem, options);
+
+	// iterate through all slot devices
+	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+	{
+		// retrieve info about the device instance
+		const char *name = slot.device().tag() + 1;
+		if (options.exists(name) && !slot.option_list().empty())
+		{
+			// device_slot_interface::get_default_card_software() is essentially a hook
+			// that lets devices provide a feedback loop to force a specified software
+			// list entry to be loaded
+			//
+			// In the repeated cycle of adding slots and slot devices, this gives a chance
+			// for devices to "plug in" default software list items.  Of course, the fact
+			// that this is all shuffling options is brittle and roundabout, but such is
+			// the nature of software lists.
+			//
+			// In reality, having some sort of hook into the pipeline of slot/device evaluation
+			// makes sense, but the fact that it is joined at the hip to device_image_interface
+			// and device_slot_interface is unfortunate
+			std::string default_card_software = slot.get_default_card_software();
+			if (!default_card_software.empty())
+			{
+				std::string old_value = options.value(name);
+
+				options.set_default_value(name, default_card_software.c_str());
+
+				if (strcmp(old_value.c_str(), options.value(name)))
+					result = true;
+			}
+		}
+	}
+	return result;
 }
 
 
@@ -239,8 +300,7 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	};
 
 	// parse the slot devices
-	if (!parse_slot_devices(options, value_specifier))
-		return false;
+	parse_slot_devices(options, value_specifier);
 
 	// at this point, we should have handled all arguments; the only argument that shouldn't have
 	// been handled is the file name
