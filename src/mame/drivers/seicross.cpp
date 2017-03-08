@@ -393,12 +393,12 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 static MACHINE_CONFIG_START( no_nvram, seicross_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
-	MCFG_CPU_ADD("mcu", NSC8105, 3072000)   /* ??? */
+	MCFG_CPU_ADD("mcu", NSC8105, XTAL_18_432MHz / 6)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -546,7 +546,7 @@ ROM_START( radrad )
 	ROM_LOAD( "pal16h2.2b", 0x0000, 0x0044, CRC(a356803a) SHA1(a324d3cbe2de5bf54be9aa07c984054149ac3eb0) )
 ROM_END
 
-ROM_START( radradj ) // PCB has Nihon Bussan etched and a Nichibutsu sticker
+ROM_START( radradj ) // Top and bottom PCBs have Nihon Bussan etched and the top PCB has a Nichibutsu sticker
 	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "1.3a",         0x0000, 0x1000, CRC(b1e958ca) SHA1(3ab5fc3314f202ba527470eacbb76d52fe969bca) ) // 2732
 	ROM_LOAD( "2.3b",         0x1000, 0x1000, CRC(30ba76b3) SHA1(e6af1fc35fdc71d5436f0d29e5722cbcb4409196) ) // 2732
