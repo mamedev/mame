@@ -187,7 +187,6 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// memory helpers
-	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler);
 	uint32_t ROPCODE(offs_t pc);
 	uint32_t RMEM(offs_t addr);
 	void WMEM(offs_t addr, uint32_t data);

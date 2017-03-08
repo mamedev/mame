@@ -290,20 +290,6 @@ tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-DIRECT_UPDATE_MEMBER( tms3203x_device::direct_handler )
-{
-	// internal boot loader ROM
-	if (m_mcbl_mode && address < (0x1000 << 2))
-	{
-		direct.explicit_configure(0x000000, 0x003fff, 0x003fff, m_bootrom);
-		return (offs_t)-1;
-	}
-
-	return address;
-}
-
-
 //-------------------------------------------------
 //  ~tms3203x_device - destructor
 //-------------------------------------------------
@@ -339,6 +325,9 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 
 inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 {
+	if (m_mcbl_mode && pc < 0x1000)
+		return m_bootrom[pc];
+
 	return m_direct->read_dword(pc << 2);
 }
 
@@ -383,7 +372,6 @@ void tms3203x_device::device_start()
 
 	// set up the internal boot loader ROM
 	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
-	m_direct->set_direct_update(direct_update_delegate(&tms3203x_device::direct_handler, this));
 
 	// save state
 	save_item(NAME(m_pc));
