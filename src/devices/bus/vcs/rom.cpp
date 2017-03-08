@@ -465,16 +465,6 @@ WRITE8_MEMBER(a26_rom_f6_device::write_bank)
 	}
 }
 
-DIRECT_UPDATE_MEMBER(a26_rom_f6_device::cart_opbase)
-{
-	if ((address & 0x1fff) >= 0x1ff6 && (address & 0x1fff) <= 0x1ff9)
-	{
-		if (!machine().side_effect_disabled())
-			write_bank(direct.space(), (address & 0x1fff) - 0x1ff6, 0);
-	}
-	return address;
-}
-
 /*-------------------------------------------------
  "F8 Bankswitch" Carts:
  read/write access to 0x1ff8-0x1ff9 determines the
