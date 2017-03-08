@@ -3267,6 +3267,8 @@ files {
 	MAME_DIR .. "src/mame/audio/depthch.h",
 	MAME_DIR .. "src/mame/audio/invinco.cpp",
 	MAME_DIR .. "src/mame/audio/invinco.h",
+	MAME_DIR .. "src/mame/audio/nsub.cpp",
+	MAME_DIR .. "src/mame/audio/nsub.h",
 	MAME_DIR .. "src/mame/audio/pulsar.cpp",
 	MAME_DIR .. "src/mame/audio/pulsar.h",
 	MAME_DIR .. "src/mame/drivers/zaxxon.cpp",

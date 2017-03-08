@@ -127,6 +127,9 @@ public:
 	/*----------- defined in audio/invinco.c -----------*/
 	DECLARE_WRITE8_MEMBER( invinco_audio_w );
 
+	/*----------- defined in audio/nsub.c -----------*/
+	DECLARE_WRITE8_MEMBER( nsub_audio_w );
+
 	/*----------- defined in audio/pulsar.c -----------*/
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
 	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
