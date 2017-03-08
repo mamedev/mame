@@ -96,7 +96,12 @@ ADDRESS_MAP_END
 ******************************************************************************/
 /** TODO: actually hook this up to the ACIA */
 static INPUT_PORTS_START(votrtnt)
-	PORT_START("DSW1") /* not connected to cpu, each switch is connected directly to the output of a 4040 counter dividing the cpu m1? clock to feed the 6850 ACIA. Setting more than one switch on (downward is on, upward is off) is a bad idea, as it will short together outputs of the 4040, possibly damaging it. see tnt_schematic.jpg */
+	PORT_START("DSW1")
+	/* not connected to cpu, each switch is connected directly to the output
+	   of a 4040 counter dividing the cpu m1? clock to feed the 6850 ACIA.
+	   Setting more than one switch on (downward is on, upward is off) is a bad
+	   idea, as it will short together outputs of the 4040, possibly damaging it.
+	   see tnt_schematic.jpg */
 	PORT_DIPNAME( 0xFF, 0x80, "Baud Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x01, "75" )
 	PORT_DIPSETTING(    0x02, "150" )
