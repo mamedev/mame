@@ -181,7 +181,13 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sdk86 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
-	// Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are interchangeable; the ones at FF000-FFFFF are the ones which start on bootup, and the other ones live at FE000-FEFFF and can be switched in by the user. One pair is the Serial RS232 Monitor and the other is the Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad monitor was primary, but the other SDK-86 I know of has the roms in the opposite arrangement (Serial primary).
+	/* Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are
+	   interchangeable; the ones at FF000-FFFFF are the ones which start on
+	   bootup, and the other ones live at FE000-FEFFF and can be switched in by
+	   the user. One pair is the Serial RS232 Monitor and the other is the
+	   Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad
+	   monitor was primary, but the other SDK-86 I know of has the roms in
+	   the opposite arrangement (Serial primary). */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
 	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
 	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
