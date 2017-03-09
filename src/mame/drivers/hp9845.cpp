@@ -1488,9 +1488,9 @@ void hp9845ct_state::draw_line(unsigned x0 , unsigned y0 , unsigned x1 , unsigne
 	// draw line, vector generator uses Bresenham's algorithm
 	x = x0;
 	y = y0;
-	dx = abs(x1 - x);
+	dx = abs((int) (x1 - x));
 	sx = x < x1 ? 1 : -1;	// actually always 1 because of normalization
-	dy = abs(y1 - y);
+	dy = abs((int) (y1 - y));
 	sy = y < y1 ? 1 : -1;
 	err = (dx > dy ? dx : -dy) / 2;
 
