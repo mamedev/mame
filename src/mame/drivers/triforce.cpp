@@ -93,8 +93,8 @@ Games on this system include....
 | | 2006 | Triforce Firmware Update for Compact Flash Box                  | Sega                                | GDROM | GDT-0022       | 317-0567-COM |               |
 |*| 2006 | Triforce Firmware Update for Compact Flash Box (Rev A)          | Sega                                | GDROM | GDT-0022A      | 317-0567-COM |               |
 | | 2006 | Donkey Kong : Banana Kingdom                                    | Namco / Nintendo                    | Cart? |                |              |               |
-|*| 2007 | Mario Kart Arcade GP 2 (Japan, MK21 Ver.A)                      | Namco / Nintendo                    | Cart  | 837-14343-R4S0 |!317-5128-??? | 253-5509-5128 |
-|*| 2007 | Mario Kart Arcade GP 2 (Japan, MK21 Ver.A, alt dump)            | Namco / Nintendo                    | Cart  | 837-14343-R4S0 |!317-5128-??? | 253-5509-5128 |
+|*| 2007 | Mario Kart Arcade GP 2 (Japan, MK21 Ver.A)                      | Namco / Nintendo                    | Cart  | 837-14343-R4S0 | 317-5128-COM | 253-5509-5128 |
+|*| 2007 | Mario Kart Arcade GP 2 (Japan, MK21 Ver.A, alt dump)            | Namco / Nintendo                    | Cart  | 837-14343-R4S0 | 317-5128-COM | 253-5509-5128 |
 +-+------+-----------------------------------------------------------------+-------------------------------------+-------|----------------+--------------+---------------|
 * denotes these games are archived.
 ! security PIC is not dumped
@@ -1030,6 +1030,9 @@ ROM_START( mkartag2 )
 	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) )
 	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) )
 	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-5128-com.pic", 0x00, 0x4000, CRC(0231b10c) SHA1(e060d74753a39081364e3175ac12e724ad585c33) )
 ROM_END
 
 ROM_START( mkartag2a )
@@ -1045,6 +1048,9 @@ ROM_START( mkartag2a )
 	ROM_LOAD( "ic6_k9f1208u0b.bin",    0x14c00000, 0x4200000, CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) ) // sldh
 	ROM_LOAD( "ic7_k9f1208u0b.bin",    0x18e00000, 0x4200000, CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) ) // sldh
 	ROM_LOAD( "ic8_k9f1208u0b.bin",    0x1d000000, 0x4200000, CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) ) // sldh
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-5128-com.pic", 0x00, 0x4000, CRC(0231b10c) SHA1(e060d74753a39081364e3175ac12e724ad585c33) )
 ROM_END
 
 /* Main board */
