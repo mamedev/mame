@@ -94,6 +94,9 @@ public:
 	DECLARE_READ8_MEMBER(supercon_input2_r);
 
 	// Constellation Forte
+	void cforte_prepare_display();
+	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
+	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
 
 	// Super Expert
@@ -339,22 +342,63 @@ READ8_MEMBER(novag6502_state::supercon_input2_r)
     Constellation Forte
 ******************************************************************************/
 
-// TTL
+// TTL/generic
+
+void novag6502_state::cforte_prepare_display()
+{
+	// 3 led rows
+	display_matrix(8, 3, m_led_data, m_led_select, false);
+	
+	// lcd panel (mostly handled in cforte_lcd_output_w)
+	set_display_segmask(0x3ff0, 0xff);
+	set_display_size(8, 3+13);
+	display_update();
+}
+
+WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
+{
+	// 4 rows used
+	u32 rowdata[4];
+	for (int i = 0; i < 4; i++)
+		rowdata[i] = (data >> i & 1) ? u32(data >> 8) : 0;
+
+	// 2 segments per row
+	for (int dig = 0; dig < 13; dig++)
+	{
+		m_display_state[dig+3] = 0;
+		for (int i = 0; i < 4; i++)
+			m_display_state[dig+3] |= ((rowdata[i] >> (2*dig) & 3) << (2*i));
+		
+		m_display_state[dig+3] = BITSWAP8(m_display_state[dig+3],7,2,0,4,6,5,3,1);
+	}
+	
+	cforte_prepare_display();
+}
+
+WRITE8_MEMBER(novag6502_state::cforte_mux_w)
+{
+	// d0-d7: input mux, led data
+	m_inp_mux = m_led_data = data;
+	cforte_prepare_display();
+}
 
 WRITE8_MEMBER(novag6502_state::cforte_control_w)
 {
 	// d0: lcd data
-	// d1: lcd clk
+	// d1: lcd clock
 	// d2: lcd interrupt
+	m_hlcd0538->write_data(data & 1);
+	m_hlcd0538->write_clk(data >> 1 & 1);
+	m_hlcd0538->write_int(data >> 2 & 1);
+
 	// d3: unused?
-	m_lcd_control = data;
-	
-	// here's a hacky workaround for now
-	for (int i = 0; i < 10; i++)
-		output().set_digit_value(i, BITSWAP8(m_nvram[i + 0xc2d],3,5,4,6,7,2,1,0));
-	
-	// other: same as supercon
-	supercon_control_w(space, offset, data);
+
+	// d4-d6: select led row
+	m_led_select = data >> 4 & 7;
+	cforte_prepare_display();
+
+	// d7: enable beeper
+	m_beeper->set_state(data >> 7 & 1);
 }
 
 
@@ -485,6 +529,7 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, cforte_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, cforte_control_w)
 	AM_IMPORT_FROM( supercon_map )
 ADDRESS_MAP_END
@@ -852,6 +897,10 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	/* video hardware */
+	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
+	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(novag6502_state, cforte_lcd_output_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
