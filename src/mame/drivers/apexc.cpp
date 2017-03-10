@@ -269,7 +269,7 @@ READ8_MEMBER(apexc_state::tape_read)
 	uint8_t reply;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
-	if (image->exists() && (image->fread(& reply, 1) == 1))
+	if (image && image->exists() && (image->fread(& reply, 1) == 1))
 		return reply & 0x1f;
 	else
 		return 0;   /* unit not ready - I don't know what we should do */
@@ -281,7 +281,7 @@ WRITE8_MEMBER(apexc_state::tape_write)
 	uint8_t data5 = (data & 0x1f);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
-	if (image->exists())
+	if (image && image->exists())
 		image->fwrite(& data5, 1);
 
 	apexc_teletyper_putchar(data & 0x1f);    /* display on screen */
