@@ -12148,6 +12148,7 @@ spectar1                        // (c) 1980
 targ                            // (c) 1980
 targc                           // (c) 1980
 teetert                         // (c) 1981
+teetert2                        // (c) 1981
 venture                         // (c) 1981
 venture2                        // (c) 1981
 venture4                        // (c) 1981
@@ -33290,6 +33291,7 @@ friskyt                         // (c) 1981
 friskyta                        // (c) 1981
 friskytb                        // (c) 1981
 radrad                          // (c) 1982 Nichibutsu USA
+radradj                         // (c) 1982 Logitec Corp
 sectrzon                        // (c) 1984 + Alice
 seicross                        // (c) 1984 + Alice
 
@@ -36920,6 +36922,7 @@ voyager                         // (c) 2002 Team Play, Inc.
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix
 specfrce                        // (c) 2002 ICE/Play Mechanix
+zoofari							// (c) 2006 ICE/Play Mechanix
 
 @source:vpoker.cpp
 5acespkr                        // (c) 198?
@@ -37658,6 +37661,7 @@ fh_l5                           //
 fh_l9                           //
 fh_l9b                          //
 hd_l1                           //
+hd_l2                           //
 hd_l3                           //
 tfa_13                          //
 

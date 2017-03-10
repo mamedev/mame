@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x1c000014, 0x1c000017) AM_READ(tty_ready_r)
 	AM_RANGE(0x1c400000, 0x1c400003) AM_WRITE(tty_w)        // boot ROM code uses this one
 	AM_RANGE(0x1c400014, 0x1c400017) AM_READ(tty_ready_r)
-	AM_RANGE(0x1fc00000, 0x1fcfffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vp101 )
@@ -98,7 +98,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START(jnero)
-	ROM_REGION(0x100000, "maincpu", 0)  /* Boot ROM */
+	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_LOAD( "d710.05523.bin", 0x000000, 0x100000, CRC(6054a066) SHA1(58e68b7d86e6f24c79b99c8406e86e3c14387726) )
 
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 program - read-protected, need dumped */
@@ -109,7 +109,7 @@ ROM_START(jnero)
 ROM_END
 
 ROM_START(specfrce)
-	ROM_REGION(0x100000, "maincpu", 0)  /* Boot ROM */
+	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58) )
 	ROM_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a) ) /* Newer, but keep both in driver */
 
@@ -120,6 +120,17 @@ ROM_START(specfrce)
 	DISK_IMAGE_READONLY("sf010101", 0, SHA1(59b5e3d8e1d5537204233598830be2066aad0556) )
 ROM_END
 
+ROM_START(zoofari)
+	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
+	ROM_LOAD( "zf_boot_rel.u13", 0x000000, 0x400000, CRC(e629689a) SHA1(7352d033c638040c3e51a453e2440a7f38a1b406) )
+
+	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 program - read-protected, need dumped */
+	ROM_LOAD( "8777z-568.bin", 0x000000, 0x80000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
+ROM_END
 
 GAME( 2002,  specfrce,  0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training",   MACHINE_IS_SKELETON )
 GAME( 2004,  jnero,     0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero",         MACHINE_IS_SKELETON )
+GAME( 2006,  zoofari,   0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Zoofari",         MACHINE_IS_SKELETON )

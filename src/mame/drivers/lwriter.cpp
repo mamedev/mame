@@ -34,9 +34,9 @@
     0xC - <Passes> 400000-5fffff comprehensive DRAM data test
     0xB - <Passes?> Unknown test
     0xA - <Passes> dies if 600000-7fffff doesn't mirror 400000-5fffff ?
-    0x8 - <Passes> SRAM test 000000-000FFF (2e3616-2e3654)
-    0x0 - <runs off into weeds> not sure... (2e2fd0... 2db764 is the end of the 'clear ram 41d53f down to 400000' loop...)
-
+    0x8 - <Passes> SRAM test 000000-000FFF (2e3616-2e3664)
+    0x0 - main loop? starts at 2e0002 (2e2fd0... 2db764 is the end of the 'clear ram 41d53f down to 400000' loop...),
+    touches the via and fires an int, but runs off into the weeds
     If one of the self tests fails, the uppermost bit will oscillate (c000 4000 c000 4000 etc) forever
 
 ******************************************************************************/

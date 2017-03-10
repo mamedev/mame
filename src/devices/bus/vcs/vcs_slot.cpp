@@ -817,16 +817,3 @@ WRITE8_MEMBER(vcs_cart_slot_device::write_ram)
 	if (m_cart)
 		m_cart->write_ram(space, offset, data, mem_mask);
 }
-
-
-/*-------------------------------------------------
- direct update
- -------------------------------------------------*/
-
-DIRECT_UPDATE_MEMBER(vcs_cart_slot_device::cart_opbase)
-{
-	if (m_cart)
-		return m_cart->cart_opbase(direct, address);
-	else
-		return address;
-}

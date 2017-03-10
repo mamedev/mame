@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "hp9845_io.h"
-#include "includes/hp9845.h"
 
 // device type definition
 const device_type HP9845_IO_SLOT = device_creator<hp9845_io_slot_device>;
@@ -20,9 +19,11 @@ const device_type HP9845_IO_SLOT = device_creator<hp9845_io_slot_device>;
 // +---------------------+
 hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HP9845_IO_SLOT, "HP9845 I/O Slot", tag, owner, clock, "hp9845_io_slot", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_irq_cb_func(*this),
+	m_sts_cb_func(*this),
+	m_flg_cb_func(*this)
 {
-	//printf("hp9845_io_slot_device %s %p\n" , tag , this);
 }
 
 hp9845_io_slot_device::~hp9845_io_slot_device()
@@ -31,16 +32,62 @@ hp9845_io_slot_device::~hp9845_io_slot_device()
 
 void hp9845_io_slot_device::device_start()
 {
-	//printf("hp9845_io_slot_device::device_start\n");
+	m_irq_cb_func.resolve_safe();
+	m_sts_cb_func.resolve_safe();
+	m_flg_cb_func.resolve_safe();
+
+	hp9845_io_card_device *card = dynamic_cast<hp9845_io_card_device*>(get_card_device());
+
+	if (card != nullptr) {
+		card->set_slot_device(this);
+	}
+}
+
+void hp9845_io_slot_device::irq_w(uint8_t sc , int state)
+{
+	m_irq_cb_func(sc , state , 0xff);
+}
+
+void hp9845_io_slot_device::sts_w(uint8_t sc , int state)
+{
+	m_sts_cb_func(sc , state , 0xff);
+}
+
+void hp9845_io_slot_device::flg_w(uint8_t sc , int state)
+{
+	m_flg_cb_func(sc , state , 0xff);
+}
+
+int hp9845_io_slot_device::get_rw_handlers(read16_delegate& rhandler , write16_delegate& whandler)
+{
+	hp9845_io_card_device *card = dynamic_cast<hp9845_io_card_device*>(get_card_device());
+
+	if (card != nullptr) {
+		rhandler = read16_delegate(FUNC(hp9845_io_card_device::reg_r) , card);
+		whandler = write16_delegate(FUNC(hp9845_io_card_device::reg_w) , card);
+		return card->get_sc();
+	} else {
+		return -1;
+	}
 }
 
 // +---------------------+
 // |hp9845_io_card_device|
 // +---------------------+
+void hp9845_io_card_device::set_slot_device(hp9845_io_slot_device* dev)
+{
+	m_slot_dev = dev;
+}
+
+uint8_t hp9845_io_card_device::get_sc(void)
+{
+	return m_select_code_port->read() + HP9845_IO_FIRST_SC;
+}
+
 hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this),
-	m_sys(nullptr),
+	m_slot_dev(nullptr),
 	m_select_code_port(*this , "SC"),
 	m_my_sc(0)
 {
@@ -52,31 +99,27 @@ hp9845_io_card_device::~hp9845_io_card_device()
 
 void hp9845_io_card_device::device_reset()
 {
-	m_my_sc = m_select_code_port->read() + HP9845_IO_FIRST_SC;
-	//printf("m_my_sc=%u\n" , m_my_sc);
+	m_my_sc = get_sc();
 }
 
 void hp9845_io_card_device::irq_w(int state)
 {
-	m_sys->irq_w(m_my_sc , state);
+	if (m_slot_dev) {
+		m_slot_dev->irq_w(m_my_sc , state);
+	}
 }
 
 void hp9845_io_card_device::sts_w(int state)
 {
-	m_sys->sts_w(m_my_sc , state);
+	if (m_slot_dev) {
+		m_slot_dev->sts_w(m_my_sc , state);
+	}
 }
 
 void hp9845_io_card_device::flg_w(int state)
 {
-	m_sys->flg_w(m_my_sc , state);
-}
-
-void hp9845_io_card_device::install_readwrite_handler(read16_delegate rhandler, write16_delegate whandler)
-{
-	if (m_sys == nullptr) {
-		m_sys = dynamic_cast<hp9845b_state*>(&machine().root_device());
-		//printf("m_sys=%p\n" , m_sys);
-		m_sys->install_readwrite_handler(m_my_sc , rhandler, whandler);
+	if (m_slot_dev) {
+		m_slot_dev->flg_w(m_my_sc , state);
 	}
 }
 
