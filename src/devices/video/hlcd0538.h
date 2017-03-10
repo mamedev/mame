@@ -14,6 +14,10 @@
 #define MCFG_HLCD0538_WRITE_COLS_CB(_devcb) \
 	devcb = &hlcd0538_device::set_write_cols_callback(*device, DEVCB_##_devcb);
 
+// INTERRUPT pin
+#define MCFG_HLCD0538_INTERRUPT_CB(_devcb) \
+	devcb = &hlcd0538_device::set_write_interrupt_callback(*device, DEVCB_##_devcb);
+
 
 // pinout reference
 
@@ -22,7 +26,7 @@
         +V  1 |*   \_/    | 40 R 1
    DATA IN  2 |           | 39 R 2
        CLK  3 |           | 38 R 3
-      LCD0  4 |           | 37 R 4
+       LCD  4 |           | 37 R 4
        GND  5 |           | 36 R 5
  INTERRUPT  6 |           | 35 R 6
       C 26  7 |           | 34 R 7
@@ -51,22 +55,24 @@ public:
 
 	// static configuration helpers
 	template<typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&object) { return downcast<hlcd0538_device &>(device).m_write_cols.set_callback(std::forward<Object>(object)); }
+	template<typename Object> static devcb_base &set_write_interrupt_callback(device_t &device, Object &&object) { return downcast<hlcd0538_device &>(device).m_write_interrupt.set_callback(std::forward<Object>(object)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clk);
-	DECLARE_WRITE_LINE_MEMBER(write_int);
+	DECLARE_WRITE_LINE_MEMBER(write_lcd);
 	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	int m_int;      // input pin state
+	int m_lcd;      // input pin state
 	int m_clk;      // "
 	int m_data;     // "
 	u64 m_shift;
 
 	// callbacks
 	devcb_write64 m_write_cols;
+	devcb_write_line m_write_interrupt;
 };
 
 

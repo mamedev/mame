@@ -8,7 +8,6 @@
   0539: 0 rows, 34 columns
 
   TODO:
-  - LCD pin
   - the only difference between 0538/0539 is row pins voltage levels?
 
 */
@@ -26,7 +25,7 @@ const device_type HLCD0539 = device_creator<hlcd0539_device>;
 
 hlcd0538_device::hlcd0538_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_write_cols(*this)
+	m_write_cols(*this), m_write_interrupt(*this)
 {
 }
 
@@ -50,15 +49,16 @@ void hlcd0538_device::device_start()
 {
 	// resolve callbacks
 	m_write_cols.resolve_safe();
+	m_write_interrupt.resolve_safe();
 
 	// zerofill
-	m_int = 0;
+	m_lcd = 0;
 	m_clk = 0;
 	m_data = 0;
 	m_shift = 0;
 
 	// register for savestates
-	save_item(NAME(m_int));
+	save_item(NAME(m_lcd));
 	save_item(NAME(m_clk));
 	save_item(NAME(m_data));
 	save_item(NAME(m_shift));
@@ -81,16 +81,19 @@ WRITE_LINE_MEMBER(hlcd0538_device::write_clk)
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER(hlcd0538_device::write_int)
+WRITE_LINE_MEMBER(hlcd0538_device::write_lcd)
 {
 	state = (state) ? 1 : 0;
 	
 	// transfer to latches on rising edge
-	if (state && !m_int)
+	if (state && !m_lcd)
 	{
-		m_write_cols(0, m_shift, ~0);
+		m_write_cols(0, m_shift, ~u64(0));
 		m_shift = 0;
 	}
 
-	m_int = state;
+	m_lcd = state;
+	
+	// interrupt output follows lcd input
+	m_write_interrupt(state);
 }

@@ -384,12 +384,12 @@ WRITE8_MEMBER(novag6502_state::cforte_mux_w)
 
 WRITE8_MEMBER(novag6502_state::cforte_control_w)
 {
-	// d0: lcd data
-	// d1: lcd clock
-	// d2: lcd interrupt
+	// d0: HLCD0538 data in
+	// d1: HLCD0538 clk
+	// d2: HLCD0538 lcd
 	m_hlcd0538->write_data(data & 1);
 	m_hlcd0538->write_clk(data >> 1 & 1);
-	m_hlcd0538->write_int(data >> 2 & 1);
+	m_hlcd0538->write_lcd(data >> 2 & 1);
 
 	// d3: unused?
 
