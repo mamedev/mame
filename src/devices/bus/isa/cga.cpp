@@ -1619,6 +1619,7 @@ void isa8_wyse700_device::change_resolution(uint8_t mode)
 		case 0xa0: width = 1280; height = 400; break;
 		case 0x80: width = 640; height = 400; break;
 		case 0x00: width = 640; height = 400; break; // unhandled
+		default: width = 640; height = 400; break; // avoid division by zero in configure()
 	}
 	rectangle visarea(0, width-1, 0, height-1);
 	subdevice<screen_device>(CGA_SCREEN_NAME)->configure(width, height, visarea, HZ_TO_ATTOSECONDS(60));
