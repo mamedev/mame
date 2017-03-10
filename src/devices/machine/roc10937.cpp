@@ -361,8 +361,8 @@ void roc10957_t::write_char(int data)
 		}
 	}
 	else
-	{ // Display data
-		data &= 0x3F;
+	{ // Display data.  Bit 6 is a "don't care" bit except for PNT and TAIL.
+		data &= 0x7F;
 
 		switch ( data )
 		{
