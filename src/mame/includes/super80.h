@@ -87,7 +87,7 @@ public:
 	uint32_t screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_super80m(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_super80m);
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);

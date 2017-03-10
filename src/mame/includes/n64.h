@@ -31,7 +31,7 @@ public:
 	void n64_machine_stop();
 
 	uint32_t screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_n64(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_n64);
 
 	// Getters
 	n64_rdp* rdp() { return m_rdp; }

@@ -79,7 +79,7 @@ public:
 	DECLARE_READ32_MEMBER(spg290_regs_r);
 	DECLARE_WRITE32_MEMBER(spg290_regs_w);
 	void spg290_timers_update();
-	void spg290_vblank_irq(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(spg290_vblank_irq);
 	inline uint32_t spg290_read_mem(uint32_t offset);
 	inline void spg290_write_mem(uint32_t offset, uint32_t data);
 	void spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb);
@@ -549,7 +549,7 @@ void hyperscan_state::spg290_timers_update()
 		}
 }
 
-void hyperscan_state::spg290_vblank_irq(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 {
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( hyperscan, hyperscan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_DRIVER(hyperscan_state, spg290_vblank_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
 MACHINE_CONFIG_END
 
 

@@ -1537,7 +1537,7 @@ static MACHINE_CONFIG_START( tnzs_base, tnzs_base_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_base_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_DRIVER(tnzs_base_state, screen_eof_tnzs)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tnzs_base_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)

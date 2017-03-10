@@ -4486,7 +4486,7 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 	combiner.function_Aop3 = std::max(std::min((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
-void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 {
 #ifdef LOG_NV2A
 	printf("vblank_callback\n\r");

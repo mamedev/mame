@@ -313,7 +313,7 @@ public:
 	void overlay_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
-	void thom_vblank( screen_device &screen, bool state );
+	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
 	DECLARE_READ8_MEMBER( to7_5p14_r );

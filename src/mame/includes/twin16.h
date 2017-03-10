@@ -76,7 +76,7 @@ public:
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_twin16(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(sprite_tick);

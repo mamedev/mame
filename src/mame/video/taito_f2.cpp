@@ -871,7 +871,7 @@ void taitof2_state::taitof2_update_sprites_active_area(  )
 }
 
 
-void taitof2_state::screen_eof_taitof2_no_buffer(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitof2_state::screen_vblank_no_buffer)
 {
 	// rising edge
 	if (state)
@@ -882,7 +882,7 @@ void taitof2_state::screen_eof_taitof2_no_buffer(screen_device &screen, bool sta
 	}
 }
 
-void taitof2_state::screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitof2_state::screen_vblank_full_buffer_delayed)
 {
 	// rising edge
 	if (state)
@@ -900,7 +900,7 @@ void taitof2_state::screen_eof_taitof2_full_buffer_delayed(screen_device &screen
 	}
 }
 
-void taitof2_state::screen_eof_taitof2_partial_buffer_delayed(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitof2_state::screen_vblank_partial_buffer_delayed)
 {
 	// rising edge
 	if (state)
@@ -918,7 +918,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed(screen_device &scr
 	}
 }
 
-void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitof2_state::screen_vblank_partial_buffer_delayed_thundfox)
 {
 	// rising edge
 	if (state)
@@ -940,7 +940,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_de
 	}
 }
 
-void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitof2_state::screen_vblank_partial_buffer_delayed_qzchikyu)
 {
 	// rising edge
 	if (state)

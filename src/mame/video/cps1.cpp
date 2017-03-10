@@ -3089,7 +3089,7 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-void cps_state::screen_eof_cps1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
 {
 	// rising edge
 	if (state)

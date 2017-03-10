@@ -222,7 +222,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
@@ -291,7 +291,7 @@ uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-void mazerbla_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mazerbla_state::screen_vblank)
 {
 	if (state)
 	{
@@ -1515,7 +1515,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
-	MCFG_SCREEN_VBLANK_DRIVER(mazerbla_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mazerbla_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)

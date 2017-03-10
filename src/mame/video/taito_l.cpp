@@ -309,7 +309,7 @@ uint32_t taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 
 
 
 
-void taitol_state::screen_eof_taitol(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitol_state::screen_vblank_taitol)
 {
 	// rising edge
 	if (state)

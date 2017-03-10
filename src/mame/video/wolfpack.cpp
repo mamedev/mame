@@ -273,7 +273,7 @@ uint32_t wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_in
 }
 
 
-void wolfpack_state::screen_eof_wolfpack(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(wolfpack_state::screen_vblank_wolfpack)
 {
 	// rising edge
 	if (state)

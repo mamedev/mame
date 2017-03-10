@@ -323,7 +323,7 @@ uint32_t gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void gaplus_state::screen_eof(screen_device &screen, bool state)/* update starfields */
+WRITE_LINE_MEMBER(gaplus_state::screen_vblank)/* update starfields */
 {
 	// falling edge
 	if (!state)

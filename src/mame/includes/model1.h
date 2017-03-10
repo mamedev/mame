@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_model1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
 
 	struct spoint_t
 	{
