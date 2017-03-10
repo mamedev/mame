@@ -415,6 +415,8 @@ WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 	case 1: tm = midground_layer; break;
 	case 2: tm = foreground_layer; break;
 	}
+	if(!tm)
+		return;
 	if(offset & 1)
 		tm->set_scrolly(0, data);
 	else
