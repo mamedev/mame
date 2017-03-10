@@ -176,7 +176,7 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tsp_sprite_enable(uint32_t spr_offset, uint8_t sw_bit);
+	void tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit);
 	void execute_sync_cmd();
 	void execute_dspon_cmd();
 	void execute_dspdef_cmd();
@@ -759,7 +759,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 	}
 }
 
-void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint8_t sw_bit)
+void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
