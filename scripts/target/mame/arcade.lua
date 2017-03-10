@@ -300,6 +300,7 @@ VIDEOS["HD61830"] = true
 VIDEOS["HD63484"] = true
 --VIDEOS["HD66421"] = true
 --VIDEOS["HLCD0515"] = true
+--VIDEOS["HLCD0538"] = true
 VIDEOS["HUC6202"] = true
 VIDEOS["HUC6260"] = true
 --VIDEOS["HUC6261"] = true

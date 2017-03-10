@@ -11,7 +11,7 @@
     such as Arena(in editmode).
 
     TODO:
-    - cforte lcd(chip unknown), and ACIA?
+    - cforte ACIA?
     - verify supercon/cforte IRQ and beeper frequency
     - sforte irq active time (21.5us is too long)
     - sforte/sexpert led handling is correct?
@@ -31,7 +31,7 @@ Super Constellation Chess Computer (model 844):
 Constellation Forte:
 - 65C02 @ 5MHz
 - 4KB RAM, 64KB ROM
-- 10-digit 7seg LCD display
+- HLCD0538P, 10-digit 7seg LCD display
 - TTL, 18 LEDs, 8*8 chessboard buttons
 
 When it was first added to MAME as skeleton driver in mmodular.c, this romset
@@ -63,6 +63,7 @@ instead of magnet sensors.
 #include "cpu/m6502/m65c02.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "video/hlcd0538.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -77,8 +78,11 @@ class novag6502_state : public novagbase_state
 {
 public:
 	novag6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: novagbase_state(mconfig, type, tag)
+		: novagbase_state(mconfig, type, tag),
+		m_hlcd0538(*this, "hlcd0538")
 	{ }
+
+	optional_device<hlcd0538_device> m_hlcd0538;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
@@ -339,10 +343,9 @@ READ8_MEMBER(novag6502_state::supercon_input2_r)
 
 WRITE8_MEMBER(novag6502_state::cforte_control_w)
 {
-	// TODO: unknown lcd at d0-d3, clocks it 34 times with rowselect in lower bits
 	// d0: lcd data
-	// d1: lcd clock
-	// d2: lcd cs
+	// d1: lcd clk
+	// d2: lcd interrupt
 	// d3: unused?
 	m_lcd_control = data;
 	
@@ -845,7 +848,7 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 256) // guessed
+	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 256) // approximation
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -855,7 +858,7 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1024) // guessed
+	MCFG_SOUND_ADD("beeper", BEEP, 1024) // 1024Hz (measured from video reference)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
