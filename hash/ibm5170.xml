@@ -2672,6 +2672,7 @@ Missing files come here
 	<!-- Driver Disks -->
 
 	<software name="amouse7">
+		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
 		<description>AMouse Mouse Driver Disk</description>
 		<year>1991</year>
 		<publisher>ULTIMA Electronics Corp.</publisher>
