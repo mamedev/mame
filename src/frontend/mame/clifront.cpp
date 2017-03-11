@@ -1501,7 +1501,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{
 			// parse any relevant INI files before proceeding
 			const char *sysname = m_options.system_name();
-			(this->*info_command.function)((sysname[0] == 0) ? nullptr : sysname);
+			(this->*info_command.function)((sysname[0] == 0) ? "*" : sysname);
 			return;
 		}
 	}
