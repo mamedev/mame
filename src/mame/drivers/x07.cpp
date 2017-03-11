@@ -1009,7 +1009,7 @@ void x07_state::kb_irq()
 	{
 		m_regs_r[0] = 0;
 		m_regs_r[1] = m_t6834_ram[0x400];
-		memcpy(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
+		memmove(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
 		m_kb_size--;
 		m_regs_r[2] |= 0x01;
 		m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
