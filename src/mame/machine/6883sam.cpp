@@ -330,9 +330,39 @@ void sam6883_friend_device::update_cpu_clock(void)
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 
 	// the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E'
-	m_cpu->set_clock_scale(speed ? 2 : 1);
+	set_clock_scale_recursive(m_cpu->machine().root_device(), speed ? 2 : 1);
 }
 
+
+//-------------------------------------------------
+//  set_clock_scale_recursive
+//-------------------------------------------------
+
+void sam6883_friend_device::set_clock_scale_recursive(device_t &device, double clockscale)
+{
+	if (is_device_subject_to_clock_changes(device))
+		device.set_clock_scale(clockscale);
+	for (device_t &child : device.subdevices())
+		set_clock_scale_recursive(child, clockscale);
+}
+
+
+//-------------------------------------------------
+//  is_device_subject_to_clock_changes
+//-------------------------------------------------
+
+bool sam6883_friend_device::is_device_subject_to_clock_changes(const device_t &device) const
+{
+	// This is a crude heuristic to identify which devices in the system are subject to
+	// clock changes incurred on account of SAM writes.  The ideal solution would be some
+	// way to have the devices "subscribe" to a clock, and have the SAM control that one
+	// clock from one place.  However, MAME doesn't have such a facility.
+	//	
+	// Because the SAM emulation is only used in the CoCo family emulation, this is a
+	// safe technique
+	return device.configured_clock() != 0
+		&& (m_cpu->configured_clock() % device.configured_clock()) <= (m_cpu->configured_clock() / device.configured_clock());
+}
 
 
 //-------------------------------------------------
