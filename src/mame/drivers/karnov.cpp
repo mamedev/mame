@@ -85,6 +85,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "sound/3812intf.h"
 #include "cpu/mcs51/mcs51.h"
 #include "screen.h"
 #include "speaker.h"
@@ -441,12 +442,21 @@ static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
+static ADDRESS_MAP_START( base_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
+	AM_IMPORT_FROM(base_sound_map)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( karnovjbl_sound_map, AS_PROGRAM, 8, karnov_state )
+	AM_IMPORT_FROM(base_sound_map)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3812_device, write)
 ADDRESS_MAP_END
 
 
@@ -838,6 +848,16 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( karnovjbl, karnov )
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(karnovjbl_sound_map)
+
+	MCFG_SOUND_REPLACE("ym2", YM3812, 3000000)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_CONFIG_END
+
 static ADDRESS_MAP_START( chelnovjbl_mcu_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -1023,6 +1043,51 @@ ROM_START( karnovj )
 	ROM_LOAD( "kar19",        0x70000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
+	ROM_LOAD( "karnprom.20",  0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) )
+ROM_END
+
+ROM_START( karnovjbl )
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "3.bin",        0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
+	ROM_LOAD16_BYTE( "6.bin",        0x00001, 0x10000, CRC(509eb27e) SHA1(ff2866791f7e220132224ccb2db1bbee21b6ff2b) )
+	ROM_LOAD16_BYTE( "2.bin",        0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
+	ROM_LOAD16_BYTE( "5.bin",        0x20001, 0x10000, CRC(a4a34e37) SHA1(f40b680cc7312c844f81d01997f9a47c48d36e88) )
+	ROM_LOAD16_BYTE( "1.bin",        0x40000, 0x08000, CRC(6c66b30c) SHA1(0db0441cb55b88db328237f62f22882d486cb76f) )
+	ROM_FILL(0x48000, 0x08000, 0xff)
+	ROM_LOAD16_BYTE( "4.bin",        0x40001, 0x08000, CRC(015e74ad) SHA1(62850776e064a22dd14d0a31d091d295c65ebc0d) )
+	ROM_FILL(0x48001, 0x08000, 0xff)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
+	ROM_LOAD( "7.bin",         0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* NEC D8748HD MCU */
+	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // labeled 19 on PCB (yes, they labeled two chips as 19)
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "8.bin",       0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "11.bin",       0x00000, 0x08000, CRC(fd18a75c) SHA1(21f753bd7062c00afde48a1585c9aeba247b68b8) )  /* Backgrounds */
+	ROM_LOAD( "12.bin",       0x08000, 0x08000, CRC(a47791d7) SHA1(c242afc80bb885b5d612cc4e7780a8a0ed1f0879) )
+	ROM_LOAD( "13.bin",       0x10000, 0x08000, CRC(e8baf220) SHA1(34ad6453757f87defde5d2f1946fda920a10b1f6) )
+	ROM_LOAD( "14.bin",       0x18000, 0x08000, CRC(27cecdec) SHA1(529f2f14c88cbefd3b630c9b5fa3bbb6bdb8dabf) )
+	ROM_LOAD( "9.bin",        0x20000, 0x08000, CRC(4c403259) SHA1(375feab295be3a540ea3a1d281c2f2cec2d91a21) )
+	ROM_LOAD( "10.bin",       0x28000, 0x08000, CRC(14821a07) SHA1(63504313c117dbeb0d3b425fcb4d216078ef7b82) )
+	ROM_LOAD( "15.bin",       0x30000, 0x08000, CRC(04551cc8) SHA1(d0b89b55b8e139e11b79efd26edeffd8022ee385) )
+	ROM_LOAD( "16.bin",       0x38000, 0x08000, CRC(12bc9e09) SHA1(d2f527138d475fc7d798aaf48e08b133be090543) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
+	ROM_LOAD( "19.bin",       0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
+	ROM_LOAD( "18.bin",       0x20000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "20.bin",       0x30000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
+	ROM_LOAD( "21.bin",       0x40000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "22.bin",       0x50000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
+	ROM_LOAD( "23.bin",       0x60000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "24.bin",       0x70000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
+
+	ROM_REGION( 0x0800, "proms", 0 ) // not dumped for this set
 	ROM_LOAD( "karnprom.21",  0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) )
 	ROM_LOAD( "karnprom.20",  0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) )
 ROM_END
@@ -1324,12 +1389,13 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovj)
  *
  *************************************/
 
-GAME( 1987, karnov,   0,       karnov,   karnov, karnov_state,   karnov,   ROT0,   "Data East USA",         "Karnov (US, rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnova,  karnov,  karnov,   karnov, karnov_state,   karnov,   ROT0,   "Data East USA",         "Karnov (US, rev 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovj,  karnov,  karnov,   karnov, karnov_state,   karnovj,  ROT0,   "Data East Corporation", "Karnov (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wndrplnt, 0,       wndrplnt, wndrplnt, karnov_state, wndrplnt, ROT270, "Data East Corporation", "Wonder Planet (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnov,  0,       karnov,   chelnov, karnov_state,  chelnov,  ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovu, chelnov, karnov,   chelnovu, karnov_state, chelnovu, ROT0,   "Data East USA",         "Chelnov - Atomic Runner (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovj, chelnov, karnov,   chelnovj, karnov_state, chelnovj, ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,chelnov,chelnovjbl,chelnovj,karnov_state, chelnovj, ROT0,   "bootleg",               "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
-GAME( 1988, chelnovjbla,chelnov,chelnovjbl,chelnovj,karnov_state,chelnovj, ROT0,   "bootleg",               "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1987, karnov,   0,       karnov,   karnov, karnov_state,   karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnova,  karnov,  karnov,   karnov, karnov_state,   karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovj,  karnov,  karnov,   karnov, karnov_state,   karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovjbl,karnov,  karnovjbl,karnov, karnov_state,   karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrplnt, 0,       wndrplnt, wndrplnt, karnov_state, wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnov,  0,       karnov,   chelnov, karnov_state,  chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovu, chelnov, karnov,   chelnovu, karnov_state, chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovj, chelnov, karnov,   chelnovj, karnov_state, chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,chelnov,chelnovjbl,chelnovj,karnov_state, chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
+GAME( 1988, chelnovjbla,chelnov,chelnovjbl,chelnovj,karnov_state,chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^
