@@ -217,11 +217,17 @@ std::string device_t::parameter(const char *tag) const
 
 void device_t::static_set_clock(device_t &device, u32 clock)
 {
+	device.m_derived_clock_dividend = 0;
+	device.m_derived_clock_divisor = 0;
+
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
 	{
+		device.m_derived_clock_dividend = (clock >> 12) & 0xfff;
+		device.m_derived_clock_divisor = (clock >> 0) & 0xfff;
+
 		assert(device.m_owner != nullptr);
-		clock = device.m_owner->m_configured_clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
+		clock = device.m_owner->m_configured_clock * device.m_derived_clock_dividend * device.m_derived_clock_divisor;
 	}
 
 	device.m_clock = device.m_unscaled_clock = device.m_configured_clock = clock;
@@ -561,6 +567,21 @@ void device_t::notify_clock_changed()
 
 
 //-------------------------------------------------
+//	owner_clock_changed - 
+//-------------------------------------------------
+
+void device_t::owner_clock_changed()
+{
+	if (m_derived_clock_dividend && m_derived_clock_divisor)
+	{
+		u32 owner_clock = owner()->clock();
+		u32 new_clock = owner_clock * m_derived_clock_dividend / m_derived_clock_divisor;
+		set_unscaled_clock(new_clock);
+	}
+}
+
+
+//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -689,7 +710,9 @@ void device_t::device_post_load()
 
 void device_t::device_clock_changed()
 {
-	// do nothing by default
+	// notify all subdevices that their owner's clock has changed
+	for (auto &child : subdevices())
+		child.owner_clock_changed();
 }
 
 

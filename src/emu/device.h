@@ -463,6 +463,7 @@ protected:
 	void pre_save();
 	void post_load();
 	void notify_clock_changed();
+	void owner_clock_changed();
 	finder_base *register_auto_finder(finder_base &autodev);
 
 	//------------------- begin derived class overrides
@@ -529,6 +530,9 @@ private:
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
+
+	u16						m_derived_clock_dividend;
+	u16						m_derived_clock_divisor;
 };
 
 
