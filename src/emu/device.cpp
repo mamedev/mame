@@ -227,7 +227,7 @@ void device_t::static_set_clock(device_t &device, u32 clock)
 		device.m_derived_clock_divisor = (clock >> 0) & 0xfff;
 
 		assert(device.m_owner != nullptr);
-		clock = device.m_owner->m_configured_clock * device.m_derived_clock_dividend * device.m_derived_clock_divisor;
+		clock = device.m_owner->m_configured_clock * device.m_derived_clock_dividend / device.m_derived_clock_divisor;
 	}
 
 	device.m_clock = device.m_unscaled_clock = device.m_configured_clock = clock;
