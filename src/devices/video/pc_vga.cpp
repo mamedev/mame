@@ -335,6 +335,14 @@ void vga_device::device_start()
 	save_item(NAME(vga.attribute.pel_shift));
 	save_item(NAME(vga.attribute.pel_shift_latch));
 
+	save_item(NAME(vga.dac.read_index));
+	save_item(NAME(vga.dac.write_index));
+	save_item(NAME(vga.dac.mask));
+	save_item(NAME(vga.dac.read));
+	save_item(NAME(vga.dac.state));
+	save_item(NAME(vga.dac.color));
+	save_item(NAME(vga.dac.dirty));
+
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 }
 
@@ -924,9 +932,9 @@ uint8_t vga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
+				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
 			vga.dac.dirty = 0;
 		}
@@ -985,9 +993,9 @@ uint8_t svga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
-										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
+				m_palette->set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f) << 2,
+										(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f) << 2);
 			}
 			vga.dac.dirty = 0;
 		}
@@ -1802,13 +1810,13 @@ READ8_MEMBER(vga_device::port_03c0_r)
 				switch (vga.dac.state++)
 				{
 					case 0:
-						data = vga.dac.color[vga.dac.read_index].red;
+						data = vga.dac.color[3*vga.dac.read_index];
 						break;
 					case 1:
-						data = vga.dac.color[vga.dac.read_index].green;
+						data = vga.dac.color[3*vga.dac.read_index + 1];
 						break;
 					case 2:
-						data = vga.dac.color[vga.dac.read_index].blue;
+						data = vga.dac.color[3*vga.dac.read_index + 2];
 						break;
 				}
 
@@ -1990,13 +1998,13 @@ WRITE8_MEMBER(vga_device::port_03c0_w)
 		{
 			switch (vga.dac.state++) {
 			case 0:
-				vga.dac.color[vga.dac.write_index].red=data;
+				vga.dac.color[3*vga.dac.write_index]=data;
 				break;
 			case 1:
-				vga.dac.color[vga.dac.write_index].green=data;
+				vga.dac.color[3*vga.dac.write_index + 1]=data;
 				break;
 			case 2:
-				vga.dac.color[vga.dac.write_index].blue=data;
+				vga.dac.color[3*vga.dac.write_index + 2]=data;
 				break;
 			}
 			vga.dac.dirty=1;
