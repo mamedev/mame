@@ -2582,6 +2582,58 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="wfw311g">
+		<!-- KryoFlux dump from original disks, shows as unmodified -->
+		<description>Windows for Workgroups Verison 3.11 (German)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk1.img" size="1474560" crc="43524fe7" sha1="039c817f3cfec479f61b92f5c90f10ae58d43aa5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk2.img" size="1474560" crc="cd23933a" sha1="83dd69871278e957d7e241bc2cdd8e11494ea2af" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk3.img" size="1474560" crc="451ae63f" sha1="626febc9e474f0599eeec6eb543803edd7d12245" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk4.img" size="1474560" crc="dcd5ab20" sha1="564c72f83b101f1dab353968aed0a78e15b0d479" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk5.img" size="1474560" crc="47717a5d" sha1="60c0366580874a7c0de023b8b2f113430bffa474" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk6.img" size="1474560" crc="3e8b52f6" sha1="ecc6ddd1ae24961d6ba57a5f8a56e32fcfd69937" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk7.img" size="1474560" crc="41bda462" sha1="bb990adbd048131d4961add7174c31ae9af1cc38" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk8.img" size="1474560" crc="58797771" sha1="6b38b4d6c31bfa086a2fe884626b5aadfece29f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Windows_for_Workgroups_3.11_German_disk9.img" size="1474560" crc="b35d8025" sha1="3715a7ba0d976bda38a0cde7a3807a452b42ffc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wfw311u">
 		<description>Windows for Workgroups Version 3.11 (Upgrade)</description>
 		<year>1993</year>
