@@ -199,7 +199,20 @@ READ8_MEMBER(lastbank_state::mux_0_r)
 
 WRITE8_MEMBER(lastbank_state::output_w)
 {
-	//logerror("%s: Writing %02x to A80%x\n", machine().describe_context(), data, offset);
+	switch (offset)
+	{
+		case 0:
+		case 1:
+			//logerror("%s: Writing %02x to A80%x\n", machine().describe_context(), data, offset);
+			break;
+
+		case 2:
+			machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin 1
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // coin 2
+			machine().bookkeeping().coin_counter_w(2, BIT(data, 3)); // coin 3
+			machine().bookkeeping().coin_counter_w(3, BIT(data, 1)); // key in
+			break;
+	}
 }
 
 WRITE8_MEMBER(lastbank_state::mux_w)
