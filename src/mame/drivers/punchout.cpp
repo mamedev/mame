@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_IO_MAP(punchout_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", N2A03, XTAL_21_4772MHz/12)
+	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
+	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END

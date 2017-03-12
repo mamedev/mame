@@ -303,8 +303,6 @@ Notes & Todo:
 #include "screen.h"
 #include "speaker.h"
 
-/* clock frequency */
-#define N2A03_DEFAULTCLOCK (21477272.724 / 12)
 
 /******************************************************************************/
 
@@ -654,7 +652,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", playch10_state,  playch10_interrupt)
 
-	MCFG_CPU_ADD("cart", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
 
 

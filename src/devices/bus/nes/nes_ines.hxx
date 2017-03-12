@@ -691,7 +691,7 @@ void nes_cart_slot_device::call_load_ines()
 	if (!ines20)
 	{
 		logerror("Loaded game in iNES format:\n");
-		logerror("-- Mapper %d\n", mapper);
+		logerror("-- Mapper %u\n", mapper);
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
@@ -707,8 +707,8 @@ void nes_cart_slot_device::call_load_ines()
 	else
 	{
 		logerror("Loaded game in Extended iNES format:\n");
-		logerror("-- Mapper: %d\n", mapper);
-		logerror("-- Submapper: %d\n", (header[8] & 0xf0) >> 4);
+		logerror("-- Mapper: %u\n", mapper);
+		logerror("-- Submapper: %u\n", (header[8] & 0xf0) >> 4);
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
