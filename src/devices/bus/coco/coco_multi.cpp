@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco_multi.c
+    coco_multi.cpp
 
     Code for emulating CoCo's Multi-Pak Interface
 

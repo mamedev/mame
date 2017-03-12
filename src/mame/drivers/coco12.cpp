@@ -254,7 +254,7 @@ SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
-	SLOT_INTERFACE("multi", COCO_MULTIPAK)
+	SLOT_INTERFACE("multi", COCO_MULTIPAK) MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -299,8 +299,11 @@ DEVICE_INPUT_DEFAULTS_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( coco, coco12_state )
+	MCFG_DEVICE_MODIFY(":")
+	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+
 	// basic machine hardware
-	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, XTAL_3_579545MHz)
+	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco_mem)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
