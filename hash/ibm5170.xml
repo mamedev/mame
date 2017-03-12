@@ -1457,6 +1457,29 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="msdos622g">
+		<!-- KryoFlux dump from original disks, shows as unmodified -->
+		<description>MS-DOS (Version 6.22, German)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk1.img" size="1474560" crc="59641924" sha1="df473043d61524d74a8391c4649e7362858b6d81" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk2.img" size="1474560" crc="600c5a02" sha1="2b1b7e938cb8eb7bb4eac35a36bd9415fbfe31d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_disk3.img" size="1474560" crc="95f32c5d" sha1="ed1358083d1c56105356e4b029e2beca6d6211da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos622a" cloneof="msdos622">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>MS-DOS (Version 6.22, Alt)</description>
