@@ -1457,7 +1457,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="msdos622g">
+	<software name="msdos622g" cloneof="msdos622">
 		<!-- KryoFlux dump from original disks, shows as unmodified -->
 		<description>MS-DOS (Version 6.22, German)</description>
 		<year>1994</year>
