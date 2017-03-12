@@ -807,96 +807,24 @@ void cli_frontend::verifyroms(const char *gamename)
 				summary_string);
 	}
 
-	if (!matched || strchr(gamename, '*') || strchr(gamename, '?'))
+	machine_config config(GAME_NAME(___empty), m_options);
+	for (device_type type : registered_device_types)
 	{
-		driver_enumerator dummy_drivlist(m_options);
-		std::unordered_set<std::string> device_map;
-		while (dummy_drivlist.next())
+		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+		if (!gamename || !core_strwildcmp(gamename, dev->shortname()))
 		{
-			std::shared_ptr<machine_config> const &config = dummy_drivlist.config();
-			for (device_t &dev : device_iterator(config->root_device()))
-			{
-				if (dev.owner() != nullptr && (*(dev.shortname()) != 0) && dev.rom_region() != nullptr && (device_map.insert(dev.shortname()).second)) {
-					if (core_strwildcmp(gamename, dev.shortname()) == 0)
-					{
-						matched++;
+			matched++;
 
-						// audit the ROMs in this set
-						media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
+			// audit the ROMs in this set
+			media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
-						print_summary(
-								auditor, summary, false,
-								"rom", dev.shortname(), nullptr,
-								correct, incorrect, notfound,
-								summary_string);
-					}
-				}
-			}
-
-			for (const device_slot_interface &slot : slot_interface_iterator(config->root_device()))
-			{
-				for (auto &option : slot.option_list())
-				{
-					std::string temptag("_");
-					temptag.append(option.second->name());
-					device_t *dev = config->device_add(&config->root_device(), temptag.c_str(), option.second->devtype(), 0);
-
-					// notify this device and all its subdevices that they are now configured
-					for (device_t &device : device_iterator(*dev))
-						if (!device.configured())
-							device.config_complete();
-
-					if (device_map.insert(dev->shortname()).second) {
-						if (core_strwildcmp(gamename, dev->shortname()) == 0)
-						{
-							matched++;
-							if (dev->rom_region() != nullptr)
-							{
-								// audit the ROMs in this set
-								media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
-
-								print_summary(
-										auditor, summary, false,
-										"rom", dev->shortname(), nullptr,
-										correct, incorrect, notfound,
-										summary_string);
-							}
-						}
-					}
-					else
-					{
-						// check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
-						for (device_t &device : device_iterator(*dev))
-						{
-							for (device_t &subdev : device_iterator(device))
-							{
-								if (subdev.owner() == &device && subdev.rom_region() != nullptr && subdev.shortname() != nullptr && subdev.shortname()[0] != '\0')
-								{
-									if (device_map.insert(subdev.shortname()).second)
-									{
-										if (core_strwildcmp(gamename, subdev.shortname()) == 0)
-										{
-											matched++;
-
-											// audit the ROMs in this set
-											media_auditor::summary summary = auditor.audit_device(subdev, AUDIT_VALIDATE_FAST);
-
-											print_summary(
-													auditor, summary, false,
-													"rom", subdev.shortname(), nullptr,
-													correct, incorrect, notfound,
-													summary_string);
-										}
-									}
-								}
-							}
-						}
-					}
-
-					config->device_remove(&config->root_device(), temptag.c_str());
-				}
-			}
+			print_summary(
+					auditor, summary, false,
+					"rom", dev->shortname(), nullptr,
+					correct, incorrect, notfound,
+					summary_string);
 		}
+		config.device_remove(&config.root_device(), "_tmp");
 	}
 
 	// clear out any cached files
@@ -904,15 +832,15 @@ void cli_frontend::verifyroms(const char *gamename)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename ? gamename : "");
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename ? gamename : "");
 		else
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename);
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename ? gamename : "");
 	}
 
 	// otherwise, print a summary
@@ -932,6 +860,9 @@ void cli_frontend::verifyroms(const char *gamename)
 
 void cli_frontend::verifysamples(const char *gamename)
 {
+	if (!gamename)
+		gamename = "*";
+
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 
@@ -1199,6 +1130,9 @@ void cli_frontend::listsoftware(const char *gamename)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const char *gamename)
 {
+	if (!gamename)
+		gamename = "*";
+
 	std::unordered_set<std::string> list_map;
 
 	unsigned correct = 0;
@@ -1273,6 +1207,9 @@ void cli_frontend::verifysoftware(const char *gamename)
 
 void cli_frontend::getsoftlist(const char *gamename)
 {
+	if (!gamename)
+		gamename = "*";
+
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
 	bool isfirst = true;
@@ -1301,6 +1238,9 @@ void cli_frontend::getsoftlist(const char *gamename)
 -------------------------------------------------*/
 void cli_frontend::verifysoftlist(const char *gamename)
 {
+	if (!gamename)
+		gamename = "*";
+
 	std::unordered_set<std::string> list_map;
 	unsigned correct = 0;
 	unsigned incorrect = 0;

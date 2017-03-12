@@ -2242,12 +2242,12 @@ ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
-ROM_START( fexcela ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
+ROM_START( fexcela ) // model EP12, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072a01.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
 ROM_END
 
-ROM_START( fexcelb ) // model EP12, PCB label 510-1099A01
+ROM_START( fexcelb ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END

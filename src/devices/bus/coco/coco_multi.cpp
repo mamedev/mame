@@ -228,6 +228,18 @@ WRITE8_MEMBER(coco_multipak_device::write)
 
 
 //-------------------------------------------------
+//  set_sound_enable
+//-------------------------------------------------
+
+void coco_multipak_device::set_sound_enable(bool sound_enable)
+{
+	for (cococart_slot_device *slot : m_slots)
+		slot->cart_set_line(cococart_slot_device::line::SOUND_ENABLE, sound_enable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
+}
+
+
+
+//-------------------------------------------------
 //  ff7f_write
 //-------------------------------------------------
 

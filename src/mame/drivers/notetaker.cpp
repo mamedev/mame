@@ -285,7 +285,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 /* * Keyboard hd6402 */
 READ16_MEMBER( notetaker_state::ReadKeyData_r )
 {
-	return 0xFF00||m_kbduart->get_received_data();
+	return 0xFF00|m_kbduart->get_received_data();
 }
 
 READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
@@ -425,7 +425,7 @@ WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
 /* EIA hd6402 */
 READ16_MEMBER( notetaker_state::ReadEIAData_r )
 {
-	return 0xFF00||m_eiauart->get_received_data();
+	return 0xFF00|m_eiauart->get_received_data();
 }
 
 READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
