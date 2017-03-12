@@ -849,6 +849,10 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( karnovjbl, karnov )
+	/* X-TALs: 
+	Top board next to #9 is 20.000 MHz
+	Top board next to the microcontroller is 6.000 MHz
+	Bottom board next to the ribbon cable is 12.000 MHz*/
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(karnovjbl_sound_map)
 
