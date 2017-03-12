@@ -258,6 +258,10 @@ void vga_device::device_start()
 	vga.memory.resize(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
+	save_item(NAME(vga.pens));
+
+	save_item(NAME(vga.miscellaneous_output));
+	save_item(NAME(vga.feature_control));
 
 	save_item(NAME(vga.sequencer.index));
 	save_item(NAME(vga.sequencer.data));
