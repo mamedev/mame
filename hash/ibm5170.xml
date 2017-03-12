@@ -2258,7 +2258,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win31a">
+	<software name="win31a" cloneof="win31">
 		<description>Microsoft Windows Version 3.1 (Alt)</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
@@ -2300,7 +2300,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win31g">
+	<software name="win31g" cloneof="win31">
 		<!-- KryoFlux dump from original disks, shows as unmodified except for disk 7-->
 		<description>Windows Version 3.1 (German)</description>
 		<year>1992</year>
@@ -2342,7 +2342,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="win31m">
+	<software name="win31m" cloneof="win31">
 		<description>Windows Version 3.1 (5.25")</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
@@ -2582,7 +2582,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="wfw311g">
+	<software name="wfw311g" cloneof="wfw311">
 		<!-- KryoFlux dump from original disks, shows as unmodified -->
 		<description>Windows for Workgroups Verison 3.11 (German)</description>
 		<year>1993</year>
@@ -3834,7 +3834,7 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="bpdx40ga">
+	<software name="bpdx40ga" cloneof="bpdx40g">
 		<!-- dumped via Kryoflux from original media, shows as unmodified -->
 		<description>Borland Paradox 4.0 (German, 5.25")</description>
 		<year>1992</year>
