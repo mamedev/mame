@@ -2307,7 +2307,7 @@ Missing files come here
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk1.img" size="1474560" crc="b74eee18" sha1="fda4f76e32a45979c9b4a1b44cd0fbae04d650c3" offset="0" />
+				<rom name="Windows_3.1_German_Disk1.img" size="1474560" crc="137a61db" sha1="d5bbaef25ecf1178cce58f5c389a7c599bdc3e93" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -2317,27 +2317,27 @@ Missing files come here
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk3.img" size="1474560" crc="a2605b54" sha1="4b0eac2ecdf3946bfec6be64617ba95fd03c2714" offset="0" />
+				<rom name="Windows_3.1_German_Disk3.img" size="1474560" crc="b1fa75ee" sha1="c6e36eab8eeffe971e58ae1cfbafd9c99b57bcb8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk4.img" size="1474560" crc="c2c2cfb5" sha1="a428f2b0f11ab339d5f606b18ac63c77b9d6dece" offset="0" />
+				<rom name="Windows_3.1_German_Disk4.img" size="1474560" crc="bc82507b" sha1="7db58df6ecc65e92b331ae44604968965356278f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk5.img" size="1474560" crc="5aba21f1" sha1="3512aa478081e899fb08f589170ab030a65b7e4f" offset="0" />
+				<rom name="Windows_3.1_German_Disk5.img" size="1474560" crc="92956da3" sha1="377a21b30764d623d3d6a367bc69b22e3703156d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk6.img" size="1474560" crc="3627eca0" sha1="9895d6bf967f7bf1fb36e650f3d0a7834e3059d6" offset="0" />
+				<rom name="Windows_3.1_German_Disk6.img" size="1474560" crc="93d21186" sha1="4344e76a27a6a08e50fd8e2e13e00234a10ed76c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Windows_3.1_German_Disk7.img" size="1474560" crc="ecf660ee" sha1="06256f221e110214a32ab064d2138acc54e7ff3f" offset="0" />
+				<rom name="Windows_3.1_German_Disk7.img" size="1474560" crc="f66212e8" sha1="c45f0fbbb781dfc67ad2f0de7cef2ab14605ac4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
