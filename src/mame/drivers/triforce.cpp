@@ -76,7 +76,7 @@ Games on this system include....
 |*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B)        | Sega / Hitmaker                     | GDROM | GDT-0017B      | 317-0403-JPN | 253-5508-0403J|
 | | 2004 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | GDROM |                |              |               |
 | | 2005 | Donkey Kong Jungle Fever                                        | Namco / Nintendo                    | Cart  |                |              |               |
-|*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  |!317-5109-COM | 253-5509-5109 |
+|*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0018       | 317-0403-JPN | 253-5508-0403J|
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev B)          | Sega / Hitmaker                     | GDROM | GDT-0018B      | 317-0403-JPN | 253-5508-0403J|
@@ -1006,6 +1006,9 @@ ROM_START( mkartagp )
 	ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) )
 	ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) )
 	ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-5109-com.pic", 0x00, 0x4000, CRC(b7159fe3) SHA1(886c026ae62651bb5f700dfd6f9ebb2c415c1ae8) )
 ROM_END
 
 /*
