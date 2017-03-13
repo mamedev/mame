@@ -158,8 +158,14 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
+#include "machine/ds2401.h"
+#include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
-//#include "video/hd63484.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/hd63484.h"
 #include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -167,7 +173,7 @@
 
 #define MAIN_CLOCK  XTAL_12MHz
 #define AY_CLOCK    MAIN_CLOCK / 8
-#define SEC_CLOCK   XTAL_3.6864MHz
+#define SEC_CLOCK   XTAL_3_6864MHz
 #define AUX1_CLOCK  XTAL_26MHz
 #define AUX2_CLOCK  XTAL_24MHz
 
@@ -177,16 +183,37 @@ class wildpkr_state : public driver_device
 public:
 	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_id(*this, "id"),
+		m_dac(*this, "dac"),
+		m_dac_clock(*this, "dacclock"),
+		m_nvram(*this, "nvram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<ds2401_device> m_id;
+	optional_device<dac_byte_interface> m_dac;
+	optional_device<clock_device> m_dac_clock;
+
+	optional_shared_ptr<u16> m_nvram;
+
+	u16 m_clock_rate;
 
 	DECLARE_DRIVER_INIT(wildpkr);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
-	uint32_t screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(unknown_read8);
+	DECLARE_WRITE8_MEMBER(unknown_write8);
+	DECLARE_WRITE16_MEMBER(nvram_w);
+	DECLARE_READ16_MEMBER(id_serial_r);
+	DECLARE_WRITE16_MEMBER(id_serial_w);
+	DECLARE_WRITE16_MEMBER(out0_w);
+	DECLARE_WRITE16_MEMBER(out1_w);
+	DECLARE_WRITE8_MEMBER(dac_w);
+	DECLARE_WRITE16_MEMBER(clock_start_w);
+	DECLARE_WRITE16_MEMBER(clock_rate_w);
+	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
 };
 
 
@@ -196,11 +223,6 @@ public:
 
 void wildpkr_state::video_start()
 {
-}
-
-uint32_t wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
@@ -217,6 +239,62 @@ PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
 *      Misc Handlers     *
 *************************/
 
+READ8_MEMBER(wildpkr_state::unknown_read8)
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER(wildpkr_state::unknown_write8)
+{
+}
+
+WRITE16_MEMBER(wildpkr_state::nvram_w)
+{
+	m_nvram[offset] = data | 0xff00;
+}
+
+READ16_MEMBER(wildpkr_state::id_serial_r)
+{
+	return m_id->read();
+}
+
+WRITE16_MEMBER(wildpkr_state::id_serial_w)
+{
+	m_id->write(data & 1);
+}
+
+WRITE16_MEMBER(wildpkr_state::out0_w)
+{
+}
+
+WRITE16_MEMBER(wildpkr_state::out1_w)
+{
+}
+
+WRITE8_MEMBER(wildpkr_state::dac_w)
+{
+	m_dac->write(space, 0, data);
+	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+}
+
+WRITE16_MEMBER(wildpkr_state::clock_start_w)
+{
+	if (data != 0 && m_clock_rate != 0)
+		m_dac_clock->set_clock_scale(1.0 / m_clock_rate);
+	else
+		m_dac_clock->set_clock_scale(0.0);
+
+	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+}
+
+WRITE16_MEMBER(wildpkr_state::clock_rate_w)
+{
+	m_clock_rate = data;
+}
+
+WRITE16_MEMBER(wildpkr_state::unknown_trigger_w)
+{
+}
 
 /*************************
 *      Memory Map        *
@@ -224,23 +302,44 @@ PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
 
 static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-//  AM_RANGE(0x800000, 0x800003) ACRTC?
-	AM_RANGE(0x800180, 0x800181) AM_DEVWRITE8("aysnd", ay8930_device, address_w, 0xff00)
-	AM_RANGE(0x800180, 0x800181) AM_DEVREADWRITE8("aysnd", ay8930_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100000, 0x113fff) AM_RAM
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("acrtc", hd63484_device, status_r, address_w)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE("acrtc", hd63484_device, data_r, data_w)
+	AM_RANGE(0x800080, 0x80009f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
+	AM_RANGE(0x800180, 0x800181) AM_READ8(unknown_read8, 0xff00)
+	AM_RANGE(0x800180, 0x800181) AM_WRITE8(unknown_write8, 0x00ff)
 	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
 	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
 	AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
+	AM_RANGE(0x800280, 0x800281) AM_DEVWRITE8("aysnd", ay8930_device, data_w, 0xff00)
+	AM_RANGE(0x800282, 0x800283) AM_DEVWRITE8("aysnd", ay8930_device, address_w, 0xff00)
+	AM_RANGE(0x800284, 0x800285) AM_DEVREAD8("aysnd", ay8930_device, data_r, 0x00ff) // (odd!)
+	AM_RANGE(0x800286, 0x800289) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM // dallas timekeeper?
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE("acrtc", hd63484_device, status_r, address_w)
+	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE("acrtc", hd63484_device, data_r, data_w)
+	AM_RANGE(0x500020, 0x500021) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x500022, 0x500023) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x500024, 0x500025) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x500040, 0x50005f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
+	AM_RANGE(0x500060, 0x500061) AM_READWRITE(id_serial_r, id_serial_w)
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0") AM_WRITE(out0_w)
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1") AM_WRITE(out1_w)
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("IN2")
+	AM_RANGE(0x600004, 0x600005) AM_WRITE8(dac_w, 0xff00)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(clock_start_w)
+	AM_RANGE(0x700002, 0x700003) AM_WRITE(clock_rate_w)
+	AM_RANGE(0x700004, 0x700007) AM_WRITE(unknown_trigger_w)
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP // only writes 0 at POST
+ADDRESS_MAP_END
 
-//  AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
-//  AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
-//  AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
+static ADDRESS_MAP_START( hd63484_map, AS_0, 16, wildpkr_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
 /* Unknown R/W:
@@ -254,6 +353,62 @@ ADDRESS_MAP_END
 *************************/
 
 static INPUT_PORTS_START( wildpkr )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tabpkr )
+	PORT_START("IN0")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN1")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("IN2")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 
@@ -271,7 +426,7 @@ void wildpkr_state::machine_start()
   80000-bffff = unused
   c0000-fffff = unused
 */
-
+	m_clock_rate = 0;
 }
 
 
@@ -290,17 +445,20 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
+
+	MCFG_MC68681_ADD("duart", SEC_CLOCK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wildpkr_state, screen_update_wildpkr)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(384, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -318,22 +476,38 @@ static MACHINE_CONFIG_START( tabpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tabpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // 2 / 5 are valid
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // 2 / 5 are valid
+
+	MCFG_NVRAM_ADD_1FILL("nvram") // DS1220Y
+
+	MCFG_MC68681_ADD("duart", 3686400)
+
+	MCFG_DEVICE_ADD("id", DS2401, 0)
+
+	MCFG_DEVICE_ADD("dacclock", CLOCK, 1500000) // base rate derived from program code
+	MCFG_CLOCK_SIGNAL_HANDLER(ASSERTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wildpkr_state, screen_update_wildpkr)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(384, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", AD557, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -376,6 +550,18 @@ ROM_START( tabpkr ) // Royal Poker V 1.85 Oct 29 1996 12:20:07
 	// are these missing, or just unpopulated but checked anyway?
 	/* reads 0x100000 - 0x1fffff ? - 2x sockets for same type of roms as above */
 	/* reads 0x200000 - 0x2fffff ? - 1x socket for larger ROM? */
+
+	ROM_REGION(8, "id", 0)
+	ROM_LOAD("ds2401.bin", 0, 8, NO_DUMP)
+	// Dummy data to appease POST
+	ROM_FILL(0, 1, 0x66)
+	ROM_FILL(1, 1, 0xfa)
+	ROM_FILL(2, 1, 0xce)
+	ROM_FILL(3, 1, 0xde)
+	ROM_FILL(4, 1, 0xad)
+	ROM_FILL(5, 1, 0xbe)
+	ROM_FILL(6, 1, 0xef)
+	ROM_FILL(7, 1, 0x01)
 ROM_END
 
 
@@ -395,4 +581,4 @@ DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
 GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, tabpkr,    0,        tabpkr,   wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, tabpkr,    0,        tabpkr,   tabpkr,  wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
