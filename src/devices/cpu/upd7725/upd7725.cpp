@@ -174,7 +174,9 @@ void necdsp_device::device_reset()
 
 const address_space_config *necdsp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : &m_data_config;
+	return  (spacenum == AS_PROGRAM) ? &m_program_config :
+		(spacenum == AS_DATA) ? &m_data_config :
+		nullptr;
 }
 
 
