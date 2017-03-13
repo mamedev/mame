@@ -569,6 +569,10 @@ void n64_periphs::sp_dma(int direction)
 	uint32_t *sp_mem[2] = { m_rsp_dmem, m_rsp_imem };
 
 	int sp_mem_page = (sp_mem_addr >> 12) & 1;
+
+	if(sp_mem_page == 1)
+		m_rsp->rspdrc_flush_drc_cache();
+
 	if(direction == 0)// RDRAM -> I/DMEM
 	{
 		for(int c = 0; c <= sp_dma_count; c++)
