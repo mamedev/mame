@@ -1674,7 +1674,11 @@ void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer)
 	unsigned int current_sum = 0;
 	for(unsigned int i=0; i != buffer.size(); i++) {
 		uint32_t time = buffer[i] & floppy_image::TIME_MASK;
-		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * current_sum / total_sum);
+		if (total_sum) {
+			buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * current_sum / total_sum);
+		} else {
+			buffer[i] = (buffer[i] & floppy_image::MG_MASK);
+		}
 		current_sum += time;
 	}
 }

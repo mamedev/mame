@@ -112,7 +112,7 @@ bool esq8img_format::load(io_generic *io, uint32_t form_factor, floppy_image *im
 			sectors[i].size = 1024;
 			sectors[i].sector_id = i;
 		}
-		else
+		else if (i == 5)
 		{
 			sectors[i].data = sectdata + (5*1024);  // 1 512 byte sector
 			sectors[i].size = 512;

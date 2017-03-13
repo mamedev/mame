@@ -287,7 +287,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		if (filectx.dirp) {
 			dp = filectx.dirp->read();
 			if(dp) {
-				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename)-1);
 			} else {
 				memset(filectx.filename, 0, sizeof(filectx.filename));
 			}
