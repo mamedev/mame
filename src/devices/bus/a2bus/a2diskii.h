@@ -59,8 +59,17 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
+class a2bus_agat7flop_device: public a2bus_floppy_device
+{
+public:
+	a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
 // device type definition
 extern const device_type A2BUS_DISKII;
 extern const device_type A2BUS_IWM_FDC;
+extern const device_type A2BUS_AGAT7_FDC;
 
 #endif  /* __A2BUS_DISKII__ */

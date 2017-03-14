@@ -111,6 +111,7 @@ enum
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
 	XTAL_10MHz          = 10000000,
 	XTAL_10_245MHz      = 10245000,     /* PES Speech box */
+	XTAL_10_5MHz        = 10500000,     /* Agat-7 */
 	XTAL_10_595MHz      = 10595000,     /* Mad Alien */
 	XTAL_10_6875MHz     = 10687500,     /* BBC Bridge Companion */
 	XTAL_10_69425MHz    = 10694250,     /* Xerox 820 */
@@ -141,6 +142,7 @@ enum
 	XTAL_13_4952MHz     = 13495200,     /* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
+	XTAL_14_3MHz        = 14300000,	    /* Agat-7 */
 	XTAL_14_314MHz      = 14314000,     /* Taito TTL Board  */
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	XTAL_14_705882MHz   = 14705882,     /* Aleck64 */
