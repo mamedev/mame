@@ -279,7 +279,7 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 	case NECDSP_INPUT_LINE_INT:
 		if ( ((m_irq == 0) && (state == 1)) && (regs.sr.ei == 1)) // detect rising edge AND if EI == 1;
 		{
-			regs.stack[regs.sp++] = regs.pc; regs.pc = 0x0100; regs.sp &= 0xf; regs.sr.ei = 0; return; //push PC, pc = 0x100
+			regs.stack[regs.sp++] = regs.pc; regs.pc = 0x0100; regs.sp &= 0xf; regs.sr.ei = 0; //push PC, pc = 0x100
 		}
 		m_irq = state; // set old state to current state
 		break;
