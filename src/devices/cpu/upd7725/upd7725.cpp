@@ -372,8 +372,8 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
 	case  9: regs.idb = regs.dr; break;
 	case 10: regs.idb = regs.sr; break;
-	case 11: regs.idb = regs.si; break;  //MSB
-	case 12: regs.idb = regs.si; break;  //LSB
+	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
+	case 12: regs.idb = BITSWAP16(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
 	case 15: regs.idb = dataRAM[regs.dp]; break;
