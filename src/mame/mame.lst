@@ -12104,6 +12104,10 @@ promutrvb                       // (c) 1985 Enerdyne Technologies Inc
 promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
+@source:eurocom2.cpp
+eurocom2						//
+waveterm						//
+
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 
