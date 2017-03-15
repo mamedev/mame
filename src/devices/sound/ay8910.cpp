@@ -991,6 +991,11 @@ void ay8910_device::ay_set_clock(int clock)
 	m_channel->set_sample_rate( clock / 8 );
 }
 
+void ay8910_device::device_clock_changed()
+{
+	ay_set_clock(clock());
+}
+
 void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
 {
 	if (addr & 1)
