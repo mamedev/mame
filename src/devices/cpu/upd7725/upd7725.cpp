@@ -277,7 +277,10 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case NECDSP_INPUT_LINE_INT:
-		//TODO: detect rising edge; if rising edge found AND IE = 1, push PC, pc = 0x100; else do nothing
+		if ( ((m_irq == 0) && (state == 1)) && (regs.sr.ei == 1)) // detect rising edge AND if EI == 1;
+		{
+			regs.stack[regs.sp++] = regs.pc; regs.pc = 0x0100; regs.sp &= 0xf; regs.sr.ei = 0; return; //push PC, pc = 0x100
+		}
 		m_irq = state; // set old state to current state
 		break;
 	// add more when needed
