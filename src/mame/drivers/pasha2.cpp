@@ -80,6 +80,9 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#include "pasha2.lh"
+
+
 class pasha2_state : public driver_device
 {
 public:
@@ -214,19 +217,17 @@ WRITE16_MEMBER(pasha2_state::oki2_bank_w)
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
-#ifdef MAME_DEBUG
-	if (data)
-		popmessage("1P: %c%c%c 2P: %c%c%c 3P: %c%c%c",
-				(data & 0x001) ? 'R' : '-',
-				(data & 0x002) ? 'G' : '-',
-				(data & 0x004) ? 'B' : '-',
-				(data & 0x010) ? 'R' : '-',
-				(data & 0x020) ? 'G' : '-',
-				(data & 0x040) ? 'B' : '-',
-				(data & 0x100) ? 'R' : '-',
-				(data & 0x200) ? 'G' : '-',
-				(data & 0x400) ? 'B' : '-');
-#endif
+	machine().output().set_value("lamp_p1_r", BIT(data,  0));
+	machine().output().set_value("lamp_p1_g", BIT(data,  1));
+	machine().output().set_value("lamp_p1_b", BIT(data,  2));
+
+	machine().output().set_value("lamp_p2_r", BIT(data,  4));
+	machine().output().set_value("lamp_p2_g", BIT(data,  5));
+	machine().output().set_value("lamp_p2_b", BIT(data,  6));
+
+	machine().output().set_value("lamp_p3_r", BIT(data,  8));
+	machine().output().set_value("lamp_p3_g", BIT(data,  9));
+	machine().output().set_value("lamp_p3_b", BIT(data, 10));
 }
 
 static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
@@ -486,4 +487,4 @@ DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 	membank("bank1")->set_entry(0);
 }
 
-GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )
