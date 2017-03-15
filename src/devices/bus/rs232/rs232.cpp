@@ -116,6 +116,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "pty.h"
 #include "sun_kbd.h"
 #include "terminal.h"
+#include "ie15.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
@@ -125,4 +126,5 @@ SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
 	SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
 	SLOT_INTERFACE("sunkbd", SUN_KBD_ADAPTOR)
+	SLOT_INTERFACE("ie15", SERIAL_TERMINAL_IE15)
 SLOT_INTERFACE_END

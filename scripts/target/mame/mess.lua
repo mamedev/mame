@@ -426,6 +426,7 @@ MACHINES["I8271"] = true
 MACHINES["I8279"] = true
 MACHINES["I8355"] = true
 MACHINES["IDE"] = true
+MACHINES["IE15"] = true
 MACHINES["IM6402"] = true
 MACHINES["INS8154"] = true
 MACHINES["INS8250"] = true
@@ -956,6 +957,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"homelab",
 		"hp",
 		"ibm6580",
+		"ie15",
 		"imp",
 		"intel",
 		"interpro",
@@ -2066,6 +2068,11 @@ files {
 	MAME_DIR .. "src/mame/machine/ibm6580_kbd.h",
 	MAME_DIR .. "src/mame/machine/ibm6580_fdc.cpp",
 	MAME_DIR .. "src/mame/machine/ibm6580_fdc.h",
+}
+
+createMESSProjects(_target, _subtarget, "ie15")
+files {
+	MAME_DIR .. "src/mame/drivers/ie15.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "intel")
@@ -3373,9 +3380,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
-	MAME_DIR .. "src/mame/drivers/ie15.cpp",
-	MAME_DIR .. "src/mame/machine/ie15_kbd.cpp",
-	MAME_DIR .. "src/mame/machine/ie15_kbd.h",
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",

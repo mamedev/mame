@@ -21,13 +21,13 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class ie15_device;
+class ie15_cpu_device;
 
-class ie15_device : public cpu_device
+class ie15_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -84,6 +84,6 @@ protected:
 };
 
 // device type definition
-extern const device_type IE15;
+extern const device_type IE15_CPU;
 
 #endif
