@@ -229,7 +229,7 @@ public:
 	DECLARE_MACHINE_RESET(aleste);
 	DECLARE_PALETTE_INIT(aleste);
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_amstrad(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_amstrad);
 	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);

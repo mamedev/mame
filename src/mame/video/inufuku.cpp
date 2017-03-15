@@ -163,7 +163,7 @@ uint32_t inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void inufuku_state::screen_eof_inufuku(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(inufuku_state::screen_vblank_inufuku)
 {
 	// rising edge
 	if (state)

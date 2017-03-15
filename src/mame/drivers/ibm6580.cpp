@@ -157,7 +157,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(video_r);
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	DECLARE_READ8_MEMBER(ppi_a_r);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -316,7 +316,7 @@ READ8_MEMBER(ibm6580_state::video_r)
 	return data;
 }
 
-void ibm6580_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 {
 //  if (state)
 //      m_pic8259->ir6_w(state);
@@ -891,7 +891,7 @@ static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25MHz/2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_DRIVER(ibm6580_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ibm6580_state, vblank_w))
 	MCFG_DEFAULT_LAYOUT(layout_ibm6580)
 
 	MCFG_PALETTE_ADD("palette", 3)

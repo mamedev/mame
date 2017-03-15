@@ -664,7 +664,7 @@ uint32_t pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitma
 
 }
 
-void pgm_state::screen_eof_pgm(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pgm_state::screen_vblank_pgm)
 {
 	// rising edge
 	if (state)

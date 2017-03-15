@@ -56,7 +56,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ultratnk);
 	uint32_t screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_ultratnk(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ultratnk);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;

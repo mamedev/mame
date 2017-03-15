@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update_ultratnk)
-	MCFG_SCREEN_VBLANK_DRIVER(ultratnk_state, screen_eof_ultratnk)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ultratnk_state, screen_vblank_ultratnk))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ultratnk)

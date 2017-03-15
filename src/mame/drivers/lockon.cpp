@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_DRIVER(lockon_state, screen_eof_lockon)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)

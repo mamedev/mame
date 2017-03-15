@@ -41,7 +41,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_ram_bank[4];
 	uint8_t m_rom_bank;
@@ -100,7 +100,7 @@ uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void lastbank_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 {
 	if (state)
 	{
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(lastbank_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )

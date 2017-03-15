@@ -81,8 +81,8 @@ public:
 	void write(address_space &space, offs_t offset, _Type data, _Type mem_mask = ~_Type(0)) { copy(); }
 
 	// VBLANK handlers
-	void vblank_copy_rising(screen_device &screen, bool state) { if (state) copy(); }
-	void vblank_copy_falling(screen_device &screen, bool state) { if (!state) copy(); }
+	DECLARE_WRITE_LINE_MEMBER(vblank_copy_rising) { if (state) copy(); }
+	DECLARE_WRITE_LINE_MEMBER(vblank_copy_falling) { if (!state) copy(); }
 
 protected:
 	// first-time setup

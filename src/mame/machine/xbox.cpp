@@ -575,9 +575,9 @@ void xbox_base_state::debug_generate_irq(int irq, bool active)
 	}
 }
 
-void xbox_base_state::vblank_callback(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(xbox_base_state::vblank_callback)
 {
-	nvidia_nv2a->vblank_callback(screen, state);
+	nvidia_nv2a->vblank_callback(state);
 }
 
 uint32_t xbox_base_state::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1312,5 +1312,5 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(xbox_base_state, screen_update_callback)
-	MCFG_SCREEN_VBLANK_DRIVER(xbox_base_state, vblank_callback)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xbox_base_state, vblank_callback))
 MACHINE_CONFIG_END

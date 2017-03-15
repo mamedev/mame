@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER( super80_state, super80m )
 
 
 
-void super80_state::screen_eof_super80m(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(super80_state::screen_vblank_super80m)
 {
 	// rising edge
 	if (state)

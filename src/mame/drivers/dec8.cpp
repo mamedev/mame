@@ -72,7 +72,7 @@ WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
 {
 	// rising edge
 	if (state)
@@ -2123,7 +2123,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
@@ -2177,7 +2177,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
@@ -2235,7 +2235,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)

@@ -709,7 +709,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	void set_graphic_mode(bool graphic);
@@ -865,7 +865,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
 	}
 }
 
-void hp9845b_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hp9845b_state::vblank_w)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -1248,7 +1248,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	required_ioport m_lightpen_x;
@@ -1378,7 +1378,7 @@ uint32_t hp9845ct_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-void hp9845ct_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -2617,7 +2617,7 @@ static MACHINE_CONFIG_START(hp9845b, hp9845b_state)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(hp9845b_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845b_state, vblank_w))
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
@@ -2635,7 +2635,7 @@ static MACHINE_CONFIG_START(hp9845c, hp9845c_state)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(hp9845c_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845c_state, vblank_w))
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
 	MCFG_PALETTE_ADD("palette", 24)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845c_state, scanline_timer, "screen", 0, 1)

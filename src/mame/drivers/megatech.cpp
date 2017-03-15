@@ -137,7 +137,7 @@ public:
 
 	uint32_t screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_main(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_main);
 
 private:
 	uint8_t m_mt_cart_select_reg;
@@ -635,10 +635,10 @@ uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-void mtech_state::screen_eof_main(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 {
 	if (!m_current_MACHINE_IS_sms)
-		screen_eof_megadriv(screen, state);
+		screen_vblank_megadriv(state);
 }
 
 MACHINE_RESET_MEMBER(mtech_state, megatech)
@@ -694,7 +694,7 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
-	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_main)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mtech_state, screen_vblank_main))
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGA315_5313_INT_CB(INPUTLINE("genesis_snd_z80", 0))

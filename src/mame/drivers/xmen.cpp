@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_DRIVER(xmen_state, screen_eof_xmen6p)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)

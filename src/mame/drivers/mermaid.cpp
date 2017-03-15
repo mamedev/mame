@@ -444,7 +444,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
-	MCFG_SCREEN_VBLANK_DRIVER(mermaid_state, screen_eof_mermaid)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mermaid_state, screen_vblank_mermaid))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mermaid)

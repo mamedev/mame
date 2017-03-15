@@ -74,7 +74,7 @@ public:
 	// video
 	DECLARE_PALETTE_INIT(thedealr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 };
 
 /***************************************************************************
@@ -105,7 +105,7 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void thedealr_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(thedealr_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( thedealr, thedealr_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(thedealr_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)

@@ -83,7 +83,6 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(text_control_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
 
 private:
 	void text_memory_clear();
@@ -307,11 +306,6 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void sm7238_state::screen_eof(screen_device &screen, bool state)
-{
-	m_pic8259->ir2_w(state);
-}
-
 
 /* F4 Character Displayer */
 static const gfx_layout sm7238_charlayout =
@@ -357,7 +351,7 @@ static MACHINE_CONFIG_START( sm7238, sm7238_state )
 		KSM_TOTAL_VERT, KSM_VERT_START, KSM_VERT_START+KSM_DISP_VERT);
 #endif
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(sm7238_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 3)

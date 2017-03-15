@@ -697,7 +697,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
 
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_spectrum)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)

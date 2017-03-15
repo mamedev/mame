@@ -165,7 +165,7 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-void n64_state::screen_eof_n64(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
 {
 }
 

@@ -148,7 +148,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
@@ -220,7 +220,7 @@ uint32_t hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void hvyunit_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hvyunit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
