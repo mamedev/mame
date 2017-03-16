@@ -880,6 +880,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"acorn",
 		"act",
 		"adc",
+		"agat",
 		"alesis",
 		"altos",
 		"ami",
@@ -1321,6 +1322,12 @@ files {
 	MAME_DIR .. "src/mame/includes/super6.h",
 	MAME_DIR .. "src/mame/drivers/superslave.cpp",
 	MAME_DIR .. "src/mame/includes/superslave.h",
+}
+
+createMESSProjects(_target, _subtarget, "agat")
+files {
+	MAME_DIR .. "src/mame/drivers/agat.cpp",
+	MAME_DIR .. "src/mame/includes/apple2.h",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")

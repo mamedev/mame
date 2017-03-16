@@ -58,7 +58,13 @@ MACHINE_CONFIG_END
 
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
-	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
+	ROM_DEFAULT_BIOS("diskii")
+
+	ROM_SYSTEM_BIOS(0, "diskii", "Apple Disk II firmware")
+	ROMX_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(1, "agat7", "Agat-7 3.089.105 firmware")
+	ROMX_LOAD( "shugart7.rom", 0x0000, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34), ROM_BIOS(2))
 ROM_END
 
 //-------------------------------------------------
