@@ -43,7 +43,7 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 }
 
 ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ie15_device(mconfig, IE15, "IE15 Terminal", tag, owner, clock, "ie15", __FILE__)
+	: ie15_device(mconfig, IE15, "IE15", tag, owner, clock, "ie15_device", __FILE__)
 {
 }
 
