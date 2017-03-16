@@ -112,11 +112,30 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.n));
 	save_item(NAME(regs.a));
 	save_item(NAME(regs.b));
+	save_item(NAME(regs.flaga.s1));
+	save_item(NAME(regs.flaga.s0));
+	save_item(NAME(regs.flaga.c));
+	save_item(NAME(regs.flaga.z));
+	save_item(NAME(regs.flaga.ov1));
+	save_item(NAME(regs.flaga.ov0));
+	save_item(NAME(regs.flaga.ov0p));
+	save_item(NAME(regs.flaga.ov0pp));
+	save_item(NAME(regs.flagb.s1));
+	save_item(NAME(regs.flagb.s0));
+	save_item(NAME(regs.flagb.c));
+	save_item(NAME(regs.flagb.z));
+	save_item(NAME(regs.flagb.ov1));
+	save_item(NAME(regs.flagb.ov0));
+	save_item(NAME(regs.flagb.ov0p));
+	save_item(NAME(regs.flagb.ov0pp));
 	save_item(NAME(regs.tr));
 	save_item(NAME(regs.trb));
 	save_item(NAME(regs.dr));
+	save_item(NAME(regs.si));
 	save_item(NAME(regs.so));
 	save_item(NAME(regs.idb));
+	save_item(NAME(regs.siack));
+	save_item(NAME(regs.soack));
 	save_item(NAME(regs.sr.rqm));
 	save_item(NAME(regs.sr.usf0));
 	save_item(NAME(regs.sr.usf1));
@@ -164,6 +183,8 @@ void necdsp_device::device_reset()
 	regs.si = 0x0000;
 	regs.so = 0x0000;
 	regs.idb = 0x0000;
+	regs.siack = 0;
+	regs.soack = 0;
 }
 
 //-------------------------------------------------
@@ -530,6 +551,11 @@ void necdsp_device::exec_jp(uint32_t opcode) {
 		case 0x0b1: if((regs.dp & 0x0f) != 0x00) regs.pc = jps; return;  //JDPLN0
 		case 0x0b2: if((regs.dp & 0x0f) == 0x0f) regs.pc = jps; return;  //JDPLF
 		case 0x0b3: if((regs.dp & 0x0f) != 0x0f) regs.pc = jps; return;  //JDPLNF
+
+		case 0x0b4: if(regs.siack == 0) regs.pc = jps; return;  //JNSIAK
+		case 0x0b6: if(regs.siack == 1) regs.pc = jps; return;  //JSIAK
+		case 0x0b8: if(regs.soack == 0) regs.pc = jps; return;  //JNSOAK
+		case 0x0ba: if(regs.soack == 1) regs.pc = jps; return;  //JSOAK
 
 		case 0x0bc: if(regs.sr.rqm == 0) regs.pc = jps; return;  //JNRQM
 		case 0x0be: if(regs.sr.rqm == 1) regs.pc = jps; return;  //JRQM
