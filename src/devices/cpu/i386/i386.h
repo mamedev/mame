@@ -13,8 +13,8 @@
 #endif
 
 #include "divtlb.h"
-
 #include "i386dasm.h"
+#include "machine/pic8259.h"
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -1544,6 +1544,30 @@ protected:
 	virtual void WRITEPORT32(offs_t port, uint32_t value) override;
 };
 
+class i386ex_device : public i386_device
+{
+public:
+	// construction/destruction
+	i386ex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+protected:
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_reset() override;
+	const address_space_config m_io_space_config;
+	const address_space_config *memory_space_config(address_spacenum spacenum) const override
+	{
+		switch (spacenum)
+		{
+			case AS_IO: return &m_io_space_config;
+			default: return i386_device::memory_space_config(spacenum);
+		}
+	}
+private:
+	required_device<pic8259_device> m_pic8259_slave;
+};
+
+
 class i486_device : public i386_device
 {
 public:
@@ -1666,6 +1690,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(I386,        i386_device)
 DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
+DECLARE_DEVICE_TYPE(I386EX,      i386ex_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)

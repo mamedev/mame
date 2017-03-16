@@ -41666,6 +41666,9 @@ vsmilebg                        //
 vsmilebf                        //
 vsmilebfp                       //
 
+@source:vmp3700.cpp
+vmp3700                         // 1999 Raf Electronics Vmp 3700 Videoke
+
 @source:vsmilepro.cpp
 vsmilpro
 

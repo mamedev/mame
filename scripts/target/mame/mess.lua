@@ -1337,6 +1337,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"quantel",
 		"qume",
 		"radio",
+                "rafelectronics",
 		"rca",
 		"regnecentralen",
 		"ritam",
@@ -3280,6 +3281,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/compc.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.h",
+}
+
+createMESSProjects(_target, _subtarget, "rafelectronics")
+files {
+	MAME_DIR .. "src/mame/drivers/vmp3700.cpp"
 }
 
 createMESSProjects(_target, _subtarget, "pdp1")

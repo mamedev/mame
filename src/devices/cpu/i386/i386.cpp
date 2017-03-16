@@ -34,6 +34,7 @@
 
 DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
 DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
+DEFINE_DEVICE_TYPE(I386EX,      i386ex_device,      "i386ex",      "Intel I386EX")
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
@@ -66,6 +67,31 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 
 i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
+{
+}
+
+ADDRESS_MAP_START( io_map, AS_IO, 16, i386EX_device )
+//        AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
+        AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0x0022, 0x0023) AM_NOP // TODO: Implement-me: Setup Extended I/O
+        AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0xf020, 0xf03f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0xf0a0, 0xf0bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0xf400, 0xf43f) AM_NOP // TODO: Implement-me: Chip Select Unit
+//        AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
+//        AM_RANGE(0x0060, 0x0061) AM_READWRITE8(portb_r, portb_w, 0xff00)
+//        AM_RANGE(0x0060, 0x0061) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, data_r, data_w, 0x00ff)
+//        AM_RANGE(0x0064, 0x0065) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0x00ff)
+//        AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
+//        AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffff)
+//        AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+//        AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
+ADDRESS_MAP_END
+
+i386EX_device::i386EX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, I386EX, "I386EX", tag, owner, clock, "i386ex", __FILE__, 16, 26, 16)
+        , m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( io_map ) ) 
+	, m_pic8259_slave(*this, "pic8259_slave")
 {
 }
 
@@ -137,6 +163,29 @@ pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag,
 {
 	// 128 dtlb, 64 itlb
 	set_vtlb_dynamic_entries(196);
+}
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+READ8_MEMBER( i386EX_device::get_slave_ack )
+{
+        if (offset==2) // IRQ = 2
+                return m_pic8259_slave->acknowledge();
+
+        return 0x00;
+}
+
+static MACHINE_CONFIG_FRAGMENT( i386ex )
+        MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(DEVICE_SELF, 0), VCC, READ8(i386EX_device, get_slave_ack) )
+        MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
+MACHINE_CONFIG_END
+
+machine_config_constructor i386EX_device::device_mconfig_additions() const
+{
+        return MACHINE_CONFIG_NAME( i386ex );
 }
 
 device_memory_interface::space_config_vector i386_device::memory_space_config() const
@@ -2484,6 +2533,48 @@ void i386_device::device_reset()
 	m_CPL = 0;
 
 	m_auto_clear_RF = true;
+
+	CHANGE_PC(m_eip);
+}
+
+void i386EX_device::device_reset()
+{
+	zero_state();
+
+	m_sreg[CS].selector = 0xf000;
+	m_sreg[CS].base     = 0x03ff0000;
+	m_sreg[CS].limit    = 0x03ff;
+	m_sreg[CS].flags    = 0x9b;
+	m_sreg[CS].valid    = true;
+
+	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
+	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid =true;
+
+	m_idtr.base = 0;
+	m_idtr.limit = 0x3ff;
+	m_smm = false;
+	m_smi_latched = false;
+	m_nmi_masked = false;
+	m_nmi_latched = false;
+
+	m_a20_mask = ~0;
+
+	m_cr[0] = 0x7fffffe0; // reserved bits set to 1
+	m_eflags = 0;
+	m_eflags_mask = 0x00037fd7;
+	m_eip = 0xfff0;
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
+	REG32(EAX) = 0;
+	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
+	m_cpu_version = REG32(EDX);
+
+	m_CPL = 0;
 
 	CHANGE_PC(m_eip);
 }
