@@ -255,7 +255,7 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if (1) {
-					uint8_t tex = get_texel_8bit((uint64_t *)base, y, x, texel_width);
+					uint8_t tex = get_texel_8bit_4x2((uint64_t *)base, y, x, texel_width);
 					dest[x] = (tex << 16) | (tex << 8) | tex;
 				}
 				else {
@@ -546,7 +546,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				if (logit)
 					logerror("\t-- pal table rgb555 load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
 				poly->wait("PAL_TABLE_WRITE");
-				m_curPalTableSrc = m_zeusbase[0x41];
+				// blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+				m_curPalTableSrc = (m_zeusbase[0x41] % WAVERAM0_WIDTH) + ((m_zeusbase[0x41] >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 				void *dataPtr = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
 				load_pal_table(dataPtr, m_zeusbase[0x40], 0, logit);
 			}
@@ -866,7 +867,7 @@ void zeus2_device::load_pal_table(void *wavePtr, uint32_t ctrl, int type, int lo
 	if (logit) {
 		logerror("\ntable: ");
 		tablePtr = &m_pal_table[addr];
-		for (int i = 0; i <= count*4; ++i) {
+		for (int i = 0; i < (count+1)*4; ++i) {
 			logerror(" %08X", *tablePtr++);
 			if (0 && (i + 1) % 16 == 0)
 				logerror("\n");
@@ -1317,6 +1318,24 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 							if (logit)
 								logerror("texdata\n");
 						}
+						else if (1 && ((databuffer[0] >> 16) & 0xff) == 0x98)
+						{
+							texdata = databuffer[1];
+							if (logit)
+								logerror("98_texdata\n");
+						}
+						else if (1 && ((databuffer[0] >> 16) & 0xff) == 0x99)
+						{
+							texdata = databuffer[1];
+							if (logit)
+								logerror("99_texdata\n");
+						}
+						else if (1 && ((databuffer[0] >> 16) & 0xff) == 0x9a)
+						{
+							texdata = databuffer[1];
+							if (logit)
+								logerror("9a_texdata\n");
+						}
 						else if (logit)
 							logerror("unknown offset %08X %08X\n", databuffer[0], databuffer[1]);
 						break;
@@ -1493,52 +1512,52 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[0].x = (int16_t)databuffer[2];
 		vert[0].y = (int16_t)databuffer[3];
 		vert[0].p[0] = (int16_t)databuffer[4];
-		vert[0].p[1] = ((databuffer[5] >> 0) & 0xff) << 2;
-		vert[0].p[2] = ((databuffer[5] >> 8) & 0xff) << 2;
+		vert[0].p[1] = ((databuffer[5] >> 0) & 0xff);
+		vert[0].p[2] = ((databuffer[5] >> 8) & 0xff);
 
 		vert[1].x = (int16_t)(databuffer[2] >> 16);
 		vert[1].y = (int16_t)(databuffer[3] >> 16);
 		vert[1].p[0] = (int16_t)(databuffer[4] >> 16);
-		vert[1].p[1] = ((databuffer[5] >> 16) & 0xff) << 2;
-		vert[1].p[2] = ((databuffer[5] >> 24) & 0xff) << 2;
+		vert[1].p[1] = ((databuffer[5] >> 16) & 0xff);
+		vert[1].p[2] = ((databuffer[5] >> 24) & 0xff);
 
 		vert[2].x = (int16_t)databuffer[6];
 		vert[2].y = (int16_t)databuffer[7];
 		vert[2].p[0] = (int16_t)databuffer[8];
-		vert[2].p[1] = ((databuffer[9] >> 0) & 0xff) << 2;
-		vert[2].p[2] = ((databuffer[9] >> 8) & 0xff) << 2;
+		vert[2].p[1] = ((databuffer[9] >> 0) & 0xff);
+		vert[2].p[2] = ((databuffer[9] >> 8) & 0xff);
 
 		vert[3].x = (int16_t)(databuffer[6] >> 16);
 		vert[3].y = (int16_t)(databuffer[7] >> 16);
 		vert[3].p[0] = (int16_t)(databuffer[8] >> 16);
-		vert[3].p[1] = ((databuffer[9] >> 16) & 0xff) << 2;
-		vert[3].p[2] = ((databuffer[9] >> 24) & 0xff) << 2;
+		vert[3].p[1] = ((databuffer[9] >> 16) & 0xff);
+		vert[3].p[2] = ((databuffer[9] >> 24) & 0xff);
 	}
 	else {
 		//printf("R40: %06X\n", m_state->m_renderRegs[0x40]);
 		vert[0].x = (int16_t)databuffer[2];
 		vert[0].y = (int16_t)databuffer[3];
 		vert[0].p[0] = (int16_t)databuffer[6];
-		vert[0].p[1] = (databuffer[1] >> 0) & 0x3ff;
-		vert[0].p[2] = (databuffer[1] >> 16) & 0x3ff;
+		vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
+		vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
 
 		vert[1].x = (int16_t)(databuffer[2] >> 16);
 		vert[1].y = (int16_t)(databuffer[3] >> 16);
 		vert[1].p[0] = (int16_t)(databuffer[6] >> 16);
-		vert[1].p[1] = (databuffer[4] >> 0) & 0x3ff;
-		vert[1].p[2] = (databuffer[4] >> 10) & 0x3ff;
+		vert[1].p[1] = (databuffer[4] >> 2) & 0xff;
+		vert[1].p[2] = (databuffer[4] >> 12) & 0xff;
 
 		vert[2].x = (int16_t)databuffer[8];
 		vert[2].y = (int16_t)databuffer[9];
 		vert[2].p[0] = (int16_t)databuffer[7];
-		vert[2].p[1] = (databuffer[4] >> 20) & 0x3ff;
-		vert[2].p[2] = (databuffer[5] >> 0) & 0x3ff;
+		vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
+		vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
 
 		vert[3].x = (int16_t)(databuffer[8] >> 16);
 		vert[3].y = (int16_t)(databuffer[9] >> 16);
 		vert[3].p[0] = (int16_t)(databuffer[7] >> 16);
-		vert[3].p[1] = (databuffer[5] >> 10) & 0x3ff;
-		vert[3].p[2] = (databuffer[5] >> 20) & 0x3ff;
+		vert[3].p[1] = (databuffer[5] >> 12) & 0xff;
+		vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
 	}
 	int unknown[8];
 	float unknownFloat[4];
@@ -1619,9 +1638,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].p[0] += shift;
 		}
 
-		vert[i].p[2] += (texdata >> 16) << 2;
-		vert[i].p[1] *= 256.0f / 4.0f;
-		vert[i].p[2] *= 256.0f / 4.0f;
+		vert[i].p[2] += (texdata >> 16);
+		vert[i].p[1] *= 256.0f;
+		vert[i].p[2] *= 256.0f;
 
 		// back face cull using polygon normal and first vertex
 		if (0 && i == 0)
@@ -1727,6 +1746,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	// 0x014d == atlantis initial screen and scoreboard background
 	//if (texmode != 0x014D) return;
 	// Just a guess but seems to work
+	//int texTmp = (texmode & 0x20) ? 0x10 : 0x20;
+	//extra.texwidth = texTmp << ((texmode >> 2) & 3);
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	//if (texmode & 0x80) extra.texwidth <<= 1;
 	//if (m_state->m_palSize == 16) extra.texwidth *= 2;
@@ -1761,11 +1782,12 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//  break;
 
 	//case 0x000:     // thegrid guess
-	//case 0x120:     // thegrid guess
 	//case 0x140:     // atlantis
 	//case 0x141:     // atlantis
 	//  extra.texwidth = 32;
 	//  break;
+	//case 0x120:     // thegrid "LOADING"
+	//  extra.texwidth = 16;
 
 	//default:
 	//{
@@ -1784,7 +1806,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.alpha = 0;//m_zeusbase[0x4e];
 	extra.transcolor = 0; // (texmode & 0x100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
-	extra.palbase = m_state->waveram0_ptr_from_expanded_addr(m_state->m_zeusbase[0x41]);
+	//extra.palbase = m_state->waveram0_ptr_from_expanded_addr(m_state->m_zeusbase[0x41]);
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x020000);
 	// crusnexo text is R14=0x4062
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
@@ -1794,13 +1816,24 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.depth_write_enable = true;
 	switch (texmode & 0x3) {
 	case 0:
-		extra.get_texel = m_state->get_texel_alt_4bit;
+		extra.get_texel = m_state->get_texel_4bit_2x2;
+		extra.texwidth >>= 1;
 		break;
 	case 1:
-		extra.get_texel = m_state->get_texel_8bit;
+		extra.get_texel = m_state->get_texel_8bit_4x2;
+		break;
+	case 2:
+		if (texmode & 0x80) {
+			// Texel , Alpha
+			extra.get_texel = m_state->get_texel_8bit_2x2_alpha;
+		}
+		else {
+			extra.get_texel = m_state->get_texel_8bit_2x2;
+		}
 		break;
 	default:
-		extra.get_texel = m_state->get_texel_alt_8bit;
+		m_state->logerror("unknown texel type");
+		extra.get_texel = m_state->get_texel_8bit_2x2;
 		break;
 	}
 	//extra.get_texel = ((texmode & 0x1) == 0) ? m_state->get_texel_alt_4bit : m_state->get_texel_8bit;
@@ -1928,7 +1961,8 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 		std::string infoStr;
 		std::stringstream infoStream;
 		infoStream << "tex=0x" << std::setw(8) << std::setfill('0') << std::hex << zeus_texbase << " ";
-		infoStream << "pal=0x" << std::setw(4) << std::setfill('0') << (m_curPalTableSrc>>16) << ", 0x" << std::setw(4) << (m_curPalTableSrc & 0xffff) << " ";
+		//infoStream << "pal=0x" << std::setw(4) << std::setfill('0') << (m_curPalTableSrc >> 16) << ", 0x" << std::setw(4) << (m_curPalTableSrc & 0xffff) << " ";
+		infoStream << "pal=0x" << std::setw(8) << std::setfill('0') << m_curPalTableSrc << " ";
 		infoStream << "texdata=" << std::setw(8) << std::hex << texmode << " ";
 		infoStream << "(6c)=" << m_zeusbase[0x6c] << " ";
 		infoStream << "(63)=" << std::dec << reinterpret_cast<float&>(m_zeusbase[0x63]) << " ";
@@ -1950,7 +1984,8 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 std::string zeus2_device::tex_info(void)
 {
 	std::string retVal;
-	switch (zeus_texbase) {
+	if (m_system == CRUSNEXO) {
+		switch (zeus_texbase) {
 		// crusnexo
 		case 0x01fc00:      retVal = "credits / insert coin"; break;
 		case 0x1dc000:      retVal = "copywrite text"; break;
@@ -1992,8 +2027,11 @@ std::string zeus2_device::tex_info(void)
 		case 0x00115400:    retVal = "welcome to las vegas sign"; break;
 		case 0x000f3c00:    retVal = "star or headlight?"; break;
 		case 0x00127400:    retVal = "another (lod) star or headlight?"; break;
-
-
+		default: retVal = "Unknown"; break;
+		}
+	}
+	else if (m_system == MWSKINS) {
+		switch (zeus_texbase) {
 		// mwskinsa
 		case 0x1fdf00:      retVal = "Skins Tip Box, s=256"; break;
 		case 0x07f540:      retVal = "Left main intro"; break;
@@ -2014,12 +2052,13 @@ std::string zeus2_device::tex_info(void)
 		case 0x0014b800:    retVal = "silver letter O, s=64"; break;
 		case 0x00152d80:    retVal = "silver letter A, s=64"; break;
 		case 0x0014f680:    retVal = "silver letter m, s=64"; break;
-		case 0x00142b40:    retVal = "black screen?"; break;
+		case 0x00142b40:    retVal = "Black Screen?"; break;
 		case 0x00004740:    retVal = "picture bridge over water, s=256"; break;
 		case 0x00005c80:    retVal = "picture water shore, s=256"; break;
 		case 0x000030c0:    retVal = "left leaderboard background graphics, s=256"; break;
 		case 0x00003c00:    retVal = "right leaderboard background graphics, s=256"; break;
-		case 0x00040bc0:    retVal = "extreme mode, s=256"; break;
+		case 0x00040bc0:    retVal = "extreme mode, s=128, t=8alpha"; break;
+		case 0x001602a0:    retVal = "photo black hat, sunglasses, gautee, s=64, t=8"; break;
 		case 0x00091630:    retVal = "photo wild eye guy, s=64"; break;
 		case 0x00159d80:    retVal = "white M s=32, t=4"; break;
 		case 0x0015a080:    retVal = "white 9 s=32, t=4"; break;
@@ -2029,11 +2068,43 @@ std::string zeus2_device::tex_info(void)
 		case 0x00159300:    retVal = "white _ s=32, t=4"; break;
 		case 0x00158d00:    retVal = "white 1 s=32, t=4"; break;
 		case 0x00158e80:    retVal = "white 4 s=32, t=4"; break;
-		case 0x0001c080:    retVal = "maybe checkboard"; break;
-
-		// thegrid
-		//case 0x0001c080:  retVal = "maybe checkboard"; break;
+		case 0x0001c080:    retVal = "scorecard background, s=256, t=8alpha"; break;
 		default: retVal = "Unknown"; break;
+		}
+	}
+	else {
+		switch (zeus_texbase) {
+		// thegrid
+		case 0x000116c8:    retVal = "letter L, s=16, t=4a"; break;
+		case 0x00011668:    retVal = "letter O, s=16, t=4a"; break;
+		case 0x00011828:    retVal = "letter A, s=16, t=4a"; break;
+		case 0x000117c8:    retVal = "letter D, s=16, t=4a"; break;
+		case 0x00011728:    retVal = "letter I, s=16, t=4a"; break;
+		case 0x00011688:    retVal = "letter N, s=16, t=4a"; break;
+		case 0x00011768:    retVal = "letter G, s=16, t=4a"; break;
+		case 0x00155b40:    retVal = "green 1010, s=256, t=8"; break;
+		case 0x0014db80:    retVal = "The Grid logo, s=256, t=8a"; break;
+		case 0x0014f280:    retVal = "Searching fo, s=256, t=8a"; break;
+		case 0x00150500:    retVal = "or, s=64, t=8a"; break;
+		case 0x00150d00:    retVal = "System 1, s=128, t=8"; break;
+		case 0x00151360:    retVal = "System 2, s=128, t=8"; break;
+		case 0x001519c0:    retVal = "System 3, s=128, t=8"; break;
+		case 0x00152020:    retVal = "System 4, s=128, t=8"; break;
+		case 0x00152680:    retVal = "System 5, s=128, t=8"; break;
+		case 0x00152ce0:    retVal = "System 6, s=128, t=8"; break;
+		case 0x001509c0:    retVal = "READY!, s=128, t=8a"; break;
+		case 0x000c2d10:    retVal = "6, s=32, t=8a"; break;
+		case 0x000c30d0:    retVal = "0, s=32, t=8a"; break;
+		case 0x000c2db0:    retVal = "5, s=32, t=8a"; break;
+		case 0x000c2b30:    retVal = "9, s=32, t=8a"; break;
+		case 0x000c2bd0:    retVal = "8, s=32, t=8a"; break;
+		case 0x000c2c70:    retVal = "7, s=32, t=8a"; break;
+		case 0x000c2e50:    retVal = "4, s=32, t=8a"; break;
+		case 0x000c2ef0:    retVal = "3, s=32, t=8a"; break;
+		case 0x000c2f90:    retVal = "2, s=32, t=8a"; break;
+
+		default: retVal = "Unknown"; break;
+		}
 	}
 	return retVal;
 }
