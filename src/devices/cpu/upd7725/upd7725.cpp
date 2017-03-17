@@ -583,8 +583,8 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  5: regs.rp = id; break;
 	case  6: regs.dr = id; regs.sr.rqm = 1; break;
 	case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-				m_out_p0_cb(regs.sr&0x1);
-				m_out_p1_cb((regs.sr&0x2)>>1);
+				m_out_p0_cb(regs.sr.p0);
+				m_out_p1_cb(regs.sr.p1);
 				break;
 	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
