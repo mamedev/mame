@@ -50,7 +50,6 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void device_config_complete() override;
 
 	// serial overrides
 	virtual void tra_complete() override;    // Tx completed sending byte
@@ -73,6 +72,6 @@ private:
 extern const device_type MIDIIN;
 
 // device iterator
-typedef device_type_iterator<MIDIIN, midiin_device> midiin_device_iterator;
+typedef device_type_iterator<midiin_device> midiin_device_iterator;
 
 #endif /* __MIDIIN_H__ */

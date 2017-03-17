@@ -37,7 +37,7 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_GCR_t()
+	virtual ~matrix_solver_GCR_t() override
 	{
 	}
 

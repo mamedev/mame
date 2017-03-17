@@ -71,7 +71,7 @@ public:
 	uint32_t screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_xmen6p(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_xmen6p);
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
 	K052109_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);

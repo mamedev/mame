@@ -141,8 +141,8 @@ public:
 	DECLARE_MACHINE_RESET(vimana);
 	uint32_t screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void screen_eof_toaplan1(screen_device &screen, bool state);
-	void screen_eof_samesame(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan1);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_samesame);
 	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
 
 	void demonwld_restore_dsp();
@@ -179,7 +179,7 @@ public:
 	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
 	DECLARE_VIDEO_START(rallybik);
 	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_rallybik(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
 
 	required_device<toaplan_scu_device> m_spritegen;
 };

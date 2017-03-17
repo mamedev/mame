@@ -944,6 +944,43 @@ ROM_START( flashgal )
 	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
+ROM_START( flashgalk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-7167.4f",  0x0000, 0x2000, CRC(cf5ad733) SHA1(24561db9a3d72c7a69a7ce5a85aaa78254788675) )
+	ROM_LOAD( "epr-7168.4h",  0x2000, 0x2000, CRC(00c4851f) SHA1(f29ef123702bb3506ac3740b2779ae2757d884c2) )
+	ROM_LOAD( "epr-7169.4j",  0x4000, 0x2000, CRC(1ef0b8f7) SHA1(9c3ded1f985f4fb6b38843e0ca90ec458633d145) )
+	ROM_LOAD( "epr-7170.4k",  0x6000, 0x2000, CRC(885d53de) SHA1(14c8d4d07574e2dc3fba9fc92483a810649e100a) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "epr-7163.2f",  0x0000, 0x2000, CRC(eee2134d) SHA1(4d67a969ff033576988de73942717c84068a291d) )
+	ROM_LOAD( "epr-7164.2h",  0x2000, 0x2000, CRC(e5e0cd22) SHA1(ad17f5a207a6d74cf0bd1cfebb061c8f65309563) )
+	ROM_LOAD( "epr-7165.2j",  0x4000, 0x2000, CRC(4cd3fe5e) SHA1(a69e02acbcad825101f96dcabfada667ae25799c) )
+	ROM_LOAD( "epr-7166.2k",  0x6000, 0x2000, CRC(552ca339) SHA1(2313c6aaec47957bce00d0d04f89012eafc014fd) )
+
+	ROM_REGION( 0x01000, "gfx1", 0 )
+	ROM_LOAD( "4a.bin",  0x00000, 0x1000, CRC(83a30785) SHA1(685e833bbeaff5b4513627eebdee4cde114e8588) ) /* chars, only different rom from the Sega set above */
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "epr-7178.9h",  0x00000, 0x2000, CRC(2f5b62c0) SHA1(8be09e4ef1c3e2b1494431d4f07570a109e93dfd) ) /* tiles - plane 0 */
+	ROM_LOAD( "epr-7179.10h", 0x02000, 0x2000, CRC(8fbb49b5) SHA1(111f0c42cee6ab2766a5322dd90e1516ffbbc35c) ) /* tiles - plane 1 */
+	ROM_LOAD( "epr-7180.11h", 0x04000, 0x2000, CRC(26a8e5c3) SHA1(9a2bc4de87e16bbb777b39564c08d99fd3ccd4ff) ) /* tiles - plane 2 */
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "epr-7171.6a",  0x00000, 0x4000, CRC(62caf2a1) SHA1(6fb2c1882630b32af27638d2e9b306d4fc028d62) ) /* sprites - plane 0 */
+	ROM_LOAD( "epr-7172.7a",  0x04000, 0x4000, CRC(10f78a10) SHA1(8745da857bdb873d5ffebf753dd66321e1fabc59) ) /* sprites - plane 0 */
+	ROM_LOAD( "epr-7173.8a",  0x08000, 0x4000, CRC(36ea1d59) SHA1(cba9117de745049c06c703dc1782b83376523ce3) ) /* sprites - plane 1 */
+	ROM_LOAD( "epr-7174.9a",  0x0c000, 0x4000, CRC(f527d837) SHA1(a674e1e71c98d263670962d60a9ac6e205df1204) ) /* sprites - plane 1 */
+	ROM_LOAD( "epr-7175.10a", 0x10000, 0x4000, CRC(ba76e4c1) SHA1(e521fbf6a6a8f0e9866c143a576b9dbbc19c4ffd) ) /* sprites - plane 2 */
+	ROM_LOAD( "epr-7176.11a", 0x14000, 0x4000, CRC(f095d619) SHA1(7f278c124141ae03f1d8a03b4ea06c81391f16eb) ) /* sprites - plane 2 */
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "7161.1j",      0x0000, 0x0100, CRC(02c4043f) SHA1(bc2af8e054d71a3d0835c795b0f2263c32f2bc42) ) /* red */
+	ROM_LOAD( "7160.1h",      0x0100, 0x0100, CRC(225938d1) SHA1(22bf02832b9f08e4811f9d74a6007bf0ff030eef) ) /* green */
+	ROM_LOAD( "7159.1f",      0x0200, 0x0100, CRC(1e0a1cd3) SHA1(cc120d8fba3e4fb5e18d789981ece77e589ee5a2) ) /* blue */
+	ROM_LOAD( "7162.5j",      0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
+	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+ROM_END
+
 ROM_START( flashgala )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flashgal.5",   0x0000, 0x2000, CRC(aa889ace) SHA1(7caac8fae723485adb6990367bdb8a94bd273322) )
@@ -1386,6 +1423,7 @@ GAME( 1985, 99lstwara, repulse,  repulse,   repulse,  driver_device, 0,        R
 GAME( 1985, 99lstwark, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Kyugo", "'99: The Last War (Kyugo)", MACHINE_SUPPORTS_SAVE ) // directly for Kyugo? (Flashgal, Legend, SRD Mission, Airwolf, Planet Probe)
 GAME( 1985, sonofphx,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "bootleg (Associated Overseas MFR, Inc.)", "Son of Phoenix (bootleg of Repulse)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, flashgal,  0,        repulse,   flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flashgalk, flashgal, repulse,   flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 1, Kyugo logo)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, flashgala, flashgal, flashgala, flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "Kyugo / Taito Corporation", "S.R.D. Mission", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "bootleg", "F-X (bootleg of S.R.D. Mission)", MACHINE_SUPPORTS_SAVE )

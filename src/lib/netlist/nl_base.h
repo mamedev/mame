@@ -58,7 +58,7 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
 	private: detail::family_setter_t m_famsetter;                              \
-	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
 /*! Used to define the constructor of a netlist device.
@@ -67,7 +67,7 @@ class NETLIB_NAME(name) : public device_t
  */
 #define NETLIB_CONSTRUCTOR(cname)                                              \
 	private: detail::family_setter_t m_famsetter;                              \
-	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 		: device_t(owner, name)
 
 	/*! Used to define the destructor of a netlist device.
@@ -81,7 +81,7 @@ class NETLIB_NAME(name) : public device_t
 	*/
 #define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
 	private: detail::family_setter_t m_famsetter;                              \
-	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 		: device_t(owner, name)
 
 	/*! Add this to a device definition to mark the device as dynamic.
@@ -216,7 +216,7 @@ namespace netlist
 		/*! Constructor.
 		 *  Allows a descriptive text to be assed to the exception
 		 */
-		explicit nl_exception(const pstring text //!< text to be passed
+		explicit nl_exception(const pstring &text //!< text to be passed
 				)
 		: plib::pexception(text) { }
 		/*! Copy constructor. */
@@ -314,7 +314,7 @@ namespace netlist
 		template <typename O>
 		//! Constructor.
 		state_var(O &owner,             //!< owner must have a netlist() method.
-				const pstring name,     //!< identifier/name for this state variable
+				const pstring &name,     //!< identifier/name for this state variable
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
@@ -350,7 +350,7 @@ namespace netlist
 		//! Constructor.
 		template <typename O>
 		state_var(O &owner,             //!< owner must have a netlist() method.
-				const pstring name,     //!< identifier/name for this state variable
+				const pstring &name,     //!< identifier/name for this state variable
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
@@ -398,7 +398,7 @@ namespace netlist
 		 *
 		 *  Every class derived from the object_t class must have a name.
 		 */
-		object_t(const pstring &aname /*!< string containing name of the object */);
+		explicit object_t(const pstring &aname /*!< string containing name of the object */);
 
 		/*! return name of the object
 		 *
@@ -419,7 +419,7 @@ namespace netlist
 
 	struct detail::netlist_ref
 	{
-		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
+		explicit netlist_ref(netlist_t &nl) : m_netlist(nl) { }
 
 		netlist_t & netlist() NL_NOEXCEPT { return m_netlist; }
 		const netlist_t & netlist() const NL_NOEXCEPT { return m_netlist; }
@@ -917,7 +917,7 @@ namespace netlist
 	class param_ptr_t final: public param_t
 	{
 	public:
-		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		param_ptr_t(device_t &device, const pstring &name, std::uint8_t* val);
 		std::uint8_t * operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
@@ -927,7 +927,7 @@ namespace netlist
 	class param_logic_t final: public param_t
 	{
 	public:
-		param_logic_t(device_t &device, const pstring name, const bool val);
+		param_logic_t(device_t &device, const pstring &name, const bool val);
 		bool operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
@@ -937,7 +937,7 @@ namespace netlist
 	class param_int_t final: public param_t
 	{
 	public:
-		param_int_t(device_t &device, const pstring name, const int val);
+		param_int_t(device_t &device, const pstring &name, const int val);
 		int operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
@@ -947,7 +947,7 @@ namespace netlist
 	class param_double_t final: public param_t
 	{
 	public:
-		param_double_t(device_t &device, const pstring name, const double val);
+		param_double_t(device_t &device, const pstring &name, const double val);
 		double operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
@@ -957,7 +957,7 @@ namespace netlist
 	class param_str_t : public param_t
 	{
 	public:
-		param_str_t(device_t &device, const pstring name, const pstring val);
+		param_str_t(device_t &device, const pstring &name, const pstring &val);
 		virtual ~param_str_t();
 
 		const pstring operator()() const NL_NOEXCEPT { return Value(); }
@@ -984,7 +984,7 @@ namespace netlist
 		class value_t
 		{
 		public:
-			value_t(param_model_t &param, const pstring name)
+			value_t(param_model_t &param, const pstring &name)
 			{
 				m_value = param.model_value(name);
 			}
@@ -996,7 +996,7 @@ namespace netlist
 
 		friend class value_t;
 
-		param_model_t(device_t &device, const pstring name, const pstring val)
+		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
 		const pstring model_value_str(const pstring &entity) /*const*/;
@@ -1014,7 +1014,7 @@ namespace netlist
 	class param_data_t : public param_str_t
 	{
 	public:
-		param_data_t(device_t &device, const pstring name);
+		param_data_t(device_t &device, const pstring &name);
 
 		std::unique_ptr<plib::pistream> stream();
 	protected:
@@ -1030,7 +1030,7 @@ namespace netlist
 	{
 	public:
 
-		param_rom_t(device_t &device, const pstring name);
+		param_rom_t(device_t &device, const pstring &name);
 
 		const ST & operator[] (std::size_t n) { return m_data[n]; }
 	protected:
@@ -1128,7 +1128,7 @@ namespace netlist
 		device_t(netlist_t &owner, const pstring &name);
 		device_t(core_device_t &owner, const pstring &name);
 
-		virtual ~device_t();
+		virtual ~device_t() override;
 
 		setup_t &setup();
 
@@ -1159,7 +1159,7 @@ namespace netlist
 	struct detail::family_setter_t
 	{
 		family_setter_t() { }
-		family_setter_t(core_device_t &dev, const pstring desc);
+		family_setter_t(core_device_t &dev, const pstring &desc);
 		family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
 	};
 
@@ -1260,7 +1260,7 @@ namespace netlist
 		}
 
 		template<class C>
-		C *get_single_device(const pstring classname)
+		C *get_single_device(const pstring &classname)
 		{
 			return dynamic_cast<C *>(get_single_device(classname, check_class<C>));
 		}
@@ -1305,7 +1305,7 @@ namespace netlist
 		static pstring from_utf8(const char *c) { return pstring(c, pstring::UTF8); }
 		static pstring from_utf8(const pstring &c) { return c; }
 
-		core_device_t *get_single_device(const pstring classname, bool (*cc)(core_device_t *));
+		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *));
 
 		/* mostly rw */
 		netlist_time                        m_time;
@@ -1355,7 +1355,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	template <typename ST, std::size_t AW, std::size_t DW>
-	inline param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring name)
+	inline param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)
 	: param_data_t(device, name)
 	{
 		auto f = stream();
@@ -1468,7 +1468,7 @@ namespace netlist
 
 	template <typename T>
 	template <typename O>
-	state_var<T>::state_var(O &owner, const pstring name, const T &value)
+	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
 	: m_value(value)
 	{
 		owner.netlist().save(owner, m_value, name);
@@ -1476,7 +1476,7 @@ namespace netlist
 
 	template <typename T, std::size_t N>
 	template <typename O>
-	state_var<T[N]>::state_var(O &owner, const pstring name, const T & value)
+	state_var<T[N]>::state_var(O &owner, const pstring &name, const T & value)
 	{
 		owner.netlist().save(owner, m_value, name);
 		for (std::size_t i=0; i<N; i++)

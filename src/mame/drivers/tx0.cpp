@@ -375,7 +375,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
@@ -408,7 +407,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
@@ -442,7 +440,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
@@ -475,7 +472,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 };
 
@@ -1561,7 +1557,7 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tx0_state, screen_update_tx0)
-	MCFG_SCREEN_VBLANK_DRIVER(tx0_state, screen_eof_tx0)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx0_state, screen_vblank_tx0))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)

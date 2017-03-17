@@ -28,7 +28,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_amazonlf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_amazonlf(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_amazonlf);
 };
 
 static ADDRESS_MAP_START( amazonlf_mem, AS_PROGRAM, 32, amazonlf_state )
@@ -48,7 +48,7 @@ uint32_t amazonlf_state::screen_update_amazonlf(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void amazonlf_state::screen_eof_amazonlf(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(amazonlf_state::screen_vblank_amazonlf)
 {
 }
 
@@ -72,7 +72,7 @@ static MACHINE_CONFIG_START( amazonlf, amazonlf_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(amazonlf_state, screen_update_amazonlf)
-	MCFG_SCREEN_VBLANK_DRIVER(amazonlf_state, screen_eof_amazonlf)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amazonlf_state, screen_vblank_amazonlf))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")

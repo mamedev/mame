@@ -2476,7 +2476,7 @@ void amstrad_state::kccomp_reset_machine()
 }
 
 
-void amstrad_state::screen_eof_amstrad(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(amstrad_state::screen_vblank_amstrad)
 {
 	// rising edge
 	if (state)

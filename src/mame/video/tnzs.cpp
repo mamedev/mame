@@ -54,7 +54,7 @@ uint32_t tnzs_base_state::screen_update_tnzs(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-void tnzs_base_state::screen_eof_tnzs(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tnzs_base_state::screen_vblank_tnzs)
 {
 	// rising edge
 	if (state)

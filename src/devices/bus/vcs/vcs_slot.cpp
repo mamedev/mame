@@ -102,18 +102,6 @@ void vcs_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_vcs_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vcs_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------
@@ -828,17 +816,4 @@ WRITE8_MEMBER(vcs_cart_slot_device::write_ram)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data, mem_mask);
-}
-
-
-/*-------------------------------------------------
- direct update
- -------------------------------------------------*/
-
-DIRECT_UPDATE_MEMBER(vcs_cart_slot_device::cart_opbase)
-{
-	if (m_cart)
-		return m_cart->cart_opbase(direct, address);
-	else
-		return address;
 }

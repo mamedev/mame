@@ -55,9 +55,6 @@ void cdrom_image_device::device_config_complete()
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	add_format("chdcd", "CD-ROM drive", m_extension_list, "");
-
-	// set brief and instance name
-	update_names();
 }
 
 //-------------------------------------------------

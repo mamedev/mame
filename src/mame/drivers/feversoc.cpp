@@ -14,7 +14,7 @@ looping over a complex control structure. Could these be derived from the
 
 TODO:
 - Layout including lamps
-- Hook up a ticket dispenser and solve the "HOPPER ERROR" issue
+- Hopper only works in "COIN HOPPER" mode
 - Do button 5 or remaining DIPs actually do anything outside service mode?
 
 ============================================================================
@@ -72,6 +72,7 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/eepromser.h"
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -90,6 +91,7 @@ public:
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_rtc(*this, "rtc"),
+		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -109,6 +111,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<jrc6355e_device> m_rtc;
+	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -158,9 +161,9 @@ WRITE16_MEMBER( feversoc_state::output_w )
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
 	machine().bookkeeping().coin_counter_w(0, data & 1);
-	// data & 2 coin out
+	// data & 2 coin out counter
 	machine().bookkeeping().coin_counter_w(1, data & 4);
-	// data & 8 coin hopper
+	m_hopper->motor_w((data & 0x08) >> 3); // coin hopper or prize hopper
 	m_oki->set_rom_bank((data & 0x20) >> 5);
 
 	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
@@ -232,7 +235,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "DIP1:1" )
@@ -301,6 +304,8 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 MACHINE_CONFIG_END
 
 /***************************************************************************

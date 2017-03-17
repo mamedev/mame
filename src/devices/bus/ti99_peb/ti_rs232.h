@@ -131,7 +131,6 @@ protected:
 	virtual void    device_start(void) override;
 	image_init_result    call_load() override;
 	void    call_unload() override;
-	virtual void    device_config_complete() override;
 
 private:
 	int get_index_from_tagname();
@@ -158,7 +157,6 @@ protected:
 	virtual void    device_start(void) override;
 	image_init_result    call_load() override;
 	void    call_unload() override;
-	virtual void    device_config_complete() override;
 };
 
 #endif

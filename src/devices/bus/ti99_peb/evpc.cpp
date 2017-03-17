@@ -68,7 +68,7 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (TRACE_ADDRESS) logerror("set address %04x, %s\n", offset, (state==ASSERT_LINE)? "read" : "write");
 

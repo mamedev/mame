@@ -311,7 +311,7 @@ public:
 	DECLARE_MACHINE_RESET(f3);
 	DECLARE_VIDEO_START(f3);
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_f3(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_f3);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
 
 protected:

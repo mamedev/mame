@@ -10,6 +10,14 @@
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>
 	</element>
+	<element name="seg_m" defstate="0">
+		<text state="1" string="M"><color red="1.0" green="1.0" blue="1.0" /></text>
+		<text state="0" string="M"><color red="0.12" green="0.12" blue="0.12" /></text>
+	</element>
+	<element name="seg_ap" defstate="0">
+		<text state="1" string="'"><color red="1.0" green="1.0" blue="1.0" /></text>
+		<text state="0" string="'"><color red="0.12" green="0.12" blue="0.12" /></text>
+	</element>
 
 	<element name="ledr" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
@@ -161,7 +169,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-3" right="110" top="-2" bottom="89" />
+		<bounds left="-3" right="111" top="-2" bottom="89" />
 
 	<!-- chessboard coords -->
 
@@ -324,16 +332,19 @@
 
 	<!-- right side lcd panel/leds -->
 
-		<bezel name="digit0" element="digit"><bounds x="87.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="89.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="91.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="93.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit4" element="digit"><bounds x="95.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit5" element="digit"><bounds x="97.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit6" element="digit"><bounds x="99.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit7" element="digit"><bounds x="101.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit8" element="digit"><bounds x="103.125" y="9" width="2" height="3" /></bezel>
-		<bezel name="digit9" element="digit"><bounds x="105.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="88.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="90.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="92.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="94.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="96.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit9" element="digit"><bounds x="98.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit10" element="digit"><bounds x="100.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit11" element="digit"><bounds x="102.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit12" element="digit"><bounds x="104.125" y="9" width="2" height="3" /></bezel>
+		<bezel name="digit13" element="digit"><bounds x="106.125" y="9" width="2" height="3" /></bezel>
+
+		<bezel name="3.6" element="seg_m"><bounds x="86" y="8.75" width="2" height="1.5" /></bezel>
+		<bezel name="14.0" element="seg_ap"><bounds x="97.75" y="8.25" width="1" height="1.5" /></bezel>
 
 		<bezel element="text_l7"><bounds x="87" y="68.64" width="14" height="1.4" /></bezel>
 		<bezel element="text_l8"><bounds x="87" y="76.35" width="14" height="1.4" /></bezel>

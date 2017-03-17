@@ -156,7 +156,7 @@ v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t 
 
 
 v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33A, "V33A", tag, owner, clock, "v33A", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: nec_common_device(mconfig, V33A, "V33A", tag, owner, clock, "v33a", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 

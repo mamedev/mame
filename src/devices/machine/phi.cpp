@@ -189,7 +189,7 @@ phi_device::phi_device(const machine_config &mconfig, device_type type, const ch
 }
 
 phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHI, "HP PHI", tag, owner, clock, "PHI", __FILE__),
+	: device_t(mconfig, PHI, "HP PHI", tag, owner, clock, "phi", __FILE__),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
 	  m_signal_wr_fns{

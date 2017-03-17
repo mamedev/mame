@@ -104,7 +104,7 @@ void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::substr(const iterator start, const iterator end) const
+const pstring_t<F> pstring_t<F>::substr(const iterator &start, const iterator &end) const
 {
 	pstring_t ret;
 	//FIXME: throw ?
@@ -167,7 +167,7 @@ typename pstring_t<F>::iterator pstring_t<F>::find_last_not_of(const pstring_t &
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t search, iterator start) const
+typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iterator start) const
 {
 	for (; start != end(); ++start)
 	{
@@ -213,13 +213,13 @@ pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &rep
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::ltrim(const pstring_t ws) const
+const pstring_t<F> pstring_t<F>::ltrim(const pstring_t &ws) const
 {
 	return substr(find_first_not_of(ws), end());
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::rtrim(const pstring_t ws) const
+const pstring_t<F> pstring_t<F>::rtrim(const pstring_t &ws) const
 {
 	auto f = find_last_not_of(ws);
 	if (f==end())

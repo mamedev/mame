@@ -1368,7 +1368,7 @@ READ32_MEMBER(sms_state::sms_pixel_color)
 }
 
 
-void sms_state::screen_vblank_sms1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 {
 	// on falling edge
 	if (!state)

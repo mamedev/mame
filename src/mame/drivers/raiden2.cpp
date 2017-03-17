@@ -406,15 +406,17 @@ WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
 
 WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 {
-	COMBINE_DATA(scrollvals + offset);
-	data = scrollvals[offset];
-
 	tilemap_t *tm = nullptr;
 	switch(offset/2) {
 	case 0: tm = background_layer; break;
 	case 1: tm = midground_layer; break;
 	case 2: tm = foreground_layer; break;
+	default: assert(0); break;
 	}
+
+	COMBINE_DATA(scrollvals + offset);
+	data = scrollvals[offset];
+
 	if(offset & 1)
 		tm->set_scrolly(0, data);
 	else

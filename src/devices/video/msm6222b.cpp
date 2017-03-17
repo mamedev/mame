@@ -34,7 +34,7 @@ msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag,
 }
 
 msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	msm6222b_device(mconfig, MSM6222B_01, "msm6222b-01", tag, owner, clock, "msm6222b", __FILE__)
+	msm6222b_device(mconfig, MSM6222B_01, "msm6222b-01", tag, owner, clock, "msm6222b01", __FILE__)
 {
 	// load the fixed cgrom
 	m_cgrom.set_tag("cgrom");

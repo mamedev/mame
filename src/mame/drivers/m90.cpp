@@ -970,6 +970,36 @@ ROM_START( dynablstb2 )
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
+/*Roms 2 and 3 (code) are different
+
+XTALS:
+
+16mhz (x1)
+&
+30mhz (x2)
+
+The ROMs came with Playmark labels but the copyright is still Seitu.
+*/
+
+ROM_START( dynablstb3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.ic26", 0x000001, 0x020000, CRC(08b1573e) SHA1(ef39177792b3263027e6eb88f61e761976e770ef) )
+	ROM_LOAD16_BYTE( "3.ic25", 0x000000, 0x020000, CRC(bbf540ad) SHA1(8bec4e8da9cb2e7b9e22894dcc0e078ced028174) )
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "1.ic17",    0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "7.ic104",    0x000000, 0x40000, CRC(695d2019) SHA1(3537e9fb0e7dc13d6113b4af71cba3c73392335a) )
+	ROM_LOAD( "6.ic105",    0x040000, 0x40000, CRC(4c7c8bbc) SHA1(31ab5557d96c4184a9c02ed1c309f3070d148e25) )
+	ROM_LOAD( "5.ic108",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
+	ROM_LOAD( "4.ic107",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
+
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
+	/* the samples are in the Z80 ROM in this bootleg */
+ROM_END
+
 /*
 New Dyna Blaster Global Quest
 Irem, 1992
@@ -1232,8 +1262,9 @@ GAME( 1991, hasamu,   0,        hasamu,   hasamu,   driver_device, 0,        ROT
 GAME( 1991, dynablst, 0,        bombrman, dynablst, driver_device, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, driver_device, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, driver_device, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dynablstb2,dynablst,dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, alt)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb,dynablst, dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb2,dynablst,dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dynablstb3,dynablst,dynablsb, dynablsb, driver_device, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // PCB has Playmark labels
 GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   driver_device, 0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  driver_device, 0,        ROT0, "Irem", "Bomber Man World (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bbmanwja, bbmanw,   bbmanwj,  bbmanwj,  driver_device, 0,        ROT0, "Irem", "Bomber Man World (Japan, revised sound hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

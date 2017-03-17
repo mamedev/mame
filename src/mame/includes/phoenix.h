@@ -34,8 +34,9 @@ public:
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
-	DECLARE_DRIVER_INIT(condor);
-	DECLARE_DRIVER_INIT(vautourza);
+	DECLARE_DRIVER_INIT(oneprom);
+	DECLARE_DRIVER_INIT(coindsw);
+	DECLARE_DRIVER_INIT(oneprom_coindsw);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_RESET(phoenix);

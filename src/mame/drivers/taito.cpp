@@ -879,14 +879,14 @@ ROM_END
 /-------------------------------*/
 
 /*--------------------------------
-/ Voley Ball
+/ Volley
 /-------------------------------*/
 ROM_START(voleybal)
 	ROM_REGION(0x2800, "roms", 0)
-	ROM_LOAD( "voley1.bin", 0x0000, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley2.bin", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley3.bin", 0x1000, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley4.bin", 0x1800, 0x0800, NO_DUMP)
+	ROM_LOAD( "voley1.bin", 0x0000, 0x0800, CRC(d218b759) SHA1(91dab8a583b9fa897fc0bd17cce2812015b2a82a))
+	ROM_LOAD( "voley2.bin", 0x0800, 0x0800, CRC(59b049cc) SHA1(f3b42debddf7e088f520c020017c0aca56ad0052))
+	ROM_LOAD( "voley3.bin", 0x1000, 0x0800, CRC(f3fdbb37) SHA1(d78bd68e7bdbdbc4447c65b77bd5b30a23d0951c))
+	ROM_LOAD( "voley4.bin", 0x1800, 0x0800, CRC(35168496) SHA1(29ca360368970a0fae51f187ad5a89ad81ae2c6a))
 
 	ROM_REGION(0x8000, "cpu2", 0)
 	ROM_LOAD("voley_s1.bin", 0x2000, 0x1000, CRC(9c825666) SHA1(330ecd9caccb8a1555c5e7302095ae25558c020e))
@@ -999,7 +999,7 @@ GAME(1982,  hawkman1,   hawkman,    taito4, taito, taito_state, taito,  ROT0,   
 
 // dac and ay
 GAME(1982,  snake,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Snake Machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(198?,  voleybal,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Voley Ball",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  voleybal,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Volley",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  mrblack,    0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  mrblack1,   mrblack,    taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  sshuttle,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 1)", MACHINE_IS_SKELETON_MECHANICAL)

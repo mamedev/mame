@@ -88,7 +88,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_drv_sel(0),
 	m_mode_sel(0),
 	m_rw_sel(0), m_odd_hd(0), m_pi(0),
-	m_period(attotime::from_hz(clock)), t_gen(nullptr)
+	t_gen(nullptr)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -124,6 +124,17 @@ void c2040_fdc_t::device_start()
 	save_item(NAME(m_drv_sel));
 	save_item(NAME(m_mode_sel));
 	save_item(NAME(m_rw_sel));
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called when the
+//  device clock is altered in any way
+//-------------------------------------------------
+
+void c2040_fdc_t::device_clock_changed()
+{
+	m_period = attotime::from_hz(clock());
 }
 
 

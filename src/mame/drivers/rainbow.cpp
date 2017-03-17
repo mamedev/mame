@@ -2859,7 +2859,7 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 
 READ16_MEMBER(rainbow_state::vram_r)
 {
-	if((!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) || space.debugger_access())  // (NOT VECTOR MODE)
+	if((!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) || machine().side_effect_disabled())  // (NOT VECTOR MODE)
 	{
 		// SCROLL_MAP IN BITMAP MODE ONLY...?
 		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)

@@ -19,9 +19,9 @@ public:
 	media_identifier(emu_options &options);
 
 	// getters
-	int total() const { return m_total; }
-	int matches() const { return m_matches; }
-	int nonroms() const { return m_nonroms; }
+	unsigned total() const { return m_total; }
+	unsigned matches() const { return m_matches; }
+	unsigned nonroms() const { return m_nonroms; }
 
 	// operations
 	void reset() { m_total = m_matches = m_nonroms = 0; }
@@ -31,11 +31,12 @@ public:
 	int find_by_hash(const util::hash_collection &hashes, int length);
 
 private:
+
 	// internal state
 	driver_enumerator   m_drivlist;
-	int                 m_total;
-	int                 m_matches;
-	int                 m_nonroms;
+	unsigned            m_total;
+	unsigned            m_matches;
+	unsigned            m_nonroms;
 };
 
 

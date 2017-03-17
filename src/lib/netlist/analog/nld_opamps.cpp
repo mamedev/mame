@@ -77,7 +77,7 @@ namespace netlist
 	class opamp_model_t : public param_model_t
 	{
 	public:
-		opamp_model_t(device_t &device, const pstring name, const pstring val)
+		opamp_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_model_t(device, name, val)
 		, m_TYPE(*this, "TYPE")
 		, m_FPF(*this, "FPF")

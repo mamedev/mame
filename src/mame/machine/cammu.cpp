@@ -44,13 +44,13 @@ const device_type CAMMU_C4I = device_creator<cammu_c4i_device>;
 const device_type CAMMU_C3 = device_creator<cammu_c3_device>;
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C4T, "C4E/C4T CAMMU", tag, owner, clock, "C4T", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C4T, "C4E/C4T CAMMU", tag, owner, clock, "c4t", __FILE__) { }
 
 cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C4I, "C4I CAMMU", tag, owner, clock, "C4I", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C4I, "C4I CAMMU", tag, owner, clock, "c4i", __FILE__) { }
 
 cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C4T, "C1/C3 CAMMU", tag, owner, clock, "C3", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C3, "C1/C3 CAMMU", tag, owner, clock, "c3", __FILE__) { }
 
 cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)

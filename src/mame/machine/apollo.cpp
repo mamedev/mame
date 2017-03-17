@@ -714,7 +714,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
 		device_t *owner, uint32_t clock) :
-	mc68681_device(mconfig, tag, owner, clock),
+	mc68681_base_device(mconfig, APOLLO_SIO, "DN3000/DS3500 SIO", tag, owner, clock, "apollo_sio", __FILE__),
 	m_csrb(0),
 	m_ip6(0)
 {
@@ -745,7 +745,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_device::read(space, offset/2, mem_mask);
+	int data = mc68681_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -805,7 +805,7 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_device::write(space, offset/2, data, mem_mask);
+	mc68681_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
@@ -881,11 +881,6 @@ apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
 
 apollo_ni::~apollo_ni()
 {
-}
-
-void apollo_ni::device_config_complete()
-{
-	update_names(APOLLO_NI, "node_id", "ni");
 }
 
 //-------------------------------------------------

@@ -4,347 +4,221 @@
 #include "debugger.h"
 #include "mb86233.h"
 
-static std::string COND(unsigned int cond)
+/*
+
+    Main register bank:
+        0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
+    0  b0  b1  x0  x1  x2  i0  i1  i2  sp pag vsm dmc  c0  c1  pc   -
+    1   a  ah  al   b  bh  bl   c  ch  cl   d  dh  dl   p  ph  pl sft
+    
+    Second register bank:
+         0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f
+    2 <register file>
+    3 sio0  si1  pio pioa  rpc    -    -    -  pad  mod  ear   st mask  tim   cx   dx
+
+
+
+    Address encoding:
+      0 0aaa aaaa  $a
+      0 1aaa aaaa  $a(xn)
+      1 0aaa aaaa  $a(xn+)
+      1 100b bbbb  (xn+$b)
+      1 101b bbbb  (bxn+$b)
+      1 110b bbbb  [xn+$b]
+      1 111b bbbb  [bxn+$b]
+
+
+
+    3322 2222 2222 1111 1111 1100 0000 0000
+    1098 7654 3210 9876 5432 1098 7654 3210
+
+    0000 00aa aaao ooyy yyyy yyyx xxxx xxxx lab
+
+    0000 00aa aaa0 11yy yyyy yyyx xxxx xxxx lab adx (e), ady
+    0000 00aa aaa1 00yy yyyy yyyx xxxx xxxx lab adx, ady (e)
+
+    0001 11aa aaa0 10yy yyyy yyyx xxxx xxxx mov adx, ady
+    0001 11aa aaa0 11yy yyyy yyyx xxxx xxxx mov adx (e), ady
+    0001 11aa aaa1 00yy yyyy yyyx xxxx xxxx mov adx, ady (e)
+    0001 11aa aaa1 01yy yyyy yyyx xxxx xxxx mov adx (o), ady
+    0001 11aa aaa1 1100 0rrr rrry yyyy yyyy mov r, ady (e)
+    0001 11aa aaa1 1100 1rrr rrry yyyy yyyy mov r, ady
+    0001 11aa aaa1 1101 1rrr rrrx xxxx xxxx mov adx (e), r
+    0001 11aa aaa1 1110 0rrr rrrx xxxx xxxx mov adx, r
+    0001 11aa aaa1 1110 1rrr rrrx xxxx xxxx mov adx (o), r
+    0001 11aa aaa1 1111 0rrr rrr. ..ss ssss mov s, r
+
+    0011 10rr vvvv vvvv vvvv vvvv vvvv vvvv lipl/lia/lib/lid #v
+
+    0011 11aa aaa. 000. rrrr rrrr rrrr rrrr clr0 <reglist>
+    0011 11aa aaa. 001. ffff ffff ffff ffff clr1 flags
+    0011 11aa aaa. 010. 0... .... nnnn nnnn rep #n
+    0011 11aa aaa. 010. 1... .... ..11 0100 rep rpc
+    0011 11aa aaa. 011. ffff ffff ffff ffff set flags
+
+    010r rrrr .... .... vvvv vvvv vvvv vvvv ldi #v, b0/.../- (bank 0/1) (h/l is special and targets exponent/mantissa size 8/24)
+
+    1i11 11.c cccc 0000 aaaa aaaa aaaa aaaa brif cond #a
+    1i11 11.c cccc 0010 .0.. ...x xxxx xxxx brul cond (adx)
+    1i11 11.c cccc 0010 .1.. .... ...r rrrr brul cond r
+    1i11 11.c cccc 0100 aaaa aaaa aaaa aaaa bsif cond #a
+    1i11 11.c cccc 0110 .0.. ...x xxxx xxxx bsul cond (adx)
+    1i11 11.c cccc 0110 .1.. .... ...r rrrr bsul cond r
+    1i11 11.c cccc 1010 .... .... .... .... rtif cond
+    1i11 11.c cccc 1100 .rrr rrrx xxxx xxxx ldif cond adx, r
+    1011 11.c 0110 1110 .... .... .... .... iret
+
+    Top 3 bits = instruction group, except when it isn't.
+    
+ */
+
+
+
+static const char *const regnames[0x40] = {
+	"b0", "b1", "x0", "x1", "x2", "i0", "i1", "i2", "sp", "pag", "vsm", "dmc", "c0", "c1", "pc", "-",
+	"a", "ah", "al", "b", "bh", "bl", "c", "ch", "cl", "d", "dh", "dl", "p", "ph", "pl", "sft",
+	"rf0", "rf1", "rf2", "rf3", "rf4", "rf5", "rf6", "rf7", "rf8", "rf9", "rfa", "rfb", "rfc", "rfd", "rfe", "rff",
+	"sio0", "si1", "pio", "pioa", "rpc", "r?35", "r?36", "r?37", "pad", "mod", "ear", "st", "mask", "tim", "cx", "dx"
+};
+
+static std::string condition(unsigned int cond, bool invert)
 {
 	std::ostringstream stream;
 
-	switch(cond)
-	{
-		case 0x16:
-			util::stream_format(stream, "always");
-			return stream.str();
+	if(invert)
+		stream << '!';
 
-		case 0x00:
-			util::stream_format(stream, "eq");
-			return stream.str();
-
-		case 0x01:
-			util::stream_format(stream, "ge");
-			return stream.str();
-
-		case 0x02:
-			util::stream_format(stream, "le");
-			return stream.str();
-
-		case 0x06:
-			util::stream_format(stream, "never");
-			return stream.str();
-
-		case 0x10:
-			util::stream_format(stream, "(--r12)!=0");
-			return stream.str();
-
-		case 0x11:
-			util::stream_format(stream, "(--r13)!=0");
-			return stream.str();
+	switch(cond) {
+		case 0x00: util::stream_format(stream, "zrd"); return stream.str();
+		case 0x01: util::stream_format(stream, "ged"); return stream.str();
+		case 0x02: util::stream_format(stream, "led"); return stream.str();
+		case 0x10: util::stream_format(stream, "zc0"); return stream.str();
+		case 0x11: util::stream_format(stream, "zc1"); return stream.str();
+		case 0x16: util::stream_format(stream, "alw"); return stream.str();
 	}
 
-	util::stream_format(stream, "unk (%x)",cond);
+	util::stream_format(stream, "cond(%02x)", cond);
 	return stream.str();
 }
 
-static std::string REGS( uint32_t reg, int IsSource )
+static std::string regs(uint32_t reg)
 {
-	std::ostringstream stream;
-	int         mode = (reg >> 6 ) & 0x07;
-
-	reg &= 0x3f;
-
-	if ( mode == 0 || mode == 1 || mode == 3 )
-	{
-		if ( reg < 0x10 )
-		{
-			util::stream_format(stream, "r%d",reg);
-			return stream.str();
-		}
-
-		switch(reg)
-		{
-			case 0x10:
-				util::stream_format(stream, "a");
-			break;
-
-			case 0x11:
-				util::stream_format(stream, "a.e");
-			break;
-
-			case 0x12:
-				util::stream_format(stream, "a.m");
-			break;
-
-			case 0x13:
-				util::stream_format(stream, "b");
-			break;
-
-			case 0x14:
-				util::stream_format(stream, "b.e");
-			break;
-
-			case 0x15:
-				util::stream_format(stream, "b.m");
-			break;
-
-			case 0x19:
-				util::stream_format(stream, "d");
-			break;
-
-			case 0x1a:
-				util::stream_format(stream, "d.e");
-			break;
-
-			case 0x1b:
-				util::stream_format(stream, "d.m");
-			break;
-
-			case 0x1c:
-				util::stream_format(stream, "p");
-			break;
-
-			case 0x1d:
-				util::stream_format(stream, "p.e");
-			break;
-
-			case 0x1e:
-				util::stream_format(stream, "p.m");
-			break;
-
-			case 0x1f:
-				util::stream_format(stream, "shift");
-			break;
-
-			case 0x20:
-				util::stream_format(stream, "parport");
-			break;
-
-			case 0x21:
-				util::stream_format(stream, "FIn");
-			break;
-
-			case 0x22:
-				util::stream_format(stream, "FOut");
-			break;
-
-			case 0x23:
-				util::stream_format(stream, "EB");
-			break;
-
-			default:
-				util::stream_format(stream, "Unkreg (%x)",reg);
-			break;
-		}
-	}
-	else if ( mode == 2 )
-	{
-		util::stream_format(stream, "0x%x+",reg & 0x1f);
-
-		if ( IsSource )
-		{
-			if ( !( reg & 0x20 ) )
-				util::stream_format(stream, "r0+");
-
-			util::stream_format(stream, "r2");
-		}
-		else
-		{
-			if ( !( reg & 0x20 ) )
-				util::stream_format(stream, "r1+");
-
-			util::stream_format(stream, "r3");
-		}
-	}
-	else if ( mode == 6 )
-	{
-		if ( IsSource )
-		{
-			if ( !( reg & 0x20 ) )
-				util::stream_format(stream, "r0+");
-
-			util::stream_format(stream, "r2");
-		}
-		else
-		{
-			if ( !( reg & 0x20 ) )
-				util::stream_format(stream, "r1+");
-
-			util::stream_format(stream, "r3");
-		}
-
-		if ( reg & 0x10 )
-			util::stream_format(stream, "--%d", 0x20 - ( reg & 0x1f ) );
-		else
-			util::stream_format(stream, "++%d", reg & 0x1f );
-	}
-	else
-	{
-		util::stream_format(stream, "UNKMOD %x (0x%x)", mode, reg);
-	}
-
-	return stream.str();
+	return regnames[reg & 0x3f];
 }
 
-static std::string INDIRECT( uint32_t reg, int IsSource )
+static std::string memory(uint32_t reg, bool x1)
 {
 	std::ostringstream stream;
-	int         mode = ( reg >> 6 ) & 0x07;
 
-	if ( mode == 0 || mode == 3 || mode == 1)
-	{
-		util::stream_format(stream, "0x%x", reg);
-	}
-	else if ( mode == 2 )
-	{
-		util::stream_format(stream, "0x%x+",reg&0x1f);
-
-		if ( IsSource )
-		{
-			if ( !(reg & 0x20) )
-				util::stream_format(stream, "r0+");
-
-			util::stream_format(stream, "r2");
-		}
+	switch(reg & 0x180) {
+	case 0x000:
+		if((reg & 0x7f) < 10)
+			util::stream_format(stream, "$%d", reg & 0x7f );
 		else
-		{
-			if ( !(reg & 0x20) )
-				util::stream_format(stream, "r1+");
+			util::stream_format(stream, "$0x%x", reg & 0x7f );
+		break;
 
-			util::stream_format(stream, "r3");
+	case 0x080:
+		if(reg & 0x7f) {
+			if((reg & 0x7f) < 10)
+				util::stream_format(stream, "$%d", reg & 0x7f );
+			else
+				util::stream_format(stream, "$0x%x", reg & 0x7f );
 		}
-	}
-	else if ( mode == 6 || mode == 7 )
-	{
-		if ( IsSource )
-		{
-			if ( !( reg & 0x20 ) )
-				util::stream_format(stream, "r0+");
 
-			util::stream_format(stream, "r2");
-		}
+		stream << '(';
+
+		if(x1)
+				util::stream_format(stream, "x1");
 		else
-		{
-			if( !( reg & 0x20 ) )
-				util::stream_format(stream, "r1+");
+				util::stream_format(stream, "x0");
+		stream << ')';
+		break;
 
-			util::stream_format(stream, "r3");
+	case 0x100:
+		if(reg & 0x7f)
+			util::stream_format(stream, "$0x%x", reg & 0x7f );
+
+		stream << '(';
+
+		if ( x1 )
+				util::stream_format(stream, "x1");
+		else
+				util::stream_format(stream, "x0");
+		stream << "+)";
+		break;
+
+	case 0x180:
+		stream << (reg & 0x40 ? "$[" : "$(");
+		if(x1) {
+			if(!(reg & 0x20))
+				util::stream_format(stream, "bx1");
+			else
+				util::stream_format(stream, "x1");
+		} else {
+			if(!(reg & 0x20))
+				util::stream_format(stream, "bx0");
+			else
+				util::stream_format(stream, "x0");
+		}
+			
+		if(reg & 0x10) {
+			if((0x10 - (reg & 0xf)) < 10)
+				util::stream_format(stream, "-%d", 0x10 - (reg & 0xf));
+			else
+				util::stream_format(stream, "-0x%x", 0x10 - (reg & 0xf));
+
+		} else if(reg & 0xf) {
+			if((reg & 0xf) < 10)
+				util::stream_format(stream, "+%d", reg & 0xf);
+			else
+				util::stream_format(stream, "+0x%x", reg & 0xf);
 		}
 
-		if ( reg & 0x10 )
-			util::stream_format(stream, "--%d",0x20 - ( reg & 0x1f ));
-		else
-			util::stream_format(stream, "++%d",reg & 0x1f);
-	}
-	else
-	{
-		util::stream_format(stream, "UNKMOD %x (0x%x)", mode, reg);
+		stream << (reg & 0x40 ? ']' : ')');
+		break;
 	}
 
 	return stream.str();
 }
 
-
-static std::string ALU( uint32_t alu)
+static std::string alu0_func( uint32_t alu)
 {
 	std::ostringstream stream;
 
-	switch( alu )
-	{
-		case 0x0:
-		break;
-
-		case 0x1:
-			util::stream_format(stream, "d=d&a");
-		break;
-
-		case 0x2:
-			util::stream_format(stream, "d=d|a");
-		break;
-
-		case 0x3:
-			util::stream_format(stream, "d=d^a");
-		break;
-
-		case 0x5:
-			util::stream_format(stream, "cmp d,a");
-		break;
-
-		case 0x6:
-			util::stream_format(stream, "d=d+a");
-		break;
-
-		case 0x7:
-			util::stream_format(stream, "d=d-a");
-		break;
-
-		case 0x8:
-			util::stream_format(stream, "p=a*b");
-		break;
-
-		case 0x9:
-			util::stream_format(stream, "d=d+p, p=a*b");
-		break;
-
-		case 0xa:
-			util::stream_format(stream, "d=d-p, p=a*b");
-		break;
-
-		case 0xb:
-			util::stream_format(stream, "d=fabs d");
-		break;
-
-		case 0xc:
-			util::stream_format(stream, "d=d+p");
-		break;
-
-		case 0xd:
-			util::stream_format(stream, "d=p, p=a*b");
-		break;
-
-		case 0xe:
-			util::stream_format(stream, "d=float(d)");
-		break;
-
-		case 0xf:
-			util::stream_format(stream, "d=int(d)");
-		break;
-
-		case 0x10:
-			util::stream_format(stream, "d=d/a");
-		break;
-
-		case 0x11:
-			util::stream_format(stream, "d=-d");
-		break;
-
-		case 0x13:
-			util::stream_format(stream, "d=a+b");
-		break;
-
-		case 0x14:
-			util::stream_format(stream, "d=b-a");
-		break;
-
-		case 0x16:
-			util::stream_format(stream, "d=(lsr d,shift)");
-		break;
-
-		case 0x17:
-			util::stream_format(stream, "d=(lsl d,shift)");
-		break;
-
-		case 0x18:
-			util::stream_format(stream, "d=(asr d,shift)");
-		break;
-
-		case 0x1a:
-			util::stream_format(stream, "d=d+a (int)");
-		break;
-
-		case 0x1b:
-			util::stream_format(stream, "d=d-a (int)");
-		break;
-
-		default:
-			util::stream_format(stream, "ALU UNK(%x)",alu);
-		break;
+	switch(alu) {
+	case 0x00: break;
+	case 0x01: util::stream_format(stream, "andd"); break;
+	case 0x02: util::stream_format(stream, "orad"); break;
+	case 0x03: util::stream_format(stream, "eord"); break;
+		// 04
+	case 0x05: util::stream_format(stream, "fcpd"); break;
+	case 0x06: util::stream_format(stream, "fadd"); break;
+	case 0x07: util::stream_format(stream, "fsbd"); break;
+	case 0x08: util::stream_format(stream, "fml"); break;
+	case 0x09: util::stream_format(stream, "fmsd"); break;
+	case 0x0a: util::stream_format(stream, "fmrd"); break;
+	case 0x0b: util::stream_format(stream, "fabd"); break;
+	case 0x0c: util::stream_format(stream, "fsmd"); break;
+	case 0x0d: util::stream_format(stream, "fspd"); break;
+	case 0x0e: util::stream_format(stream, "cifd"); break;
+	case 0x0f: util::stream_format(stream, "cfid"); break;
+	case 0x10: util::stream_format(stream, "fdvd"); break;
+	case 0x11: util::stream_format(stream, "fned"); break;
+		// 12
+	case 0x13: util::stream_format(stream, "d=b+a"); break;
+	case 0x14: util::stream_format(stream, "d=b-a"); break;
+	case 0x16: util::stream_format(stream, "lsrd"); break;
+	case 0x17: util::stream_format(stream, "lsld"); break;
+	case 0x18: util::stream_format(stream, "asrd"); break;
+	case 0x19: util::stream_format(stream, "asld"); break;
+	case 0x1a: util::stream_format(stream, "addd"); break;
+	case 0x1b: util::stream_format(stream, "subd"); break;
+		// 1c
+		// 1d
+		// 1e
+		// 1f
+	default: util::stream_format(stream, "alu0_func(%02x)", alu); break;
 	}
 
 	return stream.str();
@@ -352,398 +226,231 @@ static std::string ALU( uint32_t alu)
 
 static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 {
-	uint32_t  grp = ( opcode >> 26 ) & 0x3f;
-
-	switch( grp )
-	{
-		case 0x0:   /* Dual move */
-		{
-			uint32_t r1=opcode & 0x1ff;
-			uint32_t r2=(opcode>>9) & 0x7f;
-			uint32_t alu=(opcode>>21) & 0x1f;
-			uint32_t op=(opcode>>16) & 0x1f;
-
-			if ( alu != 0 )
-				util::stream_format(stream, "%s, ", ALU(alu) );
-
-			switch( op )
-			{
-				case 0x0c:  /* a = RAM[addr], b = BRAM[addr] */
-					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(0x%x)->b",r1,r2);
-				break;
-
-				case 0x0d:  /* a = RAM[addr], b = BRAM[addr] */
-					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(2<<6),0));
-				break;
-
-				case 0x0f:  /* a = RAM[addr], b = BRAM[reg] */
-					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(6<<6),0));
-				break;
-
-				case 0x10:  /* a = BRAM[reg], b = RAM[addr] */
-					util::stream_format(stream, "LAB BRAM(%s)->a,RAM(0x%x)->b",INDIRECT(r1,1),r2);
-				break;
-
-				default:
-					util::stream_format(stream, "UNKDUAL (%x)",op);
-				break;
-			}
-		}
-		break;
-
-		case 0x7:   /* LD/MOV */
-		{
-			uint32_t r1=opcode & 0x1ff;
-			uint32_t r2=(opcode>>9) & 0x7f;
-			uint32_t alu=(opcode>>21) & 0x1f;
-			uint32_t op=(opcode>>16) & 0x1f;
-
-			if ( alu != 0 )
-			{
-				util::stream_format(stream, "%s", ALU(alu) );
-
-				if ( !(op == 0x1f && r1 == 0x10 && r2 == 0x0f) )
-					util::stream_format(stream, ", ");
-			}
-
-			switch(op)
-			{
-				case 0x03:  /* RAM->External Indirect */
-				{
-					util::stream_format(stream, "MOV RAM(0x%x)->E(EB+%s)",r1,INDIRECT(r2|(6<<6),0));
-				}
-				break;
-
-				case 0x04:  /* MOV RAM->External */
-				{
-					util::stream_format(stream, "MOV RAM(0x%x)->E(EB+0x%x)",r1,r2);
-				}
-				break;
-
-				case 0x07:  /* RAMInd->External */
-				{
-					util::stream_format(stream, "MOV RAM(%s)->E(EB+%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
-				}
-				break;
-
-				case 0x08:  /* External->RAM */
-				{
-					util::stream_format(stream, "MOV EXT(EB+");
-					util::stream_format(stream, "%s",INDIRECT(r1,1));
-					util::stream_format(stream, ")->RAM(0x%x)",r2);
-				}
-				break;
-
-				case 0x0b:  /* External->RAMInd */
-				{
-					int mode = ( r1 >> 6 ) & 0x07;
-
-					util::stream_format(stream, "MOV EXT(EB+");
-
-					if ( mode == 0 || mode == 3 || mode == 1 )
-						util::stream_format(stream, "RAM(");
-
-					util::stream_format(stream, "%s",INDIRECT(r1,1));
-
-					if ( mode == 0 || mode == 3 || mode == 1)
-						util::stream_format(stream, ")");
-
-					util::stream_format(stream, ")->RAM(%s)",INDIRECT(r2|(6<<6),0));
-				}
-				break;
-
-				case 0x0c:  /* MOV RAM->BRAM */
-					util::stream_format(stream, "MOV RAM(0x%x)->BRAM(0x%x)",r1,r2);
-				break;
-
-				case 0x0f:  /* MOV RAMInd->BRAMInd */
-					util::stream_format(stream, "MOV RAM(%s)->BRAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
-				break;
-
-				case 0x10:  /* MOV BRAMInd->RAM */
-					util::stream_format(stream, "MOV BRAM(%s)->RAM(0x%x)",INDIRECT(r1,1),r2);
-				break;
-
-				case 0x13:  /* MOV BRAMInd->RAMInd */
-					util::stream_format(stream, "MOV BRAM(%s)->RAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
-				break;
-
-				case 0x1c:  /* MOV Reg->RAMInd */
-					if ( ( r2 >> 6 ) & 0x01)
-					{
-						util::stream_format(stream, "MOV %s->EXT(EB+%s)",REGS(r2,1),INDIRECT(r1,0));
-					}
-					else
-					{
-						util::stream_format(stream, "MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
-					}
-				break;
-
-				case 0x1d:  /* MOV RAM->Reg */
-				{
-					if ( r1 & 0x180 )
-					{
-						util::stream_format(stream, "MOV RAM(%s)->%s",REGS(r1,0),REGS(r2,0));
-					}
-					else
-					{
-						util::stream_format(stream, "MOV RAM(0x%x)->%s",r1,REGS(r2,0));
-					}
-				}
-				break;
-
-				case 0x1e:  /* External->Reg */
-				{
-					int     mode2 = (r2 >> 6) & 1;
-					util::stream_format(stream, "MOV EXT(EB+%s)->%s",INDIRECT(r1,mode2),REGS(r2,0));
-				}
-				break;
-
-				case 0x1f:  /* MOV Reg->Reg */
-					if ( !(r1 == 0x10 && r2 == 0x0f) )
-					{
-						util::stream_format(stream, "MOV %s->%s",REGS(r1,1),REGS(r2,0));
-					}
-				break;
-
-				default:
-					util::stream_format(stream, "UNKMV (0x%x)",op);
-				break;
-			}
-		}
-		break;
-
-		case 0x0e:  /* Load 24 bit val */
-		{
-			uint32_t sub=(opcode>>24)&0x3;
-			static const char regs[4] = { 'p', 'a', 'b', 'd' };
-
-			util::stream_format(stream, "LDIMM24 0x%X->%c",opcode&0xffffff, regs[sub]);
-		}
-		break;
-
-		case 0x0f:  /* repeat */
-		{
-			uint32_t  alu = ( opcode >> 20 ) & 0x1f;
-			uint32_t  sub2 = ( opcode >> 16 ) & 0x0f;
-
-			if ( alu != 0 )
-				util::stream_format(stream, "%s, ", ALU(alu) );
-
-			if ( sub2 == 0x00 )
-			{
-				util::stream_format(stream, "CLEAR ");
-
-				switch( opcode & 0x3f )
-				{
-					case 0x04: util::stream_format(stream, "a" ); break;
-					case 0x08: util::stream_format(stream, "b" ); break;
-					case 0x10: util::stream_format(stream, "d" ); break;
-					default: util::stream_format(stream, "UNKNOWN REG(%x)",opcode&0x3F); break;
-				}
-			}
-			else if ( sub2 == 0x02 )
-				util::stream_format(stream, "CLRFLAG 0x%x",opcode&0xffff);
-			else if ( sub2==0x4 )
-			{
-				if ( (opcode & 0xfff) == 0 )
-					util::stream_format(stream, "REP 0x100");
-				else
-					util::stream_format(stream, "REP 0x%x",opcode&0xff);
-			}
-			else if ( sub2 == 0x06 )
-				util::stream_format(stream, "SETFLAG 0x%x",opcode&0xffff);
-		}
-		break;
-
-		case 0x10:
-		{
-			uint32_t  dst=(opcode>>24)&0xf;
-			uint32_t  imm=(opcode)&0xFFFF;
-
-			if ( dst <= 3 )
-				util::stream_format(stream, "LDIMM 0x%x->r%d",imm,dst);
-			else
-				util::stream_format(stream, "LDIMM 0x%x->UNKDST(0x%x)",imm,dst);
-		}
-		break;
-
-		case 0x13:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
-
-			if ( sub == 0 ) util::stream_format(stream, "r12");
-			else if ( sub == 1 ) util::stream_format(stream, "r13");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x14:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
-
-			if ( sub == 0 ) util::stream_format(stream, "a.exp");
-			else if ( sub == 1 ) util::stream_format(stream, "a.e");
-			else if ( sub == 2 ) util::stream_format(stream, "a.m");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x15:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
-
-			if ( sub == 0 ) util::stream_format(stream, "b.exp");
-			else if ( sub == 1 ) util::stream_format(stream, "b.e");
-			else if ( sub == 2 ) util::stream_format(stream, "b.m");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x16:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
-
-			if ( sub == 2 ) util::stream_format(stream, "d.e");
-			else if ( sub == 3 ) util::stream_format(stream, "d.m");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x17:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
-
-			if ( sub == 0x03 ) util::stream_format(stream, "shift");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x18:
-		{
-			uint32_t sub = ( opcode >> 24 ) & 0x03;
-
-			util::stream_format(stream, "LDIMM24 0x%X->",opcode&0xffffff);
-
-			if ( sub == 0x03 ) util::stream_format(stream, "EB");
-			else util::stream_format(stream, "UNKREG(%x)", sub);
-		}
-		break;
-
-		case 0x2f:
-		{
-			uint32_t cond = ( opcode >> 20 ) & 0x1f;
-			uint32_t subtype = ( opcode >> 16 ) & 0x0f;
-			uint32_t data = opcode & 0xffff;
-
-			switch( subtype )
-			{
-				case 0:
-					util::stream_format(stream, "BRIF %s 0x%X", COND(cond), data);
-				break;
-
-				case 2:
-					util::stream_format(stream, "BRIF %s ", COND(cond));
-					if ( data & 0x4000 )
-						util::stream_format(stream, "%s",REGS(data&0x3f,0));
-					else
-						util::stream_format(stream, "RAM(0x%x)",data);
-				break;
-
-				case 4:
-					util::stream_format(stream, "BSIF %s 0x%X", COND(cond), data);
-				break;
-
-				case 0x6:
-					util::stream_format(stream, "BSIF %s ", COND(cond));
-					if ( data & 0x4000 )
-						util::stream_format(stream, "%s",REGS(data&0x3f,0));
-					else
-						util::stream_format(stream, "RAM(0x%x)",data);
-				break;
-
-				case 0xa:
-					util::stream_format(stream, "RTIF %s", COND(cond));
-				break;
-
-				case 0xc:
-					util::stream_format(stream, "LDIF %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
-				break;
-
-				case 0xe:
-					util::stream_format(stream, "RIIF %s", COND(cond));
-				break;
-
-				default:
-					util::stream_format(stream, "UNKG5 (%x cond %x)",subtype,cond);
-				break;
-			}
-		}
-		break;
-
-		case 0x3f:
-		{
-			uint32_t cond = ( opcode >> 20 ) & 0x1f;
-			uint32_t subtype = ( opcode >> 16 ) & 0x0f;
-			uint32_t data = opcode & 0xffff;
-
-			switch( subtype )
-			{
-				case 0:
-					util::stream_format(stream, "BRUL %s 0x%X", COND(cond), data);
-				break;
-
-				case 2:
-					util::stream_format(stream, "BRUL %s ", COND(cond));
-					if ( data & 0x4000 )
-						util::stream_format(stream, "%s",REGS(data&0x3f,0));
-					else
-						util::stream_format(stream, "RAM(0x%x)",data);
-				break;
-
-				case 4:
-					util::stream_format(stream, "BSUL %s 0x%X", COND(cond), data);
-				break;
-
-				case 0x6:
-					util::stream_format(stream, "BSUL %s ", COND(cond));
-					if ( data & 0x4000 )
-						util::stream_format(stream, "%s",REGS(data&0x3f,0));
-					else
-						util::stream_format(stream, "RAM(0x%x)",data);
-				break;
-
-				case 0xa:
-					util::stream_format(stream, "RTUL %s", COND(cond));
-				break;
-
-				case 0xc:
-					util::stream_format(stream, "LDUL %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
-				break;
-
-				case 0xe:
-					util::stream_format(stream, "RIUL %s", COND(cond));
-				break;
-
-				default:
-					util::stream_format(stream, "UNKG5 (%x cond %x)",subtype,cond);
-				break;
-			}
-		}
-		break;
+	switch((opcode >> 26) & 0x3f) {
+	case 0x00: { // Dual move AB
+		uint32_t r1 = opcode & 0x1ff;
+		uint32_t r2 = (opcode >> 9) & 0x1ff;
+		uint32_t alu = (opcode >> 21) & 0x1f;
+		uint32_t op = (opcode >> 18) & 0x7;
+
+		if(alu)
+			util::stream_format(stream, "%s : ", alu0_func(alu) );
+
+		switch(op) {
+		case 3:
+			util::stream_format(stream, "lab %s (e), %s", memory(r1, false), memory(r2, true));
+			break;
+
+		case 4:
+			util::stream_format(stream, "lab %s, %s (e)", memory(r1, false), memory(r2, true));
+			break;
 
 		default:
-			util::stream_format(stream, "UNKOP");
+			util::stream_format(stream, "lab {%d} %s, %s", op, memory(r1, false), memory(r2, true));
+			break;
+		}
+		break;
+	}
+
+	case 0x07: { // LD/MOV
+		uint32_t r1 = opcode & 0x1ff;
+		uint32_t r2 = (opcode >> 9) & 0x1ff;
+		uint32_t alu = (opcode >> 21) & 0x1f;
+		uint32_t op = (opcode >> 18) & 0x7;
+
+		if(alu) {
+			util::stream_format(stream, "%s", alu0_func(alu));
+			if((opcode & 0x001fffff) == 0x1f1e10) {
+				// mov a, -  used as nop
+				break;
+			}
+			stream << " : ";
+		}
+
+		switch(op) {
+		case 0:
+			util::stream_format(stream, "mov %s, %s", memory(r1, false), memory(r2, true));
+			break;
+
+		case 1:
+			util::stream_format(stream, "mov %s, %s (io)", memory(r1, false), memory(r2, true));
+			break;
+
+		case 2:
+			util::stream_format(stream, "mov %s (io), %s", memory(r1, false), memory(r2, true));
+			break;
+
+		case 3:
+			util::stream_format(stream, "mov %s (e), %s", memory(r1, false), memory(r2, true));
+			break;
+
+		case 4:
+			util::stream_format(stream, "mov %s, %s (e)", memory(r1, false), memory(r2, true));
+			break;
+
+		case 5:
+			util::stream_format(stream, "mov %s (o), %s", memory(r1, false), memory(r2, true));
+			break;
+
+		case 7: {
+			switch(r2 >> 6) {
+			case 0:
+				util::stream_format(stream, "mov %s, %s (e)", regs(r2 & 0x3f), memory(r1, true));
+				break;
+
+			case 1:
+				util::stream_format(stream, "mov %s, %s (io)", regs(r2 & 0x3f), memory(r1, true));
+				break;
+
+			case 2:
+				util::stream_format(stream, "mov %s, %s", memory(r1, false), regs(r2 & 0x3f));
+				break;
+
+			case 3:
+				util::stream_format(stream, "mov %s (e), %s", memory(r1, false), regs(r2 & 0x3f));
+				break;
+
+			case 4:
+				util::stream_format(stream, "mov %s (io), %s", memory(r1, false), regs(r2 & 0x3f));
+				break;
+
+			case 5:
+				util::stream_format(stream, "mov %s (o), %s", memory(r1, false), regs(r2 & 0x3f));
+				break;
+
+			case 6:
+				if(r1 >> 6)
+					util::stream_format(stream, "mov {r1 %d} %s, %s", r1 >> 6, regs(r1 & 0x3f), regs(r2 & 0x3f));
+				else
+					util::stream_format(stream, "mov %s, %s", regs(r1 & 0x3f), regs(r2 & 0x3f));
+				break;
+
+			default:
+				util::stream_format(stream, "mov {r2 %d} %s, %s", r2 >> 6, memory(r1, true), regs(r2 & 0x3f));
+				break;
+			}
+			break;
+		}
+		default:
+			util::stream_format(stream, "mov {%d} %s, %s", op, memory(r1, false), memory(r2, true));
+			break;
+		}				
+		break;
+	}
+
+	case 0x0e: { // Load 24 bit val
+		static const char *const inst[4] = { "lipl", "lia", "lib", "lid" };
+		util::stream_format(stream, "%s #0x%x", inst[(opcode >> 24) & 0x3], opcode&0xffffff);
+		break;
+	}
+
+	case 0x0f: { // rep/clr0/clr1/set
+		uint32_t alu = (opcode >> 21) & 0x1f;
+		uint32_t sub2 = (opcode >> 17) & 7;
+
+		if(alu)
+			util::stream_format(stream, "%s : ", alu0_func(alu));
+
+		switch(sub2) {
+		case 0: {
+			static const char *rl2[16] = {
+				"?0", "?1", "a", "b", "d", "?5", "?6", "?7", "?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
+			};
+			util::stream_format(stream, "clr0");
+			bool first = true;
+			for(int i=0; i<16; i++)
+				if(opcode & (1<<i)) {
+					if(first) {
+						first = false;
+						util::stream_format(stream, " %s", rl2[i]);
+					} else
+						util::stream_format(stream, ", %s", rl2[i]);
+				}
+			break;
+		}
+
+		case 1:
+			util::stream_format(stream, "clr1 #0x%04x",opcode & 0xffff);
+			break;
+
+		case 2:
+			if(opcode & 0x8000)
+				util::stream_format(stream, "rep %s", regs(opcode & 0x3f));
+			else if(!(opcode & 0xff))
+				util::stream_format(stream, "rep #0x100");
+			else if((opcode & 0xff) < 10)
+				util::stream_format(stream, "rep #%d", opcode & 0xff);
+			else
+				util::stream_format(stream, "rep #0x%x", opcode & 0xff);
+			break;
+
+		case 3:
+			util::stream_format(stream, "set #0x%04x",opcode & 0xffff);
+			break;
+
+		default:
+			util::stream_format(stream, "unk %02x.%x", opcode >> 26, sub2);
+			break;
+		}
+		break;
+	}
+
+	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
+		util::stream_format(stream, "ldi #0x%x, %s", opcode & 0xffffff, regnames[(opcode >> 24) & 0x3f]); break;
+		break;
+		
+	case 0x2f: case 0x3f: {
+		uint32_t cond = ( opcode >> 20 ) & 0x1f;
+		uint32_t subtype = ( opcode >> 17 ) & 7;
+		uint32_t data = opcode & 0xffff;
+		bool invert = opcode & 0x40000000;
+
+		switch(subtype) {
+		case 0:
+			util::stream_format(stream, "brif %s #0x%x", condition(cond, invert), data);
+			break;
+
+		case 1:
+			util::stream_format(stream, "brul %s ", condition(cond, invert));
+			if(opcode & 0x4000)
+				util::stream_format(stream, "%s", regs(opcode & 0x1f));
+			else
+				util::stream_format(stream, "(%s)", memory(opcode & 0x1ff, false));
+			break;
+
+		case 2:
+			util::stream_format(stream, "bsif %s #0x%x", condition(cond, invert), data);
+			break;
+
+		case 3:
+			util::stream_format(stream, "bsul %s ", condition(cond, invert));
+			if(opcode & 0x4000)
+				util::stream_format(stream, "%s", regs(opcode & 0x1f));
+			else
+				util::stream_format(stream, "(%s)", memory(opcode & 0x1ff, false));
+			break;
+
+		case 5:
+			util::stream_format(stream, "rtif %s", condition(cond, invert));
+			break;
+
+		case 6:
+			util::stream_format(stream, "ldif %s %s, %s", condition(cond, invert), memory(data & 0x1ff, false), regs((data >> 9) & 0x3f));
+			break;
+
+		case 7:
+			util::stream_format(stream, "iret");
+			break;
+
+		default:
+			util::stream_format(stream, "unk %02x.%d", opcode >> 26, subtype);
+			break;
+		}
+		break;
+	}
+
+	default:
+		util::stream_format(stream, "unk %02x", opcode >> 26);
 		break;
 	}
 

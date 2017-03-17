@@ -129,7 +129,7 @@ READ16_MEMBER(pushman_state::mcu_comm_r)
 	switch (offset & 0x03)
 	{
 	case 0: // read and acknowledge MCU reply
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			m_mcu_semaphore = false;
 		return m_mcu_latch;
 	case 2: // expects bit 0 to be high when MCU has accepted command (other bits ignored)

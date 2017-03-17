@@ -34,9 +34,9 @@
     0xC - <Passes> 400000-5fffff comprehensive DRAM data test
     0xB - <Passes?> Unknown test
     0xA - <Passes> dies if 600000-7fffff doesn't mirror 400000-5fffff ?
-    0x8 - <Passes> SRAM test 000000-000FFF (2e3616-2e3654)
-    0x0 - <runs off into weeds> not sure... (2e2fd0... 2db764 is the end of the 'clear ram 41d53f down to 400000' loop...)
-
+    0x8 - <Passes> SRAM test 000000-000FFF (2e3616-2e3664)
+    0x0 - main loop? starts at 2e0002 (2e2fd0... 2db764 is the end of the 'clear ram 41d53f down to 400000' loop...),
+    touches the via and fires an int, but runs off into the weeds
     If one of the self tests fails, the uppermost bit will oscillate (c000 4000 c000 4000 etc) forever
 
 ******************************************************************************/
@@ -251,10 +251,10 @@ READ16_MEMBER(lwriter_state::bankedarea_r)
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !space.debugger_access()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
 		return m_sram_ptr[offset&0x7FF];
 	}
-	if(!space.debugger_access()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
+	if(!machine().side_effect_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
 	return 0xFFFF;
 }
 
@@ -262,16 +262,16 @@ WRITE16_MEMBER(lwriter_state::bankedarea_w)
 {
 	if (m_overlay)
 	{
-		if(!space.debugger_access()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
+		if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay ON) with data %04X to offset %08X IGNORED!\n",data, offset<<1); }
 		return;
 	}
 	else if (offset <= 0x01ffff)
 	{
-		if ((offset > 0x7ff) && !space.debugger_access()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
+		if ((offset > 0x7ff) && !machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X!\n",data, offset<<1); }
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
-	if(!space.debugger_access()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+	if(!machine().side_effect_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */

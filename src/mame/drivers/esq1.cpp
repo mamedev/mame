@@ -229,7 +229,7 @@ private:
 static const device_type ESQ1_FILTERS = device_creator<esq1_filters>;
 
 esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
+	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1_filters", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

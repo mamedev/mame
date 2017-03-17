@@ -369,11 +369,11 @@ private:
 	bool m_slotc3rom;
 	bool m_altzp;
 	bool m_ramrd, m_ramwrt;
-	bool m_lcram, m_lcram2, m_lcwriteenable;
-	int m_last_offset, m_last_access;
+	bool m_lcram, m_lcram2, m_lcprewrite, m_lcwriteenable;
 	bool m_ioudis;
 	bool m_romswitch;
 	bool m_mockingboard4c;
+	bool m_intc8rom;
 
 	bool m_isiic, m_isiicplus;
 	uint8_t m_iicplus_ce00[0x200];
@@ -401,7 +401,7 @@ private:
 	void do_io(address_space &space, int offset, bool is_iic);
 	uint8_t read_floatingbus();
 	void update_slotrom_banks();
-	void lc_update(int offset, int access);
+	void lc_update(int offset, bool writing);
 	uint8_t read_slot_rom(address_space &space, int slotbias, int offset);
 	void write_slot_rom(address_space &space, int slotbias, int offset, uint8_t data);
 	uint8_t read_int_rom(address_space &space, int slotbias, int offset);
@@ -701,10 +701,10 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_exp_addrmask));
 	save_item(NAME(m_lcram));
 	save_item(NAME(m_lcram2));
+	save_item(NAME(m_lcprewrite));
 	save_item(NAME(m_lcwriteenable));
-	save_item(NAME(m_last_offset));
-	save_item(NAME(m_last_access));
 	save_item(NAME(m_mockingboard4c));
+	save_item(NAME(m_intc8rom));
 }
 
 void apple2e_state::machine_reset()
@@ -724,6 +724,7 @@ void apple2e_state::machine_reset()
 	m_xirq = false;
 	m_yirq = false;
 	m_mockingboard4c = false;
+	m_intc8rom = false;
 
 	// IIe prefers INTCXROM default to off, IIc has it always on
 	if (m_rom_ptr[0x3bc0] == 0x00)
@@ -757,9 +758,8 @@ void apple2e_state::machine_reset()
 	// LC default state: read ROM, write enabled, Dxxx bank 2
 	m_lcram = false;
 	m_lcram2 = true;
+	m_lcprewrite = false;
 	m_lcwriteenable = true;
-	m_last_offset = -1;
-	m_last_access = 0;
 
 	m_exp_bankhior = 0xf0;
 
@@ -975,8 +975,8 @@ void apple2e_state::update_slotrom_banks()
 	m_c100bank->set_bank(cxswitch);
 	m_c400bank->set_bank(cxswitch);
 
-//  printf("intcxrom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_cnxx_slot, m_isiic, m_romswitch);
-	if ((m_intcxrom) || (m_cnxx_slot < 0) || (m_isiic))
+	//printf("intcxrom %d intc8rom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_intc8rom, m_cnxx_slot, m_isiic, m_romswitch);
+	if ((m_intcxrom) || (m_intc8rom) || (m_isiic))
 	{
 		if (m_romswitch)
 		{
@@ -992,7 +992,7 @@ void apple2e_state::update_slotrom_banks()
 		m_c800bank->set_bank(0);
 	}
 
-	if ((!m_slotc3rom) || (m_isiic))
+	if ((m_intcxrom) || (!m_slotc3rom) || (m_isiic))
 	{
 		if (m_romswitch)
 		{
@@ -1009,40 +1009,53 @@ void apple2e_state::update_slotrom_banks()
 	}
 }
 
-void apple2e_state::lc_update(int offset, int access)
+void apple2e_state::lc_update(int offset, bool writing)
 {
 	bool old_lcram = m_lcram;
 
-	m_lcram = false;
-	m_lcwriteenable = false;
+	//any even access disables pre-write and writing
+	if ((offset & 1) == 0)
+	{
+		m_lcprewrite = false;
+		m_lcwriteenable = false;
+	}
+
+	//any write disables pre-write
+	//has no effect on write-enable if writing was enabled already
+	if (writing == true)
+	{
+		m_lcprewrite = false;
+	}
+	//first odd read enables pre-write, second one enables writing
+	else if ((offset & 1) == 1)
+	{
+		if (m_lcprewrite == false)
+		{
+			m_lcprewrite = true;
+		}
+		else
+		{
+			m_lcwriteenable = true;
+		}
+	}
 
 	switch (offset & 3)
 	{
 		case 0:
+		case 3:
 		{
 			m_lcram = true;
 			break;
 		}
 
-		case 3:
-		{
-			m_lcram = true;
-		} //fall through
-
 		case 1:
+		case 2:
 		{
-			//if accessed twice, then write-enable
-			if (((m_last_offset & 1) == 1) && (access == m_last_access))
-			{
-				m_lcwriteenable = true;
-			}
-
+			m_lcram = false;
 			break;
 		}
 	}
 
-	m_last_offset = offset;
-	m_last_access = access;
 	m_lcram2 = false;
 
 	if (!(offset & 8))
@@ -1081,7 +1094,7 @@ void apple2e_state::lc_update(int offset, int access)
 // most softswitches don't care about read vs write, so handle them here
 void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	// Handle C058-C05F according to IOUDIS
 	if ((offset & 0x58) == 0x58)
@@ -1282,7 +1295,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 
 READ8_MEMBER(apple2e_state::c000_r)
 {
-	if(space.debugger_access()) return read_floatingbus();
+	if(machine().side_effect_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1393,7 +1406,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 WRITE8_MEMBER(apple2e_state::c000_w)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	switch (offset)
 	{
@@ -1511,7 +1524,7 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 
 READ8_MEMBER(apple2e_state::c000_iic_r)
 {
-	if(space.debugger_access()) return read_floatingbus();
+	if(machine().side_effect_disabled()) return read_floatingbus();
 
 	switch (offset)
 	{
@@ -1655,7 +1668,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 WRITE8_MEMBER(apple2e_state::c000_iic_w)
 {
-	if(space.debugger_access()) return;
+	if(machine().side_effect_disabled()) return;
 
 	switch (offset)
 	{
@@ -1853,7 +1866,7 @@ void apple2e_state::update_iic_mouse()
 
 READ8_MEMBER(apple2e_state::c080_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		int slot;
 
@@ -1862,7 +1875,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 
 		if (slot == 0)
 		{
-			lc_update(offset & 0xf, 0);
+			lc_update(offset & 0xf, false);
 		}
 		else
 		{
@@ -1885,7 +1898,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 
 	if (slot == 0)
 	{
-		lc_update(offset & 0xf, 1);
+		lc_update(offset & 0xf, true);
 	}
 	else
 	{
@@ -1902,7 +1915,7 @@ uint8_t apple2e_state::read_slot_rom(address_space &space, int slotbias, int off
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -1920,7 +1933,7 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -1932,12 +1945,13 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 
 uint8_t apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
 {
-	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!space.debugger_access()))
+#if 0
+	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!machine().side_effect_disabled()))
 	{
 		m_cnxx_slot = CNXX_INTROM;
 		update_slotrom_banks();
 	}
-
+#endif
 	return m_rom_ptr[slotbias + offset];
 }
 
@@ -1946,9 +1960,37 @@ READ8_MEMBER(apple2e_state::c100_int_r)  { return read_int_rom(space, 0x100, off
 READ8_MEMBER(apple2e_state::c100_int_bank_r)  { return read_int_rom(space, 0x4100, offset); }
 WRITE8_MEMBER(apple2e_state::c100_w) { write_slot_rom(space, 1, offset, data); }
 READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(space, 3, offset); }
-READ8_MEMBER(apple2e_state::c300_int_r)  { return read_int_rom(space, 0x300, offset); }
-READ8_MEMBER(apple2e_state::c300_int_bank_r)  { return read_int_rom(space, 0x4300, offset); }
-WRITE8_MEMBER(apple2e_state::c300_w) { write_slot_rom(space, 3, offset, data); }
+
+READ8_MEMBER(apple2e_state::c300_int_r)  
+{ 
+	if (!m_slotc3rom)
+	{
+		m_intc8rom = true;
+		update_slotrom_banks();
+	}
+	return read_int_rom(space, 0x300, offset); 
+}
+
+READ8_MEMBER(apple2e_state::c300_int_bank_r)  
+{ 
+	if (!m_slotc3rom)
+	{
+		m_intc8rom = true;
+		update_slotrom_banks();
+	}
+	return read_int_rom(space, 0x4300, offset); 
+}
+
+WRITE8_MEMBER(apple2e_state::c300_w) 
+{ 	
+	if (!m_slotc3rom)
+	{
+		m_intc8rom = true;
+		update_slotrom_banks();
+	}
+
+	write_slot_rom(space, 3, offset, data); 
+}
 READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(space, 4, offset); }
 READ8_MEMBER(apple2e_state::c400_int_r)
 {
@@ -1989,7 +2031,7 @@ READ8_MEMBER(apple2e_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
 			update_slotrom_banks();
@@ -2013,9 +2055,10 @@ READ8_MEMBER(apple2e_state::c800_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if ((offset == 0x7ff) && !space.debugger_access())
+	if ((offset == 0x7ff) && !machine().side_effect_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
 		update_slotrom_banks();
 	}
 
@@ -2029,9 +2072,10 @@ READ8_MEMBER(apple2e_state::c800_b2_int_r)
 		return m_iicplus_ce00[offset-0x600];
 	}
 
-	if ((offset == 0x7ff) && !space.debugger_access())
+	if ((offset == 0x7ff) && !machine().side_effect_disabled())
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
 		update_slotrom_banks();
 	}
 
@@ -2048,9 +2092,10 @@ WRITE8_MEMBER(apple2e_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = CNXX_UNCLAIMED;
+			m_intc8rom = false;
 			update_slotrom_banks();
 		}
 

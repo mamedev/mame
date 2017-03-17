@@ -184,7 +184,7 @@ READ8_MEMBER(mm58167_device::read)
 {
 //  printf("read reg %x = %02x\n", offset, m_regs[offset]);
 
-	if (offset == R_CTL_IRQSTATUS && !space.debugger_access())
+	if (offset == R_CTL_IRQSTATUS && !machine().side_effect_disabled())
 	{
 		// reading the IRQ status clears IRQ line and IRQ status
 		uint8_t data = m_regs[offset];

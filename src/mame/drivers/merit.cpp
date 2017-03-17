@@ -464,8 +464,8 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("aysnd", ay8912_device, address_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -485,8 +485,8 @@ static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
+	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -506,8 +506,8 @@ static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -1388,7 +1388,7 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
+	MCFG_SOUND_ADD("aysnd", AY8912, CRTC_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(merit_state, led2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END

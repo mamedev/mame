@@ -181,6 +181,8 @@ private:
 		uint16_t si;
 		uint16_t so;
 		uint16_t idb;
+		bool siack;         // Serial in ACK
+		bool soack;         // Serial out ACK
 	} regs;
 
 	void exec_op(uint32_t opcode);
@@ -255,7 +257,9 @@ enum
 	UPD7725_TRB,
 	UPD7725_SI,
 	UPD7725_SO,
-	UPD7725_IDB
+	UPD7725_IDB,
+	UPD7725_SIACK,
+	UPD7725_SOACK
 };
 
 #endif /* __UPD7725_H__ */

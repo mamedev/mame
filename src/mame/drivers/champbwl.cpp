@@ -187,8 +187,8 @@ public:
 	DECLARE_PALETTE_INIT(champbwl);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_champbwl(screen_device &screen, bool state);
-	void screen_eof_doraemon(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -483,7 +483,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 {
 	// rising edge
 	if (state)
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -543,7 +543,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 {
 	// rising edge
 	if (state)
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)

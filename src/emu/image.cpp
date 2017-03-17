@@ -38,7 +38,7 @@ image_manager::image_manager(running_machine &machine)
 			continue;
 
 		// is an image specified for this image
-		const char *image_name_ptr = machine.options().value(image.instance_name());
+		const char *image_name_ptr = machine.options().value(image.instance_name().c_str());
 		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
 		{
 			image_init_result result = image_init_result::FAIL;
@@ -107,7 +107,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name()))
+					if (!strcmp(dev_instance, image.instance_name().c_str()))
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -131,7 +131,7 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 	{
 		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		{
-			const char *const dev_instance = image.instance_name();
+			const char *const dev_instance = image.instance_name().c_str();
 
 			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
@@ -188,7 +188,7 @@ void image_manager::options_extract()
 
 			/* and set the option */
 			std::string error;
-			machine().options().set_value(image.instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
+			machine().options().set_value(image.instance_name().c_str(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
 
 			index++;
 		}

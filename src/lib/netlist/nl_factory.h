@@ -82,7 +82,7 @@ namespace factory {
 	class list_t : public std::vector<std::unique_ptr<element_t>>
 	{
 	public:
-		list_t(setup_t &m_setup);
+		explicit list_t(setup_t &m_setup);
 		~list_t();
 
 		template<class device_class>

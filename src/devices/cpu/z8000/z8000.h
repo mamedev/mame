@@ -667,7 +667,7 @@ protected:
 	virtual uint32_t read_irq_vector() override;
 
 private:
-	void z8k_disass_mode(int ref, int params, const char *param[]);
+	void z8k_disass_mode(int ref, const std::vector<std::string> &params);
 };
 
 

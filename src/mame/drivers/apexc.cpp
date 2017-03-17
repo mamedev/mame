@@ -91,7 +91,6 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 private:
 	int m_writable;
@@ -215,7 +214,6 @@ public:
 	virtual const char *file_extensions() const override { return "tap"; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
@@ -247,7 +245,6 @@ public:
 	virtual const char *file_extensions() const override { return "tap"; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 

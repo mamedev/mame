@@ -553,7 +553,7 @@ uint16_t *fd1094_decryption_cache::decrypted_opcodes(uint8_t state)
 
 
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, tag, owner, clock, "fd1094", __FILE__)
+	: m68000_device(mconfig, FD1094, "FD1094", tag, owner, clock, "fd1094", __FILE__)
 	, m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes")
 	, m_state(0x00)
 	, m_irqmode(false)

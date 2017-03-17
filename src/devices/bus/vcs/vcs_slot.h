@@ -60,9 +60,6 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_bank) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
 
-	// direct update handler
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) { return address; }
-
 	virtual void setup_addon_ptr(uint8_t *ptr) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -93,7 +90,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -120,7 +116,6 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_bank);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
 
 private:
 	device_vcs_cart_interface*       m_cart;

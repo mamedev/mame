@@ -72,7 +72,7 @@ tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag,
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 

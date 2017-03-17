@@ -191,32 +191,14 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 	m_variant(variant),
-	m_wr0_ptrbits(0){
+	m_wr0_ptrbits(0)
+{
 	for (auto & elem : m_int_state)
 		elem = 0;
 }
 
 z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80SCC, "Z80 SCC", tag, owner, clock, "z80scc", __FILE__),
-		device_z80daisy_interface(mconfig, *this),
-		m_chanA(*this, CHANA_TAG),
-		m_chanB(*this, CHANB_TAG),
-		m_out_txda_cb(*this),
-		m_out_dtra_cb(*this),
-		m_out_rtsa_cb(*this),
-		m_out_wrdya_cb(*this),
-		m_out_synca_cb(*this),
-		m_out_txdb_cb(*this),
-		m_out_dtrb_cb(*this),
-		m_out_rtsb_cb(*this),
-		m_out_wrdyb_cb(*this),
-		m_out_syncb_cb(*this),
-		m_out_int_cb(*this),
-		m_out_rxdrqa_cb(*this),
-		m_out_txdrqa_cb(*this),
-		m_out_rxdrqb_cb(*this),
-		m_out_txdrqb_cb(*this),
-		m_variant(TYPE_Z80SCC)
+	: z80scc_device(mconfig, Z80SCC, "Z80 SCC", tag, owner, clock, TYPE_Z80SCC, "z80scc", __FILE__)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -226,7 +208,7 @@ scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, d
 	: z80scc_device(mconfig, SCC8030, "SCC 8030", tag, owner, clock, TYPE_SCC8030, "scc8030", __FILE__){ }
 
 scc80C30_device::scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC80C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80C30", __FILE__){ }
+	: z80scc_device(mconfig, SCC80C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80c30", __FILE__){ }
 
 scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC80230, "SCC 80230", tag, owner, clock, TYPE_SCC80230, "scc80230", __FILE__){ }
@@ -235,7 +217,7 @@ scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, d
 	: z80scc_device(mconfig, SCC8530N, "SCC 8530", tag, owner, clock, TYPE_SCC8530, "scc8530", __FILE__){ }
 
 scc85C30_device::scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC85C30, "SCC 85C30", tag, owner, clock, TYPE_SCC85C30, "scc85C30", __FILE__){ }
+	: z80scc_device(mconfig, SCC85C30, "SCC 85C30", tag, owner, clock, TYPE_SCC85C30, "scc85c30", __FILE__){ }
 
 scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80scc_device(mconfig, SCC85230, "SCC 85230", tag, owner, clock, TYPE_SCC85230, "scc85230", __FILE__){ }
@@ -244,7 +226,7 @@ scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag,
 	: z80scc_device(mconfig, SCC85233, "SCC 85233", tag, owner, clock, TYPE_SCC85233, "scc85233", __FILE__){ }
 
 scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC8523L, "SCC 8523L", tag, owner, clock, TYPE_SCC8523L, "scc8523L", __FILE__){ }
+	: z80scc_device(mconfig, SCC8523L, "SCC 8523L", tag, owner, clock, TYPE_SCC8523L, "scc8523l", __FILE__){ }
 
 //-------------------------------------------------
 //  device_start - device-specific startup

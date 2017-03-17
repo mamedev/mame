@@ -92,18 +92,6 @@ void iq151cart_slot_device::device_start()
 
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void iq151cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 /*-------------------------------------------------
     read

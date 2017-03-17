@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)

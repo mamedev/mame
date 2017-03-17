@@ -127,6 +127,7 @@ READ8_MEMBER(dpc_device::read)
 		{
 			case 0x00:      // Random number generator
 			case 0x02:
+				m_shift_reg = (m_shift_reg << 1) | (~(((m_shift_reg >> 7) ^ (m_shift_reg >> 5)) ^ ((m_shift_reg >> 4) ^ (m_shift_reg >> 3))) & 1);
 				return m_shift_reg;
 			case 0x04:      // Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add
 				m_latch_62 = m_latch_64;
@@ -290,17 +291,4 @@ WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
 		m_dpc->write(space, offset, data);
 	else
 		a26_rom_f8_device::write_bank(space, offset, data);
-}
-
-DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
-{
-	if (!direct.space().debugger_access())
-	{
-		uint8_t new_bit;
-		new_bit = (m_dpc->m_shift_reg & 0x80) ^ ((m_dpc->m_shift_reg & 0x20) << 2);
-		new_bit = new_bit ^ (((m_dpc->m_shift_reg & 0x10) << 3) ^ ((m_dpc->m_shift_reg & 0x08) << 4));
-		new_bit = new_bit ^ 0x80;
-		m_dpc->m_shift_reg = new_bit | (m_dpc->m_shift_reg >> 1);
-	}
-	return address;
 }
