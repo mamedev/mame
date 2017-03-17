@@ -69,7 +69,6 @@ Notes:
     - MyAB TKN80 80-column card
     - GeJo 80-column card
     - Mikrodatorn 64K expansion
-    - floppy
     - Metric ABC CAD 1000
 
 */
@@ -152,12 +151,19 @@ WRITE8_MEMBER( abc80_state::write )
 //**************************************************************************
 
 //-------------------------------------------------
-//  vco_voltage_w - CSG VCO voltage select
+//  csg_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc80_state::vco_voltage_w )
+WRITE8_MEMBER( abc80_state::csg_w )
 {
-	m_psg->vco_voltage_w(state ? 2.5 : 0);
+	m_csg->enable_w(!BIT(data, 0));
+	m_csg->vco_voltage_w(BIT(data, 1) ? 2.5 : 0);
+	m_csg->vco_w(BIT(data, 2));
+	m_csg->mixer_b_w(BIT(data, 3));
+	m_csg->mixer_a_w(BIT(data, 4));
+	m_csg->mixer_c_w(BIT(data, 5));
+	m_csg->envelope_2_w(BIT(data, 6));
+	m_csg->envelope_1_w(BIT(data, 7));
 }
 
 
@@ -189,7 +195,7 @@ static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c2_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c3_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c4_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
+	AM_RANGE(0x06, 0x06) AM_WRITE(csg_w)
 	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
@@ -224,16 +230,6 @@ static INPUT_PORTS_START( abc80 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("SN76477")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, enable_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, abc80_state, vco_voltage_w)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, vco_w)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, mixer_b_w)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, mixer_a_w)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, mixer_c_w)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, envelope_2_w)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(SN76477_TAG, sn76477_device, envelope_1_w)
 INPUT_PORTS_END
 
 
@@ -536,7 +532,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(2.2))   // attack_decay_cap + attack_res: C50 10u/35V - R21 2.2k
 	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res: R19 33k
 	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res: R18 10k
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(10), RES_K(100))   // VCO volt + cap + res: 0V or 2.5V - C48 10n - R20 100k
+	MCFG_SN76477_VCO_PARAMS(0, CAP_N(10), RES_K(100))   // VCO volt + cap + res: 0V/2.5V (voltage divider R17 1k / R16 1k) - C48 10n - R20 100k
 	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage: N/C
 	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(220))       // slf caps + res: C51 1u/35V - R22 220k
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k

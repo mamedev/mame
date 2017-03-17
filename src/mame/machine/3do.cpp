@@ -657,7 +657,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 			offset != 0x118/4 && offset != 0x11c/4)
@@ -775,7 +775,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 		break;
 	}

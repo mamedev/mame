@@ -56,7 +56,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) override;
 
 protected:
 	int m_base_bank;

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
-// **************************
-// Driver for HP 9845B system
-// **************************
+// *******************************
+// Driver for HP 9845B/C/T systems
+// *******************************
 #ifndef _HP9845_H_
 #define _HP9845_H_
 
@@ -11,37 +11,32 @@
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "screen.h"
+#include "machine/ram.h"
 
-class hp9845b_state : public driver_device
+class hp9845_base_state : public driver_device
 {
 public:
-	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	hp9845_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_reset() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
 
-	void vblank_w(screen_device &screen, bool state);
-
-	void set_graphic_mode(bool graphic);
-	DECLARE_READ16_MEMBER(graphic_r);
-	DECLARE_WRITE16_MEMBER(graphic_w);
+	virtual DECLARE_READ16_MEMBER(graphic_r) = 0;
+	virtual DECLARE_WRITE16_MEMBER(graphic_w) = 0;
 	attotime time_to_gv_mem_availability(void) const;
-	void advance_gv_fsm(bool ds , bool trigger);
-	void update_graphic_bits(void);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq(void);
+	DECLARE_WRITE8_MEMBER(irq_w);
 	void irq_w(uint8_t sc , int state);
 	void update_flg_sts(void);
+	DECLARE_WRITE8_MEMBER(sts_w);
 	void sts_w(uint8_t sc , int state);
+	DECLARE_WRITE8_MEMBER(flg_w);
 	void flg_w(uint8_t sc , int state);
-	void install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 	DECLARE_READ16_MEMBER(kb_scancode_r);
@@ -55,7 +50,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
-private:
+protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
 	required_device<screen_device> m_screen;
@@ -69,17 +64,20 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
 	required_device<hp9845_io_slot_device> m_io_slot0;
+	required_device<hp9845_io_slot_device> m_io_slot1;
+	required_device<hp9845_io_slot_device> m_io_slot2;
+	required_device<hp9845_io_slot_device> m_io_slot3;
+	required_device<ram_device> m_ram;
 
-	void set_video_mar(uint16_t mar);
-	void video_fill_buff(bool buff_idx);
-	void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
-	void graphic_video_render(unsigned video_scanline);
+	void setup_ram_block(unsigned block , unsigned offset);
+
+	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
 
 	// Character generator
-	const uint8_t *m_chargen;
+	required_region_ptr<uint8_t> m_chargen;
 
 	// Optional character generator
-	const uint8_t *m_optional_chargen;
+	required_region_ptr<uint8_t> m_optional_chargen;
 
 	// Text mode video I/F
 	typedef struct {
@@ -94,7 +92,6 @@ private:
 	bool m_video_load_mar;
 	bool m_video_first_mar;
 	bool m_video_byte_idx;
-	uint8_t m_video_attr;
 	bool m_video_buff_idx;
 	bool m_video_blanked;
 	video_buffer_t m_video_buff[ 2 ];
@@ -120,12 +117,10 @@ private:
 	uint16_t m_gv_data_w;     // U29, U45, U28 & U44 (GC)
 	uint16_t m_gv_data_r;     // U59 & U60 (GC)
 	uint16_t m_gv_io_counter; // U1, U2, U14 & U15 (GC)
-	uint16_t m_gv_cursor_w;   // U38 & U39 (GS)
 	uint16_t m_gv_cursor_x;   // U31 & U23 (GS)
 	uint16_t m_gv_cursor_y;   // U15 & U8 (GS)
 	bool m_gv_cursor_gc;    // U8 (GS)
 	bool m_gv_cursor_fs;    // U8 (GS)
-	std::vector<uint16_t> m_graphic_mem;
 
 	// Interrupt handling
 	uint8_t m_irl_pending;

@@ -57,7 +57,7 @@ public:
 	DECLARE_PALETTE_INIT(photon2);
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_spectrum(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
 };
@@ -137,7 +137,7 @@ static inline unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
 {
 	// rising edge
 	if (state)
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_DRIVER(photon2_state, screen_eof_spectrum)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(photon2_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)

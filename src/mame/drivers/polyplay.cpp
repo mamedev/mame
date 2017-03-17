@@ -18,10 +18,7 @@
 
 
 TODO:
-  - check PIO PortB wiring in real machines
-  - write some own code for the ZRE-PP to find the SIO in address space and then do something cool with it :)
   - get other rom versions and games
-  - document the light-organ related stuff
 
 
 NOTES:
@@ -87,7 +84,7 @@ i/o ports:
   - Revision 2 -
   80 - 83 ZRE-PP UB857D  (Z80 CTC)
   84 - 87 ZRE-PP UB855D  (Z80 PIO)
-  ?? - ?? ZRE-PP UB8560D (Z80 SIO)
+  88 - 8B ZRE-PP UB8560D (Z80 SIO)
 
   read:
   83        CTC COUNT 3 (IN1)
@@ -125,9 +122,7 @@ I currently haven't figured out how the I/O port handling for the book-
 mark system works.
 
 Uniquely the Poly-Play has a light organ which totally confuses you whilst
-playing the automaton. Bits 1-5 of PORTB control the organ but it's not
-emulated now. ;) (An external artwork file could be created that simulates
-this.)
+playing the automaton. Bits 0-2 of PORTB control the organ.
 
 ***************************************************************************/
 
@@ -268,7 +263,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( polyplay_io_zrepp, AS_IO, 8, polyplay_state )
 	AM_IMPORT_FROM(polyplay_io_zre)
-	// TODO: add SIO ports here
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( polyplay )

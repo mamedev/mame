@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 	MCFG_SCREEN_SIZE(512, 524)
 	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
 	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(tank8_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tank8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)

@@ -25,6 +25,7 @@
 
 const device_type A2BUS_DISKII = device_creator<a2bus_diskii_device>;
 const device_type A2BUS_IWM_FDC = device_creator<a2bus_iwmflop_device>;
+const device_type A2BUS_AGAT7_FDC = device_creator<a2bus_agat7flop_device>;
 
 #define DISKII_ROM_REGION  "diskii_rom"
 #define FDC_TAG            "diskii_fdc"
@@ -61,6 +62,11 @@ ROM_START( diskii )
 	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
 ROM_END
 
+ROM_START( agat7 )
+	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "shugart7.rom", 0x0000, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34) )
+ROM_END
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -85,6 +91,11 @@ const tiny_rom_entry *a2bus_floppy_device::device_rom_region() const
 	return ROM_NAME( diskii );
 }
 
+const tiny_rom_entry *a2bus_agat7flop_device::device_rom_region() const
+{
+	return ROM_NAME( agat7 );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -103,6 +114,11 @@ a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const ch
 
 a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2iwm_flop", __FILE__)
+{
+}
+
+a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_floppy_device(mconfig, A2BUS_AGAT7_FDC, "Agat-7 140K floppy card", tag, owner, clock, "agat7_flop", __FILE__)
 {
 }
 

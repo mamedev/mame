@@ -642,24 +642,24 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-void z8001_device::z8k_disass_mode(int ref, int params, const char *param[])
+void z8001_device::z8k_disass_mode(int ref, const std::vector<std::string> &params)
 {
 	size_t len;
-	if (params == 1)
+	if (params.size() == 1)
 	{
-		len = strlen(param[0]);
-		if (!core_strnicmp(param[0], "segmented", len) || !core_stricmp(param[0], "z8001")) {
+		len = params[0].length();
+		if (!core_strnicmp(params[0].c_str(), "segmented", len) || !core_stricmp(params[0].c_str(), "z8001")) {
 			z8k_segm = true;
 			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
 			machine().debugger().console().printf("Disassembler mode set to Z8001/segmented\n");
 		}
-		else if (!core_strnicmp(param[0], "non-segmented", len) || !core_stricmp(param[0], "z8002"))
+		else if (!core_strnicmp(params[0].c_str(), "non-segmented", len) || !core_stricmp(params[0].c_str(), "z8002"))
 		{
 			z8k_segm = false;
 			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
 			machine().debugger().console().printf("Disassembler mode set to Z8002/non-segmented\n");
 		}
-		else if (!core_strnicmp(param[0], "automatic", len))
+		else if (!core_strnicmp(params[0].c_str(), "automatic", len))
 		{
 			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
 			machine().debugger().console().printf("Disassembler mode set to automatic\n");
@@ -667,7 +667,7 @@ void z8001_device::z8k_disass_mode(int ref, int params, const char *param[])
 		else
 			goto usage;
 	}
-	else if (params > 1)
+	else if (params.size() > 1)
 	{
 	usage:
 		machine().debugger().console().printf("Usage: z8k_disass_mode <mode>\n");
@@ -706,7 +706,7 @@ void z8001_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, std::bind(&z8001_device::z8k_disass_mode, this, _1, _2, _3));
+		machine().debugger().console().register_command("z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, std::bind(&z8001_device::z8k_disass_mode, this, _1, _2));
 	}
 
 	z8k_segm = true;

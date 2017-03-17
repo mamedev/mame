@@ -2524,6 +2524,11 @@ m68000_device::m68000_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+m68000_device::m68000_device(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: m68000_base_device(mconfig, name, tag, owner, clock, type, 16,24, shortname, source)
+{
+}
+
 void m68000_device::device_start()
 {
 	init_cpu_m68000();
@@ -2569,7 +2574,7 @@ void m68008_device::device_start()
 
 
 m68008plcc_device::m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, "M68008PLCC", tag, owner, clock, M68008, 8,22, "m68008plcc", __FILE__)
+	: m68000_base_device(mconfig, "M68008PLCC", tag, owner, clock, M68008PLCC, 8,22, "m68008plcc", __FILE__)
 {
 }
 
@@ -2604,7 +2609,7 @@ void m68020_device::device_start()
 
 
 m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020, 32,32, "m68020fpu", __FILE__)
+	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020FPU, 32,32, "m68020fpu", __FILE__)
 {
 }
 

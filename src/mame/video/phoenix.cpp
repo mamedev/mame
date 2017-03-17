@@ -2,7 +2,7 @@
 // copyright-holders:Richard Davies
 /***************************************************************************
 
-  video.c
+  phoenix.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -273,7 +273,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 
 	/* the palette table is at $0420-$042f and is set by $06bc.
 	   Four palette changes by level.  The palette selection is
-	   wrong, but the same paletter is used for both layers. */
+	   wrong, but the same palette is used for both layers. */
 
 	if (m_palette_bank != ((data >> 1) & 3))
 	{

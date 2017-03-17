@@ -360,7 +360,7 @@ READ8_MEMBER(a26_rom_f4_device::read_rom)
 	}
 
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset)
 		{
@@ -426,7 +426,7 @@ READ8_MEMBER(a26_rom_f6_device::read_rom)
 	}
 
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset)
 		{
@@ -465,16 +465,6 @@ WRITE8_MEMBER(a26_rom_f6_device::write_bank)
 	}
 }
 
-DIRECT_UPDATE_MEMBER(a26_rom_f6_device::cart_opbase)
-{
-	if ((address & 0x1fff) >= 0x1ff6 && (address & 0x1fff) <= 0x1ff9)
-	{
-		if (!direct.space().debugger_access())
-			write_bank(direct.space(), (address & 0x1fff) - 0x1ff6, 0);
-	}
-	return address;
-}
-
 /*-------------------------------------------------
  "F8 Bankswitch" Carts:
  read/write access to 0x1ff8-0x1ff9 determines the
@@ -494,7 +484,7 @@ READ8_MEMBER(a26_rom_f8_device::read_rom)
 	}
 
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset)
 		{
@@ -550,7 +540,7 @@ READ8_MEMBER(a26_rom_fa_device::read_rom)
 	}
 
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset)
 		{
@@ -618,7 +608,7 @@ READ8_MEMBER(a26_rom_fe_device::read_rom)
 
 	data = m_rom[offset + (m_base_bank * 0x1000)];
 
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (m_trigger_on_next_access)
 		{
@@ -643,7 +633,7 @@ READ8_MEMBER(a26_rom_fe_device::read_bank)
 {
 	uint8_t data = space.read_byte(0xfe + offset);
 
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset & 1)
 		{
@@ -667,7 +657,7 @@ READ8_MEMBER(a26_rom_fe_device::read_bank)
 WRITE8_MEMBER(a26_rom_fe_device::write_bank)
 {
 	space.write_byte(0xfe, data);
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		// The next byte on the data bus determines which bank to switch to
 		m_trigger_on_next_access = 1;
@@ -753,7 +743,7 @@ WRITE8_MEMBER(a26_rom_3f_device::write_bank)
 READ8_MEMBER(a26_rom_e0_device::read_rom)
 {
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (offset >= 0xfe0 && offset <= 0xff8)
 			m_base_banks[(offset >> 3) & 3] = offset & 7;
@@ -792,7 +782,7 @@ WRITE8_MEMBER(a26_rom_e0_device::write_bank)
 READ8_MEMBER(a26_rom_e7_device::read_rom)
 {
 	// update banks
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (offset >= 0xfe0 && offset <= 0xfe7)
 			m_base_bank = offset - 0xfe0;
@@ -858,7 +848,7 @@ READ8_MEMBER(a26_rom_ua_device::read_rom)
 
 READ8_MEMBER(a26_rom_ua_device::read_bank)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_base_bank = offset >> 6;
 
 	return 0;
@@ -913,7 +903,7 @@ WRITE8_MEMBER(a26_rom_cv_device::write_bank)
 
 READ8_MEMBER(a26_rom_dc_device::read_rom)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (offset == 0xff0)
 			m_base_bank = (m_base_bank + 1) & 0x0f;
@@ -943,7 +933,7 @@ WRITE8_MEMBER(a26_rom_dc_device::write_bank)
 
 READ8_MEMBER(a26_rom_fv_device::read_rom)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (offset == 0xfd0)
 		{
@@ -1027,7 +1017,7 @@ READ8_MEMBER(a26_rom_4in1_device::read_rom)
 
 READ8_MEMBER(a26_rom_8in1_device::read_rom)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		switch (offset)
 		{

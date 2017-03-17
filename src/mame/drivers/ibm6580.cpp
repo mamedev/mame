@@ -93,6 +93,7 @@ Displaywriter System Manual S544-2023-0 (?) -- mentioned in US patents 4648071 a
 #include "machine/pit8253.h"
 #include "machine/ibm6580_kbd.h"
 //nclude "machine/ibm6580_fdc.h"
+#include "machine/ram.h"
 #include "machine/upd765.h"
 
 #include "screen.h"
@@ -134,6 +135,7 @@ public:
 	ibm6580_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
+		, m_ram(*this, RAM_TAG)
 		, m_maincpu(*this, "maincpu")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
@@ -157,7 +159,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(video_r);
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	DECLARE_READ8_MEMBER(ppi_a_r);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -200,6 +202,7 @@ private:
 	bool floppy_mcu_cr_full();
 
 	required_shared_ptr<uint16_t> m_p_videoram;
+	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -316,7 +319,7 @@ READ8_MEMBER(ibm6580_state::video_r)
 	return data;
 }
 
-void ibm6580_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 {
 //  if (state)
 //      m_pic8259->ir6_w(state);
@@ -472,11 +475,6 @@ WRITE_LINE_MEMBER(ibm6580_state::floppy_intrq)
 	m_floppy_intrq = state;
 	if (state)
 		m_floppy_idle = true;
-}
-
-WRITE_LINE_MEMBER(ibm6580_state::floppy_hdl)
-{
-	m_floppy_hdl = !state;
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
@@ -648,6 +646,7 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 
 	case 5: // 815a
 		data = m_fdc->fifo_r(space, offset);
+		break;
 
 	case 6: // 815c
 		if (!m_floppy_mcu_sr.empty())
@@ -680,7 +679,6 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 
 static ADDRESS_MAP_START(ibm6580_mem, AS_PROGRAM, 16, ibm6580_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM   // system RAM
 	AM_RANGE(0x90000, 0x90001) AM_WRITE(unk_latch_w)
 	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")  // 66-line vram starts at 0xec000
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
@@ -688,10 +686,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
 	ADDRESS_MAP_UNMAP_HIGH
-//
-//  AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE8("upd8251", i8251_device, data_r, data_w)
-//  AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE8("upd8251", i8251_device, status_r, control_w)
-//
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE (pic_latch_w)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
@@ -699,8 +693,10 @@ static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
 	AM_RANGE(0x0040, 0x005f) AM_READWRITE8(p40_r, p40_w, 0x00ff)
 	AM_RANGE(0x0070, 0x007f) AM_UNMAP
 	AM_RANGE(0x0120, 0x0127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x0140, 0x014f) AM_UNMAP
-	AM_RANGE(0x0160, 0x016f) AM_UNMAP
+	AM_RANGE(0x0140, 0x0141) AM_DEVREADWRITE8("upd8251a", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x0142, 0x0143) AM_DEVREADWRITE8("upd8251a", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x0160, 0x0161) AM_DEVREADWRITE8("upd8251b", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x0162, 0x0163) AM_DEVREADWRITE8("upd8251b", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x4000, 0x400f) AM_UNMAP
 	AM_RANGE(0x5000, 0x500f) AM_UNMAP
 	AM_RANGE(0x6000, 0x601f) AM_UNMAP
@@ -841,7 +837,12 @@ PALETTE_INIT_MEMBER( ibm6580_state, ibm6580 )
 
 void ibm6580_state::machine_start()
 {
-	m_fdc->set_rate(500000);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
+	membank("bank10")->set_base(m_ram->pointer());
+
+	m_fdc->set_rate(500000); // XXX workaround
 }
 
 void ibm6580_state::machine_reset()
@@ -869,14 +870,6 @@ void ibm6580_state::video_start()
 	memset(m_p_videoram, 0x0, 0x1000);
 }
 
-FLOPPY_FORMATS_MEMBER( ibm6580_state::floppy_formats )
-	FLOPPY_HFE_FORMAT,
-	FLOPPY_IPF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END0
-
 static SLOT_INTERFACE_START( dw_floppies )
 	SLOT_INTERFACE( "8sssd", IBM_6360 )
 SLOT_INTERFACE_END
@@ -887,11 +880,15 @@ static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
 	MCFG_CPU_IO_MAP(ibm6580_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,320K,384K")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25MHz/2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_DRIVER(ibm6580_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ibm6580_state, vblank_w))
 	MCFG_DEFAULT_LAYOUT(layout_ibm6580)
 
 	MCFG_PALETTE_ADD("palette", 3)
@@ -925,9 +922,32 @@ static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(ibm6580_state, floppy_intrq))
 //  MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq0_w))
-//  MCFG_UPD765_HDL_CALLBACK(WRITELINE(ibm6580_state, floppy_hdl))
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", ibm6580_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", ibm6580_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
+
+	MCFG_DEVICE_ADD( "upd8251a", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251a", i8251_device, write_cts))
+
+	MCFG_DEVICE_ADD( "upd8251b", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd8251b", i8251_device, write_cts))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ibm6580")
 MACHINE_CONFIG_END
@@ -937,11 +957,11 @@ ROM_START( ibm6580 )
 	ROM_REGION16_LE( 0x4000, "user1", 0 )
 	ROM_DEFAULT_BIOS("old")
 
-	ROM_SYSTEM_BIOS(0, "old", "old bios")
+	ROM_SYSTEM_BIOS(0, "old", "old bios - 1981")
 	ROMX_LOAD("8493823_8K.BIN", 0x0001, 0x2000, CRC(aa5524c0) SHA1(9938f2a82828b17966cb0be7fdbf73803c1f10d3),ROM_SKIP(1)|ROM_BIOS(1))
 	ROMX_LOAD("8493822_8K.BIN", 0x0000, 0x2000, CRC(90e7e73a) SHA1(d3ee7a4d2cb8f4920b5d95e8c7f4fef06599d24e),ROM_SKIP(1)|ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(1, "new", "new bios")
+	ROM_SYSTEM_BIOS(1, "new", "new bios - 1983?")
 	// was downloaded via DDT86
 	ROMX_LOAD( "DWROM16KB.bin", 0x0000, 0x4000, BAD_DUMP CRC(ced87929) SHA1(907a46f288809bc93a1f59f3fbef18bd44be42d9),ROM_BIOS(2))
 

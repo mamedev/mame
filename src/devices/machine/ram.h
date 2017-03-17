@@ -90,7 +90,7 @@ private:
 extern const device_type RAM;
 
 // device iterator
-typedef device_type_iterator<RAM, ram_device> ram_device_iterator;
+typedef device_type_iterator<ram_device> ram_device_iterator;
 
 extern template class device_finder<ram_device, false>;
 extern template class device_finder<ram_device, true>;

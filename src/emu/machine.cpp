@@ -112,6 +112,7 @@ osd_interface &running_machine::osd() const
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: firstcpu(nullptr),
 		primary_screen(nullptr),
+		m_side_effect_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),

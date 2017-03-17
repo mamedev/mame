@@ -167,6 +167,7 @@ public:
 	void        disassemble(char* buffer);
 
 	void        set_machine(running_machine& machine) { m_machine = &machine; }
+	void        set_n64_periphs(n64_periphs* periphs) { m_n64_periphs = periphs; }
 
 	// CPU-visible registers
 	void        set_start(uint32_t val) { m_start = val; }
@@ -335,6 +336,7 @@ private:
 	running_machine* m_machine;
 	uint32_t*         m_rdram;
 	uint32_t*         m_dmem;
+	n64_periphs* m_n64_periphs;
 
 	combine_modes_t m_combine;
 	bool            m_pending_mode_block;

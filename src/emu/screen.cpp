@@ -557,6 +557,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yoffset(0.0f),
 		m_xscale(1.0f),
 		m_yscale(1.0f),
+		m_screen_vblank(*this),
 		m_palette(*this, finder_base::DUMMY_TAG),
 		m_video_attributes(0),
 		m_svg_region(nullptr),
@@ -720,17 +721,6 @@ void screen_device::static_set_screen_update(device_t &device, screen_update_rgb
 
 
 //-------------------------------------------------
-//  static_set_screen_vblank - set the screen
-//  VBLANK callback in the device configuration
-//-------------------------------------------------
-
-void screen_device::static_set_screen_vblank(device_t &device, screen_vblank_delegate callback)
-{
-	downcast<screen_device &>(device).m_screen_vblank = callback;
-}
-
-
-//-------------------------------------------------
 //  static_set_palette - set the screen palette
 //  configuration
 //-------------------------------------------------
@@ -828,7 +818,7 @@ void screen_device::device_start()
 	// bind our handlers
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
-	m_screen_vblank.bind_relative_to(*owner());
+	m_screen_vblank.resolve_safe();
 
 	// if we have a palette and it's not started, wait for it
 	if (m_palette != nullptr && !m_palette->started())
@@ -1494,8 +1484,7 @@ void screen_device::vblank_begin()
 	// call the screen specific callbacks
 	for (auto &item : m_callback_list)
 		item->m_callback(*this, true);
-	if (!m_screen_vblank.isnull())
-		m_screen_vblank(*this, true);
+	m_screen_vblank(1);
 
 	// reset the VBLANK start timer for the next frame
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
@@ -1518,8 +1507,7 @@ void screen_device::vblank_end()
 	// call the screen specific callbacks
 	for (auto &item : m_callback_list)
 		item->m_callback(*this, false);
-	if (!m_screen_vblank.isnull())
-		m_screen_vblank(*this, false);
+	m_screen_vblank(0);
 
 	// if this is the primary screen and we need to update now
 	if (this == machine().first_screen() && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))

@@ -43,7 +43,7 @@ protected:
 	explicit pstream(const unsigned flags) : m_flags(flags)
 	{
 	}
-	virtual ~pstream();
+	~pstream();
 
 	virtual void vseek(const pos_type n) = 0;
 	virtual pos_type vtell() = 0;
@@ -73,7 +73,6 @@ class pistream : public pstream
 {
 public:
 
-	explicit pistream(const unsigned flags) : pstream(flags) {}
 	virtual ~pistream();
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
@@ -84,6 +83,7 @@ public:
 	}
 
 protected:
+	explicit pistream(const unsigned flags) : pstream(flags) {}
 	/* read up to n bytes from stream */
 	virtual pos_type vread(void *buf, const pos_type n) = 0;
 
@@ -97,7 +97,6 @@ class postream : public pstream
 {
 public:
 
-	explicit postream(unsigned flags) : pstream(flags) {}
 	virtual ~postream();
 
 	void write(const void *buf, const pos_type n)
@@ -108,6 +107,7 @@ public:
 	void write(pistream &strm);
 
 protected:
+	explicit postream(unsigned flags) : pstream(flags) {}
 	/* write n bytes to stream */
 	virtual void vwrite(const void *buf, const pos_type n) = 0;
 
@@ -123,7 +123,7 @@ class pomemstream : public postream
 public:
 
 	pomemstream();
-	virtual ~pomemstream();
+	virtual ~pomemstream() override;
 
 	char *memory() const { return m_mem; }
 	pos_type size() const { return m_size; }
@@ -146,7 +146,7 @@ class postringstream : public postream
 public:
 
 	postringstream() : postream(0) { }
-	virtual ~postringstream();
+	virtual ~postringstream() override;
 
 	const pstringbuffer &str() { return m_buf; }
 
@@ -172,10 +172,10 @@ class pofilestream : public postream
 public:
 
 	explicit pofilestream(const pstring &fname);
-	virtual ~pofilestream();
+	virtual ~pofilestream() override;
 
 protected:
-	pofilestream(void *file, const pstring name, const bool do_close);
+	pofilestream(void *file, const pstring &name, const bool do_close);
 	/* write n bytes to stream */
 	virtual void vwrite(const void *buf, const pos_type n) override;
 	virtual void vseek(const pos_type n) override;
@@ -221,10 +221,10 @@ class pifilestream : public pistream
 public:
 
 	explicit pifilestream(const pstring &fname);
-	virtual ~pifilestream();
+	virtual ~pifilestream() override;
 
 protected:
-	pifilestream(void *file, const pstring name, const bool do_close);
+	pifilestream(void *file, const pstring &name, const bool do_close);
 
 	/* read up to n bytes from stream */
 	virtual pos_type vread(void *buf, const pos_type n) override;
@@ -249,7 +249,7 @@ class pstdin : public pifilestream
 public:
 
 	pstdin();
-	virtual ~pstdin();
+	virtual ~pstdin() override;
 };
 
 // -----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ public:
 
 	pimemstream(const void *mem, const pos_type len);
 	explicit pimemstream(const pomemstream &ostrm);
-	virtual ~pimemstream();
+	virtual ~pimemstream() override;
 
 	pos_type size() const { return m_len; }
 protected:
@@ -284,8 +284,8 @@ private:
 class pistringstream : public pimemstream
 {
 public:
-	pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
-	virtual ~pistringstream();
+	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
+	virtual ~pistringstream() override;
 
 private:
 	/* only needed for a reference till destruction */
@@ -365,7 +365,7 @@ class putf8_fmt_writer : public pfmt_writer_t<>, public putf8_writer
 public:
 
 	explicit putf8_fmt_writer(postream &strm);
-	virtual ~putf8_fmt_writer();
+	virtual ~putf8_fmt_writer() override;
 
 protected:
 	virtual void vdowrite(const pstring &ls) const override;
@@ -389,14 +389,14 @@ public:
 		m_strm.write(&val, sizeof(T));
 	}
 
-	void write(const pstring s)
+	void write(const pstring &s)
 	{
 		write(s.blen());
 		m_strm.write(s.c_str(), s.blen());
 	}
 
 	template <typename T>
-	void write(const std::vector<T> val)
+	void write(const std::vector<T> &val)
 	{
 		std::size_t sz = val.size();
 		write(sz);

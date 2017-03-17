@@ -244,7 +244,7 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 	return data;
 }
 
-void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mermaid_state::screen_vblank_mermaid)
 {
 	// rising edge
 	if (state)
@@ -304,7 +304,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 			m_helper.fill(0, rect);
 			m_helper2.fill(0, rect);
 
-			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
+			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
 
 			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
@@ -315,7 +315,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 			m_helper.fill(0, rect);
 			m_helper2.fill(0, rect);
 
-			m_fg_tilemap->draw(screen, m_helper, rect, 0, 0);
+			m_fg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
 
 			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 

@@ -85,7 +85,7 @@ public:
 
 	DECLARE_PALETTE_INIT(ms0515);
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 
@@ -413,7 +413,7 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void ms0515_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(ms0515_state::screen_vblank)
 {
 //  irq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 	if (BIT(m_bankreg, 9))
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_15MHz, 958,0,640, 313,0,200 )
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
-	MCFG_SCREEN_VBLANK_DRIVER(ms0515_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ms0515_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_ms0515)
 

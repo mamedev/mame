@@ -258,9 +258,82 @@ void vga_device::device_start()
 	vga.memory.resize(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
-	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
-	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
-	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+
+	save_item(NAME(vga.sequencer.index));
+	save_item(NAME(vga.sequencer.data));
+	save_item(NAME(vga.sequencer.map_mask));
+	save_item(NAME(vga.sequencer.char_sel.A));
+	save_item(NAME(vga.sequencer.char_sel.B));
+
+	save_item(NAME(vga.crtc.index));
+	save_item(NAME(vga.crtc.data));
+	save_item(NAME(vga.crtc.horz_total));
+	save_item(NAME(vga.crtc.horz_disp_end));
+	save_item(NAME(vga.crtc.horz_blank_start));
+	save_item(NAME(vga.crtc.horz_retrace_start));
+	save_item(NAME(vga.crtc.horz_retrace_skew));
+	save_item(NAME(vga.crtc.horz_retrace_end));
+	save_item(NAME(vga.crtc.disp_enable_skew));
+	save_item(NAME(vga.crtc.evra));
+	save_item(NAME(vga.crtc.vert_total));
+	save_item(NAME(vga.crtc.vert_disp_end));
+	save_item(NAME(vga.crtc.vert_retrace_start));
+	save_item(NAME(vga.crtc.vert_retrace_end));
+	save_item(NAME(vga.crtc.vert_blank_start));
+	save_item(NAME(vga.crtc.line_compare));
+	save_item(NAME(vga.crtc.cursor_addr));
+	save_item(NAME(vga.crtc.byte_panning));
+	save_item(NAME(vga.crtc.preset_row_scan));
+	save_item(NAME(vga.crtc.scan_doubling));
+	save_item(NAME(vga.crtc.maximum_scan_line));
+	save_item(NAME(vga.crtc.cursor_enable));
+	save_item(NAME(vga.crtc.cursor_scan_start));
+	save_item(NAME(vga.crtc.cursor_skew));
+	save_item(NAME(vga.crtc.cursor_scan_end));
+	save_item(NAME(vga.crtc.start_addr));
+	save_item(NAME(vga.crtc.start_addr_latch));
+	save_item(NAME(vga.crtc.protect_enable));
+	save_item(NAME(vga.crtc.bandwidth));
+	save_item(NAME(vga.crtc.offset));
+	save_item(NAME(vga.crtc.word_mode));
+	save_item(NAME(vga.crtc.dw));
+	save_item(NAME(vga.crtc.div4));
+	save_item(NAME(vga.crtc.underline_loc));
+	save_item(NAME(vga.crtc.vert_blank_end));
+	save_item(NAME(vga.crtc.sync_en));
+	save_item(NAME(vga.crtc.aw));
+	save_item(NAME(vga.crtc.div2));
+	save_item(NAME(vga.crtc.sldiv));
+	save_item(NAME(vga.crtc.map14));
+	save_item(NAME(vga.crtc.map13));
+	save_item(NAME(vga.crtc.irq_clear));
+	save_item(NAME(vga.crtc.irq_disable));
+
+	save_item(NAME(vga.gc.index));
+	save_item(NAME(vga.gc.latch));
+	save_item(NAME(vga.gc.set_reset));
+	save_item(NAME(vga.gc.enable_set_reset));
+	save_item(NAME(vga.gc.color_compare));
+	save_item(NAME(vga.gc.logical_op));
+	save_item(NAME(vga.gc.rotate_count));
+	save_item(NAME(vga.gc.shift256));
+	save_item(NAME(vga.gc.shift_reg));
+	save_item(NAME(vga.gc.read_map_sel));
+	save_item(NAME(vga.gc.read_mode));
+	save_item(NAME(vga.gc.write_mode));
+	save_item(NAME(vga.gc.color_dont_care));
+	save_item(NAME(vga.gc.bit_mask));
+	save_item(NAME(vga.gc.alpha_dis));
+	save_item(NAME(vga.gc.memory_map_sel));
+	save_item(NAME(vga.gc.host_oe));
+	save_item(NAME(vga.gc.chain_oe));
+   
+	save_item(NAME(vga.attribute.index));
+	save_item(NAME(vga.attribute.data));
+	save_item(NAME(vga.attribute.state));
+	save_item(NAME(vga.attribute.prot_bit));
+	save_item(NAME(vga.attribute.pel_shift));
+	save_item(NAME(vga.attribute.pel_shift_latch));
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 }
@@ -269,6 +342,14 @@ void svga_device::device_start()
 {
 	vga_device::device_start();
 	memset(&svga, 0, sizeof(svga));
+
+	save_item(NAME(svga.bank_r));
+	save_item(NAME(svga.bank_w));
+	save_item(NAME(svga.rgb15_en));
+	save_item(NAME(svga.rgb16_en));
+	save_item(NAME(svga.rgb24_en));
+	save_item(NAME(svga.rgb32_en));
+	save_item(NAME(svga.id));
 }
 
 void ati_vga_device::device_start()
@@ -303,6 +384,15 @@ void tseng_vga_device::device_start()
 {
 	svga_device::device_start();
 	memset(&et4k, 0, sizeof(et4k));
+
+	save_item(NAME(et4k.reg_3d8));
+	save_item(NAME(et4k.dac_ctrl));
+	save_item(NAME(et4k.dac_state));
+	save_item(NAME(et4k.horz_overflow));
+	save_item(NAME(et4k.aux_ctrl));
+	save_item(NAME(et4k.ext_reg_ena));
+	save_item(NAME(et4k.misc1));
+	save_item(NAME(et4k.misc2));
 }
 
 void ibm8514a_device::device_start()
@@ -1988,7 +2078,7 @@ READ8_MEMBER(vga_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset)];
 			vga.gc.latch[1]=vga.memory[(offset)+0x10000];

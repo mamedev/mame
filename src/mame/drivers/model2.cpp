@@ -1243,10 +1243,7 @@ WRITE32_MEMBER(model2_state::model2o_serial_w)
 {
 	if(mem_mask == 0xffff0000)
 	{
-		if (!space.debugger_access())
-		{
-			//m_soundack++;
-		}
+		//m_soundack++;
 	}
 	if (mem_mask == 0x0000ffff)
 	{

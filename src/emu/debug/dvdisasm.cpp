@@ -335,6 +335,8 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 
 bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
+	auto dis = machine().disable_side_effect();
+
 	util::ovectorstream buffer;
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);

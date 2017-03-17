@@ -49,7 +49,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override { update_names(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

@@ -172,20 +172,19 @@ static const uint32_t mouse_bitmap[32*32] =
 //-------------------------------------------------
 
 mame_ui_manager::mame_ui_manager(running_machine &machine)
-	: ui_manager(machine),
-		m_font(nullptr),
-		m_handler_callback(nullptr),
-		m_handler_param(0),
-		m_single_step(false),
-		m_showfps(false),
-		m_showfps_end(0),
-		m_show_profiler(false),
-		m_popup_text_end(0),
-		m_mouse_arrow_texture(nullptr),
-		m_mouse_show(false),
-		m_load_save_hold(false)
-{
-}
+	: ui_manager(machine)
+	, m_font(nullptr)
+	, m_handler_callback(nullptr)
+	, m_handler_callback_type(ui_callback_type::GENERAL)
+	, m_handler_param(0)
+	, m_single_step(false)
+	, m_showfps(false)
+	, m_showfps_end(0)
+	, m_show_profiler(false)
+	, m_popup_text_end(0)
+	, m_mouse_arrow_texture(nullptr)
+	, m_mouse_show(false)
+	, m_load_save_hold(false) {}
 
 mame_ui_manager::~mame_ui_manager()
 {

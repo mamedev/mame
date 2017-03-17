@@ -69,7 +69,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm3(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm3);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -85,7 +85,7 @@ uint32_t pgm3_state::screen_update_pgm3(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void pgm3_state::screen_eof_pgm3(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pgm3_state::screen_vblank_pgm3)
 {
 }
 
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( pgm3, pgm3_state )
 	MCFG_SCREEN_SIZE(1280, 720)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 720-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm3_state, screen_update_pgm3)
-	MCFG_SCREEN_VBLANK_DRIVER(pgm3_state, screen_eof_pgm3)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm3_state, screen_vblank_pgm3))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)

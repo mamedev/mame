@@ -109,19 +109,12 @@ const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
 
 
 //-------------------------------------------------
-//  midway_serial_pic2_device - constructor
+//  midway_serial_pic_device - constructor
 //-------------------------------------------------
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic Simulation", tag, owner, clock, "midway_serial_pic_sim", __FILE__),
-	m_upper(0),
-	m_buff(0),
-	m_idx(0),
-	m_status(0),
-	m_bits(0),
-	m_ormask(0)
+	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, "Midway Serial Pic Simulation", tag, owner, clock, "midway_serial_pic_sim", __FILE__)
 {
-	memset(m_data,0,sizeof(m_data));
 }
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

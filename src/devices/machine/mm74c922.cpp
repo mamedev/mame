@@ -24,7 +24,7 @@
 //**************************************************************************
 
 const device_type MM74C922 = device_creator<mm74c922_device>;
-const device_type MM74C923 = device_creator<mm74c922_device>;
+const device_type MM74C923 = MM74C922;
 
 
 

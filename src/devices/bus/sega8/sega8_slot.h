@@ -109,12 +109,13 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override { update_names(SEGA8_CART_SLOT, "cartridge", "cart"); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+	virtual const char *custom_instance_name() const override { return "cartridge"; }
+	virtual const char *custom_brief_instance_name() const override { return "cart"; }
 
 	int get_type() { return m_type; }
 	int get_cart_type(uint8_t *ROM, uint32_t len);
@@ -166,7 +167,8 @@ public:
 	// construction/destruction
 	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_config_complete() override { update_names(SEGA8_CARD_SLOT, "card", "card"); }
+	virtual const char *custom_instance_name() const override { return "card"; }
+	virtual const char *custom_brief_instance_name() const override { return "card"; }
 };
 
 

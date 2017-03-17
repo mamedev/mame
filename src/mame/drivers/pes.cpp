@@ -117,15 +117,13 @@ WRITE8_MEMBER(pes_state::data_from_i8031)
 }
 
 /* Port Handlers */
-WRITE8_MEMBER( pes_state::rsws_w )
+WRITE8_MEMBER( pes_state::rsq_wsq_w )
 {
-	m_wsstate = data&0x1; // /ws is bit 0
-	m_rsstate = (data&0x2)>>1; // /rs is bit 1
 #ifdef DEBUG_PORTS
-	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", m_rsstate, m_wsstate);
+	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", (data&0x2)>>1, data&0x1);
 #endif
-	m_speech->rsq_w(m_rsstate);
-	m_speech->wsq_w(m_wsstate);
+	/* /RS is bit 1, /WS is bit 0 */
+	m_speech->combined_rsq_wsq_w(space, 0, data&0x3);
 }
 
 WRITE8_MEMBER( pes_state::port1_w )
@@ -233,7 +231,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, pes_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x0) AM_WRITE(rsws_w) /* /WS(0) and /RS(1) */
+	AM_RANGE(0x0, 0x0) AM_WRITE(rsq_wsq_w) /* /WS(0) and /RS(1) */
 	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */
 	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3, see top of file */
 ADDRESS_MAP_END

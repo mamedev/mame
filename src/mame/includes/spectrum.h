@@ -158,8 +158,8 @@ public:
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_spectrum(screen_device &screen, bool state);
-	void screen_eof_timex(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_timex);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
 

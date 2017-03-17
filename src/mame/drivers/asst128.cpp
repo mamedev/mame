@@ -6,12 +6,14 @@
 #include "machine/pc_fdc.h"
 #include "formats/asst128_dsk.h"
 
+extern const device_type ASST128_MOTHERBOARD;
+
 class asst128_mb_device : public ibm5150_mb_device
 {
 public:
 	// construction/destruction
 	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ibm5150_mb_device(mconfig, tag, owner, clock) { }
+		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, "ASST128_MOTHERBOARD", tag, owner, clock, "asst128_mb", __FILE__) { }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 };

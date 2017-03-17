@@ -360,7 +360,7 @@ void decocpu_type3_device::device_start()
 }
 
 decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: decocpu_type3_device(mconfig, DECOCPU3, "Data East Pinball CPU Board Type 3B", tag, owner, clock, "decocpu3b", __FILE__)
+	: decocpu_type3_device(mconfig, DECOCPU3B, "Data East Pinball CPU Board Type 3B", tag, owner, clock, "decocpu3b", __FILE__)
 {}
 
 void decocpu_type3b_device::device_start()

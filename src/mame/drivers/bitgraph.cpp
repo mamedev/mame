@@ -58,9 +58,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "bitgrpha.lh"
-#include "bitgrphb.lh"
-
 #define M68K_TAG "maincpu"
 #define PPU_TAG "ppu"
 
@@ -196,12 +193,23 @@ static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
 	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
 	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
 //	AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
-//	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
+	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
 	AM_RANGE(0x380000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 READ8_MEMBER(bitgraph_state::pia_r)
 {
@@ -313,6 +321,8 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 	}
 }
 
+// rev A writes EA5E -- 9600 HOST, 2400 PNT, 300 KBD, 9600 DBG
+// rev B writes EE5E -- 9600 HOST, 9600 PNT, 300 KBD, 9600 DBG
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
@@ -401,13 +411,13 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 READ8_MEMBER(bitgraph_state::ppu_read)
 {
 	uint8_t data = m_ppu[offset];
-	DBG_LOG(1, "PPU", ("%d == %02X\n", offset, data));
+	DBG_LOG(2, "PPU", ("%d == %02X\n", offset, data));
 	return data;
 }
 
 WRITE8_MEMBER(bitgraph_state::ppu_write)
 {
-	DBG_LOG(1, "PPU", ("%d <- %02X\n", offset, data));
+	DBG_LOG(2, "PPU", ("%d <- %02X\n", offset, data));
 	m_ppu[offset] = data;
 }
 
@@ -503,6 +513,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
 	MCFG_DEVICE_ADD(ACIA2_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
@@ -577,8 +588,6 @@ static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_cts))
 
-	MCFG_DEFAULT_LAYOUT(layout_bitgrpha)
-
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
@@ -592,8 +601,6 @@ static MACHINE_CONFIG_START( bitgrphb, bitgraph_state )
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
-
-	MCFG_DEFAULT_LAYOUT(layout_bitgrphb)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -632,5 +639,5 @@ ROM_END
 
 /* Driver */
 /*       YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", MACHINE_IMPERFECT_KEYBOARD)
-COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)
+COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", ROT90 | MACHINE_IMPERFECT_KEYBOARD)
+COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)

@@ -133,14 +133,14 @@ namespace netlist
 		{
 			if (m_CD() && !m_last_CU && m_CU())
 			{
-				m_cnt++;
+				++m_cnt;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
 			}
 			if (m_CU() && !m_last_CD && m_CD())
 			{
 				if (m_cnt > 0)
-					m_cnt--;
+					--m_cnt;
 				else
 					m_cnt = MAXCNT;
 			}

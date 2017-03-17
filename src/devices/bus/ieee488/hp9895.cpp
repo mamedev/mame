@@ -139,7 +139,7 @@ static const uint8_t xv_drive_masks[] = {
 };
 
 hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP9895, "HP9895", tag, owner, clock, "HP9895", __FILE__),
+	: device_t(mconfig, HP9895, "HP9895", tag, owner, clock, "hp9895", __FILE__),
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_phi(*this , "phi"),

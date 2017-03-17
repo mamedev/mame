@@ -28,7 +28,7 @@ struct mat_cr_t
 	std::size_t size;
 	std::size_t nz_num;
 
-	mat_cr_t(const std::size_t n)
+	explicit mat_cr_t(const std::size_t n)
 	: size(n)
 	, nz_num(0)
 	{

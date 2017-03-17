@@ -795,7 +795,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	}
 
 	if (m_bv_pulse == 1) {
-		return (0x70 || m_in0->read()); // Add Bill Validator Credit Pulse
+		return (0x70 | m_in0->read()); // Add Bill Validator Credit Pulse
 	} else {
 		return m_in0->read();
 	}

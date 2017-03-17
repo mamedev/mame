@@ -114,7 +114,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 		{
 			uint8_t *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
-			memcpy(RAM, RAM+80, 24*80);
+			memmove(RAM, RAM+80, 24*80);
 		}
 		break;
 

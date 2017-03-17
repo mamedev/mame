@@ -203,7 +203,7 @@ void favorite_manager::add_favorite_game()
 			tmpmatches.driver = &machine().system();
 			tmpmatches.listname = strensure(image.software_list_name());
 			tmpmatches.interface = part->interface();
-			tmpmatches.instance = strensure(image.instance_name());
+			tmpmatches.instance = image.instance_name();
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
 			if (!swinfo->parentname().empty())

@@ -17,6 +17,13 @@
 #ifndef MAME_EMU_DEVICE_H
 #define MAME_EMU_DEVICE_H
 
+#include <iterator>
+#include <memory>
+#include <string>
+#include <typeinfo>
+#include <unordered_map>
+#include <vector>
+
 
 
 //**************************************************************************
@@ -76,23 +83,159 @@ struct input_device_default;
 class finder_base;
 
 
-// exception classes
-class device_missing_dependencies : public emu_exception { };
+namespace emu { namespace detail {
+
+class device_type_impl;
 
 
-// a device_type is simply a pointer to its alloc function
-typedef std::unique_ptr<device_t> (*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+class device_registrar
+{
+private:
+	class const_iterator_helper;
+
+public:
+	class const_iterator
+	{
+	public:
+		typedef std::ptrdiff_t difference_type;
+		typedef device_type_impl value_type;
+		typedef device_type_impl *pointer;
+		typedef device_type_impl &reference;
+		typedef std::forward_iterator_tag iterator_category;
+
+		const_iterator() = default;
+		const_iterator(const_iterator const &) = default;
+		const_iterator &operator=(const_iterator const &) = default;
+
+		bool operator==(const_iterator const &that) const { return m_type == that.m_type; }
+		bool operator!=(const_iterator const &that) const { return m_type != that.m_type; }
+		reference operator*() const { assert(m_type); return *m_type; }
+		pointer operator->() const { return m_type; }
+		const_iterator &operator++();
+		const_iterator operator++(int) { const_iterator const result(*this); ++*this; return result; }
+
+	private:
+		friend class const_iterator_helper;
+
+		pointer m_type = nullptr;
+	};
+
+	// explicit constructor is required for const variable initialization
+	constexpr device_registrar() { }
+
+	const_iterator begin() const { return cbegin(); }
+	const_iterator end() const { return cend(); }
+	const_iterator cbegin() const;
+	const_iterator cend() const;
+
+private:
+	friend class device_type_impl;
+
+	class const_iterator_helper : public const_iterator
+	{
+	public:
+		const_iterator_helper(device_type_impl *type) { m_type = type; }
+	};
+
+	static device_type_impl *register_device(device_type_impl &type);
+};
 
 
-// this template function creates a stub which constructs a device
-template <class DeviceClass>
-std::unique_ptr<device_t> device_creator_impl(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+template <class DeviceClass> struct device_tag_struct { typedef DeviceClass type; };
+template <class DriverClass> struct driver_tag_struct { typedef DriverClass type; };
+
+template <class DeviceClass> inline device_tag_struct<DeviceClass> device_tag_func() { return device_tag_struct<DeviceClass>{ }; }
+template <class DriverClass> inline driver_tag_struct<DriverClass> driver_tag_func() { return driver_tag_struct<DriverClass>{ }; }
+
+class device_type_impl
+{
+private:
+	friend class device_registrar;
+
+	typedef std::unique_ptr<device_t> (*create_func)(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	device_type_impl(device_type_impl const &) = delete;
+	device_type_impl(device_type_impl &&) = delete;
+	device_type_impl &operator=(device_type_impl const &) = delete;
+	device_type_impl &operator=(device_type_impl &&) = delete;
+
+	// don't make these static member function templates inline
+	template <typename DeviceClass> static std::unique_ptr<device_t> create_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	template <typename DriverClass> static std::unique_ptr<device_t> create_driver(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	create_func const m_creator;
+	std::type_info const &m_type;
+	device_type_impl *m_next;
+
+public:
+	device_type_impl(std::nullptr_t)
+		: m_creator(nullptr)
+		, m_type(typeid(std::nullptr_t))
+		, m_next(nullptr)
+	{
+	}
+
+	template <class DeviceClass> device_type_impl(device_tag_struct<DeviceClass> (*)())
+		: m_creator(&create_device<DeviceClass>)
+		, m_type(typeid(DeviceClass))
+		, m_next(device_registrar::register_device(*this))
+	{
+	}
+
+	template <class DriverClass> device_type_impl(driver_tag_struct<DriverClass> (*)())
+		: m_creator(&create_driver<DriverClass>)
+		, m_type(typeid(DriverClass))
+		, m_next(nullptr)
+	{
+	}
+
+	std::type_info const &type() const { return m_type; }
+
+	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+	{
+		return m_creator(mconfig, tag, owner, clock);
+	}
+
+	explicit operator bool() const { return bool(m_creator); }
+	bool operator==(device_type_impl const &that) const { return &that == this; }
+	bool operator!=(device_type_impl const &that) const { return &that != this; }
+};
+
+
+inline device_registrar::const_iterator &device_registrar::const_iterator::operator++() { m_type = m_type->m_next; return *this; }
+
+
+template <typename DeviceClass>
+std::unique_ptr<device_t> device_type_impl::create_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 {
 	return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
 }
 
-template <class DeviceClass>
-constexpr device_type device_creator = &device_creator_impl<DeviceClass>;
+template <typename DriverClass>
+std::unique_ptr<device_t> device_type_impl::create_driver(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+{
+	assert(!owner);
+	assert(!clock);
+
+	// this is not thread-safe
+	// we can get away with it because driver creators aren't registered
+	// hence all members are initialised with constant values and the race won't cause issues
+	static device_type_impl const &driver_type = &driver_tag_func<DriverClass>;
+	return make_unique_clear<DriverClass>(mconfig, driver_type, tag);
+}
+
+} } // namespace emu::detail
+
+
+// device types
+typedef emu::detail::device_type_impl const &device_type;
+template <class DeviceClass> constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass>;
+template <class DriverClass> constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass>;
+extern emu::detail::device_registrar const registered_device_types;
+
+
+// exception classes
+class device_missing_dependencies : public emu_exception { };
 
 
 // timer IDs for devices
@@ -448,57 +591,68 @@ public:
 	class auto_iterator
 	{
 	public:
+		typedef std::ptrdiff_t difference_type;
+		typedef device_t value_type;
+		typedef device_t *pointer;
+		typedef device_t &reference;
+		typedef std::forward_iterator_tag iterator_category;
+
 		// construction
 		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
 			: m_curdevice(devptr)
 			, m_curdepth(curdepth)
 			, m_maxdepth(maxdepth)
-		{ }
+		{
+		}
 
 		// getters
 		device_t *current() const { return m_curdevice; }
 		int depth() const { return m_curdepth; }
 
 		// required operator overrides
-		bool operator!=(const auto_iterator &iter) const { return m_curdevice != iter.m_curdevice; }
-		device_t &operator*() const { assert(m_curdevice != nullptr); return *m_curdevice; }
-		const auto_iterator &operator++() { advance(); return *this; }
+		bool operator==(auto_iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
+		bool operator!=(auto_iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
+		device_t &operator*() const { assert(m_curdevice); return *m_curdevice; }
+		device_t *operator->() const { return m_curdevice; }
+		auto_iterator &operator++() { advance(); return *this; }
+		auto_iterator operator++(int) { auto_iterator const result(*this); ++*this; return result; }
 
 	protected:
 		// search depth-first for the next device
 		void advance()
 		{
 			// remember our starting position, and end immediately if we're nullptr
-			device_t *start = m_curdevice;
-			if (start == nullptr)
-				return;
-
-			// search down first
-			if (m_curdepth < m_maxdepth)
+			if (m_curdevice)
 			{
-				m_curdevice = start->subdevices().first();
-				if (m_curdevice != nullptr)
+				device_t *start = m_curdevice;
+
+				// search down first
+				if (m_curdepth < m_maxdepth)
 				{
-					m_curdepth++;
-					return;
+					m_curdevice = start->subdevices().first();
+					if (m_curdevice)
+					{
+						m_curdepth++;
+						return;
+					}
 				}
+
+				// search next for neighbors up the ownership chain
+				while (m_curdepth > 0 && start)
+				{
+					// found a neighbor? great!
+					m_curdevice = start->next();
+					if (m_curdevice)
+						return;
+
+					// no? try our parent
+					start = start->owner();
+					m_curdepth--;
+				}
+
+				// returned to the top; we're done
+				m_curdevice = nullptr;
 			}
-
-			// search next for neighbors up the ownership chain
-			while (m_curdepth > 0 && start != nullptr)
-			{
-				// found a neighbor? great!
-				m_curdevice = start->next();
-				if (m_curdevice != nullptr)
-					return;
-
-				// no? try our parent
-				start = start->owner();
-				m_curdepth--;
-			}
-
-			// returned to the top; we're done
-			m_curdevice = nullptr;
 		}
 
 		// protected state
@@ -563,65 +717,71 @@ private:
 // ======================> device_type_iterator
 
 // helper class to find devices of a given type in the device hierarchy
-template <device_type const &_DeviceType, class _DeviceClass = device_t>
+template <class DeviceType, class DeviceClass = DeviceType>
 class device_type_iterator
 {
 public:
-	class auto_iterator : public device_iterator::auto_iterator
+	class auto_iterator : protected device_iterator::auto_iterator
 	{
-public:
+	public:
+		using device_iterator::auto_iterator::difference_type;
+		using device_iterator::auto_iterator::iterator_category;
+		using device_iterator::auto_iterator::depth;
+
+		typedef DeviceClass value_type;
+		typedef DeviceClass *pointer;
+		typedef DeviceClass &reference;
+
 		// construction
 		auto_iterator(device_t *devptr, int curdepth, int maxdepth)
 			: device_iterator::auto_iterator(devptr, curdepth, maxdepth)
 		{
 			// make sure the first device is of the specified type
-			while (m_curdevice && (m_curdevice->type() != _DeviceType))
+			while (m_curdevice && (m_curdevice->type().type() != typeid(DeviceType)))
 				advance();
 		}
 
+		// required operator overrides
+		bool operator==(auto_iterator const &iter) const { return m_curdevice == iter.m_curdevice; }
+		bool operator!=(auto_iterator const &iter) const { return m_curdevice != iter.m_curdevice; }
+
 		// getters returning specified device type
-		_DeviceClass *current() const { return downcast<_DeviceClass *>(m_curdevice); }
-		_DeviceClass &operator*() const { assert(m_curdevice != nullptr); return downcast<_DeviceClass &>(*m_curdevice); }
+		DeviceClass *current() const { return downcast<DeviceClass *>(m_curdevice); }
+		DeviceClass &operator*() const { assert(m_curdevice); return downcast<DeviceClass &>(*m_curdevice); }
+		DeviceClass *operator->() const { return downcast<DeviceClass *>(m_curdevice); }
 
 		// search for devices of the specified type
-		const auto_iterator &operator++()
+		auto_iterator &operator++()
 		{
 			advance();
-			while (m_curdevice != nullptr && m_curdevice->type() != _DeviceType)
+			while (m_curdevice && (m_curdevice->type().type() != typeid(DeviceType)))
 				advance();
 			return *this;
 		}
+
+		auto_iterator operator++(int) { auto_iterator const result(*this); ++*this; return result; }
 	};
 
-public:
 	// construction
-	device_type_iterator(device_t &root, int maxdepth = 255)
-		: m_root(root), m_maxdepth(maxdepth) { }
+	device_type_iterator(device_t &root, int maxdepth = 255) : m_root(root), m_maxdepth(maxdepth) { }
 
 	// standard iterators
 	auto_iterator begin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
 	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
+	auto_iterator cbegin() const { return auto_iterator(&m_root, 0, m_maxdepth); }
+	auto_iterator cend() const { return auto_iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
-	_DeviceClass *first() const { return begin().current(); }
+	DeviceClass *first() const { return begin().current(); }
 
 	// return the number of items available
-	int count() const
-	{
-		int result = 0;
-		for (_DeviceClass &item : *this)
-		{
-			(void)&item;
-			result++;
-		}
-		return result;
-	}
+	int count() const { return std::distance(cbegin(), cend()); }
 
 	// return the index of a given item in the virtual list
-	int indexof(_DeviceClass &device) const
+	int indexof(DeviceClass &device) const
 	{
 		int index = 0;
-		for (_DeviceClass &item : *this)
+		for (DeviceClass &item : *this)
 		{
 			if (&item == &device)
 				return index;
@@ -632,9 +792,9 @@ public:
 	}
 
 	// return the indexed item in the list
-	_DeviceClass *byindex(int index) const
+	DeviceClass *byindex(int index) const
 	{
-		for (_DeviceClass &item : *this)
+		for (DeviceClass &item : *this)
 			if (index-- == 0)
 				return &item;
 		return nullptr;

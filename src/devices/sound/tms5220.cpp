@@ -198,23 +198,55 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
 
 
 ****Documentation of chip commands:***
-    x0x0xbcc : on 5200/5220: NOP (does nothing); on 5220C and CD2501ECD: Select frame length by cc, and b selects whether every frame is preceded by 2 bits to select the frame length (instead of using the value set by cc); the default (and after a reset command) is as if '0x00' was written, i.e. for frame length (200 samples) and 0 for whether the preceding 2 bits are enabled (off)
+    x0x0xbcc: on 5200/5220: NOP (does nothing)
+              on 5220C and CD2501ECD: Select frame length by cc, and b selects
+              whether every frame is preceded by 2 bits to select the frame
+              length (instead of using the value set by cc); the default (and
+              after a reset command) is as if '0x00' was written, i.e. for
+              frame length (200 samples) and 0 for whether the preceding 2
+              bits are enabled (off)
 
-    x001xxxx: READ BYTE (RDBY) Sends eight read bit commands (M0 high M1 low) to VSM and reads the resulting bits serially into a temporary register, which becomes readable as the next byte read from the tms52xx once ready goes active. Note the bit order of the byte read from the TMS52xx is BACKWARDS as compared to the actual data order as in the rom on the VSM chips; the read byte command of the tms5100 reads the bits in the 'correct' order. This was IMHO a rather silly design decision of TI. (I (LN) asked Larry Brantingham about this but he wasn't involved with the TMS52xx chips, just the 5100); There's ASCII data in the TI 99/4 speech module VSMs which has the bit order reversed on purpose because of this!
+    x001xxxx: READ BYTE (RDBY)
+              Sends eight read bit commands (M0 high M1 low) to VSM and reads
+              the resulting bits serially into a temporary register, which
+              becomes readable as the next byte read from the tms52xx once
+              ready goes active. Note the bit order of the byte read from the
+              TMS52xx is BACKWARDS as compared to the actual data order as in
+              the rom on the VSM chips; the read byte command of the tms5100
+              reads the bits in the 'correct' order. This was IMHO a rather
+              silly design decision of TI. (I (LN) asked Larry Brantingham
+              about this but he wasn't involved with the TMS52xx chips, just
+              the 5100); There's ASCII data in the TI 99/4 speech module VSMs
+              which has the bit order reversed on purpose because of this!
     TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-    x011xxxx: READ AND BRANCH (RB) Sends a read and branch command (M0 high, M1 high) to force VSM to set its data pointer to whatever the data is at its current pointer location is)
+    x011xxxx: READ AND BRANCH (RB)
+              Sends a read and branch command (M0 high, M1 high) to force VSM
+              to set its data pointer to whatever the data is at its current
+              pointer location is)
     TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-    x100aaaa: LOAD ADDRESS (LA) Send a load address command (M0 low M1 high) to VSM with the 4 'a' bits; Note you need to send four or five of these in sequence to actually specify an address to the vsm.
+    x100aaaa: LOAD ADDRESS (LA)
+              Send a load address command (M0 low M1 high) to VSM with the 4
+              'a' bits; Note you need to send four or five of these in
+              sequence to actually specify an address to the vsm.
     TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-    x101xxxx: SPEAK (SPK) Begins speaking, pulling speech data from the current address pointer location of the VSM modules.
+    x101xxxx: SPEAK (SPK)
+              Begins speaking, pulling speech data from the current address
+              pointer location of the VSM modules.
 
-    x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
-    The patent implies TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP, but the decap shows that this is not true, and is an error on the patent diagram.
+    x110xxxx: SPEAK EXTERNAL (SPKEXT)
+              Clears the FIFO using SPKEE line, then sets TALKD (TALKST
+              remains zero) until 8 bytes have been written to the FIFO, at
+              which point it begins speaking, pulling data from the 16 byte
+              FIFO.
+    The patent implies TALK STATUS must be CLEAR for this command to work;
+    otherwise it is treated as a NOP, but the decap shows that this is not
+    true, and is an error on the patent diagram.
 
-    x111xxxx: RESET (RST) Resets the speech synthesis core immediately, and clears the FIFO.
+    x111xxxx: RESET (RST)
+              Resets the speech synthesis core immediately, and clears the FIFO.
 
 
     Other chip differences:
@@ -321,10 +353,14 @@ static int16_t clip_analog(int16_t cliptemp);
 
 
 /* *****configuration of chip connection stuff***** */
-/* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
+/* must be defined; if 0, output the waveform as if it was tapped on the
+   speaker pin as usual, if 1, output the waveform as if it was tapped on the
+   i/o pin (volume is much lower in the latter case) */
 #define FORCE_DIGITAL 0
 
-/* 5220 only; must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
+/* 5220 only; must be defined; if 1, normal speech (one A cycle, one B cycle
+   per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles,
+   one B cycle per interpolation step) */
 #define FORCE_SUBC_RELOAD 1
 
 
@@ -332,7 +368,8 @@ static int16_t clip_analog(int16_t cliptemp);
 #undef VERBOSE
 // above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
 #undef DEBUG_DUMP_INPUT_DATA
-// 5220 only; above dumps the data written to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
+/* 5220 only; above dumps the data written to the tms52xx to stdout, useful
+   for making logged data dumps for real hardware tests */
 #undef DEBUG_FIFO
 // 5220 only; above debugs fifo stuff: writes, reads and flag updates
 #undef DEBUG_PARSE_FRAME_DUMP
@@ -2020,7 +2057,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 WRITE8_MEMBER( tms5220_device::data_w )
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 #ifdef DEBUG_RS_WS
 	logerror("tms5220_data_w: data %02x\n", data);
@@ -2053,7 +2090,7 @@ WRITE8_MEMBER( tms5220_device::data_w )
 READ8_MEMBER( tms5220_device::status_r )
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return 0;
+	if (machine().side_effect_disabled()) return 0;
 
 	if (!m_true_timing)
 	{

@@ -289,7 +289,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_wheelfir(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
 };
 
@@ -553,12 +553,12 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void wheelfir_state::screen_eof_wheelfir(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(wheelfir_state::screen_vblank_wheelfir)
 {
 	// rising edge
 	if (state)
 	{
-		m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
+		m_tmp_bitmap[LAYER_FG]->fill(0, m_screen->visible_area());
 	}
 }
 
@@ -788,7 +788,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
-	MCFG_SCREEN_VBLANK_DRIVER(wheelfir_state, screen_eof_wheelfir)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wheelfir_state, screen_vblank_wheelfir))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)

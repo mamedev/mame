@@ -175,15 +175,15 @@ public:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(mbc55x);
-	void screen_eof_mbc55x(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mbc55x);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();
 
 private:
-	void debug_command(int ref, int params, const char *param[]);
-	void video_debug(int ref, int params, const char *param[]);
+	void debug_command(int ref, const std::vector<std::string> &params);
+	void video_debug(int ref, const std::vector<std::string> &params);
 };
 
 /*----------- defined in drivers/mbc55x.c -----------*/

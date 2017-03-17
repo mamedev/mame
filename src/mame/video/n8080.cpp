@@ -338,7 +338,7 @@ uint32_t n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16
 }
 
 
-void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(n8080_state::screen_vblank_helifire)
 {
 	// falling edge
 	if (!state)

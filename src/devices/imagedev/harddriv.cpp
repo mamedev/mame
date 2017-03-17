@@ -80,9 +80,6 @@ harddisk_image_device::~harddisk_image_device()
 void harddisk_image_device::device_config_complete()
 {
 	add_format("chd", "CHD Hard drive", "chd,hd", hd_option_spec);
-
-	// set brief and instance name
-	update_names();
 }
 
 const util::option_guide &harddisk_image_device::create_option_guide() const

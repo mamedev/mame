@@ -120,7 +120,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(a2600_state::cart_over_all_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
@@ -342,7 +342,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 // TODO: is this the correct behavior for the real hardware?!?
 READ8_MEMBER(a2600_state::cart_over_riot_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }
@@ -385,7 +385,6 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 		case A26_F6:
 		case A26_DPC:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&vcs_cart_slot_device::cart_opbase,(vcs_cart_slot_device*)m_cart));
 			break;
 		case A26_FE:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));

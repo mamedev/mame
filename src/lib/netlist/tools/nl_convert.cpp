@@ -40,7 +40,7 @@ struct lib_map_entry
 
 using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
-static lib_map_t read_lib_map(const pstring lm)
+static lib_map_t read_lib_map(const pstring &lm)
 {
 	plib::pistringstream istrm(lm);
 	plib::putf8_reader reader(istrm);
@@ -305,7 +305,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED long nval =tt[4].as_long(&cerr);
+				ATTR_UNUSED long nval(tt[4].as_long(&cerr));
 				pstring model;
 				pstring pins ="CBE";
 

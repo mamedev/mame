@@ -91,20 +91,6 @@ void cococart_slot_device::device_start()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cococart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-
-
-//-------------------------------------------------
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
@@ -286,7 +272,8 @@ void cococart_slot_device::cart_set_line(cococart_slot_device::line which, cococ
 			break;
 
 		case line::SOUND_ENABLE:
-			// do nothing for now
+			if (m_cart)
+				m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
 			break;
 	}
 }
@@ -401,6 +388,16 @@ READ8_MEMBER(device_cococart_interface::read)
 //-------------------------------------------------
 
 WRITE8_MEMBER(device_cococart_interface::write)
+{
+}
+
+
+
+//-------------------------------------------------
+//  set_sound_enable
+//-------------------------------------------------
+
+void device_cococart_interface::set_sound_enable(bool sound_enable)
 {
 }
 

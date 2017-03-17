@@ -9,12 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "xmlfile.h"
-#include "modules/lib/osdobj_common.h"
+
 #include "ui/uimain.h"
 
+#include "emuopts.h"
 #include "drivenum.h"
+
+#include "xmlfile.h"
+
+#include "modules/lib/osdobj_common.h"
+
 
 GAME_EXTERN(zexall);
 
@@ -24,7 +28,7 @@ const game_driver * const driver_list::s_drivers_sorted[2] =
 	&GAME_NAME(zexall),
 };
 
-int driver_list::s_driver_count = 2;
+std::size_t const driver_list::s_driver_count = 2;
 
 // ======================> zexall_machine_manager
 
@@ -95,7 +99,7 @@ void emulator_info::periodic_check() { }
 
 bool emulator_info::frame_hook() { return false; }
 
-void emulator_info::layout_file_cb(xml_data_node &layout) { }
+void emulator_info::layout_file_cb(util::xml::data_node &layout) { }
 
 const char * emulator_info::get_appname() { return nullptr; }
 

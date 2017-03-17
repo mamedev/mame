@@ -260,9 +260,6 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 floppy_image_format_t *floppy_image_device::get_formats() const
@@ -273,11 +270,6 @@ floppy_image_format_t *floppy_image_device::get_formats() const
 floppy_image_format_t *floppy_image_device::get_load_format() const
 {
 	return input_format;
-}
-
-void floppy_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void floppy_image_device::set_rpm(float _rpm)
@@ -1710,7 +1702,7 @@ void floppy_525_dd::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 floppy_525_ssqd::floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
+	floppy_image_device(mconfig, FLOPPY_525_SSQD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
 {
 }
 
@@ -1930,7 +1922,7 @@ void floppy_8_dsdd::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+	floppy_image_device(mconfig, EPSON_SMD_165, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
 {
 }
 
@@ -2156,7 +2148,7 @@ void sony_oa_d32v::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
+	floppy_image_device(mconfig, TEAC_FD_55E, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
 {
 }
 
@@ -2291,7 +2283,7 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+	floppy_image_device(mconfig, IBM_6360, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
 {
 }
 

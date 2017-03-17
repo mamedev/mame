@@ -1624,7 +1624,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
 
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1709,7 +1709,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1787,7 +1787,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ABC)
@@ -4210,7 +4210,7 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().side_effect_disabled())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x889e;
@@ -4238,7 +4238,7 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().side_effect_disabled())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
@@ -4357,7 +4357,7 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().side_effect_disabled())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x835d;
@@ -4382,7 +4382,7 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().side_effect_disabled())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
@@ -4506,7 +4506,7 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().side_effect_disabled())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x835d;
@@ -4524,7 +4524,7 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().side_effect_disabled())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 

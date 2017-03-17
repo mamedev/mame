@@ -33,8 +33,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
+	virtual DECLARE_READ16_MEMBER(reg_r) override;
+	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
 
 	DECLARE_WRITE8_MEMBER(ram_addr_w);
 	DECLARE_READ8_MEMBER(ram_data_r);

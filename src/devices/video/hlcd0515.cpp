@@ -86,16 +86,6 @@ void hlcd0515_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void hlcd0515_device::device_reset()
-{
-}
-
-
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -105,7 +95,7 @@ void hlcd0515_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_rowout = 0;
 
 	// write to COL/ROW pins
-	m_write_cols(m_rowout, m_blank ? 0 : m_ram[m_rowout], 0xffffffff);
+	m_write_cols(m_rowout, m_blank ? 0 : m_ram[m_rowout], ~0);
 	m_rowout++;
 }
 

@@ -116,7 +116,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 
 READ8_MEMBER(a26_rom_ss_device::read_rom)
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return read_byte(offset);
 
 	// Bankswitch

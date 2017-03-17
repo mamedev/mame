@@ -373,7 +373,7 @@ uint32_t starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_in
 }
 
 
-void starshp1_state::screen_eof_starshp1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(starshp1_state::screen_vblank_starshp1)
 {
 	// rising edge
 	if (state)

@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update_wolfpack)
-	MCFG_SCREEN_VBLANK_DRIVER(wolfpack_state, screen_eof_wolfpack)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wolfpack_state, screen_vblank_wolfpack))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)

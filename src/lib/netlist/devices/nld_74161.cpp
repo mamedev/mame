@@ -108,7 +108,7 @@ namespace netlist
 			}
 			else if (m_ENABLET() && m_ENABLEP())
 			{
-				m_cnt++;
+				++m_cnt;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
 			}

@@ -102,7 +102,6 @@ void hp98034_io_card::device_start()
 void hp98034_io_card::device_reset()
 {
 	hp9845_io_card_device::device_reset();
-	install_readwrite_handler(read16_delegate(FUNC(hp98034_io_card::reg_r) , this) , write16_delegate(FUNC(hp98034_io_card::reg_w) , this));
 
 	m_idr = 0;
 	m_odr = 0;

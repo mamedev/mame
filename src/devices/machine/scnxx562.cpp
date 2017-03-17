@@ -208,13 +208,13 @@ duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *
 	: duscc_device(mconfig, DUSCC26562, "DUSCC 26562", tag, owner, clock, TYPE_DUSCC26562, "duscc26562", __FILE__){ }
 
 duscc26C562_device::duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duscc_device(mconfig, DUSCC26C562, "DUSCC 26C562", tag, owner, clock, TYPE_DUSCC26C562, "duscc26C562", __FILE__){ }
+	: duscc_device(mconfig, DUSCC26C562, "DUSCC 26C562", tag, owner, clock, TYPE_DUSCC26C562, "duscc26c562", __FILE__){ }
 
 duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC68562, "DUSCC 68562", tag, owner, clock, TYPE_DUSCC68562, "duscc68562", __FILE__){ }
 
 duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duscc_device(mconfig, DUSCC68C562, "DUSCC 68C562", tag, owner, clock, TYPE_DUSCC68C562, "duscc68C562", __FILE__){ }
+	: duscc_device(mconfig, DUSCC68C562, "DUSCC 68C562", tag, owner, clock, TYPE_DUSCC68C562, "duscc68c562", __FILE__){ }
 
 //-------------------------------------------------
 //  device_start - device-specific startup

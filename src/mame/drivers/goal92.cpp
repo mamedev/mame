@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
 	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
-	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(goal92_state, screen_vblank_goal92))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goal92)

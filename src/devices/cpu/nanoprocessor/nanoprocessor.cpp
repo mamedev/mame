@@ -117,9 +117,11 @@ void hp_nanoprocessor_device::execute_run()
 		if (BIT(m_flags , NANO_I_BIT)) {
 			m_reg_ISR = m_reg_PA;
 			m_reg_PA = (uint16_t)(standard_irq_callback(0) & 0xff);
-			dc_clr(HP_NANO_IE_DC);
 			// Vector fetching takes 1 cycle
 			m_icount -= 1;
+			dc_clr(HP_NANO_IE_DC);
+			// Need this to propagate the clearing of DC7 to the clearing of int. line
+			yield();
 		} else {
 			debugger_instruction_hook(this , m_reg_PA);
 
