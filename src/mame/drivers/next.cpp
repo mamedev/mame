@@ -900,13 +900,13 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
-void next_state::vblank_w(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(next_state::vblank_w)
 {
 	if(vbl_enabled) {
 		if(screen_color)
-			irq_set(13, vblank_state);
+			irq_set(13, state);
 		else
-			irq_set(5, vblank_state);
+			irq_set(5, state);
 	}
 }
 
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_DRIVER(next_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(next_state, vblank_w))
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")

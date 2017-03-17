@@ -104,7 +104,7 @@ uint32_t snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_in
 }
 
 
-void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(snowbros_state::screen_vblank_snowbros)
 {
 	// rising edge
 	if (state)
@@ -1782,7 +1782,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
@@ -1816,7 +1816,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
-	MCFG_SCREEN_VBLANK_NONE()
+	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 MACHINE_CONFIG_END
 
 
@@ -2026,7 +2026,7 @@ static MACHINE_CONFIG_START( yutnori, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)

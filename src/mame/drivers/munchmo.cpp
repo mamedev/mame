@@ -46,9 +46,9 @@ WRITE8_MEMBER(munchmo_state::nmi_enable_w)
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
-void munchmo_state::vblank_irq(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(munchmo_state::vblank_irq)
 {
-	if (vblank_state)
+	if (state)
 	{
 		if (m_nmi_enable)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_SCREEN_SIZE(256+32+32, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(munchmo_state, vblank_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)

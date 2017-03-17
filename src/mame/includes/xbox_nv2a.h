@@ -455,7 +455,7 @@ public:
 	}
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
-	void vblank_callback(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
 	void set_interrupt_device(pic8259_device *device);

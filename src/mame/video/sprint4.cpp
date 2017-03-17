@@ -85,7 +85,7 @@ uint32_t sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind1
 }
 
 
-void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sprint4_state::screen_vblank_sprint4)
 {
 	// rising edge
 	if (state)
@@ -115,7 +115,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			rect &= m_screen->visible_area();
 
-			m_playfield->draw(screen, m_helper, rect, 0, 0);
+			m_playfield->draw(*m_screen, m_helper, rect, 0, 0);
 
 			if (i & 1)
 				bank = 32;

@@ -250,7 +250,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_sammymdl(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
@@ -1145,7 +1145,7 @@ WRITE8_MEMBER(sigmab98_state::vblank_w)
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
 
-void sigmab98_state::screen_eof_sammymdl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sigmab98_state::screen_vblank_sammymdl)
 {
 	// rising edge
 	if (state)
@@ -2250,7 +2250,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sigmab98_state, screen_vblank_sammymdl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)

@@ -282,7 +282,7 @@ void mcatadv_state::video_start()
 	save_pointer(NAME(m_vidregs_old.get()), (0x0f + 1) / 2);
 }
 
-void mcatadv_state::screen_eof_mcatadv(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)
 {
 	// rising edge
 	if (state)

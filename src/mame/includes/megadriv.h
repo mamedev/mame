@@ -133,7 +133,7 @@ public:
 	DECLARE_MACHINE_RESET( megadriv );
 	DECLARE_VIDEO_START( megadriv );
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_megadriv(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
 	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
 };
@@ -171,7 +171,7 @@ public:
 	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
 	DECLARE_MACHINE_RESET( ms_megadriv );
 
-	void screen_eof_console(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 

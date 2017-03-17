@@ -910,6 +910,10 @@ wbbc97                          // (c) 1997 Comad
 @source:age_candy.cpp
 age_cand                        // AGE Candy Crane
 
+@source:agat.cpp
+agat7                           // Agat-7
+agat9                           // Agat-9
+
 @source:aim65.cpp
 aim65                           // Rockwell AIM65
 
@@ -1216,8 +1220,6 @@ apple1                          // Jul 1976 Apple 1
 
 @source:apple2.cpp
 ace100                          // ??? 1982 Franklin Ace 100
-agat7                           // Agat-7
-agat9                           // Agat-9
 am64                            // 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
 apple2                          // Apr 1977 Apple ][
 apple2jp                        // ??? ???? Apple ][j+
@@ -12104,6 +12106,10 @@ promutrvb                       // (c) 1985 Enerdyne Technologies Inc
 promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
+@source:eurocom2.cpp
+eurocom2						//
+waveterm						//
+
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 
@@ -12345,6 +12351,7 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 @source:fidel6502.cpp
 chesster                        //
 chesstera                       //
+kishon                          //
 csc                             // CSC: Champion Sensory Chess Challenger (English)
 cscfr                           // * French
 cscg                            // * German
@@ -12366,8 +12373,9 @@ feag2100fr                      // * French
 feag2100g                       // * German
 feag2100sp                      // * Spanish
 fexcel                          //
+fexcel12                        //
+fexcel124                       //
 fexcela                         //
-fexcelb                         //
 fexceld                         //
 fexcelp                         //
 fexcelpb                        //
@@ -31241,6 +31249,7 @@ portraita                       // (c) 1983 Olympia
 
 @source:potgoldu.cpp
 potgoldu                        // (c) 200? U.S. Games
+potgoldu580                     // (c) 200? U.S. Games
 
 @source:powerbal.cpp
 hotminda                        // (c) 1995

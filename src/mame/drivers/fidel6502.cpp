@@ -500,6 +500,7 @@ public:
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
+	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	DECLARE_DRIVER_INIT(chesster);
 };
 
@@ -1004,9 +1005,17 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
+WRITE8_MEMBER(fidel6502_state::kishon_control_w)
+{
+	chesster_control_w(space, offset, data);
+	
+	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
+	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4) | (m_speech_bank << 1 & 8) | (m_speech_bank << 4 & 0x10));
+}
+
 DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, memregion("user1")->bytes() / 0x4000, memregion("user1")->base(), 0x4000);
 }
 
 
@@ -1147,6 +1156,11 @@ static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac8", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kishon_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
+	AM_IMPORT_FROM( chesster_map )
 ADDRESS_MAP_END
 
 
@@ -1793,6 +1807,13 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fexcel4, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_4MHz) // R65C02P4
+	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
 
 	/* basic machine hardware */
@@ -1914,6 +1935,14 @@ static MACHINE_CONFIG_START( chesster, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kishon, chesster )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(kishon_map)
 MACHINE_CONFIG_END
 
 
@@ -2242,12 +2271,17 @@ ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
-ROM_START( fexcela ) // model EP12, PCB label 510-1099A01
+ROM_START( fexcel12 ) // model EP12, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072a01.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
 ROM_END
 
-ROM_START( fexcelb ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
+ROM_START( fexcel124 ) // model EP12, PCB label 510-1099A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1073a01.ic5", 0xc000, 0x4000, CRC(3e221534) SHA1(7516bc6a8aab9d8ac30ac1a9317630a6aa9ac1a0) )
+ROM_END
+
+ROM_START( fexcela ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
@@ -2320,6 +2354,14 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
+ROM_START( kishon ) // model 6120G, PCB label 510.1141C01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256
+
+	ROM_REGION( 0x80000, "user1", 0 )
+	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
+ROM_END
+
 
 
 /******************************************************************************
@@ -2362,8 +2404,9 @@ CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0
 CONS( 1987, fexcel,     0,        0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
-CONS( 1985, fexcelb,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcel12,   fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
+CONS( 1985, fexcel124,  fexcel,   0,      fexcel4,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, fexcelpb,   fexcelp,  0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -2378,3 +2421,4 @@ CONS( 1988, fphantom,   0,        0,      fphantom,  fphantom,  fidel6502_state,
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, chesstera,  chesster, 0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,     chesster, 0,      kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -56,7 +56,7 @@ public:
 	virtual void hack_eeprom() {};
 	virtual void hack_usb() {};
 
-	void vblank_callback(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;

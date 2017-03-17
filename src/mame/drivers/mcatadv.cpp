@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)

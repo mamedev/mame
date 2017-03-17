@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
-	MCFG_SCREEN_VBLANK_DRIVER(baraduke_state, screen_eof_baraduke)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)

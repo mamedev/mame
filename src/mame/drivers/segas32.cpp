@@ -529,6 +529,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
+#include "cpu/upd7725/upd7725.h"
 #include "machine/eepromser.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
@@ -609,6 +610,11 @@ void segas32_state::device_start()
 }
 
 void segas32_v25_state::device_start()
+{
+	common_start(0);
+}
+
+void segas32_upd7725_state::device_start()
 {
 	common_start(0);
 }
@@ -1494,6 +1500,20 @@ static ADDRESS_MAP_START( ga2_v25_map, AS_PROGRAM, 8, segas32_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  UPD7725 DSP memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( upd7725_prg_map, AS_PROGRAM, 32, segas32_state )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( upd7725_data_map, AS_DATA, 16, segas32_state )
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -2558,6 +2578,37 @@ machine_config_constructor segas32_v25_state::device_mconfig_additions() const
 }
 
 
+
+
+
+static MACHINE_CONFIG_FRAGMENT( system32_upd7725 )
+	MCFG_FRAGMENT_ADD( system32 )
+
+	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	MCFG_CPU_PROGRAM_MAP(upd7725_prg_map)
+	MCFG_CPU_DATA_MAP(upd7725_data_map)
+	MCFG_DEVICE_DISABLE() // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
+	// TODO: find /INT source for upd7725
+	// TODO: figure out how the p0 and p1 lines from the upd7725 affect the mainboard; do they select one of four (or 8) latches to/from the mainboard?
+	// TODO: trace out the 837-8341 pcb
+	// See HLE of this dsp in /src/mame/machine/segas32.cpp : arescue_dsp_r and arescue_dsp_w
+MACHINE_CONFIG_END
+
+const device_type SEGA_S32_UPD7725_DEVICE = device_creator<segas32_upd7725_state>;
+
+segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: segas32_state(mconfig, SEGA_S32_UPD7725_DEVICE, "Sega System 32 UPD7725 PCB", tag, owner, clock, "sega32_pcb_upd7725", __FILE__)
+{
+}
+
+machine_config_constructor segas32_upd7725_state::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( system32_upd7725 );
+}
+
+
+
 static MACHINE_CONFIG_FRAGMENT( multi32 )
 
 	/* basic machine hardware */
@@ -2672,9 +2723,15 @@ static MACHINE_CONFIG_START( sega_system32, segas32_new_state )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
 MACHINE_CONFIG_END
 
-// for air rescue & f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
+// for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
 static MACHINE_CONFIG_START( sega_system32_dual_direct, segas32_new_state )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
+	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_REGULAR_DEVICE, 0)
+MACHINE_CONFIG_END
+
+// air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
+static MACHINE_CONFIG_START( sega_system32_dual_direct_upd7725, segas32_new_state )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_REGULAR_DEVICE, 0)
 MACHINE_CONFIG_END
 
@@ -2823,8 +2880,10 @@ ROM_START( arescue )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
 
-	ROM_REGION( 0x20000, "user2", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
+	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
+	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -2898,8 +2957,10 @@ ROM_START( arescuej )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
 
-	ROM_REGION( 0x20000, "user2", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
+	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
+	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -3655,7 +3716,7 @@ ROM_END
 */
 ROM_START( ga2j )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
-	ROM_LOAD_x4( "epr-14956.ic17",        0x000000, 0x020000, CRC(f1929177) SHA1(7dc39c40eff9fb46c2e51d1e83478cd6970e3951) )
+	ROM_LOAD_x4( "epr-14959.ic17",        0x000000, 0x020000, CRC(f1929177) SHA1(7dc39c40eff9fb46c2e51d1e83478cd6970e3951) )
 	ROM_LOAD_x4( "epr-14946.ic8",         0x080000, 0x020000, CRC(eacafe94) SHA1(d41a7e1ee2df9e053b559be0a1a6d2ae520fd3e4) )
 	ROM_LOAD16_BYTE_x2( "epr-14941.ic18", 0x100000, 0x040000, CRC(0ffb8203) SHA1(b27dce634d203af8abb6ddfb656d4c48eb54af01) )
 	ROM_LOAD16_BYTE_x2( "epr-14940.ic9",  0x100001, 0x040000, CRC(3b5b3084) SHA1(ea17f6b7fd413fe3808f822cec84c993c9b75aa2) )
@@ -5270,6 +5331,26 @@ void segas32_state::init_arescue(int m_hasdsp)
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
+	if (m_hasdsp)
+	{
+		// massages the data from the BPMicro-compatible dump to runnable form
+		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
+		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
+		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
+	
+		// copy DSP program
+		for (int i = 0; i < 0x2000; i+= 4)
+		{
+			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
+			dspprg++;
+		}
+	
+		// copy DSP data
+		for (int i = 0; i < 0x800; i+= 2)
+		{
+			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
+		}
+	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 
@@ -5467,8 +5548,8 @@ void segas32_state::init_titlef(void)
  *
  *************************************/
 
-GAME( 1992, arescue,   0,        sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, alien3,    0,        sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, alien3u,   alien3,   sega_system32,     alien3,   segas32_new_state, alien3,   ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )

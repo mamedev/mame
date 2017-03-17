@@ -67,7 +67,9 @@ private:
 	// device-specific option handling
 	static void add_device_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier = nullptr);
 	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
-	static bool parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier);
+	static void parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier);
+	static std::string get_full_option_name(const device_image_interface &image);
+	static bool reevaluate_slot_options(emu_options &options);
 
 	// INI parsing helper
 	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);

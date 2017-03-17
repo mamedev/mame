@@ -1565,7 +1565,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	void sub_irq(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(sub_irq);
 	uint8_t nthbyte(const uint32_t *pSource, int offs);
 	uint16_t nthword(const uint32_t *pSource, int offs);
 	inline int32_t u32_to_s24(uint32_t v);
@@ -2460,11 +2460,11 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-void namcos23_state::sub_irq(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(namcos23_state::sub_irq)
 {
-	m_subcpu->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
-	m_adc->adtrg_w(vblank_state);
-	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
+	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_adc->adtrg_w(state);
+	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
 
@@ -3583,7 +3583,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3649,7 +3649,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3726,7 +3726,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 

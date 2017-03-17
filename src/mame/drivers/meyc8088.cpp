@@ -71,7 +71,7 @@ public:
 
 	DECLARE_PALETTE_INIT(meyc8088);
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_meyc8088(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 };
 
@@ -160,7 +160,7 @@ uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
 {
 	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
 	generic_pulse_irq_line_and_vector(*m_maincpu, 0, 0x20, 1);
@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
-	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)

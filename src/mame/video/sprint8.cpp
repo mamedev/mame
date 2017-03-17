@@ -161,7 +161,7 @@ uint32_t sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind1
 }
 
 
-void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sprint8_state::screen_vblank_sprint8)
 {
 	// rising edge
 	if (state)
@@ -170,7 +170,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 		int y;
 		const rectangle &visarea = m_screen->visible_area();
 
-		m_tilemap2->draw(screen, m_helper2, visarea, 0, 0);
+		m_tilemap2->draw(*m_screen, m_helper2, visarea, 0, 0);
 
 		m_helper1.fill(0x20, visarea);
 

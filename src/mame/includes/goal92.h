@@ -68,7 +68,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_goal92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_goal92(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_goal92);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);

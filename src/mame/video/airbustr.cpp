@@ -136,7 +136,7 @@ uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void airbustr_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
 {
 	// rising edge
 	if (state)

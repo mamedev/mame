@@ -217,8 +217,8 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 			// If write mode:
 			//  0=Write Channel B data, 1 = Record Channel B Audio
 			tape_drive.channel_select = (data & 1);
-		case 0x027:
 			break;
+		case 0x027:
 			// "Tape Drive Control: Erase"
 			tape_drive.erase = (data & 1);
 			break;

@@ -435,6 +435,7 @@ MACHINES["I8255"] = true
 MACHINES["I8279"] = true
 MACHINES["I8355"] = true
 MACHINES["IDE"] = true
+MACHINES["IE15"] = true
 MACHINES["IM6402"] = true
 MACHINES["INS8154"] = true
 MACHINES["INS8250"] = true

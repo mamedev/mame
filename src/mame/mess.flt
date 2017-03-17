@@ -17,6 +17,7 @@ aceex.cpp
 acrnsys1.cpp
 adam.cpp
 advision.cpp
+agat.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
@@ -179,6 +180,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurocom2.cpp
 europc.cpp
 evmbug.cpp
 excali64.cpp

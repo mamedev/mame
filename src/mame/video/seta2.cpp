@@ -482,7 +482,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-void seta2_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 {
 	// rising edge
 	if (state)

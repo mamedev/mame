@@ -84,7 +84,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -362,7 +362,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
 		m_via->write_cb1(m_cassette->input() > 0.0038);
 }
 
-void oric_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(oric_state::vblank_w)
 {
 	if(m_config->read())
 		m_via->write_cb1(state);
@@ -779,7 +779,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_SIZE(40*6, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_DRIVER(oric_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 

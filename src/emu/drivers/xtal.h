@@ -80,6 +80,7 @@ enum
 	XTAL_4_9152MHz      = 4915200,
 	XTAL_5MHz           = 5000000,      /* Mutant Night */
 	XTAL_5_0688MHz      = 5068800,      /* Xerox 820, DEC VK100 */
+	XTAL_5_3586MHz      = 5358600,      /* Eltec EurocomII */
 	XTAL_5_46MHz        = 5460000,      /* ec1840 and ec1841 keyboard */
 	XTAL_5_626MHz       = 5626000,      /* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz        = 5670000,      /* RCA CDP1869 NTSC dot clock */
@@ -110,6 +111,7 @@ enum
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
 	XTAL_10MHz          = 10000000,
 	XTAL_10_245MHz      = 10245000,     /* PES Speech box */
+	XTAL_10_5MHz        = 10500000,     /* Agat-7 */
 	XTAL_10_595MHz      = 10595000,     /* Mad Alien */
 	XTAL_10_6875MHz     = 10687500,     /* BBC Bridge Companion */
 	XTAL_10_69425MHz    = 10694250,     /* Xerox 820 */
@@ -140,6 +142,7 @@ enum
 	XTAL_13_4952MHz     = 13495200,     /* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
+	XTAL_14_3MHz        = 14300000,	    /* Agat-7 */
 	XTAL_14_314MHz      = 14314000,     /* Taito TTL Board  */
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	XTAL_14_705882MHz   = 14705882,     /* Aleck64 */
@@ -149,6 +152,7 @@ enum
 	XTAL_15_4MHz        = 15400000,     /* DVK KSM */
 	XTAL_15_468MHz      = 15468480,     /* Bank Panic h/w, Sega G80 */
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
+	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */

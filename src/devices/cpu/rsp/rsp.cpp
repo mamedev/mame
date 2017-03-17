@@ -492,7 +492,7 @@ void rsp_device::device_start()
 	state_add( RSP_V31,     "V31", m_debugger_temp).formatstr("%39s");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_rsp_state->pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 	state_add( STATE_GENSP, "GENSP", m_rsp_state->r[31]).noshow();
 
