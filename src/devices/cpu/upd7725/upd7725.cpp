@@ -586,8 +586,8 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 				m_out_p0_cb(regs.sr&0x1);
 				m_out_p1_cb((regs.sr&0x2)>>1);
 				break;
-	case  8: regs.so = id; break;  //LSB
-	case  9: regs.so = id; break;  //MSB
+	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
+	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp<<1); break;
 	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
