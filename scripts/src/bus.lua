@@ -717,6 +717,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
+---------------------------------------------------
+
+if (BUSES["HPHIL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/generic/slot.h,BUSES["GENERIC"] = true
 ---------------------------------------------------
 
