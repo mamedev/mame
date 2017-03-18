@@ -9775,6 +9775,20 @@ Confirmed dump but no pcb pic
 		</part>
 	</software>
 
+	<software name="valis3j" cloneof="valis3">
+		<description>Valis III (Jpn, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Reno</publisher>
+		<info name="serial" value="T-49023"/>
+		<info name="release" value="19910322"/>
+		<info name="alt_title" value="ヴァリスIII"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 Old scrambled/interleaved dumps.
 Some carts have been partially documented, based on available pics (from Nepereny's old website, or from MikeHaggar's and ICEKnight's contributions),
@@ -28171,20 +28185,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="valis iii (usa).bin" size="1048576" crc="59a2a368" sha1="bb051779d6c4c68a8a4571177990f7d190696b4a" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="valis3j" cloneof="valis3">
-		<description>Valis III (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Reno</publisher>
-		<info name="serial" value="T-49023"/>
-		<info name="release" value="19910322"/>
-		<info name="alt_title" value="ヴァリスIII"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
