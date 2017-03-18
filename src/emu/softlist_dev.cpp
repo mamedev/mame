@@ -365,7 +365,7 @@ software_compatibility software_list_device::is_compatible(const software_part &
 //  that can automatically mount this software part
 //-------------------------------------------------
 
-device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool(const device_image_interface &)> filter)
 {
 	// if automount="no", don't bother
 	const char *mount = part.feature("automount");
@@ -375,13 +375,32 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
 	{
 		const char *interface = image.image_interface();
-		if (interface != nullptr && part.matches_interface(interface))
-		{
-			if (!image.filename())
-				return &image;
-		}
+		if (interface != nullptr && part.matches_interface(interface) && filter(image))
+			return &image;
 	}
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  find_mountable_image - find an image interface
+//  that can automatically mount this software part
+//-------------------------------------------------
+
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+{
+	// Multi-part softlists will distribute individual images serially (e.g. - first floppy to flop1, next one to flop2
+	// etc).  Pre MAME 0.183 relied on the core doing this distribution between calls to find_mountable_image() so it
+	// could check to see if the slot was empty.
+	//
+	// When softlists were refactored in MAME 0.183, this was changed to build a "plan" for what needs to be loaded, so
+	// it was incorrect to check the image slot.  This is why an overload for find_mountable_image() was created that
+	// takes an std::function.  This overload is being preserved for compatibility with existing code, but I regard the
+	// continued existance of this overload is a red flag.
+	return find_mountable_image(
+		mconfig,
+		part,
+		[](const device_image_interface &image) { return !image.exists(); });
 }
 
 
