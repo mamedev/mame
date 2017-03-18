@@ -50,8 +50,6 @@ public:
 	void set_time(bool update, int year, int month, int day, int day_of_week, int hour, int minute, int second);
 	void set_current_time(const system_time &systime);
 
-	bool has_battery() const { return rtc_battery_backed(); }
-
 protected:
 	static u8 convert_to_bcd(int val);
 	static int bcd_to_integer(u8 val);
@@ -68,7 +66,6 @@ protected:
 	// derived class overrides
 	virtual bool rtc_feature_y2k() const { return false; }
 	virtual bool rtc_feature_leap_year() const { return false; }
-	virtual bool rtc_battery_backed() const { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) = 0;
 
 	int m_register[7];

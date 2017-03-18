@@ -90,8 +90,6 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
 
 	optional_memory_region  m_region;
 

@@ -815,8 +815,7 @@ void running_machine::current_datetime(system_time &systime)
 void running_machine::set_rtc_datetime(const system_time &systime)
 {
 	for (device_rtc_interface &rtc : rtc_interface_iterator(root_device()))
-		if (rtc.has_battery())
-			rtc.set_current_time(systime);
+		rtc.set_current_time(systime);
 }
 
 
@@ -874,7 +873,7 @@ void running_machine::handle_saveload()
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
-			auto const filerr = file.open(m_saveload_pending_file.c_str());
+			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
 				const char *const opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
@@ -1114,14 +1113,16 @@ void running_machine::nvram_load()
 {
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
-		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
+		if (nvram.has_battery_backup())
 		{
-			nvram.nvram_load(file);
-			file.close();
+			emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
+			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			{
+				nvram.nvram_load(file);
+				continue;
+			}
 		}
-		else
-			nvram.nvram_reset();
+		nvram.nvram_reset();
 	}
 }
 
@@ -1134,11 +1135,11 @@ void running_machine::nvram_save()
 {
 	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
 	{
-		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(nvram.device()).c_str()) == osd_file::error::NONE)
+		if (nvram.has_battery_backup())
 		{
-			nvram.nvram_save(file);
-			file.close();
+			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+				nvram.nvram_save(file);
 		}
 	}
 }

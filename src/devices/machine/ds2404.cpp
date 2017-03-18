@@ -104,6 +104,8 @@ void ds2404_device::device_start()
 
 	m_tick_timer = timer_alloc(0);
 	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+
+	memarray().set(m_sram, sizeof(m_sram), 8, ENDIANNESS_LITTLE, 1);
 }
 
 
@@ -380,26 +382,4 @@ void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void ds2404_device::nvram_default()
 {
 	memset(m_sram, 0, sizeof(m_sram));
-}
-
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-
-void ds2404_device::nvram_read(emu_file &file)
-{
-	file.read(m_sram, sizeof(m_sram));
-}
-
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-
-void ds2404_device::nvram_write(emu_file &file)
-{
-	file.write(m_sram, sizeof(m_sram));
 }

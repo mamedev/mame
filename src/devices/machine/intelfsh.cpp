@@ -441,6 +441,9 @@ void intelfsh_device::device_start()
 	save_item( NAME(m_flash_mode) );
 	save_item( NAME(m_flash_master_lock) );
 	save_pointer( &m_data[0], "m_data", m_size);
+
+	assert(m_bits == 8 || m_bits == 16);
+	memarray().set(&m_data[0], m_size, 8, ENDIANNESS_BIG, m_bits / 8);
 }
 
 
@@ -495,28 +498,6 @@ void intelfsh_device::nvram_default()
 
 	// otherwise, default to 0xff
 	memset(&m_data[0], 0xff, m_size);
-}
-
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-
-void intelfsh_device::nvram_read(emu_file &file)
-{
-	file.read(&m_data[0], m_size);
-}
-
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-
-void intelfsh_device::nvram_write(emu_file &file)
-{
-	file.write(&m_data[0], m_size);
 }
 
 

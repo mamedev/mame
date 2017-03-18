@@ -209,8 +209,10 @@ void eeprom_base_device::device_validity_check(validity_checker &valid) const
 
 void eeprom_base_device::device_start()
 {
-	uint32_t size = (m_data_bits == 8 ? 1 : 2) << m_address_bits;
+	int bpe = m_data_bits / 8;
+	uint32_t size = bpe * m_cells;
 	m_data = std::make_unique<uint8_t []>(size);
+	memarray().set(&m_data[0], size, 8, ENDIANNESS_LITTLE, bpe);
 
 	// save states
 	save_item(NAME(m_completion_time));
@@ -270,34 +272,6 @@ void eeprom_base_device::nvram_default()
 
 		memcpy(&m_data[0], m_region->base(), eeprom_bytes);
 	}
-}
-
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-
-void eeprom_base_device::nvram_read(emu_file &file)
-{
-	uint32_t eeprom_length = 1 << m_address_bits;
-	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
-
-	file.read(&m_data[0], eeprom_bytes);
-}
-
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-
-void eeprom_base_device::nvram_write(emu_file &file)
-{
-	uint32_t eeprom_length = 1 << m_address_bits;
-	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
-
-	file.write(&m_data[0], eeprom_bytes);
 }
 
 
