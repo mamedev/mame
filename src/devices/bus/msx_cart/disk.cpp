@@ -105,10 +105,10 @@
 #include "formats/msx_dsk.h"
 #include "softlist.h"
 
-const device_type MSX_CART_VY0010 = &device_creator<msx_cart_vy0010>;
-const device_type MSX_CART_FSFD1 = &device_creator<msx_cart_fsfd1>;
-const device_type MSX_CART_FSFD1A = &device_creator<msx_cart_fsfd1a>;
-const device_type MSX_CART_FSCF351 = &device_creator<msx_cart_fscf351>;
+const device_type MSX_CART_VY0010 = device_creator<msx_cart_vy0010>;
+const device_type MSX_CART_FSFD1 = device_creator<msx_cart_fsfd1>;
+const device_type MSX_CART_FSFD1A = device_creator<msx_cart_fsfd1a>;
+const device_type MSX_CART_FSCF351 = device_creator<msx_cart_fscf351>;
 
 
 FLOPPY_FORMATS_MEMBER( msx_cart_disk::floppy_formats )

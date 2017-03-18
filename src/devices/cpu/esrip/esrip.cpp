@@ -10,8 +10,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "esrip.h"
+
+#include "debugger.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -1685,7 +1687,7 @@ void esrip_device::nop(uint16_t inst)
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type ESRIP = &device_creator<esrip_device>;
+const device_type ESRIP = device_creator<esrip_device>;
 
 //-------------------------------------------------
 //  esrip_device - constructor

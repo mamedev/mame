@@ -36,7 +36,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_MS151A = &device_creator<iq151_ms151a_device>;
+const device_type IQ151_MS151A = device_creator<iq151_ms151a_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

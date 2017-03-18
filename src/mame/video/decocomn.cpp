@@ -10,7 +10,7 @@
 #include "video/decocomn.h"
 
 
-const device_type DECOCOMN = &device_creator<decocomn_device>;
+const device_type DECOCOMN = device_creator<decocomn_device>;
 
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECOCOMN, "DECO Common Video Functions", tag, owner, clock, "decocomn", __FILE__),

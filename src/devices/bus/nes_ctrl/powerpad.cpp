@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_POWERPAD = &device_creator<nes_powerpad_device>;
+const device_type NES_POWERPAD = device_creator<nes_powerpad_device>;
 
 
 static INPUT_PORTS_START( nes_powerpad )

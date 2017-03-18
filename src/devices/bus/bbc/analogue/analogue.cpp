@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_ANALOGUE_SLOT = &device_creator<bbc_analogue_slot_device>;
+const device_type BBC_ANALOGUE_SLOT = device_creator<bbc_analogue_slot_device>;
 
 
 

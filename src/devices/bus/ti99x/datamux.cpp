@@ -322,7 +322,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 	uint16_t value = 0;
 
 	// Care for debugger
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		return debugger_read(space, offset);
 	}
@@ -371,7 +371,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		debugger_write(space, offset, data);
 		return;
@@ -634,4 +634,4 @@ ioport_constructor ti99_datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-const device_type DATAMUX = &device_creator<ti99_datamux_device>;
+const device_type DATAMUX = device_creator<ti99_datamux_device>;

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PCD3311 = &device_creator<pcd3311_t>;
+const device_type PCD3311 = device_creator<pcd3311_t>;
 
 
 

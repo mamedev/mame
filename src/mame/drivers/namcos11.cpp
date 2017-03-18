@@ -295,11 +295,13 @@ Pin 22 Solder Side - Gun 2 Trigger
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/at28c16.h"
 #include "machine/namcomcu.h"
 #include "machine/ns11prot.h"
+#include "machine/ram.h"
 #include "sound/c352.h"
+#include "video/psx.h"
+#include "speaker.h"
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )

@@ -32,7 +32,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_EMB = &device_creator<wangpc_emb_device>;
+const device_type WANGPC_EMB = device_creator<wangpc_emb_device>;
 
 
 

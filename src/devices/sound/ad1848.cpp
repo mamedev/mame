@@ -5,7 +5,10 @@
 
 #include "emu.h"
 #include "sound/ad1848.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 const device_type AD1848 = device_creator<ad1848_device>;
 

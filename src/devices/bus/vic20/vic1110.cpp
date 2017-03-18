@@ -28,7 +28,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1110 = &device_creator<vic1110_device>;
+const device_type VIC1110 = device_creator<vic1110_device>;
 
 
 

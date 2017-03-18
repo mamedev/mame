@@ -214,6 +214,9 @@
 
 #include "bus/ti99_peb/peribox.h"
 
+#include "speaker.h"
+
+
 #define TRACE_READY 0
 #define TRACE_LINES 0
 #define TRACE_CRU 0

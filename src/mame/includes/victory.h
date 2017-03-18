@@ -6,6 +6,8 @@
 
 ****************************************************************************/
 
+#include "screen.h"
+
 
 #define VICTORY_MAIN_CPU_CLOCK      (XTAL_8MHz / 2)
 

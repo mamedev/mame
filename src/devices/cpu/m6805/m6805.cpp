@@ -707,6 +707,6 @@ void hd63705_device::interrupt_vector()
 }
 
 
-const device_type M6805 = &device_creator<m6805_device>;
-const device_type M68HC05EG = &device_creator<m68hc05eg_device>;
-const device_type HD63705 = &device_creator<hd63705_device>;
+const device_type M6805 = device_creator<m6805_device>;
+const device_type M68HC05EG = device_creator<m68hc05eg_device>;
+const device_type HD63705 = device_creator<hd63705_device>;

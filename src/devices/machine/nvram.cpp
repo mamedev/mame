@@ -16,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type NVRAM = &device_creator<nvram_device>;
+const device_type NVRAM = device_creator<nvram_device>;
 
 //-------------------------------------------------
 //  nvram_device - constructor

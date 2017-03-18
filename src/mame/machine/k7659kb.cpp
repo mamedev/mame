@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type K7659_KEYBOARD = &device_creator<k7659_keyboard_device>;
+const device_type K7659_KEYBOARD = device_creator<k7659_keyboard_device>;
 
 
 

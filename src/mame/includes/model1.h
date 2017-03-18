@@ -1,14 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <functional>
+#ifndef MAME_INCLUDES_MODEL1_H
+#define MAME_INCLUDES_MODEL1_H
 
-#include <glm/glm/vec3.hpp>
+#pragma once
 
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
+
+#include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
 #include "machine/m1comm.h"
 #include "video/segaic24.h"
+
+#include "screen.h"
+
+#include <glm/glm/vec3.hpp>
+
+#include <functional>
+
 
 #define DECLARE_TGP_FUNCTION(name) void name()
 
@@ -97,7 +107,7 @@ public:
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_model1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
 
 	struct spoint_t
 	{
@@ -476,3 +486,5 @@ private:
 /*----------- defined in machine/model1.c -----------*/
 
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
+
+#endif // MAME_INCLUDES_MODEL1_H

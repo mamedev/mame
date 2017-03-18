@@ -15,8 +15,8 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_RS232 = &device_creator<cpc_rs232_device>;
-const device_type CPC_RS232_AMS = &device_creator<cpc_ams_rs232_device>;
+const device_type CPC_RS232 = device_creator<cpc_rs232_device>;
+const device_type CPC_RS232_AMS = device_creator<cpc_ams_rs232_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )

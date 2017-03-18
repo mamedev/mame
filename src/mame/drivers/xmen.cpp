@@ -16,15 +16,17 @@ likewise a 2 screen game
 
 ***************************************************************************/
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "rendlay.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "rendlay.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -398,7 +400,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_DRIVER(xmen_state, screen_eof_xmen6p)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)

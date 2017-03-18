@@ -94,7 +94,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_21056 = &device_creator<luxor_55_21056_device>;
+const device_type LUXOR_55_21056 = device_creator<luxor_55_21056_device>;
 
 
 //-------------------------------------------------

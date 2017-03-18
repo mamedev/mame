@@ -34,6 +34,8 @@
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tmmjprd_state : public driver_device

@@ -88,12 +88,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/capbowl.h"
+
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/capbowl.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_8MHz
 

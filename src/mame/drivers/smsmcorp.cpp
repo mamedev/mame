@@ -217,9 +217,11 @@ U145        1Brown          PAL14H4CN
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class smsmfg_state : public driver_device

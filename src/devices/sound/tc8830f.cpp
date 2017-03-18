@@ -22,7 +22,7 @@
 
 
 // device type definition
-const device_type TC8830F = &device_creator<tc8830f_device>;
+const device_type TC8830F = device_creator<tc8830f_device>;
 
 tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),

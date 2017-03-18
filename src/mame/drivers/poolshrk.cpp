@@ -7,10 +7,13 @@ Atari Poolshark Driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/poolshrk.h"
+
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 
+#include "screen.h"
+#include "speaker.h"
 
 
 

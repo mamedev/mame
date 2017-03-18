@@ -80,8 +80,9 @@ Blitter source graphics
 
 
 #include "emu.h"
-#include "includes/konamipt.h"
 #include "includes/tutankhm.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -92,6 +93,8 @@ Blitter source graphics
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class junofrst_state : public tutankhm_state

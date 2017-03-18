@@ -9,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEC_P72 = &device_creator<nec_p72_t>;
+const device_type NEC_P72 = device_creator<nec_p72_t>;
 
 
 //-------------------------------------------------

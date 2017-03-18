@@ -41,15 +41,18 @@ documentation still exists.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dgn_beta.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "includes/dgn_beta.h"
 #include "machine/mos6551.h"
+#include "machine/ram.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "video/mc6845.h"
 
 
 /*

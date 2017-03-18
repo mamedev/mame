@@ -443,6 +443,8 @@
 #include "cpu/i86/i186.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/saa1099.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bingor_state : public driver_device

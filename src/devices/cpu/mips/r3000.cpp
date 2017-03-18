@@ -113,11 +113,11 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type R3041 = &device_creator<r3041_device>;
-const device_type R3051 = &device_creator<r3051_device>;
-const device_type R3052 = &device_creator<r3052_device>;
-const device_type R3071 = &device_creator<r3071_device>;
-const device_type R3081 = &device_creator<r3081_device>;
+const device_type R3041 = device_creator<r3041_device>;
+const device_type R3051 = device_creator<r3051_device>;
+const device_type R3052 = device_creator<r3052_device>;
+const device_type R3071 = device_creator<r3071_device>;
+const device_type R3081 = device_creator<r3081_device>;
 
 
 //-------------------------------------------------

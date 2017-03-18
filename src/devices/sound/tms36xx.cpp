@@ -309,7 +309,7 @@ static const int *const tunes[] = {nullptr,tune1,tune2,tune3,tune4};
 
 
 // device type definition
-const device_type TMS36XX = &device_creator<tms36xx_device>;
+const device_type TMS36XX = device_creator<tms36xx_device>;
 
 
 //**************************************************************************

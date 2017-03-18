@@ -64,9 +64,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pacman.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
-#include "includes/pacman.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pengo_state : public pacman_state

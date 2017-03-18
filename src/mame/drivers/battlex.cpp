@@ -45,9 +45,12 @@
 
 
 #include "emu.h"
+#include "includes/battlex.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/battlex.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)

@@ -202,7 +202,7 @@ WRITE8_MEMBER( ym2203_device::write_port_w )
 	write(space, 1, data);
 }
 
-const device_type YM2203 = &device_creator<ym2203_device>;
+const device_type YM2203 = device_creator<ym2203_device>;
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2203, "YM2203", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2203", __FILE__),

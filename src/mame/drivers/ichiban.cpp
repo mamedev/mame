@@ -36,11 +36,13 @@ HSync - 15.510kHz
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_18_432MHz
 
@@ -48,8 +50,8 @@ class ichibanjyan_state : public driver_device
 {
 public:
 	ichibanjyan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	// devices

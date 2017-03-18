@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CPC_EXPANSION_SLOT = &device_creator<cpc_expansion_slot_device>;
+const device_type CPC_EXPANSION_SLOT = device_creator<cpc_expansion_slot_device>;
 
 
 //**************************************************************************

@@ -47,12 +47,15 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "h8.lh"
 
 

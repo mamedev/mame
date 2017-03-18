@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nomapper.h"
 
-const device_type MSX_CART_NOMAPPER = &device_creator<msx_cart_nomapper>;
+const device_type MSX_CART_NOMAPPER = device_creator<msx_cart_nomapper>;
 
 
 msx_cart_nomapper::msx_cart_nomapper(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

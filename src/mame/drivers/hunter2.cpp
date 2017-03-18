@@ -21,15 +21,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/hd61830.h"
-#include "machine/mm58274c.h"
-#include "rendlay.h"
-#include "sound/speaker.h"
-#include "machine/nsc810.h"
 #include "bus/rs232/rs232.h"
-#include "machine/nvram.h"
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
+#include "machine/mm58274c.h"
+#include "machine/nsc810.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "video/hd61830.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class hunter2_state : public driver_device
 {

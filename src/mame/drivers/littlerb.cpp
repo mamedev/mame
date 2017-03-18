@@ -8,9 +8,6 @@ David Haywood
 */
 
 
-#define littlerb_printf logerror
-#define littlerb_alt_printf logerror
-
 /*
 
 Notes:
@@ -71,6 +68,10 @@ Dip sw.2
 #include "machine/inder_vid.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
+#define littlerb_printf logerror
+#define littlerb_alt_printf logerror
 
 class littlerb_state : public driver_device
 {

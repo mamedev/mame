@@ -17,9 +17,9 @@
 //  apf_rom_device - constructor
 //-------------------------------------------------
 
-const device_type APF_ROM_STD = &device_creator<apf_rom_device>;
-const device_type APF_ROM_BASIC = &device_creator<apf_basic_device>;
-const device_type APF_ROM_SPACEDST = &device_creator<apf_spacedst_device>;
+const device_type APF_ROM_STD = device_creator<apf_rom_device>;
+const device_type APF_ROM_BASIC = device_creator<apf_basic_device>;
+const device_type APF_ROM_SPACEDST = device_creator<apf_spacedst_device>;
 
 
 apf_rom_device::apf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

@@ -63,14 +63,15 @@ zooming might be wrong
 
 ***************************************************************************/
 
-
-
 #include "emu.h"
+#include "includes/taotaido.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/taotaido.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TAOTAIDO_SHOW_ALL_INPUTS    0
 
@@ -377,7 +378,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taotaido_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(taotaido_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taotaido_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)

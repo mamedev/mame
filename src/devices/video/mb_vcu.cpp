@@ -30,7 +30,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-const device_type MB_VCU = &device_creator<mb_vcu_device>;
+const device_type MB_VCU = device_creator<mb_vcu_device>;
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the

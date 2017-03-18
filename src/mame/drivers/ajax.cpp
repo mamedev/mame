@@ -13,12 +13,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ajax.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/konami.h"
 #include "sound/ym2151.h"
-#include "includes/ajax.h"
-#include "includes/konamipt.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ls138_f10_r, ls138_f10_w)   /* bankswitch + sound command + FIRQ command */

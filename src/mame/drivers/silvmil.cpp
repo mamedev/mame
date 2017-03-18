@@ -28,8 +28,10 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "video/decospr.h"
 #include "sound/ym2151.h"
+#include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class silvmil_state : public driver_device

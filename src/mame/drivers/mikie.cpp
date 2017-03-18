@@ -39,13 +39,17 @@ Stephh's notes (based on the games M6809 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mikie.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "includes/mikie.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MIKIE_TIMER_RATE 512

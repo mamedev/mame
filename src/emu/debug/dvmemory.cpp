@@ -741,6 +741,8 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 	{
 		offs_t dummyaddr = offs;
 
+		auto dis = machine().disable_side_effect();
+
 		bool ismapped = m_no_translation ? true : source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
 		data = ~u64(0);
 		if (ismapped)
@@ -817,6 +819,8 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	// if no raw data, just use the standard debug routines
 	if (source.m_space != nullptr)
 	{
+		auto dis = machine().disable_side_effect();
+
 		switch (size)
 		{
 			case 1: machine().debugger().cpu().write_byte(*source.m_space, offs, data, !m_no_translation); break;

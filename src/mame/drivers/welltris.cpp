@@ -312,14 +312,18 @@ TODO:
 
 *******************************************************************************/
 
-#define WELLTRIS_4P_HACK 0
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/welltris.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "video/vsystem_gga.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define WELLTRIS_4P_HACK 0
 
 
 WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
@@ -368,9 +372,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")              /* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITENOP                    /* ?? */
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITENOP                    /* ?? */
+	AM_RANGE(0xfff00c, 0xfff00f) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
@@ -710,6 +713,8 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", welltris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)

@@ -75,15 +75,17 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/clock.h"
-#include "machine/6850acia.h"
-#include "machine/meters.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/upd7759.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/meters.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "sound/upd7759.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*

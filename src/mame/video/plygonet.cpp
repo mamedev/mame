@@ -10,8 +10,9 @@
 */
 
 #include "emu.h"
-
 #include "includes/plygonet.h"
+#include "screen.h"
+
 
 /* TTL text plane */
 

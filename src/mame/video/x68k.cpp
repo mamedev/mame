@@ -34,10 +34,7 @@
 */
 
 #include "emu.h"
-
-#include "machine/mc68901.h"
 #include "includes/x68k.h"
-#include "machine/ram.h"
 
 
 PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)

@@ -78,6 +78,7 @@
 #include "machine/nl_stuntcyc.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
+#include "screen.h"
 
 
 // copied by Pong, not accurate for this driver!

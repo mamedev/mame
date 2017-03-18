@@ -58,8 +58,9 @@ mae(forward), migi(right), ushiro(back), hidari(left)
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/msm5205.h"
 #include "machine/i8255.h"
+#include "sound/msm5205.h"
+#include "speaker.h"
 
 #include "kungfur.lh"
 

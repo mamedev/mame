@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "tmpz84c011.h"
 
-const device_type TMPZ84C011 = &device_creator<tmpz84c011_device>;
+const device_type TMPZ84C011 = device_creator<tmpz84c011_device>;
 
 static ADDRESS_MAP_START( tmpz84c011_internal_io_map, AS_IO, 8, tmpz84c011_device )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c011_ctc", z80ctc_device, read, write)

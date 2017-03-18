@@ -4,7 +4,7 @@
 #include "rom.h"
 
 
-const device_type MSX_SLOT_ROM = &device_creator<msx_slot_rom_device>;
+const device_type MSX_SLOT_ROM = device_creator<msx_slot_rom_device>;
 
 
 msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DISKIING = &device_creator<a2bus_diskiing_device>;
+const device_type A2BUS_DISKIING = device_creator<a2bus_diskiing_device>;
 
 #define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"

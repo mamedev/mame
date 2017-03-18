@@ -25,11 +25,13 @@
 
 
 #include "emu.h"
+#include "includes/rampart.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "includes/rampart.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_14_31818MHz

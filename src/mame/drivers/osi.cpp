@@ -218,7 +218,11 @@ PRINT FRE(0)
 
 #include "emu.h"
 #include "includes/osi.h"
+
 #include "machine/clock.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Sound */
 

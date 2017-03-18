@@ -147,7 +147,7 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_t &nl)
-	: timed_queue<net_t *, netlist_time>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>>(512)
 	, netlist_ref(nl)
 	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
@@ -513,8 +513,8 @@ void netlist_t::reset()
 		break;
 		case 2:     // brute force forward
 		{
-			for (std::size_t i = 0; i < m_devices.size(); i++)
-				m_devices[i]->update_dev();
+			for (auto &d : m_devices)
+				d->update_dev();
 		}
 		break;
 	}
@@ -527,7 +527,7 @@ void netlist_t::reset()
 }
 
 
-void netlist_t::process_queue(const netlist_time &delta)
+void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 {
 	netlist_time stop(m_time + delta);
 
@@ -537,13 +537,15 @@ void netlist_t::process_queue(const netlist_time &delta)
 
 	if (m_mainclock == nullptr)
 	{
-		detail::queue_t::entry_t e(m_queue.pop());
+		detail::queue_t::entry_t e(m_queue.top());
+		m_queue.pop();
 		m_time = e.m_exec_time;
 		while (e.m_object != nullptr)
 		{
 			e.m_object->update_devs();
 			m_perf_out_processed.inc();
-			e = m_queue.pop();
+			e = m_queue.top();
+			m_queue.pop();
 			m_time = e.m_exec_time;
 		}
 	}
@@ -553,7 +555,9 @@ void netlist_t::process_queue(const netlist_time &delta)
 		const netlist_time inc = m_mainclock->m_inc;
 		netlist_time mc_time(mc_net.time());
 
-		while (1)
+		detail::queue_t::entry_t e;
+
+		do
 		{
 			while (m_queue.top().m_exec_time > mc_time)
 			{
@@ -563,16 +567,15 @@ void netlist_t::process_queue(const netlist_time &delta)
 				mc_time += inc;
 			}
 
-			const detail::queue_t::entry_t e(m_queue.pop());
+			e = m_queue.top();
+			m_queue.pop();
 			m_time = e.m_exec_time;
 			if (e.m_object != nullptr)
 			{
 				e.m_object->update_devs();
 				m_perf_out_processed.inc();
 			}
-			else
-				break;
-		}
+		} while (e.m_object != nullptr);
 		mc_net.set_time(mc_time);
 	}
 	m_stat_mainloop.stop();
@@ -638,7 +641,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-core_device_t *netlist_t::get_single_device(const pstring classname, bool (*cc)(core_device_t *))
+core_device_t *netlist_t::get_single_device(const pstring &classname, bool (*cc)(core_device_t *))
 {
 	core_device_t *ret = nullptr;
 	for (auto &d : m_devices)
@@ -761,7 +764,7 @@ void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_term
 // family_setter_t
 // -----------------------------------------------------------------------------
 
-detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring desc)
+detail::family_setter_t::family_setter_t(core_device_t &dev, const pstring &desc)
 {
 	dev.set_logic_family(dev.netlist().setup().family_from_model(desc));
 }
@@ -780,9 +783,9 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, netlist_ref(nl)
 	, m_new_Q(*this, "m_new_Q", 0)
 	, m_cur_Q (*this, "m_cur_Q", 0)
+	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_active(*this, "m_active", 0)
-	, m_in_queue(*this, "m_in_queue", 2)
 	, m_cur_Analog(*this, "m_cur_Analog", 0.0)
 	, m_railterminal(mr)
 {
@@ -795,23 +798,23 @@ detail::net_t::~net_t()
 
 void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
-	m_active++;
+	++m_active;
 	m_list_active.push_front(&term);
 	nl_assert(m_active <= static_cast<int>(num_cons()));
 	if (m_active == 1)
 	{
 		railterminal().device().do_inc_active();
-		if (m_in_queue == 0)
+		if (m_in_queue == QS_DELAYED_DUE_TO_INACTIVE)
 		{
 			if (m_time > netlist().time())
 			{
-				m_in_queue = 1;     /* pending */
+				m_in_queue = QS_QUEUED;     /* pending */
 				netlist().queue().push(queue_t::entry_t(m_time, this));
 			}
 			else
 			{
+				m_in_queue = QS_DELIVERED;
 				m_cur_Q = m_new_Q;
-				m_in_queue = 2;
 			}
 		}
 	}
@@ -845,7 +848,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	const unsigned masks[4] =
+	const uint8_t masks[4] =
 	{
 		0,
 		core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE,
@@ -853,16 +856,20 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 		0
 	};
 
-	const unsigned mask = masks[ (m_cur_Q << 1) | m_new_Q ];
+	const auto mask = masks[ (m_cur_Q << 1) | m_new_Q ];
 
 	m_cur_Q = m_new_Q;
-	m_in_queue = 2; /* mark as taken ... */
+	m_in_queue = QS_DELIVERED; /* mark as taken ... */
 
 	for (auto & p : m_list_active)
 	{
 		p.device().m_stat_call_count.inc();
 		if ((p.state() & mask) != 0)
+		{
+			p.device().m_stat_total_time.start();
 			p.m_delegate();
+			p.device().m_stat_total_time.stop();
+		}
 	}
 }
 
@@ -870,7 +877,7 @@ void detail::net_t::reset()
 {
 	m_time = netlist_time::zero();
 	m_active = 0;
-	m_in_queue = 2;
+	m_in_queue = QS_DELIVERED;
 
 	m_new_Q = 0;
 	m_cur_Q = 0;
@@ -892,7 +899,7 @@ void detail::net_t::reset()
 
 void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
-	for (auto t : m_core_terms)
+	for (auto &t : m_core_terms)
 		if (t == &terminal)
 			netlist().log().fatal(MF_2_NET_1_DUPLICATE_TERMINAL_2, name(),
 					t->name());
@@ -1029,19 +1036,17 @@ terminal_t::~terminal_t()
 {
 }
 
-void terminal_t::schedule_solve()
+void terminal_t::solve_now()
 {
 	// Nets may belong to railnets which do not have a solver attached
-	// FIXME: Enforce that all terminals get connected?
 	if (this->has_net())
 		if (net().solver() != nullptr)
 			net().solver()->update_forced();
 }
 
-void terminal_t::schedule_after(const netlist_time &after)
+void terminal_t::schedule_solve_after(const netlist_time &after)
 {
 	// Nets may belong to railnets which do not have a solver attached
-	// FIXME: Enforce that all terminals get connected?
 	if (this->has_net())
 		if (net().solver() != nullptr)
 			net().solver()->update_after(after);
@@ -1181,7 +1186,7 @@ const pstring param_model_t::model_type()
 	return m_map["COREMODEL"];
 }
 
-param_str_t::param_str_t(device_t &device, const pstring name, const pstring val)
+param_str_t::param_str_t(device_t &device, const pstring &name, const pstring &val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1195,7 +1200,7 @@ void param_str_t::changed()
 {
 }
 
-param_double_t::param_double_t(device_t &device, const pstring name, const double val)
+param_double_t::param_double_t(device_t &device, const pstring &name, const double val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1206,7 +1211,7 @@ param_double_t::~param_double_t()
 {
 }
 #endif
-param_int_t::param_int_t(device_t &device, const pstring name, const int val)
+param_int_t::param_int_t(device_t &device, const pstring &name, const int val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1219,7 +1224,7 @@ param_int_t::~param_int_t()
 }
 #endif
 
-param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
+param_logic_t::param_logic_t(device_t &device, const pstring &name, const bool val)
 : param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
@@ -1232,7 +1237,7 @@ param_logic_t::~param_logic_t()
 }
 #endif
 
-param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
+param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
 : param_t(device, name)
 {
 	m_param = val; //device.setup().get_initial_param_val(this->name(),val);
@@ -1265,7 +1270,7 @@ nl_double param_model_t::model_value(const pstring &entity)
 	return netlist().setup().model_value(m_map, entity);
 }
 
-param_data_t::param_data_t(device_t &device, const pstring name)
+param_data_t::param_data_t(device_t &device, const pstring &name)
 : param_str_t(device, name, "")
 {
 }

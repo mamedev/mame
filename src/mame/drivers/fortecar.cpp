@@ -308,24 +308,26 @@
 
 **************************************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/v3021.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "fortecrd.lh"
+
 
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
 #define AY_CLOCK        (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
-#include "sound/ay8910.h"
-#include "machine/i8255.h"
-#include "machine/v3021.h"
-#include "video/mc6845.h"
-#include "machine/nvram.h"
-#include "video/resnet.h"
-
-#include "fortecrd.lh"
 
 
 class fortecar_state : public driver_device

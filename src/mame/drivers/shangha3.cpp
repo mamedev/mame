@@ -34,11 +34,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/shangha3.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/2612intf.h"
-#include "includes/shangha3.h"
+#include "speaker.h"
 
 
 /* this looks like a simple protection check */

@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type I8008 = &device_creator<i8008_device>;
+const device_type I8008 = device_creator<i8008_device>;
 
 //**************************************************************************
 //  DEVICE INTERFACE

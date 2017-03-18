@@ -143,7 +143,7 @@ ROM_START( namco_53xx )
 	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
 ROM_END
 
-const device_type NAMCO_53XX = &device_creator<namco_53xx_device>;
+const device_type NAMCO_53XX = device_creator<namco_53xx_device>;
 
 namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_53XX, "Namco 53xx", tag, owner, clock, "namco53", __FILE__),

@@ -65,6 +65,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/tms5220.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

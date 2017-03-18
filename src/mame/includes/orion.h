@@ -6,18 +6,23 @@
  *
  ****************************************************************************/
 
-#ifndef ORION_H_
-#define ORION_H_
+#ifndef MAME_INCLUDES_ORION_H
+#define MAME_INCLUDES_ORION_H
 
-#include "machine/wd_fdc.h"
+#pragma once
+
 #include "includes/radio86.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+
 #include "machine/i8255.h"
-#include "machine/ram.h"
 #include "machine/mc146818.h"
-#include "sound/speaker.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+
 #include "sound/ay8910.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
 
 
@@ -122,4 +127,4 @@ protected:
 	void orionpro_bank_switch();
 };
 
-#endif /* ORION_H_ */
+#endif // MAME_INCLUDES_ORION_H

@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A2232 = &device_creator<a2232_device>;
+const device_type A2232 = device_creator<a2232_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

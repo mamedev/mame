@@ -24,45 +24,45 @@
 //-------------------------------------------------
 
 // BASE CARTS + NVRAM
-const device_type MD_STD_ROM = &device_creator<md_std_rom_device>;
-const device_type MD_ROM_SRAM = &device_creator<md_rom_sram_device>;
-const device_type MD_ROM_FRAM = &device_creator<md_rom_fram_device>;
+const device_type MD_STD_ROM = device_creator<md_std_rom_device>;
+const device_type MD_ROM_SRAM = device_creator<md_rom_sram_device>;
+const device_type MD_ROM_FRAM = device_creator<md_rom_fram_device>;
 
 // BASE CARTS + BANKSWITCH AT RESET
-const device_type MD_ROM_CM2IN1 = &device_creator<md_rom_cm2in1_device>;
+const device_type MD_ROM_CM2IN1 = device_creator<md_rom_cm2in1_device>;
 
 // BASE CARTS + PROTECTION / BANKSWITCH
-const device_type MD_ROM_SSF2 = &device_creator<md_rom_ssf2_device>;
-const device_type MD_ROM_BUGSLIFE = &device_creator<md_rom_bugslife_device>;
-const device_type MD_ROM_SMOUSE = &device_creator<md_rom_smouse_device>;
-const device_type MD_ROM_SMW64 = &device_creator<md_rom_smw64_device>;
-const device_type MD_ROM_SMB = &device_creator<md_rom_smb_device>;
-const device_type MD_ROM_SMB2 = &device_creator<md_rom_smb2_device>;
-const device_type MD_ROM_SBUBL = &device_creator<md_rom_sbubl_device>;
-const device_type MD_ROM_RX3 = &device_creator<md_rom_rx3_device>;
-const device_type MD_ROM_MJLOV = &device_creator<md_rom_mjlov_device>;
-const device_type MD_ROM_CJMJCLUB = &device_creator<md_rom_cjmjclub_device>;
-const device_type MD_ROM_KOF98 = &device_creator<md_rom_kof98_device>;
-const device_type MD_ROM_KOF99 = &device_creator<md_rom_kof99_device>;
-const device_type MD_ROM_SOULB = &device_creator<md_rom_soulb_device>;
-const device_type MD_ROM_CHINF3 = &device_creator<md_rom_chinf3_device>;
-const device_type MD_ROM_16MJ2 = &device_creator<md_rom_16mj2_device>;
-const device_type MD_ROM_ELFWOR = &device_creator<md_rom_elfwor_device>;
-const device_type MD_ROM_YASECH = &device_creator<md_rom_yasech_device>;
-const device_type MD_ROM_LION2 = &device_creator<md_rom_lion2_device>;
-const device_type MD_ROM_LION3 = &device_creator<md_rom_lion3_device>;
-const device_type MD_ROM_MCPIR = &device_creator<md_rom_mcpirate_device>;
-const device_type MD_ROM_POKEA = &device_creator<md_rom_pokea_device>;
-const device_type MD_ROM_POKESTAD = &device_creator<md_rom_pokestad_device>;
-const device_type MD_ROM_REALTEC = &device_creator<md_rom_realtec_device>;
-const device_type MD_ROM_REDCL = &device_creator<md_rom_redcl_device>;
-const device_type MD_ROM_SQUIR = &device_creator<md_rom_squir_device>;
-const device_type MD_ROM_TEKKENSP = &device_creator<md_rom_tekkensp_device>;
-const device_type MD_ROM_TOPF = &device_creator<md_rom_topf_device>;
-const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
-const device_type MD_ROM_BEGGARP = &device_creator<md_rom_beggarp_device>;
-const device_type MD_ROM_WUKONG = &device_creator<md_rom_wukong_device>;
-const device_type MD_ROM_STARODYS = &device_creator<md_rom_starodys_device>;
+const device_type MD_ROM_SSF2 = device_creator<md_rom_ssf2_device>;
+const device_type MD_ROM_BUGSLIFE = device_creator<md_rom_bugslife_device>;
+const device_type MD_ROM_SMOUSE = device_creator<md_rom_smouse_device>;
+const device_type MD_ROM_SMW64 = device_creator<md_rom_smw64_device>;
+const device_type MD_ROM_SMB = device_creator<md_rom_smb_device>;
+const device_type MD_ROM_SMB2 = device_creator<md_rom_smb2_device>;
+const device_type MD_ROM_SBUBL = device_creator<md_rom_sbubl_device>;
+const device_type MD_ROM_RX3 = device_creator<md_rom_rx3_device>;
+const device_type MD_ROM_MJLOV = device_creator<md_rom_mjlov_device>;
+const device_type MD_ROM_CJMJCLUB = device_creator<md_rom_cjmjclub_device>;
+const device_type MD_ROM_KOF98 = device_creator<md_rom_kof98_device>;
+const device_type MD_ROM_KOF99 = device_creator<md_rom_kof99_device>;
+const device_type MD_ROM_SOULB = device_creator<md_rom_soulb_device>;
+const device_type MD_ROM_CHINF3 = device_creator<md_rom_chinf3_device>;
+const device_type MD_ROM_16MJ2 = device_creator<md_rom_16mj2_device>;
+const device_type MD_ROM_ELFWOR = device_creator<md_rom_elfwor_device>;
+const device_type MD_ROM_YASECH = device_creator<md_rom_yasech_device>;
+const device_type MD_ROM_LION2 = device_creator<md_rom_lion2_device>;
+const device_type MD_ROM_LION3 = device_creator<md_rom_lion3_device>;
+const device_type MD_ROM_MCPIR = device_creator<md_rom_mcpirate_device>;
+const device_type MD_ROM_POKEA = device_creator<md_rom_pokea_device>;
+const device_type MD_ROM_POKESTAD = device_creator<md_rom_pokestad_device>;
+const device_type MD_ROM_REALTEC = device_creator<md_rom_realtec_device>;
+const device_type MD_ROM_REDCL = device_creator<md_rom_redcl_device>;
+const device_type MD_ROM_SQUIR = device_creator<md_rom_squir_device>;
+const device_type MD_ROM_TEKKENSP = device_creator<md_rom_tekkensp_device>;
+const device_type MD_ROM_TOPF = device_creator<md_rom_topf_device>;
+const device_type MD_ROM_RADICA = device_creator<md_rom_radica_device>;
+const device_type MD_ROM_BEGGARP = device_creator<md_rom_beggarp_device>;
+const device_type MD_ROM_WUKONG = device_creator<md_rom_wukong_device>;
+const device_type MD_ROM_STARODYS = device_creator<md_rom_starodys_device>;
 
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

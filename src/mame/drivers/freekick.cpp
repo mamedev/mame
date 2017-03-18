@@ -42,11 +42,14 @@ TODO:
 */
 
 #include "emu.h"
+#include "includes/freekick.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
-#include "includes/freekick.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

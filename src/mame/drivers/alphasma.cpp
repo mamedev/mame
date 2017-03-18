@@ -18,6 +18,7 @@
 #include "machine/ram.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
+#include "screen.h"
 
 class alphasmart_state : public driver_device
 {

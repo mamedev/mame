@@ -20,10 +20,13 @@ displayed.
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/seibu.h"
+
 #include "cpu/nec/nec.h"
 #include "sound/2203intf.h"
-#include "audio/seibu.h"
 #include "video/hd63484.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class shanghai_state : public driver_device

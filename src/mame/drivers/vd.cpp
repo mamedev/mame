@@ -17,16 +17,19 @@
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "vd.lh"
 
 class vd_state : public driver_device
 {
 public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ8_MEMBER(ack_r);

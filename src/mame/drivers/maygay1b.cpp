@@ -73,6 +73,7 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+#include "speaker.h"
 
 #include "maygay1b.lh"
 

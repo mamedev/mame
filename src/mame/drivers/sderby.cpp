@@ -61,14 +61,18 @@
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
 #include "includes/sderby.h"
-#include "machine/nvram.h"
 
+#include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "pmroulet.lh"
 #include "sderby.lh"
 #include "spacewin.lh"
-#include "pmroulet.lh"
+
 
 /***************************
 *       R/W Handlers       *

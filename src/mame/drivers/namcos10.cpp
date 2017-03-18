@@ -267,9 +267,13 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 */
 
 #include "emu.h"
-#include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/ns10crypt.h"
+
+#include "cpu/psx/psx.h"
+#include "machine/ram.h"
+#include "video/psx.h"
+#include "speaker.h"
+
 
 class namcos10_state : public driver_device
 {

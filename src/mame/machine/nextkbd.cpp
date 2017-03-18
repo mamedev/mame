@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nextkbd.h"
 
-const device_type NEXTKBD = &device_creator<nextkbd_device>;
+const device_type NEXTKBD = device_creator<nextkbd_device>;
 
 DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TIKI100_8088 = &device_creator<tiki100_8088_t>;
+const device_type TIKI100_8088 = device_creator<tiki100_8088_t>;
 
 
 //-------------------------------------------------

@@ -407,11 +407,13 @@ Donkey Kong Notes
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dkong.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/dkong.h"
 #include "machine/eepromser.h"
+
 
 /*************************************
  *

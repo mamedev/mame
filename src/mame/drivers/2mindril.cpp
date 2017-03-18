@@ -35,9 +35,11 @@ DAC               -26.6860Mhz
 */
 
 #include "emu.h"
+#include "includes/taito_f3.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taito_f3.h"
+#include "speaker.h"
 
 
 class _2mindril_state : public taito_f3_state
@@ -460,7 +462,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_DRIVER(_2mindril_state, screen_eof_f3)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(_2mindril_state, screen_vblank_f3))
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)

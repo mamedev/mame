@@ -110,12 +110,12 @@ namespace netlist
 			{
 				m_R.update_dev();
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
 			else
 			{
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 				//m_R->update_dev();
 			}
 		}

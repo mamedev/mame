@@ -25,6 +25,8 @@
 
 #include "emu.h"
 #include "includes/pc8001.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -600,5 +602,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY FULLNAME        FLAGS */
-COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001",      MACHINE_NOT_WORKING )
-COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001mkII",  MACHINE_NOT_WORKING )
+COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, driver_device,      0,          "NEC",    "PC-8001",      MACHINE_NOT_WORKING )
+COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, driver_device,      0,          "NEC",    "PC-8001mkII",  MACHINE_NOT_WORKING )

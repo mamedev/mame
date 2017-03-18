@@ -12,7 +12,7 @@
 #include "plaparse.h"
 
 
-const device_type PLA = &device_creator<pla_device>;
+const device_type PLA = device_creator<pla_device>;
 
 //-------------------------------------------------
 //  pla_device - constructor

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_TF20 = &device_creator<epson_tf20_device>;
+const device_type EPSON_TF20 = device_creator<epson_tf20_device>;
 
 //-------------------------------------------------
 //  address maps

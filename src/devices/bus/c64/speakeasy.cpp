@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "speakeasy.h"
+#include "speaker.h"
 
 
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SPEAKEASY = &device_creator<c64_speakeasy_t>;
+const device_type C64_SPEAKEASY = device_creator<c64_speakeasy_t>;
 
 
 //-------------------------------------------------

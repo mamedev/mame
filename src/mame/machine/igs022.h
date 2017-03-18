@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 /* IGS022 */
+#ifndef MAME_MACHINE_IGS022_H
+#define MAME_MACHINE_IGS022_H
 
 
 class igs022_device : public device_t
@@ -23,5 +25,6 @@ protected:
 };
 
 
-
 extern const device_type IGS022;
+
+#endif // MAME_MACHINE_IGS022_H

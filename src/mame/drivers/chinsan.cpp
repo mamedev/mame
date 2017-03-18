@@ -48,6 +48,8 @@ MM63.10N
 #include "machine/mc8123.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
 
 class chinsan_state : public driver_device
 {

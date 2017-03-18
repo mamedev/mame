@@ -45,7 +45,7 @@ const int cdp1864_device::bckgnd[] = { 2, 0, 4, 1 };
 //**************************************************************************
 
 // devices
-const device_type CDP1864 = &device_creator<cdp1864_device>;
+const device_type CDP1864 = device_creator<cdp1864_device>;
 
 
 

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/midikbd.h"
 
-const device_type MIDI_KBD = &device_creator<midi_keyboard_device>;
+const device_type MIDI_KBD = device_creator<midi_keyboard_device>;
 
 midi_keyboard_device::midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MIDI_KBD, "Generic MIDI Keyboard", tag, owner, clock, "midi_kbd", __FILE__),

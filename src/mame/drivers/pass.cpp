@@ -102,12 +102,15 @@
  */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/pass.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/pass.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* todo: check all memory regions actually readable / read from */

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
+#include "screen.h"
 
 class tecmo16_state : public driver_device
 {

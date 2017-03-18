@@ -12,6 +12,7 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
+#include "screen.h"
 
 class peoplepc_state : public driver_device
 {

@@ -75,7 +75,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define PCE_CD_CLOCK    9216000
 
 
-const device_type PCE_CD = &device_creator<pce_cd_device>;
+const device_type PCE_CD = device_creator<pce_cd_device>;
 
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -187,10 +187,9 @@ Notes:
 
 */
 
-#define PGMLOGERROR 0
-
 #include "emu.h"
 #include "includes/pgm.h"
+
 #include "machine/pgmprot_igs025_igs012.h"
 #include "machine/pgmprot_igs025_igs022.h"
 #include "machine/pgmprot_igs025_igs028.h"
@@ -198,6 +197,12 @@ Notes:
 #include "machine/pgmprot_igs027a_type2.h"
 #include "machine/pgmprot_igs027a_type3.h"
 #include "machine/pgmprot_orlegend.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#define PGMLOGERROR 0
+
 
 READ16_MEMBER(pgm_state::pgm_videoram_r)
 {
@@ -523,7 +528,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
-	MCFG_SCREEN_VBLANK_DRIVER(pgm_state, screen_eof_pgm)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm_state, screen_vblank_pgm))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)

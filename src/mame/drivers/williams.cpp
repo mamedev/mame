@@ -502,9 +502,11 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 
 #include "emu.h"
 #include "includes/williams.h"
+
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        (XTAL_12MHz)

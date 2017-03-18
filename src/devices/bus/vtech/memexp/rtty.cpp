@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type RTTY_INTERFACE = &device_creator<rtty_interface_device>;
+const device_type RTTY_INTERFACE = device_creator<rtty_interface_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

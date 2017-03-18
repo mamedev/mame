@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "audio/decobsmt.h"
+#include "speaker.h"
 
 #define M6809_TAG   "soundcpu"
 #define BSMT_TAG    "bsmt"
@@ -52,7 +53,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DECOBSMT = &device_creator<decobsmt_device>;
+const device_type DECOBSMT = device_creator<decobsmt_device>;
 
 
 //-------------------------------------------------

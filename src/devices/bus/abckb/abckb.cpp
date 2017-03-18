@@ -16,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type ABC_KEYBOARD_PORT = &device_creator<abc_keyboard_port_device>;
+const device_type ABC_KEYBOARD_PORT = device_creator<abc_keyboard_port_device>;
 
 
 

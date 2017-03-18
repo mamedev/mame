@@ -24,11 +24,13 @@ Notes:
 #include "emu.h"
 #include "includes/nbmj9195.h"
 #include "includes/nb1413m3.h"      // needed for mahjong input controller
+
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 void nbmj9195_state::machine_start()

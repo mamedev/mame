@@ -37,7 +37,7 @@
 #define DST_LATCH  do { if(DST_IS_RIGHT_BANK) m_right_IV = READPORT(m_IVR+0x100); else m_left_IV = READPORT(m_IVL); } while (0)
 #define SET_OVF    do { if(result & 0xff00) m_OVF = 1; else m_OVF = 0; } while (0)
 
-const device_type N8X300 = &device_creator<n8x300_cpu_device>;
+const device_type N8X300 = device_creator<n8x300_cpu_device>;
 
 
 n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

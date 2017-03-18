@@ -665,6 +665,10 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 		// if this entry references a memory region, validate it
 		if (entry.m_region != nullptr && entry.m_share == nullptr)
 		{
+			// address map entries that reference regions but are NOPs are pointless
+			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
+				osd_printf_error("%s space references memory region %s, but is AM_NOP\n", spaceconfig.m_name, entry.m_region);
+
 			// make sure we can resolve the full path to the region
 			bool found = false;
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);

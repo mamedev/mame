@@ -29,12 +29,14 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "machine/z80ctc.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 // temporary
 #include "machine/keyboard.h"

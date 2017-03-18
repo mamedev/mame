@@ -2,6 +2,7 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/slapshot.h"
+#include "screen.h"
 
 /**********************************************************/
 
@@ -418,7 +419,7 @@ void slapshot_state::taito_update_sprites_active_area(  )
 	}
 }
 
-void slapshot_state::screen_eof_taito_no_buffer(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(slapshot_state::screen_vblank_taito_no_buffer)
 {
 	// rising edge
 	if (state)

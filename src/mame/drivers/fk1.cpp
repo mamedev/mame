@@ -14,6 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "screen.h"
 
 
 class fk1_state : public driver_device

@@ -101,6 +101,8 @@ CRU lines:
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

@@ -520,16 +520,16 @@ const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
 }
 
 
-const device_type M6800 = &device_creator<m6800_cpu_device>;
-const device_type M6801 = &device_creator<m6801_cpu_device>;
-const device_type M6802 = &device_creator<m6802_cpu_device>;
-const device_type M6803 = &device_creator<m6803_cpu_device>;
-const device_type M6808 = &device_creator<m6808_cpu_device>;
-const device_type HD6301 = &device_creator<hd6301_cpu_device>;
-const device_type HD63701 = &device_creator<hd63701_cpu_device>;
-const device_type NSC8105 = &device_creator<nsc8105_cpu_device>;
-const device_type HD6303R = &device_creator<hd6303r_cpu_device>;
-const device_type HD6303Y = &device_creator<hd6303y_cpu_device>;
+const device_type M6800 = device_creator<m6800_cpu_device>;
+const device_type M6801 = device_creator<m6801_cpu_device>;
+const device_type M6802 = device_creator<m6802_cpu_device>;
+const device_type M6803 = device_creator<m6803_cpu_device>;
+const device_type M6808 = device_creator<m6808_cpu_device>;
+const device_type HD6301 = device_creator<hd6301_cpu_device>;
+const device_type HD63701 = device_creator<hd63701_cpu_device>;
+const device_type NSC8105 = device_creator<nsc8105_cpu_device>;
+const device_type HD6303R = device_creator<hd6303r_cpu_device>;
+const device_type HD6303Y = device_creator<hd6303y_cpu_device>;
 
 
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1341,7 +1341,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DATA:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_p3csr_is3_flag_read)
 			{
@@ -1362,7 +1362,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 			data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff))
 				| (m_port3_data & m_port3_ddr);
 
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_port3_latched = 0;
 
@@ -1387,7 +1387,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_CH:
-		if(!(m_pending_tcsr&TCSR_TOF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_TOF;
 			MODIFIED_tcsr;
@@ -1400,7 +1400,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		// HACK there should be a break here, but Coleco Adam won't boot with it present, proper fix required to the free-running counter
 
 	case IO_OCRH:
-		if(!(m_pending_tcsr&TCSR_OCF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1409,7 +1409,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_OCRL:
-		if(!(m_pending_tcsr&TCSR_OCF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1418,7 +1418,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_ICRH:
-		if(!(m_pending_tcsr&TCSR_ICF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_ICF;
 			MODIFIED_tcsr;
@@ -1431,7 +1431,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3CSR:
-		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !space.debugger_access())
+		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !machine().side_effect_disabled())
 		{
 			m_p3csr_is3_flag_read = 1;
 		}
@@ -1444,7 +1444,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_TRCSR:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_trcsr & M6800_TRCSR_TDRE)
 			{
@@ -1466,7 +1466,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_RDR:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_trcsr_read_orfe)
 			{

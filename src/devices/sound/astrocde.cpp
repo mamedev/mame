@@ -46,7 +46,7 @@
 
 
 // device type definition
-const device_type ASTROCADE = &device_creator<astrocade_device>;
+const device_type ASTROCADE = device_creator<astrocade_device>;
 
 
 //**************************************************************************

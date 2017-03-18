@@ -33,13 +33,17 @@ Notes:
 
 #include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/cosmac/cosmac.h"
+
 #include "cpu/cop400/cop400.h"
-#include "machine/clock.h"
+#include "cpu/cosmac/cosmac.h"
 #include "machine/7474.h"
+#include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/cdp1863.h"
+#include "speaker.h"
+
 #include "play_2.lh"
+
 
 class play_2_state : public genpin_class
 {

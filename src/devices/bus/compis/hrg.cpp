@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "hrg.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -23,8 +24,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_HRG = &device_creator<compis_hrg_t>;
-const device_type COMPIS_UHRG = &device_creator<compis_uhrg_t>;
+const device_type COMPIS_HRG = device_creator<compis_hrg_t>;
+const device_type COMPIS_UHRG = device_creator<compis_uhrg_t>;
 
 
 //-------------------------------------------------

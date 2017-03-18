@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_PACHINKO = &device_creator<snes_pachinko_device>;
+const device_type SNES_PACHINKO = device_creator<snes_pachinko_device>;
 
 
 static INPUT_PORTS_START( snes_pachinko )

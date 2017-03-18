@@ -19,12 +19,14 @@ DIP Locations verified for:
 
 #include "emu.h"
 #include "includes/bking.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
@@ -419,7 +421,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
-	MCFG_SCREEN_VBLANK_DRIVER(bking_state, screen_eof_bking)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)

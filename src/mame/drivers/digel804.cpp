@@ -27,6 +27,20 @@
 *
 ******************************************************************************/
 
+/* Core includes */
+#include "emu.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "machine/mm74c922.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+#include "machine/roc10937.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+#include "digel804.lh"
+
+
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -51,18 +65,6 @@
 #undef PORT46_W_VERBOSE
 
 // port 47 write is tim0-tim7
-
-
-/* Core includes */
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "machine/roc10937.h"
-#include "machine/mos6551.h"
-#include "machine/mm74c922.h"
-#include "machine/ram.h"
-#include "bus/rs232/rs232.h"
-#include "digel804.lh"
 
 
 class digel804_state : public driver_device

@@ -3,6 +3,10 @@
 #include "emu.h"
 #include "teleprinter.h"
 
+#include "screen.h"
+#include "speaker.h"
+
+
 static const uint8_t teleprinter_font[128*8] =
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -237,4 +241,4 @@ void teleprinter_device::device_reset()
 	generic_terminal_device::device_reset();
 }
 
-const device_type TELEPRINTER = &device_creator<teleprinter_device>;
+const device_type TELEPRINTER = device_creator<teleprinter_device>;

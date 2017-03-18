@@ -36,10 +36,14 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/spcforce.h"
+
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
-#include "includes/spcforce.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void spcforce_state::machine_start()
 {

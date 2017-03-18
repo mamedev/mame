@@ -34,8 +34,8 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NTDEC_ASDER = &device_creator<nes_ntdec_asder_device>;
-const device_type NES_NTDEC_FH = &device_creator<nes_ntdec_fh_device>;
+const device_type NES_NTDEC_ASDER = device_creator<nes_ntdec_asder_device>;
+const device_type NES_NTDEC_FH = device_creator<nes_ntdec_fh_device>;
 
 
 nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

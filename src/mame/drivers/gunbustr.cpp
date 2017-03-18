@@ -44,11 +44,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/taito_en.h"
+#include "includes/gunbustr.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
-#include "includes/gunbustr.h"
+#include "screen.h"
 
 
 /*********************************************************************/

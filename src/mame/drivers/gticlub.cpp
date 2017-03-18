@@ -236,8 +236,9 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/k001006.h"
 #include "video/k001604.h"
 
-
 #include "rendlay.h"
+#include "speaker.h"
+
 
 class gticlub_state : public driver_device
 {

@@ -8,9 +8,11 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
 #include "includes/pp01.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Address maps */

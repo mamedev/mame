@@ -600,24 +600,6 @@ VIDEO_START_MEMBER(galaxold_state,mooncrst)
 	m_modify_spritecode = &galaxold_state::mooncrst_modify_spritecode;
 }
 
-void galaxold_state::batman2_modify_charcode(uint16_t *code, uint8_t x)
-{
-	if (*code & 0x80)
-	{
-		*code |= (m_gfxbank[0] << 8);
-	}
-}
-
-VIDEO_START_MEMBER(galaxold_state,batman2)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode   = &galaxold_state::batman2_modify_charcode;
-	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
-}
-
-
-
 void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_rockclim_tilemap->draw(screen, bitmap, cliprect, 0,0);

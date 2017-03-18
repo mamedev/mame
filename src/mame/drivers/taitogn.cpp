@@ -331,17 +331,21 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 
 #include "emu.h"
 #include "audio/taito_zm.h"
+
 #include "cpu/psx/psx.h"
 #include "machine/at28c16.h"
 #include "machine/ataflash.h"
 #include "machine/bankdev.h"
+#include "machine/cat702.h"
 #include "machine/intelfsh.h"
 #include "machine/mb3773.h"
+#include "machine/ram.h"
 #include "machine/rf5c296.h"
-#include "machine/cat702.h"
 #include "machine/znmcu.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "speaker.h"
+
 
 class taitogn_state : public driver_device
 {

@@ -38,9 +38,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TENGEN_800008 = &device_creator<nes_tengen008_device>;
-const device_type NES_TENGEN_800032 = &device_creator<nes_tengen032_device>;
-const device_type NES_TENGEN_800037 = &device_creator<nes_tengen037_device>;
+const device_type NES_TENGEN_800008 = device_creator<nes_tengen008_device>;
+const device_type NES_TENGEN_800032 = device_creator<nes_tengen032_device>;
+const device_type NES_TENGEN_800037 = device_creator<nes_tengen037_device>;
 
 
 nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

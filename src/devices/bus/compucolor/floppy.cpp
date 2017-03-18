@@ -15,8 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPUCOLOR_FLOPPY_PORT = &device_creator<compucolor_floppy_port_device>;
-const device_type COMPUCOLOR_FLOPPY = &device_creator<compucolor_floppy_device>;
+const device_type COMPUCOLOR_FLOPPY_PORT = device_creator<compucolor_floppy_port_device>;
+const device_type COMPUCOLOR_FLOPPY = device_creator<compucolor_floppy_device>;
 
 
 //-------------------------------------------------

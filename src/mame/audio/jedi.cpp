@@ -9,10 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jedi.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
-#include "includes/jedi.h"
+#include "speaker.h"
 
 
 

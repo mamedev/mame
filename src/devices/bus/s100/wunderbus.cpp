@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
+const device_type S100_WUNDERBUS = device_creator<s100_wunderbus_device>;
 
 
 //-------------------------------------------------

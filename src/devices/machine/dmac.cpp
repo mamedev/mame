@@ -27,7 +27,7 @@ BOARDS:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DMAC = &device_creator<dmac_device>;
+const device_type DMAC = device_creator<dmac_device>;
 
 
 //**************************************************************************

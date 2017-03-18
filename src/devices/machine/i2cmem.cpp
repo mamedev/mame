@@ -58,7 +58,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 //**************************************************************************
 
 // device type definition
-const device_type I2CMEM = &device_creator<i2cmem_device>;
+const device_type I2CMEM = device_creator<i2cmem_device>;
 
 
 //**************************************************************************

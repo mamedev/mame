@@ -1,28 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
-#include "sound/sn76496.h"
-#include "sound/speaker.h"
-#include "video/pc_t1t.h"
-#include "machine/ins8250.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/pc_fdc.h"
+#include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/pckeybrd.h"
-#include "machine/pc_lpt.h"
-#include "machine/pc_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "video/pc_t1t.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/isa/fdc.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"
-#include "bus/pc_joy/pc_joy.h"
-#include "bus/isa/fdc.h"
-#include "imagedev/cassette.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class pcjr_state : public driver_device
 {
@@ -441,7 +445,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		int header_size = 0;
 

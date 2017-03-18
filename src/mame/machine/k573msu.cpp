@@ -94,4 +94,4 @@ const tiny_rom_entry *k573msu_device::device_rom_region() const
 	return ROM_NAME( k573msu );
 }
 
-const device_type KONAMI_573_MULTI_SESSION_UNIT = &device_creator<k573msu_device>;
+const device_type KONAMI_573_MULTI_SESSION_UNIT = device_creator<k573msu_device>;

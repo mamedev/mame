@@ -273,25 +273,30 @@
 **************************************************************************/
 
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
-#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
-#define VIDEO_CLOCK     (XTAL_7.8643MHz)
-
-
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "videopkr.lh"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "babydad.lh"
+#include "babypkr.lh"
 #include "blckjack.lh"
 #include "videocba.lh"
 #include "videodad.lh"
-#include "babypkr.lh"
-#include "babydad.lh"
+#include "videopkr.lh"
+
+
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
+#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
+#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
+#define VIDEO_CLOCK     (XTAL_7.8643MHz)
 
 
 class videopkr_state : public driver_device

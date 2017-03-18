@@ -21,8 +21,6 @@ protected:
 
 };
 
-static const device_type DECO_222 = &device_creator<deco_222_device>;
-
 
 
 class deco_c10707_device : public m6502_device {
@@ -43,4 +41,6 @@ protected:
 
 };
 
-static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
+
+extern const device_type DECO_222;
+extern const device_type DECO_C10707;

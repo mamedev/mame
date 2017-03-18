@@ -44,7 +44,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
+const device_type A2BUS_SCSI = device_creator<a2bus_scsi_device>;
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"

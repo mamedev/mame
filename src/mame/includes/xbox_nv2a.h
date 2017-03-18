@@ -3,6 +3,14 @@
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */
+#ifndef MAME_INCLUDES_XBOX_NV2A_H
+#define MAME_INCLUDES_XBOX_NV2A_H
+
+#pragma once
+
+#include "machine/pic8259.h"
+#include "video/poly.h"
+
 #include <mutex>
 
 class vertex_program_disassembler {
@@ -447,7 +455,7 @@ public:
 	}
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
-	void vblank_callback(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
 	void set_interrupt_device(pic8259_device *device);
@@ -757,3 +765,5 @@ public:
 	bool enable_waitvblank;
 	bool enable_clipping_w;
 };
+
+#endif // MAME_INCLUDES_XBOX_NV2A_H

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "midi.h"
 
-const device_type MIDI_PORT = &device_creator<midi_port_device>;
+const device_type MIDI_PORT = device_creator<midi_port_device>;
 
 midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDI_PORT, "Midi Port", tag, owner, clock, "midi_port", __FILE__),

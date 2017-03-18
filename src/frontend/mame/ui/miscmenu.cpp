@@ -603,7 +603,7 @@ void menu_export::handle()
 						for (auto & elem : m_list)
 							drvlist.include(driver_list::find(*elem));
 
-						info_xml_creator creator(drvlist);
+						info_xml_creator creator(drvlist, true);
 						creator.output(pfile, ((uintptr_t)menu_event->itemref == 1) ? false : true);
 						fclose(pfile);
 						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());

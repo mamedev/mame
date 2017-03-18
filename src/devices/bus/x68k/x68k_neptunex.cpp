@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_NEPTUNEX = &device_creator<x68k_neptune_device>;
+const device_type X68K_NEPTUNEX = device_creator<x68k_neptune_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( x68k_neptunex )

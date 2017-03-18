@@ -125,7 +125,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
+const device_type COCO_MULTIPAK = device_creator<coco_multipak_device>;
 
 
 
@@ -223,6 +223,18 @@ READ8_MEMBER(coco_multipak_device::read)
 WRITE8_MEMBER(coco_multipak_device::write)
 {
 	active_scs_slot()->write(space,offset,data);
+}
+
+
+
+//-------------------------------------------------
+//  set_sound_enable
+//-------------------------------------------------
+
+void coco_multipak_device::set_sound_enable(bool sound_enable)
+{
+	for (cococart_slot_device *slot : m_slots)
+		slot->cart_set_line(cococart_slot_device::line::SOUND_ENABLE, sound_enable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
 
 

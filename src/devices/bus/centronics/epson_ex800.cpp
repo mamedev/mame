@@ -129,6 +129,7 @@ TODO:  - The UPD7810 core is missing analog port emulation
 
 #include "emu.h"
 #include "epson_ex800.h"
+#include "speaker.h"
 #include "ex800.lh"
 
 
@@ -170,7 +171,7 @@ TODO:  - The UPD7810 core is missing analog port emulation
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_EX800 = &device_creator<epson_ex800_t>;
+const device_type EPSON_EX800 = device_creator<epson_ex800_t>;
 
 
 //-------------------------------------------------

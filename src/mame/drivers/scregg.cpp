@@ -52,9 +52,12 @@ it as ASCII text.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/btime.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "includes/btime.h"
+#include "speaker.h"
+
 
 class scregg_state : public btime_state
 {

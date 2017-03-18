@@ -24,6 +24,7 @@
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

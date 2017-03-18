@@ -11,7 +11,7 @@
 
 #define LOG_WPC (0)
 
-const device_type WPCASIC = &device_creator<wpc_device>;
+const device_type WPCASIC = device_creator<wpc_device>;
 
 wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,WPCASIC,"Williams WPC ASIC",tag,owner,clock, "wpc", __FILE__),

@@ -467,6 +467,8 @@ hardware modification to the security cart.....
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "machine/wd33c93.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "sfiii2.lh"
 

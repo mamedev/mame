@@ -100,7 +100,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type MCCS1850 = &device_creator<mccs1850_device>;
+const device_type MCCS1850 = device_creator<mccs1850_device>;
 
 
 

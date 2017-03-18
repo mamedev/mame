@@ -446,6 +446,9 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 #include "emu.h"
 #include "ega.h"
 
+#include "screen.h"
+
+
 #define VERBOSE_EGA     1
 
 #define EGA_SCREEN_NAME "ega_screen"
@@ -535,7 +538,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_EGA = &device_creator<isa8_ega_device>;
+const device_type ISA8_EGA = device_creator<isa8_ega_device>;
 
 
 //-------------------------------------------------
@@ -963,7 +966,7 @@ READ8_MEMBER( isa8_ega_device::read )
 {
 	uint8_t data = 0xFF;
 
-	if ( !space.debugger_access() && ! ( m_sequencer.data[4] & 0x04 ) )
+	if ( !machine().side_effect_disabled() && ! ( m_sequencer.data[4] & 0x04 ) )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];

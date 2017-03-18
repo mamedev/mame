@@ -96,15 +96,16 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/nc.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/mc146818.h"   /* for NC200 real time clock */
-#include "machine/rp5c01.h" /* for NC100 real time clock */
+#include "machine/rp5c01.h"     /* for NC100 real time clock */
 #include "machine/upd765.h"     /* for NC200 disk drive interface */
 #include "formats/pc_dsk.h"     /* for NC200 disk image */
-#include "sound/beep.h"
-#include "machine/ram.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define VERBOSE 0

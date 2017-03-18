@@ -21,7 +21,7 @@ Memo:
 
 #define NB1413M3_TIMER_BASE 20000000
 
-const device_type NB1413M3 = &device_creator<nb1413m3_device>;
+const device_type NB1413M3 = device_creator<nb1413m3_device>;
 
 nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NB1413M3, "NB1413M3 Mahjong Custom", tag, owner, clock, "nb1413m3", __FILE__),

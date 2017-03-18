@@ -54,26 +54,31 @@ class mame_options
 
 public:
 	// parsing wrappers
-	static bool parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string);
+	static bool parse_command_line(emu_options &options, std::vector<std::string> &args, std::string &error_string);
 	static void parse_standard_inis(emu_options &options, std::string &error_string, const game_driver *driver = nullptr);
-	static bool parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name = nullptr, const char *value = nullptr, const software_part *swpart = nullptr);
 	// FIXME: Couriersud: This should be in image_device_exit
 	static void remove_device_options(emu_options &options);
 
 	static const game_driver *system(const emu_options &options);
 	static void set_system_name(emu_options &options, const char *name);
-	static bool add_slot_options(emu_options &options, const software_part *swpart = nullptr);
+	static bool add_slot_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier = nullptr);
+
 private:
 	// device-specific option handling
-	static void add_device_options(emu_options &options);
+	static void add_device_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier = nullptr);
 	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
+	static void parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier);
+	static std::string get_full_option_name(const device_image_interface &image);
+	static bool reevaluate_slot_options(emu_options &options);
 
 	// INI parsing helper
 	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);
 
+	// softlist handling
+	static std::map<std::string, std::string> evaluate_initial_softlist_options(emu_options &options);
+
 	static int m_slot_options;
 	static int m_device_options;
-
 };
 
 #endif  /* __MAMEOPTS_H__ */

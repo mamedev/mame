@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "video/ppu2c0x.h"
 
+#include "screen.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -73,14 +75,14 @@ static const pen_t default_colortable[] =
 //**************************************************************************
 
 // devices
-const device_type PPU_2C02 = &device_creator<ppu2c02_device>;
-const device_type PPU_2C03B = &device_creator<ppu2c03b_device>;
-const device_type PPU_2C04 = &device_creator<ppu2c04_device>;
-const device_type PPU_2C07 = &device_creator<ppu2c07_device>;
-const device_type PPU_2C05_01 = &device_creator<ppu2c05_01_device>;
-const device_type PPU_2C05_02 = &device_creator<ppu2c05_02_device>;
-const device_type PPU_2C05_03 = &device_creator<ppu2c05_03_device>;
-const device_type PPU_2C05_04 = &device_creator<ppu2c05_04_device>;
+const device_type PPU_2C02 = device_creator<ppu2c02_device>;
+const device_type PPU_2C03B = device_creator<ppu2c03b_device>;
+const device_type PPU_2C04 = device_creator<ppu2c04_device>;
+const device_type PPU_2C07 = device_creator<ppu2c07_device>;
+const device_type PPU_2C05_01 = device_creator<ppu2c05_01_device>;
+const device_type PPU_2C05_02 = device_creator<ppu2c05_02_device>;
+const device_type PPU_2C05_03 = device_creator<ppu2c05_03_device>;
+const device_type PPU_2C05_04 = device_creator<ppu2c05_04_device>;
 
 
 // default address map

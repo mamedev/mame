@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_IBM_PC_83 = &device_creator<ibm_pc_83_keyboard_device>;
+const device_type PC_KBD_IBM_PC_83 = device_creator<ibm_pc_83_keyboard_device>;
 
 
 //-------------------------------------------------

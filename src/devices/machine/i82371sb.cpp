@@ -4,11 +4,15 @@
 #include "emu.h"
 #include "i82371sb.h"
 #include "cpu/i386/i386.h"
+
 #include "bus/pc_kbd/keyboards.h"
 // VGA-HACK
 #include "video/pc_vga.h"
 // end-VGA-HACK
-const device_type I82371SB_ISA = &device_creator<i82371sb_isa_device>;
+#include "speaker.h"
+
+
+const device_type I82371SB_ISA = device_creator<i82371sb_isa_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE8 (iort_r,    iort_w,    0x000000ff)

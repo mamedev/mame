@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cdp1862.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -24,7 +26,7 @@ static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
 //**************************************************************************
 
 // device type definition
-const device_type CDP1862 = &device_creator<cdp1862_device>;
+const device_type CDP1862 = device_creator<cdp1862_device>;
 
 
 

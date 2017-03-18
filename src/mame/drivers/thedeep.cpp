@@ -27,11 +27,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/thedeep.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/thedeep.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

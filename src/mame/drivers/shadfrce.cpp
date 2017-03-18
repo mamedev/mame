@@ -140,11 +140,13 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/shadfrce.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/shadfrce.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(shadfrce_state::flip_screen)
@@ -552,7 +554,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)

@@ -24,7 +24,7 @@
 
 
 // devices
-const device_type HD44352 = &device_creator<hd44352_device>;
+const device_type HD44352 = device_creator<hd44352_device>;
 
 //**************************************************************************
 //  live device

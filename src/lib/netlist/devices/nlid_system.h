@@ -119,7 +119,7 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
 
 			connect(m_feedback, m_Q);
 			{
@@ -127,8 +127,8 @@ namespace netlist
 				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				unsigned long pati[256];
-				m_size = pat.size();
+				unsigned long pati[32];
+				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
@@ -155,10 +155,10 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		netlist_time m_inc[32];
-		state_var<unsigned> m_cnt;
+		state_var<std::uint8_t> m_cnt;
+		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
-		std::size_t m_size;
+		netlist_time m_inc[32];
 	};
 
 	// -----------------------------------------------------------------------------

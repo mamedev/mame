@@ -48,8 +48,10 @@
 
  Undumped Semicom games on similar hardware:
    Red Wyvern - A semi-sequel or update?
- Same time era, but unknown hardware:
-   Choice III: Joker's Dream (c) 2001
+   Choice III: Joker's Dream (c) 2001 (likely SEMICOM-003 hardware)
+ Undumped F2 System games on F-E1-16-002 hardware:
+   New Cross Pang
+   World Adventure
 
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
@@ -59,13 +61,15 @@ TODO:
 *********************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
 #include "sound/qs1000.h"
 #include "sound/ym2151.h"
-#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vamphalf_state : public driver_device

@@ -62,7 +62,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WDXT_GEN = &device_creator<wdxt_gen_device>;
+const device_type ISA8_WDXT_GEN = device_creator<wdxt_gen_device>;
 
 
 //-------------------------------------------------

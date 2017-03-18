@@ -116,8 +116,6 @@ class pformat_base
 {
 public:
 
-	virtual ~pformat_base() { }
-
 	P &operator ()(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this); }
 	P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
 	P &          g(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
@@ -157,6 +155,7 @@ public:
 
 protected:
 
+	~pformat_base() { }
 	virtual void format_element(const char *f, const char *l, const char *fmt_spec, ...) = 0;
 
 };
@@ -164,7 +163,7 @@ protected:
 class pfmt : public pformat_base<pfmt>
 {
 public:
-	explicit pfmt(const pstring fmt);
+	explicit pfmt(const pstring &fmt);
 	virtual ~pfmt();
 
 	operator pstring() const { return pstring(m_str, pstring::UTF8); }
@@ -190,46 +189,45 @@ class pfmt_writer_t : plib::nocopyassignmove
 {
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
-	virtual ~pfmt_writer_t() { }
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
-	void log(const pstring fmt, Args&&... args) const
+	void log(const pstring & fmt, Args&&... args) const
 	{
 		if (build_enabled && enabled && m_enabled) (*this)(fmt, std::forward<Args>(args)...);
 	}
 
-	void operator ()(const pstring fmt) const
+	void operator ()(const pstring &fmt) const
 	{
 		if (build_enabled && m_enabled) vdowrite(fmt);
 	}
 
 	template<typename T1>
-	void operator ()(const pstring fmt, const T1 &v1) const
+	void operator ()(const pstring &fmt, const T1 &v1) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1));
 	}
 
 	template<typename T1, typename T2>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2));
 	}
 
 	template<typename T1, typename T2, typename T3>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
 	}
@@ -242,6 +240,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
+	~pfmt_writer_t() { }
 	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:

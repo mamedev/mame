@@ -68,8 +68,8 @@
 //**************************************************************************
 
 // devices
-const device_type PIONEER_PR8210 = &device_creator<pioneer_pr8210_device>;
-const device_type SIMUTREK_SPECIAL = &device_creator<simutrek_special_device>;
+const device_type PIONEER_PR8210 = device_creator<pioneer_pr8210_device>;
+const device_type SIMUTREK_SPECIAL = device_creator<simutrek_special_device>;
 
 
 // bitmaps for the characters

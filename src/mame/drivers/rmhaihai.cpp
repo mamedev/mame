@@ -34,6 +34,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class rmhaihai_state : public driver_device

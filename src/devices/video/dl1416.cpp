@@ -164,9 +164,9 @@ protected:
     DEVICE TYPE GLOBALS
 *****************************************************************************/
 
-device_type const DL1414T = &device_creator<dl1414t_device>;
-device_type const DL1416B = &device_creator<dl1416b_device>;
-device_type const DL1416T = &device_creator<dl1416t_device>;
+device_type const DL1414T = device_creator<dl1414t_device>;
+device_type const DL1416B = device_creator<dl1416b_device>;
+device_type const DL1416T = device_creator<dl1416t_device>;
 
 
 

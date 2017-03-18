@@ -54,12 +54,15 @@ RSSENGO2.72   chr.
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
 #include "audio/seibu.h"
+
+#include "cpu/nec/nec.h"
+#include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sengokmj_state : public driver_device

@@ -30,6 +30,10 @@ MZ80B
 
 #include "emu.h"
 #include "includes/mz80.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/mz_cas.h"
 
 

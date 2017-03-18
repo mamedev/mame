@@ -30,8 +30,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/spkrdev.h"
 #include "video/sed1520.h"
-#include "sound/speaker.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class monty_state : public driver_device

@@ -73,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NICK = &device_creator<nick_device>;
+const device_type NICK = device_creator<nick_device>;
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )

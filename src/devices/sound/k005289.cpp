@@ -42,7 +42,7 @@
 #define CLOCK_DIVIDER 32
 
 // device type definition
-const device_type K005289 = &device_creator<k005289_device>;
+const device_type K005289 = device_creator<k005289_device>;
 
 
 //**************************************************************************

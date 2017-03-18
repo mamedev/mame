@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "screen.h"
+
 
 #define TX1_PIXEL_CLOCK     (XTAL_18MHz / 3)
 #define TX1_HBSTART         256
@@ -223,8 +225,8 @@ public:
 	uint32_t screen_update_buggyboy_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buggyboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_tx1(screen_device &screen, bool state);
-	void screen_eof_buggyboy(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx1);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_buggyboy);
 	INTERRUPT_GEN_MEMBER(z80_irq);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECO_HAND_CONTROLLER = &device_creator<coleco_hand_controller_t>;
+const device_type COLECO_HAND_CONTROLLER = device_creator<coleco_hand_controller_t>;
 
 
 CUSTOM_INPUT_MEMBER( coleco_hand_controller_t::keypad_r )

@@ -26,7 +26,10 @@ Bugs
 
 #include "emu.h"
 #include "includes/aim65.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 #include "aim65.lh"
 
 
@@ -157,7 +160,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() != nullptr && image.get_software_region(slot_tag) == nullptr)
+	if (image.loaded_through_softlist() && image.get_software_region(slot_tag) == nullptr)
 	{
 		std::string errmsg = string_format(
 				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",

@@ -38,6 +38,9 @@
 #include "emu.h"
 #include "evpc.h"
 
+#include "speaker.h"
+
+
 #define EVPC_CRU_BASE 0x1400
 
 #define TRACE_ADDRESS 0
@@ -65,7 +68,7 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (TRACE_ADDRESS) logerror("set address %04x, %s\n", offset, (state==ASSERT_LINE)? "read" : "write");
 
@@ -477,4 +480,4 @@ machine_config_constructor snug_enhanced_video_device::device_mconfig_additions(
 	return MACHINE_CONFIG_NAME( ti99_evpc );
 }
 
-const device_type TI99_EVPC = &device_creator<snug_enhanced_video_device>;
+const device_type TI99_EVPC = device_creator<snug_enhanced_video_device>;

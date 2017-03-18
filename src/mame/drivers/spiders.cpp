@@ -190,14 +190,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
+#include "includes/spiders.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
-#include "includes/spiders.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK   (11200000)

@@ -20,7 +20,7 @@
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
-extern int utf8_main(int argc, char *argv[]);
+extern int utf8_main(std::vector<std::string> &args);
 //============================================================
 //  main
 //============================================================
@@ -30,17 +30,13 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i;
 	std::vector<std::string> argv_vectors(argc);
-	char **utf8_argv = (char **) alloca(argc * sizeof(char *));
 
 	// convert arguments to UTF-8
 	for (i = 0; i < argc; i++)
-	{
 		argv_vectors[i] = osd::text::from_tstring(argv[i]);
-		utf8_argv[i] = (char *) argv_vectors[i].c_str();
-	}
 
 	// run utf8_main
-	return utf8_main(argc, utf8_argv);
+	return utf8_main(argv_vectors);
 }
 #endif
 

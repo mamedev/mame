@@ -20,9 +20,9 @@
 //  vectrex_rom_device - constructor
 //-------------------------------------------------
 
-const device_type VECTREX_ROM_STD = &device_creator<vectrex_rom_device>;
-const device_type VECTREX_ROM_64K = &device_creator<vectrex_rom64k_device>;
-const device_type VECTREX_ROM_SRAM = &device_creator<vectrex_sram_device>;
+const device_type VECTREX_ROM_STD = device_creator<vectrex_rom_device>;
+const device_type VECTREX_ROM_64K = device_creator<vectrex_rom64k_device>;
+const device_type VECTREX_ROM_SRAM = device_creator<vectrex_sram_device>;
 
 
 vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

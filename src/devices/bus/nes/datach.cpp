@@ -65,7 +65,7 @@ READ8_MEMBER(datach_cart_interface::read)
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_DATACH_SLOT = &device_creator<nes_datach_slot_device>;
+const device_type NES_DATACH_SLOT = device_creator<nes_datach_slot_device>;
 
 nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_DATACH_SLOT, "NES Datach Cartridge Slot", tag, owner, clock, "nes_datach_slot", __FILE__),
@@ -102,7 +102,7 @@ image_init_result nes_datach_slot_device::call_load()
 			return image_init_result::FAIL;
 
 		// Existing Datach carts are all 256K, so we only load files of this size
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x40000 && length() != 0x40010)
 				return image_init_result::FAIL;
@@ -159,8 +159,8 @@ ROM_START( datach_rom )
 	ROM_REGION(0x40000, "datachrom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_DATACH_ROM = &device_creator<nes_datach_rom_device>;
-const device_type NES_DATACH_24C01 = &device_creator<nes_datach_24c01_device>;
+const device_type NES_DATACH_ROM = device_creator<nes_datach_rom_device>;
+const device_type NES_DATACH_24C01 = device_creator<nes_datach_24c01_device>;
 
 nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -218,7 +218,7 @@ machine_config_constructor nes_datach_24c01_device::device_mconfig_additions() c
 //
 //---------------------------------
 
-const device_type NES_DATACH = &device_creator<nes_datach_device>;
+const device_type NES_DATACH = device_creator<nes_datach_device>;
 
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

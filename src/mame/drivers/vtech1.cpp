@@ -31,17 +31,22 @@ Todo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "formats/imageutl.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6847.h"
+
 #include "bus/vtech/ioexp/ioexp.h"
 #include "bus/vtech/memexp/memexp.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "imagedev/snapquik.h"
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "formats/vt_cas.h"
+#include "imagedev/snapquik.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6847.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/imageutl.h"
+#include "formats/vt_cas.h"
+
 
 /***************************************************************************
     CONSTANTS & MACROS

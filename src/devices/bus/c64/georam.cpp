@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_GEORAM = &device_creator<c64_georam_cartridge_device>;
+const device_type C64_GEORAM = device_creator<c64_georam_cartridge_device>;
 
 
 

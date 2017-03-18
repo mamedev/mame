@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP700 = &device_creator<vp700_device>;
+const device_type VP700 = device_creator<vp700_device>;
 
 
 //-------------------------------------------------

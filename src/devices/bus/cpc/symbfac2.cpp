@@ -21,7 +21,7 @@
 #include "symbfac2.h"
 
 
-const device_type CPC_SYMBIFACE2 = &device_creator<cpc_symbiface2_device>;
+const device_type CPC_SYMBIFACE2 = device_creator<cpc_symbiface2_device>;
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE

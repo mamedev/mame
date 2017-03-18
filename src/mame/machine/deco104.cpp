@@ -1051,7 +1051,7 @@ deco146port_xx port104_table[] = {
 
 
 
-const device_type DECO104PROT = &device_creator<deco104_device>;
+const device_type DECO104PROT = device_creator<deco104_device>;
 
 
 

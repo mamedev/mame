@@ -115,12 +115,12 @@ DONE (x) (p=partly)         NMOS         CMOS
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type DUSCC         = &device_creator<duscc_device>;
-const device_type DUSCC_CHANNEL = &device_creator<duscc_channel>;
-const device_type DUSCC26562    = &device_creator<duscc26562_device>;
-const device_type DUSCC26C562   = &device_creator<duscc26C562_device>;
-const device_type DUSCC68562    = &device_creator<duscc68562_device>;
-const device_type DUSCC68C562   = &device_creator<duscc68C562_device>;
+const device_type DUSCC         = device_creator<duscc_device>;
+const device_type DUSCC_CHANNEL = device_creator<duscc_channel>;
+const device_type DUSCC26562    = device_creator<duscc26562_device>;
+const device_type DUSCC26C562   = device_creator<duscc26C562_device>;
+const device_type DUSCC68562    = device_creator<duscc68562_device>;
+const device_type DUSCC68C562   = device_creator<duscc68C562_device>;
 
 //-------------------------------------------------
 //  device_mconfig_additions -
@@ -208,13 +208,13 @@ duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *
 	: duscc_device(mconfig, DUSCC26562, "DUSCC 26562", tag, owner, clock, TYPE_DUSCC26562, "duscc26562", __FILE__){ }
 
 duscc26C562_device::duscc26C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duscc_device(mconfig, DUSCC26C562, "DUSCC 26C562", tag, owner, clock, TYPE_DUSCC26C562, "duscc26C562", __FILE__){ }
+	: duscc_device(mconfig, DUSCC26C562, "DUSCC 26C562", tag, owner, clock, TYPE_DUSCC26C562, "duscc26c562", __FILE__){ }
 
 duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: duscc_device(mconfig, DUSCC68562, "DUSCC 68562", tag, owner, clock, TYPE_DUSCC68562, "duscc68562", __FILE__){ }
 
 duscc68C562_device::duscc68C562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duscc_device(mconfig, DUSCC68C562, "DUSCC 68C562", tag, owner, clock, TYPE_DUSCC68C562, "duscc68C562", __FILE__){ }
+	: duscc_device(mconfig, DUSCC68C562, "DUSCC 68C562", tag, owner, clock, TYPE_DUSCC68C562, "duscc68c562", __FILE__){ }
 
 //-------------------------------------------------
 //  device_start - device-specific startup

@@ -47,7 +47,7 @@ namespace netlist { namespace devices {
 			m_R.set_R(m_base_r());
 		else
 			m_R.set_R(NL_FCONST(1.0) / netlist().gmin());
-		m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+		m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 	}
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE)

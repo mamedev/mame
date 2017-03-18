@@ -50,7 +50,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_SLOT = &device_creator<bml3bus_slot_device>;
+const device_type BML3BUS_SLOT = device_creator<bml3bus_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -93,7 +93,7 @@ void bml3bus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS = &device_creator<bml3bus_device>;
+const device_type BML3BUS = device_creator<bml3bus_device>;
 
 void bml3bus_device::static_set_cputag(device_t &device, const char *tag)
 {

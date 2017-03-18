@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class argo_state : public driver_device
@@ -40,7 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
@@ -113,7 +114,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 		{
 			uint8_t *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
-			memcpy(RAM, RAM+80, 24*80);
+			memmove(RAM, RAM+80, 24*80);
 		}
 		break;
 

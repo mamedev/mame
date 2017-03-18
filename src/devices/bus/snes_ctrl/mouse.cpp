@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_MOUSE = &device_creator<snes_mouse_device>;
+const device_type SNES_MOUSE = device_creator<snes_mouse_device>;
 
 
 static INPUT_PORTS_START( snes_mouse )

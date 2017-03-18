@@ -51,13 +51,13 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_STD_EEPROM = &device_creator<md_std_eeprom_device>;
-const device_type MD_EEPROM_NBAJAM = &device_creator<md_eeprom_nbajam_device>;
-const device_type MD_EEPROM_NBAJAMTE = &device_creator<md_eeprom_nbajamte_device>;
-const device_type MD_EEPROM_NFLQB = &device_creator<md_eeprom_nflqb_device>;
-const device_type MD_EEPROM_CSLAM = &device_creator<md_eeprom_cslam_device>;
-const device_type MD_EEPROM_NHLPA = &device_creator<md_eeprom_nhlpa_device>;
-const device_type MD_EEPROM_BLARA = &device_creator<md_eeprom_blara_device>;
+const device_type MD_STD_EEPROM = device_creator<md_std_eeprom_device>;
+const device_type MD_EEPROM_NBAJAM = device_creator<md_eeprom_nbajam_device>;
+const device_type MD_EEPROM_NBAJAMTE = device_creator<md_eeprom_nbajamte_device>;
+const device_type MD_EEPROM_NFLQB = device_creator<md_eeprom_nflqb_device>;
+const device_type MD_EEPROM_CSLAM = device_creator<md_eeprom_cslam_device>;
+const device_type MD_EEPROM_NHLPA = device_creator<md_eeprom_nhlpa_device>;
+const device_type MD_EEPROM_BLARA = device_creator<md_eeprom_blara_device>;
 
 
 md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
@@ -378,7 +378,7 @@ WRITE16_MEMBER(md_eeprom_blara_device::write)
 // TEMPORARY ADDITION UNTIL WE FIND OUT WHAT IS MISSING IN THE CORE X24C02 CODE
 // THIS IS A CUSTOM I2C EEPROM EMULATION THAT ALLOWS NBA JAM TO WORK
 
-const device_type MD_EEPROM_NBAJAM_ALT = &device_creator<md_eeprom_nbajam_device_alt>;
+const device_type MD_EEPROM_NBAJAM_ALT = device_creator<md_eeprom_nbajam_device_alt>;
 
 md_eeprom_nbajam_device_alt::md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM_ALT, "MD NBA Jam (Alt)", tag, owner, clock, "md_eeprom_nbajama", __FILE__)

@@ -19,12 +19,14 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/contra.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/contra.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)

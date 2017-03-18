@@ -13,10 +13,14 @@
 
 #include "emu.h"
 #include "sblaster.h"
+
 #include "machine/pic8259.h"
-#include "sound/speaker.h"
 #include "sound/262intf.h"
+#include "sound/spkrdev.h"
 #include "sound/volt_reg.h"
+
+#include "speaker.h"
+
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -1190,9 +1194,9 @@ ioport_constructor sb16_device::device_input_ports() const
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SOUND_BLASTER_1_0 = &device_creator<isa8_sblaster1_0_device>;
-const device_type ISA8_SOUND_BLASTER_1_5 = &device_creator<isa8_sblaster1_5_device>;
-const device_type ISA16_SOUND_BLASTER_16 = &device_creator<isa16_sblaster16_device>;
+const device_type ISA8_SOUND_BLASTER_1_0 = device_creator<isa8_sblaster1_0_device>;
+const device_type ISA8_SOUND_BLASTER_1_5 = device_creator<isa8_sblaster1_5_device>;
+const device_type ISA16_SOUND_BLASTER_16 = device_creator<isa16_sblaster16_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

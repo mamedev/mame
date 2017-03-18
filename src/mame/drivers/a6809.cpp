@@ -57,6 +57,8 @@ enter  show next address
 #include "video/mc6845.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class a6809_state : public driver_device

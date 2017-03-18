@@ -9,7 +9,7 @@
 #include "acb4070.h"
 
 // device type definition
-const device_type ACB4070 = &device_creator<acb4070_device>;
+const device_type ACB4070 = device_creator<acb4070_device>;
 
 acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scsihd_device(mconfig, ACB4070, "ACB4070", tag, owner, clock, "acb4070", __FILE__)

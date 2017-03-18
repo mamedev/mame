@@ -87,7 +87,7 @@ namespace netlist
 
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		m_Q.push(!m_feedback.Q(), m_inc);
+		m_Q.push(!m_feedback(), m_inc);
 
 		/* shift register
 		 *
@@ -109,7 +109,7 @@ namespace netlist
 			if (m_is_timestep)
 				m_RV.update_dev();
 			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
+			m_RV.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 		}
 
 	}

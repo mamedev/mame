@@ -550,9 +550,12 @@ TODO:
 
 #include "emu.h"
 #include "includes/mappy.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 /*************************************
  *

@@ -839,7 +839,7 @@ machine_config_constructor mainboard8_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ti998_mainboard );
 }
-const device_type MAINBOARD8 = &device_creator<mainboard8_device>;
+const device_type MAINBOARD8 = device_creator<mainboard8_device>;
 
 
 /***************************************************************************
@@ -1335,7 +1335,7 @@ void video_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-const device_type VAQUERRO = &device_creator<vaquerro_device>;
+const device_type VAQUERRO = device_creator<vaquerro_device>;
 
 /***************************************************************************
   ===== MOFETTA: Physical Address Space decoder =====
@@ -1583,7 +1583,7 @@ void mofetta_device::device_reset()
 }
 
 
-const device_type MOFETTA = &device_creator<mofetta_device>;
+const device_type MOFETTA = device_creator<mofetta_device>;
 
 /***************************************************************************
 
@@ -1939,7 +1939,7 @@ void amigo_device::device_reset()
 	m_logical_space = true;
 }
 
-const device_type AMIGO = &device_creator<amigo_device>;
+const device_type AMIGO = device_creator<amigo_device>;
 
 /***************************************************************************
 
@@ -2078,4 +2078,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-const device_type OSO = &device_creator<oso_device>;
+const device_type OSO = device_creator<oso_device>;

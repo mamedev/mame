@@ -14,7 +14,7 @@
 #include "awacs.h"
 
 // device type definition
-const device_type AWACS = &device_creator<awacs_device>;
+const device_type AWACS = device_creator<awacs_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

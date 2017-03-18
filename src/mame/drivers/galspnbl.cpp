@@ -38,11 +38,13 @@ Manuals for both games define the controls as 4 push buttons:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/galspnbl.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "includes/galspnbl.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(galspnbl_state::soundcommand_w)

@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SLOT = &device_creator<isa8_slot_device>;
+const device_type ISA8_SLOT = device_creator<isa8_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -64,7 +64,7 @@ void isa8_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SLOT = &device_creator<isa16_slot_device>;
+const device_type ISA16_SLOT = device_creator<isa16_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -100,7 +100,7 @@ void isa16_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8 = &device_creator<isa8_device>;
+const device_type ISA8 = device_creator<isa8_device>;
 
 void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -113,17 +113,6 @@ void isa8_device::static_set_custom_spaces(device_t &device)
 	isa8_device &isa = downcast<isa8_device &>(device);
 
 	isa.m_allocspaces = true;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void isa8_device::device_config_complete()
-{
-	m_maincpu = subdevice<cpu_device>(m_cputag);
 }
 
 //**************************************************************************
@@ -455,7 +444,7 @@ void device_isa8_card_interface::set_isa_device()
 }
 
 
-const device_type ISA16 = &device_creator<isa16_device>;
+const device_type ISA16 = device_creator<isa16_device>;
 
 //-------------------------------------------------
 //  isa16_device - constructor
@@ -473,17 +462,6 @@ isa16_device::isa16_device(const machine_config &mconfig, const char *tag, devic
 		m_out_drq6_cb(*this),
 		m_out_drq7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void isa16_device::device_config_complete()
-{
-	m_maincpu = mconfig().device<cpu_device>(m_cputag);
 }
 
 //-------------------------------------------------

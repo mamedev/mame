@@ -165,8 +165,8 @@ Timming
 #include "alph8201.h"
 
 
-const device_type ALPHA8201L = &device_creator<alpha8201_cpu_device>;
-const device_type ALPHA8301L = &device_creator<alpha8301_cpu_device>;
+const device_type ALPHA8201L = device_creator<alpha8201_cpu_device>;
+const device_type ALPHA8301L = device_creator<alpha8301_cpu_device>;
 
 
 /* instruction cycle count */

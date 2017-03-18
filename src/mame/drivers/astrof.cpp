@@ -59,8 +59,8 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/astrof.h"
+#include "cpu/m6502/m6502.h"
 
 
 #define MASTER_CLOCK        (XTAL_10_595MHz)

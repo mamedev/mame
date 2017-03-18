@@ -82,6 +82,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "emu.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
+#include "screen.h"
 
 class ti99_2_state : public driver_device
 {

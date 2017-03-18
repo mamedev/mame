@@ -1139,6 +1139,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ie15.h,MACHINES["IE15"] = true
+---------------------------------------------------
+
+if (MACHINES["IE15"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ie15.cpp",
+		MAME_DIR .. "src/devices/machine/ie15.h",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.cpp",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/ie15.cpp", GEN_DIR .. "emu/layout/ie15.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "ie15"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/im6402.h,MACHINES["IM6402"] = true
 ---------------------------------------------------
 
@@ -1233,6 +1255,18 @@ if (MACHINES["K056230"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/k056230.cpp",
 		MAME_DIR .. "src/devices/machine/k056230.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
+---------------------------------------------------
+
+if (MACHINES["MM5740"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mm5740.cpp",
+		MAME_DIR .. "src/devices/machine/mm5740.h",
 	}
 end
 

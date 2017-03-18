@@ -24,6 +24,7 @@ TODO:
 
 #include "emu.h"
 #include "audio/galaxian.h"
+#include "includes/galaxian.h"
 
 /*************************************
  *
@@ -31,10 +32,8 @@ TODO:
  *
  *************************************/
 
-#define XTAL                    18432000
-
-#define SOUND_CLOCK             (XTAL/6/2)          /* 1.536 MHz */
-#define RNG_RATE                (XTAL/3*2)          /* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
+#define SOUND_CLOCK             (GALAXIAN_MASTER_CLOCK/6/2)          /* 1.536 MHz */
+#define RNG_RATE                (GALAXIAN_MASTER_CLOCK/3*2)          /* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
 
 /* 74LS259 */
 #define GAL_INP_BG_DAC          NODE_10     /* at 9M Q4 to Q7 in schematics */
@@ -387,7 +386,7 @@ static DISCRETE_SOUND_START(mooncrst)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
-const device_type GALAXIAN = &device_creator<galaxian_sound_device>;
+const device_type GALAXIAN = device_creator<galaxian_sound_device>;
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GALAXIAN, "Galaxian Audio Custom", tag, owner, clock, "galaxian_sound", __FILE__),

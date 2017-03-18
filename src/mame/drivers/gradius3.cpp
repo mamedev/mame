@@ -23,14 +23,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gradius3.h"
+#include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/gradius3.h"
+
+#include "speaker.h"
+
 
 READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {

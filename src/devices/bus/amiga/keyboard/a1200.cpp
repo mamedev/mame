@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-device_type const A1200_KBD = &device_creator<bus::amiga::keyboard::a1200_kbd_device>;
+device_type const A1200_KBD = device_creator<bus::amiga::keyboard::a1200_kbd_device>;
 
 
 

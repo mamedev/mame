@@ -7,20 +7,21 @@
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/qix.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/qix.h"
-#include "sound/sn76496.h"
 #include "sound/discrete.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
+
+
 
 /* Discrete Sound Input Nodes */
 #define QIX_DAC_DATA        NODE_01
 #define QIX_VOL_DATA        NODE_02
 #define QIX_VOL_DATA_L      NODE_03
 #define QIX_VOL_DATA_R      NODE_04
-
-
-
 
 
 

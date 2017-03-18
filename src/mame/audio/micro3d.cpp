@@ -165,7 +165,7 @@ void micro3d_sound_device::noise_sh_w(uint8_t data)
  *************************************/
 
 
-const device_type MICRO3D = &device_creator<micro3d_sound_device>;
+const device_type MICRO3D = device_creator<micro3d_sound_device>;
 
 micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MICRO3D, "Microprose Audio Custom", tag, owner, clock, "micro3d_sound", __FILE__),

@@ -11,7 +11,7 @@
 
 #define LOG 0
 
-const device_type MOS6551 = &device_creator<mos6551_device>;
+const device_type MOS6551 = device_creator<mos6551_device>;
 
 mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
@@ -378,7 +378,7 @@ void mos6551_device::write_command(uint8_t data)
 
 READ8_MEMBER( mos6551_device::read )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0xff;
 
 	switch (offset & 0x03)

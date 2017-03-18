@@ -36,11 +36,13 @@ Notes/Tidbits:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/scramble.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/scramble.h"
+#include "speaker.h"
 
 
 class scobra_state : public scramble_state

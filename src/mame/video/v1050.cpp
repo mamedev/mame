@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "includes/v1050.h"
 
+#include "screen.h"
+
 /*
 
     TODO:

@@ -51,16 +51,18 @@
 /* Mapping for joystick see hec2hrp.c*/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "formats/hect_tap.h"
-#include "imagedev/printer.h"
-#include "sound/wave.h"      /* for K7 sound*/
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
-#include "softlist.h"
 #include "includes/hec2hrp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+#include "formats/hect_tap.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
+#include "sound/discrete.h"  /* for 1 Bit sound*/
+#include "sound/wave.h"      /* for K7 sound*/
+#include "screen.h"
+#include "softlist.h"
 
 
 class interact_state : public hec2hrp_state

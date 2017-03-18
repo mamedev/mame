@@ -91,7 +91,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MPU401 = &device_creator<mpu401_device>;
+const device_type MPU401 = device_creator<mpu401_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
+const device_type PC9801_KBD = device_creator<pc9801_kbd_device>;
 
 
 //**************************************************************************

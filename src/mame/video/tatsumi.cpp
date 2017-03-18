@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 #include "emu.h"
 #include "includes/tatsumi.h"
+#include "screen.h"
 
 
 /******************************************************************************/

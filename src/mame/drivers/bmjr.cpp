@@ -16,9 +16,11 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/beep.h"
 #include "imagedev/cassette.h"
+#include "sound/beep.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bmjr_state : public driver_device

@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88CART_SLOT = &device_creator<z88cart_slot_device>;
+const device_type Z88CART_SLOT = device_creator<z88cart_slot_device>;
 
 
 //**************************************************************************
@@ -86,18 +86,6 @@ void z88cart_slot_device::device_start()
 	m_flp_timer->reset();
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z88cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -125,7 +113,7 @@ image_init_result z88cart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);

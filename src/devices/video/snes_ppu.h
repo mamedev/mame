@@ -6,10 +6,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_SNES_PPU_H
+#define MAME_DEVICES_VIDEO_SNES_PPU_H
+
 #pragma once
 
-#ifndef __SNES_PPU_H__
-#define __SNES_PPU_H__
+#include "screen.h"
 
 
 #define MCLK_NTSC   (21477272)  /* verified */
@@ -297,4 +299,4 @@ extern const device_type SNES_PPU;
 #define MCFG_SNES_PPU_OPENBUS_CB(_read) \
 	devcb = &snes_ppu_device::static_set_open_bus_callback(*device, DEVCB_##_read);
 
-#endif
+#endif // MAME_DEVICES_VIDEO_SNES_PPU_H

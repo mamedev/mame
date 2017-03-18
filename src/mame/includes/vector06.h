@@ -6,22 +6,26 @@
  *
  ****************************************************************************/
 
-#ifndef VECTOR06_H_
-#define VECTOR06_H_
+#ifndef MAME_INCLUDES_VECTOR06_H
+#define MAME_INCLUDES_VECTOR06_H
 
-#include "cpu/z80/z80.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
+#include "sound/ay8910.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 
 class vector06_state : public driver_device
@@ -116,4 +120,4 @@ private:
 	void update_mem();
 };
 
-#endif /* VECTOR06_H_ */
+#endif // MAME_INCLUDES_VECTOR06_H

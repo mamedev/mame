@@ -15,7 +15,7 @@
 
 namespace plib {
 
-void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile(const std::vector<pstring> &inputs, const pstring &expr)
 {
 	if (expr.startsWith("rpn:"))
 		compile_postfix(inputs, expr.substr(4));
@@ -23,14 +23,14 @@ void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
 		compile_infix(inputs, expr);
 }
 
-void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring &expr)
 {
 	std::vector<pstring> cmds(plib::psplit(expr, " "));
 	compile_postfix(inputs, cmds, expr);
 }
 
 void pfunction::compile_postfix(const std::vector<pstring> &inputs,
-		const std::vector<pstring> &cmds, const pstring expr)
+		const std::vector<pstring> &cmds, const pstring &expr)
 {
 	m_precompiled.clear();
 	int stk = 0;
@@ -107,7 +107,7 @@ static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
 	return res;
 }
 
-void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring &expr)
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};

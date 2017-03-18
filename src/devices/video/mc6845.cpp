@@ -41,23 +41,25 @@
 #include "emu.h"
 #include "mc6845.h"
 
+#include "screen.h"
+
 
 #define LOG     (0)
 
 
-const device_type MC6845 = &device_creator<mc6845_device>;
-const device_type MC6845_1 = &device_creator<mc6845_1_device>;
-const device_type R6545_1 = &device_creator<r6545_1_device>;
-const device_type C6545_1 = &device_creator<c6545_1_device>;
-const device_type H46505 = &device_creator<h46505_device>;
-const device_type HD6845 = &device_creator<hd6845_device>;
-const device_type SY6545_1 = &device_creator<sy6545_1_device>;
-const device_type SY6845E = &device_creator<sy6845e_device>;
-const device_type HD6345 = &device_creator<hd6345_device>;
-const device_type AMS40041 = &device_creator<ams40041_device>;
-const device_type AMS40489 = &device_creator<ams40489_device>;
-const device_type MOS8563 = &device_creator<mos8563_device>;
-const device_type MOS8568 = &device_creator<mos8568_device>;
+const device_type MC6845 = device_creator<mc6845_device>;
+const device_type MC6845_1 = device_creator<mc6845_1_device>;
+const device_type R6545_1 = device_creator<r6545_1_device>;
+const device_type C6545_1 = device_creator<c6545_1_device>;
+const device_type H46505 = device_creator<h46505_device>;
+const device_type HD6845 = device_creator<hd6845_device>;
+const device_type SY6545_1 = device_creator<sy6545_1_device>;
+const device_type SY6845E = device_creator<sy6845e_device>;
+const device_type HD6345 = device_creator<hd6345_device>;
+const device_type AMS40041 = device_creator<ams40041_device>;
+const device_type AMS40489 = device_creator<ams40489_device>;
+const device_type MOS8563 = device_creator<mos8563_device>;
+const device_type MOS8568 = device_creator<mos8568_device>;
 
 
 /* mode macros */

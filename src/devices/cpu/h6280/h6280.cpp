@@ -153,7 +153,7 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type H6280 = &device_creator<h6280_device>;
+const device_type H6280 = device_creator<h6280_device>;
 
 //-------------------------------------------------
 //  h6280_device - constructor

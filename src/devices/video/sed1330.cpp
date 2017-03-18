@@ -61,7 +61,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SED1330 = &device_creator<sed1330_device>;
+const device_type SED1330 = device_creator<sed1330_device>;
 
 
 // default address map

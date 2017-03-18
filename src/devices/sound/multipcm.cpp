@@ -464,7 +464,7 @@ void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
 	printf("%08x, %08x\n", leftoffs, rightoffs);
 }
 
-const device_type MULTIPCM = &device_creator<multipcm_device>;
+const device_type MULTIPCM = device_creator<multipcm_device>;
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),

@@ -12,7 +12,8 @@
 #include "emu.h"
 #include "cpu/sm510/sm510.h"
 #include "cpu/sm510/kb1013vk1-2.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "hh_sm510_test.lh" // common test-layout - use external artwork
 

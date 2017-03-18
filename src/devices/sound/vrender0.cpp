@@ -77,7 +77,7 @@ static const unsigned short ULawTo16[]=
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type VRENDER0 = &device_creator<vrender0_device>;
+const device_type VRENDER0 = device_creator<vrender0_device>;
 
 //-------------------------------------------------
 //  vrender0_device - constructor

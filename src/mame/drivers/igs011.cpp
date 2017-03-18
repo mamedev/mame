@@ -70,6 +70,8 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 struct blitter_t
@@ -229,7 +231,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_vbowl(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
 	void lhb_decrypt();
@@ -2687,7 +2689,7 @@ READ16_MEMBER(igs011_state::vbowl_unk_r)
 	return 0xffff;
 }
 
-void igs011_state::screen_eof_vbowl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(igs011_state::screen_vblank_vbowl)
 {
 	// rising edge
 	if (state)
@@ -4128,7 +4130,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(igs011_state, screen_eof_vbowl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs011_state, screen_vblank_vbowl))
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
@@ -4857,5 +4859,5 @@ GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xy
 GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",                     "Wan Li Chang Cheng (China, V638C)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,      vbowl,    vbowl,           vbowl,     igs011_state, vbowlj,       ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Honk Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING |MACHINE_IMPERFECT_SOUND ) // different encryption?
+GAME( 1996, vbowlhk,      vbowl,    vbowl,           vbowl,     igs011_state, vbowlj,       ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING |MACHINE_IMPERFECT_SOUND ) // different encryption?
 GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )

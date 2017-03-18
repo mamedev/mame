@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_IRRMAZE = &device_creator<neogeo_irrmaze_device>;
+const device_type NEOGEO_IRRMAZE = device_creator<neogeo_irrmaze_device>;
 
 
 static INPUT_PORTS_START( neogeo_irrmaze )

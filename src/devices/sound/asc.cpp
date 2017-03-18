@@ -35,7 +35,7 @@
 #include "asc.h"
 
 // device type definition
-const device_type ASC = &device_creator<asc_device>;
+const device_type ASC = device_creator<asc_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -90,19 +90,22 @@
 
 *******************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "sanremo.lh"
+
 
 #define MASTER_CLOCK    XTAL_18MHz
 
 #define CPU_CLOCK       MASTER_CLOCK/3
 #define SND_CLOCK       MASTER_CLOCK/12
 #define CRTC_CLOCK      MASTER_CLOCK/12
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "sanremo.lh"
 
 
 class sanremo_state : public driver_device

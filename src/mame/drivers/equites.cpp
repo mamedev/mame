@@ -360,6 +360,7 @@ D                                                                               
 
 #include "emu.h"
 #include "includes/equites.h"
+
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
@@ -368,6 +369,7 @@ D                                                                               
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
 

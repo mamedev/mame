@@ -70,9 +70,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2040 = &device_creator<c2040_t>;
-const device_type C3040 = &device_creator<c3040_t>;
-const device_type C4040 = &device_creator<c4040_t>;
+const device_type C2040 = device_creator<c2040_t>;
+const device_type C3040 = device_creator<c3040_t>;
+const device_type C4040 = device_creator<c4040_t>;
 
 
 //-------------------------------------------------

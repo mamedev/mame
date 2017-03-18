@@ -105,9 +105,11 @@ TODO:
  ***************************************************************************/
 
 #include "emu.h"
+#include "includes/naughtyb.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/tms36xx.h"
-#include "includes/naughtyb.h"
+#include "speaker.h"
 
 #define CLOCK_XTAL 12000000
 

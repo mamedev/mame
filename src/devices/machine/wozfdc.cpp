@@ -21,8 +21,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DISKII_FDC = &device_creator<diskii_fdc>;
-const device_type APPLEIII_FDC = &device_creator<appleiii_fdc>;
+const device_type DISKII_FDC = device_creator<diskii_fdc>;
+const device_type APPLEIII_FDC = device_creator<appleiii_fdc>;
 
 #define DISKII_P6_REGION  "diskii_rom_p6"
 
@@ -55,7 +55,7 @@ diskii_fdc::diskii_fdc(const machine_config &mconfig, const char *tag, device_t 
 }
 
 appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	wozfdc_device(mconfig, DISKII_FDC, "Apple III floppy controller", tag, owner, clock, "a3fdc", __FILE__)
+	wozfdc_device(mconfig, APPLEIII_FDC, "Apple III floppy controller", tag, owner, clock, "a3fdc", __FILE__)
 {
 }
 

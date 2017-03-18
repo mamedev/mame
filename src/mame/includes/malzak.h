@@ -8,6 +8,7 @@
 
 #include "machine/s2636.h"
 #include "video/saa5050.h"
+#include "screen.h"
 
 class malzak_state : public driver_device
 {

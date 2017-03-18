@@ -183,21 +183,13 @@ namespace netlist
 			{
 				auto *t = &m_ttp->m_timing[timebase];
 				for (std::size_t i = 0; i < m_NO; ++i)
-				{
-					m_Q[i].push(out & 1, m_ttp->m_timing_nt[*t]);
-					++t;
-					out >>= 1;
-				}
+					m_Q[i].push((out >> i) & 1, m_ttp->m_timing_nt[t[i]]);
 			}
 			else
 			{
 				auto *t = &m_ttp->m_timing[timebase];
 				for (std::size_t i = 0; i < m_NO; ++i)
-				{
-					m_Q[i].net().set_Q_time(out & 1, mt + m_ttp->m_timing_nt[*t]);
-					++t;
-					out >>= 1;
-				}
+					m_Q[i].set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[t[i]]);
 			}
 
 			if (m_NI > 1)

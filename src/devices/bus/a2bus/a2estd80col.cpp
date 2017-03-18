@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUX_STD80COL = &device_creator<a2eaux_std80col_device>;
+const device_type A2EAUX_STD80COL = device_creator<a2eaux_std80col_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -6,7 +6,7 @@
 
 #define DELAY_HACK
 
-const device_type NCR5390 = &device_creator<ncr5390_device>;
+const device_type NCR5390 = device_creator<ncr5390_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(tcount_lo_r, tcount_lo_w)

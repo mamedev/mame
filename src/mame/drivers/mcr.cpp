@@ -284,10 +284,13 @@
 
 
 #include "emu.h"
-#include "audio/midway.h"
-#include "sound/samples.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
+
+#include "audio/midway.h"
+#include "machine/nvram.h"
+#include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "dpoker.lh"
 

@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EA2001_CART_SLOT = &device_creator<arcadia_cart_slot_device>;
+const device_type EA2001_CART_SLOT = device_creator<arcadia_cart_slot_device>;
 
 //**************************************************************************
 //    ARCADIA Cartridges Interface
@@ -88,18 +88,6 @@ void arcadia_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_arcadia_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void arcadia_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  ARCADIA PCB
@@ -150,16 +138,16 @@ image_init_result arcadia_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), len);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			// we need to identify Golf!
 			m_type = ARCADIA_STD;

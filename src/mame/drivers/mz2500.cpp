@@ -46,15 +46,17 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
 #include "machine/i8255.h"
-#include "machine/wd_fdc.h"
 #include "machine/pit8253.h"
+#include "machine/rp5c15.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "machine/z80pio.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
-#include "machine/rp5c15.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 //#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
@@ -1672,7 +1674,8 @@ static INPUT_PORTS_START( mz2500 )
 
 	PORT_START("KEYD")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("LOGO KEY")
-	PORT_BIT(0xfe,IP_ACTIVE_LOW,IPT_UNUSED)
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("HELP")
+	PORT_BIT(0xfc,IP_ACTIVE_LOW,IPT_UNUSED)
 
 	PORT_START("UNUSED")
 	PORT_BIT(0xff,IP_ACTIVE_LOW,IPT_UNUSED )

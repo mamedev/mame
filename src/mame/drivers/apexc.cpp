@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/apexc/apexc.h"
+#include "screen.h"
 
 
 class apexc_state : public driver_device
@@ -90,13 +91,12 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 private:
 	int m_writable;
 };
 
-const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
+const device_type APEXC_CYLINDER = device_creator<apexc_cylinder_image_device>;
 
 apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock, "apexc_cylinder_image", __FILE__),
@@ -214,11 +214,10 @@ public:
 	virtual const char *file_extensions() const override { return "tap"; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
+const device_type APEXC_TAPE_PUNCHER = device_creator<apexc_tape_puncher_image_device>;
 
 apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock, "apexc_tape_puncher_image", __FILE__),
@@ -246,11 +245,10 @@ public:
 	virtual const char *file_extensions() const override { return "tap"; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
+const device_type APEXC_TAPE_READER = device_creator<apexc_tape_reader_image_device>;
 
 apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock, "apexc_tape_reader_image", __FILE__),

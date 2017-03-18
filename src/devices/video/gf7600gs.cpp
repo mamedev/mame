@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "gf7600gs.h"
 
-const device_type GEFORCE_7600GS = &device_creator<geforce_7600gs_device>;
+const device_type GEFORCE_7600GS = device_creator<geforce_7600gs_device>;
 
 DEVICE_ADDRESS_MAP_START(map1, 32, geforce_7600gs_device)
 ADDRESS_MAP_END

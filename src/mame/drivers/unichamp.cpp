@@ -37,12 +37,17 @@
  ************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cp1610/cp1610.h"
 #include "video/gic.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class unichamp_state : public driver_device
 {

@@ -11,8 +11,9 @@
 #include "emu.h"
 #include "decodmd2.h"
 #include "rendlay.h"
+#include "screen.h"
 
-const device_type DECODMD2 = &device_creator<decodmd_type2_device>;
+const device_type DECODMD2 = device_creator<decodmd_type2_device>;
 
 WRITE8_MEMBER( decodmd_type2_device::bank_w )
 {

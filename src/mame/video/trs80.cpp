@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "screen.h"
 
 /* Bit assignment for "state->m_mode"
     d7 Page select

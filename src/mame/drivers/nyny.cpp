@@ -64,7 +64,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -76,6 +76,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz

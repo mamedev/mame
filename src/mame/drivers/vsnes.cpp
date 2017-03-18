@@ -140,11 +140,15 @@ Changes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vsnes.h"
+
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "rendlay.h"
-#include "includes/vsnes.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /******************************************************************************/
 

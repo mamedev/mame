@@ -32,7 +32,7 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_SOR_t() {}
+	virtual ~matrix_solver_SOR_t() override {}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;

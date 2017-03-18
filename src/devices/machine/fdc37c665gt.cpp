@@ -59,4 +59,4 @@ machine_config_constructor fdc37c665gt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(fdc37c665gt);
 }
 
-const device_type FDC37C665GT = &device_creator<fdc37c665gt_device>;
+const device_type FDC37C665GT = device_creator<fdc37c665gt_device>;

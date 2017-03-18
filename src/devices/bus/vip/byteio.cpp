@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VIP_BYTEIO_PORT = &device_creator<vip_byteio_port_device>;
+const device_type VIP_BYTEIO_PORT = device_creator<vip_byteio_port_device>;
 
 
 

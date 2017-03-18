@@ -179,7 +179,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 
 
-const device_type K056832 = &device_creator<k056832_device>;
+const device_type K056832 = device_creator<k056832_device>;
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K056832, "K056832 Tilemap Generator", tag, owner, clock, "k056832", __FILE__),

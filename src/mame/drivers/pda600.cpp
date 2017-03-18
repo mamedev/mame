@@ -60,6 +60,7 @@
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
 #include "rendlay.h"
+#include "screen.h"
 
 
 class pda600_state : public driver_device

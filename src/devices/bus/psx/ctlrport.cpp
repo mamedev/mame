@@ -7,7 +7,7 @@
 #include "analogue.h"
 #include "multitap.h"
 
-const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_device>;
+const device_type PSX_CONTROLLER_PORT = device_creator<psx_controller_port_device>;
 
 psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PSX_CONTROLLER_PORT, "Playstation Controller Port", tag, owner, clock, "psx_controller_port", __FILE__),
@@ -40,7 +40,7 @@ void psx_controller_port_device::disable_card(bool state)
 	m_card->disable(state);
 }
 
-const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
+const device_type PSXCONTROLLERPORTS = device_creator<psxcontrollerports_device>;
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__), m_port0(nullptr), m_port1(nullptr),
@@ -172,7 +172,7 @@ void device_psx_controller_interface::sel_w(bool state) {
 	m_sel = state;
 }
 
-const device_type PSX_STANDARD_CONTROLLER = &device_creator<psx_standard_controller_device>;
+const device_type PSX_STANDARD_CONTROLLER = device_creator<psx_standard_controller_device>;
 
 psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PSX_STANDARD_CONTROLLER, "Playstation Standard Controller", tag, owner, clock, "psx_standard_controller", __FILE__),

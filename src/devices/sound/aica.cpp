@@ -1468,7 +1468,7 @@ READ16_MEMBER( aica_device::midi_out_r )
 	return val;
 }
 
-const device_type AICA = &device_creator<aica_device>;
+const device_type AICA = device_creator<aica_device>;
 
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AICA, "AICA", tag, owner, clock, "aica", __FILE__),

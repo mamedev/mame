@@ -98,7 +98,7 @@ SH4 IO port A bits
 
 */
 
-const device_type NAOMI_GDROM_BOARD = &device_creator<naomi_gdrom_board>;
+const device_type NAOMI_GDROM_BOARD = device_creator<naomi_gdrom_board>;
 
 const uint32_t naomi_gdrom_board::DES_LEFTSWAP[] = {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101, 0x00010000, 0x00010001, 0x00010100, 0x00010101,

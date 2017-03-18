@@ -30,7 +30,7 @@ Release data from the Sega Retro project:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_JOYPAD = &device_creator<sms_joypad_device>;
+const device_type SMS_JOYPAD = device_creator<sms_joypad_device>;
 
 
 static INPUT_PORTS_START( sms_joypad )

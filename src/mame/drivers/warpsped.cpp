@@ -87,6 +87,7 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 class warpspeed_state : public driver_device
 {

@@ -10,14 +10,17 @@
 */
 
 #include "emu.h"
+#include "includes/n64.h"
+
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "imagedev/harddriv.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class n64_mess_state : public n64_state
 {
@@ -298,7 +301,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	uint8_t *cart = memregion("user2")->base();
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		length = image.fread(cart, 0x4000000);
 	}
@@ -447,7 +450,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	//MCFG_SCREEN_SIZE(640, 525)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(n64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_DRIVER(n64_state, screen_eof_n64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 

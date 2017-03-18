@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type COM8116 = &device_creator<com8116_device>;
+const device_type COM8116 = device_creator<com8116_device>;
 
 // Parts with T after the number do not have an internal oscillator and require an external clock source
 // The SMC/COM 5xxx parts are all dual 5v/12v parts, while the 8xxx parts are 5v only

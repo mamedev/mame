@@ -46,10 +46,13 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
-#include "sound/saa1099.h"
 #include "machine/nvram.h"
+#include "sound/saa1099.h"
+#include "video/mc6845.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class blitz68k_state : public driver_device
 {

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LIC = &device_creator<wangpc_lic_device>;
+const device_type WANGPC_LIC = device_creator<wangpc_lic_device>;
 
 
 //-------------------------------------------------

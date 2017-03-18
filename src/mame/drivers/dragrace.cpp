@@ -7,9 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/dragrace.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "dragrace.lh"
 

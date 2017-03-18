@@ -23,7 +23,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 // device type definition
-const device_type C352 = &device_creator<c352_device>;
+const device_type C352 = device_creator<c352_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

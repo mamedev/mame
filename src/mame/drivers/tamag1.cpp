@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "tama.lh"
 

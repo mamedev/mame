@@ -38,13 +38,15 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
+#include "machine/6821pia.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class pegasus_state : public driver_device
@@ -421,7 +423,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() != nullptr && size == 0)
+	if (image.loaded_through_softlist() && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"

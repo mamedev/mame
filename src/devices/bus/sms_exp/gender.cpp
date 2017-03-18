@@ -22,7 +22,7 @@ real hardware, when run plugged-in to the SMS expansion slot.
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_GENDER_ADAPTER = &device_creator<sms_gender_adapter_device>;
+const device_type SMS_GENDER_ADAPTER = device_creator<sms_gender_adapter_device>;
 
 
 

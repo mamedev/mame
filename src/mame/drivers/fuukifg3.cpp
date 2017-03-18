@@ -157,10 +157,12 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fuukifg3.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "includes/fuukifg3.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -560,7 +562,7 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)

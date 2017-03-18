@@ -82,10 +82,13 @@ NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but as
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gcpinbal.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-#include "includes/gcpinbal.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

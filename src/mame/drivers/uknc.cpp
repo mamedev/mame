@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "screen.h"
 
 
 class uknc_state : public driver_device

@@ -70,6 +70,21 @@
 
 *******************************************************************************/
 
+#include "emu.h"
+#include "cpu/i86/i86.h"
+#include "machine/i8155.h"
+#include "machine/i8255.h"
+#include "machine/msm5832.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ticket.h"
+#include "sound/sn76496.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "amusco.lh"
+
 
 #define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
 #define SECOND_CLOCK        XTAL_15MHz          /* confirmed */
@@ -81,18 +96,6 @@
 #define PIT_CLOCK1          SECOND_CLOCK / 8    /* guess */
 
 #define COIN_IMPULSE        3
-
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/i8155.h"
-#include "machine/i8255.h"
-#include "sound/sn76496.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/msm5832.h"
-#include "machine/ticket.h"
-#include "amusco.lh"
 
 
 class amusco_state : public driver_device

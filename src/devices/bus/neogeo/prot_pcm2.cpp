@@ -6,7 +6,7 @@
 #include "prot_pcm2.h"
 
 
-extern const device_type PCM2_PROT = &device_creator<pcm2_prot_device>;
+const device_type PCM2_PROT = device_creator<pcm2_prot_device>;
 
 
 pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

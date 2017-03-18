@@ -36,8 +36,8 @@
 #include "sound/sn76496.h"
 #include "machine/msm6242.h"
 #include "machine/ldp1450.h"
-
 #include "machine/mos6551.h"
+#include "speaker.h"
 
 #include "cops.lh"
 

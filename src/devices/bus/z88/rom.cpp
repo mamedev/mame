@@ -19,9 +19,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88_32K_ROM = &device_creator<z88_32k_rom_device>;
-const device_type Z88_128K_ROM = &device_creator<z88_128k_rom_device>;
-const device_type Z88_256K_ROM = &device_creator<z88_256k_rom_device>;
+const device_type Z88_32K_ROM = device_creator<z88_32k_rom_device>;
+const device_type Z88_128K_ROM = device_creator<z88_128k_rom_device>;
+const device_type Z88_256K_ROM = device_creator<z88_256k_rom_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

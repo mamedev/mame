@@ -46,10 +46,10 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-const device_type ADC0831 = &device_creator<adc0831_device>;
-const device_type ADC0832 = &device_creator<adc0832_device>;
-const device_type ADC0834 = &device_creator<adc0834_device>;
-const device_type ADC0838 = &device_creator<adc0838_device>;
+const device_type ADC0831 = device_creator<adc0831_device>;
+const device_type ADC0832 = device_creator<adc0832_device>;
+const device_type ADC0834 = device_creator<adc0834_device>;
+const device_type ADC0838 = device_creator<adc0838_device>;
 
 adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),

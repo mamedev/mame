@@ -74,9 +74,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/funkybee.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/funkybee.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)

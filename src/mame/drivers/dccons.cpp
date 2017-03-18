@@ -261,16 +261,19 @@
 */
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
-#include "machine/aicartc.h"
-#include "includes/dc.h"
 #include "includes/dccons.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/sh4/sh4.h"
 #include "imagedev/chd_cd.h"
+#include "machine/aicartc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define CPU_CLOCK (200000000)
 

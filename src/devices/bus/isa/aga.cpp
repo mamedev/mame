@@ -51,7 +51,7 @@ INPUT_PORTS_END
 #define CGA_MONITOR     (m_cga_config->read()&0x1C)
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
 
-const device_type ISA8_AGA = &device_creator<isa8_aga_device>;
+const device_type ISA8_AGA = device_creator<isa8_aga_device>;
 
 //-------------------------------------------------
 //  isa8_aga_device - constructor
@@ -159,7 +159,7 @@ ioport_constructor isa8_aga_device::device_input_ports() const
 
 
 
-const device_type ISA8_AGA_PC200 = &device_creator<isa8_aga_pc200_device>;
+const device_type ISA8_AGA_PC200 = device_creator<isa8_aga_pc200_device>;
 
 //-------------------------------------------------
 //  isa8_aga_pc200_device - constructor

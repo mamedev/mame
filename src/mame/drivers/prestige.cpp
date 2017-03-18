@@ -78,13 +78,17 @@ Notes:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "rendlay.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+
 
 class prestige_state : public driver_device
 {
@@ -101,7 +105,7 @@ public:
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
 		, m_bank5(*this, "bank5")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

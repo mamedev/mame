@@ -12,6 +12,7 @@
 #include "video/k053936.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class metro_state : public driver_device
 {

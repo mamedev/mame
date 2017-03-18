@@ -26,19 +26,25 @@ TODO:
 
 *******************************************************************************/
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
-
 #include "emu.h"
+#include "includes/cdi.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/cdi.h"
+#include "imagedev/chd_cd.h"
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
-#include "cdrom.h"
-#include "cdi.lh"
-#include "imagedev/chd_cd.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "cdrom.h"
+
+#include "cdi.lh"
+
+#define CLOCK_A XTAL_30MHz
+#define CLOCK_B XTAL_19_6608MHz
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -364,7 +370,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (space.debugger_access())
+	if (space.machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -564,7 +570,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (space.debugger_access())
+	if (space.machine().side_effect_disabled())
 	{
 		return 0;
 	}

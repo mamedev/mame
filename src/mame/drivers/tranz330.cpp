@@ -22,7 +22,11 @@
 
 #include "emu.h"
 #include "includes/tranz330.h"
+
+#include "speaker.h"
+
 #include "tranz330.lh"
+
 
 static void construct_address_map_tranz330_mem(address_map &map)
 {

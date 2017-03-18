@@ -24,9 +24,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/wiping.h"
 #include "includes/clshroad.h"
+#include "audio/wiping.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void clshroad_state::machine_reset()
 {

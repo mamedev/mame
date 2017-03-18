@@ -50,13 +50,15 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mycom_state : public driver_device
@@ -78,7 +80,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "vram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);

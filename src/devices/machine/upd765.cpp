@@ -7,18 +7,18 @@
 
 #define LOG 0
 
-const device_type UPD765A = &device_creator<upd765a_device>;
-const device_type UPD765B = &device_creator<upd765b_device>;
-const device_type I8272A = &device_creator<i8272a_device>;
-const device_type UPD72065 = &device_creator<upd72065_device>;
-const device_type SMC37C78 = &device_creator<smc37c78_device>;
-const device_type N82077AA = &device_creator<n82077aa_device>;
-const device_type PC_FDC_SUPERIO = &device_creator<pc_fdc_superio_device>;
-const device_type DP8473 = &device_creator<dp8473_device>;
-const device_type PC8477A = &device_creator<pc8477a_device>;
-const device_type WD37C65C = &device_creator<wd37c65c_device>;
-const device_type MCS3201 = &device_creator<mcs3201_device>;
-const device_type TC8566AF = &device_creator<tc8566af_device>;
+const device_type UPD765A = device_creator<upd765a_device>;
+const device_type UPD765B = device_creator<upd765b_device>;
+const device_type I8272A = device_creator<i8272a_device>;
+const device_type UPD72065 = device_creator<upd72065_device>;
+const device_type SMC37C78 = device_creator<smc37c78_device>;
+const device_type N82077AA = device_creator<n82077aa_device>;
+const device_type PC_FDC_SUPERIO = device_creator<pc_fdc_superio_device>;
+const device_type DP8473 = device_creator<dp8473_device>;
+const device_type PC8477A = device_creator<pc8477a_device>;
+const device_type WD37C65C = device_creator<wd37c65c_device>;
+const device_type MCS3201 = device_creator<mcs3201_device>;
+const device_type TC8566AF = device_creator<tc8566af_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
@@ -2458,21 +2458,21 @@ pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, cons
 	select_connected = true;
 }
 
-dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "DP8473", tag, owner, clock, "dp8473", __FILE__)
+dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, DP8473, "DP8473", tag, owner, clock, "dp8473", __FILE__)
 {
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
 }
 
-pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC8477A", tag, owner, clock, "pc8477a", __FILE__)
+pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC8477A, "PC8477A", tag, owner, clock, "pc8477a", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "WD37C65C", tag, owner, clock, "wd37c65c", __FILE__)
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, WD37C65C, "WD37C65C", tag, owner, clock, "wd37c65c", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;

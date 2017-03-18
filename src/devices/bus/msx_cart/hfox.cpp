@@ -4,7 +4,7 @@
 #include "hfox.h"
 
 
-const device_type MSX_CART_HFOX = &device_creator<msx_cart_hfox>;
+const device_type MSX_CART_HFOX = device_creator<msx_cart_hfox>;
 
 
 msx_cart_hfox::msx_cart_hfox(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

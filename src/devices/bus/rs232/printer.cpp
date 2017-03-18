@@ -83,4 +83,4 @@ void serial_printer_device::rcv_complete()
 	m_printer->output(get_received_char());
 }
 
-const device_type SERIAL_PRINTER = &device_creator<serial_printer_device>;
+const device_type SERIAL_PRINTER = device_creator<serial_printer_device>;

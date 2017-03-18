@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EF9369 = &device_creator<ef9369_device>;
+const device_type EF9369 = device_creator<ef9369_device>;
 
 
 //**************************************************************************

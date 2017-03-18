@@ -24,7 +24,7 @@
 
 
 // device type definition
-const device_type REDBARON = &device_creator<redbaron_sound_device>;
+const device_type REDBARON = device_creator<redbaron_sound_device>;
 
 
 //**************************************************************************

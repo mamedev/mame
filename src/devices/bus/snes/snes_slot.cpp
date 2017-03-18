@@ -56,9 +56,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SNS_CART_SLOT = &device_creator<sns_cart_slot_device>;
-const device_type SNS_SUFAMI_CART_SLOT = &device_creator<sns_sufami_cart_slot_device>;
-const device_type SNS_BSX_CART_SLOT = &device_creator<sns_bsx_cart_slot_device>;
+const device_type SNS_CART_SLOT = device_creator<sns_cart_slot_device>;
+const device_type SNS_SUFAMI_CART_SLOT = device_creator<sns_sufami_cart_slot_device>;
+const device_type SNS_BSX_CART_SLOT = device_creator<sns_bsx_cart_slot_device>;
 
 //**************************************************************************
 //    SNES Cartridge Interface
@@ -211,18 +211,6 @@ base_sns_cart_slot_device::~base_sns_cart_slot_device()
 void base_sns_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void base_sns_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -609,7 +597,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 		const char *slot_name;
 
 		/* Check for a header (512 bytes), and skip it if found */
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			uint32_t tmplen = length();
 			std::vector<uint8_t> tmpROM(tmplen);
@@ -618,11 +606,11 @@ image_init_result base_sns_cart_slot_device::call_load()
 			fseek(offset, SEEK_SET);
 		}
 
-		len = (software_entry() == nullptr) ? (length() - offset) : get_software_region_length("rom");
+		len = !loaded_through_softlist() ? (length() - offset) : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -630,7 +618,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 		m_cart->rom_map_setup(len);
 
 		// check for on-cart CPU bios
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			if (get_software_region("addon"))
 			{
@@ -640,7 +628,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 		}
 
 		// get pcb type
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			get_cart_type_addon(ROM, len, m_type, m_addon);
 		else
 		{
@@ -653,7 +641,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 					m_type = SNES_DSP_2MB;
 		}
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			setup_addon_from_fullpath();
 
 		// in carts with an add-on CPU having internal dump, this speeds up access to the internal rom
@@ -845,7 +833,7 @@ void base_sns_cart_slot_device::setup_nvram()
 {
 	uint8_t *ROM = (uint8_t *)m_cart->get_rom_base();
 	uint32_t size = 0;
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 	{
 		int hilo_mode = snes_find_hilo_mode(this, ROM, m_cart->get_rom_size());
 		uint8_t sram_size = (m_type == SNES_SFX) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);

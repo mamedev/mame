@@ -15,18 +15,20 @@
 
 // 4-bit ports (3210 = DCBA)
 // valid ports: 4-7 for TMS1024, 1-7 for TMS1025
-#define MCFG_TMS1024_WRITE_PORT_CB(X, _devcb) \
-	devcb = &tms1024_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMS1025_READ_PORT_CB(X, _devcb) \
+	devcb = &tms1024_device::set_read_port_callback(*device, X, DEVCB_##_devcb);
+#define MCFG_TMS1025_WRITE_PORT_CB(X, _devcb) \
+	devcb = &tms1024_device::set_write_port_callback(*device, X, DEVCB_##_devcb);
 
 enum
 {
-	TMS1024_PORT1 = 0,
-	TMS1024_PORT2,
-	TMS1024_PORT3,
-	TMS1024_PORT4,
-	TMS1024_PORT5,
-	TMS1024_PORT6,
-	TMS1024_PORT7
+	TMS1025_PORT1 = 0,
+	TMS1025_PORT2,
+	TMS1025_PORT3,
+	TMS1025_PORT4,
+	TMS1025_PORT5,
+	TMS1025_PORT6,
+	TMS1025_PORT7
 };
 
 
@@ -67,17 +69,21 @@ public:
 	tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_write_port1_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port2_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port3_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port4_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port4.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port5_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port5.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port6_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port6.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port7_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port7.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_port_callback(device_t &device, int port, _Object &&object)
+	{
+		assert(port >= TMS1025_PORT1 && port <= TMS1025_PORT7);
+		return downcast<tms1024_device &>(device).m_read_port[port].set_callback(std::forward<_Object>(object));
+	}
+	template<class _Object> static devcb_base &set_write_port_callback(device_t &device, int port, _Object &&object)
+	{
+		assert(port >= TMS1025_PORT1 && port <= TMS1025_PORT7);
+		return downcast<tms1024_device &>(device).m_write_port[port].set_callback(std::forward<_Object>(object));
+	}
 
 	DECLARE_WRITE8_MEMBER(write_h);
 	DECLARE_WRITE8_MEMBER(write_s);
 	DECLARE_WRITE_LINE_MEMBER(write_std);
+	DECLARE_READ8_MEMBER(read_h);
 
 protected:
 	// device-level overrides
@@ -89,8 +95,8 @@ protected:
 	u8 m_std;    // strobe pin
 
 	// callbacks
-	devcb_write8 m_write_port1, m_write_port2, m_write_port3, m_write_port4, m_write_port5, m_write_port6, m_write_port7;
-	devcb_write8 *m_write_port[7];
+	devcb_read8 m_read_port[7];
+	devcb_write8 m_write_port[7];
 };
 
 

@@ -118,6 +118,8 @@ OSC:    12.000MHz
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jalmah_state : public driver_device

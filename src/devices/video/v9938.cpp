@@ -84,8 +84,8 @@ ADDRESS_MAP_END
 
 
 // devices
-const device_type V9938 = &device_creator<v9938_device>;
-const device_type V9958 = &device_creator<v9958_device>;
+const device_type V9938 = device_creator<v9938_device>;
+const device_type V9958 = device_creator<v9958_device>;
 
 
 v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock)
@@ -129,7 +129,7 @@ v9938_device::v9938_device(const machine_config &mconfig, const char *tag, devic
 }
 
 v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: v99x8_device(mconfig, V9938, "V9958 VDP", "v9958", tag, owner, clock)
+: v99x8_device(mconfig, V9958, "V9958 VDP", "v9958", tag, owner, clock)
 {
 	m_model = MODEL_V9958;
 }

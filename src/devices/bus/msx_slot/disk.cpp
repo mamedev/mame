@@ -35,12 +35,12 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 #include "disk.h"
 
 
-const device_type MSX_SLOT_DISK1 = &device_creator<msx_slot_disk1_device>;
-const device_type MSX_SLOT_DISK2 = &device_creator<msx_slot_disk2_device>;
-const device_type MSX_SLOT_DISK3 = &device_creator<msx_slot_disk3_device>;
-const device_type MSX_SLOT_DISK4 = &device_creator<msx_slot_disk4_device>;
-const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
-const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
+const device_type MSX_SLOT_DISK1 = device_creator<msx_slot_disk1_device>;
+const device_type MSX_SLOT_DISK2 = device_creator<msx_slot_disk2_device>;
+const device_type MSX_SLOT_DISK3 = device_creator<msx_slot_disk3_device>;
+const device_type MSX_SLOT_DISK4 = device_creator<msx_slot_disk4_device>;
+const device_type MSX_SLOT_DISK5 = device_creator<msx_slot_disk5_device>;
+const device_type MSX_SLOT_DISK6 = device_creator<msx_slot_disk6_device>;
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

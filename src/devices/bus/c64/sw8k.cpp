@@ -38,7 +38,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SW8K = &device_creator<c64_switchable_8k_cartridge_device>;
+const device_type C64_SW8K = device_creator<c64_switchable_8k_cartridge_device>;
 
 
 //-------------------------------------------------

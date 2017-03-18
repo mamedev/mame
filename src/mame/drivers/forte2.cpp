@@ -40,6 +40,8 @@ found/dumped yet. */
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class forte2_state : public driver_device

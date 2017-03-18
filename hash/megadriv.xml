@@ -25,7 +25,6 @@
     SIDE POCKET                         JAPAN/USA   conflict in current info
     SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
     SUMISEI HOME TANMATSU               JAPAN
-    TOM & JERRY                         JAPAN
     VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI                         JAPAN
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
@@ -5497,6 +5496,23 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="bullvsblj" cloneof="bullvsbl">
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20017"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G"/>
+			<feature name="u1" value="EM200017"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="bullvslaj" cloneof="bullvsla">
 		<description>NBA Pro Basketball - Bulls Vs Lakers (Jpn)</description>
 		<year>1993</year>
@@ -9257,6 +9273,22 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="worldillj" cloneof="worldill">
+		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4080"/>
+		<info name="release" value="19921218"/>
+		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="u1" value="MPR-15283-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="mpr-15283-f.u1" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wsb98">
 		<description>World Series Baseball '98 (USA)</description>
 		<year>1997</year>
@@ -9730,6 +9762,51 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!--
+Confirmed dump but no pcb pic
+-->
+
+	<software name="shikinjo">
+		<description>Shikinjoh (Jpn)</description>
+		<year>1991</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15053"/>
+		<info name="release" value="19910427"/>
+		<info name="alt_title" value="紫禁城"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerryj" cloneof="tomjerry">
+		<description>Tom and Jerry - Frantic Antics (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-166013"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="トムとジェリー"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="3479ee6b" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis3j" cloneof="valis3">
+		<description>Valis III (Jpn, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Reno</publisher>
+		<info name="serial" value="T-49023"/>
+		<info name="release" value="19910322"/>
+		<info name="alt_title" value="ヴァリスIII"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!--
 Old scrambled/interleaved dumps.
@@ -20132,20 +20209,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="bullvsblj" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts Victor</publisher>
-		<info name="serial" value="EM20017"/>
-		<info name="release" value="19930730"/>
-		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bullvsblj1" cloneof="bullvsbl">
 		<description>NBA Playoffs - Bulls Vs Blazers (Jpn, Alt)</description>
 		<year>1993</year>
@@ -23955,20 +24018,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shikinjo">
-		<description>Shikinjoh (Jpn)</description>
-		<year>1991</year>
-		<publisher>Sunsoft</publisher>
-		<info name="serial" value="T-15053"/>
-		<info name="release" value="19910427"/>
-		<info name="alt_title" value="紫禁城"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28159,20 +28208,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="valis3j" cloneof="valis3">
-		<description>Valis III (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Reno</publisher>
-		<info name="serial" value="T-49023"/>
-		<info name="release" value="19910322"/>
-		<info name="alt_title" value="ヴァリスIII"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vaportr">
 		<description>Vapor Trail (USA)</description>
 		<year>1991</year>
@@ -29416,20 +29451,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 30, 1994).bin" size="2097152" crc="50c797cb" sha1="8c4dc2b06e0734fc8e39997f8da6295d187e316e" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="worldillj" cloneof="worldill">
-		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4080"/>
-		<info name="release" value="19921218"/>
-		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="world of illusion - fushigi na magic box (jpn).bin" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

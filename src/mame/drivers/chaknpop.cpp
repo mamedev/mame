@@ -110,9 +110,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/chaknpop.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/chaknpop.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

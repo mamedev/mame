@@ -376,12 +376,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
-#include "machine/ticket.h"
-#include "machine/nvram.h"
-#include "machine/gen_latch.h"
+#include "speaker.h"
 
 #define UNICODE_10YEN   "\xC2\xA5" "10"
 #define UNICODE_100YEN  "\xC2\xA5" "100"

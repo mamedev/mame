@@ -35,11 +35,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "bus/rs232/rs232.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 #define ACIA1_TAG   "acia1"
 #define ACIA2_TAG   "acia2"

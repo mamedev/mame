@@ -10,6 +10,7 @@
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 
 class sega005_sound_device;

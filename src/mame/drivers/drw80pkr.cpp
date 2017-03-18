@@ -28,9 +28,11 @@
 
 ***********************************************************************************/
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "cpu/mcs48/mcs48.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class drw80pkr_state : public driver_device

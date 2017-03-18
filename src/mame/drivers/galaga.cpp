@@ -699,23 +699,26 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/bosco.h"
+#include "includes/digdug.h"
+#include "includes/galaga.h"
+#include "includes/xevious.h"
+#include "audio/namco52.h"
+#include "audio/namco54.h"
+
 #include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/z80.h"
 #include "machine/atari_vg.h"
 #include "machine/namco06.h"
 #include "machine/namco50.h"
 #include "machine/namco51.h"
 #include "machine/namco53.h"
-#include "includes/galaga.h"
-#include "includes/xevious.h"
-#include "includes/bosco.h"
-#include "includes/digdug.h"
-#include "audio/namco52.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "audio/namco54.h"
+
+#include "speaker.h"
+
 
 #define MASTER_CLOCK (XTAL_18_432MHz)
 
@@ -1665,7 +1668,7 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_bosco)
-	MCFG_SCREEN_VBLANK_DRIVER(bosco_state, screen_eof_bosco)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bosco_state, screen_vblank_bosco))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bosco)
@@ -1730,7 +1733,7 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(galaga_state, screen_update_galaga)
-	MCFG_SCREEN_VBLANK_DRIVER(galaga_state, screen_eof_galaga)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaga_state, screen_vblank_galaga))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaga)

@@ -66,6 +66,8 @@ There are some unmapped writes past the end of text ram too
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/snk68_spr.h"
+#include "speaker.h"
+
 
 class blackt96_state : public driver_device
 {

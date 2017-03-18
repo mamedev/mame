@@ -16,14 +16,14 @@
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
-const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // high voltage version, 1 R pin removed for Vdd
+const device_type TMS1400 = device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
+const device_type TMS1470 = device_creator<tms1470_cpu_device>; // high voltage version, 1 R pin removed for Vdd
 
 // TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-const device_type TMS1600 = &device_creator<tms1600_cpu_device>; // 40-pin DIP, 16 R pins
-const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage version
+const device_type TMS1600 = device_creator<tms1600_cpu_device>; // 40-pin DIP, 16 R pins
+const device_type TMS1670 = device_creator<tms1670_cpu_device>; // high voltage version
 
 
 // internal memory maps

@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "machine/pcecommn.h"
+
 #include "video/huc6270.h"
 #include "video/huc6260.h"
 #include "video/huc6202.h"
@@ -27,16 +28,18 @@
 #include "sound/c6280.h"
 #include "sound/okim6295.h"
 #include "machine/msm6242.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ggconnie_state : public pce_common_state
 {
 public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_rtc(*this, "rtc"),
-		m_oki(*this, "oki")
-		{ }
+		: pce_common_state(mconfig, type, tag)
+		, m_rtc(*this, "rtc")
+		, m_oki(*this, "oki")
+	{ }
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;

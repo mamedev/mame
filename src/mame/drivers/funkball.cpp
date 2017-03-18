@@ -71,14 +71,15 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/bankdev.h"
+#include "machine/idectrl.h"
+#include "machine/intelfsh.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/voodoo.h"
 #include "machine/pcshare.h"
-#include "machine/bankdev.h"
-#include "machine/intelfsh.h"
 #include "machine/terminal.h"
+#include "video/voodoo.h"
+#include "screen.h"
 
 
 class funkball_state : public pcat_base_state

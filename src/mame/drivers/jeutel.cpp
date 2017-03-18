@@ -17,11 +17,15 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/tms5110.h"
+#include "speaker.h"
+
 #include "jeutel.lh"
+
 
 class jeutel_state : public genpin_class
 {

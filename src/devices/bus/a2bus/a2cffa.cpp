@@ -27,8 +27,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CFFA2 = &device_creator<a2bus_cffa2_device>;
-const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
+const device_type A2BUS_CFFA2 = device_creator<a2bus_cffa2_device>;
+const device_type A2BUS_CFFA2_6502 = device_creator<a2bus_cffa2_6502_device>;
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"
@@ -97,7 +97,7 @@ a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char
 }
 
 a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock, "a2cffa02", __FILE__),
+	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2_6502, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock, "a2cffa02", __FILE__),
 	device_nvram_interface(mconfig, *this)
 {
 }

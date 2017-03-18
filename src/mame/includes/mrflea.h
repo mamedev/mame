@@ -5,6 +5,7 @@
     Mr. Flea
 
 *************************************************************************/
+#include "screen.h"
 
 class mrflea_state : public driver_device
 {

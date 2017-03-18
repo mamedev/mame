@@ -22334,6 +22334,28 @@
 		</part>
 	</software>
 
+	<software name="mkgoogoo">
+		<description>Magic Kid GooGoo</description>
+		<year>1992</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="도술동자 구구"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="zemina" />
+			<!-- Generic board! No signature, according to kevtris. Using NES-ZEMINA -->
+			<feature name="pcb" value="NES-ZEMINA" />
+			<!-- No stickers either, confirmed! -->
+			<dataarea name="prg" size="262144">
+				<rom name="0.prg" size="262144" crc="78f00865" sha1="8c9476dc5a6bbbf5604bc3327fa9d0bb0efd76cb" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="0.chr" size="131072" crc="fc8c3915" sha1="e79bf2aa4d44243176128452e9f5db7e8d0cc8d1" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magicsch">
 		<description>The Magic of Scheherazade (USA)</description>
 		<year>1989</year>
@@ -61332,14 +61354,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="dancekar" supported="no">
+	<software name="dancekar">
 		<description>Dance and Karaoke (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="跳舞与卡拉OK"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
 			<dataarea name="prg" size="131072">
 				<rom name="33 songs dance and karaoke (with eng and chi subtitle) (c).prg" size="131072" crc="ed4984e0" sha1="da99ecd707a1d67ecbbbcdc7b7790d12d26d1cb4" offset="00000" status="baddump" />
 			</dataarea>
@@ -62122,13 +62144,17 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="karaok" supported="partial">
-		<description>Kara OK (Chi)</description>
+	<software name="skaraok" supported="no">
+		<description>Subor Kara OK</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王卡拉OK"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
-			<feature name="pcb" value="TXC-MXMDHTWO" />     <!-- This was marked as mapper 168, but not the Racermate one. it's not mapper 241 either => new pcb to be emulated, eventually! -->
+			<!-- NESBBS dump marks this as mapper 168 because VirtuaNESEx emulates a completely different one in place of the Racermate mapper. -->
+			<!-- Subor Karaoke, Subor v5.0, and Subor 999 variations appear to use the same mapper implementation, but each one functions slightly different. -->
+			<!-- ex: this has additional PRG paging/VRAM mirroring compared to other carts using the same basic logic. -->
+			<feature name="slot" value="unknown" />
+			<feature name="pcb" value="UNKNOWN" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[subor] karaoke (c).prg" size="1048576" crc="0a9808ae" sha1="57086cc965ba6828082a7c8c4617093ea6c1434a" offset="00000" status="baddump" />
 			</dataarea>
@@ -69255,6 +69281,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<description>GSD Super Student Computer Cartridge (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="高升达超级学生电脑卡"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sgzlz" />
 			<feature name="pcb" value="WAIXING-SGZLZ" />
@@ -69884,7 +69911,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Carts by Subor are manufactured in China, but for Russian market -->
+<!-- Carts by Subor were produced mainly for the Chinese market... -->
+<!-- However, Subor did produce carts for the Russian market at some point. -->
 
 <!--
 tszone_fc has documented a lot of Subor versions, some of them has still to be dumped
@@ -69902,17 +69930,18 @@ Subor v9.0
 Subor v9.1
 Subor v10.0 (this shows VI+ on the title screen)
 Subor v11.0 (this shows 999 on the title screen)
-Subor v12.0  [supposed to exist, but yet to be found]
+Subor v12.0 [supposed to exist, but yet to be found]
 Subor v13.0 (this shows 999 on the title screen, but in different position)
 Subor v14.0 (this shows Windows(?) 2000 on the title screen)
 Subor v15.0 (this shows Windows 2002 on the title screen)
  -->
 
 
-	<software name="subor">
-		<description>Subor v8.0 (Rus)</description>
+	<software name="subor8">
+		<description>Subor v8.0 (Chi)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王中英文电脑学习卡(V8.0)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hengg_srich" />
 			<feature name="peripheral" value="sub_keyboard" />
@@ -69933,6 +69962,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<description>Subor v4.0 (Chi)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王中英文电脑学习卡(V4.0)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="subor0" />
 			<feature name="pcb" value="SUBOR-BOARD-0" />
@@ -69954,6 +69984,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<description>Subor v3.0 (Chi)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王中英文电脑学习卡(V3.0)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_wxzs2" />
 			<feature name="pcb" value="WAIXING-PS2" />
@@ -69971,6 +70002,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<description>Subor v1.1 (Chi)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王中英文电脑学习卡(V1.1)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
@@ -69989,10 +70021,11 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
-	<software name="suborr" cloneof="subor3">
+	<software name="subor1r" cloneof="subor3">
 		<description>Subor v1.0 (Rus)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="subor1" />
 			<feature name="pcb" value="SUBOR-BOARD-1" />
@@ -70010,10 +70043,11 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
-	<software name="suborr1" cloneof="subor3" supported="partial">
+	<software name="subor1ra" cloneof="subor3" supported="partial">
 		<description>Subor v1.0 (Rus, Alt)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
+		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_wxzs2" />
 			<feature name="pcb" value="WAIXING-PS2" />
@@ -70027,7 +70061,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
-	<software name="magistr" cloneof="subor3">
+	<software name="magistr1" cloneof="subor3">
 		<description>Magistr v1.0 (Rus)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -70048,7 +70082,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
-	<software name="simbas" cloneof="subor3">
+	<software name="simbas1" cloneof="subor3">
 		<description>Simba's v1.0 (Rus)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

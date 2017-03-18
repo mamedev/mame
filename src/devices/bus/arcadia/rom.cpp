@@ -18,8 +18,8 @@
 //  arcadia_rom_device - constructor
 //-------------------------------------------------
 
-const device_type ARCADIA_ROM_STD = &device_creator<arcadia_rom_device>;
-const device_type ARCADIA_ROM_GOLF = &device_creator<arcadia_golf_device>;
+const device_type ARCADIA_ROM_STD = device_creator<arcadia_rom_device>;
+const device_type ARCADIA_ROM_GOLF = device_creator<arcadia_golf_device>;
 
 
 arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

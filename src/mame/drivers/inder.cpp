@@ -30,14 +30,18 @@
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/74157.h"
+#include "machine/7474.h"
 #include "machine/i8255.h"
-#include "sound/sn76496.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "machine/7474.h"
-#include "machine/74157.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
+
 #include "inder.lh"
+
 
 class inder_state : public genpin_class
 {

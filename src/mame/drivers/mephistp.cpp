@@ -20,6 +20,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/3812intf.h"
+#include "speaker.h"
 
 // mephisto_state was also defined in mess/drivers/mephisto.c
 class mephisto_pinball_state : public driver_device

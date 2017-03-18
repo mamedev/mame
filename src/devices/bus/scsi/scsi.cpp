@@ -665,7 +665,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
 	}
 }
 
-const device_type SCSI_PORT = &device_creator<SCSI_PORT_DEVICE>;
+const device_type SCSI_PORT = device_creator<SCSI_PORT_DEVICE>;
 
 SCSI_PORT_SLOT_device::SCSI_PORT_SLOT_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCSI_PORT_SLOT, "SCSI Connector", tag, owner, clock, "scsi_slot", __FILE__),
@@ -700,7 +700,7 @@ void SCSI_PORT_SLOT_device::device_start()
 {
 }
 
-const device_type SCSI_PORT_SLOT = &device_creator<SCSI_PORT_SLOT_device>;
+const device_type SCSI_PORT_SLOT = device_creator<SCSI_PORT_SLOT_device>;
 
 scsi_port_interface::scsi_port_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)

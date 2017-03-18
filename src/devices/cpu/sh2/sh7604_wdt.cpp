@@ -20,7 +20,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_WDT = &device_creator<sh7604_wdt_device>;
+const device_type SH7604_WDT = device_creator<sh7604_wdt_device>;
 
 
 //**************************************************************************

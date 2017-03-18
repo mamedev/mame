@@ -23,12 +23,13 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "render.h"
 #include "includes/amiga.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
+#include "render.h"
+#include "speaker.h"
 
 
 class alg_state : public amiga_state

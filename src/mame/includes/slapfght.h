@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 #include "machine/taito68705interface.h"
+#include "screen.h"
 
 class slapfght_state : public driver_device
 {

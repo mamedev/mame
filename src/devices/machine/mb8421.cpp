@@ -15,7 +15,7 @@
 #include "machine/mb8421.h"
 
 
-const device_type MB8421 = &device_creator<mb8421_device>;
+const device_type MB8421 = device_creator<mb8421_device>;
 
 //-------------------------------------------------
 //  mb8421_device - constructor
@@ -69,7 +69,7 @@ READ8_MEMBER(mb8421_device::left_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7fe && !space.debugger_access())
+	if (offset == 0x7fe && !machine().side_effect_disabled())
 		m_intl_handler(0);
 
 	return m_ram[offset];
@@ -88,7 +88,7 @@ READ8_MEMBER(mb8421_device::right_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7ff && !space.debugger_access())
+	if (offset == 0x7ff && !machine().side_effect_disabled())
 		m_intr_handler(0);
 
 	return m_ram[offset];

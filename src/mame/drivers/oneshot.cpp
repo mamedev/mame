@@ -36,12 +36,17 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/oneshot.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 {

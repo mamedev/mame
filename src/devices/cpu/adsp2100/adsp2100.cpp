@@ -103,12 +103,12 @@
 
 
 // device type definitions
-const device_type ADSP2100 = &device_creator<adsp2100_device>;
-const device_type ADSP2101 = &device_creator<adsp2101_device>;
-const device_type ADSP2104 = &device_creator<adsp2104_device>;
-const device_type ADSP2105 = &device_creator<adsp2105_device>;
-const device_type ADSP2115 = &device_creator<adsp2115_device>;
-const device_type ADSP2181 = &device_creator<adsp2181_device>;
+const device_type ADSP2100 = device_creator<adsp2100_device>;
+const device_type ADSP2101 = device_creator<adsp2101_device>;
+const device_type ADSP2104 = device_creator<adsp2104_device>;
+const device_type ADSP2105 = device_creator<adsp2105_device>;
+const device_type ADSP2115 = device_creator<adsp2115_device>;
+const device_type ADSP2181 = device_creator<adsp2181_device>;
 
 
 //**************************************************************************

@@ -22,16 +22,21 @@
 
 */
 
-#include "softlist.h"
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "video/mc6847.h"
-#include "sound/ay8910.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/rescap.h"
-#include "machine/ram.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u13"

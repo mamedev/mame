@@ -9,7 +9,7 @@
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type X1_KEYBOARD = &device_creator<x1_keyboard_device>;
+const device_type X1_KEYBOARD = device_creator<x1_keyboard_device>;
 
 //-------------------------------------------------
 //  z80ctc_device - constructor

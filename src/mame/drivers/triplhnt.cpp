@@ -9,9 +9,10 @@ Atari Triple Hunt Driver
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/triplhnt.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
-#include "includes/triplhnt.h"
+#include "speaker.h"
 
 
 

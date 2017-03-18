@@ -59,7 +59,7 @@ TODO:
 
 
 // device type definition
-const device_type ZSG2 = &device_creator<zsg2_device>;
+const device_type ZSG2 = device_creator<zsg2_device>;
 
 //-------------------------------------------------
 //  zsg2_device - constructor

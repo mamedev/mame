@@ -57,9 +57,11 @@ Infinite loop is reached at address 0x7699
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "sound/speaker.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class hprot1_state : public driver_device
 {

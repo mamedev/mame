@@ -11,10 +11,10 @@
 #include "debugger.h"
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
-const device_type TMS1100 = &device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1170 = &device_creator<tms1170_cpu_device>; // high voltage version
-const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 16 R pins
-const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // high voltage version
+const device_type TMS1100 = device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS1170 = device_creator<tms1170_cpu_device>; // high voltage version
+const device_type TMS1300 = device_creator<tms1300_cpu_device>; // 40-pin DIP, 16 R pins
+const device_type TMS1370 = device_creator<tms1370_cpu_device>; // high voltage version
 
 
 // internal memory maps

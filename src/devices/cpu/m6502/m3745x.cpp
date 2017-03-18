@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type M37450 = &device_creator<m37450_device>;
+const device_type M37450 = device_creator<m37450_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

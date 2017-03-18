@@ -41,14 +41,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i86/i86.h"
-#include "machine/i8255.h"
-#include "sound/ay8910.h"
-#include "rendlay.h"
 #include "includes/tx1.h"
+
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "rendlay.h"
+#include "speaker.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"
@@ -645,7 +647,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_tx1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_tx1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
@@ -705,7 +707,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -751,7 +753,7 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggybjr)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)

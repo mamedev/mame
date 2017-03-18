@@ -71,6 +71,9 @@ Dumped 06/15/2000
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/nile.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class srmp6_state : public driver_device
 {

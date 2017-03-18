@@ -18,9 +18,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK            (XTAL_10MHz)
 #define CPU_CLOCK               (MASTER_CLOCK / 4)

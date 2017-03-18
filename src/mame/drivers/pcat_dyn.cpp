@@ -21,18 +21,23 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 ********************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
-#include "bus/isa/trident.h"
 #include "machine/bankdev.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "sound/ad1848.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
+#include "bus/isa/trident.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
+
+#include "screen.h"
+
 
 class pcat_dyn_state : public pcat_base_state
 {

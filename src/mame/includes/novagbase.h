@@ -27,7 +27,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<beep_device> m_beeper;
 	optional_device<hd44780_device> m_lcd;
-	optional_ioport_array<8> m_inp_matrix;
+	optional_ioport_array<8> m_inp_matrix; // max 8
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask

@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "a2alfam2.h"
 #include "sound/sn76496.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ALFAM2 = &device_creator<a2bus_alfam2_device>;
-const device_type A2BUS_AESMS = &device_creator<a2bus_aesms_device>;
+const device_type A2BUS_ALFAM2 = device_creator<a2bus_alfam2_device>;
+const device_type A2BUS_AESMS = device_creator<a2bus_aesms_device>;
 
 #define SN1_TAG         "sn76489_1" // left
 #define SN2_TAG         "sn76489_2" // center
@@ -99,7 +100,7 @@ a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const ch
 }
 
 a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, "Applied Engineering Super Music Synthesizer", tag, owner, clock, "a2aesms", __FILE__)
+	a2bus_sn76489_device(mconfig, A2BUS_AESMS, "Applied Engineering Super Music Synthesizer", tag, owner, clock, "a2aesms", __FILE__)
 {
 	m_has4thsn = true;
 }

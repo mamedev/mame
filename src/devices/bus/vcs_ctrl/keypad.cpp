@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_KEYPAD = &device_creator<vcs_keypad_device>;
+const device_type VCS_KEYPAD = device_creator<vcs_keypad_device>;
 
 
 static INPUT_PORTS_START( vcs_keypad )

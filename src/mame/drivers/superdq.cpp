@@ -19,14 +19,16 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK    20000000
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
 #include "machine/ldv1000.h"
+#include "sound/sn76496.h"
 #include "video/resnet.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    20000000
+
 
 class superdq_state : public driver_device
 {

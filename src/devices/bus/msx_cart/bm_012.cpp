@@ -19,7 +19,7 @@ TODO:
 #include "cpu/z80/z80.h"
 
 
-const device_type MSX_CART_BM_012 = &device_creator<msx_cart_bm_012>;
+const device_type MSX_CART_BM_012 = device_creator<msx_cart_bm_012>;
 
 
 msx_cart_bm_012::msx_cart_bm_012(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -47,6 +47,13 @@
 
 *******************************************************************/
 
+#include "emu.h"
+#include "cpu/h8/h83048.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK  XTAL_30MHz
 #define SND_CLOCK   XTAL_1MHz
 
@@ -54,11 +61,6 @@
 #define MNUMBER_SND_CLOCK   XTAL_16MHz
 
 #define EJOLLYX5_MAIN_CLOCK XTAL_16MHz
-
-
-#include "emu.h"
-#include "cpu/h8/h83048.h"
-#include "sound/okim6295.h"
 
 
 class itgamble_state : public driver_device

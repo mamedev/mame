@@ -189,7 +189,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_PPU = &device_creator<snes_ppu_device>;
+const device_type SNES_PPU = device_creator<snes_ppu_device>;
 
 
 //**************************************************************************

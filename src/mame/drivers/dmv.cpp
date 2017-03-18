@@ -10,15 +10,15 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
-#include "machine/upd765.h"
+#include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
-#include "machine/pit8253.h"
 #include "machine/dmv_keyb.h"
-#include "sound/speaker.h"
+#include "machine/pit8253.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "video/upd7220.h"
-#include "formats/dmv_dsk.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -31,7 +31,11 @@
 #include "bus/dmv/k806.h"
 #include "bus/dmv/ram.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/dmv_dsk.h"
 
 #include "dmv.lh"
 

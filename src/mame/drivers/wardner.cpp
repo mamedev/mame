@@ -127,12 +127,14 @@ out:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
-#include "machine/bankdev.h"
-#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
+#include "includes/toaplipt.h"
+
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 class wardner_state : public twincobr_state
@@ -400,7 +402,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz/2, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram8", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)

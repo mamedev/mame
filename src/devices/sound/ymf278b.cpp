@@ -1025,7 +1025,7 @@ void ymf278b_device::device_start()
 }
 
 
-const device_type YMF278B = &device_creator<ymf278b_device>;
+const device_type YMF278B = device_creator<ymf278b_device>;
 
 ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock, "ymf278b", __FILE__),

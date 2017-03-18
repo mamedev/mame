@@ -260,11 +260,11 @@ TODO: - Distinguish door switches using manual
       - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
 ***********************************************************************************************************/
 #include "emu.h"
-
 #include "includes/mpu4.h"
 
-
 #include "video/awpvid.h"       //Fruit Machines Only
+
+#include "speaker.h"
 
 #include "mpu4.lh"
 #include "mpu4ext.lh"

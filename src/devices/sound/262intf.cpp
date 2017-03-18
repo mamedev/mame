@@ -135,7 +135,7 @@ WRITE8_MEMBER( ymf262_device::write )
 	ymf262_write(m_chip, offset & 3, data);
 }
 
-const device_type YMF262 = &device_creator<ymf262_device>;
+const device_type YMF262 = device_creator<ymf262_device>;
 
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF262, "YMF262", tag, owner, clock, "ymf262", __FILE__),

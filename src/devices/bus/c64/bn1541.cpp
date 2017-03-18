@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_BN1541 = &device_creator<c64_bn1541_device>;
+const device_type C64_BN1541 = device_creator<c64_bn1541_device>;
 
 
 

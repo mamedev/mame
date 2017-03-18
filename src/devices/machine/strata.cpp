@@ -44,7 +44,7 @@
 #define SET_BLOCKLOCK(block) (m_blocklock[(block) >> 3] |= 1 << ((block) & 7))
 #define CLEAR_BLOCKLOCK(block) (m_blocklock[(block) >> 3] &= ~(1 << ((block) & 7)))
 
-const device_type STRATAFLASH = &device_creator<strataflash_device>;
+const device_type STRATAFLASH = device_creator<strataflash_device>;
 
 strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock, "strataflash", __FILE__),

@@ -45,6 +45,9 @@
 #include "emu.h"
 #include "includes/zx.h"
 
+#include "speaker.h"
+
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8, zx_state )

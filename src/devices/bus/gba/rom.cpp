@@ -21,19 +21,19 @@
 //  gba_rom_device - constructor
 //-------------------------------------------------
 
-const device_type GBA_ROM_STD = &device_creator<gba_rom_device>;
-const device_type GBA_ROM_SRAM = &device_creator<gba_rom_sram_device>;
-const device_type GBA_ROM_DRILLDOZ = &device_creator<gba_rom_drilldoz_device>;
-const device_type GBA_ROM_WARIOTWS = &device_creator<gba_rom_wariotws_device>;
-const device_type GBA_ROM_EEPROM = &device_creator<gba_rom_eeprom_device>;
-const device_type GBA_ROM_YOSHIUG = &device_creator<gba_rom_yoshiug_device>;
-const device_type GBA_ROM_EEPROM64 = &device_creator<gba_rom_eeprom64_device>;
-const device_type GBA_ROM_BOKTAI = &device_creator<gba_rom_boktai_device>;
-const device_type GBA_ROM_FLASH = &device_creator<gba_rom_flash_device>;
-const device_type GBA_ROM_FLASH_RTC = &device_creator<gba_rom_flash_rtc_device>;
-const device_type GBA_ROM_FLASH1M = &device_creator<gba_rom_flash1m_device>;
-const device_type GBA_ROM_FLASH1M_RTC = &device_creator<gba_rom_flash1m_rtc_device>;
-const device_type GBA_ROM_3DMATRIX = &device_creator<gba_rom_3dmatrix_device>;
+const device_type GBA_ROM_STD = device_creator<gba_rom_device>;
+const device_type GBA_ROM_SRAM = device_creator<gba_rom_sram_device>;
+const device_type GBA_ROM_DRILLDOZ = device_creator<gba_rom_drilldoz_device>;
+const device_type GBA_ROM_WARIOTWS = device_creator<gba_rom_wariotws_device>;
+const device_type GBA_ROM_EEPROM = device_creator<gba_rom_eeprom_device>;
+const device_type GBA_ROM_YOSHIUG = device_creator<gba_rom_yoshiug_device>;
+const device_type GBA_ROM_EEPROM64 = device_creator<gba_rom_eeprom64_device>;
+const device_type GBA_ROM_BOKTAI = device_creator<gba_rom_boktai_device>;
+const device_type GBA_ROM_FLASH = device_creator<gba_rom_flash_device>;
+const device_type GBA_ROM_FLASH_RTC = device_creator<gba_rom_flash_rtc_device>;
+const device_type GBA_ROM_FLASH1M = device_creator<gba_rom_flash1m_device>;
+const device_type GBA_ROM_FLASH1M_RTC = device_creator<gba_rom_flash1m_rtc_device>;
+const device_type GBA_ROM_3DMATRIX = device_creator<gba_rom_3dmatrix_device>;
 
 
 gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

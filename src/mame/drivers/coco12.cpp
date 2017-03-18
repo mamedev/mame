@@ -25,18 +25,23 @@
 
 #include "emu.h"
 #include "includes/coco12.h"
-#include "bus/coco/coco_t4426.h"
+
 #include "bus/coco/coco_232.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_dwsock.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
-#include "bus/coco/coco_dwsock.h"
+#include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_t4426.h"
+
 #include "cpu/m6809/m6809.h"
-#include "formats/coco_cas.h"
 #include "imagedev/cassette.h"
 #include "sound/volt_reg.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/coco_cas.h"
 
 //**************************************************************************
 //  ADDRESS MAPS

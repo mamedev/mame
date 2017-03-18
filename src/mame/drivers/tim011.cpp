@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/upd765.h"
+#include "screen.h"
 
 #define FDC9266_TAG "u43"
 

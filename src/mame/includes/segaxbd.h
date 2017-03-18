@@ -16,6 +16,7 @@
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
 #include "video/resnet.h"
+#include "screen.h"
 
 // ======================> segaxbd_state
 
@@ -25,6 +26,7 @@ class segaxbd_state : public device_t
 public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// compare/timer chip callbacks
 	void timer_ack_callback();

@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "speakeasy.h"
 
+#include "speaker.h"
+
 
 
 //**************************************************************************
@@ -24,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_SPEAKEASY = &device_creator<vic20_speakeasy_t>;
+const device_type VIC20_SPEAKEASY = device_creator<vic20_speakeasy_t>;
 
 
 //-------------------------------------------------

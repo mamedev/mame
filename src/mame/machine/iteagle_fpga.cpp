@@ -15,7 +15,7 @@
 #define COM1_TAG "com1"
 #define COM2_TAG "com2"
 
-const device_type ITEAGLE_FPGA = &device_creator<iteagle_fpga_device>;
+const device_type ITEAGLE_FPGA = device_creator<iteagle_fpga_device>;
 
 MACHINE_CONFIG_FRAGMENT(iteagle_fpga)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
@@ -595,7 +595,7 @@ WRITE32_MEMBER( iteagle_fpga_device::ram_w )
 // Attached serial EEPROM
 //************************************
 
-const device_type ITEAGLE_EEPROM = &device_creator<iteagle_eeprom_device>;
+const device_type ITEAGLE_EEPROM = device_creator<iteagle_eeprom_device>;
 
 DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
 	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
@@ -729,7 +729,7 @@ machine_config_constructor iteagle_periph_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME(eagle1);
 }
 
-const device_type ITEAGLE_PERIPH = &device_creator<iteagle_periph_device>;
+const device_type ITEAGLE_PERIPH = device_creator<iteagle_periph_device>;
 
 DEVICE_ADDRESS_MAP_START(ctrl_map, 32, iteagle_periph_device)
 	AM_RANGE(0x000, 0x0cf) AM_READWRITE(ctrl_r, ctrl_w)

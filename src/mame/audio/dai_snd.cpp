@@ -14,7 +14,7 @@
 #include "dai_snd.h"
 
 // device type definition
-const device_type DAI_SOUND = &device_creator<dai_sound_device>;
+const device_type DAI_SOUND = device_creator<dai_sound_device>;
 
 
 //-------------------------------------------------

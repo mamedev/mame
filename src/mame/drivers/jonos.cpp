@@ -19,6 +19,7 @@ Data presented at 5000 will appear on screen in a dumb-terminal format.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class jonos_state : public driver_device

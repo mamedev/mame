@@ -28,7 +28,7 @@ inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char
 }
 
 // device type definition
-const device_type ZS01 = &device_creator<zs01_device>;
+const device_type ZS01 = device_creator<zs01_device>;
 
 zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t( mconfig, ZS01, "Konami ZS01 PIC", tag, owner, clock, "zs01", __FILE__ ),

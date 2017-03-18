@@ -100,7 +100,7 @@ private:
 	class bjt_model_t : public param_model_t
 	{
 	public:
-		bjt_model_t(device_t &device, const pstring name, const pstring val)
+		bjt_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_model_t(device, name, val)
 		, m_IS(*this, "IS")
 		, m_BF(*this, "BF")
@@ -309,11 +309,11 @@ NETLIB_RESET(QBJT_switch)
 NETLIB_UPDATE(QBJT_switch)
 {
 	if (!m_RB.m_P.net().isRailNet())
-		m_RB.m_P.schedule_solve();   // Basis
+		m_RB.m_P.solve_now();   // Basis
 	else if (!m_RB.m_N.net().isRailNet())
-		m_RB.m_N.schedule_solve();   // Emitter
+		m_RB.m_N.solve_now();   // Emitter
 	else if (!m_RC.m_P.net().isRailNet())
-		m_RC.m_P.schedule_solve();   // Collector
+		m_RC.m_P.solve_now();   // Collector
 }
 
 
@@ -372,11 +372,11 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 NETLIB_UPDATE(QBJT_EB)
 {
 	if (!m_D_EB.m_P.net().isRailNet())
-		m_D_EB.m_P.schedule_solve();   // Basis
+		m_D_EB.m_P.solve_now();   // Basis
 	else if (!m_D_EB.m_N.net().isRailNet())
-		m_D_EB.m_N.schedule_solve();   // Emitter
+		m_D_EB.m_N.solve_now();   // Emitter
 	else
-		m_D_CB.m_N.schedule_solve();   // Collector
+		m_D_CB.m_N.solve_now();   // Collector
 }
 
 NETLIB_RESET(QBJT_EB)

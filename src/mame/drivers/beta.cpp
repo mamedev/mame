@@ -34,10 +34,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 
 #include "beta.lh"
 
@@ -300,7 +302,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 

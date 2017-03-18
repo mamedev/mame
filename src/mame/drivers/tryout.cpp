@@ -20,9 +20,13 @@ $208 strikes count
 ****************************************************************/
 
 #include "emu.h"
+#include "includes/tryout.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-#include "includes/tryout.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(tryout_state::nmi_ack_w)
 {

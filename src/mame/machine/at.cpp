@@ -13,10 +13,11 @@
 #include "machine/at_keybc.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #define LOG_PORT80  0
 
-const device_type AT_MB = &device_creator<at_mb_device>;
+const device_type AT_MB = device_creator<at_mb_device>;
 
 at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AT_MB, "PC/AT Motherboard", tag, owner, clock, "at_mb", __FILE__),

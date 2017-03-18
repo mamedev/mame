@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PET_DATASSETTE_PORT = &device_creator<pet_datassette_port_device>;
+const device_type PET_DATASSETTE_PORT = device_creator<pet_datassette_port_device>;
 
 
 

@@ -6,10 +6,10 @@
 
 #include "emu.h"
 #include "stfight_dev.h"
+#include "screen.h"
 
 
-
-extern const device_type STFIGHT_VIDEO = &device_creator<stfight_video_device>;
+const device_type STFIGHT_VIDEO = device_creator<stfight_video_device>;
 
 
 stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -185,7 +185,8 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 
 DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
 {
-	if (image.software_entry() != nullptr){
+	if (image.loaded_through_softlist())
+	{
 		paper_tape_length = image.get_software_region_length("rom");
 		paper_tape_data = image.get_software_region("rom");
 		paper_tape_address = 0;
@@ -253,7 +254,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
+	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)
 	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
 	MCFG_PATINHO_BUTTONS_READ_CB(READ16(patinho_feio_state, buttons_r))
 

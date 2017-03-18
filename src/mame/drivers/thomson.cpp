@@ -78,17 +78,21 @@
 
 #include "emu.h"
 #include "includes/thomson.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "formats/cd90_640_dsk.h"
-#include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/basicdsk.h"
+#include "formats/cd90_640_dsk.h"
 
 
 /**************************** common *******************************/
@@ -629,7 +633,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
-	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thomson_state, thom_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */

@@ -32,10 +32,13 @@ inputs + notes by stephh
 */
 
 #include "emu.h"
+#include "includes/fcombat.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/fcombat.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)

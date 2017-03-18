@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-    Poisk-1 HDC device (model B942)
+	Poisk-1 HDC device (model B942)
 
 **********************************************************************/
 
@@ -39,7 +39,7 @@ protected:
 private:
 	required_device<wd2010_device> m_hdc;
 
-	//uint8_t m_ram[0x800];
+	// uint8_t m_ram[0x800];
 
 public:
 	DECLARE_READ8_MEMBER(p1_HDC_r);

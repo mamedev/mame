@@ -24,11 +24,12 @@
 
 
 #include "emu.h"
+#include "includes/prof180x.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
-#include "includes/prof180x.h"
+#include "screen.h"
 #include "softlist.h"
 
 uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

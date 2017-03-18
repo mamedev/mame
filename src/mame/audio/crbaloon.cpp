@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/crbaloon.h"
+#include "speaker.h"
 
 
 /* timing sources */

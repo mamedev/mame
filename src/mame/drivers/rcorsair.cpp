@@ -57,6 +57,7 @@ Notes added 2014-09-10:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class rcorsair_state : public driver_device

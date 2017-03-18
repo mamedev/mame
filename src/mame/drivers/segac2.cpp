@@ -74,6 +74,9 @@
 
 
 #include "emu.h"
+#include "includes/megadriv.h"
+#include "includes/segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -81,9 +84,7 @@
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
-#include "includes/segaipt.h"
-
-#include "includes/megadriv.h"
+#include "speaker.h"
 
 
 #define XL1_CLOCK           XTAL_640kHz
@@ -1543,7 +1544,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_DRIVER(segac2_state, screen_eof_megadriv )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(segac2_state, screen_vblank_megadriv))
 
 	MCFG_PALETTE_ADD("palette", 2048*3)
 

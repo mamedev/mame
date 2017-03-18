@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "machine/z80pio.h"
+#include "speaker.h"
+
 #include "sc2.lh"
 
 class sc2_state : public driver_device
@@ -45,7 +47,7 @@ public:
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!space.debugger_access())
+	//if (!machine().side_effect_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 

@@ -216,4 +216,4 @@ ioport_constructor mecmouse_device::device_input_ports() const
 	return INPUT_PORTS_NAME( mecmouse );
 }
 
-const device_type MECMOUSE = &device_creator<mecmouse_device>;
+const device_type MECMOUSE = device_creator<mecmouse_device>;

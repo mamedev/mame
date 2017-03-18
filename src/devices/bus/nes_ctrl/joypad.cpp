@@ -34,11 +34,11 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_JOYPAD = &device_creator<nes_joypad_device>;
-const device_type NES_FCPAD_P2 = &device_creator<nes_fcpad2_device>;
-const device_type NES_CCPAD_LEFT = &device_creator<nes_ccpadl_device>;
-const device_type NES_CCPAD_RIGHT = &device_creator<nes_ccpadr_device>;
-const device_type NES_ARCSTICK = &device_creator<nes_arcstick_device>;
+const device_type NES_JOYPAD = device_creator<nes_joypad_device>;
+const device_type NES_FCPAD_P2 = device_creator<nes_fcpad2_device>;
+const device_type NES_CCPAD_LEFT = device_creator<nes_ccpadl_device>;
+const device_type NES_CCPAD_RIGHT = device_creator<nes_ccpadr_device>;
+const device_type NES_ARCSTICK = device_creator<nes_arcstick_device>;
 
 
 static INPUT_PORTS_START( nes_joypad )

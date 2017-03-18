@@ -45,12 +45,16 @@ The manual is not that clear, there's a lot we don't know, this *seems* to work.
 
 #include "emu.h"
 #include "machine/genpin.h"
+#include "audio/efo_zsu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
-#include "audio/efo_zsu.h"
+#include "speaker.h"
+
 #include "play_3.lh"
+
 
 
 class play_3_state : public genpin_class

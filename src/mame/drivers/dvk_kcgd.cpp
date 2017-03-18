@@ -21,6 +21,8 @@
 #include "cpu/t11/t11.h"
 #include "machine/clock.h"
 #include "machine/ms7004.h"
+#include "screen.h"
+
 
 #define KCGD_TOTAL_HORZ 1000    // XXX verify
 #define KCGD_DISP_HORZ  800

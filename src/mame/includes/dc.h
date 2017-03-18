@@ -5,9 +5,10 @@
     dc.h - Sega Dreamcast includes
 
 */
+#ifndef MAME_INCLUDES_DC_H
+#define MAME_INCLUDES_DC_H
 
-#ifndef __DC_H__
-#define __DC_H__
+#pragma once
 
 #include "video/powervr2.h"
 #include "machine/naomig1.h"
@@ -286,4 +287,4 @@ class dc_state : public driver_device
 
 void dc_maple_irq(running_machine &machine);
 
-#endif
+#endif // MAME_INCLUDES_DC_H

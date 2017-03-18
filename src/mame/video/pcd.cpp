@@ -3,11 +3,14 @@
 
 #include "emu.h"
 #include "pcd.h"
-#include "cpu/mcs51/mcs51.h"
-#include "cpu/mcs48/mcs48.h"
 
-const device_type PCD_VIDEO = &device_creator<pcd_video_device>;
-const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/mcs51/mcs51.h"
+#include "screen.h"
+
+
+const device_type PCD_VIDEO = device_creator<pcd_video_device>;
+const device_type PCX_VIDEO = device_creator<pcx_video_device>;
 
 pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),

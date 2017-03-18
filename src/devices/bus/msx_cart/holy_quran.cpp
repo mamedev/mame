@@ -4,7 +4,7 @@
 #include "holy_quran.h"
 
 
-const device_type MSX_CART_HOLY_QURAN = &device_creator<msx_cart_holy_quran>;
+const device_type MSX_CART_HOLY_QURAN = device_creator<msx_cart_holy_quran>;
 
 
 msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -81,7 +81,7 @@ READ8_MEMBER(msx_cart_holy_quran::read_cart)
 
 		// The decryption should actually start working after the first M1 cycle executing something
 		// from the cartridge.
-		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !space.debugger_access())
+		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effect_disabled())
 		{
 			m_decrypt = true;
 		}

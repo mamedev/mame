@@ -8,6 +8,7 @@ Namco System 1 Video Hardware
 
 #include "emu.h"
 #include "includes/namcos1.h"
+#include "screen.h"
 
 
 /*
@@ -346,7 +347,7 @@ uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void namcos1_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
 {
 	// rising edge
 	if (state)

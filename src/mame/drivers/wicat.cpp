@@ -17,18 +17,21 @@ Wicat - various systems.
 */
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
-#include "cpu/8x300/8x300.h"
 #include "machine/6522via.h"
-#include "machine/mm58274c.h"
-#include "machine/mc2661.h"
-#include "machine/im6402.h"
-#include "video/i8275.h"
 #include "machine/am9517a.h"
-#include "machine/x2212.h"
+#include "machine/im6402.h"
+#include "machine/mc2661.h"
+#include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "machine/x2212.h"
+#include "video/i8275.h"
+#include "screen.h"
+
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -397,7 +400,7 @@ WRITE8_MEMBER( wicat_state::via_b_w )
 
 READ16_MEMBER( wicat_state::invalid_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -408,7 +411,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 
 WRITE16_MEMBER( wicat_state::invalid_w )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);

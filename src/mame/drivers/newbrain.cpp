@@ -50,6 +50,9 @@
 
 #include "emu.h"
 #include "includes/newbrain.h"
+
+#include "screen.h"
+
 #include "newbrain.lh"
 #include "newbraina.lh"
 

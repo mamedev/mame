@@ -40,13 +40,13 @@ NETLIB_UPDATE(VCCS)
 {
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
 	if (!m_IP.net().isRailNet())
-		m_IP.schedule_solve();
+		m_IP.solve_now();
 	else if (!m_IN.net().isRailNet())
-		m_IN.schedule_solve();
+		m_IN.solve_now();
 	else if (!m_OP.net().isRailNet())
-		m_OP.schedule_solve();
+		m_OP.solve_now();
 	else if (!m_ON.net().isRailNet())
-		m_ON.schedule_solve();
+		m_ON.solve_now();
 }
 
 // ----------------------------------------------------------------------------------------

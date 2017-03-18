@@ -38,14 +38,16 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
 #include "imagedev/cassette.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ram.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
-#include "machine/ram.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_4MHz
 

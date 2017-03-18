@@ -1,4 +1,3 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_INLINE
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/integer.hpp>
@@ -94,7 +93,7 @@ namespace log2_
 
 			for(std::size_t i = 0; i < Count; ++i)
 			{
-				glm::vec<4, unsigned long, glm::defaultp> Tmp(glm::uninitialize);
+				glm::tvec4<unsigned long, glm::defaultp> Tmp(glm::uninitialize);
 				_BitScanReverse(&Tmp.x, i);
 				_BitScanReverse(&Tmp.y, i);
 				_BitScanReverse(&Tmp.z, i);
@@ -109,7 +108,7 @@ namespace log2_
 
 
 		{
-			std::vector<glm::vec<4, unsigned long, glm::defaultp> > Result;
+			std::vector<glm::tvec4<unsigned long, glm::defaultp> > Result;
 			Result.resize(Count);
 
 			std::clock_t Begin = clock();

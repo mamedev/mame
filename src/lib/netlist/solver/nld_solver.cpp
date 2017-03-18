@@ -136,8 +136,7 @@ NETLIB_UPDATE(solver)
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
 	{
-		m_Q_step.net().toggle_new_Q();
-		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+		m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
 	}
 }
 

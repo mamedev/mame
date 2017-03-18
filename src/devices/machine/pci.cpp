@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "pci.h"
 
-const device_type PCI_ROOT   = &device_creator<pci_root_device>;
-const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
+const device_type PCI_ROOT   = device_creator<pci_root_device>;
+const device_type PCI_BRIDGE = device_creator<pci_bridge_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                                 0x0000ffff)

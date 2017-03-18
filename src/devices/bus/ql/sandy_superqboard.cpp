@@ -25,10 +25,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SANDY_SUPERQBOARD = &device_creator<sandy_superqboard_t>;
-const device_type SANDY_SUPERQBOARD_512K = &device_creator<sandy_superqboard_512k_t>;
-const device_type SANDY_SUPERQMOUSE = &device_creator<sandy_superqmouse_t>;
-const device_type SANDY_SUPERQMOUSE_512K = &device_creator<sandy_superqmouse_512k_t>;
+const device_type SANDY_SUPERQBOARD = device_creator<sandy_superqboard_t>;
+const device_type SANDY_SUPERQBOARD_512K = device_creator<sandy_superqboard_512k_t>;
+const device_type SANDY_SUPERQMOUSE = device_creator<sandy_superqmouse_t>;
+const device_type SANDY_SUPERQMOUSE_512K = device_creator<sandy_superqmouse_512k_t>;
 
 
 //-------------------------------------------------

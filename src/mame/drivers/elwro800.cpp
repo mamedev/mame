@@ -21,7 +21,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "sound/wave.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
@@ -30,7 +29,9 @@
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 #include "machine/bankdev.h"
-#include "machine/ram.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class elwro800_state : public spectrum_state
@@ -571,7 +572,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(elwro800_state, screen_update_spectrum )
-	MCFG_SCREEN_VBLANK_DRIVER(elwro800_state, screen_eof_spectrum)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(elwro800_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)

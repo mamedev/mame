@@ -18,7 +18,7 @@
 #include "cp1610.h"
 
 
-const device_type CP1610 = &device_creator<cp1610_cpu_device>;
+const device_type CP1610 = device_creator<cp1610_cpu_device>;
 
 
 #define S  0x80

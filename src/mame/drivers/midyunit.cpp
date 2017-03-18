@@ -115,8 +115,11 @@ Notes:
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/midyunit.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* master clocks vary based on game */

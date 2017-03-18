@@ -129,10 +129,12 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/crshrace.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-
-#include "includes/crshrace.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define CRSHRACE_3P_HACK    0
@@ -434,7 +436,8 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)

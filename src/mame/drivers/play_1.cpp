@@ -19,13 +19,16 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 
 **********************************************************************************/
 
-
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "play_1.lh"
+
 
 class play_1_state : public genpin_class
 {

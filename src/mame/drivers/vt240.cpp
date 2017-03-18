@@ -19,12 +19,14 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "screen.h"
+
 
 #define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
 	do { \
-	if(VERBOSE_DBG>=N) \
+		if(VERBOSE_DBG>=N) \
 		{ \
 			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
 			logerror A; \
@@ -35,20 +37,22 @@ class vt240_state : public driver_device
 {
 public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_i8085(*this, "charcpu"),
-		m_i8251(*this, "i8251"),
-		m_duart(*this, "duart"),
-		m_host(*this, "host"),
-		m_hgdc(*this, "upd7220"),
-		m_bank(*this, "bank"),
-		m_nvram(*this, "x2212"),
-		m_palette(*this, "palette"),
-		m_rom(*this, "maincpu"),
-		m_video_ram(*this, "vram"),
-		m_monitor(*this, "monitor"),
-		m_lk201(*this, "lk201"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_i8085(*this, "charcpu")
+		, m_i8251(*this, "i8251")
+		, m_duart(*this, "duart")
+		, m_host(*this, "host")
+		, m_hgdc(*this, "upd7220")
+		, m_bank(*this, "bank")
+		, m_nvram(*this, "x2212")
+		, m_palette(*this, "palette")
+		, m_rom(*this, "maincpu")
+		, m_video_ram(*this, "vram")
+		, m_monitor(*this, "monitor")
+		, m_lk201(*this, "lk201")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
@@ -374,7 +378,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(!BIT(m_reg0, 3) || space.debugger_access())
+	if(!BIT(m_reg0, 3) || machine().side_effect_disabled())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
 		return m_video_ram[offset & 0x7fff];

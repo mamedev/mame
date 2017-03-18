@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SCV_CART_SLOT = &device_creator<scv_cart_slot_device>;
+const device_type SCV_CART_SLOT = device_creator<scv_cart_slot_device>;
 
 //**************************************************************************
 //    SCV cartridges Interface
@@ -98,18 +98,6 @@ void scv_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_scv_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void scv_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  SCV PCB
@@ -165,8 +153,8 @@ image_init_result scv_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint8_t *ROM;
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		bool has_ram = (software_entry() != nullptr) && get_software_region("ram");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		bool has_ram = loaded_through_softlist() && get_software_region("ram");
 
 		if (len > 0x20000)
 		{
@@ -180,12 +168,12 @@ image_init_result scv_cart_slot_device::call_load()
 
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			m_type = get_cart_type(ROM, len);
 		else
 		{

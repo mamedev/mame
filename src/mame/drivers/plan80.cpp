@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class plan80_state : public driver_device

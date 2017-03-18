@@ -870,9 +870,12 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 
 #include "emu.h"
 #include "includes/segas16b.h"
-#include "machine/mc8123.h"
 #include "includes/segaipt.h"
+
+#include "machine/mc8123.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  CONSTANTS

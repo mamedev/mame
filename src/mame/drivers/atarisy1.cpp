@@ -191,6 +191,7 @@ RoadBlasters (aka Future Vette):005*
 
 
 #include "emu.h"
+#include "includes/atarisy1.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
@@ -199,7 +200,7 @@ RoadBlasters (aka Future Vette):005*
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "video/atarimo.h"
-#include "includes/atarisy1.h"
+#include "speaker.h"
 
 
 

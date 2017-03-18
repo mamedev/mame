@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_OCEAN = &device_creator<c64_ocean_cartridge_device>;
+const device_type C64_OCEAN = device_creator<c64_ocean_cartridge_device>;
 
 
 

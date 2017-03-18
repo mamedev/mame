@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class mes_state : public driver_device

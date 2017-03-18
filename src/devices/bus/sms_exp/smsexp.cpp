@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SMS_EXPANSION_SLOT = &device_creator<sms_expansion_slot_device>;
+const device_type SMS_EXPANSION_SLOT = device_creator<sms_expansion_slot_device>;
 
 
 

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_WESTERMANN = &device_creator<c64_westermann_cartridge_device>;
+const device_type C64_WESTERMANN = device_creator<c64_westermann_cartridge_device>;
 
 
 

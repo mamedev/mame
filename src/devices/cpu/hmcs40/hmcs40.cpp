@@ -22,36 +22,36 @@
 // MCU types
 
 // HMCS42/C/CL
-//const device_type HD38702 = &device_creator<hd38702_device>; // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
-//const device_type HD44700 = &device_creator<hd44700_device>; // CMOS version
-//const device_type HD44708 = &device_creator<hd44708_device>; // CMOS version, low-power
+//const device_type HD38702 = device_creator<hd38702_device>; // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
+//const device_type HD44700 = device_creator<hd44700_device>; // CMOS version
+//const device_type HD44708 = device_creator<hd44708_device>; // CMOS version, low-power
 
 // HMCS43/C/CL
-const device_type HD38750 = &device_creator<hd38750_device>; // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
-const device_type HD38755 = &device_creator<hd38755_device>; // ceramic filter oscillator type
-const device_type HD44750 = &device_creator<hd44750_device>; // CMOS version
-const device_type HD44758 = &device_creator<hd44758_device>; // CMOS version, low-power
+const device_type HD38750 = device_creator<hd38750_device>; // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
+const device_type HD38755 = device_creator<hd38755_device>; // ceramic filter oscillator type
+const device_type HD44750 = device_creator<hd44750_device>; // CMOS version
+const device_type HD44758 = device_creator<hd44758_device>; // CMOS version, low-power
 
 // HMCS44A/C/CL
-const device_type HD38800 = &device_creator<hd38800_device>; // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-const device_type HD38805 = &device_creator<hd38805_device>; // ceramic filter oscillator type
-const device_type HD44801 = &device_creator<hd44801_device>; // CMOS version
-const device_type HD44808 = &device_creator<hd44808_device>; // CMOS version, low-power
+const device_type HD38800 = device_creator<hd38800_device>; // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+const device_type HD38805 = device_creator<hd38805_device>; // ceramic filter oscillator type
+const device_type HD44801 = device_creator<hd44801_device>; // CMOS version
+const device_type HD44808 = device_creator<hd44808_device>; // CMOS version, low-power
 
 // HMCS45A/C/CL
-const device_type HD38820 = &device_creator<hd38820_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-const device_type HD38825 = &device_creator<hd38825_device>; // ceramic filter oscillator type
-const device_type HD44820 = &device_creator<hd44820_device>; // CMOS version
-const device_type HD44828 = &device_creator<hd44828_device>; // CMOS version, low-power
+const device_type HD38820 = device_creator<hd38820_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+const device_type HD38825 = device_creator<hd38825_device>; // ceramic filter oscillator type
+const device_type HD44820 = device_creator<hd44820_device>; // CMOS version
+const device_type HD44828 = device_creator<hd44828_device>; // CMOS version, low-power
 
 // HMCS46C/CL (no PMOS version exists)
-//const device_type HD44840 = &device_creator<hd44840_device>; // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
-//const device_type HD44848 = &device_creator<hd44848_device>; // CMOS, low-power
+//const device_type HD44840 = device_creator<hd44840_device>; // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
+//const device_type HD44848 = device_creator<hd44848_device>; // CMOS, low-power
 
 // HMCS47A/C/CL
-//const device_type HD38870 = &device_creator<hd38870_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
-//const device_type HD44860 = &device_creator<hd44860_device>; // CMOS version
-//const device_type HD44868 = &device_creator<hd44868_device>; // CMOS version, low-power
+//const device_type HD38870 = device_creator<hd38870_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
+//const device_type HD44860 = device_creator<hd44860_device>; // CMOS version
+//const device_type HD44868 = device_creator<hd44868_device>; // CMOS version, low-power
 
 
 // internal memory maps

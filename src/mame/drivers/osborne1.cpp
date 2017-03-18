@@ -58,7 +58,7 @@ Schematics specify a WD1793 floppy controller, but we're using the Fujitsu
 equivalent MB8877 here.  Is it known that the original machines used one or
 the other exclusively?  In any case MAME emulates them identically.
 
-The installing the SCREEN-PAC requires the CPU and character generator ROM
+Installation of the SCREEN-PAC requires the CPU and character generator ROM
 to be transplanted to the add-on board, and cables run to the sockets that
 previously held these chips.  It contains additional RAM clocked at twice
 the speed of the main system RAM.  Writes to video memory get sent to this
@@ -72,9 +72,8 @@ character generator ROM, so the mainboard's character generator ROM doesn't
 need to be moved.  However, it doesn't behave like the SCREEN-PAC.  It uses
 a Synertek SY6545-1 with its pixel clock derived from a 12.288MHz crystal
 mapped at 0x04/0x05 in I/O space.  It runs at 640x240 (80x24) at just below
-60Hz and doesn't allow resolution switching.  We don't know how video RAM
-contention on video RAM is handled, or whether the CRTC can generate VBL
-interrupts.
+60Hz and doesn't allow resolution switching.  We don't know how contention
+for video RAM is handled, or whether the CRTC can generate VBL interrupts.
 
 
 TODO:
@@ -93,6 +92,8 @@ TODO:
 #include "includes/osborne1.h"
 
 #include "bus/rs232/rs232.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "softlist.h"
 

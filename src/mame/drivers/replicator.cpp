@@ -25,11 +25,13 @@
 // * implement avr8 WDR (watchdog reset) opcode
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hd44780.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    16000000
 #define LOG_PORTS 0

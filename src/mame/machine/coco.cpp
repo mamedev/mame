@@ -59,7 +59,9 @@ DAC and bitbanger values written should be reflected in the read.
 
 #include "emu.h"
 #include "includes/coco.h"
+
 #include "cpu/m6809/m6809.h"
+#include "screen.h"
 
 
 

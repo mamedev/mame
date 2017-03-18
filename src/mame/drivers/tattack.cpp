@@ -10,18 +10,43 @@
     dipsw 8-position x2,
     volume pots x6,
     2114 ram x5,
-    ne555 + 7910CG
+    7910CQ + NE555P sound section,
+    SN74198N shifter
     no proms
 
     TODO:
     - colors
-    - sound
+    - sound (requires Epson 7910 Multi-Melody emulation)
     - game logic
+
+    Connector pinout from manual
+
+          Solder Side      Parts Side
+          -----------      ----------
+                  GND   1  GND
+                  GND   2  GND
+                  GND   3  GND
+              Speaker   4  Speaker
+                 +12V   5  +12V
+              Antenna   6  Antenna
+                        7
+                        8
+                  +5V   9  +5V
+                 VR a  10  VR b
+         2P VR Center  11  1P VR Center
+                 Coin  12  2P Serve
+           Coin Alarm  13  1P Start
+        Counter (Out)  14  2P Start
+              TV Sync  15  1P Serve
+      Counter (futei)  16  TV G
+         Counter (In)  17  TV B
+            Medal Out  18  TV R
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class tattack_state : public driver_device

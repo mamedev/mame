@@ -53,15 +53,17 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "machine/k7659kb.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
+#include "machine/z80pio.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pcm_state : public driver_device
@@ -79,7 +81,8 @@ public:
 		, m_cass(*this, "cassette")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{
+	}
 
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );

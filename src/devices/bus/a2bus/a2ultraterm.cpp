@@ -29,6 +29,7 @@
 
 #include "emu.h"
 #include "a2ultraterm.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -39,8 +40,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ULTRATERM = &device_creator<a2bus_ultraterm_device>;
-const device_type A2BUS_ULTRATERMENH = &device_creator<a2bus_ultratermenh_device>;
+const device_type A2BUS_ULTRATERM = device_creator<a2bus_ultraterm_device>;
+const device_type A2BUS_ULTRATERMENH = device_creator<a2bus_ultratermenh_device>;
 
 #define ULTRATERM_ROM_REGION  "uterm_rom"
 #define ULTRATERM_GFX_REGION  "uterm_gfx"

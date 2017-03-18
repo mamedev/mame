@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type OPD_BASIC_MASTER = &device_creator<opd_basic_master_t>;
+const device_type OPD_BASIC_MASTER = device_creator<opd_basic_master_t>;
 
 
 //-------------------------------------------------

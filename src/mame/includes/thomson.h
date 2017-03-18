@@ -11,27 +11,29 @@
 #ifndef _THOMSON_H_
 #define _THOMSON_H_
 
-#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "machine/mc6846.h"
-#include "machine/6850acia.h"
-#include "machine/mos6551.h"
-#include "sound/dac.h"
-#include "sound/mea8000.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/cassette.h"
-#include "machine/mc6843.h"
-#include "machine/mc6846.h"
-#include "machine/mc6854.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
-#include "machine/thomflop.h"
+#include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/mc6843.h"
+#include "machine/mc6846.h"
+#include "machine/mc6846.h"
+#include "machine/mc6854.h"
+#include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/thomflop.h"
+#include "sound/dac.h"
+#include "sound/mea8000.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 
 
 /* 6821 PIAs */
@@ -311,7 +313,7 @@ public:
 	void overlay_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
-	void thom_vblank( screen_device &screen, bool state );
+	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
 	DECLARE_READ8_MEMBER( to7_5p14_r );

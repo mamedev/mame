@@ -9,14 +9,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/z80ctc.h"
-#include "machine/upd765.h"
-#include "formats/nanos_dsk.h"
 #include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
+#include "machine/z80pio.h"
+
+#include "formats/nanos_dsk.h"
+
+#include "screen.h"
 
 
 class nanos_state : public driver_device

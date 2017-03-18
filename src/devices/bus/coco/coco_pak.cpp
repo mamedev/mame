@@ -43,7 +43,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK = &device_creator<coco_pak_device>;
+const device_type COCO_PAK = device_creator<coco_pak_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -138,7 +138,7 @@ uint8_t* coco_pak_device::get_cart_base()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
+const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -11,7 +11,9 @@
 #include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class scv_state : public driver_device

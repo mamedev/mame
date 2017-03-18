@@ -5,9 +5,6 @@
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
-
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -16,6 +13,10 @@
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+
+// We encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {
@@ -162,7 +163,7 @@ public:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_toaplan2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);

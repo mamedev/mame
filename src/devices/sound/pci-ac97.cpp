@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "pci-ac97.h"
 
-const device_type AC97 = &device_creator<ac97_device>;
+const device_type AC97 = device_creator<ac97_device>;
 
 DEVICE_ADDRESS_MAP_START(native_audio_mixer_map, 32, ac97_device)
 ADDRESS_MAP_END

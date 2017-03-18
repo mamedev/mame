@@ -24,8 +24,12 @@
 
 #include "emu.h"
 #include "includes/tandy2k.h"
+
 #include "machine/pckeybrd.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define LOG 1
 

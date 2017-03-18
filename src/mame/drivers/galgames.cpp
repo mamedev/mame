@@ -40,6 +40,8 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "screen.h"
+#include "speaker.h"
 
 /***************************************************************************
 
@@ -52,19 +54,25 @@ Notes:
 ***************************************************************************/
 
 class galgames_slot_device;
+extern const device_type GALGAMES_CART;
+extern const device_type GALGAMES_BIOS_CART;
+extern const device_type GALGAMES_STARPAK2_CART;
+extern const device_type GALGAMES_STARPAK3_CART;
+extern const device_type GALGAMES_SLOT;
 
 // CART declaration
 
-class galgames_cart_device :    public device_t,
-								public device_rom_interface
+class galgames_cart_device : public device_t, public device_rom_interface
 {
 public:
 	// construction/destruction
-	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		galgames_cart_device(mconfig, GALGAMES_CART, "Galaxy Games StarPak Cartridge", tag, owner, clock, "starpak_cart", __FILE__)
+	{ }
 
 	// static configuration
 	static void static_set_cart(device_t &device, uint8_t cart) { downcast<galgames_cart_device &>(device).m_cart = cart; }
-	static void static_set_pic_bits(device_t &device, int clk, int in, int out, int dis)    { downcast<galgames_cart_device &>(device).set_pic_bits(clk, in, out, dis); }
+	static void static_set_pic_bits(device_t &device, int clk, int in, int out, int dis) { downcast<galgames_cart_device &>(device).set_pic_bits(clk, in, out, dis); }
 
 	// ROM
 	DECLARE_READ16_MEMBER(rom_r)    { return read_word(offset*2); }
@@ -85,6 +93,16 @@ public:
 	DECLARE_WRITE8_MEMBER(int_pic_bank_w);
 
 protected:
+	galgames_cart_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
+
 	// device-level overrides
 	virtual void device_start() override { }
 	virtual void device_reset() override;
@@ -113,7 +131,7 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_CART = &device_creator<galgames_cart_device>;
+const device_type GALGAMES_CART = device_creator<galgames_cart_device>;
 
 #define MCFG_GALGAMES_CART_INDEX(_cart) \
 	galgames_cart_device::static_set_cart(*device, _cart);
@@ -133,19 +151,19 @@ static MACHINE_CONFIG_FRAGMENT( bios )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_bios_cart_device :   public galgames_cart_device
+class galgames_bios_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
 	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, tag, owner, clock)
+		galgames_cart_device(mconfig, GALGAMES_BIOS_CART, "Galaxy Games BIOS Cartridge", tag, owner, clock, "galgames_bios_cart", __FILE__)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(bios); }
 };
 
-const device_type GALGAMES_BIOS_CART = &device_creator<galgames_bios_cart_device>;
+const device_type GALGAMES_BIOS_CART = device_creator<galgames_bios_cart_device>;
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -163,19 +181,19 @@ static MACHINE_CONFIG_FRAGMENT( starpak2 )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_starpak2_cart_device :   public galgames_cart_device
+class galgames_starpak2_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
 	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, tag, owner, clock)
+		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, "Galaxy Games StarPak 2 Cartridge", tag, owner, clock, "starpak2_cart", __FILE__)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak2); }
 };
 
-const device_type GALGAMES_STARPAK2_CART = &device_creator<galgames_starpak2_cart_device>;
+const device_type GALGAMES_STARPAK2_CART = device_creator<galgames_starpak2_cart_device>;
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -195,19 +213,19 @@ static MACHINE_CONFIG_FRAGMENT( starpak3 )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-class galgames_starpak3_cart_device :   public galgames_cart_device
+class galgames_starpak3_cart_device : public galgames_cart_device
 {
 public:
 	// construction/destruction
 	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, tag, owner, clock)
+		galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, "Galaxy Games StarPak 3 Cartridge", tag, owner, clock, "starpak3_cart", __FILE__)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak3); }
 };
 
-const device_type GALGAMES_STARPAK3_CART = &device_creator<galgames_starpak3_cart_device>;
+const device_type GALGAMES_STARPAK3_CART = device_creator<galgames_starpak3_cart_device>;
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
@@ -224,8 +242,7 @@ const device_type GALGAMES_STARPAK3_CART = &device_creator<galgames_starpak3_car
 
 // SLOT declaration
 
-class galgames_slot_device :    public device_t,
-								public device_memory_interface
+class galgames_slot_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -289,15 +306,23 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_SLOT = &device_creator<galgames_slot_device>;
+const device_type GALGAMES_SLOT = device_creator<galgames_slot_device>;
 
 #define MCFG_GALGAMES_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_SLOT, 0)
 
 // CART implementation
 
-galgames_cart_device::galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GALGAMES_CART, "Galaxy Games StarPak Cartridge", tag, owner, clock, "starpak_cart", __FILE__),
+galgames_cart_device::galgames_cart_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *name,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		const char *shortname,
+		const char *source):
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16),
 	m_mconfig_additions(nullptr),
 	m_cart(0),

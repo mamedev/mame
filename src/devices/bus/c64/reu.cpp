@@ -22,9 +22,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REU1700 = &device_creator<c64_reu1700_cartridge_device>;
-const device_type C64_REU1750 = &device_creator<c64_reu1750_cartridge_device>;
-const device_type C64_REU1764 = &device_creator<c64_reu1764_cartridge_device>;
+const device_type C64_REU1700 = device_creator<c64_reu1700_cartridge_device>;
+const device_type C64_REU1750 = device_creator<c64_reu1750_cartridge_device>;
+const device_type C64_REU1764 = device_creator<c64_reu1764_cartridge_device>;
 
 
 //-------------------------------------------------

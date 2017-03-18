@@ -221,7 +221,9 @@ Notes:
 
 #include "emu.h"
 #include "includes/vip.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

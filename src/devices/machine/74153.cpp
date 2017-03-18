@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TTL153 = &device_creator<ttl153_device>;
+const device_type TTL153 = device_creator<ttl153_device>;
 
 
 //**************************************************************************

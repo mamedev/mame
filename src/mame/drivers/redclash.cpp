@@ -23,9 +23,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/redclash.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/redclash.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Sound comm between CPU's */
@@ -639,7 +642,7 @@ static MACHINE_CONFIG_START( zerohour, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_redclash)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
@@ -668,7 +671,7 @@ static MACHINE_CONFIG_START( redclash, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_redclash)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
@@ -702,7 +705,7 @@ static MACHINE_CONFIG_START( sraider, redclash_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_sraider)
-	MCFG_SCREEN_VBLANK_DRIVER(redclash_state, screen_eof_sraider)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(redclash_state, screen_vblank_sraider))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)

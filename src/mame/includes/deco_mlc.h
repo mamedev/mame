@@ -3,6 +3,7 @@
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
 
 
 class deco_mlc_state : public driver_device
@@ -67,7 +68,7 @@ public:
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
 	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_mlc(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
 	void descramble_sound(  );

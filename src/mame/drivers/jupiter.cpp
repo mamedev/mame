@@ -19,13 +19,16 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jupiter.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
 #include "machine/keyboard.h"
+#include "machine/ram.h"
 #include "machine/terminal.h"
 #include "machine/wd_fdc.h"
-#include "includes/jupiter.h"
+
+#include "screen.h"
 
 
 //**************************************************************************

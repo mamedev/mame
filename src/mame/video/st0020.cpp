@@ -13,7 +13,7 @@
 #include "st0020.h"
 #include "render.h"
 
-const device_type ST0020_SPRITES = &device_creator<st0020_device>;
+const device_type ST0020_SPRITES = device_creator<st0020_device>;
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__)

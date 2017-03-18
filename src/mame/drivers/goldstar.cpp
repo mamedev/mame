@@ -219,14 +219,18 @@
 #define OKI_CLOCK       1056000     /* unverified resonator */
 
 #include "emu.h"
+#include "includes/goldstar.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
 #include "video/ramdac.h"
-#include "includes/goldstar.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #include "bingowng.lh"
 #include "cherryb3.lh"

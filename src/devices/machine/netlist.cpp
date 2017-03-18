@@ -30,21 +30,21 @@
 //#define LOG_DEV_CALLS(x)   printf x
 #define LOG_DEV_CALLS(x)   do { } while (0)
 
-const device_type NETLIST_CORE = &device_creator<netlist_mame_device_t>;
-const device_type NETLIST_CPU = &device_creator<netlist_mame_cpu_device_t>;
-const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
+const device_type NETLIST_CORE = device_creator<netlist_mame_device_t>;
+const device_type NETLIST_CPU = device_creator<netlist_mame_cpu_device_t>;
+const device_type NETLIST_SOUND = device_creator<netlist_mame_sound_device_t>;
 
 /* subdevices */
 
-const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
-const device_type NETLIST_INT_INPUT = &device_creator<netlist_mame_int_input_t>;
-const device_type NETLIST_RAM_POINTER = &device_creator<netlist_ram_pointer_t>;
-const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
-const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
+const device_type NETLIST_ANALOG_INPUT = device_creator<netlist_mame_analog_input_t>;
+const device_type NETLIST_INT_INPUT = device_creator<netlist_mame_int_input_t>;
+const device_type NETLIST_RAM_POINTER = device_creator<netlist_ram_pointer_t>;
+const device_type NETLIST_LOGIC_INPUT = device_creator<netlist_mame_logic_input_t>;
+const device_type NETLIST_STREAM_INPUT = device_creator<netlist_mame_stream_input_t>;
 
-const device_type NETLIST_LOGIC_OUTPUT = &device_creator<netlist_mame_logic_output_t>;
-const device_type NETLIST_ANALOG_OUTPUT = &device_creator<netlist_mame_analog_output_t>;
-const device_type NETLIST_STREAM_OUTPUT = &device_creator<netlist_mame_stream_output_t>;
+const device_type NETLIST_LOGIC_OUTPUT = device_creator<netlist_mame_logic_output_t>;
+const device_type NETLIST_ANALOG_OUTPUT = device_creator<netlist_mame_analog_output_t>;
+const device_type NETLIST_STREAM_OUTPUT = device_creator<netlist_mame_stream_output_t>;
 
 // ----------------------------------------------------------------------------------------
 // Special netlist extension devices  ....
@@ -308,7 +308,7 @@ public:
 			m_param[i]->setTo(v * (*m_param_mult[i])() + (*m_param_offset[i])());
 		}
 		m_pos++;
-		m_Q.push(!m_Q.net().new_Q(), m_inc  );
+		m_Q.net().toggle_and_push_to_queue(m_inc);
 	}
 
 public:
@@ -557,7 +557,7 @@ void netlist_mame_logic_output_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_int_input_t::netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_INT_INPUT, "Netlist Integer Input", tag, owner, clock, "netlist_logic_input", __FILE__),
+		: device_t(mconfig, NETLIST_INT_INPUT, "Netlist Integer Input", tag, owner, clock, "netlist_int_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(nullptr),
 			m_mask(0xffffffff),
@@ -657,7 +657,7 @@ void netlist_ram_pointer_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_stream_input_t::netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Stream Input", tag, owner, clock, "netlist_stream_input", __FILE__),
+		: device_t(mconfig, NETLIST_STREAM_INPUT, "Netlist Stream Input", tag, owner, clock, "netlist_stream_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_channel(0),
 			m_param_name("")
@@ -694,7 +694,7 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &set
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_stream_output_t::netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Stream Output", tag, owner, clock, "netlist_stream_output", __FILE__),
+		: device_t(mconfig, NETLIST_STREAM_OUTPUT, "Netlist Stream Output", tag, owner, clock, "netlist_stream_output", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_channel(0),
 			m_out_name("")
@@ -960,7 +960,8 @@ netlist_mame_cpu_device_t::netlist_mame_cpu_device_t(const machine_config &mconf
 		device_state_interface(mconfig, *this),
 		device_disasm_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 12) // Interface is needed to keep debugger happy
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 12), // Interface is needed to keep debugger happy
+		m_genPC(0)
 {
 }
 
@@ -1054,8 +1055,13 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_sound_device_t::netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist Sound Device", tag, owner, clock, "netlist_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: netlist_mame_device_t(mconfig, NETLIST_SOUND, "Netlist Sound Device", tag, owner, clock, "netlist_sound", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_out{nullptr},
+		m_in(nullptr),
+		m_stream(nullptr),
+		m_num_inputs(0),
+		m_num_outputs(0)
 {
 }
 

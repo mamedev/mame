@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MIDI = &device_creator<a2bus_midi_device>;
+const device_type A2BUS_MIDI = device_creator<a2bus_midi_device>;
 
 #define MIDI_PTM_TAG     "midi_ptm"
 #define MIDI_ACIA_TAG    "midi_acia"

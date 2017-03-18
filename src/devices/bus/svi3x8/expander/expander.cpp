@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SVI_EXPANDER = &device_creator<svi_expander_device>;
+const device_type SVI_EXPANDER = device_creator<svi_expander_device>;
 
 
 //**************************************************************************

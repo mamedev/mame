@@ -14,11 +14,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/scramble.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "sound/flt_rc.h"
 #include "sound/ay8910.h"
-#include "includes/scramble.h"
+#include "speaker.h"
 
 #define AD2083_TMS5110_CLOCK        XTAL_640kHz
 

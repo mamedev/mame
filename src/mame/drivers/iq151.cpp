@@ -44,11 +44,12 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/pic8259.h"
-#include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "sound/spkrdev.h"
 
 // cartridge slot
 #include "bus/iq151/iq151.h"
@@ -61,7 +62,10 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class iq151_state : public driver_device
 {

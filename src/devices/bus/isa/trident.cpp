@@ -10,10 +10,13 @@
 
 #include "emu.h"
 #include "trident.h"
-#include "debugger.h"
 
-const device_type TRIDENT_VGA = &device_creator<tgui9860_device>;
-const device_type TVGA9000_VGA = &device_creator<tvga9000_device>;
+#include "debugger.h"
+#include "screen.h"
+
+
+const device_type TRIDENT_VGA = device_creator<tgui9860_device>;
+const device_type TVGA9000_VGA = device_creator<tvga9000_device>;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 

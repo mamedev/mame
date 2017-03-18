@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "machine/315-5838_317-0229_comp.h"
 
-extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_device>;
+const device_type SEGA315_5838_COMP = device_creator<sega_315_5838_comp_device>;
 
 //#define DEBUG_DATA_DUMP
 

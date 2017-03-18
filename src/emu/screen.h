@@ -7,17 +7,12 @@
     Core MAME screen device.
 
 ***************************************************************************/
-
-#include <utility>
+#ifndef MAME_EMU_SCREEN_H
+#define MAME_EMU_SCREEN_H
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef MAME_EMU_SCREEN_H
-#define MAME_EMU_SCREEN_H
+#include <utility>
 
 
 //**************************************************************************
@@ -167,7 +162,6 @@ typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
 
 typedef device_delegate<u32 (screen_device &, bitmap_ind16 &, const rectangle &)> screen_update_ind16_delegate;
 typedef device_delegate<u32 (screen_device &, bitmap_rgb32 &, const rectangle &)> screen_update_rgb32_delegate;
-typedef device_delegate<void (screen_device &, bool)> screen_vblank_delegate;
 
 
 // ======================> screen_device
@@ -210,7 +204,7 @@ public:
 	static void static_set_default_position(device_t &device, double xscale, double xoffs, double yscale, double yoffs);
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
-	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
+	template<class Object> static devcb_base &static_set_screen_vblank(device_t &device, Object &&object) { return downcast<screen_device &>(device).m_screen_vblank.set_callback(std::forward<Object>(object)); }
 	static void static_set_palette(device_t &device, const char *tag);
 	static void static_set_video_attributes(device_t &device, u32 flags);
 	static void static_set_color(device_t &device, rgb_t color);
@@ -297,7 +291,7 @@ private:
 	float               m_xscale, m_yscale;         // default X/Y scale factor
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
-	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
+	devcb_write_line    m_screen_vblank;            // screen vblank line callback
 	optional_device<palette_device> m_palette;      // our palette
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
@@ -370,7 +364,10 @@ private:
 extern const device_type SCREEN;
 
 // iterator helper
-typedef device_type_iterator<&device_creator<screen_device>, screen_device> screen_device_iterator;
+typedef device_type_iterator<screen_device> screen_device_iterator;
+
+extern template class device_finder<screen_device, false>;
+extern template class device_finder<screen_device, true>;
 
 /*!
  @defgroup Screen device configuration macros
@@ -496,12 +493,8 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
-#define MCFG_SCREEN_VBLANK_NONE() \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate());
-#define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)nullptr));
+#define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
+	devcb = &screen_device::static_set_screen_vblank(*device, DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	screen_device::static_set_palette(*device, "^" _palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \

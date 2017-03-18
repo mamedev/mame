@@ -14,12 +14,15 @@
 #include "emu.h"
 #include "s3virge.h"
 
-#define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
+#include "screen.h"
+
+
+#define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
 #define LOG_REG        1
 
-const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
-const device_type S3VIRGEDX = &device_creator<s3virgedx_vga_device>;
-const device_type S3VIRGEDX1 = &device_creator<s3virgedx_rev1_vga_device>;
+const device_type S3VIRGE = device_creator<s3virge_vga_device>;
+const device_type S3VIRGEDX = device_creator<s3virgedx_vga_device>;
+const device_type S3VIRGEDX1 = device_creator<s3virgedx_rev1_vga_device>;
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3_vga_device(mconfig, S3VIRGE, "S3 86C325", tag, owner, clock, "virge_vga", __FILE__)

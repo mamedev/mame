@@ -404,11 +404,6 @@
 
 ************************************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_16MHz          /* unknown */
-#define CPU_CLOCK       MASTER_CLOCK/4      /* guess... seems accurate */
-#define CRTC_CLOCK      MASTER_CLOCK/24     /* it gives 63.371293 Hz. with current settings */
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
@@ -416,6 +411,13 @@
 #include "video/mc6845.h"
 //#include "machine/z80ctc.h"
 //#include "machine/z80pio.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_16MHz          /* unknown */
+#define CPU_CLOCK       MASTER_CLOCK/4      /* guess... seems accurate */
+#define CRTC_CLOCK      MASTER_CLOCK/24     /* it gives 63.371293 Hz. with current settings */
 
 
 class avt_state : public driver_device

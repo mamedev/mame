@@ -254,7 +254,7 @@ uint32_t bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void bking_state::screen_eof_bking(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(bking_state::screen_vblank_bking)
 {
 	// rising edge
 	if (state)
@@ -290,7 +290,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 		m_bg_tilemap->set_scrollx(0, flip_screen() ? -xld : xld);
 		m_bg_tilemap->set_scrolly(0, flip_screen() ? -yld : yld);
 
-		m_bg_tilemap->draw(screen, m_colmap_bg, rect, 0, 0);
+		m_bg_tilemap->draw(*m_screen, m_colmap_bg, rect, 0, 0);
 
 		m_bg_tilemap->set_scrollx(0, 0);
 		m_bg_tilemap->set_scrolly(0, 0);

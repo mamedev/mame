@@ -32,12 +32,15 @@
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
+
+#include "cpu/m68000/m68000.h"
 #include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */

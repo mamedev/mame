@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CMD_HD = &device_creator<cmd_hd_device>;
+const device_type CMD_HD = device_creator<cmd_hd_device>;
 
 
 //-------------------------------------------------

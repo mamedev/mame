@@ -153,7 +153,7 @@ ROM board internal layouts:
 
 */
 
-const device_type AW_ROM_BOARD = &device_creator<aw_rom_board>;
+const device_type AW_ROM_BOARD = device_creator<aw_rom_board>;
 
 DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x00, 0x01) AM_WRITE(epr_offsetl_w)

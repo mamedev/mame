@@ -29,8 +29,8 @@ enum
 };
 
 
-const device_type MSX_SLOT_CARTRIDGE = &device_creator<msx_slot_cartridge_device>;
-const device_type MSX_SLOT_YAMAHA_EXPANSION = &device_creator<msx_slot_yamaha_expansion_device>;
+const device_type MSX_SLOT_CARTRIDGE = device_creator<msx_slot_cartridge_device>;
+const device_type MSX_SLOT_YAMAHA_EXPANSION = device_creator<msx_slot_yamaha_expansion_device>;
 
 
 msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -106,7 +106,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 {
 	if ( m_cartridge )
 	{
-		if ( software_entry() )
+		if (loaded_through_softlist())
 		{
 			uint32_t length;
 

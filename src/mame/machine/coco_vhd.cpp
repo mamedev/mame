@@ -65,7 +65,7 @@
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const device_type COCO_VHD = &device_creator<coco_vhd_image_device>;
+const device_type COCO_VHD = device_creator<coco_vhd_image_device>;
 
 //-------------------------------------------------
 //  coco_vhd_image_device - constructor
@@ -83,18 +83,6 @@ coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, cons
 
 coco_vhd_image_device::~coco_vhd_image_device()
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_vhd_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DIAG264_SERIAL_LOOPBACK = &device_creator<diag264_serial_loopback_device>;
+const device_type DIAG264_SERIAL_LOOPBACK = device_creator<diag264_serial_loopback_device>;
 
 
 

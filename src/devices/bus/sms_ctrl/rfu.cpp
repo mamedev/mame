@@ -28,7 +28,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
+const device_type SMS_RAPID_FIRE = device_creator<sms_rapid_fire_device>;
 
 // time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)

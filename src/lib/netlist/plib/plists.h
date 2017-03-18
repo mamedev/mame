@@ -111,9 +111,11 @@ public:
 	private:
 		LC* p;
 	public:
-		explicit constexpr iter_t(LC* x) noexcept : p(x) {}
-		explicit constexpr iter_t(const iter_t &rhs) noexcept = default;
-		constexpr iter_t(iter_t &&rhs) noexcept = default;
+		explicit constexpr iter_t(LC* x) noexcept : p(x) { }
+		explicit constexpr iter_t(const iter_t &rhs) noexcept : p(rhs.p) { }
+		iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
+		iter_t& operator=(const iter_t &rhs) { iter_t t(rhs); std::swap(*this, t); return *this; }
+		iter_t& operator=(iter_t &&rhs) { std::swap(*this, rhs); return *this; }
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
 		constexpr bool operator==(const iter_t& rhs) const noexcept {return p == rhs.p;}
@@ -130,13 +132,13 @@ public:
 	constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 	constexpr iter_t end() const noexcept { return iter_t(nullptr); }
 
-	void push_front(LC *elem)
+	void push_front(LC *elem) noexcept
 	{
 		elem->m_next = m_head;
 		m_head = elem;
 	}
 
-	void push_back(LC *elem)
+	void push_back(LC *elem) noexcept
 	{
 		LC **p = &m_head;
 		while (*p != nullptr)
@@ -147,7 +149,7 @@ public:
 		elem->m_next = nullptr;
 	}
 
-	void remove(const LC *elem)
+	void remove(const LC *elem) noexcept
 	{
 		auto p = &m_head;
 		for ( ; *p != elem; p = &((*p)->m_next))
@@ -157,9 +159,9 @@ public:
 		(*p) = elem->m_next;
 	}
 
-	LC *front() const { return m_head; }
-	void clear() { m_head = nullptr; }
-	constexpr bool empty() const { return (m_head == nullptr); }
+	LC *front() const noexcept { return m_head; }
+	void clear() noexcept { m_head = nullptr; }
+	constexpr bool empty() const noexcept { return (m_head == nullptr); }
 
 private:
 	LC *m_head;

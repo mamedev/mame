@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "naomim1.h"
 
-const device_type NAOMI_M1_BOARD = &device_creator<naomi_m1_board>;
+const device_type NAOMI_M1_BOARD = device_creator<naomi_m1_board>;
 
 DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 	AM_RANGE(0x0a, 0x0b) AM_READ(actel_id_r)

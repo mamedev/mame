@@ -13,11 +13,14 @@
 */
 
 #include "emu.h"
+#include "cpu/cop400/cop400.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldstub.h"
 #include "machine/ldv1000.h"
-#include "cpu/cop400/cop400.h"
+#include "speaker.h"
+
 #include "thayers.lh"
+
 
 #define LOG 0
 

@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "sound/cem3394.h"
+#include "screen.h"
 
 #define BALSENTE_MASTER_CLOCK   (20000000)
 #define BALSENTE_CPU_CLOCK      (BALSENTE_MASTER_CLOCK / 16)

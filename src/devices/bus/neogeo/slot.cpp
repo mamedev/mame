@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
+const device_type NEOGEO_CART_SLOT = device_creator<neogeo_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -123,18 +123,6 @@ void neogeo_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_neogeo_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void neogeo_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  NEOGEO PCB
@@ -239,7 +227,7 @@ image_init_result neogeo_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			uint16_t *ROM16;
 			uint8_t *ROM8;

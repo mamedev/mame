@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_64K = &device_creator<pet_64k_expansion_device>;
+const device_type PET_64K = device_creator<pet_64k_expansion_device>;
 
 
 

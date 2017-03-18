@@ -46,8 +46,8 @@ typedef uint32_t DWORD;
 #include "v25priv.h"
 #include "nec_common.h"
 
-const device_type V25 = &device_creator<v25_device>;
-const device_type V35 = &device_creator<v35_device>;
+const device_type V25 = device_creator<v25_device>;
+const device_type V35 = device_creator<v35_device>;
 
 
 v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)

@@ -13,7 +13,7 @@
 #include "chd_cd.h"
 
 // device type definition
-const device_type CDROM = &device_creator<cdrom_image_device>;
+const device_type CDROM = device_creator<cdrom_image_device>;
 
 //-------------------------------------------------
 //  cdrom_image_device - constructor
@@ -55,9 +55,6 @@ void cdrom_image_device::device_config_complete()
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	add_format("chdcd", "CD-ROM drive", m_extension_list, "");
-
-	// set brief and instance name
-	update_names();
 }
 
 //-------------------------------------------------
@@ -94,7 +91,7 @@ image_init_result cdrom_image_device::call_load()
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
 
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 	{
 		if (is_filetype("chd") && is_loaded()) {
 			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */

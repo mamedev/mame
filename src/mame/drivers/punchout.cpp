@@ -115,12 +115,15 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/punchout.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
-#include "includes/punchout.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************

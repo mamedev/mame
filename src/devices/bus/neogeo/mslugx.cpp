@@ -16,7 +16,7 @@
 //  neogeo_mslugx_cart - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_MSLUGX_CART = &device_creator<neogeo_mslugx_cart>;
+const device_type NEOGEO_MSLUGX_CART = device_creator<neogeo_mslugx_cart>;
 
 
 neogeo_mslugx_cart::neogeo_mslugx_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :

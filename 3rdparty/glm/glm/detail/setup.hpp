@@ -3,19 +3,25 @@
 
 #pragma once
 
-#if defined(GLM_FORCE_SWIZZLE) && defined(GLM_FORCE_UNRESTRICTED_GENTYPE)
+#if (defined(GLM_FORCE_SWIZZLE) || defined(GLM_SWIZZLE)) && defined(GLM_FORCE_UNRESTRICTED_GENTYPE)
 #	error "Both GLM_FORCE_SWIZZLE and GLM_FORCE_UNRESTRICTED_GENTYPE can't be defined at the same time"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Messages
 
+#ifdef GLM_MESSAGES
+#	pragma message("GLM: GLM_MESSAGES is deprecated, use GLM_FORCE_MESSAGES instead")
+#endif
+
 #define GLM_MESSAGES_ENABLED 1
 #define GLM_MESSAGES_DISABLE 0
 
-#if defined(GLM_FORCE_MESSAGES)
+#if defined(GLM_FORCE_MESSAGES) || defined(GLM_MESSAGES)
+#	undef GLM_MESSAGES
 #	define GLM_MESSAGES GLM_MESSAGES_ENABLED
 #else
+#	undef GLM_MESSAGES
 #	define GLM_MESSAGES GLM_MESSAGES_DISABLE
 #endif
 
@@ -26,15 +32,15 @@
 ///////////////////////////////////////////////////////////////////////////////////
 // Version
 
-#define GLM_VERSION					99
+#define GLM_VERSION					98
 #define GLM_VERSION_MAJOR			0
 #define GLM_VERSION_MINOR			9
-#define GLM_VERSION_PATCH			9
-#define GLM_VERSION_REVISION		0
+#define GLM_VERSION_PATCH			8
+#define GLM_VERSION_REVISION		5
 
 #if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_MESSAGE_VERSION_DISPLAYED)
 #	define GLM_MESSAGE_VERSION_DISPLAYED
-#	pragma message ("GLM: version 0.9.9.0")
+#	pragma message ("GLM: version 0.9.8.5")
 #endif//GLM_MESSAGES
 
 // Report compiler detection
@@ -188,18 +194,28 @@
 #		ifdef _MSC_EXTENSIONS
 #			if __cplusplus >= 201402L
 #				define GLM_LANG (GLM_LANG_CXX14 | GLM_LANG_CXXMS_FLAG)
+//#			elif GLM_COMPILER >= GLM_COMPILER_VC14
+//#				define GLM_LANG (GLM_LANG_CXX1Y | GLM_LANG_CXXMS_FLAG)
 #			elif __cplusplus >= 201103L
 #				define GLM_LANG (GLM_LANG_CXX11 | GLM_LANG_CXXMS_FLAG)
-#			else
+#			elif GLM_COMPILER >= GLM_COMPILER_VC10
 #				define GLM_LANG (GLM_LANG_CXX0X | GLM_LANG_CXXMS_FLAG)
+#			elif __cplusplus >= 199711L
+#				define GLM_LANG (GLM_LANG_CXX98 | GLM_LANG_CXXMS_FLAG)
+#			else
+#				define GLM_LANG (GLM_LANG_CXX | GLM_LANG_CXXMS_FLAG)
 #			endif
 #		else
 #			if __cplusplus >= 201402L
 #				define GLM_LANG GLM_LANG_CXX14
 #			elif __cplusplus >= 201103L
 #				define GLM_LANG GLM_LANG_CXX11
-#			else
+#			elif GLM_COMPILER >= GLM_COMPILER_VC10
 #				define GLM_LANG GLM_LANG_CXX0X
+#			elif __cplusplus >= 199711L
+#				define GLM_LANG GLM_LANG_CXX98
+#			else
+#				define GLM_LANG GLM_LANG_CXX
 #			endif
 #		endif
 #	elif GLM_COMPILER & GLM_COMPILER_INTEL
@@ -312,7 +328,7 @@
 #	define GLM_HAS_EXTENDED_INTEGER_TYPE 1
 #else
 #	define GLM_HAS_EXTENDED_INTEGER_TYPE (\
-		((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (GLM_COMPILER & GLM_COMPILER_VC)) || \
+		((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC11)) || \
 		((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (GLM_COMPILER & GLM_COMPILER_CUDA)) || \
 		((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (GLM_COMPILER & GLM_COMPILER_GCC)) || \
 		((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (GLM_COMPILER & GLM_COMPILER_CLANG)))
@@ -367,7 +383,7 @@
 #	define GLM_HAS_DEFAULTED_FUNCTIONS ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
 		((GLM_COMPILER & GLM_COMPILER_GCC)) || \
 		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC12)) || \
-		((GLM_COMPILER & GLM_COMPILER_INTEL)) || \
+		((GLM_COMPILER & GLM_COMPILER_INTEL) && (GLM_COMPILER >= GLM_COMPILER_INTEL12)) || \
 		(GLM_COMPILER & GLM_COMPILER_CUDA)))
 #endif
 
@@ -379,8 +395,8 @@
 #else
 #	define GLM_HAS_RVALUE_REFERENCES ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
 		((GLM_COMPILER & GLM_COMPILER_GCC)) || \
-		((GLM_COMPILER & GLM_COMPILER_VC)) || \
-		((GLM_COMPILER & GLM_COMPILER_CUDA))))
+		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC11)) || \
+		((GLM_COMPILER & GLM_COMPILER_CUDA) && (GLM_COMPILER >= GLM_COMPILER_CUDA50))))
 #endif
 
 // N2437 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2437.pdf
@@ -390,10 +406,10 @@
 #	define GLM_HAS_EXPLICIT_CONVERSION_OPERATORS 1
 #else
 #	define GLM_HAS_EXPLICIT_CONVERSION_OPERATORS ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
-		((GLM_COMPILER & GLM_COMPILER_GCC)) || \
+		((GLM_COMPILER & GLM_COMPILER_GCC) && (GLM_COMPILER >= GLM_COMPILER_GCC45)) || \
 		((GLM_COMPILER & GLM_COMPILER_INTEL) && (GLM_COMPILER >= GLM_COMPILER_INTEL14)) || \
 		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC12)) || \
-		((GLM_COMPILER & GLM_COMPILER_CUDA))))
+		((GLM_COMPILER & GLM_COMPILER_CUDA) && (GLM_COMPILER >= GLM_COMPILER_CUDA50))))
 #endif
 
 // N2258 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf
@@ -403,10 +419,10 @@
 #	define GLM_HAS_TEMPLATE_ALIASES 1
 #else
 #	define GLM_HAS_TEMPLATE_ALIASES ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
-		((GLM_COMPILER & GLM_COMPILER_INTEL)) || \
+		((GLM_COMPILER & GLM_COMPILER_INTEL) && (GLM_COMPILER >= GLM_COMPILER_INTEL12_1)) || \
 		((GLM_COMPILER & GLM_COMPILER_GCC) && (GLM_COMPILER >= GLM_COMPILER_GCC47)) || \
 		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC12)) || \
-		((GLM_COMPILER & GLM_COMPILER_CUDA))))
+		((GLM_COMPILER & GLM_COMPILER_CUDA) && (GLM_COMPILER >= GLM_COMPILER_CUDA50))))
 #endif
 
 // N2930 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2930.html
@@ -417,9 +433,9 @@
 #else
 #	define GLM_HAS_RANGE_FOR ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
 		((GLM_COMPILER & GLM_COMPILER_GCC) && (GLM_COMPILER >= GLM_COMPILER_GCC46)) || \
-		((GLM_COMPILER & GLM_COMPILER_INTEL)) || \
-		((GLM_COMPILER & GLM_COMPILER_VC)) || \
-		((GLM_COMPILER & GLM_COMPILER_CUDA))))
+		((GLM_COMPILER & GLM_COMPILER_INTEL) && (GLM_COMPILER >= GLM_COMPILER_INTEL13)) || \
+		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC11)) || \
+		((GLM_COMPILER & GLM_COMPILER_CUDA) && (GLM_COMPILER >= GLM_COMPILER_CUDA50))))
 #endif
 
 // N2341 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2341.pdf
@@ -458,7 +474,7 @@
 #else
 #	define GLM_HAS_MAKE_SIGNED ((GLM_LANG & GLM_LANG_CXX0X_FLAG) && (\
 		((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC12)) || \
-		((GLM_COMPILER & GLM_COMPILER_CUDA))))
+		((GLM_COMPILER & GLM_COMPILER_CUDA) && (GLM_COMPILER >= GLM_COMPILER_CUDA50))))
 #endif
 
 #if GLM_ARCH == GLM_ARCH_PURE
@@ -478,6 +494,10 @@
 #			define GLM_HAS_OPENMP 40
 #		elif GLM_COMPILER >= GLM_COMPILER_GCC47
 #			define GLM_HAS_OPENMP 31
+#		elif GLM_COMPILER >= GLM_COMPILER_GCC44
+#			define GLM_HAS_OPENMP 30
+#		elif GLM_COMPILER >= GLM_COMPILER_GCC42
+#			define GLM_HAS_OPENMP 25
 #		else
 #			define GLM_HAS_OPENMP 0
 #		endif
@@ -488,10 +508,16 @@
 #			define GLM_HAS_OPENMP 0
 #		endif
 #	elif GLM_COMPILER & GLM_COMPILER_VC
-#		define GLM_HAS_OPENMP 20
+#		if GLM_COMPILER >= GLM_COMPILER_VC10
+#			define GLM_HAS_OPENMP 20
+#		else
+#			define GLM_HAS_OPENMP 0
+#		endif
 #	elif GLM_COMPILER & GLM_COMPILER_INTEL
 #		if GLM_COMPILER >= GLM_COMPILER_INTEL16
 #			define GLM_HAS_OPENMP 40
+#		elif GLM_COMPILER >= GLM_COMPILER_INTEL12
+#			define GLM_HAS_OPENMP 31
 #		else
 #			define GLM_HAS_OPENMP 0
 #		endif
@@ -558,12 +584,18 @@
 
 // User defines: GLM_FORCE_SWIZZLE
 
+#ifdef GLM_SWIZZLE
+#	pragma message("GLM: GLM_SWIZZLE is deprecated, use GLM_FORCE_SWIZZLE instead")
+#endif
+
 #define GLM_SWIZZLE_ENABLED 1
 #define GLM_SWIZZLE_DISABLE 0
 
-#if defined(GLM_FORCE_SWIZZLE)
+#if defined(GLM_FORCE_SWIZZLE) || defined(GLM_SWIZZLE)
+#	undef GLM_SWIZZLE
 #	define GLM_SWIZZLE GLM_SWIZZLE_ENABLED
 #else
+#	undef GLM_SWIZZLE
 #	define GLM_SWIZZLE GLM_SWIZZLE_DISABLE
 #endif
 
@@ -597,6 +629,10 @@
 ///////////////////////////////////////////////////////////////////////////////////
 // Clip control
 
+#ifdef GLM_DEPTH_ZERO_TO_ONE // Legacy 0.9.8 development
+#	error Define GLM_FORCE_DEPTH_ZERO_TO_ONE instead of GLM_DEPTH_ZERO_TO_ONE to use 0 to 1 clip space.
+#endif
+
 #define GLM_DEPTH_ZERO_TO_ONE				0x00000001
 #define GLM_DEPTH_NEGATIVE_ONE_TO_ONE		0x00000002
 
@@ -618,6 +654,10 @@
 ///////////////////////////////////////////////////////////////////////////////////
 // Coordinate system, define GLM_FORCE_LEFT_HANDED before including GLM
 // to use left handed coordinate system by default.
+
+#ifdef GLM_LEFT_HANDED // Legacy 0.9.8 development
+#	error Define GLM_FORCE_LEFT_HANDED instead of GLM_LEFT_HANDED left handed coordinate system by default.
+#endif
 
 #define GLM_LEFT_HANDED				0x00000001	// For DirectX, Metal, Vulkan
 #define GLM_RIGHT_HANDED			0x00000002	// For OpenGL, default in GLM
@@ -766,7 +806,7 @@ namespace glm
 #if GLM_HAS_CONSTEXPR_PARTIAL
 	namespace glm
 	{
-		template<typename T, std::size_t N>
+		template <typename T, std::size_t N>
 		constexpr std::size_t countof(T const (&)[N])
 		{
 			return N;

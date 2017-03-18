@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AKIKO = &device_creator<akiko_device>;
+const device_type AKIKO = device_creator<akiko_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

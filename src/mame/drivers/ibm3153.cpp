@@ -39,6 +39,8 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "screen.h"
+
 
 class ibm3153_state : public driver_device
 {

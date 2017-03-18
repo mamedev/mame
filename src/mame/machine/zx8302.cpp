@@ -41,7 +41,7 @@ static const int RTC_BASE_ADJUST = 283996800;
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ZX8302 = &device_creator<zx8302_device>;
+const device_type ZX8302 = device_creator<zx8302_device>;
 
 //**************************************************************************
 //  INLINE HELPERS

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "rax.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -493,7 +494,7 @@ MACHINE_CONFIG_FRAGMENT( rax )
 MACHINE_CONFIG_END
 
 
-const device_type ACCLAIM_RAX = &device_creator<acclaim_rax_device>;
+const device_type ACCLAIM_RAX = device_creator<acclaim_rax_device>;
 
 //-------------------------------------------------
 //  acclaim_rax_device - constructor

@@ -52,6 +52,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "machine/74145.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "acrnsys1.lh"
 
 

@@ -35,7 +35,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
@@ -44,7 +44,10 @@
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "render.h"
+#include "speaker.h"
+
 #include "dlair.lh"
 
 

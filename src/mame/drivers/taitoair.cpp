@@ -195,13 +195,16 @@ perhaps? The two writes seem to take only two values.
  */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
 #include "includes/taitoair.h"
+#include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
+#include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "speaker.h"
+
 
 /***********************************************************
                 MEMORY handlers

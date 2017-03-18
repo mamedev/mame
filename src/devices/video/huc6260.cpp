@@ -19,6 +19,9 @@
 #include "emu.h"
 #include "huc6260.h"
 
+#include "screen.h"
+
+
 #define LOG 0
 
 #define HUC6260_HSYNC_LENGTH    237
@@ -42,7 +45,7 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 }
 
 
-const device_type HUC6260 = &device_creator<huc6260_device>;
+const device_type HUC6260 = device_creator<huc6260_device>;
 
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

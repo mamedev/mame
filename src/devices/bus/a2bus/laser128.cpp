@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_LASER128 = &device_creator<a2bus_laser128_device>;
+const device_type A2BUS_LASER128 = device_creator<a2bus_laser128_device>;
 
 MACHINE_CONFIG_FRAGMENT( a2laser128 )
 MACHINE_CONFIG_END

@@ -10,13 +10,16 @@
 
 #include "emu.h"
 #include "cb2snd.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_CB2_SOUND_DEVICE = &device_creator<pet_userport_cb2_sound_device>;
+const device_type PET_USERPORT_CB2_SOUND_DEVICE = device_creator<pet_userport_cb2_sound_device>;
 
 MACHINE_CONFIG_FRAGMENT( cb2snd )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

@@ -104,7 +104,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
+const device_type ISA8_CGA_FILETTO = device_creator<isa8_cga_filetto_device>;
 
 //-------------------------------------------------
 //  isa8_cga_filetto_device - constructor
@@ -145,7 +145,7 @@ private:
 
 
 /* for superimposing CGA over a different source video (i.e. tetriskr) */
-const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
+const device_type ISA8_CGA_TETRISKR = device_creator<isa8_cga_tetriskr_device>;
 
 //-------------------------------------------------
 //  isa8_cga_tetriskr_device - constructor

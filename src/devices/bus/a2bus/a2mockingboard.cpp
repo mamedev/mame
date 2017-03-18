@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "a2mockingboard.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -29,9 +30,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MOCKINGBOARD = &device_creator<a2bus_mockingboard_device>;
-const device_type A2BUS_PHASOR = &device_creator<a2bus_phasor_device>;
-const device_type A2BUS_ECHOPLUS = &device_creator<a2bus_echoplus_device>;
+const device_type A2BUS_MOCKINGBOARD = device_creator<a2bus_mockingboard_device>;
+const device_type A2BUS_PHASOR = device_creator<a2bus_phasor_device>;
+const device_type A2BUS_ECHOPLUS = device_creator<a2bus_echoplus_device>;
 
 MACHINE_CONFIG_FRAGMENT( mockingboard )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)

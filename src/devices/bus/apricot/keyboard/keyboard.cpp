@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD_INTERFACE = &device_creator<apricot_keyboard_bus_device>;
+const device_type APRICOT_KEYBOARD_INTERFACE = device_creator<apricot_keyboard_bus_device>;
 
 
 //**************************************************************************

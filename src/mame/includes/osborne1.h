@@ -6,19 +6,21 @@
  *
  ****************************************************************************/
 
-#ifndef OSBORNE1_H_
-#define OSBORNE1_H_
+#ifndef MAME_INCLUDES_OSBORNE1_H
+#define MAME_INCLUDES_OSBORNE1_H
 
-#include "cpu/z80/z80.h"
-
-#include "sound/speaker.h"
+#pragma once
 
 #include "bus/ieee488/ieee488.h"
+
+#include "cpu/z80/z80.h"
 
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+
+#include "sound/spkrdev.h"
 
 #include "video/mc6845.h"
 
@@ -187,4 +189,4 @@ protected:
 	required_region_ptr<u8>         m_p_nuevo;
 };
 
-#endif /* OSBORNE1_H_ */
+#endif // MAME_INCLUDES_OSBORNE1_H

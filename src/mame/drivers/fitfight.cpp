@@ -84,10 +84,14 @@ Stephh's notes :
 */
 
 #include "emu.h"
+#include "includes/fitfight.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
-#include "includes/fitfight.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER( fitfight_state::hotmindff_unk_r )
 {

@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PAULA_8364 = &device_creator<paula_8364_device>;
+const device_type PAULA_8364 = device_creator<paula_8364_device>;
 
 
 //*************************************************************************

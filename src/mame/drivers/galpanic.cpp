@@ -66,21 +66,24 @@ Stephh's additional notes :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/galpanic.h"
+#include "includes/galpnipt.h"
 #include "includes/kaneko16.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
-#include "includes/galpanic.h"
-#include "includes/galpnipt.h"
+#include "speaker.h"
+
 
 void galpanic_state::machine_start()
 {
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-void galpanic_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(galpanic_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -240,7 +243,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galpanic_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)

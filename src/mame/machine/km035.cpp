@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "km035.h"
+#include "speaker.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 
@@ -33,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type KM035 = &device_creator<km035_device>;
+const device_type KM035 = device_creator<km035_device>;
 
 ROM_START( km035 )
 	ROM_REGION (0x800, KM035_CPU_TAG, 0)

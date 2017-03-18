@@ -135,7 +135,7 @@ uint32_t xmen_state::screen_update_xmen6p_right(screen_device &screen, bitmap_in
 }
 
 /* my lefts and rights are mixed up in several places.. */
-void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 {
 	// rising edge
 	if (state)

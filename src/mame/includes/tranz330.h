@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#pragma once
-
 #ifndef VERIFONE_TRANZ330_H
 #define VERIFONE_TRANZ330_H
 
-// single-driver build must have emu.h here
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -15,7 +13,7 @@
 #include "machine/msm6242.h"
 #include "machine/roc10937.h"
 #include "bus/rs232/rs232.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "machine/clock.h"
 
 #define CPU_TAG     "cpu"

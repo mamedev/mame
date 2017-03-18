@@ -18,9 +18,12 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "sound/s14001a.h"
+#include "speaker.h"
+
 #include "st_mp200.lh"
 
 #define S14001_CLOCK                (25e5)

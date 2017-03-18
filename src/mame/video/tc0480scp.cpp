@@ -144,12 +144,13 @@ Control registers
 #include "emu.h"
 #include "tc0480scp.h"
 #include "video/taito_helper.h"
+#include "screen.h"
 
 #define TC0480SCP_RAM_SIZE 0x10000
 #define TC0480SCP_TOTAL_CHARS 256
 
 
-const device_type TC0480SCP = &device_creator<tc0480scp_device>;
+const device_type TC0480SCP = device_creator<tc0480scp_device>;
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),

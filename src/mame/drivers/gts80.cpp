@@ -27,6 +27,7 @@ ToDO:
 #include "emu.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
+#include "speaker.h"
 #include "gts80.lh"
 
 class gts80_state : public genpin_class

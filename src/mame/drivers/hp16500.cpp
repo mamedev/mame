@@ -49,8 +49,10 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
 #include "machine/mc68681.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAINCPU_TAG "maincpu"
 #define CRTC_TAG    "crtc"
