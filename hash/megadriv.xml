@@ -5496,6 +5496,23 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="bullvsblj" cloneof="bullvsbl">
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20017"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G"/>
+			<feature name="u1" value="EM200017"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="bullvslaj" cloneof="bullvsla">
 		<description>NBA Pro Basketball - Bulls Vs Lakers (Jpn)</description>
 		<year>1993</year>
@@ -9748,20 +9765,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!--
 Confirmed dump but no pcb pic
 -->
-
-	<software name="bullvsblj" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts Victor</publisher>
-		<info name="serial" value="EM20017"/>
-		<info name="release" value="19930730"/>
-		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="shikinjo">
 		<description>Shikinjoh (Jpn)</description>
