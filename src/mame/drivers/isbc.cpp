@@ -60,7 +60,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
+//	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 protected:
@@ -218,11 +218,13 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 		m_pic_1->ir7_w(0);
 }
 
+#if 0
 WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 {
 	m_uart8274->m1_r(); // always set
 	m_pic_0->ir6_w(state);
 }
+#endif
 
 static MACHINE_CONFIG_START( isbc86, isbc_state )
 	/* basic machine hardware */
@@ -362,7 +364,8 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+//	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 #endif
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
