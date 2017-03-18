@@ -9730,6 +9730,23 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!--
+Confirmed dump but no pcb pic
+-->
+
+	<software name="bullvsblj" cloneof="bullvsbl">
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20017"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!--
 Old scrambled/interleaved dumps.
@@ -20128,20 +20145,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba live 98 (usa).bin" size="2097152" crc="23473a8a" sha1="89b98867c7393371a364de58ba6955e0798fa10f" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bullvsblj" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts Victor</publisher>
-		<info name="serial" value="EM20017"/>
-		<info name="release" value="19930730"/>
-		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
