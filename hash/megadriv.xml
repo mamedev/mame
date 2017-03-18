@@ -25,7 +25,6 @@
     SIDE POCKET                         JAPAN/USA   conflict in current info
     SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
     SUMISEI HOME TANMATSU               JAPAN
-    TOM & JERRY                         JAPAN
     VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI                         JAPAN
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
@@ -9758,6 +9757,20 @@ Confirmed dump but no pcb pic
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerryj" cloneof="tomjerry">
+		<description>Tom and Jerry - Frantic Antics (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-166013"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="トムとジェリー"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="3479ee6b" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
