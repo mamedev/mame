@@ -66,7 +66,7 @@
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
 
-//#define VERBOSE (LOG_READ|LOG_SETUP|LOG_INT|LOG_TX|LOG_RCV)
+//#define VERBOSE  (LOG_INT|LOG_READ|LOG_SETUP|LOG_TX|LOG_CMD) //(LOG_SETUP|LOG_INT|LOG_CMD|LOG_DCD|LOG_CTS|LOG_TX)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
@@ -149,7 +149,8 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_out_txdrqa_cb(*this),
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
-	m_variant(variant)
+    m_variant(variant),
+	m_cputag("maincpu")
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -179,7 +180,8 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 	m_out_txdrqa_cb(*this),
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
-	m_variant(TYPE_Z80SIO)
+	m_variant(TYPE_Z80SIO),
+	m_cputag("maincpu")
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -224,6 +226,7 @@ void z80sio_device::device_start()
 
 	// state saving
 	save_item(NAME(m_int_state));
+	save_item(NAME(m_int_source));
 }
 
 
@@ -244,23 +247,21 @@ void z80sio_device::device_reset()
 int z80sio_device::z80daisy_irq_state()
 {
 	int state = 0;
-	int i;
 
-
-	LOGINT("%s %s A:%d%d%d%d B:%d%d%d%d ",FUNCNAME, tag(),
-			m_int_state[0], m_int_state[1], m_int_state[2], m_int_state[3],
-			m_int_state[4], m_int_state[5], m_int_state[6], m_int_state[7]);
+	LOGINT("%s %s Hi->Lo:%d%d%d%d%d%d ", tag(), FUNCNAME,
+			m_int_state[0], m_int_state[1], m_int_state[2],
+			m_int_state[3], m_int_state[4], m_int_state[5]);
 
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (auto & elem : m_int_state)
 	{
 		// if we're servicing a request, don't indicate more interrupts
-		if (m_int_state[i] & Z80_DAISY_IEO)
+		if (elem & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-		state |= m_int_state[i];
+		state |= elem;
 	}
 
 	LOGINT("Interrupt State %u\n", state);
@@ -274,31 +275,29 @@ int z80sio_device::z80daisy_irq_state()
 //-------------------------------------------------
 int z80sio_device::z80daisy_irq_ack()
 {
-	int i;
+    // default irq vector is -1 for 68000 but 0 for z80 for example...
+    int ret = owner()->subdevice<cpu_device>(m_cputag)->default_irq_vector();
 
-	LOGINT("%s %s \n",FUNCNAME, tag());
-
+    LOGINT("%s %s \n",tag(), FUNCNAME);
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (auto & elem : m_int_state)
 	{
 		// find the first channel with an interrupt requested
-		if (m_int_state[i] & Z80_DAISY_INT)
+		if (elem & Z80_DAISY_INT)
 		{
-			// clear interrupt, switch to the IEO state, and update the IRQs
-			m_int_state[i] = Z80_DAISY_IEO;
+			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			m_chanA->m_rr0 &= ~z80sio_channel::RR0_INTERRUPT_PENDING;
+			LOGINT(" - Found an INT request, ");
+            LOGINT("returning RR2: %02x\n", m_chanB->m_rr2 );
 			check_interrupts();
-
-			LOGINT("%s %s %02x\n",FUNCNAME, tag(), m_chanB->m_rr2);
-
-			return m_chanB->m_rr2;
+            return m_chanB->m_rr2;
 		}
 	}
-
-	LOGINT("z80sio_irq_ack: failed to find an interrupt to ack!\n");
+    ret = m_chanB->m_rr2;
+	LOGINT(" - failed to find an interrupt to ack, returning default IRQ vector: %02x\n", ret );
 	logerror("z80sio_irq_ack: failed to find an interrupt to ack!\n");
 
-	return m_chanB->m_rr2;
+    return ret;
 }
 
 
@@ -307,24 +306,27 @@ int z80sio_device::z80daisy_irq_ack()
 //-------------------------------------------------
 void z80sio_device::z80daisy_irq_reti()
 {
-	int i;
+	LOGINT("%s %s \n",tag(), FUNCNAME);
 
-	LOGINT("%s %s \n",FUNCNAME, tag());
+	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
+    {
+        LOGINT(" - I8274 and UPD7201 lacks RETI detection, no action taken\n");
+        return;
+    }
 
 	// loop over all interrupt sources
-	for (i = 0; i < 8; i++)
+	for (auto & elem : m_int_state)
 	{
-		// find the first channel with an IEO pending
-		if (m_int_state[i] & Z80_DAISY_IEO)
+		// find the first channel with an interrupt requested
+		if (elem & Z80_DAISY_IEO)
 		{
 			// clear the IEO state and update the IRQs
-			m_int_state[i] &= ~Z80_DAISY_IEO;
+			elem &= ~Z80_DAISY_IEO;
 			check_interrupts();
 			return;
 		}
 	}
-
-	//logerror("z80sio_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	LOGINT("z80sio_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 
@@ -354,70 +356,104 @@ void z80sio_device::reset_interrupts()
 	check_interrupts();
 }
 
-
-//-------------------------------------------------
-//  trigger_interrupt - TODO: needs attention for SIO
-//-------------------------------------------------
-void z80sio_device::trigger_interrupt(int index, int state)
+int z80sio_device::get_interrupt_prio(int index, int type)
 {
-	uint8_t vector = m_chanB->m_wr2;
-	int priority;
+    int prio_level = -1;
+    int priority = -1;
 
-	LOGINT("%s %s \n",FUNCNAME, tag());
+//    LOGINT("prio_level: %02x priority:%02x ", prio_level, priority);
+    if ((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
+	{
+        /* These CPU variants use Bit 2 of WR2 of Channnel A to determine the priority Hi to Lo:
+           0: RxA TxA RxB TxB ExtA ExtB 
+           1: RxA RxB TxA TxB ExtA ExtB */
+        switch(type)
+        {
+        case z80sio_channel::INT_RECEIVE:
+        case z80sio_channel::INT_SPECIAL:  prio_level = z80sio_channel::INT_RCV_SPC_PRI_LVL;  break; // 0
+        case z80sio_channel::INT_TRANSMIT: prio_level = z80sio_channel::INT_TRANSMIT_PRI_LVL; break; // 1
+        case z80sio_channel::INT_EXTERNAL: prio_level = z80sio_channel::INT_EXTERNAL_PRI_LVL; break; // 2
+        default:
+            logerror("Bad interrupt source being prioritized!");
+            return -1;
+        }
+        // Assume that the PRIORITY bit is set
+        priority = (prio_level * 2) + index;
 
+        // Check if it actually was cleared
+		if ( (m_chanA->m_wr2 & z80sio_channel::WR2_PRIORITY) == 0)
+		{
+            // Adjust priority if needed, only affects TxA and RxB
+			if (index == CHANNEL_A && type == z80sio_channel::INT_TRANSMIT )
+                priority--;
+			else if (index == CHANNEL_B && type == z80sio_channel::INT_RECEIVE )
+                priority++;
+		}
+    }
+    else // Plain old z80sio
+    {
+		priority = (index << 2) | type;
+    }
+    return priority;
+}
+
+/* 
+   8274: "RR2 contains the vector which gets modified to indicate the source of interrupt. However, the state of
+   the vector does not change if no new interrupts are generated. The contents of RR2 are only changed when
+   a new interrupt is generated. In order to get the correct information, RR2 must be read only after an
+   interrrupt is generated, otherwise it will indicate the previous state."
+   8274: "If RR2 is specified but not read, no internal interrupts, regardless of priority, are accepted."
+*/
+uint8_t z80sio_device::modify_vector(int index, int type)
+{
+    uint8_t vector = m_chanB->m_wr2;
 	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
 	{
-		int prio_level = 0;
-		switch(state)
-		{
-			case z80sio_channel::INT_TRANSMIT:
-				prio_level = 1;
-				break;
-			case z80sio_channel::INT_RECEIVE:
-			case z80sio_channel::INT_SPECIAL:
-				prio_level = 0;
-				break;
-			case z80sio_channel::INT_EXTERNAL:
-				prio_level = 2;
-				break;
-		}
-
-		if(m_chanA->m_wr2 & z80sio_channel::WR2_PRIORITY)
-		{
-			priority = (prio_level * 2) + index;
-		}
-		else
-		{
-			priority = (prio_level == 2) ? index + 4 : ((index * 2) + prio_level);
-		}
 		if (m_chanB->m_wr1 & z80sio_channel::WR1_STATUS_VECTOR)
 		{
-			vector = (!index << 2) | state;
+			vector = (!index << 2) | type;
 			if((m_chanA->m_wr1 & 0x18) == z80sio_channel::WR2_MODE_8086_8088)
 			{
-				vector = (m_chanB->m_wr2 & 0xf8) | vector;
+				vector = (m_chanB->m_wr2 & 0xf8) | vector; // m_chanB->m_wr2;
 			}
 			else
 			{
-				vector = (m_chanB->m_wr2 & 0xe3) | (vector << 2);
+				vector = (m_chanB->m_wr2 & 0xe3) | (vector << 2); //(m_chanB->m_wr2 << 2);
 			}
 		}
 	}
 	else
 	{
-		priority = (index << 2) | state;
 		if (m_chanB->m_wr1 & z80sio_channel::WR1_STATUS_VECTOR)
 		{
 			// status affects vector
-			vector = (m_chanB->m_wr2 & 0xf1) | (!index << 3) | (state << 1);
+			vector = (m_chanB->m_wr2 & 0xf1) | (!index << 3) | (type << 1);
 		}
 	}
+    return vector;
+}
+
+//-------------------------------------------------
+//  trigger_interrupt - TODO: needs attention for SIO
+//-------------------------------------------------
+void z80sio_device::trigger_interrupt(int index, int type)
+{
+	uint8_t priority = get_interrupt_prio(index, type);
+    uint8_t vector = modify_vector(index, type);
+
+	LOGINT("%s %s Chan:%c Type:%s\n", tag(), FUNCNAME, 'A' + index, std::array<char const *, 4>
+           {{"INT_TRANSMIT", "INT_EXTERNAL", "INT_RECEIVE", "INT_SPECIAL"}}[type]);
+    LOGINT(" - Priority:%02x Vector:%02x\n", priority, vector);
+
 	// update vector register
 	m_chanB->m_rr2 = vector;
 
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
 	m_chanA->m_rr0 |= z80sio_channel::RR0_INTERRUPT_PENDING;
+
+	// remember the source and channel
+	m_int_source[priority] = (type & 0xff) | (index << 8);
 
 	// check for interrupt
 	check_interrupts();
@@ -430,7 +466,10 @@ void z80sio_device::trigger_interrupt(int index, int state)
 int z80sio_device::m1_r()
 {
 	LOGINT("%s %s \n",FUNCNAME, tag());
-	return z80daisy_irq_ack();
+	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
+        return 0;
+    else
+        return z80daisy_irq_ack();
 }
 
 
@@ -510,7 +549,6 @@ z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, Z80SIO_CHANNEL, "Z80 SIO channel", tag, owner, clock, "z80sio_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
-		m_rx_fifo(-1),
 		m_rx_clock(0),
 		m_rx_first(0),
 		m_rx_break(0),
@@ -529,12 +567,6 @@ z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, d
 		// Reset all registers
 		m_rr0 = m_rr1 = m_rr2 = 0;
 		m_wr0 = m_wr1 = m_wr2 = m_wr3 = m_wr4 = m_wr5 = m_wr6 = m_wr7 = 0;
-
-	for (int i = 0; i < 3; i++)
-	{
-		m_rx_data_fifo[i] = 0;
-		m_rx_error_fifo[i] = 0;
-	}
 }
 
 
@@ -560,10 +592,7 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_wr5));
 	save_item(NAME(m_wr6));
 	save_item(NAME(m_wr7));
-	save_item(NAME(m_rx_data_fifo));
-	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_error));
-	save_item(NAME(m_rx_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));
@@ -719,13 +748,6 @@ void z80sio_channel::rcv_callback()
 		LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd);
 		receive_register_update_bit(m_rxd);
 	}
-#if 0
-	else
-	{
-		LOGBIT("%s() \"%s \"Channel %c Received Data Bit but receiver is disabled\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
-		logerror("Z80SIO %s() \"%s \"Channel %c Received data dit but receiver is disabled\n", __func__, m_owner->tag(), 'A' + m_index);
-	}
-#endif
 }
 
 
@@ -871,27 +893,77 @@ uint8_t z80sio_channel::do_sioreg_rr0()
 	LOGR("%s %s\n",FUNCNAME, tag());
 	return m_rr0;
 }
+
 /*
  * This register contains the Special Receive condition status bits and Residue
  * codes for the I-Field in the SDLC Receive Mode. */
 uint8_t z80sio_channel::do_sioreg_rr1()
 {
 	LOGR("%s %s\n",FUNCNAME, tag());
+	// channel B only, channel A returns 0
+	if (m_index == z80sio_device::CHANNEL_A) return 0;
+
 	return m_rr1;
 }
-/*
- * This register contains the interrupt vector written into WR2 if the Status
-Affects Vector control bit is not set. If the control bit is set, it contains the
-modified vector listed in the Status Affects Vector paragraph of the Write
-Register 1 section. When this register is read, the vector returned is modi-
-fied by the highest priority interrupting condition at the time of the read. If
-no interrupts are pending, the vector is modified with V3 = 0, V2 = 1, and
-V1 = 1. This register is read only through Channel B. */
+
+/* Z80-SIO Technical Manual: "This register contains the interrupt vector
+   written into WR2 if the Status Affects Vector control bit is not set.
+   If the control bit is set, it contains the modified vector listed in
+   the Status Affects Vector paragraph of the Write Register 1 section.
+   When this register is read, the vector returned is modified by the
+   highest priority interrupting condition at the time of the read. If
+   no interrupts are pending, the vector is modified with V3 = 0, V2 = 1, and
+   V1 = 1. This register is read only through Channel B."
+   
+   Intel 8274 datasheet: "RR2 - Channel B: Interrupt Vector - Contains the interrupt
+   vector programmed in into WR2. If the status affects vector mode is selected (WR1:D2),
+   it containes the modified vector for the highest priority interrupt pending.
+   If no interrupts are pending the variable bits in the vector are set to one."
+
+   NEC upd7201 MPSC2 Technical Manual: "When the MPSC2 is used in vectored mode, the
+   contents of this register are placed on the bus during the appropriate portion of 
+   interrupt acknowledge sequence. You can read the value of CR2B at any time.
+   This is particularly useful in determining the cause of an interrup when using the
+   MPSC2 in Non-vectored mode."
+*/
 uint8_t z80sio_channel::do_sioreg_rr2()
 {
-	LOGR("%s %s\n",FUNCNAME, tag());
-	// channel B only
-	return m_index == z80sio_device::CHANNEL_B ? m_rr2 : 0;
+	LOGINT("%s %s Chan:%c\n", tag(), FUNCNAME, 'A' + m_index);
+	// channel B only, channel A returns 0
+	if (m_index == z80sio_device::CHANNEL_A) return 0;
+
+    LOGINT(" - Channel B so we might need to update the vector modification\n");
+	// Assume the unmodified vector
+	m_rr2 = m_uart->m_chanB->m_wr2;
+
+    if((m_variant == z80sio_device::TYPE_I8274) || (m_variant == z80sio_device::TYPE_UPD7201))
+    {
+        int i = 0;
+        LOGINT(" - 8274 or 7201 requires special care\n");
+
+        // loop over all interrupt sources
+        for (auto & elem : m_uart->m_int_state)
+        {
+            // find the first channel with an interrupt requested
+            if (elem & Z80_DAISY_INT)
+            {
+                LOGINT(" - Checking an INT source %d\n", i);
+                m_rr2 = m_uart->modify_vector((m_uart->m_int_source[i] >> 8) & 1, m_uart->m_int_source[i] & 3);
+                LOGINT(" - Found an INT request to ack while reading RR2\n");
+                elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
+                m_uart->check_interrupts();
+                break;
+            }
+			i++;
+		}
+        // If no pending interrupt were found set variable bits to ones.
+        if (i >= 6)
+        {
+            m_rr2 |= 0x1F;
+            m_uart->m_chanA->m_rr0 &= ~z80sio_channel::RR0_INTERRUPT_PENDING;
+        }
+	}
+	return m_rr2;
 }
 
 
@@ -959,44 +1031,78 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	switch (data & WR0_COMMAND_MASK)
 	{
 	case WR0_NULL:
-		LOG("Z80SIO \"%s\" Channel %c : Null\n", m_owner->tag(), 'A' + m_index);
+		LOGCMD("%s %s Ch:%c : Null command\n", FUNCNAME, tag(), 'A' + m_index);
+		break;
+	case WR0_SEND_ABORT:
+		LOGCMD("%s %s Ch:%c : Send abort command - not implemented\n", FUNCNAME, tag(), 'A' + m_index);
 		break;
 	case WR0_RESET_EXT_STATUS:
 		// reset external/status interrupt
+
 		m_rr0 &= ~(RR0_DCD | RR0_SYNC_HUNT | RR0_CTS | RR0_BREAK_ABORT);
 		// release the latch
+
 		m_rx_rr0_latch = 0;
 		// update register to reflect wire values TODO: Check if this will fire new interrupts
 		if (!m_dcd) m_rr0 |= RR0_DCD;
 		if (m_sync) m_rr0 |= RR0_SYNC_HUNT;
 		if (m_cts)  m_rr0 |= RR0_CTS;
 
-		LOG("Z80SIO \"%s\" Channel %c : Reset External/Status Interrupt\n", m_owner->tag(), 'A' + m_index);
+        // Clear any pending External interrupt
+        m_uart->m_int_state[m_index == z80sio_device::CHANNEL_A ? 4 : 5] = 0;
+
+		LOGINT("%s %s Ch:%c : Reset External/Status Interrupt\n", FUNCNAME, tag(), 'A' + m_index);
 		break;
 	case WR0_CHANNEL_RESET:
 		// channel reset
-		LOG("Z80SIO \"%s\" Channel %c : Channel Reset\n", m_owner->tag(), 'A' + m_index);
+		LOGCMD("%s %s Ch:%c : Channel Reset\n", FUNCNAME, tag(), 'A' + m_index);
 		device_reset();
 		break;
 	case WR0_ENABLE_INT_NEXT_RX:
 		// enable interrupt on next receive character
-		LOG("Z80SIO \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", m_owner->tag(), 'A' + m_index);
+		LOGINT("%s %s Ch:%c : Enable Interrupt on Next Received Character\n", FUNCNAME, tag(), 'A' + m_index);
 		m_rx_first = 1;
 		break;
 	case WR0_RESET_TX_INT:
 		// reset transmitter interrupt pending
-		LOG("Z80SIO \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index);
-		logerror("Z80SIO \"%s\" Channel %c : unsupported command: Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index);
+		{
+            uint8_t priority = 3; // Assume TxB
+            // Check if it is TxA
+            if (m_index == z80sio_device::CHANNEL_A)
+            {
+                // Check if priority bit is cleared
+                priority = (m_uart->m_chanA->m_wr2 & z80sio_channel::WR2_PRIORITY) == 0 ? 1 : 2;
+            }
+            m_uart->m_int_state[priority] = 0;
+            LOGINT("%s %s Ch:%c : Reset TX Interrupt, priority:%d\n", FUNCNAME, tag(), 'A' + m_index, priority);
+        }
+		m_uart->check_interrupts();
+		LOGCMD("%s %s Ch:%c : Reset Transmitter Interrupt Pending\n", FUNCNAME, tag(), 'A' + m_index);
 		break;
 	case WR0_ERROR_RESET:
 		// error reset
-		LOG("Z80SIO \"%s\" Channel %c : Error Reset\n", m_owner->tag(), 'A' + m_index);
+		LOGCMD("%s %s Ch:%c : Error Reset\n", FUNCNAME, tag(), 'A' + m_index);
 		m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
 		break;
 	case WR0_RETURN_FROM_INT:
-		// return from interrupt
-		LOG("Z80SIO \"%s\" Channel %c : Return from Interrupt\n", m_owner->tag(), 'A' + m_index);
-		m_uart->z80daisy_irq_reti();
+		LOGINT("%s %s Ch:%c : Return from interrupt\n", FUNCNAME, tag(), 'A' + m_index);
+        {
+            int found = 0;
+            // loop over all interrupt sources
+            for (auto & elem : m_uart->m_int_state)
+            {
+                // find the first channel with an interrupt requested
+                if (elem & (Z80_DAISY_IEO))
+                {
+                    // clear the IEO state and update the IRQs
+                    elem &= ~(Z80_DAISY_IEO);
+                    m_uart->check_interrupts();
+                    found = 1;
+                    break;
+                }
+            }
+            LOGINT(" - %s\n", found == 0 ? "failed to find an interrupt to clear IEO on!" : "cleared IEO");
+        }
 		break;
 	default:
 		LOG("Z80SIO \"%s\" Channel %c : Unsupported WR0 command %02x mask %02x\n", m_owner->tag(), 'A' + m_index, data, WR0_REGISTER_MASK);
@@ -1039,14 +1145,6 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
 {
 	m_wr2 = data;
-	if (m_index == z80sio_device::CHANNEL_B)
-	{
-		if (m_wr1 & z80sio_channel::WR1_STATUS_VECTOR)
-			m_rr2 = ( m_rr2 & 0x0e ) | ( m_wr2 & 0xF1);
-		else
-			m_rr2 = m_wr2;
-	}
-	m_uart->check_interrupts();
 	LOG("Z80SIO \"%s\" Channel %c : Interrupt Vector %02x\n", m_owner->tag(), 'A' + m_index, data);
 }
 
@@ -1129,18 +1227,15 @@ uint8_t z80sio_channel::data_read()
 {
 	uint8_t data = 0;
 
-	if (m_rx_fifo >= 0)
+	if (!m_rx_data_fifo.empty())
 	{
 		// load data from the FIFO
-		data = m_rx_data_fifo[m_rx_fifo];
+		data = m_rx_data_fifo.dequeue();
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo.dequeue();
 
-		// decrease FIFO pointer
-		m_rx_fifo--;
-
-		if (m_rx_fifo < 0)
+		if (m_rx_data_fifo.empty())
 		{
 			// no more characters available in the FIFO
 			m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
@@ -1189,7 +1284,7 @@ void z80sio_channel::receive_data(uint8_t data)
 {
 	LOGRCV("%s(%02x) %s:%c\n",FUNCNAME, data, tag(), 'A' + m_index);
 
-	if (m_rx_fifo == 2)
+	if (m_rx_data_fifo.full())
 	{
 		LOG("  Overrun detected\n");
 		// receive overrun error detected
@@ -1212,12 +1307,10 @@ void z80sio_channel::receive_data(uint8_t data)
 	}
 	else
 	{
-		m_rx_fifo++;
+		// store received character and error status into FIFO
+		m_rx_data_fifo.enqueue(data);
+		m_rx_error_fifo.enqueue(m_rx_error);
 	}
-
-	// store received character and error status into FIFO
-	m_rx_data_fifo[m_rx_fifo] = data;
-	m_rx_error_fifo[m_rx_fifo] = m_rx_error;
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
 
