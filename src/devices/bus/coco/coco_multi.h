@@ -61,7 +61,6 @@ protected:
 
 private:
 	// device references
-	cococart_slot_device *m_owner;
 	std::array<cococart_slot_device *, 4> m_slots;
 
 	// internal state
