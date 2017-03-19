@@ -51,7 +51,7 @@ protected:
 	// wrapper for setting the cart line
 	void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
 	{
-		m_owner->cart_set_line(which, value);
+		m_owner->set_line_value(which, value);
 	}
 	void cart_set_line(cococart_slot_device::line which, bool value)
 	{
