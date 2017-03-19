@@ -43,7 +43,9 @@ public:
 		m_pic_0(*this, "pic_0"),
 		m_pic_1(*this, "pic_1"),
 		m_centronics(*this, "centronics"),
-		m_cent_status_in(*this, "cent_status_in")
+		m_cent_status_in(*this, "cent_status_in"),
+		m_bios(*this, "user1"),
+		m_biosram(*this, "biosram")
 	{
 	}
 
@@ -55,6 +57,8 @@ public:
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
 	optional_device<input_buffer_device> m_cent_status_in;
+	optional_memory_region m_bios;
+	optional_shared_ptr<u16> m_biosram;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
@@ -63,8 +67,13 @@ public:
 //	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	DECLARE_WRITE8_MEMBER(upperen_w);
+	DECLARE_READ16_MEMBER(bioslo_r);
+	DECLARE_WRITE16_MEMBER(bioslo_w);
 protected:
 	void machine_reset() override;
+private:
+	bool m_upperen;
 };
 
 void isbc_state::machine_reset()
@@ -76,6 +85,7 @@ void isbc_state::machine_reset()
 	}
 	if(m_uart8251)
 		m_uart8251->write_cts(0);
+	m_upperen = false;
 }
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -141,6 +151,7 @@ static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00c8, 0x00cf) AM_WRITE8(upperen_w, 0xff00)
 	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274N_device, cd_ba_r, cd_ba_w, 0x00ff)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
@@ -156,7 +167,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
+//	AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -216,6 +228,26 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 
 	if(data & 0x80)
 		m_pic_1->ir7_w(0);
+}
+
+WRITE8_MEMBER(isbc_state::upperen_w)
+{
+	m_upperen = true;
+}
+
+READ16_MEMBER(isbc_state::bioslo_r)
+{
+	if(m_upperen)
+		return m_biosram[offset];
+	else if(offset >= 0x8000)
+		return m_bios->as_u16(offset - 0x8000);
+	return 0xffff;
+}
+
+WRITE16_MEMBER(isbc_state::bioslo_w)
+{
+	if(m_upperen)
+		COMBINE_DATA(&m_biosram[offset]);
 }
 
 #if 0
