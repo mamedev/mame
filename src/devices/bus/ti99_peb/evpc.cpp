@@ -37,9 +37,7 @@
 
 #include "emu.h"
 #include "evpc.h"
-
 #include "speaker.h"
-
 
 #define EVPC_CRU_BASE 0x1400
 
@@ -57,10 +55,14 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_novram_accessed(false),
 	m_palette_accessed(false),
 	m_RAMEN(false),
+	m_sound_accessed(false),
+	m_video_accessed(false),
+	m_intlevel(0),
 	m_dsrrom(nullptr),
 	m_novram(nullptr),
 	m_video(*this, VDP_TAG),
-	m_sound(*this, TISOUNDCHIP_TAG)
+	m_sound(*this, TISOUNDCHIP_TAG),
+	m_colorbus(*this, COLORBUS_TAG)
 {
 }
 
@@ -394,6 +396,7 @@ void snug_enhanced_video_device::device_start()
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_sound_accessed));
 	save_item(NAME(m_video_accessed));
+	save_item(NAME(m_intlevel));
 }
 
 void snug_enhanced_video_device::device_reset()
@@ -418,8 +421,16 @@ void snug_enhanced_video_device::device_stop()
 */
 WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 {
-	if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
-	else m_slot->lcp_line(state);
+	// This method is frequently called without level change, so we only
+	// react on changes
+	if (state != m_intlevel)
+	{
+		m_intlevel = state;
+		if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
+		else m_slot->lcp_line(state);
+
+		if (state!=0) m_colorbus->poll();
+	}
 }
 
 ROM_START( ti99_evpc )
@@ -438,6 +449,10 @@ MACHINE_CONFIG_FRAGMENT( ti99_evpc )
 	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(snug_enhanced_video_device, ready_line) )
+
+	// Mouse connected to the color bus of the v9938
+	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+
 MACHINE_CONFIG_END
 
 /*

@@ -618,7 +618,7 @@ inline void drcbe_x64::emit_smart_call_m64(x86code *&dst, x86code **target)
 drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device),
 		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0),
+		m_map(cache, 0xaaaaaaaa5555),
 		m_labels(cache),
 		m_log(nullptr),
 		m_sse41(false),

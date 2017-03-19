@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 
+#include "emu.h"
 #include "ie15.h"
 
 ie15_terminal_device::ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

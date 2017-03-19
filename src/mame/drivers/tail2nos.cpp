@@ -16,6 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
+#include "video/vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,7 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(sound_semaphore_r,sound_command_w,0x00ff)
-//  AM_RANGE(0xfff020, 0xfff023) V-System CRTC
+	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 //  AM_RANGE(0xfff030, 0xfff031) link comms
 ADDRESS_MAP_END
 
@@ -262,6 +263,8 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_K051316_OFFSETS(-89, -14)
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

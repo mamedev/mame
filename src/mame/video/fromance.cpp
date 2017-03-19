@@ -82,8 +82,6 @@ void fromance_state::init_common(  )
 	save_item(NAME(m_flipscreen_old));
 	save_item(NAME(m_scrollx_ofs));
 	save_item(NAME(m_scrolly_ofs));
-	save_item(NAME(m_crtc_register));
-	save_item(NAME(m_crtc_data));
 	save_pointer(NAME(m_local_paletteram.get()), 0x800 * 2);
 }
 
@@ -263,7 +261,7 @@ TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
 // TODO: guesswork, looks fully programmable
 void fromance_state::crtc_refresh()
 {
-	if(m_crtc_data[0] == 0) // sanity check
+	if (m_gga->reg(0) == 0) // sanity check
 		return;
 
 	rectangle visarea;
@@ -271,7 +269,7 @@ void fromance_state::crtc_refresh()
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
-	visarea.max_x = ((m_crtc_data[0]+1)*4) - 1;
+	visarea.max_x = ((m_gga->reg(0)+1)*4) - 1;
 	visarea.max_y = 240 - 1;
 
 	refresh = HZ_TO_ATTOSECONDS(60);
@@ -279,11 +277,9 @@ void fromance_state::crtc_refresh()
 	m_screen->configure(512, 256, visarea, refresh);
 }
 
-WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
+WRITE8_MEMBER(fromance_state::fromance_gga_data_w)
 {
-	m_crtc_data[m_crtc_register] = data;
-
-	switch (m_crtc_register)
+	switch (offset)
 	{
 		case 0x00:
 			crtc_refresh();
@@ -295,15 +291,9 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 			break;
 
 		default:
-			logerror("CRTC register %02X = %02X\n", m_crtc_register, data & 0xff);
+			logerror("CRTC register %02X = %02X\n", offset, data);
 			break;
 	}
-}
-
-
-WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
-{
-	m_crtc_register = data & 0x0f;
 }
 
 

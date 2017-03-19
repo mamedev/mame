@@ -777,9 +777,8 @@ void midway_ioasic_device::update_ioasic_irq()
 	uint16_t irqbits = 0x2000;
 	uint8_t new_state;
 
-	irqbits |= m_sound_irq_state;
-	if (m_reg[IOASIC_UARTIN] & 0x1000)
-		irqbits |= 0x1000;
+	irqbits |= m_sound_irq_state & 0xff;
+	irqbits |= m_reg[IOASIC_UARTIN] & 0x3f00;
 	if (fifo_state & 8)
 		irqbits |= 0x0008;
 	if (irqbits)
@@ -793,6 +792,8 @@ void midway_ioasic_device::update_ioasic_irq()
 		m_irq_state = new_state;
 		if (!m_irq_callback.isnull())
 			m_irq_callback(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		if (m_irq_state && (m_reg[IOASIC_UARTIN] & 0x1000))
+			logerror("IOASIC: Asserting IRQ INTCTRL=%04x INTSTAT=%04X\n", m_reg[IOASIC_INTCTL], m_reg[IOASIC_INTSTAT]);
 	}
 }
 
@@ -1042,6 +1043,12 @@ READ32_MEMBER( midway_ioasic_device::read )
 
 		case IOASIC_UARTIN:
 			m_reg[offset] &= ~0x1000;
+			if (result & 0x1000)
+				logerror("%06X:ioasic_r(%d) = %08X\n", machine().device("maincpu")->safe_pc(), offset, result);
+			// Add lf
+			if ((result & 0xff)==0x0d)
+				m_reg[offset] = 0x300a;
+			update_ioasic_irq();
 			break;
 
 		case IOASIC_SOUNDSTAT:
@@ -1087,7 +1094,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%06X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%08X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
 
 	return result;
 }
@@ -1103,8 +1110,18 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 
 WRITE8_MEMBER(midway_ioasic_device::serial_rx_w)
 {
-	m_reg[IOASIC_UARTIN] = data | 0x1000;
-	update_ioasic_irq();
+	// Break Detect        0x0100
+	// Frame Error         0x0200
+	// Overrun             0x0400
+	// Rx FIFO FULL        0x0800
+	// Rx Ready            0x1000
+	// Tx EMPTY            0x2000
+	// CTS IN              0x4000
+	// CTS OUT             0x8000
+	if (m_reg[IOASIC_UARTCONTROL] & 0x200) {
+		m_reg[IOASIC_UARTIN] = data | 0x3000;
+		update_ioasic_irq();
+	}
 
 }
 
@@ -1140,20 +1157,27 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				break;
 			break;
 
+		case IOASIC_UARTCONTROL:
+			logerror("%08X IOASIC uart control = %04X INTCTRL=%04x\n", machine().device("maincpu")->safe_pc(), data, m_reg[IOASIC_INTCTL]);
+			break;
+
 		case IOASIC_UARTOUT:
 			if (m_reg[IOASIC_UARTCONTROL] & 0x800)
 			{
 				/* we're in loopback mode -- copy to the input */
-				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
+				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x3000;
 				update_ioasic_irq();
 			}
 			else {
-				m_serial_tx_cb(data & 0xff);
+				m_serial_tx_cb(data);
+				m_reg[IOASIC_UARTIN] |= 0x2000;
+				update_ioasic_irq();
 				if (PRINTF_DEBUG) {
 					osd_printf_info("%c", data & 0xff);
 					logerror("%c", data & 0xff);
 				}
 			}
+			//logerror("IOASIC uart tx data = %04X\n", data);
 			break;
 
 		case IOASIC_SOUNDCTL:
@@ -1209,7 +1233,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* bit  7 = sound output buffer empty */
 			/* bit 14 = LED? */
 			if (LOG_IOASIC && ((oldreg ^ newreg) & 0x3ff6))
-				logerror("IOASIC int control = %04X\n", data);
+				logerror("IOASIC interrupt control = %04X\n", data);
 			update_ioasic_irq();
 			break;
 

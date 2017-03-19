@@ -296,8 +296,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, pipedrm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE(sound_command_w)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -596,8 +595,6 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 
 MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 {
-	int i;
-
 	m_pending_command = 0;
 	m_sound_command = 0;
 
@@ -612,10 +609,6 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_scrolly[1] = 0;
 	m_gfxreg = 0;
 	m_flipscreen = 0;
-	m_crtc_register = 0;
-
-	for (i = 0; i < 0x10; i++)
-		m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
@@ -645,6 +638,9 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipedrm)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
@@ -692,6 +688,9 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 

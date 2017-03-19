@@ -32,11 +32,11 @@
      - 4 internal expansion slots
     * Ports:
      - 1 composite video output for a color monitor
-     - 2 cassete interfaces
+     - 2 cassette interfaces
      - 1 RS-232C serial port
      - 1 parallel interface
     * Storage:
-     - Cassetes recorder
+     - Cassette recorder
      - Up to 4 external floppy drives: 8" (FD/DD, 1,1MB) or 5" 1/4
      - Up to 1 external 10 MB hard-drive
 

@@ -80,9 +80,11 @@
 #define A2D_IRQ_SHIFT       6
 #define VBLANK_IRQ_SHIFT    7
 
-// Not sure how duart interrupts are mapped
-#define UART1_IRQ_SHIFT     ZEUS2_IRQ_SHIFT
-#define UART2_IRQ_SHIFT     ZEUS2_IRQ_SHIFT
+// DUART mapped to int3 (map3 = 0x08)
+#define UART1_IRQ_SHIFT     ZEUS1_IRQ_SHIFT
+#define UART2_IRQ_SHIFT     ZEUS1_IRQ_SHIFT
+// PCI mapped to int2 (map2 = 0x10)
+#define PCI_IRQ_SHIFT       ZEUS2_IRQ_SHIFT
 
 /* static interrupts */
 #define GALILEO_IRQ_NUM         MIPS3_IRQ0
@@ -227,7 +229,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 				m_dcs->reset_w(CLEAR_LINE);
 			}
 		}
-		if (LOG_IRQ)
+		if ((changeData & RESET_IDE) || LOG_IRQ)
 			logerror("%s:board_ctrl_w write to CTRL_RESET offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	case CTRL_VSYNC_CLEAR:
@@ -828,6 +830,7 @@ DEVICE_INPUT_DEFAULTS_END
  *  Machine driver
  *
  *************************************/
+
 #define PCI_ID_NILE     ":pci:00.0"
 #define PCI_ID_9050     ":pci:0b.0"
 #define PCI_ID_IDE      ":pci:0c.0"
@@ -851,7 +854,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	MCFG_NVRAM_ADD_0FILL("rtc")
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x03, 0x0)
+	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(":", atlantis_state, ide_irq))
 
 	/* video hardware */

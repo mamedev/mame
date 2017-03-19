@@ -171,6 +171,7 @@ public:
 
 	// commonly-used pass-throughs
 	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
+	bool is_octal() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).is_octal() : false; }
 	device_t& device() const { return m_device; }
 
 	// hooks used by the rest of the system

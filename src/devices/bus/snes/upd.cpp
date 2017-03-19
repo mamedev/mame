@@ -387,9 +387,9 @@ void sns_rom_setadsp_device::speedup_addon_bios_access()
 	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
 	membank("dsp_data")->set_base(&m_dsp_data[0]);
 	// copy data in the correct format
-	for (int x = 0; x < 0x3fff; x++)
+	for (int x = 0; x < 0x4000; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
-	for (int x = 0; x < 0x07ff; x++)
+	for (int x = 0; x < 0x800; x++)
 		m_dsp_data[x] = (m_bios[0x10000 + x * 2] << 8) | m_bios[0x10000 + x * 2 + 1];
 }
 
