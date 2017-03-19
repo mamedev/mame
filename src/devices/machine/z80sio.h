@@ -72,12 +72,19 @@
 	MCFG_DEVICE_ADD(_tag, UPD7201N, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
+#define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
+	MCFG_DEVICE_ADD(_tag, I8274N, _clock) \
+	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
+
 /* Generic macros */
 #define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 
 #define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
 	devcb = &z80sio_device::set_out_int_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_Z80SIO_CPU(_cputag)                            \
+	z80sio_device::static_set_cputag(*device, _cputag);
 
 // Port A callbacks
 #define MCFG_Z80SIO_OUT_TXDA_CB(_devcb) \
@@ -212,6 +219,13 @@ protected:
 		INT_SPECIAL
 	};
 
+	enum
+	{
+	    INT_RCV_SPC_PRI_LVL  = 0,
+	    INT_TRANSMIT_PRI_LVL = 1,
+	    INT_EXTERNAL_PRI_LVL = 2
+	};
+
 	// Read registers
 	enum
 	{
@@ -256,30 +270,30 @@ protected:
 	};
 
 	enum
-	{                     // TODO: overload SIO functionality
-		RR2_INT_VECTOR_MASK   = 0xff, // SCC channel A, SIO channel B (special case)
-		RR2_INT_VECTOR_V1     = 0x02, // SIO (special case) /SCC Channel B
-		RR2_INT_VECTOR_V2     = 0x04, // SIO (special case) /SCC Channel B
-		RR2_INT_VECTOR_V3     = 0x08  // SIO (special case) /SCC Channel B
+	{
+		RR2_INT_VECTOR_MASK   = 0xff,
+		RR2_INT_VECTOR_V1     = 0x02,
+		RR2_INT_VECTOR_V2     = 0x04,
+		RR2_INT_VECTOR_V3     = 0x08
 	};
 
 	enum
 	{
-		WR0_REGISTER_MASK     = 0x07,
-		WR0_COMMAND_MASK      = 0x38,
-		WR0_NULL          = 0x00,
-		WR0_SEND_ABORT        = 0x08, // not supported
-		WR0_RESET_EXT_STATUS      = 0x10,
-		WR0_CHANNEL_RESET     = 0x18,
-		WR0_ENABLE_INT_NEXT_RX    = 0x20,
-		WR0_RESET_TX_INT      = 0x28, // not supported
-		WR0_ERROR_RESET       = 0x30,
-		WR0_RETURN_FROM_INT   = 0x38, // not supported
-		WR0_CRC_RESET_CODE_MASK   = 0xc0, // not supported
-		WR0_CRC_RESET_NULL    = 0x00, // not supported
-		WR0_CRC_RESET_RX      = 0x40, // not supported
-		WR0_CRC_RESET_TX      = 0x80, // not supported
-		WR0_CRC_RESET_TX_UNDERRUN = 0xc0  // not supported
+		WR0_REGISTER_MASK	= 0x07,
+		WR0_COMMAND_MASK	= 0x38,
+		WR0_NULL		= 0x00,
+		WR0_SEND_ABORT		= 0x08,
+		WR0_RESET_EXT_STATUS	= 0x10,
+		WR0_CHANNEL_RESET	= 0x18,
+		WR0_ENABLE_INT_NEXT_RX	= 0x20,
+		WR0_RESET_TX_INT	= 0x28,
+		WR0_ERROR_RESET		= 0x30,
+		WR0_RETURN_FROM_INT	= 0x38,
+		WR0_CRC_RESET_CODE_MASK = 0xc0,
+		WR0_CRC_RESET_NULL	= 0x00,
+		WR0_CRC_RESET_RX	= 0x40,
+		WR0_CRC_RESET_TX	= 0x80,
+		WR0_CRC_RESET_TX_UNDERRUN = 0xc0
 	};
 
 	enum
@@ -375,10 +389,9 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	uint8_t m_rx_data_fifo[3];    // receive data FIFO
-	uint8_t m_rx_error_fifo[3];   // receive error FIFO
+	util::fifo<uint8_t, 3> m_rx_data_fifo;
+	util::fifo<uint8_t, 3> m_rx_error_fifo;
 	uint8_t m_rx_error;       // current receive error
-	int m_rx_fifo;      // receive FIFO pointer
 
 	int m_rx_clock;     // receive clock pulse count
 	int m_rx_first;     // first character received
@@ -433,7 +446,13 @@ public:
 	template<class _Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txdrqb_cb.set_callback(object); }
 
-	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
+	static void static_set_cputag(device_t &device, const char *tag)
+	{
+		z80sio_device &dev = downcast<z80sio_device &>(device);
+        dev.m_cputag = tag;
+    }
+    
+    static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
 		z80sio_device &dev = downcast<z80sio_device &>(device);
 		dev.m_rxca = rxa;
@@ -490,13 +509,16 @@ protected:
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
+    int get_interrupt_prio(int index, int type);
+    uint8_t modify_vector(int index, int type);
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(z80sio_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
 	enum
 	{
 		TYPE_Z80SIO     = 0x001,
-		TYPE_UPD7201    = 0x002
+		TYPE_UPD7201    = 0x002,
+		TYPE_I8274      = 0x004
 	};
 
 	enum
@@ -533,7 +555,9 @@ protected:
 	devcb_write_line    m_out_txdrqb_cb;
 
 	int m_int_state[8]; // interrupt state
+	int m_int_source[8]; // interrupt source
 	int m_variant;
+	const char *m_cputag;
 };
 
 class upd7201N_device : public z80sio_device
@@ -542,9 +566,16 @@ public :
 	upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class i8274N_device : public z80sio_device
+{
+public :
+	i8274N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
 extern const device_type Z80SIO;
 extern const device_type Z80SIO_CHANNEL;
 extern const device_type UPD7201N;
+extern const device_type I8274N;
 
 #endif
