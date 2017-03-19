@@ -209,7 +209,7 @@ void konmedal_state::machine_reset()
 static MACHINE_CONFIG_START( konmedal, konmedal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)    // unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // 16.9344MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
