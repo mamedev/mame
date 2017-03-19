@@ -21,13 +21,13 @@
                       6MHz 1200Kbps
                      10MHz 2500Kbps
    -- Asynchrounous features -------------------------------------------
-    5-8 bit per char         Y
-    1,1.5,2 stop bits        Y
-    odd/even parity          Y
-    x1,x16,x32,x64           Y
+  * 5-8 bit per char         Y
+  * 1,1.5,2 stop bits        Y
+  * odd/even parity          Y
+  * x1,x16,x32,x64           Y
     break det/gen            Y
-    parity, framing &        Y
-    overrun error det        Y
+  * parity, framing &        Y
+      overrun error det      Y
     -- Byte oriented synchrounous features -------------------------------
     Int/ext char sync        Y
     1/2 synch chars          Y
@@ -41,8 +41,8 @@
     1-fld resid hand         Y
     Valid rec msg protection Y
     --
-    Receiver FIFO            3
-    Transmitter FIFO         1
+  * Receiver FIFO            3
+  * Transmitter FIFO         1
     -------------------------------------------------------------------------
     * = Features that has been implemented  n/a = features that will not
 ***************************************************************************/
@@ -106,10 +106,9 @@ const device_type I8274N = device_creator<i8274N_device>; // Remove trailing N w
 //-------------------------------------------------
 //  device_mconfig_additions -
 //-------------------------------------------------
-
 MACHINE_CONFIG_FRAGMENT( z80sio )
-MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
-MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
+	MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
+	MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor z80sio_device::device_mconfig_additions() const
@@ -124,7 +123,6 @@ machine_config_constructor z80sio_device::device_mconfig_additions() const
 //-------------------------------------------------
 //  z80sio_device - constructor
 //-------------------------------------------------
-
 z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_z80daisy_interface(mconfig, *this),
@@ -361,7 +359,6 @@ int z80sio_device::get_interrupt_prio(int index, int type)
     int prio_level = -1;
     int priority = -1;
 
-//    LOGINT("prio_level: %02x priority:%02x ", prio_level, priority);
     if ((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
 	{
         /* These CPU variants use Bit 2 of WR2 of Channnel A to determine the priority Hi to Lo:
@@ -482,8 +479,6 @@ READ8_MEMBER( z80sio_device::cd_ba_r )
 	int cd = BIT(offset, 1);
 	z80sio_channel *channel = ba ? m_chanB : m_chanA;
 
-	//LOG("%s %s %c %s read\n",FUNCNAME, tag(), 'A' + ba ? 1 : 0 , cd ? "control" : "data" );
-
 	return cd ? channel->control_read() : channel->data_read();
 }
 
@@ -496,8 +491,6 @@ WRITE8_MEMBER( z80sio_device::cd_ba_w )
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
 	z80sio_channel *channel = ba ? m_chanB : m_chanA;
-
-	LOG("%s %s %c %s write\n",FUNCNAME, tag(), 'A' + ba ? 1 : 0 , cd ? "control" : "data" );
 
 	if (cd)
 		channel->control_write(data);
@@ -515,8 +508,6 @@ READ8_MEMBER( z80sio_device::ba_cd_r )
 	int cd = BIT(offset, 0);
 	z80sio_channel *channel = ba ? m_chanB : m_chanA;
 
-	//LOG("%s %s %c %s read\n",FUNCNAME, tag(), 'A' + ba ? 1 : 0 , cd ? "control" : "data" );
-
 	return cd ? channel->control_read() : channel->data_read();
 }
 
@@ -529,8 +520,6 @@ WRITE8_MEMBER( z80sio_device::ba_cd_w )
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
 	z80sio_channel *channel = ba ? m_chanB : m_chanA;
-
-	LOG("%s %s %c %s write\n",FUNCNAME, tag(), 'A' + ba ? 1 : 0 , cd ? "control" : "data" );
 
 	if (cd)
 		channel->control_write(data);
@@ -768,7 +757,6 @@ void z80sio_channel::rcv_complete()
 //-------------------------------------------------
 //  get_clock_mode - get clock divisor
 //-------------------------------------------------
-
 int z80sio_channel::get_clock_mode()
 {
 	//LOG("%s %s\n",FUNCNAME, tag());
@@ -785,17 +773,16 @@ int z80sio_channel::get_clock_mode()
 	return clocks;
 }
 
-/* From "uPD7201/7201A MULTI PROTOCOL SERIAL COMMUNICATION CONTROLLER" by NEC:
-"RTSA (Request to Send A): The state of the RTS bit (01 of the CR5 register) controls this pin. If
-the RTS bit is reset in the asynchronous mode, a high level will not be output on the RTS pin until
-all transmit characters are written and the all sent bit (D0 of the SR1 register) is set. In the
-synchronous mode, the state of the RTS bit is used as is. That is, when the RTS bit is 0, the RTS
-pin is 1. When the RTS bit is 1, the RTS pin is O."
+/* 
+   From "uPD7201/7201A MULTI PROTOCOL SERIAL COMMUNICATION CONTROLLER" by NEC:
+   "RTSA (Request to Send A): The state of the RTS bit (01 of the CR5 register) controls this pin. If
+   the RTS bit is reset in the asynchronous mode, a high level will not be output on the RTS pin until
+   all transmit characters are written and the all sent bit (D0 of the SR1 register) is set. In the
+   synchronous mode, the state of the RTS bit is used as is. That is, when the RTS bit is 0, the RTS
+   pin is 1. When the RTS bit is 1, the RTS pin is O."
 
-CR5 = m_wr5 and SR1 = m_rr1
-
+   CR5 = m_wr5 and SR1 = m_rr1
 */
-
 void z80sio_channel::set_rts(int state)
 {
 	LOG("%s(%d) \"%s\" Channel %c \n", FUNCNAME, state, m_owner->tag(), 'A' + m_index);
@@ -828,7 +815,6 @@ void z80sio_channel::update_rts()
 //-------------------------------------------------
 //  get_stop_bits - get number of stop bits
 //-------------------------------------------------
-
 device_serial_interface::stop_bits_t z80sio_channel::get_stop_bits()
 {
 	LOG("%s %s\n",FUNCNAME, tag());
@@ -846,7 +832,6 @@ device_serial_interface::stop_bits_t z80sio_channel::get_stop_bits()
 //-------------------------------------------------
 //  get_rx_word_length - get receive word length
 //-------------------------------------------------
-
 int z80sio_channel::get_rx_word_length()
 {
 	LOG("%s %s\n",FUNCNAME, tag());
@@ -867,7 +852,6 @@ int z80sio_channel::get_rx_word_length()
 //-------------------------------------------------
 //  get_tx_word_length - get transmit word length
 //-------------------------------------------------
-
 int z80sio_channel::get_tx_word_length()
 {
 	LOG("%s %s\n",FUNCNAME, tag());
@@ -970,7 +954,6 @@ uint8_t z80sio_channel::do_sioreg_rr2()
 //-------------------------------------------------
 //  control_read - read control register
 //-------------------------------------------------
-
 uint8_t z80sio_channel::control_read()
 {
 	uint8_t data = 0;
@@ -1339,7 +1322,6 @@ void z80sio_channel::receive_data(uint8_t data)
 //-------------------------------------------------
 //  cts_w - clear to send handler
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80sio_channel::cts_w )
 {
 	LOG("%s(%02x) %s:%c\n",FUNCNAME, state, tag(), 'A' + m_index);
@@ -1378,7 +1360,6 @@ WRITE_LINE_MEMBER( z80sio_channel::cts_w )
 //-------------------------------------------------
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 {
 	LOG("Z80SIO \"%s\" Channel %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state);
@@ -1416,7 +1397,6 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 //-------------------------------------------------
 //  sh_w - Sync Hunt handler
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 {
 	LOG("Z80SIO \"%s\" Channel %c : Sync %u\n", m_owner->tag(), 'A' + m_index, state);
@@ -1449,7 +1429,6 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A');
@@ -1471,7 +1450,6 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 {
 	//LOG("Z80SIO \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A');
@@ -1534,7 +1512,6 @@ void z80sio_channel::update_serial()
 //-------------------------------------------------
 //  set_dtr -
 //-------------------------------------------------
-
 void z80sio_channel::set_dtr(int state)
 {
 	LOG("%s(%d)\n", FUNCNAME, state);
@@ -1549,7 +1526,6 @@ void z80sio_channel::set_dtr(int state)
 //-------------------------------------------------
 //  write_rx -
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER(z80sio_channel::write_rx)
 {
 	m_rxd = state;

@@ -185,7 +185,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	//DECLARE_WRITE_LINE_MEMBER( ri_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
@@ -194,11 +193,11 @@ public:
 	int m_txc;
 
 	// Register state
-		// read registers     enum
+    // read registers     enum
 	uint8_t m_rr0; // REG_RR0_STATUS
 	uint8_t m_rr1; // REG_RR1_SPEC_RCV_COND
 	uint8_t m_rr2; // REG_RR2_INTERRUPT_VECT
-		// write registers    enum
+    // write registers    enum
 	uint8_t m_wr0; // REG_WR0_COMMAND_REGPT
 	uint8_t m_wr1; // REG_WR1_INT_DMA_ENABLE
 	uint8_t m_wr2; // REG_WR2_INT_VECTOR
@@ -485,8 +484,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_chanB->dcd_w(state); }
-	//DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->ri_w(state); }
-	//DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->ri_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }
@@ -514,6 +511,7 @@ protected:
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(z80sio_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
+    // CPU types that has slightly different behaviour
 	enum
 	{
 		TYPE_Z80SIO     = 0x001,
