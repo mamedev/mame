@@ -231,9 +231,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 	manager->start_http_server();
 
 	manager->start_luaengine();
-
-	manager->start_context();
-
+	
 	if (!option_errors.empty())
 		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 

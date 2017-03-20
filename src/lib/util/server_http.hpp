@@ -197,6 +197,10 @@ namespace webpp {
 				}
 			}
 		}
+		void clear()
+		{
+			m_resource.clear();
+		}
 
 		std::function<void(std::shared_ptr<typename ServerBase<socket_type>::Request>, const std::error_code&)> on_error;
 
