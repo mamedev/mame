@@ -266,7 +266,7 @@ public:
 
 	// setters
 	void mark_dirty() { m_dirty = true; }
-	void set_string(const char *string) { m_string.assign(string); m_dirty = true; }
+	void set_string(const std::string &string) { m_string = string; m_dirty = true; }
 	void set_context(symbol_table *context);
 
 private:

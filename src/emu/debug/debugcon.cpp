@@ -231,7 +231,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
     and either executes or just validates it
 -------------------------------------------------*/
 
-CMDERR debugger_console::internal_parse_command(const char *original_command, bool execute)
+CMDERR debugger_console::internal_parse_command(const std::string &original_command, bool execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS] = { nullptr };
@@ -240,7 +240,7 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
 	char *p, c = 0;
 
 	/* make a copy of the command */
-	strcpy(command, original_command);
+	strcpy(command, original_command.c_str());
 
 	/* loop over all semicolon-separated stuff */
 	for (p = command; *p != 0; )
@@ -327,13 +327,13 @@ CMDERR debugger_console::internal_parse_command(const char *original_command, bo
     execute_command - execute a command string
 -------------------------------------------------*/
 
-CMDERR debugger_console::execute_command(const char *command, bool echo)
+CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 {
 	CMDERR result;
 
 	/* echo if requested */
 	if (echo)
-		printf(">%s\n", command);
+		printf(">%s\n", command.c_str());
 
 	/* parse and execute */
 	result = internal_parse_command(command, true);
@@ -342,7 +342,7 @@ CMDERR debugger_console::execute_command(const char *command, bool echo)
 	if (result != CMDERR_NONE)
 	{
 		if (!echo)
-			printf(">%s\n", command);
+			printf(">%s\n", command.c_str());
 		printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
 		printf("%s\n", cmderr_to_string(result));
 	}
