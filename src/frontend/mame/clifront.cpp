@@ -1313,9 +1313,9 @@ void cli_frontend::romident(const char *filename)
 	if (ident.matches() == ident.total())
 		return;
 	else if (ident.matches() == ident.total() - ident.nonroms())
-		throw emu_fatalerror(EMU_ERR_IDENT_NONROMS, "Out of %d files, %d matched, %d are not roms.\n",ident.total(),ident.matches(),ident.nonroms());
+		throw emu_fatalerror(EMU_ERR_IDENT_NONROMS, "Out of %d files, %d matched, %d are not roms.\n", ident.total(), ident.matches(), ident.nonroms());
 	else if (ident.matches() > 0)
-		throw emu_fatalerror(EMU_ERR_IDENT_PARTIAL, "Out of %d files, %d matched, %d did not match.\n",ident.total(),ident.matches(),ident.total()-ident.matches());
+		throw emu_fatalerror(EMU_ERR_IDENT_PARTIAL, "Out of %d files, %d matched, %d did not match.\n", ident.total(), ident.matches(), ident.total() - ident.matches());
 	else
 		throw emu_fatalerror(EMU_ERR_IDENT_NONE, "No roms matched.\n");
 }
