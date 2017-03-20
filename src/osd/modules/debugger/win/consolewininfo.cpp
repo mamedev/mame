@@ -317,7 +317,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 }
 
 
-void consolewin_info::process_string(const std::string &string)
+void consolewin_info::process_string(std::string const &string)
 {
 	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
