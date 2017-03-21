@@ -546,7 +546,7 @@ void famibox_state::machine_start()
 
 static MACHINE_CONFIG_START( famibox, famibox_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(famibox_map)
 
 	/* video hardware */

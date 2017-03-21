@@ -29157,13 +29157,18 @@ nprsp                           //
 neptunp2                        //
 
 @source:nes.cpp
-dendy                           // Dendy (Classic russian famiclone)
+iq501                           // Micro Genius IQ-501
+iq502                           // Micro Genius IQ-502
+dendy                           // Dendy Classic (Russian import of IQ-501 famiclone)
+dendy2                          // Dendy Classic 2 (Russian import of IQ-502 famiclone)
+sb486                           // Subor/Xiao Ba Wang SB-486
 drpcjr                          // Bung Doctor PC Jr
 famicom                         // Nintendo Family Computer (a.k.a. Famicom)
 famitwin                        // Sharp Famicom Twin System
 fds                             // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
 gchinatv                        // Golden China TV Game Centre (Chinese famiclone)
 m82                             // Nintendo M82 Display Unit
+m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 

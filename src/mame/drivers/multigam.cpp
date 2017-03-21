@@ -1214,7 +1214,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 
 static MACHINE_CONFIG_START( multigam, multigam_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
 
 
