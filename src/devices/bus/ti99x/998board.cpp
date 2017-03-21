@@ -150,6 +150,160 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 {
 }
 
+// Debugger support
+// The memory accesses by the debugger are routed around the custom chip logic
+
+READ8_MEMBER( mainboard8_device::debugger_read )
+{
+	int logical_address = offset;
+	bool compat_mode = (m_crus_debug==ASSERT_LINE);
+
+	// Check whether the mapper itself is accessed
+	int mapaddr = compat_mode? 0x8810 : 0xf870;
+	bool mapper_accessed = ((offset & 0xfff1)==mapaddr);
+
+	if (mapper_accessed) return 0; // do not allow the debugger to mess with the mapper
+
+	// or SRAM
+	int sramaddr = compat_mode? 0x8000 : 0xf000;
+
+	if ((offset & 0xf800)==sramaddr)
+	{
+		// SRAM access
+		return m_sram->pointer()[logical_address & 0x07ff];
+	}
+	if ((offset & 0xe000)==0x0000 && compat_mode)
+	{
+		// ROM0 access
+		return m_rom0[logical_address & 0x1fff];
+	}
+
+	// Physical space
+	u8 value = 0;
+	int physical_address = m_amigo->get_physical_address_debug(offset);
+
+	if ((physical_address & 0x00ff0000)==0x00000000)
+	{
+		// DRAM
+		return m_dram->pointer()[physical_address & 0xffff];
+	}
+	if ((physical_address & 0x00ffc000)==0x00f00000)
+	{
+		// Pascal ROM 16K
+		return m_pascalrom[physical_address & 0x3fff];
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff4000)
+	{
+		// Internal DSR, Hexbus DSR, or PEB
+		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
+		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
+		m_peb->memen_in(ASSERT_LINE);
+		m_peb->readz(space, physical_address & 0xffff, &value);
+		m_peb->memen_in(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff6000)
+	{
+		// Cartridge space lower 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->readz(space, physical_address & 0x1fff, &value);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff8000)
+	{
+		// Cartridge space upper 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->readz(space, (physical_address & 0x1fff) | 0x2000, &value);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ffa000)
+	{
+		// ROM1 lower 8
+		return m_rom1[(physical_address & 0x1fff) | 0x0000];
+	}
+	if ((physical_address & 0x00ffe000)==0x00ffc000)
+	{
+		// ROM1 upper 8
+		return m_rom1[(physical_address & 0x1fff) | 0x2000];
+	}
+	return 0;
+}
+
+WRITE8_MEMBER( mainboard8_device::debugger_write )
+{
+	int logical_address = offset;
+	bool compat_mode = (m_crus_debug==ASSERT_LINE);
+
+	// Check whether the mapper itself is accessed
+	int mapaddr = compat_mode? 0x8810 : 0xf870;
+	bool mapper_accessed = ((offset & 0xfff1)==mapaddr);
+
+	if (mapper_accessed)
+	{
+		// Allow for loading/saving mapper registers
+		m_amigo->mapper_access_debug(data);
+		return;
+	}
+
+	// SRAM
+	int sramaddr = compat_mode? 0x8000 : 0xf000;
+
+	if ((offset & 0xf800)==sramaddr)
+	{
+		// SRAM access
+		m_sram->pointer()[logical_address & 0x07ff] = data & 0xff;
+		return;
+	}
+
+	// ROM0 (no write access)
+	if ((offset & 0xe000)==0x0000 && compat_mode) return;
+
+	// Physical space
+	int physical_address = m_amigo->get_physical_address_debug(offset);
+
+	if ((physical_address & 0x00ff0000)==0x00000000)
+	{
+		// DRAM
+		m_dram->pointer()[physical_address & 0xffff] = data & 0xff;
+		return;
+	}
+
+	// Pascal ROM (no write)
+	if ((physical_address & 0x00ffc000)==0x00f00000) return;
+
+	// Internal DSR, Hexbus DSR, or PEB
+	if ((physical_address & 0x00ffe000)==0x00ff4000)
+	{
+		if (m_mofetta->hexbus_access_debug()) return;
+		if (m_mofetta->intdsr_access_debug()) return;
+		m_peb->memen_in(ASSERT_LINE);
+		m_peb->write(space, physical_address & 0xffff, data & 0xff);
+		m_peb->memen_in(CLEAR_LINE);
+		return;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff6000)
+	{
+		// Cartridge space lower 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->write(space, physical_address & 0x1fff, data & 0xff);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff8000)
+	{
+		// Cartridge space upper 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->write(space, (physical_address & 0x1fff) | 0x2000, data & 0xff);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return;
+	}
+
+	// ROM1 not writable
+	if ((physical_address & 0x00ffe000)==0x00ffa000 || (physical_address & 0x00ffe000)==0x00ffc000) return;
+}
+
 // =============== CRU bus access ==================
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
@@ -461,6 +615,11 @@ READ8_MEMBER( mainboard8_device::read )
 	uint8_t value = 0;
 	const char* what;
 
+	if (machine().side_effect_disabled())
+	{
+		return debugger_read(space, offset);
+	}
+
 	// =================================================
 	//   Logical space
 	// =================================================
@@ -654,6 +813,11 @@ WRITE8_MEMBER( mainboard8_device::write )
 	m_latched_data = data;
 	m_pending_write = true;
 
+	if (machine().side_effect_disabled())
+	{
+		return debugger_write(space, offset, data);
+	}
+
 	// Some logical space devices can be written immediately
 	// GROMs and video must wait to be selected
 	if (m_amigo->mapper_accessed())
@@ -704,6 +868,7 @@ WRITE_LINE_MEMBER( mainboard8_device::crus_in )
 	if (TRACE_CRU) logerror("%s CRUS\n", (state==1)? "Assert" : "Clear");
 	m_vaquerro->crus_in(state);
 	m_amigo->crus_in(state);
+	m_crus_debug = (line_state)state;
 }
 
 /*
@@ -1489,6 +1654,19 @@ READ_LINE_MEMBER( mofetta_device::dbc_out )
 	return (m_lasreq || m_cmas || m_rom1cs || m_skdrcs || !m_pmemen)? CLEAR_LINE : ASSERT_LINE;
 }
 
+/*
+    Debugger support
+*/
+bool mofetta_device::hexbus_access_debug()
+{
+	return m_alcpg;
+}
+
+bool mofetta_device::intdsr_access_debug()
+{
+	return m_txspg;
+}
+
 WRITE8_MEMBER(mofetta_device::cruwrite)
 {
 	if ((offset & 0xff00)==0x2700)
@@ -1674,6 +1852,14 @@ enum
 	SRAMLOAD,
 	SRAMSAVE
 };
+
+/*
+    Debugger support
+*/
+int amigo_device::get_physical_address_debug(offs_t offset)
+{
+	return  ((offset & 0x0fff) + m_base_register[(offset >> 12) & 0x000f]) & 0x00ffffff;
+}
 
 /*
     Incoming READY line (SRDY)
@@ -1903,6 +2089,37 @@ void amigo_device::mapper_save()
 
 	m_sram[m_sram_address++] = (m_mapvalue >> 24) & 0xff;
 	m_mapvalue = m_mapvalue << 8;
+}
+
+/*
+    Debugger support
+*/
+void amigo_device::mapper_access_debug(int data)
+{
+	if ((data & 0xf0)==0x00)
+	{
+		int address = (data & 0x0e) << 5;
+
+		if ((data & 1)==1)
+		{
+			for (int i=0; i < 64; i++)
+			{
+				// Load from SRAM
+				m_base_register[i/4] = (m_base_register[i/4] << 8) | (m_sram[address++] & 0xff);
+			}
+		}
+		else
+		{
+			for (int i=0; i < 16; i++)
+			{
+				// Save to SRAM
+				m_sram[address++] = (m_base_register[i] >> 24) & 0xff;
+				m_sram[address++] = (m_base_register[i] >> 16) & 0xff;
+				m_sram[address++] = (m_base_register[i] >> 8) & 0xff;
+				m_sram[address++] = m_base_register[i] & 0xff;
+			}
+		}
+	}
 }
 
 WRITE_LINE_MEMBER( amigo_device::holda_in )
