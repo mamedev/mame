@@ -25,7 +25,8 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "machine/z80dart.h"
+//#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
 #include "machine/isbc_215g.h"
@@ -42,27 +43,37 @@ public:
 		m_pic_0(*this, "pic_0"),
 		m_pic_1(*this, "pic_1"),
 		m_centronics(*this, "centronics"),
-		m_cent_status_in(*this, "cent_status_in")
+		m_cent_status_in(*this, "cent_status_in"),
+		m_bios(*this, "user1"),
+		m_biosram(*this, "biosram")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
-	optional_device<i8274_device> m_uart8274;
+//	optional_device<i8274_device> m_uart8274;
+	optional_device<i8274N_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
 	optional_device<input_buffer_device> m_cent_status_in;
+	optional_memory_region m_bios;
+	optional_shared_ptr<u16> m_biosram;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
+//	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	DECLARE_WRITE8_MEMBER(upperen_w);
+	DECLARE_READ16_MEMBER(bioslo_r);
+	DECLARE_WRITE16_MEMBER(bioslo_w);
 protected:
 	void machine_reset() override;
+private:
+	bool m_upperen;
 };
 
 void isbc_state::machine_reset()
@@ -74,6 +85,7 @@ void isbc_state::machine_reset()
 	}
 	if(m_uart8251)
 		m_uart8251->write_cts(0);
+	m_upperen = false;
 }
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -139,8 +151,9 @@ static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00c8, 0x00cf) AM_WRITE8(upperen_w, 0xff00)
 	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274_device, cd_ba_r, cd_ba_w, 0x00ff)
+	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274N_device, cd_ba_r, cd_ba_w, 0x00ff)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -154,7 +167,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
+//	AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -216,11 +230,33 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 		m_pic_1->ir7_w(0);
 }
 
+WRITE8_MEMBER(isbc_state::upperen_w)
+{
+	m_upperen = true;
+}
+
+READ16_MEMBER(isbc_state::bioslo_r)
+{
+	if(m_upperen)
+		return m_biosram[offset];
+	else if(offset >= 0x8000)
+		return m_bios->as_u16(offset - 0x8000);
+	return 0xffff;
+}
+
+WRITE16_MEMBER(isbc_state::bioslo_w)
+{
+	if(m_upperen)
+		COMBINE_DATA(&m_biosram[offset]);
+}
+
+#if 0
 WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 {
 	m_uart8274->m1_r(); // always set
 	m_pic_0->ir6_w(state);
 }
+#endif
 
 static MACHINE_CONFIG_START( isbc86, isbc_state )
 	/* basic machine hardware */
@@ -325,7 +361,8 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/18)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
+//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
 
@@ -344,6 +381,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, 0, 0, 0, 0)
+#if 0
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
@@ -351,16 +389,38 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+#else
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+//	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+#endif
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+#if 0
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
+#else
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274N_device, ctsa_w))
+#endif
 
 	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
+#if 0
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
+#else
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274N_device, ctsb_w))
+#endif
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
@@ -413,6 +473,78 @@ ROM_START( isbc286 )
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
 ROM_END
 
+/*
+ * :uart8274 A Reg 00 <- 18 - Channel reset command
+ * :uart8274 A Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, <DTR=0
+ * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enable
+ * :uart8274 B Reg 00 <- 18 - Channel reset command
+ * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 B Reg 05 <- ea - Tx Enabled, Transmitter Bits/Character 8, Send Break 0, RTS=0, DTR=0
+ * :uart8274 B Reg 03 <- c1 - Rx 8 bits, No Auto Enables, Rx Enabled, 
+
+ * :uart8274 B Reg 00 <- 18 - Channel reset command
+ * :uart8274 B Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
+ * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
+ * :uart8274 B Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 B Reg 06 <- 00 - Lo SYNC bits
+ * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
+ * :uart8274 B Reg 02 <- 26 - interrupt vector 26
+ * :uart8274 B Reg 01 <- 00 - Rx INT/DMA int disabled, no vector modification
+
+ * :uart8274 B Reg 00 <- 18 - Channel reset command
+ * :uart8274 B Reg 00 <- 18 - Channel reset command
+ * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables 
+ * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
+ * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
+ * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
+ * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
+
+ * :uart8274 A Reg 00 <- 18 - Channel reset command
+ * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
+ * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
+ * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
+ * :uart8274 B Reg 02 <- 26 - interrupt vector 26
+ * :uart8274 A Reg 01 <- 00 - Rx INT/DMA int disabled, no vector modification
+
+ * :uart8274 A Reg 01 -> ?? - Read out Status Register 1 (Errors and All Sent flag)
+ * :uart8274 A Reg 05 <- e2 - Tx Disabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 A Reg 03 <- c0 - Rx Disabled, Rx 8 bits, No Auto Enables
+ * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
+ * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+ * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
+ * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
+ * :uart8274 B Reg 02 <- 26 - interrupt vector 26
+ * :uart8274 A Reg 01 <- 00 - Rx INT/DMA int disabled, no vector modification
+ * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
+
+ * :uart8274 B Reg 02 <- a5 - interrupt vector a5
+ * :uart8274 B Reg 02 <- 00 - interrupt vector 0
+
+ * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 B Reg 01 <- 1e - Wait disabled, Int mode 3, vector modified, Tx int/DMA enabled
+ * :uart8274 A Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 A Reg 01 <- 1e - Wait disabled, Int mode 3, vector modified, Tx int/DMA enabled
+
+ * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 B Reg 01 <- 1e - Wait disabled, Int mode 3, vector modified, Tx int/DMA enabled
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
+ * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+
+ * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
+ * :uart8274 B Reg 01 <- 1e - Wait disabled, Int mode 3, vector modified, Tx int/DMA enabled
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
+ * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
+*/
 ROM_START( isbc2861 )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )

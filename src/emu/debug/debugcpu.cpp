@@ -3318,7 +3318,14 @@ void device_debug::tracer::update(offs_t pc)
 	// print the address
 	std::string buffer;
 	int logaddrchars = m_debug.logaddrchars();
-	buffer = string_format("%0*X: ", logaddrchars, pc);
+	if (m_debug.is_octal())
+	{
+		buffer = string_format("%0*o: ", logaddrchars*3/2, pc);
+	}
+	else
+	{
+		buffer = string_format("%0*X: ", logaddrchars, pc);
+	}
 
 	// print the disassembly
 	std::string dasm;

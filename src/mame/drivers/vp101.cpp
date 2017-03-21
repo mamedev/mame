@@ -34,12 +34,21 @@ public:
 			m_ata(*this, "ata")
 	{ }
 
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	
 	DECLARE_READ32_MEMBER(tty_ready_r);
 	DECLARE_WRITE32_MEMBER(tty_w);
 	DECLARE_READ32_MEMBER(test_r) { return 0xffffffff; }
 	
 	DECLARE_READ32_MEMBER(pic_r);
 	DECLARE_WRITE32_MEMBER(pic_w);
+	
+	DECLARE_WRITE32_MEMBER(dmaaddr_w);
+	
+	DECLARE_WRITE_LINE_MEMBER(dmarq_w);
+	
+	
 		
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -54,7 +63,50 @@ protected:
 	virtual void video_start() override;
 	int pic_cmd;
 	int pic_state;
+	int m_dmarq_state;
+	uint32_t m_dma_ptr;
 };
+
+void vp10x_state::machine_reset()
+{
+	m_dmarq_state = 0;
+	pic_cmd = pic_state = 0;
+}
+
+void vp10x_state::machine_start()
+{
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
+	m_maincpu->add_fastram(0x00000000, 0x07ffffff, false, m_mainram);
+}
+	
+WRITE32_MEMBER(vp10x_state::dmaaddr_w)
+{
+	m_dma_ptr = (data & 0x07ffffff);
+}
+
+WRITE_LINE_MEMBER(vp10x_state::dmarq_w)
+{
+	if (state != m_dmarq_state)
+	{
+		m_dmarq_state = state;
+	
+		if (state)
+		{
+			uint16_t *RAMbase = (uint16_t *)&m_mainram[0];
+			uint16_t *RAM = &RAMbase[m_dma_ptr>>1];				
+
+			m_ata->write_dmack(ASSERT_LINE);			
+
+			while (m_dmarq_state)
+			{
+				*RAM++ = m_ata->read_dma();
+				m_dma_ptr += 2;	// pointer must advance
+			}
+
+			m_ata->write_dmack(CLEAR_LINE);
+		}
+	}
+}
 
 READ32_MEMBER(vp10x_state::pic_r) 
 {
@@ -92,7 +144,6 @@ WRITE32_MEMBER(vp10x_state::pic_w)
 
 void vp10x_state::video_start()
 {
-	pic_cmd = pic_state = 0;
 }
 
 uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -127,7 +178,7 @@ WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when 
 {
 // uncomment to see startup messages - it says "RAM OK" and "EPI RSS Ver 4.5.1" followed by "<RSS active>" and then lots of dots
 // Special Forces also says "<inited tv_cap> = 00000032"
-//	printf("%c", data);
+	printf("%c", data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
@@ -140,6 +191,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x1ca0000c, 0x1ca0000f) AM_READ_PORT("IN0")
 	AM_RANGE(0x1ca00010, 0x1ca00013) AM_READ(test_r)		// bits here cause various test mode stuff
 	AM_RANGE(0x1cf00000, 0x1cf00003) AM_NOP AM_READNOP
+	AM_RANGE(0x1d000030, 0x1d000033) AM_WRITE(dmaaddr_w)	// ATA DMA destination address
 	AM_RANGE(0x1d000040, 0x1d00005f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
 	AM_RANGE(0x1d000060, 0x1d00007f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0x0000ffff)
 	AM_RANGE(0x1f200000, 0x1f200003) AM_READWRITE(pic_r, pic_w)
@@ -173,6 +225,7 @@ static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(vp10x_state, dmarq_w))
 	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

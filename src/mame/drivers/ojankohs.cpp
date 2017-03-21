@@ -40,6 +40,7 @@ Memo:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "video/vsystem_gga.h"
 #include "speaker.h"
 
 
@@ -227,8 +228,7 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP                // unknown
-	AM_RANGE(0x11, 0x11) AM_WRITENOP                // unknown
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
@@ -253,8 +253,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")     // 16bit address access
-	AM_RANGE(0x10, 0x10) AM_WRITENOP
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8, ojankohs_state )
@@ -834,6 +833,8 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
@@ -912,6 +913,8 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 

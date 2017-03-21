@@ -133,7 +133,6 @@ void rpunch_state::machine_start()
 	save_item(NAME(m_upd_rom_bank));
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_videoflags));
-	save_item(NAME(m_crtc_register));
 	save_item(NAME(m_bins));
 	save_item(NAME(m_gins));
 }
@@ -248,7 +247,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
-	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(rpunch_crtc_data_w)
+	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE(rpunch_gga_w)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0c0010, 0x0c0013) AM_WRITE(rpunch_ins_w)
@@ -256,7 +255,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x0c001a, 0x0c001b) AM_READ_PORT("P2")
 	AM_RANGE(0x0c001c, 0x0c001d) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c001e, 0x0c001f) AM_READ(sound_busy_r)
-	AM_RANGE(0x0c0028, 0x0c0029) AM_WRITE(rpunch_crtc_register_w)
 	AM_RANGE(0x0fc000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -516,6 +514,9 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
+
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
@@ -557,6 +558,9 @@ static MACHINE_CONFIG_START( svolleybl, rpunch_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svolleybl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 

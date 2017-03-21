@@ -22,32 +22,8 @@
 #include "sound/sn76496.h"
 #include "machine/ram.h"
 
-extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
 extern const device_type GENEVE_MAPPER;
-
-/*****************************************************************************/
-
-class geneve_mouse_device : public device_t
-{
-public:
-	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void poll();
-	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-
-private:
-	v9938_device*   m_v9938;
-	int             m_last_mx;
-	int             m_last_my;
-};
-
-#define MCFG_GENEVE_MOUSE_ADD(_tag )    \
-	MCFG_DEVICE_ADD(_tag, GENEVE_MOUSE, 0)
 
 /*****************************************************************************/
 

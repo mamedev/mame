@@ -30,6 +30,9 @@
 #include "eminline.h"
 #include "profiler.h"
 
+// http interface helpers
+#include "http.h"
+
 // commonly-referenced utilities imported from lib/util
 #include "palette.h"
 #include "unicode.h"

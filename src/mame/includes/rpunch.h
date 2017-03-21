@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 #include "sound/upd7759.h"
+#include "video/vsystem_gga.h"
 #include "screen.h"
 
 class rpunch_state : public driver_device
@@ -14,6 +15,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_gga(*this, "gga"),
 		m_videoram(*this, "videoram"),
 		m_bitmapram(*this, "bitmapram"),
 		m_spriteram(*this, "spriteram") { }
@@ -24,6 +26,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<vsystem_gga_device> m_gga;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_bitmapram;
@@ -36,7 +39,6 @@ public:
 	int m_sprite_palette;
 	int m_sprite_xoffs;
 	uint16_t m_videoflags;
-	uint8_t m_crtc_register;
 	uint8_t m_bins;
 	uint8_t m_gins;
 	tilemap_t *m_background[2];
@@ -48,8 +50,8 @@ public:
 	DECLARE_WRITE16_MEMBER(rpunch_videoram_w);
 	DECLARE_WRITE16_MEMBER(rpunch_videoreg_w);
 	DECLARE_WRITE16_MEMBER(rpunch_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(rpunch_crtc_data_w);
-	DECLARE_WRITE16_MEMBER(rpunch_crtc_register_w);
+	DECLARE_WRITE16_MEMBER(rpunch_gga_w);
+	DECLARE_WRITE8_MEMBER(rpunch_gga_data_w);
 	DECLARE_WRITE16_MEMBER(rpunch_ins_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
 	DECLARE_WRITE8_MEMBER(upd_control_w);

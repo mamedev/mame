@@ -140,27 +140,15 @@ void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	// compute x delta
 	delta_x = new_mx - m_last_mx;
 
-	// check for wrap
-	if (delta_x > 0x80)
-		delta_x = -0x100+delta_x;
-	if  (delta_x < -0x80)
-		delta_x = 0x100+delta_x;
-
 	// Prevent unplausible values at startup.
-	if (delta_x > 100 || delta_x<-100) delta_x = 0;
+	if (delta_x > 10000 || delta_x<-10000) delta_x = 0;
 
 	m_last_mx = new_mx;
 
 	// compute y delta
 	delta_y = new_my - m_last_my;
 
-	// check for wrap
-	if (delta_y > 0x80)
-		delta_y = -0x100+delta_y;
-	if  (delta_y < -0x80)
-		delta_y = 0x100+delta_y;
-
-	if (delta_y > 100 || delta_y<-100) delta_y = 0;
+	if (delta_y > 10000 || delta_y<-10000) delta_y = 0;
 
 	m_last_my = new_my;
 
@@ -201,10 +189,10 @@ void mecmouse_device::device_reset(void)
 INPUT_PORTS_START( mecmouse )
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSE0") /* Mouse - buttons */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)

@@ -392,8 +392,8 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
    Decapped by Digshadow in 2014 http://siliconpr0n.org/map/ti/tmc0280fnl/
    Digitally dumped via PROMOUT by PlgDavid in 2014
    The coefficients are exactly the same as the TMS5200.
-   The coefficients also come from US Patents 4,403,965 and 4,946,391 (with
-   one typo in the patent).
+   The coefficients also come from US Patents 4,403,965, 4,631,748 and
+   4,946,391 (with one typo in all 3 patents: K9(3) is 0x3E0, not 0x3ED).
    The chirp table is very slightly different from the 4,209,836 patent one,
    but matches the table in the 4,403,965 and 4,946,391 patents.
    The Mitsubishi M58817 also seems to work best with these coefficients, so
@@ -403,7 +403,12 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
    * TMC0280NLP // CD2801 with datecodes around 1980 has the same
      interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent
      transition.
-   * CD2801A-NL with datecodes around 1982 have the 'alternate behavior'
+   * CD2801A-NL with datecodes around 1982 have the 'alternate behavior',
+     which seems to be a somewhat crude workaround for a bug where when
+     an unvoiced frame follows a silent one (which in turn followed a
+     voiced frame), the k5-k10 parameters are not zeroed as they should be,
+     producing a loud noise.
+     This bug is fixed correctly on the tms52xx chips. 
    */
 static const struct tms5100_coeffs T0280F_2801A_coeff =
 {

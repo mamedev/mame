@@ -6000,13 +6000,14 @@ uint8_t saturn_state::get_vblank( void )
 	return 0;
 }
 
+// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition, assume following disp bit.
 uint8_t saturn_state::get_odd_bit( void )
 {
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
-		return 1;
+		return STV_VDP2_DISP;
 
 	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
-		return 1;
+		return STV_VDP2_DISP;
 
 	return machine().first_screen()->frame_number() & 1;
 }
