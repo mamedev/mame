@@ -29,24 +29,10 @@ void busmouse_device::poll(int& delta_x, int& delta_y, int& buttons)
 
 	/* compute x delta */
 	delta_x = new_mx - m_last_mx;
-
-	/* check for wrap */
-	if (delta_x > 0x80)
-		delta_x = 0x100-delta_x;
-	if  (delta_x < -0x80)
-		delta_x = -0x100-delta_x;
-
 	m_last_mx = new_mx;
 
 	/* compute y delta */
 	delta_y = new_my - m_last_my;
-
-	/* check for wrap */
-	if (delta_y > 0x80)
-		delta_y = 0x100-delta_y;
-	if  (delta_y < -0x80)
-		delta_y = -0x100-delta_y;
-
 	m_last_my = new_my;
 }
 
@@ -64,10 +50,10 @@ void busmouse_device::device_reset(void)
 
 INPUT_PORTS_START( busmouse )
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSEBUT") /* mouse buttons */
 		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button")
