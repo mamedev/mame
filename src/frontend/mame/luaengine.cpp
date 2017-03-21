@@ -778,6 +778,7 @@ void lua_engine::initialize()
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
+			"write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); },
 			"open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open),
 			"open_next", &emu_file::open_next,
 			"seek", &emu_file::seek,

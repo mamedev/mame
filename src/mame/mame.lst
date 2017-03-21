@@ -30773,6 +30773,7 @@ falcon                          // bootleg
 falconz                         // bootleg
 fenix                           // bootleg
 griffon                         // bootleg (Videotron)
+griffono                        // bootleg (Olympia)
 nextfase                        // bootleg
 phoenix                         // (c) 1980 Amstar
 phoenix2                        // (c) 1980 Amstar
@@ -32704,6 +32705,7 @@ seattle                         //
 sawatte                         //
 
 @source:segac2.cpp
+anpanman                        // (c) 1993 Sega
 bloxeedc                        // (c) 1989 Sega / Elorg
 bloxeedu                        // (c) 1989 Sega / Elorg
 borench                         // (c) 1990 Sega
