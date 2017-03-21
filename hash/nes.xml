@@ -69130,8 +69130,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="liko3in1">
 		<description>LIKO Study Cartridge 3 in 1 (Rus)</description>
-		<year>19??</year>
-		<publisher>BBG</publisher>
+		<year>1996?</year>
+		<publisher>BBG Electronics Co.</publisher>
+		<info name="alt_title" value="LIKO Обучающий Картридж"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
@@ -69230,7 +69231,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="bravew2k">
 		<description>Bravesoft Windows 2000 (Rus)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bravesoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="edu2k" />   <!-- Marked as mapper 178 in header -->
 			<feature name="pcb" value="UNL-EDU2000" />
@@ -69268,7 +69269,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="glk48" supported="partial">
 		<description>GLK Book 48 in 1 (Asia?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>FengLi</publisher>
+		<info name="serial" value="FL-E8MF"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sgzlz" />
 			<feature name="pcb" value="WAIXING-SGZLZ" />
@@ -69302,11 +69304,14 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
 	<software name="kibord3" supported="partial">
-		<description>Kibord 003 (Rus?)</description>
+		<description>Kibord 003 (Rus)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -69329,7 +69334,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="magistr2" supported="partial">
 		<description>Magistr-Genie 2 (Rus)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>New Game</publisher>
+		<info name="alt_title" value="Магистр Гений 2 Говорящий Картридж"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sgzlz" />
 			<feature name="pcb" value="WAIXING-SGZLZ" />
@@ -69511,7 +69517,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="abm5" supported="partial">
 		<description>ABM Study Card V5.0 (Chi)</description>
 		<year>1995?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ABM</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
@@ -69587,7 +69593,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="dongshen">
 		<description>Dong Sheng English Sound-Word Blaster (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dong Sheng</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
@@ -69938,6 +69944,9 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -69958,6 +69967,9 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -69975,12 +69987,15 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
 	<software name="subor8">
 		<description>Subor v8.0 (Chi)</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>Subor</publisher>
 		<info name="alt_title" value="小霸王中英文电脑学习卡(V8.0)"/>
 		<part name="cart" interface="nes_cart">
@@ -69991,6 +70006,9 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -70011,6 +70029,9 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -70030,6 +70051,9 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -70056,6 +70080,28 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
+	<software name="subor3">
+		<description>Subor v3.0 (Chi, with Chinese Chess)</description>
+		<year>1994</year>
+		<publisher>Subor</publisher>
+		<info name="alt_title" value="小霸王中英文电脑学习卡(V3.0)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="waixing_wxzs2" />
+			<feature name="pcb" value="WAIXING-PS2" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="524288">
+				<rom name="subor v2.0 (19xx)(subor)(cn)(ru)[p][!].prg" size="524288" crc="6733607a" sha1="d1db84222573f0b1da0a0ed52c1792622e1d8700" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="subor3a" cloneof="subor3" supported="partial">
 		<description>Subor v3.0 (Chi, with Dr. Mario)</description>
 		<year>1994</year>
@@ -70072,24 +70118,92 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="subor3">
-		<description>Subor v3.0 (Chi, with Chinese Chess)</description>
+	<software name="subor1r" cloneof="subor3">
+		<description>Subor v1.0 (Rus)</description>
 		<year>1994</year>
 		<publisher>Subor</publisher>
-		<info name="alt_title" value="小霸王中英文电脑学习卡(V3.0)"/>
+		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_wxzs2" />
-			<feature name="pcb" value="WAIXING-PS2" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="slot" value="subor1" />
+			<feature name="pcb" value="SUBOR-BOARD-1" />
 			<feature name="peripheral" value="sub_keyboard" />
-			<dataarea name="prg" size="524288">
-				<rom name="subor v2.0 (19xx)(subor)(cn)(ru)[p][!].prg" size="524288" crc="6733607a" sha1="d1db84222573f0b1da0a0ed52c1792622e1d8700" offset="00000" status="baddump" />
+			<dataarea name="prg" size="131072">
+				<rom name="subor v1.0 (r) [a1].prg" size="131072" crc="82f1fb96" sha1="5da695bea9f4d93c553969dc95dad1ae88a6e478" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subor1ra" cloneof="subor3" supported="partial">
+		<description>Subor v1.0 (Rus, Alt)</description>
+		<year>1994</year>
+		<publisher>Subor</publisher>
+		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="waixing_wxzs2" />
+			<feature name="pcb" value="WAIXING-PS2" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="131072">
+				<rom name="suborv10 (russian).prg" size="131072" crc="1460ec7b" sha1="86e2ac9f91d2b047c4e472b091667627a7eedaf1" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magistr1" cloneof="subor3">
+		<description>Magistr v1.0 (Rus)</description>
+		<year>199?</year>
+		<publisher>New Game</publisher>
+		<info name="alt_title" value="Магистр Обучающий Картридж"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_commandos" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="131072">
+				<rom name="magistr v1.0 (subor v1.0 hack) (russian).prg" size="131072" crc="903a95eb" sha1="d1d19fc5bbc2b45c90ad1928158949aadb2fb82d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simbas1" cloneof="subor3">
+		<description>Simba's v1.0 (Rus)</description>
+		<year>199?</year>
+		<publisher>Simba's</publisher>
+		<info name="alt_title" value="Simba's Обучающий Картридж (V1.0)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_commandos" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="131072">
+				<rom name="simbas v1.0 (subor v1.0 hack) (russian).prg" size="131072" crc="7bdd12f3" sha1="4c6c0fafd66d2ef828b492550812c28371ec2917" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -70110,91 +70224,8 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="subor1r" cloneof="subor3">
-		<description>Subor v1.0 (Rus)</description>
-		<year>1994</year>
-		<publisher>Subor</publisher>
-		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="subor1" />
-			<feature name="pcb" value="SUBOR-BOARD-1" />
-			<feature name="peripheral" value="sub_keyboard" />
-			<dataarea name="prg" size="131072">
-				<rom name="subor v1.0 (r) [a1].prg" size="131072" crc="82f1fb96" sha1="5da695bea9f4d93c553969dc95dad1ae88a6e478" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="subor1ra" cloneof="subor3" supported="partial">
-		<description>Subor v1.0 (Rus, Alt)</description>
-		<year>1994</year>
-		<publisher>Subor</publisher>
-		<info name="alt_title" value="Сюбор Обучающий Картридж (V1.0)"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_wxzs2" />
-			<feature name="pcb" value="WAIXING-PS2" />
-			<feature name="peripheral" value="sub_keyboard" />
-			<dataarea name="prg" size="131072">
-				<rom name="suborv10 (russian).prg" size="131072" crc="1460ec7b" sha1="86e2ac9f91d2b047c4e472b091667627a7eedaf1" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="magistr1" cloneof="subor3">
-		<description>Magistr v1.0 (Rus)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
-			<feature name="pcb" value="TXC-MXMDHTWO" />
-			<feature name="peripheral" value="sub_keyboard" />
-			<dataarea name="prg" size="131072">
-				<rom name="magistr v1.0 (subor v1.0 hack) (russian).prg" size="131072" crc="903a95eb" sha1="d1d19fc5bbc2b45c90ad1928158949aadb2fb82d" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simbas1" cloneof="subor3">
-		<description>Simba's v1.0 (Rus)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
-			<feature name="pcb" value="TXC-MXMDHTWO" />
-			<feature name="peripheral" value="sub_keyboard" />
-			<dataarea name="prg" size="131072">
-				<rom name="simbas v1.0 (subor v1.0 hack) (russian).prg" size="131072" crc="7bdd12f3" sha1="4c6c0fafd66d2ef828b492550812c28371ec2917" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -70210,7 +70241,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<dataarea name="prg" size="1048576">
 				<rom name="subor - english word blaster v1.0 (1994)(subor)(cn)[p][!].prg" size="1048576" crc="5e073a1b" sha1="a70631cae908ec08ec4702204661d77b9a25e3b9" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
@@ -70256,9 +70287,8 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -76984,7 +77014,7 @@ be better to redump them properly. -->
 	<software name="mc_20asd">
 		<description>ASDER 20 in 1</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Asder</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ntd03" />
 			<feature name="pcb" value="BMC-NTD-03" />

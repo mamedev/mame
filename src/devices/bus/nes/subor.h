@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Kaz
+// copyright-holders:Kaz, Fabio Priuli
 #ifndef MAME_BUS_NES_SUBOR_H
 #define MAME_BUS_NES_SUBOR_H
 
