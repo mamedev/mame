@@ -58,6 +58,7 @@
 #include "tbaskb.lh"
 #include "touchme.lh" // clickable
 #include "ttfball.lh"
+#include "us2pfball.lh"
 
 //#include "hh_pic16_test.lh" // common test-layout - use external artwork
 
@@ -1432,38 +1433,89 @@ public:
 
 	void prepare_display();
 	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
 void us2pfball_state::prepare_display()
 {
+	set_display_segmask(0xff, 0x7f);
+	display_matrix(7, 10, m_c, m_d | (m_a << 6 & 0x300));
 }
 
 READ8_MEMBER(us2pfball_state::read_a)
 {
-	return 0xff;
+	// A0,A1: multiplexed inputs, A4-A7: other inputs
+	return (read_inputs(4) & 3) | (m_inp_matrix[4]->read() & 0xf0) | 0x0c;
+}
+
+WRITE8_MEMBER(us2pfball_state::write_a)
+{
+	// A2,A3: leds
+	m_a = data;
+	prepare_display();
 }
 
 WRITE8_MEMBER(us2pfball_state::write_b)
 {
+	// B0-B3: input mux
+	m_inp_mux = data & 0xf;
 }
 
 WRITE8_MEMBER(us2pfball_state::write_c)
 {
+	// C7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+	
+	// C0-C6: digit segments
+	m_c = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(us2pfball_state::write_d)
+{
+	// D0-D7: digit select
+	m_d = ~data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( us2pfball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // B0 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.1") // B1 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.2") // B2 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.3") // B3 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.4") // port A high
+	PORT_CONFNAME( 0x10, 0x10, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x10, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x20, "1" ) // college
+	PORT_CONFSETTING(    0x00, "2" ) // pro
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT ) PORT_TOGGLE PORT_NAME("Play Selector") // pass
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Kick/Pass") // K/P
+
+	PORT_START("IN.5") // port B
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) // S
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
@@ -1471,14 +1523,19 @@ static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=39K, C=75pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(us2pfball_state, read_a))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(us2pfball_state, write_a))
+	MCFG_PIC16C5x_READ_B_CB(IOPORT("IN.5"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(us2pfball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(us2pfball_state, write_c))
+	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
+	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(us2pfball_state, write_d))
 
 	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_us2pfball)
+	MCFG_DEFAULT_LAYOUT(layout_us2pfball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
