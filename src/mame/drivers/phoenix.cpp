@@ -29,7 +29,7 @@ Notes:
 To Do:
 
 Phoenix:
-- Emulate the different sound system used by phoenixc2.
+- Emulate the different sound system used at least by phoenixc2 and griffono.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -1166,7 +1166,8 @@ ROM_START( griffon )  // verified single PCB, single PROM
 	ROM_LOAD( "griffon0.a5",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
 	ROM_LOAD( "griffon1.a6",  0x0800, 0x0800, CRC(3cc33e4a) SHA1(45d16334f245cc185e18f63062e08627e9bd06bb) )
 	ROM_LOAD( "griffon2.a7",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
-	ROM_LOAD( "griffon3.a8",  0x1800, 0x0800, CRC(3a6188eb) SHA1(f343d7a6dc836d118621e9a143799e33658a3005) )
+	// ROM_LOAD( "griffon3.a8",  0x1800, 0x0800, CRC(3a6188eb) SHA1(f343d7a6dc836d118621e9a143799e33658a3005) ) // suspected bitrot, new dump has been confirmed on 2 different PCBs
+	ROM_LOAD( "griffon3.a8",  0x1800, 0x0800, CRC(5e49f5b5) SHA1(288314d24b3e8f507c43db6c64a7777e97215ed1) )
 	ROM_LOAD( "griffon4.a9",  0x2000, 0x0800, CRC(87a45ceb) SHA1(0788dd57eac3047e34a50e730df37059616abc1a) )
 	ROM_LOAD( "griffon5.a10", 0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
 	ROM_LOAD( "griffon6.a11", 0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
@@ -1182,6 +1183,36 @@ ROM_START( griffon )  // verified single PCB, single PROM
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+ROM_END
+
+/*There is no MN6221AA Melody-Alarm Generator, it is substituted by a small piggyback sound PCB with some 74xx logic
+  and 2x PROM 63S140N main PCB is marked: "003 LATO A" and "003 LATO B" sound PCB is marked: "LC" and "NW"*/
+
+ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead of MM6221AA, single PROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "griffon00.5a",    0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
+	ROM_LOAD( "griffon01.6a",    0x0800, 0x0800, CRC(22ec3403) SHA1(528a0ee3e78a43e57cc7666818cb300144d410ae) )
+	ROM_LOAD( "griffon02.7a",    0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
+	ROM_LOAD( "griffon03.8a",    0x1800, 0x0800, CRC(73c90019) SHA1(7cc45e57d3566aa0b474f4bbfbaddfc4372473c4) )
+	ROM_LOAD( "griffon04.9a",    0x2000, 0x0800, CRC(87a45ceb) SHA1(0788dd57eac3047e34a50e730df37059616abc1a) )
+	ROM_LOAD( "griffon05.10a",   0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "griffon06.11a",   0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "griffon07-0.12a", 0x3800, 0x0800, CRC(7fbdd2fa) SHA1(13f3a6b5bd2191b6d40ae224f77200c7779ee8eb) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "griffonb7.7b",    0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "griffonb8.8b",    0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "griffond7-0.7d",  0x0000, 0x0800, CRC(074eb660) SHA1(5f0cd92e22b6948dffbf56e5ea57cdda9b3e2c51) )
+	ROM_LOAD( "griffond8.8d",    0x0800, 0x0800, CRC(bee48e0c) SHA1(a129510a6bddafe3de3f921fca34ecda03a1c283) )
+
+	ROM_REGION( 0x0200, "soundproms", 0 ) // currently not used by the emulation
+	ROM_LOAD( "63s140n.1",   0x0000, 0x0100, CRC(73d5f0c2) SHA1(5ca482ab68ffd52d16c532c72c1a2ed693648995) )
+	ROM_LOAD( "63s140n.2",   0x0100, 0x0100, CRC(c790b283) SHA1(50b14ffbf69851995ab9fe54d0ea58dc7a30a9ba) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
 ROM_START( nextfase )
@@ -1514,7 +1545,7 @@ GAME( 1980, phoenixj,   phoenix, phoenix,  phoenixt, driver_device, 0,          
 GAME( 1980, phoenix3,   phoenix, phoenix,  phoenix3, driver_device, 0,               ROT90, "bootleg (T.P.N.)",                  "Phoenix (T.P.N. bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixdal, phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg (D&L)",                     "Phoenix (D&L bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, driver_device, 0,               ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
@@ -1529,7 +1560,8 @@ GAME( 1980, vautourza,  phoenix, condor ,  phoenixt, phoenix_state, oneprom,    
 
 // fenix is an Italian bootleg based on vautourz
 GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (Videotron bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, oneprom_coindsw, ROT90, "bootleg (Olympia)",                 "Griffon (Olympia bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // nextfase is a Spanish bootleg
 GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, driver_device, 0,               ROT90, "bootleg (Petaco S.A.)",             "Next Fase (bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
   // as is this

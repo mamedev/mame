@@ -173,7 +173,7 @@ public:
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
-	bool exists() { return !m_image_name.empty(); }
+	bool exists() const { return !m_image_name.empty(); }
 	const char *filename() const { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
 	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
 	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
