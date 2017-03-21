@@ -9789,7 +9789,7 @@ Confirmed dump but no pcb pic
 		<info name="alt_title" value="トムとジェリー"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="3479ee6b" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
+				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="f800c814" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
