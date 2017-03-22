@@ -60,7 +60,7 @@
 #include "ttfball.lh"
 #include "us2pfball.lh"
 
-//#include "hh_pic16_test.lh" // common test-layout - use external artwork
+#include "hh_pic16_test.lh" // common test-layout - use external artwork
 
 
 class hh_pic16_state : public driver_device
@@ -405,7 +405,7 @@ MACHINE_CONFIG_END
 
   Caprice Pro-Action Baseball (manufactured by Calfax)
   * PIC 1655A-043
-  * x
+  * 1 7seg LED + 36 other LEDs, CD4028, 1-bit sound
 
 ***************************************************************************/
 
@@ -417,7 +417,6 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
 };
@@ -426,42 +425,66 @@ public:
 
 void pabball_state::prepare_display()
 {
-}
-
-READ8_MEMBER(pabball_state::read_a)
-{
-	return 0xf;
+	// CD4028 BCD to decimal decoder
+	u16 sel = m_c & 0xf;
+	if (sel & 8) sel &= 9;
+	sel = 1 << sel;
+	
+	// CD4028 9 is 7seg
+	set_display_segmask(0x200, 0xff);
+	display_matrix(8, 10, m_b, sel);
 }
 
 WRITE8_MEMBER(pabball_state::write_b)
 {
+	// B: led data
+	m_b = ~data;
+	prepare_display();
 }
 
 WRITE8_MEMBER(pabball_state::write_c)
 {
+	// C2: RTCC pin
+	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 2 & 1);
+	
+	// C7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+	
+	// C0-C3: CD4028 A-D
+	m_c = data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( pabball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // port C
+	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x20, "2" )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pabball, pabball_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=18K, C=27pF
-	MCFG_PIC16C5x_READ_A_CB(READ8(pabball_state, read_a))
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(pabball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(IOPORT("IN.1"))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(pabball_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_pabball)
+	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
