@@ -69929,7 +69929,7 @@ Subor v14.0 (this shows Windows 2000 on the title screen)
 Subor v15.0 (this shows Windows 2002 on the title screen)
  -->
 
-	<software name="subor13" cloneof="subor11">
+	<software name="subor130" cloneof="subor110">
 		<description>Subor v13.0 (Chi)</description>
 		<year>2000?</year>
 		<publisher>Subor</publisher>
@@ -69950,7 +69950,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		</part>
 	</software>
 
-	<software name="subor11">
+	<software name="subor110">
 		<description>Subor v11.0 (Chi)</description>
 		<year>2000?</year>
 		<publisher>Subor</publisher>
