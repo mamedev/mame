@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Kaz
+// copyright-holders:Kaz, Fabio Priuli
 /***********************************************************************************************************
 
  NES/Famicom cartridge emulation for Subor PCBs
