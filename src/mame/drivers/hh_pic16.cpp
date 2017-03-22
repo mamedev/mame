@@ -419,6 +419,8 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
@@ -460,18 +462,27 @@ WRITE8_MEMBER(pabball_state::write_c)
 
 static INPUT_PORTS_START( pabball )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Curve Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Curve Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Straight")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.1") // port C
 	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Hit")
 	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(pabball_state::reset_button)
+{
+	// reset button is directly tied to MCLR pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static MACHINE_CONFIG_START( pabball, pabball_state )
 
@@ -483,7 +494,6 @@ static MACHINE_CONFIG_START( pabball, pabball_state )
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(pabball_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_pabball)
 	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
@@ -1360,7 +1370,7 @@ MACHINE_CONFIG_END
 
   U.S. Games Programmable Baseball
   * PIC 1650A-133
-  * x
+  * 3 7seg LEDs + 36 other LEDs, 1-bit sound
 
   known releases:
   - USA(1): Programmable Baseball
@@ -1376,54 +1386,86 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
 void uspbball_state::prepare_display()
 {
+	// D0-D2 are 7segs
+	set_display_segmask(7, 0x7f);
+	display_matrix(16, 6, m_c << 8 | m_b, m_d);
 }
 
-READ8_MEMBER(uspbball_state::read_a)
+WRITE8_MEMBER(uspbball_state::write_a)
 {
-	return 0xff;
+	// A0: speaker out
+	m_speaker->level_w(data & 1);
 }
 
 WRITE8_MEMBER(uspbball_state::write_b)
 {
+	// B: digit segment data
+	m_b = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	prepare_display();
 }
 
 WRITE8_MEMBER(uspbball_state::write_c)
 {
+	// C: led data
+	m_c = ~data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(uspbball_state::write_d)
+{
+	// D0-D5: led/digit select
+	m_d = ~data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( uspbball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Curve Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Slow")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Curve Left")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Change Up/Fielder")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+
+	PORT_START("IN.1") // port D
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x80, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( uspbball, uspbball_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=22K, C=47pF
-	MCFG_PIC16C5x_READ_A_CB(READ8(uspbball_state, read_a))
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(uspbball_state, write_a))
+	MCFG_PIC16C5x_READ_B_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(uspbball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(uspbball_state, write_c))
+	MCFG_PIC16C5x_READ_D_CB(IOPORT("IN.1"))
+	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(uspbball_state, write_d))
 
 	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_uspbball)
+	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
