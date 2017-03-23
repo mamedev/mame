@@ -100,21 +100,28 @@ void electron_expansion_slot_device::device_reset()
 
 
 // slot devices
+#include "fbjoy.h"
+//#include "fbprint.h"
+//#include "jafamode7.h"
 //#include "plus1.h"
 #include "plus3.h"
-//#include "aplus3.h"
-//#include "aplus5.h"
-//#include "slogger.h"
-//#include "fbjoy.h"
+//#include "pwrjoy.h"
+//#include "rombox.h"
+//#include "romboxplus.h"
 #include "m2105.h"
+//#include "voxbox.h"
 
 
 SLOT_INTERFACE_START( electron_expansion_devices )
+	//SLOT_INTERFACE("ap1", ELECTRON_AP1)
+	SLOT_INTERFACE("fbjoy", ELECTRON_FBJOY)
+	//SLOT_INTERFACE("fbprint", ELECTRON_FBPRINT)
+	//SLOT_INTERFACE("jafamode7", ELECTRON_JAFAMODE7)
 	//SLOT_INTERFACE("plus1", ELECTRON_PLUS1)
 	SLOT_INTERFACE("plus3", ELECTRON_PLUS3)
-	//SLOT_INTERFACE("aplus3", ELECTRON_APLUS3)
-	//SLOT_INTERFACE("aplus5", ELECTRON_APLUS5)
-	//SLOT_INTERFACE("slogger", ELECTRON_SLOGGER)
-	//SLOT_INTERFACE("fbjoy", ELECTRON_FBJOY)
+	//SLOT_INTERFACE("pwrjoy", ELECTRON_PWRJOY)
+	//SLOT_INTERFACE("rombox", ELECTRON_ROMBOX)
+	//SLOT_INTERFACE("romboxplus", ELECTRON_ROMBOXPLUS)
 	SLOT_INTERFACE("m2105", ELECTRON_M2105)
+	//SLOT_INTERFACE("voxbox", ELECTRON_VOXBOX)
 SLOT_INTERFACE_END
