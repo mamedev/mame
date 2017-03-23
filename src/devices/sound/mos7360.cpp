@@ -627,7 +627,7 @@ void mos7360_device::drawlines(int first, int last)
 		{
 			for (int x = 0; x < m_bitmap.width(); x++)
 			{
-				m_bitmap.pix32(line, x) = PALETTE_MOS[0];
+				m_bitmap.pix32(line, x) = PALETTE_MOS[FRAMECOLOR];
 			}
 		}
 		return;

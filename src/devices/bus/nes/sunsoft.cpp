@@ -608,14 +608,14 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 // YM2149F operating in this mode. To use an AY-3-8910 as a substitute,
 // you would need an external divider to reduce the clock speed by half.
 
-#define SUN5_NTSC_CLOCK (21477272.724 / 12)
-
 static MACHINE_CONFIG_FRAGMENT( sun_5b )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("ay", YM2149, SUN5_NTSC_CLOCK/2) // divide by 2 for the internal divider
+	// TODO: this is not how Sunsoft 5B clock signaling works!
+	// The board uses the CLK pin in reality, not hardcoded NTSC values!
+	MCFG_SOUND_ADD("ay", YM2149, (XTAL_21_4772MHz/12)/2) // divide by 2 for the internal divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 

@@ -168,7 +168,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 		return image_init_result::FAIL;
 	}
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);  // allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
@@ -303,6 +303,8 @@ READ8_MEMBER(cc40_state::bankswitch_r)
 
 WRITE8_MEMBER(cc40_state::bankswitch_w)
 {
+	data &= 0x0f;
+	
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
 
@@ -310,7 +312,7 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	if (m_cart_rom)
 		membank("cartbank")->set_entry(data >> 2 & 3);
 
-	m_banks = data & 0x0f;
+	m_banks = data;
 }
 
 READ8_MEMBER(cc40_state::clock_control_r)
@@ -327,10 +329,12 @@ void cc40_state::update_clock_divider()
 
 WRITE8_MEMBER(cc40_state::clock_control_w)
 {
+	data &= 0x0f;
+	
 	// d0-d2: clock divider
 	// d3: enable clock divider always
 	// other bits: unused?
-	if (m_clock_control != (data & 0x0f))
+	if (m_clock_control != data)
 	{
 		m_clock_control = data;
 		update_clock_divider();
