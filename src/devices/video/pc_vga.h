@@ -215,12 +215,11 @@ protected:
 			uint8_t pel_shift_latch;
 		} attribute;
 
-
 		struct {
 			uint8_t read_index, write_index, mask;
 			int read;
 			int state;
-			struct { uint8_t red, green, blue; } color[0x100];
+			uint8_t color[0x300]; /* flat RGB triplets */
 			int dirty;
 		} dac;
 
