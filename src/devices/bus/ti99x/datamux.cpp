@@ -256,6 +256,7 @@ uint16_t ti99_datamux_device::debugger_read(address_space& space, uint16_t addr)
 					m_gromport->romgq_line(ASSERT_LINE);
 					m_gromport->readz(space, addrb+1, &lval);
 					m_gromport->readz(space, addrb, &hval);
+					m_gromport->romgq_line(CLEAR_LINE);
 				}
 				m_peb->memen_in(ASSERT_LINE);
 				m_peb->readz(space, addrb+1, &lval);
@@ -300,6 +301,7 @@ void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, ui
 				m_gromport->romgq_line(ASSERT_LINE);
 				m_gromport->write(space, addr+1, data & 0xff);
 				m_gromport->write(space, addr, (data>>8) & 0xff);
+				m_gromport->romgq_line(CLEAR_LINE);
 			}
 
 			m_peb->memen_in(ASSERT_LINE);

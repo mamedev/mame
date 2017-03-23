@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Aaron Giles, Nathan Woods
 /**********************************************************************
 
     Motorola 6821 PIA interface and emulation
