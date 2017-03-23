@@ -522,6 +522,7 @@ private:
 	static const uint8_t strdesc1[];
 	static const uint8_t strdesc2[];
 	uint8_t *region;
+	uint8_t midi_rs232;
 };
 
 const device_type OHCI_HLEAN2131SC = device_creator<ohci_hlean2131sc_device>;
@@ -836,7 +837,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	// PINSA register, bits 0-2 connected do dip switches 1-3 on filter board, bit 4 to dip switch 4, bit 5 to dip switch 5, bits 6-7 to buttons 1-2 on filter board
 	// bits 4-1 value must be 10 xor 15, and bit 3 is ignored since its used as the CS pin of the chip
 	endpoints[endpoint].buffer[1] = 0x4b;
-	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 give the status of the sense pin of the jvs connector
+	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bits 0-1 give the status of the sense pin of the jvs connector
 	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
 	endpoints[endpoint].buffer[2] = 0x52 | sense;
 	// OUTB register
@@ -1094,6 +1095,7 @@ ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, 
 	ohci_function_device()
 {
 	region = nullptr;
+	midi_rs232 = 0;
 }
 
 void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
@@ -1121,24 +1123,29 @@ void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_cont
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-//#ifdef VERBOSE_MSG
+#ifdef VERBOSE_MSG
 	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-//#endif
+#endif
 	if (endpoint != 0)
 		return -1;
+	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
 	endpoints[endpoint].buffer[1] = 0;
+	// PINSB register, bits 0-1 uset as rts/cts signals for uart0, bits 2-3 used as uart1, bits 5-7 used as leds (not mounted on pcb)
 	endpoints[endpoint].buffer[2] = 0x52; // PINSB
+	// OUTB register
 	endpoints[endpoint].buffer[3] = 0x53; // OUTB
 	endpoints[endpoint].buffer[4] = 0;
 	endpoints[endpoint].buffer[5] = 0;
-	endpoints[endpoint].buffer[6] = 0x56; // PINSC
-	endpoints[endpoint].buffer[7] = 0x57; // OUTC
+	// PINSC register, bit 7 selects default value for bit 6 after reset (connected to dip switch 5 on filter board), bits 0-1 used as uart0 pins
+	endpoints[endpoint].buffer[6] = 0x56;
+	// OUTC register, bit 6 specifies if uart1 should be connected to midi or rs232
+	endpoints[endpoint].buffer[7] = 0x57;
 	// bRequest is a command value
 	if (setup->bRequest == 0x16)
 	{
-		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// this command is used to read data from the i2c serial eeprom connected to the chip
 		// setup->wValue = start address to read from
 		// setup->wIndex = number of bytes to read
 		// data will be transferred to the host using endpoint 1 (IN)
@@ -1148,19 +1155,25 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x17)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0x90;
 	}
 	else if (setup->bRequest == 0x1a)
 	{
+		// used to get data received by uart0 data transferred with endpoint 2 (IN)
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x1b)
 	{
+		// used to get data received by uart 1 data transferred with endpoint 3 (IN)
+		// setup->wIndex = number of bytes host would like to retrieve (must be lower than 256, 0 means get all available)
 		endpoints[endpoint].buffer[0] = 0; //
+		endpoints[endpoint].buffer[1] = 0; // bit 0 in buffer overflow bit 1 in parity error
+		endpoints[endpoint].buffer[4] = 0x40 & 255; // how many bytes to transfer with endpoint 3
+		endpoints[endpoint].buffer[5] = (0x40 >> 8) & 255;
 	}
 	else if (setup->bRequest == 0x1d)
 	{
-		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// this command is used to write data to the i2c serial eeprom connected to the chip
 		// no more than 32 bytes can be written at a time
 		// setup->wValue = start address to write to
 		// setup->wIndex = number of bytes to write
@@ -1169,14 +1182,16 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x1e)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0x90;
 	}
 	else if (setup->bRequest == 0x22)
 	{
+		// send data to be output from uart0
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x23)
 	{
+		// send data to be output from uart1
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x25) //
@@ -1185,6 +1200,7 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x26) //
 	{
+		// set uart0 or uart1 mode
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x27) //
@@ -1213,23 +1229,41 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x2d)
 	{
+		// set pin 1 of PORTB, used as the RTS signal of the rs232 port implemented with uart0
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
-	else if (setup->bRequest == 0x2e) //
+	else if (setup->bRequest == 0x2e)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// switches uart1 between rs232 mode and midi mode
+		// low byte of wValue sets the mode: 0 mode is selected using pin 7 of PORTC (0 midi 1 rs232), 1 rs232, 2 midi, other values no mode change
+		endpoints[endpoint].buffer[0] = 0;
+		midi_rs232 = setup->wValue & 255;
 	}
 	else if (setup->bRequest == 0x2f)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// return low byte of wValue from command 0x2e
+		endpoints[endpoint].buffer[0] = 0;
+		endpoints[endpoint].buffer[4] = midi_rs232;
 	}
 	else if (setup->bRequest == 0x30)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0
+		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
+		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
+		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0
+		endpoints[endpoint].buffer[0] = 0;
+		if ((setup->wValue & 255) == 0)
+			endpoints[endpoint].buffer[4] = 0;
+		else if ((setup->wValue & 255) < 128)
+			endpoints[endpoint].buffer[4] = 1;
+		endpoints[endpoint].buffer[5] = 0;
 	}
 	else if (setup->bRequest == 0x31)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// set pins 4-7 of PORTB
+		// bits 4-7 of wValue & 255 set the direction
+		// bits 4-7 of wValue >> 8 set the level
+		endpoints[endpoint].buffer[0] = 0;
 	} else
 		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
 

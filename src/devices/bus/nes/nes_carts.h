@@ -55,6 +55,7 @@
 #include "rexsoft.h"
 #include "sachen.h"
 #include "somari.h"
+#include "subor.h"
 #include "tengen.h"
 #include "txc.h"
 #include "waixing.h"
