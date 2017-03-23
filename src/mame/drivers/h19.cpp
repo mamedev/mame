@@ -18,9 +18,8 @@
 	- Finish connecting up the 8250
 	   - enable 8520 interrupts
 	- speed up emulation
-
-	super19 version has the videoram at D800. This is not emulated.
-	However, a keyclick can be heard, to assure you it does in fact work.
+	- update SW401 baud rate options for Watz ROM
+	- update SW401 & SW402 definitions for Super-19 ROM
 
 ****************************************************************************/
 /***************************************************************************
@@ -110,7 +109,6 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
-	//uint8_t m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
@@ -155,23 +153,23 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x4100) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_ROM
+	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1F) AM_READ_PORT("SW401")
-	AM_RANGE(0x20, 0x3F) AM_READ_PORT("SW402")
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_READ_PORT("SW401")
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READ_PORT("SW402")
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x9F) AM_READ(kbd_key_r)
-	AM_RANGE(0xA0, 0xBF) AM_READ(kbd_flags_r)
-	AM_RANGE(0xC0, 0xDF) AM_WRITE(h19_keyclick_w)
-	AM_RANGE(0xE0, 0xFF) AM_WRITE(h19_bell_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1E) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x61, 0x61) AM_MIRROR(0x1E) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_READ(kbd_key_r)
+	AM_RANGE(0xA0, 0xA0) AM_MIRROR(0x1f) AM_READ(kbd_flags_r)
+	AM_RANGE(0xC0, 0xC0) AM_MIRROR(0x1f) AM_WRITE(h19_keyclick_w)
+	AM_RANGE(0xE0, 0xE0) AM_MIRROR(0x1f) AM_WRITE(h19_bell_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -608,9 +606,10 @@ ROM_START( watz19 )
 	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
+
 /*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
 COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", 0 )
 /*  TODO - verify the years for these third-party replacement ROMs. */
-COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_NOT_WORKING )
+COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
 
