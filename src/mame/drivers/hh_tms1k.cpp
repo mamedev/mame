@@ -8130,6 +8130,7 @@ void tbreakup_state::machine_reset()
 {
 	hh_tms1k_state::machine_reset();
 	set_clock();
+	m_expander->write_ms(1); // Vss
 }
 
 void tbreakup_state::machine_start()
