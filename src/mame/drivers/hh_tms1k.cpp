@@ -123,7 +123,6 @@
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
-  - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
   - 7in1ss: in 2-player mode, game select and skill select can be configured
     after selecting a game?
   - bship discrete sound, netlist is documented
@@ -8041,10 +8040,6 @@ void tbreakup_state::prepare_display()
 		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
 	}
 
-	// 22 round leds from O2-O7 and expander port 7
-	for (int y = 2; y < 8; y++)
-		m_display_state[y] = (m_o >> y & 1) ? m_exp_port[6] : 0;
-
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
 		m_display_state[y+8] = m_exp_port[y];
@@ -8081,6 +8076,10 @@ WRITE16_MEMBER(tbreakup_state::write_o)
 {
 	// O0-O3: TMS1025 port H
 	m_expander->write_h(space, 0, data & 0xf);
+
+	// 22 round leds from O2-O7 and expander port 7 (update here)
+	for (int y = 2; y < 8; y++)
+		m_display_state[y] = (data >> y & 1) ? m_exp_port[6] : 0;
 
 	// O0-O7: led state
 	m_o = data;
