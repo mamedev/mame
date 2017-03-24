@@ -1101,7 +1101,9 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);         // load    i0,base,0,dword
 
-			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (seqhead->delay.first() != nullptr
+			    && !(seqhead->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+			    && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
 				assert(base != nullptr);
@@ -1142,7 +1144,9 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr
+				    && !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+				    && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
 					assert(base != nullptr);
