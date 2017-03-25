@@ -33,8 +33,12 @@ extern const device_type R4650BE;
 extern const device_type R4650LE;
 extern const device_type R4700BE;
 extern const device_type R4700LE;
+extern const device_type TX4925BE;
+extern const device_type TX4925LE;
 extern const device_type R5000BE;
 extern const device_type R5000LE;
+extern const device_type VR5500BE;
+extern const device_type VR5500LE;
 extern const device_type QED5271BE;
 extern const device_type QED5271LE;
 extern const device_type RM7000BE;
@@ -259,10 +263,12 @@ protected:
 		MIPS3_TYPE_R4600,
 		MIPS3_TYPE_R4650,
 		MIPS3_TYPE_R4700,
+		MIPS3_TYPE_TX4925,
 
 		/* MIPS IV variants */
 		MIPS3_TYPE_MIPS_IV,
 		MIPS3_TYPE_R5000,
+		MIPS3_TYPE_VR5500,
 		MIPS3_TYPE_QED5271,
 		MIPS3_TYPE_RM7000
 	};
@@ -662,6 +668,24 @@ public:
 	{ }
 };
 
+class tx4925be_device : public mips3_device
+{
+public:
+	// construction/destruction
+	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, TX4925BE, "TX4925 (big)", tag, owner, clock, "tx4925be", MIPS3_TYPE_TX4925, ENDIANNESS_BIG)
+	{ }
+};
+
+class tx4925le_device : public mips3_device
+{
+public:
+	// construction/destruction
+	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, TX4925LE, "TX4925 (little)", tag, owner, clock, "tx4925le", MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE)
+	{ }
+};
+
 class r5000be_device : public mips3_device
 {
 public:
@@ -677,6 +701,24 @@ public:
 	// construction/destruction
 	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: mips3_device(mconfig, R5000LE, "R5000 (little)", tag, owner, clock, "r5000le", MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
+	{ }
+};
+
+class vr5500be_device : public mips3_device
+{
+public:
+	// construction/destruction
+	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, VR5500BE, "VR5500 (big)", tag, owner, clock, "vr5500be", MIPS3_TYPE_R5000, ENDIANNESS_BIG)
+	{ }
+};
+
+class vr5500le_device : public mips3_device
+{
+public:
+	// construction/destruction
+	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, VR5500LE, "VR5500 (little)", tag, owner, clock, "r5500le", MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
 	{ }
 };
 
