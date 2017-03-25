@@ -40,8 +40,7 @@ READ8_MEMBER( latch8_device::read )
 {
 	uint8_t res;
 
-	// FIXME: AM_MIRROR(0xff) doesn't work properly
-	//assert(offset == 0);
+	assert(offset == 0);
 
 	res = m_value;
 	if (m_has_read)
