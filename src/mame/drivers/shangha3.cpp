@@ -665,7 +665,7 @@ ROM_START( shangha3up ) /* PCB labeled SUN04 with a sticker labeled PCB 001, a p
 	ROM_LOAD( "s3j_chr-a1_4_sum-27e7_93.9.20.ic83", 0x180000, 0x80000, CRC(19be7039) SHA1(53839460b53144120cc2f68992c054062efa939b) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #4  SUM: 27E7  93.9.30 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
-	ROM_LOAD( "pcm_9-16_0166.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) ) /* Hand written label:  <'Japanese text'>  PCM  9/16 0166 */
+	ROM_LOAD( "pcm_9-16_0166.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) ) /* Hand written label:  <kanji for Shanghai III>  PCM  9/16 0166 */
 ROM_END
 
 ROM_START( shangha3j ) /* PCB labeled SUN04C */
