@@ -33718,6 +33718,7 @@ heberpop                        // (c) 1994 Sunsoft / Atlus
 shangha3                        // (c) 1993 Sunsoft
 shangha3j                       // (c) 1993 Sunsoft
 shangha3u                       // (c) 1993 Sunsoft
+shangha3up                      // (c) 1993 Sunsoft (US prototype from 'PCB001')
 
 @source:shanghai.cpp
 kothello                        // (c) 1990 Success.
