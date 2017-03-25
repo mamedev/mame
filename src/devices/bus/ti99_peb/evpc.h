@@ -19,6 +19,7 @@
 #include "video/v9938.h"
 #include "sound/sn76496.h"
 #include "bus/ti99x/ti99defs.h"
+#include "bus/ti99x/colorbus.h"
 
 extern const device_type TI99_EVPC;
 
@@ -45,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
 
+	TIMER_DEVICE_CALLBACK_MEMBER( hblank_interrupt );
+
 protected:
 	void device_start(void) override;
 	void device_reset(void) override;
@@ -68,6 +71,8 @@ private:
 	bool    m_sound_accessed;
 	bool    m_video_accessed;
 
+	int     m_intlevel;
+
 	uint8_t*  m_dsrrom;
 
 	std::unique_ptr<uint8_t[]>          m_novram;   // NOVRAM area
@@ -75,6 +80,7 @@ private:
 	evpc_palette                            m_palette;
 	required_device<v9938_device>           m_video;
 	required_device<sn76496_base_device>    m_sound;
+	required_device<colorbus_device>        m_colorbus;
 	evpc_clock_connector*                   m_console_conn;
 };
 

@@ -47,33 +47,34 @@ enum
 // bit definitions for (some of) the registers
 enum
 {
-	PPU_CONTROL0_INC              = 0x04,
-	PPU_CONTROL0_SPR_SELECT       = 0x08,
-	PPU_CONTROL0_CHR_SELECT       = 0x10,
-	PPU_CONTROL0_SPRITE_SIZE      = 0x20,
-	PPU_CONTROL0_NMI              = 0x80,
+	PPU_CONTROL0_INC               = 0x04,
+	PPU_CONTROL0_SPR_SELECT        = 0x08,
+	PPU_CONTROL0_CHR_SELECT        = 0x10,
+	PPU_CONTROL0_SPRITE_SIZE       = 0x20,
+	PPU_CONTROL0_NMI               = 0x80,
 
-	PPU_CONTROL1_DISPLAY_MONO     = 0x01,
-	PPU_CONTROL1_BACKGROUND_L8    = 0x02,
-	PPU_CONTROL1_SPRITES_L8       = 0x04,
-	PPU_CONTROL1_BACKGROUND       = 0x08,
-	PPU_CONTROL1_SPRITES          = 0x10,
-	PPU_CONTROL1_COLOR_EMPHASIS   = 0xe0,
+	PPU_CONTROL1_DISPLAY_MONO      = 0x01,
+	PPU_CONTROL1_BACKGROUND_L8     = 0x02,
+	PPU_CONTROL1_SPRITES_L8        = 0x04,
+	PPU_CONTROL1_BACKGROUND        = 0x08,
+	PPU_CONTROL1_SPRITES           = 0x10,
+	PPU_CONTROL1_COLOR_EMPHASIS    = 0xe0,
 
-	PPU_STATUS_8SPRITES           = 0x20,
-	PPU_STATUS_SPRITE0_HIT        = 0x40,
-	PPU_STATUS_VBLANK             = 0x80
+	PPU_STATUS_8SPRITES            = 0x20,
+	PPU_STATUS_SPRITE0_HIT         = 0x40,
+	PPU_STATUS_VBLANK              = 0x80
 };
 
 enum
 {
-	PPU_NTSC_SCANLINES_PER_FRAME  = 262,
-	PPU_PAL_SCANLINES_PER_FRAME   = 312,
+	PPU_NTSC_SCANLINES_PER_FRAME   = 262,
+	PPU_PAL_SCANLINES_PER_FRAME    = 312,
 
-	PPU_BOTTOM_VISIBLE_SCANLINE   = 239,
-	PPU_VBLANK_FIRST_SCANLINE     = 241,
-	PPU_VBLANK_LAST_SCANLINE_NTSC = 260,
-	PPU_VBLANK_LAST_SCANLINE_PAL  = 310
+	PPU_BOTTOM_VISIBLE_SCANLINE    = 239,
+	PPU_VBLANK_FIRST_SCANLINE      = 241,
+	PPU_VBLANK_FIRST_SCANLINE_PALC = 291,
+	PPU_VBLANK_LAST_SCANLINE_NTSC  = 260,
+	PPU_VBLANK_LAST_SCANLINE_PAL   = 310
 
 	// Both the scanline immediately before and immediately after VBLANK
 	// are non-rendering and non-vblank.
@@ -96,6 +97,8 @@ enum
 	MCFG_PPU2C0X_ADD(_tag, PPU_2C04)
 #define MCFG_PPU2C07_ADD(_tag)   \
 	MCFG_PPU2C0X_ADD(_tag, PPU_2C07)
+#define MCFG_PPUPALC_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_PALC)
 #define MCFG_PPU2C05_01_ADD(_tag)   \
 	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_01)
 #define MCFG_PPU2C05_02_ADD(_tag)   \
@@ -189,7 +192,7 @@ public:
 	required_device<cpu_device> m_cpu;
 
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
-	std::unique_ptr<uint8_t[]>    m_spriteram;           /* sprite ram */
+	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
 	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
@@ -210,9 +213,10 @@ public:
 	int                         m_sprite_page;          /* current sprite page */
 	int                         m_back_color;           /* background color */
 	int                         m_color_base;
-	uint8_t                       m_palette_ram[0x20];        /* shouldn't be in main memory! */
+	uint8_t                     m_palette_ram[0x20];        /* shouldn't be in main memory! */
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
+	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
 	int                         m_security_value;       /* 2C05 protection */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
@@ -261,6 +265,11 @@ public:
 	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ppupalc_device : public ppu2c0x_device {
+public:
+	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class ppu2c05_01_device : public ppu2c0x_device {
 public:
 	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -288,6 +297,7 @@ extern const device_type PPU_2C02;  // NTSC NES
 extern const device_type PPU_2C03B; // Playchoice 10
 extern const device_type PPU_2C04;  // Vs. Unisystem
 extern const device_type PPU_2C07;  // PAL NES
+extern const device_type PPU_PALC;  // PAL Clones
 extern const device_type PPU_2C05_01;   // Vs. Unisystem (Ninja Jajamaru Kun)
 extern const device_type PPU_2C05_02;   // Vs. Unisystem (Mighty Bomb Jack)
 extern const device_type PPU_2C05_03;   // Vs. Unisystem (Gumshoe)

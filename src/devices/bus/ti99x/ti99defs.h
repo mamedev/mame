@@ -81,7 +81,8 @@
 #define GLIB31_TAG GLIB3_TAG "_1"
 #define GLIB32_TAG GLIB3_TAG "_2"
 
-
+// v9938
+#define COLORBUS_TAG     "colorbus"
 
 // Geneve
 #define GKEYBOARD_TAG   "gkeyboard"

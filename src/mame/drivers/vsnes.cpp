@@ -1702,7 +1702,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( vsnes, vsnes_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
@@ -1769,10 +1769,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( vsdual, vsnes_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
-	MCFG_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)

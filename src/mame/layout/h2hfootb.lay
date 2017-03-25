@@ -34,6 +34,7 @@
 
 	<element name="text_p1">
 		<rect><color red="0.24" green="0.4" blue="0.24" /></rect>
+		<text state="1" string=""></text>
 		<text string="PL SEL:">
 			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
 			<color red="0.7" green="0.7" blue="0.8" />
@@ -81,10 +82,8 @@
 		<bezel element="text_time"><bounds x="107" y="-86" width="170" height="19" /></bezel>
 		<bezel element="text_visitor"><bounds x="301" y="-86" width="90" height="19" /></bezel>
 
-		<bezel element="text_p1"><bounds x="301" y="130" width="40" height="16" /></bezel>
-		<bezel element="text_p2" inputtag="IN.1" inputmask="0x01">
-			<bounds x="339" y="130" width="50" height="16" />
-		</bezel>
+		<bezel element="text_p1" inputtag="IN.1" inputmask="0x01"><bounds x="301" y="130" width="40" height="16" /></bezel>
+		<bezel element="text_p2" inputtag="IN.1" inputmask="0x01"><bounds x="339" y="130" width="50" height="16" /></bezel>
 
 		<bezel element="static_white"><bounds left="-9" right="393" top="-96" bottom="-90" /></bezel>
 		<bezel element="static_white"><bounds left="-9" right="393" top="-61" bottom="-51" /></bezel>

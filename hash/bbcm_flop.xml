@@ -62,4 +62,28 @@
 		</part>
 	</software>
 
+	<!-- Public Domain -->
+
+	<software name="enjoy">
+		<description>Enjoy The Silence</description>
+		<year>1990</year>
+		<publisher>The Yorkshire Boys</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="97280">
+				<rom name="tyb-enjoy.ssd" size="97280" crc="2f8dafe5" sha1="15c05a7e8c2b130ab99accee0a867467acda1774" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retribx">
+		<description>Retribution X</description>
+		<year>1992</year>
+		<publisher>The Yorkshire Boys</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="tyb-retribution.dsd" size="409600" crc="33ee87cb" sha1="346e6b2f266b663845dc5f1d71666dcdcf5f1083" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

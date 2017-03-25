@@ -54,8 +54,8 @@ enum
                                          A5 15 |           | 26 D6
                                          B5 16 |           | 25 C6
      CE: Chip Enable                     C5 17 |           | 24 B6
-     MS: Master S.?                      D5 18 |           | 23 A6
-    STD: STrobe Data?                    A2 19 |           | 22 D2
+     MS: Mode Select                     D5 18 |           | 23 A6
+    STD: STrobe Data                     A2 19 |           | 22 D2
       S: Select                          B2 20 |___________| 21 C2
       H: Hold?
 
@@ -81,18 +81,19 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(write_h);
+	DECLARE_READ8_MEMBER(read_h);
 	DECLARE_WRITE8_MEMBER(write_s);
 	DECLARE_WRITE_LINE_MEMBER(write_std);
-	DECLARE_READ8_MEMBER(read_h);
+	DECLARE_WRITE_LINE_MEMBER(write_ms);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	u8 m_h;      // 4-bit data latch
 	u8 m_s;      // 3-bit port select
 	u8 m_std;    // strobe pin
+	u8 m_ms;     // mode select pin, default to read mode
 
 	// callbacks
 	devcb_read8 m_read_port[7];

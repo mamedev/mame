@@ -443,12 +443,6 @@ READ_LINE_MEMBER( mc6845_device::cursor_r )
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_state_r )
-{
-	return m_cursor_state;
-}
-
-
 READ_LINE_MEMBER( mc6845_device::hsync_r )
 {
 	return m_hsync;

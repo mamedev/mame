@@ -311,9 +311,8 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( cham24, cham24_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

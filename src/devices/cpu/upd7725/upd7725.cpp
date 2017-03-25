@@ -29,6 +29,7 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 		m_irq(0),
+		m_irq_firing(0),
 		m_program(nullptr),
 		m_data(nullptr),
 		m_direct(nullptr),
@@ -149,22 +150,17 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.sr.p1));
 	save_item(NAME(regs.stack));
 	save_item(NAME(dataRAM));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_firing));
 
 	m_icountptr = &m_icount;
-}
 
-//-------------------------------------------------
-//  device_reset - reset the device
-//-------------------------------------------------
-
-void necdsp_device::device_reset()
-{
 	for (auto & elem : dataRAM)
 	{
 		elem = 0x0000;
 	}
-
-	regs.pc = 0x0000;
+	// reset registers not reset by the /RESET line (according to section 3.6.1 on the upd7725 advanced production datasheet)
+	m_irq = 0; // not a register, but the current irq pin state
 	regs.rp = 0x0000;
 	regs.dp = 0x0000;
 	regs.sp = 0x0;
@@ -174,17 +170,34 @@ void necdsp_device::device_reset()
 	regs.n = 0x0000;
 	regs.a = 0x0000;
 	regs.b = 0x0000;
-	regs.flaga = 0x00;
-	regs.flagb = 0x00;
 	regs.tr = 0x0000;
 	regs.trb = 0x0000;
-	regs.sr = 0x0000;
 	regs.dr = 0x0000;
 	regs.si = 0x0000;
 	regs.so = 0x0000;
 	regs.idb = 0x0000;
+}
+
+//-------------------------------------------------
+//  device_reset - reset the device
+//-------------------------------------------------
+
+void necdsp_device::device_reset()
+{
+	// according to 3.6.1 on the upd7725 advanced production datasheet, /RESET resets the following only:
+	regs.pc = 0x0000;
+	regs.sr = 0x0000;
+	m_out_p0_cb(regs.sr.p0);
+	m_out_p1_cb(regs.sr.p1);
+	// TODO: drq callback, once added, should be forced to the inactive state here
+	// TODO: the sorq pin state is also reset to 'low' state
+	regs.flaga = 0x00;
+	regs.flagb = 0x00;
 	regs.siack = 0;
 	regs.soack = 0;
+
+	// the irq state (if mid-irq) is assumed to also be reset, since the pulse width of reset must be more than 4 opcode clocks
+	m_irq_firing = 0;
 }
 
 //-------------------------------------------------
@@ -298,11 +311,12 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case NECDSP_INPUT_LINE_INT:
-		if ( ((m_irq == 0) && (state == 1)) && (regs.sr.ei == 1)) // detect rising edge AND if EI == 1;
+		if ((!m_irq && (CLEAR_LINE != state)) && regs.sr.ei) // detect rising edge AND if EI == 1;
 		{
-			regs.stack[regs.sp++] = regs.pc; regs.pc = 0x0100; regs.sp &= 0xf; regs.sr.ei = 0; //push PC, pc = 0x100
+			m_irq_firing = 1;
+			regs.sr.ei = 0;
 		}
-		m_irq = state; // set old state to current state
+		m_irq = (ASSERT_LINE == state); // set old state to current state
 		break;
 	// add more when needed
 	}
@@ -352,8 +366,26 @@ void necdsp_device::execute_run()
 			debugger_instruction_hook(this, regs.pc);
 		}
 
-		opcode = m_direct->read_dword(regs.pc<<2)>>8;
-		regs.pc++;
+		if (m_irq_firing == 0) // normal opcode
+		{
+			opcode = m_direct->read_dword(regs.pc<<2)>>8;
+			regs.pc++;
+		}
+		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
+		{
+			// NOP: OP  PSEL ALU  ASL DPL DPHM   RPDCR SRC  DST
+			//      00  00   0000 0   00  000(0) 0     0000 0000
+			opcode = 0x000000;
+			m_irq_firing = 2;
+		}
+		else // m_irq_firing == 2 // ...then a call to 100
+		{
+			// LCALL: JP BRCH      NA          BNK(all 0s on 7725)
+			//        10 101000000 00100000000 00
+			opcode = 0xA80400;
+			m_irq_firing = 0;
+		}
+
 		switch(opcode >> 22)
 		{
 			case 0: exec_op(opcode); break;

@@ -79,6 +79,7 @@ const device_type PPU_2C02 = device_creator<ppu2c02_device>;
 const device_type PPU_2C03B = device_creator<ppu2c03b_device>;
 const device_type PPU_2C04 = device_creator<ppu2c04_device>;
 const device_type PPU_2C07 = device_creator<ppu2c07_device>;
+const device_type PPU_PALC = device_creator<ppupalc_device>;
 const device_type PPU_2C05_01 = device_creator<ppu2c05_01_device>;
 const device_type PPU_2C05_02 = device_creator<ppu2c05_02_device>;
 const device_type PPU_2C05_03 = device_creator<ppu2c05_03_device>;
@@ -152,6 +153,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 
 	m_scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = PPU_VBLANK_FIRST_SCANLINE;
 
 	/* usually, no security value... */
 	m_security_value = 0;
@@ -179,6 +181,13 @@ ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, d
 ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C07, "2C07 PPU", tag, owner, clock, "ppu2c07", __FILE__)
 {
 	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
+}
+
+// PAL clones
+ppupalc_device::ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_PALC, "Generic PAL Clone PPU", tag, owner, clock, "ppupalc", __FILE__)
+{
+	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = PPU_VBLANK_FIRST_SCANLINE_PALC;
 }
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
@@ -254,6 +263,7 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_back_color));
 	save_item(NAME(m_scan_scale));
 	save_item(NAME(m_scanlines_per_frame));
+	save_item(NAME(m_vblank_first_scanline));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
@@ -469,7 +479,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TIMER_HBLANK:
 			blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
-			vblank = ((m_scanline >= PPU_VBLANK_FIRST_SCANLINE - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
+			vblank = ((m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
 
 			//update_scanline();
 
@@ -489,7 +499,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		case TIMER_SCANLINE:
 			blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
-			vblank = ((m_scanline >= PPU_VBLANK_FIRST_SCANLINE - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
+			vblank = ((m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
 			int next_scanline;
 
 			/* if a callback is available, call it */
@@ -505,7 +515,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->m_screen->vpos(), device->m_screen->hpos());
 
 			/* Note: this is called at the _end_ of each scanline */
-			if (m_scanline == PPU_VBLANK_FIRST_SCANLINE)
+			if (m_scanline == m_vblank_first_scanline)
 			{
 				// logerror("vblank starting\n");
 				/* We just entered VBLANK */

@@ -377,7 +377,14 @@ std::map<std::string, std::string> mame_options::evaluate_initial_softlist_optio
 							// only load compatible software this way
 							if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 							{
-								device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
+								// we need to find a mountable image slot, but we need to ensure it is a slot
+								// for which we have not already distributed a part to
+								device_image_interface *image = software_list_device::find_mountable_image(
+									config,
+									swpart,
+									[&results](const device_image_interface &candidate) { return results.count(candidate.instance_name()) == 0; });
+
+								// did we find a slot to put this part into?
 								if (image != nullptr)
 								{
 									// we've resolved this software
