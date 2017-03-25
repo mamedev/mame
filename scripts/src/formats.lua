@@ -943,6 +943,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/jfd_dsk.h,FORMATS["JFD_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["JFD_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/jfd_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/jfd_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/kaypro_dsk.h,FORMATS["KAYPRO_DSK"] = true
 --------------------------------------------------
 

@@ -13086,6 +13086,7 @@ galpani3k                       // (c) 1995 Kaneko (Korea)
 @source:galpanic.cpp
 galpanic                        // (c) 1990 Kaneko
 galpanica                       // (c) 1990 Kaneko
+galpanicb                       // (c) 1990 Kaneko
 
 @source:galspnbl.cpp
 galspnbl                        // (c) 1996 Comad
@@ -17471,7 +17472,6 @@ discodan                        //
 force                           //
 hhotel                          //
 hustlerp                        //
-hustlerpa                       //
 kkongltd                        //
 pecmen                          //
 tmacltd2                        //
@@ -32661,6 +32661,7 @@ croupiera                       // (c) 1997 Playmark
 luckboom                        //
 sderby                          // (c) 1996
 sderbya                         // (c) 1996
+shinygld                        //
 spacewin                        //
 
 @source:sdk80.cpp

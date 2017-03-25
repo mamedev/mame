@@ -4450,7 +4450,7 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
@@ -4503,7 +4503,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -4550,7 +4550,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -4791,7 +4791,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ADD("aysnd", AY8912, 22000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 22000000 / 8)
