@@ -4292,6 +4292,12 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	virtual ~discrete_device(void);
 
+	template<int DiscreteInput>
+	DECLARE_WRITE_LINE_MEMBER(write_line)
+	{
+		write(machine().dummy_space(), DiscreteInput, state ? 1 : 0);
+	}
+
 	/* --------------------------------- */
 
 	virtual void update_to_current_time(void) const {  }

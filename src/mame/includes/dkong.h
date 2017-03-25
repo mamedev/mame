@@ -266,10 +266,11 @@ public:
 	DECLARE_MACHINE_RESET(strtheat);
 	DECLARE_MACHINE_RESET(drakton);
 	DECLARE_WRITE8_MEMBER(M58817_command_w);
-	DECLARE_READ8_MEMBER(M58817_status_r);
 	DECLARE_READ8_MEMBER(dkong_voice_status_r);
 	DECLARE_READ8_MEMBER(dkong_tune_r);
 	DECLARE_WRITE8_MEMBER(dkong_p1_w);
+	DECLARE_READ8_MEMBER(sound_t0_r);
+	DECLARE_READ8_MEMBER(sound_t1_r);
 	uint32_t screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
