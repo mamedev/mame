@@ -874,7 +874,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	}
 
 	// check for memory @ operators
-	if (string[0] == '@' || string[0] == '!')
+	if ((string[0] == '@' || string[0] == '!') && (buffer.back() == 'b' || buffer.back() == 'w' || buffer.back() == 'd' || buffer.back() == 'q'))
 	{
 		bool with_se = string[0] == '!';
 		string += 1;
