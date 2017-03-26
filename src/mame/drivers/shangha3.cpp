@@ -653,6 +653,21 @@ ROM_START( shangha3u ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drug
 	ROM_LOAD( "ic75.ic75", 0x0000, 0x80000, CRC(a8136d8c) SHA1(8028bda5642c2546c1ac8da78dbff4084829f03b) ) /* 27C4001 with 1st & 2nd halves == s3j_v10.ic75 */
 ROM_END
 
+ROM_START( shangha3up ) /* PCB labeled SUN04 with a sticker labeled PCB 001, a prototyping version of the later SUN04C */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "syan3u_evn_10-7.ic3",  0x0000, 0x40000, CRC(a1f5275a) SHA1(71a024205bd5e6385bd9d746c339f0327bd1c1d6) ) /* ST M27C2001 EPROM hand written label:  SYAN3U  EVN 10/7 */
+	ROM_LOAD16_BYTE( "syan3u_odd_10-7.ic2",  0x0001, 0x40000, CRC(fe3960bf) SHA1(545473260d959b8ed8145263d54f5f4523a844c4) ) /* ST M27C2001 EPROM hand written label:  SYAN3U  ODD 10/7 */
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* same data as the 42 pin MASK S3J CHAR-A1 */
+	ROM_LOAD( "s3j_chr-a1_1_sum-53b1_93.9.20.ic80", 0x000000, 0x80000, CRC(fcaf795b) SHA1(312d85f39087564d67f12e0287f508b94b1493af) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #1  SUM: 53B1  93.9.30 */
+	ROM_LOAD( "s3j_chr-a1_2_sum_0e32_93.9.20.ic81", 0x080000, 0x80000, CRC(5a564f50) SHA1(34ca2ecd7101961e657034082802d89db5b4b7bd) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #2  SUM: 0E32  93.9.30 */
+	ROM_LOAD( "s3j_chr-a1_3_sum_0d9a_93.9.20.ic82", 0x100000, 0x80000, CRC(2b333c69) SHA1(6e720de5d222be25857ab18902636587e8c6afb8) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #3  SUM: 0D9A  93.9.30 */
+	ROM_LOAD( "s3j_chr-a1_4_sum-27e7_93.9.20.ic83", 0x180000, 0x80000, CRC(19be7039) SHA1(53839460b53144120cc2f68992c054062efa939b) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #4  SUM: 27E7  93.9.30 */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
+	ROM_LOAD( "pcm_9-16_0166.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) ) /* Hand written label:  <kanji for Shanghai III>  PCM  9/16 0166 */
+ROM_END
+
 ROM_START( shangha3j ) /* PCB labeled SUN04C */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s3j_v11.ic3",  0x0000, 0x40000, CRC(e98ce9c8) SHA1(359e117aebb644d7b235add7e71ed6891243d451) )
@@ -731,8 +746,9 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_do_shadows = 0;
 }
 
-GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3u, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shangha3j, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, heberpop,  0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blocken,   0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3,   0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3u,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3up, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shangha3j,  shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, heberpop,   0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blocken,    0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

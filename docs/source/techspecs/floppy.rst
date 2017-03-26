@@ -75,7 +75,7 @@ Bit endocing is then the art of transforming raw data into a cell 0/1 configurat
 2.3.1.2. FM encoding
 ````````````````````
 
-The very first encoding method developed for floppies is called Frequency Modulation, or FM.  The cell size is set at slighly over the physical limit, e.g. 4us.  That means it is possible to reliably have consecutive '1' cells.  Each bit is encoded on two cells:
+The very first encoding method developed for floppies is called Frequency Modulation, or FM.  The cell size is set at slightly over the physical limit, e.g. 4us.  That means it is possible to reliably have consecutive '1' cells.  Each bit is encoded on two cells:
 
 - the first cell, called the clock bit, is '1'
 
@@ -391,7 +391,7 @@ A number of methods are provided to simplify writing the converter classes.
 
 **stp_w(state)**
 
-  Step signal, moves by one track on 1->0 transistion.
+  Step signal, moves by one track on 1->0 transition.
 
 
 **trk00_r()**

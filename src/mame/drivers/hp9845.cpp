@@ -173,6 +173,10 @@
 #define PEN_CURSOR	3	// Graphic cursor
 #define PEN_LP		4	// Light pen cursor
 
+// Light pen constants
+constexpr unsigned LP_FOV = 9;	// Field of view
+constexpr unsigned LP_XOFFSET = 5;	// x-offset of LP (due to delay in hit recognition)
+
 // Peripheral Addresses (PA)
 #define IO_SLOT_FIRST_PA	1
 #define IO_SLOT_LAST_PA		12
@@ -1241,7 +1245,7 @@ INPUT_PORTS_END
 class hp9845ct_state : public hp9845_base_state
 {
 public:
-	hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag, unsigned v_total);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1263,11 +1267,15 @@ protected:
 	void update_line_pattern(void);
 	static uint16_t get_gv_mem_addr(unsigned x , unsigned y);
 	void update_graphic_bits(void);
+	int get_lp_cursor_y_top(void) const;
+	void render_lp_cursor(unsigned video_scanline , unsigned pen_idx);
 
 	void lp_r4_w(uint16_t data);
 	uint16_t lp_r4_r(void);
 	void lp_r5_w(uint16_t data);
+	bool lp_segment_intersect(unsigned yline) const;
 	void compute_lp_data(void);
+	void lp_scanline_update(unsigned video_scanline);
 
 	bool m_alpha_sel;
 	bool m_gv_sk_en;
@@ -1292,9 +1300,9 @@ protected:
 	uint16_t m_gv_last_xpt;
 	uint16_t m_gv_last_ypt;
 	uint16_t m_gv_lp_data[ 3 ];
+	uint16_t m_gv_next_lp_data[ 3 ];
+	unsigned m_gv_next_lp_scanline[ 3 ];
 	bool m_gv_lp_selftest;
-	bool m_gv_lp_xwindow;
-	bool m_gv_lp_ywindow;
 	bool m_gv_lp_interlace;
 	bool m_gv_lp_vblank;
 	bool m_gv_lp_1sthit;
@@ -1306,16 +1314,20 @@ protected:
 	bool m_gv_lp_sw;
 	uint8_t m_gv_lp_reg_cnt;
 	bool m_gv_lp_int_en;
+	bool m_gv_lp_hit_lt192;
+	bool m_gv_lp_int_256;
+	const unsigned m_gv_v_total;
 
 	static const uint16_t m_line_type[];
 	static const uint16_t m_area_fill[];
 };
 
-hp9845ct_state::hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag)
+hp9845ct_state::hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag, unsigned v_total)
 	: hp9845_base_state(mconfig , type , tag),
 	  m_lightpen_x(*this, "LIGHTPENX"),
 	  m_lightpen_y(*this, "LIGHTPENY"),
-	  m_lightpen_sw(*this, "GKEY")
+	  m_lightpen_sw(*this, "GKEY"),
+	  m_gv_v_total(v_total)
 {
 }
 
@@ -1335,8 +1347,6 @@ void hp9845ct_state::machine_reset()
 	m_gv_gr_en = false;
 	m_gv_opt_en = false;
 	m_gv_dsa_en = false;
-	// TODO: check
-	//m_gv_lp_status = true;		// required by Test ROM
 	m_gv_lp_status = false;
 	m_gv_sk_status = false;
 	m_gv_lp_cursor_x = 944;
@@ -1355,8 +1365,6 @@ void hp9845ct_state::machine_reset()
 	m_gv_last_xpt = 0;
 	m_gv_last_ypt = 0;
 	m_gv_lp_selftest = false;
-	m_gv_lp_xwindow = false;
-	m_gv_lp_ywindow = false;
 	m_gv_lp_interlace = false;
 	m_gv_lp_vblank = false;
 	m_gv_lp_1sthit = false;
@@ -1394,8 +1402,6 @@ WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 
 		// lightpen
 		m_gv_lp_vblank = true;
-		m_gv_lp_xwindow = false;
-		m_gv_lp_ywindow = false;
 		m_gv_lp_sw = m_lightpen_sw->read();
 		m_gv_lp_x = m_lightpen_x->read();
 		if (m_gv_lp_x > (VIDEO_TOT_HPIXELS - 1)) {
@@ -1405,14 +1411,6 @@ WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 		if (m_gv_lp_y > (GVIDEO_VPIXELS - 1)) {
 			m_gv_lp_y = GVIDEO_VPIXELS - 1;
 		}
-
-		// TODO: right place to call it?
-		compute_lp_data();
-		// VB interrupt
-		if (m_gv_lp_vbint) {
-			m_gv_lp_status = true;
-		}
-		update_graphic_bits();
 	} else {
 		m_gv_lp_vblank = false;
 	}
@@ -1549,7 +1547,7 @@ void hp9845ct_state::update_graphic_bits(void)
 	// DEBUG DEBUG DEBUG
 	static bool last_irq = false;
 	if (!last_irq && irq) {
-		logerror("GV IRQ 0->1\n");
+		logerror("GV IRQ %d %d\n" , m_gv_lp_int_en , m_gv_lp_status);
 	}
 	last_irq = irq;
 #endif
@@ -1561,6 +1559,53 @@ void hp9845ct_state::update_graphic_bits(void)
 	m_ppu->dmar_w(dmar);
 }
 
+int hp9845ct_state::get_lp_cursor_y_top(void) const
+{
+	int wrapped_cursor_y = m_gv_lp_cursor_y;
+	if (wrapped_cursor_y >= GVIDEO_VPIXELS && wrapped_cursor_y < m_gv_v_total) {
+		wrapped_cursor_y -= m_gv_v_total;
+	}
+
+	return wrapped_cursor_y;
+}
+
+void hp9845ct_state::render_lp_cursor(unsigned video_scanline , unsigned pen_idx)
+{
+	int cursor_y_top = get_lp_cursor_y_top();
+
+	bool yw;
+	if (m_gv_lp_cursor_fs) {
+		yw = true;
+	} else {
+		yw = (int)video_scanline >= cursor_y_top &&
+			(int)video_scanline <= (cursor_y_top + 48);
+	}
+	if (!yw) {
+		return;
+	}
+
+	if (!m_gv_lp_cursor_fs && m_gv_lp_cursor_x >= (VIDEO_TOT_HPIXELS + 24)) {
+		return;
+	}
+
+	bool yc = video_scanline == (cursor_y_top + 24);
+
+	const pen_t &pen = m_palette->pen(pen_idx);
+	if (!yc) {
+		if (m_gv_lp_cursor_x < VIDEO_TOT_HPIXELS) {
+			m_bitmap.pix32(video_scanline , m_gv_lp_cursor_x) = pen;
+		}
+	} else if (m_gv_lp_cursor_fs) {
+		for (unsigned x = 0; x < VIDEO_TOT_HPIXELS; x++) {
+			m_bitmap.pix32(video_scanline , x) = pen;
+		}
+	} else {
+		for (unsigned x = std::max(0 , (int)m_gv_lp_cursor_x - 24); x <= (m_gv_lp_cursor_x + 25) && x < VIDEO_TOT_HPIXELS; x++) {
+			m_bitmap.pix32(video_scanline , x) = pen;
+		}
+	}
+}
+
 void hp9845ct_state::lp_r4_w(uint16_t data)
 {
 	if (m_gv_lp_en) {
@@ -1568,16 +1613,10 @@ void hp9845ct_state::lp_r4_w(uint16_t data)
 		case 2:
 			// LP Y cursor + threshold + interlace + vertical blank interrupt
 			m_gv_lp_cursor_y = ((~data >> 6) & 0x1ff);
-#if 0
-			if (m_gv_lp_cursor_y < 454)
-				m_gv_lp_cursor_y += 24;
-			else
-				m_gv_lp_cursor_y -= 461;
-#endif
 			m_gv_lp_fullbright = BIT(data, 1);
 			m_gv_lp_threshold = BIT(data, 3);
 			m_gv_lp_interlace = !BIT(data, 4);
-			m_gv_lp_vbint = !BIT(data, 5);
+			m_gv_lp_vbint = BIT(data, 5);
 			LOG(("LP Y cursor y = %d, threshold = %d, interlace = %d, vbint = %d\n",
 				 m_gv_lp_cursor_y, m_gv_lp_threshold, m_gv_lp_interlace, m_gv_lp_vbint));
 			m_gv_lp_reg_cnt--;
@@ -1627,7 +1666,6 @@ uint16_t hp9845ct_state::lp_r4_r(void)
 			if (m_gv_lp_sw) {
 				BIT_SET(res, 14);
 			}
-			// TODO: correct?
 			if (m_gv_lp_1sthit) {
 				BIT_SET(res, 15);
 			}
@@ -1650,6 +1688,26 @@ void hp9845ct_state::lp_r5_w(uint16_t data)
 	update_graphic_bits();
 }
 
+bool hp9845ct_state::lp_segment_intersect(unsigned yline) const
+{
+	int xp = m_gv_lp_x;
+	int yp = m_gv_lp_y;
+	int xc = (int)m_gv_lp_cursor_x + 1 - LP_XOFFSET;
+
+	unsigned h = (unsigned)abs((int)yline - yp);
+
+	if (h > LP_FOV) {
+		return false;
+	}
+
+	int dt = (int)sqrt(LP_FOV * LP_FOV - h * h);
+	int ex = xp - dt;
+	int fx = xp + dt;
+
+	// Consider [xc..xc+24] segment (i.e. the right-hand side of cursor interlace window)
+	return fx >= xc && ex <= (xc + 24);
+}
+
 void hp9845ct_state::compute_lp_data(void)
 {
 	// get LP hit data, returns three words for cmd=6 and one word for cmd=4
@@ -1661,81 +1719,145 @@ void hp9845ct_state::compute_lp_data(void)
 	// bit 13 = xwindow (YHI + XLEFT + YLO) = X is in [xcursor-24, xcursor+24] and Y in [ycursor-8,ycursor+8]
 	// bit 14 = sw (YHI) bzw. ywindow (XLEFT + YLO)
 	// bit 15 = 1st hit (YHI) = valid hit
-	// TODO: check
-	m_gv_lp_status = true;
+
+	bool xwindow[ 3 ] = { false , false , false };
+	bool ywindow[ 3 ] = { false , false , false };
+	// hit coordinates
+	uint16_t yhi = 0;
+	uint16_t xleft = 0;
+	uint16_t yleft = 0;
+	uint16_t ylo = 0;
+	uint16_t xp = m_gv_lp_x;					// light gun pointer
+	uint16_t yp = m_gv_lp_y;
+	int yc = get_lp_cursor_y_top() + 24;
+
 	if (m_gv_lp_selftest) {
-		int offset = 57 - VIDEO_770_ALPHA_L_LIM;
-		m_gv_lp_xwindow = true;
-		m_gv_lp_ywindow = true;
-		m_gv_lp_data[0] = (~(m_gv_lp_cursor_y + 16)) & 0x1ff;		// YHI
-		m_gv_lp_data[1] = (~(m_gv_lp_cursor_x + offset)) & 0x3ff;	// XLEFT
-		m_gv_lp_data[2] = (~(m_gv_lp_cursor_y + 32)) & 0x1ff;		// YLO
+		constexpr int offset = 57 - VIDEO_770_ALPHA_L_LIM;
+		xwindow[ 0 ] = xwindow[ 1 ] = xwindow[ 2 ] = true;
+		ywindow[ 0 ] = ywindow[ 1 ] = ywindow[ 2 ] = true;
+		yhi = m_gv_lp_cursor_y + 16;	// YHI
+		xleft = m_gv_lp_cursor_x + offset;	// XLEFT
+		yleft = yhi;
+		ylo = m_gv_lp_cursor_y + 32;	// YLO
 	} else {
-		uint8_t fov = 9;							// field of view = [cursor - fov, cursor + fov]
-		uint16_t xp = m_gv_lp_x;					// light gun pointer
-		uint16_t yp = m_gv_lp_y;
-		uint16_t xc = m_gv_lp_cursor_x + 1;		// 9845 light pen crosshair cursor
-		uint16_t yc = m_gv_lp_cursor_y + 24;
-		uint16_t yhi, xleft, ylo;					// hit coordinates
-		uint16_t xoffset;							// delay for hit detection on horizontal line
-		// try to calculate YHI, XLEFT, YLO hit coordinates with respect to LP cursor
-		// should give a better match with the prediction algorithm in the firmware
-		uint16_t dx = 0, dy = fov;
-		xoffset = 14;	// longer delay due to bright line
-		// if vertical line of the cursor is within field of view, get y delta to intersection
-		if (abs(xc - xp) <= fov)
-			dy = (uint16_t)sqrt((fov * fov) - ((xc - xp) * (xc - xp)));
-		// if horizontal line of the cursor is within field of view, get x delta to intersection
-		if (abs(yc - yp) <= fov)
-			dx = (uint16_t)sqrt((fov * fov) - ((yc - yp) * (yc - yp)));
-		// check whether intersection with vertical line of the cursor is within window
-		if ((yp + dy >= yc - 24) && (yp - dy <= yc - 24)) {
-			// return the first hit in the window
-			yhi = (yp - dy > yc - 24) || !m_gv_lp_interlace ? yp - dy : yc - 24;
-			// return the last hit in the window
-			ylo = (yp + dy < yc + 24) || !m_gv_lp_interlace ? yp + dy : yc + 24;
+		// Hit in a cursor-only part.
+		bool yhi_hit = false;
+		uint16_t y_top = std::max(0 , (int)yp - (int)LP_FOV);
+
+		// XLEFT: x coordinate of 1st hit in the frame or hit on cursor line
+		unsigned dy = abs((int)yp - yc);
+		if (dy <= LP_FOV) {
+			// Hit on horizontal cursor line
+			xleft = (uint16_t)std::max(0 , (int)xp - (int)sqrt(LP_FOV * LP_FOV - dy * dy));
+			yleft = yc;
 		} else {
-			// otherwise return (simulated) first hit in view of field
-			yhi = yp - fov;
-			ylo = yp + fov;
+			// 1st hit in the frame
+			dy = abs((int)yp - (int)y_top);
+			xleft = (uint16_t)std::max(0 , (int)xp - (int)sqrt(LP_FOV * LP_FOV - dy * dy));
+			yleft = y_top;
 		}
-		// check whether intersection with horizontal line of the cursor is within window
-		if ((xp + dx >= xc - 24) && (xp - dx <= xc + 24))
-			// return the first hit on the horizontal bar of the cursor
-			xleft = (xp - dx > xc - 24) ? xp - dx - fov + xoffset : xp + dx - fov + xoffset;
-		else
-			// otherwise return (simulated) first hit in view of field
-			xleft = xp - fov + xoffset;
-		m_gv_lp_data[0] = ~yhi & 0x1ff;		// YHI
-		m_gv_lp_data[1] = ~xleft & 0x3ff;	// XLEFT
-		m_gv_lp_data[2] = ~ylo & 0x1ff;		// YLO
+		xleft += LP_XOFFSET;
 
 		if (m_gv_lp_interlace) {
-			m_gv_lp_xwindow = ((xp > (xc - 24)) && (xp < (xc + 24)));
-			m_gv_lp_ywindow = ((yp > (yc - 24)) && (yp < (yc + 24)));
-		} else {
-			m_gv_lp_xwindow = false;
-			m_gv_lp_ywindow = false;
+			// **** Interlaced mode ****
+			unsigned ywd_top = (unsigned)std::max(yc - 24 , 0);
+			unsigned ywd_bot = std::min((unsigned)(GVIDEO_VPIXELS - 1) , (unsigned)(yc + 24));
+			unsigned even_odd = (unsigned)m_screen->frame_number() & 1;
+
+			// Scan the cursor window [yc-24..yc+24]
+			// Only consider each other line. LSB of frame number selects either even-numbered
+			// (0) or odd-numbered lines (1).
+			for (unsigned line = ywd_top; line <= ywd_bot; line++) {
+				if ((line & 1) == even_odd) {
+					// YHI: y coordinate of 1st hit in the frame or 1st hit in cursor-only part
+					bool curs_hit = lp_segment_intersect(line);
+					if (!yhi_hit && curs_hit) {
+						yhi = line;
+						yhi_hit = true;
+					}
+					// YLO: y coordinate of last hit in cursor-only part
+					if (curs_hit) {
+						ylo = line;
+					}
+				}
+			}
+		}
+
+		if (!m_gv_lp_interlace || !yhi_hit) {
+			// **** Non-interlaced mode ****
+			// YHI: y coordinate of 1st hit in the frame
+			yhi = y_top;
+
+			// YLO: y coordinate of last hit in the frame
+			ylo = std::min((unsigned)(GVIDEO_VPIXELS - 1) , yp + LP_FOV);
+		}
+
+		xwindow[ 0 ] = yhi_hit;
+		xwindow[ 1 ] = yhi_hit && yleft >= yhi;
+		xwindow[ 2 ] = yhi_hit;
+
+		ywindow[ 1 ] = yleft == yc;
+		ywindow[ 2 ] = yleft == yc && ylo >= yleft;
+	}
+	m_gv_next_lp_data[ 0 ] = ~yhi & 0x1ff;	// YHI
+	m_gv_next_lp_data[ 1 ] = ~xleft & 0x3ff;	// XLEFT
+	m_gv_next_lp_data[ 2 ] = ~ylo & 0x1ff;	// YLO
+
+	if (!xwindow[ 0 ]) {
+		BIT_SET(m_gv_next_lp_data[ 0 ], 13);
+	}
+	if (!xwindow[ 1 ]) {
+		BIT_SET(m_gv_next_lp_data[ 1 ], 13);
+	}
+	if (!xwindow[ 2 ]) {
+		BIT_SET(m_gv_next_lp_data[ 2 ], 13);
+	}
+	if (!ywindow[ 1 ]) {
+		BIT_SET(m_gv_next_lp_data[ 1 ], 14);
+	}
+	if (!ywindow[ 2 ]) {
+		BIT_SET(m_gv_next_lp_data[ 2 ], 14);
+	}
+
+	m_gv_next_lp_scanline[ 0 ] = yhi;
+	m_gv_next_lp_scanline[ 1 ] = yleft;
+	m_gv_next_lp_scanline[ 2 ] = ylo;
+
+	m_gv_lp_hit_lt192 = yhi < 192;
+	LOG(("LP data %d %d %d %d (%u;%d) (%u;%u) %u %u %u %04x %04x %04x\n" , m_gv_lp_selftest , m_gv_lp_interlace , m_gv_lp_sw , m_gv_lp_hit_lt192 , m_gv_lp_cursor_x , yc , m_gv_lp_x , m_gv_lp_y , yhi , xleft , ylo , m_gv_next_lp_data[ 0 ] , m_gv_next_lp_data[ 1 ] , m_gv_next_lp_data[ 2 ]));
+}
+
+void hp9845ct_state::lp_scanline_update(unsigned video_scanline)
+{
+	if (video_scanline == 0) {
+		compute_lp_data();
+	}
+
+	if (video_scanline == 256 && !m_gv_lp_status && m_gv_lp_hit_lt192) {
+		LOG(("Hit < 192 @%d\n" , m_screen->vpos()));
+		m_gv_lp_status = true;
+		m_gv_lp_int_256 = true;
+		update_graphic_bits();
+	}
+
+	if (video_scanline == 456) {
+		// VB interrupt
+		if (m_gv_lp_vbint || !m_gv_lp_int_256) {
+			m_gv_lp_status = true;
+		}
+		m_gv_lp_int_256 = false;
+		update_graphic_bits();
+	}
+
+	for (unsigned i = 0; i < 3; i++) {
+		if (m_gv_next_lp_scanline[ i ] == video_scanline) {
+			m_gv_lp_data[ i ] = m_gv_next_lp_data[ i ];
+			if (!m_gv_lp_status) {
+				BIT_SET(m_gv_lp_data[ i ], 11);
+			}
+			m_gv_lp_1sthit = true;
 		}
 	}
-	// TODO: debug
-	//m_gv_lp_data[0] |= 0x8000;
-	if (!m_gv_lp_xwindow) {
-		BIT_SET(m_gv_lp_data[ 0 ], 13);
-		BIT_SET(m_gv_lp_data[ 1 ], 13);
-		BIT_SET(m_gv_lp_data[ 2 ], 13);
-	}
-	if (!m_gv_lp_ywindow) {
-		BIT_SET(m_gv_lp_data[ 1 ], 14);
-		BIT_SET(m_gv_lp_data[ 2 ], 14);
-	}
-	if (!m_gv_lp_status) {
-		BIT_SET(m_gv_lp_data[ 0 ], 11);
-		BIT_SET(m_gv_lp_data[ 1 ], 11);
-		BIT_SET(m_gv_lp_data[ 2 ], 11);
-	}
-	m_gv_lp_1sthit = true;
-	LOG(("LP data %d %04x %04x %04x\n" , m_gv_lp_selftest , m_gv_lp_data[ 0 ] , m_gv_lp_data[ 1 ] , m_gv_lp_data[ 2 ]));
 }
 
 const uint16_t hp9845ct_state::m_line_type[] = {
@@ -1787,7 +1909,7 @@ protected:
 };
 
 hp9845c_state::hp9845c_state(const machine_config &mconfig, device_type type, const char *tag)
-	: hp9845ct_state(mconfig , type , tag)
+	: hp9845ct_state(mconfig , type , tag, VIDEO_770_VTOTAL)
 {
 }
 
@@ -1871,7 +1993,7 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 			BIT_SET(res, 6);
 		}
 		if (m_gv_lp_status && m_gv_lp_int_en) {
-			BIT_SET(res, 0);	// Lightpen service request (also automatically set after system reset)
+			BIT_SET(res, 0);	// Lightpen service request
 		}
 		if (m_gv_sk_status) {
 			BIT_SET(res, 1);	// Softkey service request
@@ -1950,12 +2072,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845c_state::scanline_timer)
 {
 	unsigned video_scanline = param;
 
-	if (m_graphic_sel) {
-		if (video_scanline >= VIDEO_770_VBEND && video_scanline < VIDEO_770_VBSTART) {
+	if (video_scanline >= VIDEO_770_VBEND && video_scanline < VIDEO_770_VBSTART) {
+		if (m_graphic_sel) {
 			graphic_video_render(video_scanline - VIDEO_770_VBEND);
 		}
-	}
-	if (video_scanline >= VIDEO_770_VBEND && video_scanline < VIDEO_770_VBSTART) {
 		unsigned row = (video_scanline - VIDEO_770_VBEND) / VIDEO_CHAR_HEIGHT;
 		unsigned line_in_row = (video_scanline - VIDEO_770_VBEND) - row * VIDEO_CHAR_HEIGHT;
 
@@ -1965,7 +2085,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845c_state::scanline_timer)
 			video_fill_buff(!m_video_buff_idx);
 		}
 		video_render_buff(video_scanline , line_in_row , m_video_buff_idx);
+		// Lightpen cursor
+		if (m_graphic_sel) {
+			render_lp_cursor(video_scanline - VIDEO_770_VBEND , pen_cursor(7));
+		}
 	}
+	lp_scanline_update(video_scanline - VIDEO_770_VBEND);
 }
 
 void hp9845c_state::set_graphic_mode(bool graphic , bool alpha)
@@ -2045,7 +2170,7 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 {
 	// video_scanline is 0-based, i.e. the topmost visible line of graphic screen is 0
 	const pen_t *pen = m_palette->pens();
-	bool yc, yw, blink, lp_cursor;
+	bool yc, yw, blink;
 	uint16_t word0, word1, word2;
 	uint8_t pen0, pen1, pen2;
 
@@ -2056,17 +2181,7 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 	pen1 = ((m_gv_music_memory & 0x002) >> 1) | ((m_gv_music_memory & 0x010) >> 3) | ((m_gv_music_memory & 0x080) >> 5);
 	pen2 = ((m_gv_music_memory & 0x004) >> 2) | ((m_gv_music_memory & 0x020) >> 4) | ((m_gv_music_memory & 0x100) >> 6);
 
-	// 49 pixel lightpen cross hair cursor
-	lp_cursor = (m_gv_lp_cursor_x < VIDEO_TOT_HPIXELS) && (m_gv_lp_cursor_y < GVIDEO_VPIXELS);
-	if (lp_cursor) {
-		yc = video_scanline == (m_gv_lp_cursor_y + 24);
-		if (m_gv_lp_cursor_fs)
-			yw = true;
-		else
-			yw = video_scanline >= m_gv_lp_cursor_y &&
-				video_scanline <= (m_gv_lp_cursor_y + 49);
-		blink = true;
-	} else if (m_gv_cursor_fs) {
+	if (m_gv_cursor_fs) {
 		yw = true;
 		// Steady cursor
 		blink = true;
@@ -2096,17 +2211,13 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 			bool xw = false;
 			unsigned pixel;
 
-			if (lp_cursor) {
-				// lightpen cursor
-				xc = (x + VIDEO_770_ALPHA_L_LIM) == m_gv_lp_cursor_x;
-				xw = m_gv_lp_cursor_fs || ((x + 24 + VIDEO_770_ALPHA_L_LIM) >= m_gv_lp_cursor_x && (x + VIDEO_770_ALPHA_L_LIM - 25) <= m_gv_lp_cursor_x);
-			} else if (m_gv_cursor_gc) {
+			if (m_gv_cursor_gc) {
 				xc = (x + 61) == m_gv_cursor_x;
 				xw = m_gv_cursor_fs || ((x + 69) > m_gv_cursor_x && (x + 53) < m_gv_cursor_x && ((x + 62) < m_gv_cursor_x || (x + 60) > m_gv_cursor_x));
 			}
-			if (blink && ((xw && yc) || (yw && xc && (m_gv_cursor_gc || lp_cursor)))) {
-				// Cursor (LP cursor is white)
-				pixel = lp_cursor ? pen_cursor(7) : pen_cursor(m_gv_cursor_color);
+			if (blink && ((xw && yc) || (yw && xc && m_gv_cursor_gc))) {
+				// Cursor
+				pixel = pen_cursor(m_gv_cursor_color);
 			} else {
 				// Normal pixel
 				pixel = pen_graphic(((word0 & mask) ? pen0 : 0) | ((word1 & mask) ? pen1 : 0) | ((word2 & mask) ? pen2 : 0));
