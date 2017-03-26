@@ -530,6 +530,9 @@ public:
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
+
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// CC10 and VCC/UVC
@@ -1142,6 +1145,15 @@ static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 
+// DSC
+
+static ADDRESS_MAP_START( dsc_map, AS_PROGRAM, 8, fidelz80_state )
+	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM
+ADDRESS_MAP_END
+
+
 
 /******************************************************************************
     Input Ports
@@ -1442,6 +1454,11 @@ static INPUT_PORTS_START( vscg )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( dsc )
+	PORT_INCLUDE( cb_buttons )
+INPUT_PORTS_END
+
+
 
 /******************************************************************************
     Machine Drivers
@@ -1517,7 +1534,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( vsc, fidelz80_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3900000) // 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
@@ -1527,7 +1544,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vsc_ppi_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vsc_ppi_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3900000)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_3_9MHz)
 	MCFG_Z80PIO_IN_PA_CB(READ8(fidelz80_state, vsc_pio_porta_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
@@ -1563,6 +1580,25 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_BSY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( dsc, fidelz80_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
+	MCFG_CPU_PROGRAM_MAP(dsc_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidelz80_state, irq_on, attotime::from_hz(523)) // from 555 timer (22nF, 120K, 2.7K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(523) - attotime::from_usec(41)) // active for 41us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1733,6 +1769,12 @@ ROM_START( bridgec3 ) // 510-1016 Rev.1 PCB has neither locations nor ic labels,
 ROM_END
 
 
+ROM_START( damesc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "101-1027a01", 0x0000, 0x2000, BAD_DUMP CRC(be1c8ae6) SHA1(e322104600238c36aea9df47ef08673d833d84fe) ) // MOS 2364
+ROM_END
+
+
 
 /******************************************************************************
     Drivers
@@ -1759,3 +1801,5 @@ CONS( 1980, vscfr,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fideli
 
 CONS( 1979, vbrc,     0,      0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1981, damesc,   0,      0,      dsc,     dsc,    driver_device, 0, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

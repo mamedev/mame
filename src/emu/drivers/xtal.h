@@ -261,7 +261,8 @@ enum
 	XTAL_600kHz         = 600000,
 	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
 	XTAL_960kHz         = 960000,       /* Xerox Notetaker Keyboard UART */
-	XTAL_1_056MHz       = 1056000       /* OKI M6295 on Trio The Punch h/w */
+	XTAL_1_056MHz       = 1056000,      /* OKI M6295 on Trio The Punch h/w */
+	XTAL_3_9MHz         = 3900000       /* Used on some Fidelity boards */
 };
 
 

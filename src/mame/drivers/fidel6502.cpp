@@ -1636,7 +1636,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
 
