@@ -570,6 +570,12 @@ public:
 	DECLARE_READ8_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+
+	// DSC
+	void dsc_prepare_display();
+	DECLARE_WRITE8_MEMBER(dsc_control_w);
+	DECLARE_WRITE8_MEMBER(dsc_select_w);
+	DECLARE_READ8_MEMBER(dsc_input_r);
 };
 
 
@@ -1046,6 +1052,45 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 
 
 /******************************************************************************
+    DSC
+******************************************************************************/
+
+// TTL
+
+void fidelz80_state::dsc_prepare_display()
+{
+	// 4 7seg leds
+	set_display_segmask(0xf, 0xff);
+	display_matrix(8, 4, m_7seg_data, m_led_select);
+}
+
+WRITE8_MEMBER(fidelz80_state::dsc_control_w)
+{
+	// d0-d7: input mux, 7seg data
+	m_inp_mux = ~data;
+	m_7seg_data = data;
+	dsc_prepare_display();
+}
+
+WRITE8_MEMBER(fidelz80_state::dsc_select_w)
+{
+	// d4: speaker out
+	m_dac->write(BIT(~data, 4));
+	
+	// d0-d3: digit select
+	m_led_select = data & 0xf;
+	dsc_prepare_display();
+}
+
+READ8_MEMBER(fidelz80_state::dsc_input_r)
+{
+	// d0-d7: multiplexed inputs (active low)
+	return ~read_inputs(8);
+}
+
+
+
+/******************************************************************************
     Address Maps
 ******************************************************************************/
 
@@ -1148,9 +1193,12 @@ ADDRESS_MAP_END
 // DSC
 
 static ADDRESS_MAP_START( dsc_map, AS_PROGRAM, 8, fidelz80_state )
-	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(dsc_control_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(dsc_select_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(dsc_input_r)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -1771,7 +1819,7 @@ ROM_END
 
 ROM_START( damesc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "101-1027a01", 0x0000, 0x2000, BAD_DUMP CRC(be1c8ae6) SHA1(e322104600238c36aea9df47ef08673d833d84fe) ) // MOS 2364
+	ROM_LOAD( "101-1027a01", 0x0000, 0x2000, CRC(d86c985c) SHA1(20f923a24420050fd16e1172f5e889f144d17ac9) ) // MOS 2364
 ROM_END
 
 
