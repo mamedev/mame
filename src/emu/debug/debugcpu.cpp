@@ -929,7 +929,7 @@ device_t* debugger_cpu::expression_get_device(const char *tag)
     space
 -------------------------------------------------*/
 
-u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, bool with_se)
+u64 debugger_cpu::expression_read_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, bool disable_se)
 {
 	switch (spacenum)
 	{
@@ -951,7 +951,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				if (!with_se) {
+				if (disable_se) {
 					auto dis = m_machine.disable_side_effect();
 					return read_memory(space, space.address_to_byte(address), size, true);
 				} else
@@ -978,7 +978,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				if (!with_se) {
+				if (disable_se) {
 					auto dis = m_machine.disable_side_effect();
 					return read_memory(space, space.address_to_byte(address), size, false);
 				} else
@@ -999,7 +999,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			if (!with_se) {
+			if (disable_se) {
 				auto dis = m_machine.disable_side_effect();
 				return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			} else
@@ -1019,7 +1019,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			if (!with_se) {
+			if (disable_se) {
 				auto dis = m_machine.disable_side_effect();
 				return expression_read_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			} else
@@ -1147,7 +1147,7 @@ u64 debugger_cpu::expression_read_memory_region(const char *rgntag, offs_t addre
     space
 -------------------------------------------------*/
 
-void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data, bool with_se)
+void debugger_cpu::expression_write_memory(void *param, const char *name, expression_space spacenum, u32 address, int size, u64 data, bool disable_se)
 {
 	device_t *device = nullptr;
 	device_memory_interface *memory;
@@ -1168,7 +1168,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				if (!with_se) {
+				if (disable_se) {
 					auto dis = m_machine.disable_side_effect();
 					write_memory(space, space.address_to_byte(address), data, size, true);
 				} else
@@ -1190,7 +1190,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				if (!with_se) {
+				if (disable_se) {
 					auto dis = m_machine.disable_side_effect();
 					write_memory(space, space.address_to_byte(address), data, size, false);
 				} else
@@ -1206,7 +1206,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			if (!with_se) {
+			if (disable_se) {
 				auto dis = m_machine.disable_side_effect();
 				expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			} else
@@ -1221,7 +1221,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			if (!with_se) {
+			if (disable_se) {
 				auto dis = m_machine.disable_side_effect();
 				expression_write_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			} else
