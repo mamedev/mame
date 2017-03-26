@@ -12,7 +12,7 @@
     AC97 audio with custom DMA frontend which streams 8 stereo channels
     PIC18c442 protection chip (not readable) on VP101 only (VP100 is unprotected?)
 
-	1 MB of VRAM at main RAM offset 0x07400000
+    1 MB of VRAM at main RAM offset 0x07400000
 
 ****************************************************************************/
 
@@ -36,20 +36,20 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	
+
 	DECLARE_READ32_MEMBER(tty_ready_r);
 	DECLARE_WRITE32_MEMBER(tty_w);
 	DECLARE_READ32_MEMBER(test_r) { return 0xffffffff; }
-	
+
 	DECLARE_READ32_MEMBER(pic_r);
 	DECLARE_WRITE32_MEMBER(pic_w);
-	
+
 	DECLARE_WRITE32_MEMBER(dmaaddr_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(dmarq_w);
-	
-	
-		
+
+
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -78,7 +78,7 @@ void vp10x_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 	m_maincpu->add_fastram(0x00000000, 0x07ffffff, false, m_mainram);
 }
-	
+
 WRITE32_MEMBER(vp10x_state::dmaaddr_w)
 {
 	m_dma_ptr = (data & 0x07ffffff);
@@ -89,18 +89,18 @@ WRITE_LINE_MEMBER(vp10x_state::dmarq_w)
 	if (state != m_dmarq_state)
 	{
 		m_dmarq_state = state;
-	
+
 		if (state)
 		{
 			uint16_t *RAMbase = (uint16_t *)&m_mainram[0];
-			uint16_t *RAM = &RAMbase[m_dma_ptr>>1];				
+			uint16_t *RAM = &RAMbase[m_dma_ptr>>1];
 
-			m_ata->write_dmack(ASSERT_LINE);			
+			m_ata->write_dmack(ASSERT_LINE);
 
 			while (m_dmarq_state)
 			{
 				*RAM++ = m_ata->read_dma();
-				m_dma_ptr += 2;	// pointer must advance
+				m_dma_ptr += 2; // pointer must advance
 			}
 
 			m_ata->write_dmack(CLEAR_LINE);
@@ -108,7 +108,7 @@ WRITE_LINE_MEMBER(vp10x_state::dmarq_w)
 	}
 }
 
-READ32_MEMBER(vp10x_state::pic_r) 
+READ32_MEMBER(vp10x_state::pic_r)
 {
 	static const uint8_t vers[5] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
 	static const uint8_t serial[10] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
@@ -118,15 +118,15 @@ READ32_MEMBER(vp10x_state::pic_r)
 	{
 		case 0x20:
 			return vers[pic_state++];
-			
+
 		case 0x21:
 		case 0x22:
 			return serial[pic_state++];
-		
-		case 0x23:	// this is the same for jnero and specfrce.  great security!
+
+		case 0x23:  // this is the same for jnero and specfrce.  great security!
 			return magic[pic_state++];
 	}
-	
+
 	return 0;
 }
 
@@ -165,7 +165,7 @@ uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			*line++ = word;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -189,13 +189,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x1c400000, 0x1c400003) AM_WRITE(tty_w)        // boot ROM code uses this one
 	AM_RANGE(0x1c400014, 0x1c400017) AM_READ(tty_ready_r)
 	AM_RANGE(0x1ca0000c, 0x1ca0000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x1ca00010, 0x1ca00013) AM_READ(test_r)		// bits here cause various test mode stuff
+	AM_RANGE(0x1ca00010, 0x1ca00013) AM_READ(test_r)        // bits here cause various test mode stuff
 	AM_RANGE(0x1cf00000, 0x1cf00003) AM_NOP AM_READNOP
-	AM_RANGE(0x1d000030, 0x1d000033) AM_WRITE(dmaaddr_w)	// ATA DMA destination address
+	AM_RANGE(0x1d000030, 0x1d000033) AM_WRITE(dmaaddr_w)    // ATA DMA destination address
 	AM_RANGE(0x1d000040, 0x1d00005f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
 	AM_RANGE(0x1d000060, 0x1d00007f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0x0000ffff)
 	AM_RANGE(0x1f200000, 0x1f200003) AM_READWRITE(pic_r, pic_w)
-	AM_RANGE(0x1f807000, 0x1f807fff) AM_RAM	AM_SHARE("nvram")
+	AM_RANGE(0x1f807000, 0x1f807fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( vp101 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00000008,  IP_ACTIVE_LOW, IPT_START2 )
-	
+
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -223,10 +223,10 @@ static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, screen_update)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	
+
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(vp10x_state, dmarq_w))
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 

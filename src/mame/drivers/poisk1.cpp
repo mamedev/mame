@@ -2,22 +2,22 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/poisk1.c
+    drivers/poisk1.c
 
-	Driver file for Poisk-1
+    Driver file for Poisk-1
 
-	to do:
-	- cassette i/o and softlist
-	- verify palette
-	- monochrome output
-	- trap: does memory always get written or it's up to NMI ISR to complete writes?
-	- keyboard layout for earliest revision (v89r0)
+    to do:
+    - cassette i/o and softlist
+    - verify palette
+    - monochrome output
+    - trap: does memory always get written or it's up to NMI ISR to complete writes?
+    - keyboard layout for earliest revision (v89r0)
 
-	slot devices:
-	- hard disk controllers
-	- network cards
-	- joystick, mouse, serial, parallel ports
-	- sound card
+    slot devices:
+    - hard disk controllers
+    - network cards
+    - joystick, mouse, serial, parallel ports
+    - sound card
 
 ***************************************************************************/
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 
 /*
 06Ah    Dxx 6   Enable/Disable color burst (?)
-		7   Enable/Disable D7H/D7L
+        7   Enable/Disable D7H/D7L
 */
 
 WRITE8_MEMBER(p1_state::p1_ppi_portc_w)

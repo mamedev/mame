@@ -6,14 +6,14 @@
 
     Implementation of Agat-7 onboard video.
 
-	5 video modes:
-	- 32x32 color text
-	- 64x32 mono text with reverse video
-	- 64x64 color graphics
-	- 128x128 color graphics
-	- 256x256 mono graphics
+    5 video modes:
+    - 32x32 color text
+    - 64x32 mono text with reverse video
+    - 64x64 color graphics
+    - 128x128 color graphics
+    - 256x256 mono graphics
 
-	Character generator ROM could have 128 or 256 chars.
+    Character generator ROM could have 128 or 256 chars.
 
     C7xx: video mode select
 
@@ -75,7 +75,7 @@ agat7video_device::agat7video_device(const machine_config &mconfig, const char *
 
 void agat7video_device::device_start()
 {
-//	save_item(NAME(m_video_mode));
+//  save_item(NAME(m_video_mode));
 	save_item(NAME(m_start_address));
 }
 

@@ -5337,14 +5337,14 @@ void segas32_state::init_arescue(int m_hasdsp)
 		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
 		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
 		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-	
+
 		// copy DSP program
 		for (int i = 0; i < 0x2000; i+= 4)
 		{
 			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
 			dspprg++;
 		}
-	
+
 		// copy DSP data
 		for (int i = 0; i < 0x800; i+= 2)
 		{

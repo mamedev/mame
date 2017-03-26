@@ -2,60 +2,60 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	KSM (Kontroller Simvolnogo Monitora = Character Display Controller),
-	a single-board replacement for standalone 15IE-00-013 terminal (ie15.c)
-	in later-model DVK desktops.
+    KSM (Kontroller Simvolnogo Monitora = Character Display Controller),
+    a single-board replacement for standalone 15IE-00-013 terminal (ie15.c)
+    in later-model DVK desktops.
 
-	MPI (Q-Bus clone) board, consumes only power from the bus.
-	Interfaces with MS7004 (DEC LK201 workalike) keyboard and monochrome CRT.
+    MPI (Q-Bus clone) board, consumes only power from the bus.
+    Interfaces with MS7004 (DEC LK201 workalike) keyboard and monochrome CRT.
 
-	Hardware revisions (XXX verify everything):
-	- 7.102.076 -- has DIP switches, SRAM at 0x2000, model name "KSM"
-	- 7.102.228 -- no DIP switches, ?? SRAM at 0x2100, model name "KSM-01"
+    Hardware revisions (XXX verify everything):
+    - 7.102.076 -- has DIP switches, SRAM at 0x2000, model name "KSM"
+    - 7.102.228 -- no DIP switches, ?? SRAM at 0x2100, model name "KSM-01"
 
-	Two sets of dumps exist:
-	- one puts SRAM at 0x2000, which is where technical manual puts it,
-	  but chargen has 1 missing pixel in 'G' character.
-	- another puts SRAM at 0x2100, but has no missing pixel.
-	Merge them for now into one (SRAM at 0x2000 and no missing pixel).
+    Two sets of dumps exist:
+    - one puts SRAM at 0x2000, which is where technical manual puts it,
+      but chargen has 1 missing pixel in 'G' character.
+    - another puts SRAM at 0x2100, but has no missing pixel.
+    Merge them for now into one (SRAM at 0x2000 and no missing pixel).
 
-	Emulates a VT52 without copier (ESC Z response is ESC / M), with
-	Hold Screen mode and Graphics character set (but it is unique and
-	mapped to a different range -- 100..137).
+    Emulates a VT52 without copier (ESC Z response is ESC / M), with
+    Hold Screen mode and Graphics character set (but it is unique and
+    mapped to a different range -- 100..137).
 
-	F4 + 0..9 on numeric keypad = setup mode.  0 changes serial port speed,
-	1..9 toggle one of mode bits:
+    F4 + 0..9 on numeric keypad = setup mode.  0 changes serial port speed,
+    1..9 toggle one of mode bits:
 
-	1   XON/XOFF    0: Off  1: On
-	2   Character set   0: N0/N1  2: N2
-	3   Auto LF     0: Off  1: On
-	4   Auto repeat 0: On  1: Off
-	5   Auto wraparound 0: On  1: Off
-	6   Interpret controls  0: Interpret  1: Display
-	7   Parity check    0: Off  1: On
-	8   Parity bits 0: None  1: Even
-	9   Stop bits
+    1   XON/XOFF    0: Off  1: On
+    2   Character set   0: N0/N1  2: N2
+    3   Auto LF     0: Off  1: On
+    4   Auto repeat 0: On  1: Off
+    5   Auto wraparound 0: On  1: Off
+    6   Interpret controls  0: Interpret  1: Display
+    7   Parity check    0: Off  1: On
+    8   Parity bits 0: None  1: Even
+    9   Stop bits
 
-	N0/N1 charset has regular ASCII in C0 page and Cyrillic in C1 page,
-	switching between them via SI/SO.   N2 charset has uppercase Cyrillic
-	chars in place of lowercase Latin ones.
+    N0/N1 charset has regular ASCII in C0 page and Cyrillic in C1 page,
+    switching between them via SI/SO.   N2 charset has uppercase Cyrillic
+    chars in place of lowercase Latin ones.
 
-	ESC toggles Cyrillic/Latin mode (depends in the host's terminal driver)
-	F1 toggles Hold Screen mode (also depends in the host's terminal driver)
-	F9 resets terminal (clears memory).
-	F20 toggles on/off-line mode.
+    ESC toggles Cyrillic/Latin mode (depends in the host's terminal driver)
+    F1 toggles Hold Screen mode (also depends in the host's terminal driver)
+    F9 resets terminal (clears memory).
+    F20 toggles on/off-line mode.
 
-	Terminfo description:
+    Terminfo description:
 
 ksm|DVK KSM,
-	am, bw, dch1=\EP, ich1=\EQ,
-	acsc=hRiTjXkClJmFnNqUtEuPv\174wKxW.M\054Q\055S\053\136~_{@}Z0\177,
-	use=vt52,
+    am, bw, dch1=\EP, ich1=\EQ,
+    acsc=hRiTjXkClJmFnNqUtEuPv\174wKxW.M\054Q\055S\053\136~_{@}Z0\177,
+    use=vt52,
 
-	To do:
-	- verify if pixel stretching is done by hw
-	- verify details of hw revisions (memory map, DIP presence...)
-	- baud rate selection
+    To do:
+    - verify if pixel stretching is done by hw
+    - verify details of hw revisions (memory map, DIP presence...)
+    - baud rate selection
 
 ****************************************************************************/
 
@@ -241,19 +241,19 @@ WRITE_LINE_MEMBER(ksm_state::write_line_clock)
 }
 
 /*
-	Raster size is 28x11 scan lines.
-	XXX VBlank is active for 2 topmost on-screen rows and 1 at the bottom.
+    Raster size is 28x11 scan lines.
+    XXX VBlank is active for 2 topmost on-screen rows and 1 at the bottom.
 
-	Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
-	available to the user and 25th (topmost) line is the status line.
-	Status line displays current serial port speed and 9 setup bits.
+    Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
+    available to the user and 25th (topmost) line is the status line.
+    Status line displays current serial port speed and 9 setup bits.
 
-	No character attributes are available, but in 'display controls' mode
-	control characters stored in memory are shown as blinking chars.
+    No character attributes are available, but in 'display controls' mode
+    control characters stored in memory are shown as blinking chars.
 
-	Character cell is 10 x 11; character generator provides 7 x 8 of that.
-	3 extra horizontal pixels are always XXX blank.  Blinking XXX cursor may be
-	displayed on 3 extra scan lines.
+    Character cell is 10 x 11; character generator provides 7 x 8 of that.
+    3 extra horizontal pixels are always XXX blank.  Blinking XXX cursor may be
+    displayed on 3 extra scan lines.
 */
 
 uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline)

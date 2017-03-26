@@ -981,7 +981,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				if (!with_se) {
 					auto dis = m_machine.disable_side_effect();
 					return read_memory(space, space.address_to_byte(address), size, false);
-				} else 
+				} else
 					return read_memory(space, space.address_to_byte(address), size, false);
 			}
 			break;

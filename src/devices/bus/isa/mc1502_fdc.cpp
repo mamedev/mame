@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Electronika MC 1502 FDC device
+    Electronika MC 1502 FDC device
 
 **********************************************************************/
 

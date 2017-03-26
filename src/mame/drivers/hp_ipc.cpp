@@ -306,43 +306,43 @@ Useful links etc.
 bitsavers://pdf/hp/integral/00095-90126_Integral_Personal_Computer_Service_Jan86.pdf
 
 bitsavers://pdf/hp/hp-hil/45918A-90001_HP-HIL_Technical_Reference_Manual_Jan86.pdf
-	HP-HIL MLC, SLC datasheets
+    HP-HIL MLC, SLC datasheets
 
 bitsavers://pdf/sony/floppy/Sony_OA-D32_Microfloppy_Service_Nov83.pdf
-	OA-D32W
+    OA-D32W
 
 http://www.hpl.hp.com/hpjournal/pdfs/IssuePDFs/1983-01.pdf
-	HP-IL issue
+    HP-IL issue
 
 http://www.hpl.hp.com/hpjournal/pdfs/IssuePDFs/1985-10.pdf
-	IPC issue
+    IPC issue
 
 http://www.hpl.hp.com/hpjournal/pdfs/IssuePDFs/1987-06.pdf
-	HP-HIL article
+    HP-HIL article
 
 http://www.hpmuseum.net/pdf/ComputerNews_1985_Jan15_37pages_OCR.pdf
-	introducing the IPC
+    introducing the IPC
 
 http://www.hpmuseum.net/pdf/ComputerFocus_1985_Nov_25pages_OCR.pdf
-	SysV upgrade
+    SysV upgrade
 
 http://www.hpmuseum.net/pdf/InformationSystemsAndManufacturingNews_81pages_Jun1-86_OCR.pdf
-	EPROM/ROM modules
+    EPROM/ROM modules
 
 http://www.hpmuseum.net/pdf/HPChannels_1986_11_37pages_Nov86_OCR.pdf
-	SW Eng ROM and serial option for it
+    SW Eng ROM and serial option for it
 
 http://www.coho.org/~pete/downloads/IPC/burst/Freeware/IPC_Driver_Writers_Disc/hp-ux.5.0.0
-	kernel namelist
+    kernel namelist
 
 http://www.hpmuseum.net/display_item.php?hw=122
-	overview, manuals, software
+    overview, manuals, software
 
 http://www.ambry.com/hp-computer-model/9807A.html
-	replacement parts
+    replacement parts
 
 http://www.brouhaha.com/~eric/hpcalc/chips/
-	chip part numbers
+    chip part numbers
 
 
 Software to look for
@@ -473,20 +473,20 @@ static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
 	AM_RANGE(0x1E40000, 0x1E4002F) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
 
 // supervisor mode
-	AM_RANGE(0x0000000, 0x007FFFF) AM_ROM AM_REGION("maincpu", 0)		// Internal ROM (operating system PCA)
-	AM_RANGE(0x0080000, 0x00FFFFF) AM_UNMAP		// Internal ROM (option ROM PCA)
-	AM_RANGE(0x0100000, 0x04FFFFF) AM_UNMAP		// External ROM modules
+	AM_RANGE(0x0000000, 0x007FFFF) AM_ROM AM_REGION("maincpu", 0)       // Internal ROM (operating system PCA)
+	AM_RANGE(0x0080000, 0x00FFFFF) AM_UNMAP     // Internal ROM (option ROM PCA)
+	AM_RANGE(0x0100000, 0x04FFFFF) AM_UNMAP     // External ROM modules
 	AM_RANGE(0x0600000, 0x060FFFF) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0x0610000, 0x0610007) AM_READWRITE8(floppy_id_r, floppy_id_w, 0x00ff)
 	AM_RANGE(0x0610008, 0x061000F) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0x00ff)
 	AM_RANGE(0x0620000, 0x062000F) AM_DEVREADWRITE8("gpu", hp1ll3_device, read, write, 0x00ff)
-	AM_RANGE(0x0630000, 0x063FFFF) AM_NOP		// AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	AM_RANGE(0x0630000, 0x063FFFF) AM_NOP       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
 	AM_RANGE(0x0640000, 0x064002F) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
-	AM_RANGE(0x0650000, 0x065FFFF) AM_NOP		// HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
-	AM_RANGE(0x0660000, 0x06600FF) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0x00ff)	// 'caravan', scrn/caravan.h
-	AM_RANGE(0x0670000, 0x067FFFF) AM_NOP		// Speaker (NatSemi COP 452)
-	AM_RANGE(0x0680000, 0x068FFFF) AM_NOP		// 'SIMON (98628) fast HP-IB card' -- sys/simon.h
-	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP		// External I/O
+	AM_RANGE(0x0650000, 0x065FFFF) AM_NOP       // HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
+	AM_RANGE(0x0660000, 0x06600FF) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0x00ff)  // 'caravan', scrn/caravan.h
+	AM_RANGE(0x0670000, 0x067FFFF) AM_NOP       // Speaker (NatSemi COP 452)
+	AM_RANGE(0x0680000, 0x068FFFF) AM_NOP       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
+	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP     // External I/O
 	AM_RANGE(0x0800000, 0x0FFFFFF) AM_READWRITE(ram_r, ram_w)
 
 // bus error handler
@@ -699,15 +699,15 @@ static SLOT_INTERFACE_START( hp_ipc_floppies )
 SLOT_INTERFACE_END
 
 /*
- * 	IRQ levels (page 5-4)
+ *  IRQ levels (page 5-4)
  *
- * 	7	Soft reset from keyboard, non-maskable
- * 	6	Real-time clock or NBIR3 (ext. I/O)
- * 	5	Disc Drive or NBIR2
- * 	4	GPU or NBIR1
- * 	3	HP-IB, printer, or NBIR0
- * 	2	HP-HIL devices (keyboard, mouse)
- * 	1	Real-time clock
+ *  7   Soft reset from keyboard, non-maskable
+ *  6   Real-time clock or NBIR3 (ext. I/O)
+ *  5   Disc Drive or NBIR2
+ *  4   GPU or NBIR1
+ *  3   HP-IB, printer, or NBIR0
+ *  2   HP-HIL devices (keyboard, mouse)
+ *  1   Real-time clock
  */
 static MACHINE_CONFIG_START(hp_ipc, hp_ipc_state)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_15_92MHz / 2)
@@ -726,8 +726,8 @@ static MACHINE_CONFIG_START(hp_ipc, hp_ipc_state)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_6MHz * 2, 720, 0, 512, 278, 0, 256)
-//	when _desktop == 0:
-//	MCFG_SCREEN_RAW_PARAMS(XTAL_6MHz * 2, 720, 0, 640, 480, 0, 400)
+//  when _desktop == 0:
+//  MCFG_SCREEN_RAW_PARAMS(XTAL_6MHz * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START(hp_ipc, hp_ipc_state)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_HP1LL3_ADD("gpu")
-//	MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_4))
+//  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_4))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
@@ -748,7 +748,7 @@ static MACHINE_CONFIG_START(hp_ipc, hp_ipc_state)
 
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_1))
-//	MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_6))
+//  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_6))
 
 	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL_15_92MHz/2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp_ipc_state, irq_2))

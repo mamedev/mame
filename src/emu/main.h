@@ -90,7 +90,7 @@ public:
 	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }
-	
+
 	http_manager *http() { return m_http.get(); }
 	void start_http_server();
 

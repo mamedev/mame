@@ -1573,12 +1573,12 @@ int z180_device::z180_dma0(int max_cycles)
 	offs_t sar0 = 65536 * IO_SAR0B + 256 * IO_SAR0H + IO_SAR0L;
 	offs_t dar0 = 65536 * IO_DAR0B + 256 * IO_DAR0H + IO_DAR0L;
 	int bcr0 = 256 * IO_BCR0H + IO_BCR0L;
-	
-	if (bcr0 == 0) 
+
+	if (bcr0 == 0)
 	{
 		bcr0 = 0x10000;
 	}
-	
+
 	int count = (IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
 	int cycles = 0;
 
@@ -1710,12 +1710,12 @@ int z180_device::z180_dma1()
 	offs_t mar1 = 65536 * IO_MAR1B + 256 * IO_MAR1H + IO_MAR1L;
 	offs_t iar1 = 256 * IO_IAR1H + IO_IAR1L;
 	int bcr1 = 256 * IO_BCR1H + IO_BCR1L;
-	
-	if (bcr1 == 0) 
+
+	if (bcr1 == 0)
 	{
 		bcr1 = 0x10000;
 	}
-	
+
 	int cycles = 0;
 
 	if ((m_iol & Z180_DREQ1) == 0)
@@ -2391,7 +2391,7 @@ again:
 		else
 		{
 			do
-			{		
+			{
 				curcycles = check_interrupts();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
@@ -2413,7 +2413,7 @@ again:
 				m_icount -= curcycles;
 
 				handle_io_timers(curcycles);
-				
+
 				/* if channel 0 was started in burst mode, go recheck the mode */
 				if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 					(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
@@ -2434,7 +2434,7 @@ again:
 				curcycles = z180_dma1();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
-				
+
 				/* If DMA is done break out to the faster loop */
 				if ((IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
 					break;
@@ -2449,7 +2449,7 @@ again:
 			/* If DMA is started go to check the mode */
 			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 				goto again;
-				
+
 			curcycles = check_interrupts();
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);

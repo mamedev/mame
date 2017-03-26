@@ -408,7 +408,7 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
      an unvoiced frame follows a silent one (which in turn followed a
      voiced frame), the k5-k10 parameters are not zeroed as they should be,
      producing a loud noise.
-     This bug is fixed correctly on the tms52xx chips. 
+     This bug is fixed correctly on the tms52xx chips.
    */
 static const struct tms5100_coeffs T0280F_2801A_coeff =
 {

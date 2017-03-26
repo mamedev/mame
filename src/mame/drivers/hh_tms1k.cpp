@@ -1628,7 +1628,7 @@ MACHINE_CONFIG_END
   Coleco Quiz Wiz Challenger
   * TMS1000NLL M32001-N2 (die label 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
-  
+
   This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
   According to the manual, Quiz Wiz cartridges are compatible with it.
   The question books are needed to play, as well as optional game pieces.
@@ -2435,7 +2435,7 @@ MACHINE_CONFIG_END
     CONIC 102-001, led PCB: CONIC 100-003 REV A itac
   * TMS1000NLL MP0908 (die label 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
-  
+
   This is a peg solitaire game, with random start position.
 
   known releases:

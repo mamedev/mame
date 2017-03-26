@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /*********************************************************************
 
-	formats/hp_ipc_dsk.h
+    formats/hp_ipc_dsk.h
 
-	hp_ipc format
+    hp_ipc format
 
 *********************************************************************/
 

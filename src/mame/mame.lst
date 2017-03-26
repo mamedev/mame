@@ -12107,8 +12107,8 @@ promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
 @source:eurocom2.cpp
-eurocom2						//
-waveterm						//
+eurocom2                        //
+waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
@@ -36942,7 +36942,7 @@ voyager                         // (c) 2002 Team Play, Inc.
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix
 specfrce                        // (c) 2002 ICE/Play Mechanix
-zoofari							// (c) 2006 ICE/Play Mechanix
+zoofari                         // (c) 2006 ICE/Play Mechanix
 
 @source:vpoker.cpp
 5acespkr                        // (c) 198?
