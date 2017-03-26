@@ -188,7 +188,7 @@ enum
 	XTAL_24_576MHz      = 24576000,     /* Pole Position h/w, Model 3 CPU board */
 	XTAL_24_8832MHz     = 24883200,     /* DEC VT100 */
 	XTAL_25MHz          = 25000000,     /* Namco System 22, Taito GNET, Dogyuun h/w */
-	XTAL_25_1748MHz     = 25174800,     /* Sega S16A, S16B */
+	XTAL_25_1748MHz     = 25174800,     /* Sega System 16A/16B (1600x NTSC line rate) */
 	XTAL_25_39836MHz    = 25398360,     /* Tandberg TDV 2324 */
 	XTAL_25_447MHz      = 25447000,     /* Namco EVA3A (Funcube2) */
 	XTAL_25_590906MHz   = 25590906,     /* Atari Jaguar NTSC */
@@ -233,6 +233,7 @@ enum
 	XTAL_49_152MHz      = 49152000,     /* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz          = 50000000,     /* Williams/Midway T/W/V-unit system */
 	XTAL_50_113MHz      = 50113000,     /* Namco NA-1 (14x NTSC subcarrier)*/
+	XTAL_50_3496MHz     = 50349600,     /* Sega System 18 (3200x NTSC line rate) */
 	XTAL_52MHz          = 52000000,     /* Cojag */
 	XTAL_52_832MHz      = 52832000,     /* Wang PC TIG video controller */
 	XTAL_53_693175MHz   = 53693175,     /* PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
