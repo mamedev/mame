@@ -873,12 +873,17 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		string++;
 	}
 
-	// check for memory @ operators
-	if ((string[0] == '@' || string[0] == '!') && (buffer.back() == 'b' || buffer.back() == 'w' || buffer.back() == 'd' || buffer.back() == 'q'))
+	// check for memory @ and ! operators
+	if (string[0] == '@' || string[0] == '!')
 	{
-		bool with_se = string[0] == '!';
-		string += 1;
-		return parse_memory_operator(token, buffer.c_str(), with_se);
+		try {
+			bool with_se = string[0] == '!';
+			parse_memory_operator(token, buffer.c_str(), with_se);
+			string += 1;
+			return;
+		} catch(const expression_error &e) {
+			// Try some other operator instead
+		}
 	}
 
 	// empty string is automatically invalid
