@@ -152,10 +152,9 @@ WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_gga_w)
+WRITE8_MEMBER(rpunch_state::rpunch_gga_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_gga->write(space, offset >> 4, data & 0xff);
+	m_gga->write(space, offset >> 4, data & 0xff);
 }
 
 

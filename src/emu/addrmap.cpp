@@ -288,15 +288,39 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 	if (m_map.m_databits < width)
 		throw emu_fatalerror("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map", string, width, m_map.m_databits);
 
+	// if map is narrower than 64 bits, check the mask width as well
+	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
+		throw emu_fatalerror("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+
 	// the mask must represent whole units of width
 	u32 basemask = (width == 8) ? 0xff : (width == 16) ? 0xffff : 0xffffffff;
 	u64 singlemask = basemask;
+	int count = 0;
 	while (singlemask != 0)
 	{
-		if ((unitmask & singlemask) != 0 && (unitmask & singlemask) != singlemask)
+		if ((unitmask & singlemask) == singlemask)
+			count++;
+		else if ((unitmask & singlemask) != 0)
 			throw emu_fatalerror("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
 		singlemask <<= width;
 	}
+
+	// subunit count must be a power of 2
+	if (count != 1 && count != 2 && count != 4 && count != 8)
+		throw emu_fatalerror("Handler %s specifies %d subunits with a mask of %08X%08X; needs to be a power of 2", string, count, (u32)(unitmask >> 32), (u32)unitmask);
+
+	// the mask must be symmetrical
+	u64 unitmask_bh = unitmask >> 8 & 0x00ff00ff00ff00ffU;
+	u64 unitmask_bl = unitmask & 0x00ff00ff00ff00ffU;
+	u64 unitmask_wh = unitmask >> 16 & 0x0000ffff0000ffffU;
+	u64 unitmask_wl = unitmask & 0x0000ffff0000ffffU;
+	u64 unitmask_dh = unitmask >> 32 & 0x00000000ffffffffU;
+	u64 unitmask_dl = unitmask & 0x00000000ffffffffU;
+	if ((unitmask_bh != 0 && unitmask_bl != 0 && unitmask_bh != unitmask_bl)
+		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
+		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
+		throw emu_fatalerror("Handler %s specified an asymmetrical mask of %08X%08X", string, (u32)(unitmask >> 32), (u32)unitmask);
+
 	return true;
 }
 

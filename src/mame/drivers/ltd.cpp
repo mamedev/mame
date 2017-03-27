@@ -590,12 +590,6 @@ ROM_START(hustlerp)
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 
-ROM_START(hustlerpa)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD("hustler_2.bin", 0x0000, 0x0800, CRC(83c79157) SHA1(286fd0c984870639fcd7d7b8f6a5a5ddabcddcf5))
-	ROM_RELOAD(0x0800, 0x0800)
-ROM_END
-
 /*-------------------------------------------------------------------
 / Martian Queen
 /-------------------------------------------------------------------*/
@@ -749,7 +743,6 @@ GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", 
 GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerpa, hustlerp,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler (alternate set)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)

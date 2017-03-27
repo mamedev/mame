@@ -407,7 +407,7 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	{
 	case TIMER_ID_SCANLINE:
 		draw_scanline(m_bitmap, m_screen->vpos());
-		
+
 		m_pio_astb = !m_pio_astb;
 
 		m_pio->strobe_a(m_pio_astb);

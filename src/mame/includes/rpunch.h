@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE16_MEMBER(rpunch_videoram_w);
 	DECLARE_WRITE16_MEMBER(rpunch_videoreg_w);
 	DECLARE_WRITE16_MEMBER(rpunch_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(rpunch_gga_w);
+	DECLARE_WRITE8_MEMBER(rpunch_gga_w);
 	DECLARE_WRITE8_MEMBER(rpunch_gga_data_w);
 	DECLARE_WRITE16_MEMBER(rpunch_ins_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);

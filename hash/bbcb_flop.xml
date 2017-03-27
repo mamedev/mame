@@ -1957,6 +1957,160 @@
 		</part>
 	</software>
 
+	<software name="du01">
+		<description>Disk User 01 June/July 1987</description>
+		<year>1987</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="96256">
+				<rom name="Disk User 01.ssd" size="96256" crc="9366da84" sha1="6143701290b37c0fcddaa2c5be47450b5fd38249" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du02">
+		<description>Disk User 02 August/September 1987</description>
+		<year>1987</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="96512">
+				<rom name="Disk User 02.ssd" size="96512" crc="34b5310b" sha1="f0bbdbea28a36b3b9704318f0d1a4677297de594" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du03">
+		<description>Disk User 03 October/November 1987</description>
+		<year>1987</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101120">
+				<rom name="Disk User 03.ssd" size="101120" crc="4cd13ead" sha1="43953fb11f58d90eb697c48ebd48739165b72ae6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du04">
+		<description>Disk User 04 December/January 1987/88</description>
+		<year>1987</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="99584">
+				<rom name="Disk User 04.ssd" size="99584" crc="2a3fc3fc" sha1="ddfbbfe14566bcb917197df6327943f914f3d715" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du05">
+		<description>Disk User 05 February/March 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94208">
+				<rom name="Disk User 05.ssd" size="94208" crc="3ec2c85b" sha1="8d1841890292684a5d519db710cdb2c51877157e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du06">
+		<description>Disk User 06 April 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101376">
+				<rom name="Disk User 06.ssd" size="101376" crc="fc9f4b7d" sha1="92cb8b58657c810c21a378947a2ad79aeb30e1f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du07">
+		<description>Disk User 07 May 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102144">
+				<rom name="Disk User 07.ssd" size="102144" crc="943400a0" sha1="afac7da3ed66e151a1b8c723906359ec76601435" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du08">
+		<description>Disk User 08 June 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101376">
+				<rom name="Disk User 08.ssd" size="101376" crc="7ac0f1af" sha1="016fc2c3ef4ce38c14702b039b8ce060d3519a7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du09">
+		<description>Disk User 09 July 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102656">
+				<rom name="Disk User 09.ssd" size="102656" crc="ef6c057b" sha1="58560f4158ef712b81e0330e1498688ee8a3b7cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du10">
+		<description>Disk User 10 August 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="118528">
+				<rom name="Disk User 10.ssd" size="118528" crc="f0f415cf" sha1="3ebc5ced967aed1955c82eb5dc2b1d16f29eb801" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du11">
+		<description>Disk User 11 September 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="97280">
+				<rom name="Disk User 11.ssd" size="97280" crc="0b60d5c7" sha1="6c155e1a430c0c4aa729d2c5e64b6545b4d1f01f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du12">
+		<description>Disk User 12 October 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101120">
+				<rom name="Disk User 12.ssd" size="101120" crc="103846f1" sha1="251e956f9c328c7e4164b99ef65d8c91d0806253" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du13">
+		<description>Disk User 13 November 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100608">
+				<rom name="Disk User 13.ssd" size="100608" crc="9a329e01" sha1="4b6f3505ebf79b6ac09da7301d1e86602fc5b123" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="du14">
+		<description>Disk User 14 December 1988</description>
+		<year>1988</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100096">
+				<rom name="Disk User 14.ssd" size="100096" crc="5ce93d1e" sha1="dd54f4b22e8536ff68c2c242595cde246bff18c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swdmastr">
 		<description>Sword Master</description>
 		<year>1985</year>
@@ -2010,6 +2164,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="110592">
 				<rom name="bs-beebtrk3.ssd" size="110592" crc="4d349403" sha1="c82e305827cbebebf6f2d2f3fbd362ba6b5ac6f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="badapple">
+		<description>Teletext Bad Apple</description>
+		<year>2017</year>
+		<publisher>Bitshifters</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="bs-badappl.dsd" size="409600" crc="6c06dafd" sha1="92c4cd382c7073b47fa359d3352892d2d20c9b65" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2189,13 +2354,13 @@
 		</part>
 	</software>
 
-	<software name="tyb13">
-		<description>Retribution X</description>
-		<year>1992</year>
+	<software name="xpansion">
+		<description>X-Pansions Elevation</description>
+		<year>1991</year>
 		<publisher>The Yorkshire Boys</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="409600">
-				<rom name="d-tyb13.dsd" size="409600" crc="33ee87cb" sha1="346e6b2f266b663845dc5f1d71666dcdcf5f1083" offset="0"/>
+			<dataarea name="flop" size="81920">
+				<rom name="tyb-expansions.ssd" size="81920" crc="d0bc04b3" sha1="5f09b1f385e02df99c004d068f234fe249c54c33" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

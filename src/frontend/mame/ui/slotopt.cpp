@@ -159,7 +159,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		// does this slot have any selectable options?
 		bool has_selectable_options = slot.has_selectable_options();
 
-		// name this option		
+		// name this option
 		std::string opt_name("------");
 		const device_slot_option *option = slot_get_current_option(slot);
 		if (option)

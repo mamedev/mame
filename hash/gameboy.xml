@@ -25140,7 +25140,7 @@
 <!-- GOWIN games -->
 <!--
   Other games (which could coincide with some of the games below without serial)
-  * GS-01 - ??
+  * GS-01 - Song of the Pipa / Magic Ball
   * GS-07 - Lost Trip
   * GS-08 - Binary Monsters
   * GS-09 - ??
@@ -25152,6 +25152,26 @@
   * GS-?? - Amazing Robot
   * GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
 -->
+
+<!-- For GS-01:  You have to enable the "Skip Logo check", at 0x0423 you have to 
+patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to 
+0x00....the last routine (0x0B3D) checks if the first one was changed...
+ after that "Sound of the Pipa" should run... Magic Ball should not have
+ a Protection Check....
+-->
+
+	<software name="pipaball">
+		<description>Song of the Pipa / Magic Ball (Tw)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<info name="serial" value="GS-01"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="gs-01.gb" size="131072" crc="c60456ee" sha1="c03131a77b80ef8bfca511b8c1e6262ffee20846" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="firedrag">
 		<description>Fire Dragon (Tw)</description>

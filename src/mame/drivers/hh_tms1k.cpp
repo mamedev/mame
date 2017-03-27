@@ -82,6 +82,7 @@
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
   MP3479   TMS1100   1980, MicroVision cartridge: Baseball
   MP3481   TMS1100   1979, MicroVision cartridge: Connect Four
+ *MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
   MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
   M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
@@ -123,7 +124,6 @@
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), ...
   - stopthiep: unable to start a game (may be intentional?)
-  - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
   - 7in1ss: in 2-player mode, game select and skill select can be configured
     after selecting a game?
   - bship discrete sound, netlist is documented
@@ -1629,7 +1629,7 @@ MACHINE_CONFIG_END
   Coleco Quiz Wiz Challenger
   * TMS1000NLL M32001-N2 (die label 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
-  
+
   This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
   According to the manual, Quiz Wiz cartridges are compatible with it.
   The question books are needed to play, as well as optional game pieces.
@@ -2436,7 +2436,7 @@ MACHINE_CONFIG_END
     CONIC 102-001, led PCB: CONIC 100-003 REV A itac
   * TMS1000NLL MP0908 (die label 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
-  
+
   This is a peg solitaire game, with random start position.
 
   known releases:
@@ -8041,10 +8041,6 @@ void tbreakup_state::prepare_display()
 		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
 	}
 
-	// 22 round leds from O2-O7 and expander port 7
-	for (int y = 2; y < 8; y++)
-		m_display_state[y] = (m_o >> y & 1) ? m_exp_port[6] : 0;
-
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
 		m_display_state[y+8] = m_exp_port[y];
@@ -8081,6 +8077,10 @@ WRITE16_MEMBER(tbreakup_state::write_o)
 {
 	// O0-O3: TMS1025 port H
 	m_expander->write_h(space, 0, data & 0xf);
+
+	// 22 round leds from O2-O7 and expander port 7 (update here)
+	for (int y = 2; y < 8; y++)
+		m_display_state[y] = (data >> y & 1) ? m_exp_port[6] : 0;
 
 	// O0-O7: led state
 	m_o = data;
@@ -8130,6 +8130,7 @@ void tbreakup_state::machine_reset()
 {
 	hh_tms1k_state::machine_reset();
 	set_clock();
+	m_expander->write_ms(1); // Vss
 }
 
 void tbreakup_state::machine_start()

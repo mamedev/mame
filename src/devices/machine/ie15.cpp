@@ -2,12 +2,12 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	15IE-00-013 Terminal
+    15IE-00-013 Terminal
 
-	A serial (RS232 or current loop) green-screen terminal, mostly VT52
-	compatible (no Hold Screen mode and no graphics character set).
+    A serial (RS232 or current loop) green-screen terminal, mostly VT52
+    compatible (no Hold Screen mode and no graphics character set).
 
-	Alternate character set (selected by SO/SI chars) is Cyrillic.
+    Alternate character set (selected by SO/SI chars) is Cyrillic.
 
 ****************************************************************************/
 
@@ -416,32 +416,32 @@ void ie15_device::device_reset()
 }
 
 /*
-	Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
-	available to the user and 25th (topmost) line is the status line.
-	Status line, if enabled, displays current serial port speed, 16 setup
-	bits, and clock.  There is no NVRAM, so setup bits are always 0 after
-	reset and clock starts counting at 0 XXX.
+    Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
+    available to the user and 25th (topmost) line is the status line.
+    Status line, if enabled, displays current serial port speed, 16 setup
+    bits, and clock.  There is no NVRAM, so setup bits are always 0 after
+    reset and clock starts counting at 0 XXX.
 
-	No character attributes are available, but in 'display controls' mode
-	control characters stored in memory are shown as blinking chars.
+    No character attributes are available, but in 'display controls' mode
+    control characters stored in memory are shown as blinking chars.
 
-	Character cell is 10 x 11; character generator provides 7 x 8 of that.
-	3 extra horizontal pixels are always blank.  Blinking cursor may be
-	displayed on 3 extra scan lines.
+    Character cell is 10 x 11; character generator provides 7 x 8 of that.
+    3 extra horizontal pixels are always blank.  Blinking cursor may be
+    displayed on 3 extra scan lines.
 
-	On each scan line, video board draws 80 characters from any location
-	in video memory; this is used by firmware to provide instant scroll
-	and cursor, which is a character with code 0x7F stored in off-screen
-	memory.
+    On each scan line, video board draws 80 characters from any location
+    in video memory; this is used by firmware to provide instant scroll
+    and cursor, which is a character with code 0x7F stored in off-screen
+    memory.
 
-	Video board output is controlled by
-	- control flag 0 "disable video": 0 == disable
-	- control flag 1 "cursor": 0 == if this scan line is one of extra 3,
-	  enable video every 5 frames.
-	- control flag 3 "status line": 0 == current scan line is part of status line
-	- keyboard mode 'RED' ('display controls'): if character code is
-	  less than 0x20 and RED is set, enable video every 5 frames; if RED is
-	  unset, disable video.
+    Video board output is controlled by
+    - control flag 0 "disable video": 0 == disable
+    - control flag 1 "cursor": 0 == if this scan line is one of extra 3,
+      enable video every 5 frames.
+    - control flag 3 "status line": 0 == current scan line is part of status line
+    - keyboard mode 'RED' ('display controls'): if character code is
+      less than 0x20 and RED is set, enable video every 5 frames; if RED is
+      unset, disable video.
 */
 
 void ie15_device::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
@@ -506,9 +506,9 @@ void ie15_device::update_leds()
 }
 
 /*
-	VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3
+    VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3
    overrides VBlank,
-	allowing status line to be switched on and off.
+    allowing status line to be switched on and off.
 */
 void ie15_device::scanline_callback()
 {

@@ -72,7 +72,7 @@ public:
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
 	u32 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
@@ -260,7 +260,7 @@ WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
 	// 74ls273 Q1-Q4: 74ls145 A-D
 	// 74ls145 0-9: input mux/led select
 	m_inp_mux = 1 << (data & 0xf) & 0x3ff;
-	
+
 	// 74ls273 Q5-Q8: MC14028 A-D
 	// MC14028 Q0-Q7: led data, Q8,Q9: N/C
 	u8 led_data = 1 << (data >> 4 & 0xf) & 0xff;

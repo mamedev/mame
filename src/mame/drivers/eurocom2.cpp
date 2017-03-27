@@ -343,8 +343,8 @@ static ADDRESS_MAP_START(waveterm_map, AS_PROGRAM, 8, waveterm_state)
 	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
 	AM_RANGE(0xfd08, 0xfd0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xfd10, 0xfd17) AM_UNMAP
-	AM_RANGE(0xfd18, 0xfd18) AM_READ(waveterm_adc)	//	AD558 ADC
-//	AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)	//	ZN432 DAC ??
+	AM_RANGE(0xfd18, 0xfd18) AM_READ(waveterm_adc)  //  AD558 ADC
+//  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(eurocom2)
@@ -441,18 +441,18 @@ static MACHINE_CONFIG_START( eurocom2, eurocom2_state )
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(eurocom2_state, kbd_put))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(eurocom2_state, pia1_ca1_r))	// keyboard strobe
-	MCFG_PIA_READCA2_HANDLER(READLINE(eurocom2_state, pia1_ca2_r))	// SST output Q14
-	MCFG_PIA_READCB1_HANDLER(READLINE(eurocom2_state, pia1_cb1_r))	// SST output Q6
-	MCFG_PIA_CB2_HANDLER(WRITELINE(eurocom2_state, pia1_cb2_w))	// SST reset input
+	MCFG_PIA_READCA1_HANDLER(READLINE(eurocom2_state, pia1_ca1_r))  // keyboard strobe
+	MCFG_PIA_READCA2_HANDLER(READLINE(eurocom2_state, pia1_ca2_r))  // SST output Q14
+	MCFG_PIA_READCB1_HANDLER(READLINE(eurocom2_state, pia1_cb1_r))  // SST output Q6
+	MCFG_PIA_CB2_HANDLER(WRITELINE(eurocom2_state, pia1_cb2_w)) // SST reset input
 	MCFG_PIA_READPA_HANDLER(READ8(eurocom2_state, kbd_get))
-//	MCFG_PIA_READPB_HANDLER(READ8(eurocom2_state, kbd_get))
-//	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-//	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+//  MCFG_PIA_READPB_HANDLER(READ8(eurocom2_state, kbd_get))
+//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-//	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-//	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
@@ -462,11 +462,11 @@ static MACHINE_CONFIG_START( eurocom2, eurocom2_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
 
 	MCFG_FD1793_ADD("fdc", XTAL_2MHz/2)
-//	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
+//  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//	MCFG_FLOPPY_DRIVE_SOUND(true)
+//  MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
-//	MCFG_FLOPPY_DRIVE_SOUND(true)
+//  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS(waveterm, eurocom2, waveterm_state)
@@ -481,13 +481,13 @@ static MACHINE_CONFIG_DERIVED_CLASS(waveterm, eurocom2, waveterm_state)
 	// ports A(in/out), B(out), CA1(in), CA2(in), and CB2(out) = interface to PPG bus via DIL socket on WTI board
 	// CB1 -- front panel "End" button
 	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-//	MCFG_PIA_READPA_HANDLER(READ8(waveterm_state, pia3_pa_r))
-//	MCFG_PIA_WRITEPA_HANDLER(WRITE8(waveterm_state, pia3_pa_w))
+//  MCFG_PIA_READPA_HANDLER(READ8(waveterm_state, pia3_pa_r))
+//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(waveterm_state, pia3_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(waveterm_state, pia3_pb_w))
-//	MCFG_PIA_READCA1_HANDLER(READLINE(waveterm_state, pia3_ca1_r))
-//	MCFG_PIA_READCA2_HANDLER(READLINE(waveterm_state, pia3_ca2_r))
+//  MCFG_PIA_READCA1_HANDLER(READLINE(waveterm_state, pia3_ca1_r))
+//  MCFG_PIA_READCA2_HANDLER(READLINE(waveterm_state, pia3_ca2_r))
 	MCFG_PIA_READCB1_HANDLER(IOPORT("FP"))
-//	MCFG_PIA_CB2_HANDLER(WRITELINE(waveterm_state, pia3_cb2_w))
+//  MCFG_PIA_CB2_HANDLER(WRITELINE(waveterm_state, pia3_cb2_w))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
