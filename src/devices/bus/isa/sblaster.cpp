@@ -1425,9 +1425,13 @@ void sb_device::device_reset()
 	m_dsp.wbuf_status = 0;
 	m_dsp.rbuf_status = 0;
 	m_dsp.frequency = 8000; // per stereo-fx
+	m_dsp.flags = 0;
 	m_dsp.irq_active = 0;
 	m_dsp.dma_no_irq = false;
 	mixer_reset();
+
+	m_ldac->write(0x8000);
+	m_rdac->write(0x8000);
 
 	m_onebyte_midi = false;
 	m_uart_midi = false;
