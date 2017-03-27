@@ -82,6 +82,14 @@ void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 //-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+void ymf262_device::device_post_load()
+{
+	ymf262_post_load(m_chip);
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
