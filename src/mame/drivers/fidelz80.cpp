@@ -20,6 +20,7 @@
     - VBRC card scanner
     - VBRC MCU T1 is unknown
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
+    - DSC: what controls the 2 middle leds? or unused?
 
     Read the official manual(s) on how to play.
 
@@ -504,6 +505,7 @@ expect that the software reads these once on startup only.
 // internal artwork
 #include "fidel_cc.lh" // clickable
 #include "fidel_bcc.lh" // clickable
+#include "fidel_dsc.lh" // clickable
 #include "fidel_vcc.lh" // clickable
 #include "fidel_vbrc.lh"
 #include "fidel_vsc.lh" // clickable
@@ -1060,7 +1062,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 void fidelz80_state::dsc_prepare_display()
 {
 	// 4 7seg leds
-	set_display_segmask(0xf, 0xff);
+	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 4, m_7seg_data, m_led_select);
 }
 
@@ -1504,6 +1506,22 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dsc )
 	PORT_INCLUDE( cb_buttons )
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x8f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black King")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Black")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("White King")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("White")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("RV")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("RE")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("PB")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("LV")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("CL")
 INPUT_PORTS_END
 
 
@@ -1640,7 +1658,7 @@ static MACHINE_CONFIG_START( dsc, fidelz80_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_dsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1817,7 +1835,7 @@ ROM_START( bridgec3 ) // 510-1016 Rev.1 PCB has neither locations nor ic labels,
 ROM_END
 
 
-ROM_START( damesc )
+ROM_START( damesc ) // model DSC, PCB label 510-1030A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "101-1027a01", 0x0000, 0x2000, CRC(d86c985c) SHA1(20f923a24420050fd16e1172f5e889f144d17ac9) ) // MOS 2364
 ROM_END
@@ -1850,4 +1868,4 @@ CONS( 1980, vscfr,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fideli
 CONS( 1979, vbrc,     0,      0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1981, damesc,   0,      0,      dsc,     dsc,    driver_device, 0, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, damesc,   0,      0,      dsc,     dsc,    driver_device, 0, "Fidelity Electronics", "Dame Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
