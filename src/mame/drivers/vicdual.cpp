@@ -58,6 +58,7 @@
 #include "audio/invinco.h"
 #include "audio/pulsar.h"
 #include "audio/vicdual.h"
+#include "video/vicdual-97269pb.h"
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
@@ -2250,7 +2251,7 @@ WRITE8_MEMBER(vicdual_state::nsub_io_w)
 	if (offset & 0x04)
 	{
 		palette_bank_w(space, 0, data);
-		m_gradient = data & 4;
+		m_s97269pb->palette_bank_w(data);
 	}
 }
 
@@ -2407,6 +2408,9 @@ static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
+
+	// daughterboard
+	MCFG_S97269PB_ADD("s97269pb")
 MACHINE_CONFIG_END
 
 
@@ -2664,11 +2668,8 @@ Epr-274.u42
 Epr-275.u41
 Pr-69.u11
 
-Also PR33.u82 and PR34.u83 were not dumped from this pcb, couldn't be read because aluminium cooler on it.
-They're probably the same as on other games.
-
-This game use a separate "daughter" board for input ??? ref: 97269-P-B
-with a prom on it : PR-02 type MMI 6336-1j which is soldered.
+This game use a separate "daughter" board for gradient and starfield ref: 97269-P-B
+with 3 proms on it : PR-02 type MMI 6336-1j, PR-56 type MB7054 and PR-57 type MB7054
 
 */
 

@@ -3281,6 +3281,8 @@ files {
 	MAME_DIR .. "src/mame/audio/vicdual.cpp",
 	MAME_DIR .. "src/mame/audio/vicdual.h",
 	MAME_DIR .. "src/mame/video/vicdual.cpp",
+	MAME_DIR .. "src/mame/video/vicdual-97269pb.cpp",
+	MAME_DIR .. "src/mame/video/vicdual-97269pb.h",
 	MAME_DIR .. "src/mame/audio/carnival.cpp",
 	MAME_DIR .. "src/mame/audio/carnival.h",
 	MAME_DIR .. "src/mame/audio/depthch.cpp",

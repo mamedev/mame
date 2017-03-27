@@ -11,6 +11,7 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "screen.h"
+#include "video/vicdual-97269pb.h"
 
 class vicdual_state : public driver_device
 {
@@ -25,6 +26,7 @@ public:
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
+		m_s97269pb(*this,"s97269pb"),
 		m_proms(*this, "proms"),
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),
@@ -44,6 +46,7 @@ public:
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
+	optional_device<s97269pb_device> m_s97269pb;
 	optional_memory_region m_proms;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -58,7 +61,6 @@ public:
 
 	uint8_t m_coin_status;
 	uint8_t m_palette_bank;
-	uint8_t m_gradient;
 	uint8_t m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
