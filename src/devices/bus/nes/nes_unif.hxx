@@ -107,7 +107,7 @@ static const unif unif_list[] =
 	{ "UNL-KS7017",                 0,    0, CHRRAM_0,  KAISER_KS7017},
 	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  KAISER_KS7032}, //  mapper 142
 	{ "UNL-603-5052",               0,    0, CHRRAM_0,  UNL_603_5052}, // mapper 238?
-	{ "UNL-EDU2000",               32,    0, CHRRAM_8,  UNL_EDU2K},
+	{ "UNL-EDU2000",                0,   32, CHRRAM_8,  UNL_EDU2K},
 	{ "UNL-H2288",                  0,    0, CHRRAM_0,  UNL_H2288}, // mapper 123
 	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  SACHEN_SHERO},
 	{ "UNL-YOKO",                   0,    0, CHRRAM_0,  YOKO_BOARD}, // similar to mapper 83, but not the same
@@ -133,6 +133,7 @@ static const unif unif_list[] =
 	{ "BMC-11160",                  0,    0, CHRRAM_0,  BMC_11160},
 	{ "UNL-MALISB",                 0,    0, CHRRAM_0,  UNL_MALISB},
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  UNL_TF1201},
+	{ "UNL-DANCE2000",              0,    8, CHRRAM_8,  SUBOR_TYPE2}, // similar to some Subor carts
 	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
 	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 236?
@@ -152,7 +153,6 @@ static const unif unif_list[] =
 	{ "UNL-CITYFIGHT",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "COOLBOY",                    0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-OneBus",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
-	{ "UNL-DANCE2000",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}
 };
 
 const unif *nes_unif_lookup( const char *board )
