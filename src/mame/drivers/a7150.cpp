@@ -141,10 +141,10 @@ WRITE8_MEMBER(a7150_state::ppi_c_w)
 	// b7
 }
 
-#define	KGS_ST_OBF	0x01
-#define	KGS_ST_IBF	0x02
-#define	KGS_ST_INT	0x04
-#define	KGS_ST_ERR	0x80
+#define KGS_ST_OBF  0x01
+#define KGS_ST_IBF  0x02
+#define KGS_ST_INT  0x04
+#define KGS_ST_ERR  0x80
 
 READ8_MEMBER(a7150_state::kgs_host_r)
 {
@@ -256,7 +256,7 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 	{
 	case 0:
 		m_kgs_ctrl &= ~(KGS_ST_ERR | KGS_ST_INT);
-//		m_pic8259->ir1_w(CLEAR_LINE);
+//      m_pic8259->ir1_w(CLEAR_LINE);
 		break;
 
 	case 1:
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START(a7150_mem, AS_PROGRAM, 16, a7150_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a7150_io, AS_IO, 16, a7150_state)
-    ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x004a, 0x004b) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff) // KES board
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
@@ -422,8 +422,8 @@ static MACHINE_CONFIG_START( a7150, a7150_state )
 
 	// IFSP port on processor card
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-//	MCFG_I8255_IN_PORTA_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
-//	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+//  MCFG_I8255_IN_PORTA_CB(DEVREAD8("cent_status_in", input_buffer_device, read))
+//  MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(a7150_state, ppi_c_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( a7150, a7150_state )
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(a7150_state, kgs_iml_w))
-//	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(a7150_state, kgs_ifss_loopback_w))
+//  MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(a7150_state, kgs_ifss_loopback_w))
 
 	// V.24 port (graphics tablet)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
@@ -502,8 +502,8 @@ ROM_START( a7150 )
 	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100
 	ROM_LOAD( "KGS7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
-//	ROM_LOAD( "KGS7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
-//	ROM_LOAD( "KGS7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
+//  ROM_LOAD( "KGS7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
+//  ROM_LOAD( "KGS7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
 ROM_END
 
 /* Driver */

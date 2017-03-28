@@ -73,18 +73,18 @@ void hlcd0538_device::device_start()
 WRITE_LINE_MEMBER(hlcd0538_device::write_clk)
 {
 	state = (state) ? 1 : 0;
-	
+
 	// clock in data on falling edge
 	if (!state && m_clk)
 		m_shift = (m_shift << 1 | m_data) & u64(0x3ffffffff);
-	
+
 	m_clk = state;
 }
 
 WRITE_LINE_MEMBER(hlcd0538_device::write_lcd)
 {
 	state = (state) ? 1 : 0;
-	
+
 	// transfer to latches on rising edge
 	if (state && !m_lcd)
 	{
@@ -93,7 +93,7 @@ WRITE_LINE_MEMBER(hlcd0538_device::write_lcd)
 	}
 
 	m_lcd = state;
-	
+
 	// interrupt output follows lcd input
 	m_write_interrupt(state);
 }

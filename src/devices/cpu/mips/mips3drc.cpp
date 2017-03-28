@@ -840,6 +840,69 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 		UML_LABEL(block, addrok);                                               // addrok:
 	}
 
+	/* TX4925 on-board peripherals pass-through */
+	if (m_flavor == MIPS3_TYPE_TX4925)
+	{
+		int addrok;
+		UML_AND(block, I3, I0, 0xffff0000);             // and i3, i0, 0xffff0000
+		UML_CMP(block, I3, 0xff1f0000);                 // cmp i3, 0xff1f0000
+		UML_JMPc(block, COND_NZ, addrok = label++);
+
+		switch (size)
+		{
+			case 1:
+				if (iswrite)
+					UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM);                 // write   i0,i1,program_byte
+				else
+					UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);                  // read    i0,i0,program_byte
+				break;
+
+			case 2:
+				if (iswrite)
+					UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);                 // write   i0,i1,program_word
+				else
+					UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);                  // read    i0,i0,program_word
+				break;
+
+			case 4:
+				if (iswrite)
+				{
+					if (!ismasked)
+						UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);                // write   i0,i1,program_dword
+					else
+						UML_WRITEM(block, I0, I1, I2, SIZE_DWORD, SPACE_PROGRAM);   // writem  i0,i1,i2,program_dword
+				}
+				else
+				{
+					if (!ismasked)
+						UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM);             // read    i0,i0,program_dword
+					else
+						UML_READM(block, I0, I0, I2, SIZE_DWORD, SPACE_PROGRAM);        // readm   i0,i0,i2,program_dword
+				}
+				break;
+
+			case 8:
+				if (iswrite)
+				{
+					if (!ismasked)
+						UML_DWRITE(block, I0, I1, SIZE_QWORD, SPACE_PROGRAM);               // dwrite  i0,i1,program_qword
+					else
+						UML_DWRITEM(block, I0, I1, I2, SIZE_QWORD, SPACE_PROGRAM);  // dwritem i0,i1,i2,program_qword
+				}
+				else
+				{
+					if (!ismasked)
+						UML_DREAD(block, I0, I0, SIZE_QWORD, SPACE_PROGRAM);                // dread   i0,i0,program_qword
+					else
+						UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);   // dreadm  i0,i0,i2,program_qword
+				}
+				break;
+		}
+		UML_RET(block);
+
+		UML_LABEL(block, addrok);
+	}
+
 	/* general case: assume paging and perform a translation */
 	UML_SHR(block, I3, I0, 12);                                     // shr     i3,i0,12
 	UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb_table],i3,dword
@@ -1101,7 +1164,9 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);         // load    i0,base,0,dword
 
-			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (seqhead->delay.first() != nullptr
+				&& !(seqhead->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+				&& seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
 				assert(base != nullptr);
@@ -1142,7 +1207,9 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr
+					&& !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+					&& (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
 					assert(base != nullptr);

@@ -74,7 +74,7 @@ private:
 
 /* These are the official XTAL values and clock rates used by Nintendo for
    manufacturing throughout the production of the 2A03. PALC_APU_CLOCK is
-   the clock rate devised by UMC(?) for PAL Famicom clone hardware.        */   
+   the clock rate devised by UMC(?) for PAL Famicom clone hardware.        */
 
 #define N2A03_NTSC_XTAL           XTAL_21_4772MHz
 #define N2A03_PAL_XTAL            XTAL_26_601712MHz

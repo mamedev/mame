@@ -777,7 +777,7 @@ main PCB is marked: "PH2"
 main PCB is labeled: "03814367" and "280402" and "N 132073"
 ROMs PCB is marked: "PH1"
 On top of main PCB there is a small piggyback PCB. it is a replacement for MN6221 Melody-Alarm Generator - sound. There are 3 PROMs (dumped) and a few 74xx logics.
-This board was in a cocktail table cabinet manufactured by Model Racing and labeled "Thunderbird". 
+This board was in a cocktail table cabinet manufactured by Model Racing and labeled "Thunderbird".
 */
 
 ROM_START( phoenixc2 ) // verified main and ROMs PCBs and 2 PROMs
@@ -1158,7 +1158,7 @@ ROM_START( avefenixl )
 ROM_END
 
 /*
-PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side") 
+PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
 */
 
 ROM_START( griffon )  // verified single PCB, single PROM
@@ -1570,7 +1570,7 @@ GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  driver_device, 0,          
 GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  driver_device, 0,               ROT90, "bootleg (Video Game)",              "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet and is likely the real manufacturer, ingame shows 'Video Game'
 GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  driver_device, 0,               ROT90, "bootleg (Recreativos Franco S.A.)", "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  driver_device, 0,               ROT90, "bootleg (Laguna)",                  "Ave Fenix (Laguna, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
-  
+
   /*** Pleiads (& clones) ***/
 GAME( 1981, pleiads,    0,       pleiads,  pleiads,  driver_device, 0,               ROT90, "Tehkan",                            "Pleiads (Tehkan)", MACHINE_IMPERFECT_COLORS )
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  driver_device, 0,               ROT90, "bootleg (ESG)",                     "Pleiads (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
@@ -1580,6 +1580,6 @@ GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, driver_device, 0,          
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, driver_device, 0,               ROT90, "Niemer S.A.",                       "Pleiads (Niemer S.A.)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, driver_device, 0,               ROT90, "bootleg",                           "Pleiads (Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  driver_device, 0,               ROT90, "bootleg? (Universal Video Spiel)",  "Capitol", MACHINE_IMPERFECT_COLORS )
-  
+
   /*** Others ***/
 GAME( 1982, survival,   0,       survival, survival, driver_device, 0,               ROT90, "Rock-Ola",                          "Survival", MACHINE_IMPERFECT_COLORS )

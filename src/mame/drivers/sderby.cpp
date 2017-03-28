@@ -372,6 +372,26 @@ static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( shinygld_map, AS_PROGRAM, 16, sderby_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram") /* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)  /* tilemaps offset control */
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP    /* seems another video register. constantly used */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP    /* seems another video register. constantly used */
+	AM_RANGE(0x104010, 0x105fff) AM_WRITENOP    /* unknown */
+	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITENOP    /* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x401000, 0x40100d) AM_WRITENOP    /* unknown */
+	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")   /* 16K Dallas DS1220Y-200 NVRAM */
+	AM_RANGE(0x7f0000, 0x7fffff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -465,6 +485,26 @@ static INPUT_PORTS_START( spacewin )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( shinygld )
+	PORT_START("IN0")   /* 0x308000.w */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -603,8 +643,6 @@ static MACHINE_CONFIG_START( sderbya, sderby_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
-
 static MACHINE_CONFIG_START( luckboom, sderby_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -652,6 +690,31 @@ static MACHINE_CONFIG_START( spacewin, sderby_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( shinygld, sderby_state )
+
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // verified
+	MCFG_CPU_PROGRAM_MAP(shinygld_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.47) // measured on PCB
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -796,6 +859,31 @@ ROM_START( spacewin )
 	ROM_LOAD( "8.u145", 0x080000, 0x20000, CRC(541a73fd) SHA1(fede5e2fcbb18e90cc50995d44e831c3f9b56614) )
 ROM_END
 
+// This board seems very similar to the spacewin's one.
+ROM_START( shinygld )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "16.u16", 0x00000, 0x20000, CRC(4b08a668) SHA1(8444e7624a40e14eca73c425db1cd574c2bf02e0) ) // 27C1001
+	ROM_LOAD16_BYTE( "17.u15", 0x00001, 0x20000, CRC(eb126e19) SHA1(d02ba03551f71f3ca46bee49291e4423daeea0ce) ) // 27C1001
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "15.u147", 0x00000, 0x40000,  CRC(66db6b15) SHA1(4a1ca962c61d60db8ff66c81253131d067bec8c6) ) // 27C2001
+
+	ROM_REGION( 0xa0000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "18.u141", 0x000000, 0x20000, CRC(a905c02d) SHA1(07a0a70424aa759e4c552408154c2d1515f512d5) ) // 27C1001
+	ROM_LOAD( "19.u142", 0x020000, 0x20000, CRC(8db53f3b) SHA1(aeb2da8bb065bb49edae1de51f6db9a7a02989c3) ) // 27C1001
+	ROM_LOAD( "20.u143", 0x040000, 0x20000, CRC(be54ae86) SHA1(23c8a01aa05204a6cd186a59269e515a068e23c4) ) // 27C1001
+	ROM_LOAD( "21.u144", 0x060000, 0x20000, CRC(de3be666) SHA1(647e054b9aefa80d95f6fb26cc89a976538f0d7c) ) // 27C1001
+	ROM_LOAD( "22.u145", 0x080000, 0x20000, CRC(113ccf81) SHA1(c2192e81a4be38911c971e1593b902f92d9a02d5) ) // 27C1001
+
+	/* Dumper's note: Board carries five PLDs : one GAL22V10 near the 68000 CPU (which most likely acts as main address decoder),
+	   three PALCE22V10H (two are near the GFX ROMs, probably for enabling them), one PALCE16V8H.*/
+	ROM_REGION( 0x1000, "plds", 0)
+	ROM_LOAD( "gal22v10.bin", 0x0400, 0x02e5, NO_DUMP ) // soldered
+	ROM_LOAD( "palce22v10_1.bin",   0x2dd, 0x2dd, NO_DUMP ) // soldered
+	ROM_LOAD( "palce22v10_2.bin",   0x2dd, 0x2dd, NO_DUMP ) // soldered
+	ROM_LOAD( "palce22v10_3.bin",   0x2dd, 0x2dd, NO_DUMP ) // soldered
+	ROM_LOAD( "palce16v8h.bin", 0x0200, 0x0117, NO_DUMP ) // soldered
+ROM_END
 
 /*
 Croupier (PlaYMark)
@@ -945,6 +1033,7 @@ ROM_END
 GAMEL( 1996, sderby,    0,        sderby,   sderby,   driver_device, 0,     ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                             layout_sderby   )
 GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  driver_device, 0,     ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                             layout_sderby   )
 GAMEL( 1996, spacewin,  0,        spacewin, spacewin, driver_device, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                             layout_spacewin )
+GAME ( 1996, shinygld,  0,        shinygld, shinygld, driver_device, 0,     ROT0, "Playmark", "Shiny Golds",                          0 )
 GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
 GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, driver_device, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
 GAME ( 1996, luckboom,  0,        luckboom, luckboom, driver_device, 0,     ROT0, "Playmark", "Lucky Boom",                           0 )

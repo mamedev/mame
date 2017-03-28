@@ -431,7 +431,7 @@ void pabball_state::prepare_display()
 	u16 sel = m_c & 0xf;
 	if (sel & 8) sel &= 9;
 	sel = 1 << sel;
-	
+
 	// CD4028 9 is 7seg
 	set_display_segmask(0x200, 0xff);
 	display_matrix(8, 10, m_b, sel);
@@ -448,10 +448,10 @@ WRITE8_MEMBER(pabball_state::write_c)
 {
 	// C2: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 2 & 1);
-	
+
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
-	
+
 	// C0-C3: CD4028 A-D
 	m_c = data;
 	prepare_display();
@@ -487,7 +487,7 @@ INPUT_CHANGED_MEMBER(pabball_state::reset_button)
 static MACHINE_CONFIG_START( pabball, pabball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=18K, C=27pF
+	MCFG_CPU_ADD("maincpu", PIC1655, 1200000) // approximation - RC osc. R=18K, C=27pF
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(pabball_state, write_b))
 	MCFG_PIC16C5x_READ_C_CB(IOPORT("IN.1"))
@@ -1535,7 +1535,7 @@ WRITE8_MEMBER(us2pfball_state::write_c)
 {
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
-	
+
 	// C0-C6: digit segments
 	m_c = data;
 	prepare_display();
@@ -1580,13 +1580,13 @@ static INPUT_PORTS_START( us2pfball )
 
 	PORT_START("IN.5") // port B
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) // S
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Status/Score") // S
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=39K, C=75pF
+	MCFG_CPU_ADD("maincpu", PIC1650, 800000) // approximation - RC osc. R=39K, C=75pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(us2pfball_state, read_a))
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(us2pfball_state, write_a))
 	MCFG_PIC16C5x_READ_B_CB(IOPORT("IN.5"))
@@ -1596,7 +1596,7 @@ static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
 	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(us2pfball_state, write_d))
 
-	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_DEVICE_ADD("clock", CLOCK, 800000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
@@ -1710,4 +1710,4 @@ CONS( 1979, ttfball,   0,        0, ttfball,   ttfball,   driver_device, 0, "Toy
 CONS( 1979, ttfballa,  ttfball,  0, ttfball,   ttfballa,  driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, uspbball,  0,        0, uspbball,  uspbball,  driver_device, 0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1981, us2pfball, 0,        0, us2pfball, us2pfball, driver_device, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, us2pfball, 0,        0, us2pfball, us2pfball, driver_device, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

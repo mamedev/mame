@@ -202,7 +202,7 @@ void http_manager::update()
 
 	m_server->clear();
 	for (auto handler : m_handlers)
-	{		
+	{
 		m_server->on_get(handler.first, [handler](auto response, auto request)
 		{
 			std::tuple<std::string,int, std::string> output = handler.second(request->path);

@@ -708,8 +708,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	 */
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
-	address_space &space = machine().dummy_space();
-	m_rflip_sig = m_dev_6h->bit2_r(space, 0) & m_lfsr_5I;
+	m_rflip_sig = m_dev_6h->bit2_r() & m_lfsr_5I;
 
 	/* blue background generation */
 
@@ -774,7 +773,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	 *
 	 * Mixed with ANS line (bit 5) from Port B of 8039
 	 */
-	if (m_grid_on && m_dev_vp2->bit5_r(space, 0))
+	if (m_grid_on && m_dev_vp2->bit5_r())
 	{
 		diff = (0.0 - m_cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );

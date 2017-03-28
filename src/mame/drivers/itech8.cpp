@@ -2247,16 +2247,14 @@ ROM_START( slikshot16 )
 ROM_END
 
 
-
-
 ROM_START( dynobop )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "dynobop.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
-	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
+	ROM_CONTINUE(                   0x10000, 0xc000 )
+	ROM_COPY( "maincpu",   0x14000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "dynobop.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
+	ROM_LOAD( "dyno_snd-u27.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "dynobop.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
@@ -2265,11 +2263,11 @@ ROM_START( dynobop )
 	ROM_CONTINUE(            0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "dynobop.gr0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )
-	ROM_LOAD( "dynobop.gr1", 0x20000, 0x20000, CRC(1544a232) SHA1(60bba76537c82887db8e38c6a87c528afdd385d0) )
+	ROM_LOAD( "grom00-dyno.grom0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )
+	ROM_LOAD( "grom01-dyno.grom1", 0x20000, 0x20000, CRC(1544a232) SHA1(60bba76537c82887db8e38c6a87c528afdd385d0) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "dynobop.sr0", 0x00000, 0x10000, CRC(b355bf1d) SHA1(c9745638feb33ec181b8d9a894421f9854286cd9) )
+	ROM_LOAD( "dyno_vr-srom0.srom0", 0x00000, 0x10000, CRC(b355bf1d) SHA1(c9745638feb33ec181b8d9a894421f9854286cd9) )
 ROM_END
 
 
@@ -2759,7 +2757,7 @@ GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,  
 GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
 GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device,0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab

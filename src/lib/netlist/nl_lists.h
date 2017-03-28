@@ -25,7 +25,7 @@
 // timed queue
 // ----------------------------------------------------------------------------------------
 
-#define USE_HEAP	(0)
+#define USE_HEAP    (0)
 
 namespace netlist
 {

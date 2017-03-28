@@ -3,17 +3,17 @@
 /***************************************************************************
 
     agat.c
-	Skeleton driver for Agat series of Soviet Apple II non-clones
+    Skeleton driver for Agat series of Soviet Apple II non-clones
 
-	These are similar to Apple II (same bus architecture, keyboard and
-	floppy interface), but video controller is completely different.
+    These are similar to Apple II (same bus architecture, keyboard and
+    floppy interface), but video controller is completely different.
 
-	To do:
-	- native keyboards (at least two variants)
-	- 840K floppy controller (MFM encoding, but track layout is unique)
-	- agat7: 64K and 128K onboard memory configurations
-	- agat9
-	- 3rd party slot devices
+    To do:
+    - native keyboards (at least two variants)
+    - 840K floppy controller (MFM encoding, but track layout is unique)
+    - agat7: 64K and 128K onboard memory configurations
+    - agat9
+    - 3rd party slot devices
 
 ************************************************************************/
 
@@ -485,7 +485,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 
 READ8_MEMBER(agat7_state::c800_r)
 {
-//	logerror("%s: c800_r %04X (slot %d) == %02X\n", machine().describe_context(), offset+0xc800, m_cnxx_slot, 0);
+//  logerror("%s: c800_r %04X (slot %d) == %02X\n", machine().describe_context(), offset+0xc800, m_cnxx_slot, 0);
 
 	if (offset == 0x7ff)
 	{
@@ -507,7 +507,7 @@ READ8_MEMBER(agat7_state::c800_r)
 
 WRITE8_MEMBER(agat7_state::c800_w)
 {
-//	logerror("%s: c800_w %04X <- %02X\n", machine().describe_context(), offset+0xc800, data);
+//  logerror("%s: c800_w %04X <- %02X\n", machine().describe_context(), offset+0xc800, data);
 
 	if (offset == 0x7ff)
 	{
@@ -551,7 +551,7 @@ uint8_t agat7_state::read_floatingbus()
 }
 
 /***************************************************************************
-	ADDRESS MAP
+    ADDRESS MAP
 ***************************************************************************/
 
 /* onboard memory banking on Agat-7 */
@@ -599,8 +599,8 @@ READ8_MEMBER(agat7_state::agat7_ram_r)
 
 WRITE8_MEMBER(agat7_state::agat7_ram_w)
 {
-//	if (offset > 0x7fff)
-//	logerror("%s: ram %04X (bank %d slot %d) <- %02X\n", machine().describe_context(), offset, m_agat7_membank, m_agat7_ram_slot, data);
+//  if (offset > 0x7fff)
+//  logerror("%s: ram %04X (bank %d slot %d) <- %02X\n", machine().describe_context(), offset, m_agat7_membank, m_agat7_ram_slot, data);
 
 	if (offset < 32768)
 	{
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( agat7, agat7_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
-//	MCFG_RAM_EXTRA_OPTIONS("64K,128K")
+//  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* sound hardware */
@@ -1078,11 +1078,11 @@ ROM_START( agat7 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v1")
 
-	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )	// original?
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" ) // original?
 	ROMX_LOAD( "monitor7.rom", 0x3800, 0x0800, CRC(071fda0b) SHA1(6089d46b7addc4e2ae096b2cf81124681bd2b27a), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )	// modded by author of agatcomp.ru
+	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" ) // modded by author of agatcomp.ru
 	ROMX_LOAD( "agat_pzu.bin", 0x3800, 0x0800, CRC(c605163d) SHA1(b30fd1b264a347a9de69bb9e3105483254994d06), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "debug", "Debug" )	// written by author of agatcomp.ru
+	ROM_SYSTEM_BIOS( 2, "debug", "Debug" )  // written by author of agatcomp.ru
 	ROMX_LOAD( "debug-sysmon7.bin", 0x3800, 0x0800, CRC(d26f18a4) SHA1(2862c13a82e2f4dfc757aa2eeab11fe71c570c12), ROM_BIOS(3))
 
 	// 140KB floppy controller

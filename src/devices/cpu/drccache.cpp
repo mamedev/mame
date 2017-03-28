@@ -243,7 +243,7 @@ void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, voi
 	oob_handler *oob = (oob_handler *)alloc(sizeof(*oob));
 	assert(oob != nullptr);
 	new (oob) oob_handler();
-	
+
 	// fill it in
 	oob->m_callback = callback;
 	oob->m_param1 = param1;

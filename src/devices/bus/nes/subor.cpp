@@ -146,7 +146,7 @@ void nes_subor2_device::pcb_reset()
  and studying VirtuaNESEx. The latter makes the
  read at 0x5300 return 0x8F, perhaps as a form
  of copy protection?
- 
+
  There are two revisions of Type 2 that are
  currently known;
 

@@ -624,15 +624,15 @@ uint8_t gime_base_device::read(offs_t offset)
 	switch(offset & 0xF0)
 	{
 		case 0x00:
-			data = read_gime_register(offset);			// $FF90 - $FF9F
+			data = read_gime_register(offset);          // $FF90 - $FF9F
 			break;
 
 		case 0x10:
-			data = read_mmu_register(offset);			// $FFA0 - $FFAF
+			data = read_mmu_register(offset);           // $FFA0 - $FFAF
 			break;
 
 		case 0x20:
-			data = read_palette_register(offset);		// $FFB0 - $FFBF
+			data = read_palette_register(offset);       // $FFB0 - $FFBF
 			break;
 
 		default:
@@ -733,20 +733,20 @@ void gime_base_device::write(offs_t offset, uint8_t data)
 	switch(offset & 0xF0)
 	{
 		case 0x00:
-			write_gime_register(offset & 0x0F, data);				// $FF90 - $FF9F
+			write_gime_register(offset & 0x0F, data);               // $FF90 - $FF9F
 			break;
 
 		case 0x10:
-			write_mmu_register(offset & 0x0F, data);				// $FFA0 - $FFAF
+			write_mmu_register(offset & 0x0F, data);                // $FFA0 - $FFAF
 			break;
 
 		case 0x20:
-			write_palette_register(offset & 0x0F, data & 0x3F);		// $FFB0 - $FFBF
+			write_palette_register(offset & 0x0F, data & 0x3F);     // $FFB0 - $FFBF
 			break;
 
 		case 0x30:
 		case 0x40:
-			write_sam_register(offset - 0x30);						// $FFC0 - $FFDF
+			write_sam_register(offset - 0x30);                      // $FFC0 - $FFDF
 			break;
 	}
 }
