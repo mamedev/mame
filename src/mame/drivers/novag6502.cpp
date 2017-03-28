@@ -348,7 +348,7 @@ void novag6502_state::cforte_prepare_display()
 {
 	// 3 led rows
 	display_matrix(8, 3, m_led_data, m_led_select, false);
-	
+
 	// lcd panel (mostly handled in cforte_lcd_output_w)
 	set_display_segmask(0x3ff0, 0xff);
 	set_display_size(8, 3+13);
@@ -368,10 +368,10 @@ WRITE64_MEMBER(novag6502_state::cforte_lcd_output_w)
 		m_display_state[dig+3] = 0;
 		for (int i = 0; i < 4; i++)
 			m_display_state[dig+3] |= ((rowdata[i] >> (2*dig) & 3) << (2*i));
-		
+
 		m_display_state[dig+3] = BITSWAP8(m_display_state[dig+3],7,2,0,4,6,5,3,1);
 	}
-	
+
 	cforte_prepare_display();
 }
 

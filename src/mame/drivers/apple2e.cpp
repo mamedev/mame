@@ -1961,35 +1961,35 @@ READ8_MEMBER(apple2e_state::c100_int_bank_r)  { return read_int_rom(space, 0x410
 WRITE8_MEMBER(apple2e_state::c100_w) { write_slot_rom(space, 1, offset, data); }
 READ8_MEMBER(apple2e_state::c300_r)  { return read_slot_rom(space, 3, offset); }
 
-READ8_MEMBER(apple2e_state::c300_int_r)  
-{ 
+READ8_MEMBER(apple2e_state::c300_int_r)
+{
 	if (!m_slotc3rom)
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
 	}
-	return read_int_rom(space, 0x300, offset); 
+	return read_int_rom(space, 0x300, offset);
 }
 
-READ8_MEMBER(apple2e_state::c300_int_bank_r)  
-{ 
+READ8_MEMBER(apple2e_state::c300_int_bank_r)
+{
 	if (!m_slotc3rom)
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
 	}
-	return read_int_rom(space, 0x4300, offset); 
+	return read_int_rom(space, 0x4300, offset);
 }
 
-WRITE8_MEMBER(apple2e_state::c300_w) 
-{ 	
+WRITE8_MEMBER(apple2e_state::c300_w)
+{
 	if (!m_slotc3rom)
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
 	}
 
-	write_slot_rom(space, 3, offset, data); 
+	write_slot_rom(space, 3, offset, data);
 }
 READ8_MEMBER(apple2e_state::c400_r)  { return read_slot_rom(space, 4, offset); }
 READ8_MEMBER(apple2e_state::c400_int_r)

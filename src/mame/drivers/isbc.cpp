@@ -51,7 +51,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
-//	optional_device<i8274_device> m_uart8274;
+//  optional_device<i8274_device> m_uart8274;
 	optional_device<i8274N_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
@@ -64,7 +64,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-//	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
+//  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 	DECLARE_WRITE8_MEMBER(upperen_w);
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
-//	AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
+//  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/18)
-//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
+//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-//	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
 	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 #endif
 
@@ -481,13 +481,13 @@ ROM_END
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Transmitter Bits/Character 8, Send Break 0, RTS=0, DTR=0
- * :uart8274 B Reg 03 <- c1 - Rx 8 bits, No Auto Enables, Rx Enabled, 
+ * :uart8274 B Reg 03 <- c1 - Rx 8 bits, No Auto Enables, Rx Enabled,
 
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 B Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 B Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 B Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26
@@ -497,7 +497,7 @@ ROM_END
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
- * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables 
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
@@ -507,7 +507,7 @@ ROM_END
  * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26
@@ -520,7 +520,7 @@ ROM_END
  * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26

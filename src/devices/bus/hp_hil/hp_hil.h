@@ -14,51 +14,51 @@
 #include "emu.h"
 
 
-#define HPMLC_R1_OB		0x10
+#define HPMLC_R1_OB     0x10
 
-#define HPMLC_W1_C		0x0800
+#define HPMLC_W1_C      0x0800
 
-#define HPMLC_R2_PERR	0x01
-#define HPMLC_R2_FERR	0x02
-#define HPMLC_R2_FOF	0x04
+#define HPMLC_R2_PERR   0x01
+#define HPMLC_R2_FERR   0x02
+#define HPMLC_R2_FOF    0x04
 
-#define HPMLC_W2_TEST	0x01
-#define HPMLC_W2_IPF	0x04
+#define HPMLC_W2_TEST   0x01
+#define HPMLC_W2_IPF    0x04
 
-#define HPMLC_R3_INT	0x01
-#define HPMLC_R3_NMI	0x02
-#define HPMLC_R3_LERR	0x04
+#define HPMLC_R3_INT    0x01
+#define HPMLC_R3_NMI    0x02
+#define HPMLC_R3_LERR   0x04
 
-#define HPMLC_W3_APE	0x02
+#define HPMLC_W3_APE    0x02
 
 // commands
-#define	HPHIL_IFC		0x00	// Interface Clear
-#define	HPHIL_EPT		0x01	// Enter Pass-Thru Mode
-#define	HPHIL_ELB		0x02	// Enter Loop-Back Mode
-#define	HPHIL_IDD		0x03	// Identify and Describe
-#define	HPHIL_DSR		0x04	// Device Soft Reset
-#define	HPHIL_PST		0x05	// Perform Self Test
-#define	HPHIL_RRG		0x06	// Read Register
-#define	HPHIL_WRG		0x07	// Write Register
-#define	HPHIL_ACF		0x08	// Auto Configure [08..0f]
-#define	HPHIL_POL		0x10	// Poll [10..1f]
-#define	HPHIL_RPL		0x20	// RePoll [20..2f]
-#define	HPHIL_RNM		0x30	// Report Name
-#define	HPHIL_RST		0x31	// Report Status
-#define	HPHIL_EXD		0x32	// Extended Describe
-#define	HPHIL_RSC		0x33	// Report Security Code
-#define	HPHIL_DKA		0x3D	// Disable Keyswitch AutoRepeat
-#define	HPHIL_EK1		0x3E	// Enable Keyswitch AutoRepeat 30cps
-#define	HPHIL_EK2		0x3F	// Enable Keyswitch AutoRepeat 60cps
-#define	HPHIL_PR1		0x40	// Prompt 1..7 [40..46]
-#define	HPHIL_PRM		0x47	// Prompt (General Purpose)
-#define	HPHIL_AK1		0x48	// Acknowledge 1..7 [40..46]
-#define	HPHIL_ACK		0x4F	// Acknowledge (General Purpose)
-#define	HPHIL_RIO		0xFA	// Register I/O Error
-#define	HPHIL_SHR		0xFB	// System Hard Reset
-#define	HPHIL_TER		0xFC	// Transmission Error
-#define	HPHIL_CAE		0xFD	// Configuration Address Error
-#define	HPHIL_DHR		0xFE	// Device Hard Reset
+#define HPHIL_IFC       0x00    // Interface Clear
+#define HPHIL_EPT       0x01    // Enter Pass-Thru Mode
+#define HPHIL_ELB       0x02    // Enter Loop-Back Mode
+#define HPHIL_IDD       0x03    // Identify and Describe
+#define HPHIL_DSR       0x04    // Device Soft Reset
+#define HPHIL_PST       0x05    // Perform Self Test
+#define HPHIL_RRG       0x06    // Read Register
+#define HPHIL_WRG       0x07    // Write Register
+#define HPHIL_ACF       0x08    // Auto Configure [08..0f]
+#define HPHIL_POL       0x10    // Poll [10..1f]
+#define HPHIL_RPL       0x20    // RePoll [20..2f]
+#define HPHIL_RNM       0x30    // Report Name
+#define HPHIL_RST       0x31    // Report Status
+#define HPHIL_EXD       0x32    // Extended Describe
+#define HPHIL_RSC       0x33    // Report Security Code
+#define HPHIL_DKA       0x3D    // Disable Keyswitch AutoRepeat
+#define HPHIL_EK1       0x3E    // Enable Keyswitch AutoRepeat 30cps
+#define HPHIL_EK2       0x3F    // Enable Keyswitch AutoRepeat 60cps
+#define HPHIL_PR1       0x40    // Prompt 1..7 [40..46]
+#define HPHIL_PRM       0x47    // Prompt (General Purpose)
+#define HPHIL_AK1       0x48    // Acknowledge 1..7 [40..46]
+#define HPHIL_ACK       0x4F    // Acknowledge (General Purpose)
+#define HPHIL_RIO       0xFA    // Register I/O Error
+#define HPHIL_SHR       0xFB    // System Hard Reset
+#define HPHIL_TER       0xFC    // Transmission Error
+#define HPHIL_CAE       0xFD    // Configuration Address Error
+#define HPHIL_DHR       0xFE    // Device Hard Reset
 
 /*
  * init sequnce (p. 4-13)

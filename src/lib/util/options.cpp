@@ -482,8 +482,8 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 
 
 //-------------------------------------------------
-//	pluck_from_command_line - finds a specific
-//	value from within a command line
+//  pluck_from_command_line - finds a specific
+//  value from within a command line
 //-------------------------------------------------
 
 bool core_options::pluck_from_command_line(std::vector<std::string> &args, const std::string &optionname, std::string &result)

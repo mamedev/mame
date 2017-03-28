@@ -659,10 +659,10 @@ ROM_START( shangha3up ) /* PCB labeled SUN04 with a sticker labeled PCB 001, a p
 	ROM_LOAD16_BYTE( "syan3u_odd_10-7.ic2",  0x0001, 0x40000, CRC(fe3960bf) SHA1(545473260d959b8ed8145263d54f5f4523a844c4) ) /* ST M27C2001 EPROM hand written label:  SYAN3U  ODD 10/7 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* same data as the 42 pin MASK S3J CHAR-A1 */
-	ROM_LOAD( "s3j_chr-a1_1_sum-53b1_93.9.20.ic80", 0x000000, 0x80000, CRC(fcaf795b) SHA1(312d85f39087564d67f12e0287f508b94b1493af) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #1  SUM: 53B1  93.9.30 */
-	ROM_LOAD( "s3j_chr-a1_2_sum_0e32_93.9.20.ic81", 0x080000, 0x80000, CRC(5a564f50) SHA1(34ca2ecd7101961e657034082802d89db5b4b7bd) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #2  SUM: 0E32  93.9.30 */
-	ROM_LOAD( "s3j_chr-a1_3_sum_0d9a_93.9.20.ic82", 0x100000, 0x80000, CRC(2b333c69) SHA1(6e720de5d222be25857ab18902636587e8c6afb8) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #3  SUM: 0D9A  93.9.30 */
-	ROM_LOAD( "s3j_chr-a1_4_sum-27e7_93.9.20.ic83", 0x180000, 0x80000, CRC(19be7039) SHA1(53839460b53144120cc2f68992c054062efa939b) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #4  SUM: 27E7  93.9.30 */
+	ROM_LOAD( "s3j_chr-a1_1_sum_53b1_93.9.20.ic80", 0x000000, 0x80000, CRC(fcaf795b) SHA1(312d85f39087564d67f12e0287f508b94b1493af) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #1  SUM: 53B1  93.9.20 */
+	ROM_LOAD( "s3j_chr-a1_2_sum_0e32_93.9.20.ic81", 0x080000, 0x80000, CRC(5a564f50) SHA1(34ca2ecd7101961e657034082802d89db5b4b7bd) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #2  SUM: 0E32  93.9.20 */
+	ROM_LOAD( "s3j_chr-a1_3_sum_0d9a_93.9.20.ic82", 0x100000, 0x80000, CRC(2b333c69) SHA1(6e720de5d222be25857ab18902636587e8c6afb8) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #3  SUM: 0D9A  93.9.20 */
+	ROM_LOAD( "s3j_chr-a1_4_sum_27e7_93.9.20.ic83", 0x180000, 0x80000, CRC(19be7039) SHA1(53839460b53144120cc2f68992c054062efa939b) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #4  SUM: 27E7  93.9.20 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "pcm_9-16_0166.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) ) /* Hand written label:  <kanji for Shanghai III>  PCM  9/16 0166 */

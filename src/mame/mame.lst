@@ -9626,6 +9626,9 @@ firebeas                        // (proto)          (c) 1983
 @source:clowndwn.cpp
 clowndwn                        // Elwood Clown Roll Down
 
+@source:clpoker.cpp
+clpoker                         // Chain Leisure
+
 @source:clshroad.cpp
 clshroad                        // (c) 1986 Wood Place Inc.
 clshroadd                       // (c) 1986 Wood Place Inc. (Data East license)
@@ -12107,8 +12110,8 @@ promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
 @source:eurocom2.cpp
-eurocom2						//
-waveterm						//
+eurocom2                        //
+waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
@@ -12405,6 +12408,7 @@ fexcel68k                       //
 bridgec3                        //
 cc10                            //
 cc7                             //
+damesc                          //
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German
@@ -13048,6 +13052,7 @@ galgame                         // (c) 1971 Computer Recreations, Inc
 @source:galgames.cpp
 galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
 galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
+galgame4                        // (c) 1998 Creative Electronics & Software (CES) / Atari
 galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:galivan.cpp
@@ -30715,6 +30720,7 @@ kovshxas                        // bootleg
 kovytzy                         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
 martmast                        // (c) 2001 Martial Masters
 martmastc                       //
+martmastc103                    //
 martmastc102                    //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
@@ -36942,7 +36948,7 @@ voyager                         // (c) 2002 Team Play, Inc.
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix
 specfrce                        // (c) 2002 ICE/Play Mechanix
-zoofari							// (c) 2006 ICE/Play Mechanix
+zoofari                         // (c) 2006 ICE/Play Mechanix
 
 @source:vpoker.cpp
 5acespkr                        // (c) 198?

@@ -223,7 +223,8 @@ public:
 	screen_device *first_screen() const { return primary_screen; }
 
 	// RAII-based side effect disable
-	side_effect_disabler disable_side_effect() { return side_effect_disabler(this); }
+	// NOP-ed when passed false, to make it more easily conditional
+	side_effect_disabler disable_side_effect(bool disable_se = true) { return side_effect_disabler(this, disable_se); }
 	bool side_effect_disabled() const { return m_side_effect_disabled != 0; }
 
 	// additional helpers
@@ -291,13 +292,16 @@ public:
 private:
 	struct side_effect_disabler {
 		running_machine *m_machine;
+		bool m_disable_se;
 
-		side_effect_disabler(running_machine *m) : m_machine(m) {
-			m_machine->disable_side_effect_count();
+		side_effect_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
+			if(m_disable_se)
+				m_machine->disable_side_effect_count();
 		}
 
 		~side_effect_disabler() {
-			m_machine->enable_side_effect_count();
+			if(m_disable_se)
+				m_machine->enable_side_effect_count();
 		}
 
 		side_effect_disabler(const side_effect_disabler &) = delete;

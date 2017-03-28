@@ -65,12 +65,12 @@ void nes_zemina_device::pcb_reset()
 -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  Zemina board emulation
 
  Currently, this board is only known to be used
  by one game: Magic Kid GooGoo.
- 
+
  Info from kevtris at NESDev, who dumped the game:
  wiki.nesdev.com/w/index.php/INES_Mapper_190
 

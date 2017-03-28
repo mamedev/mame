@@ -493,7 +493,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
 	DECLARE_DRIVER_INIT(fdesdis);
-	
+
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
 	DECLARE_DRIVER_INIT(fphantom);
@@ -1008,7 +1008,7 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 {
 	chesster_control_w(space, offset, data);
-	
+
 	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4) | (m_speech_bank << 1 & 8) | (m_speech_bank << 4 & 0x10));
 }
@@ -1636,7 +1636,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
 

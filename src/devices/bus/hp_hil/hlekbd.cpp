@@ -288,7 +288,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 void hle_device_base::hil_write(uint16_t data)
 {
 	int frames = 0;
-//	printf("rx from mlc %04X (%s %02X)\n", data, BIT(data, 11) ? "command" : "data", data & 255);
+//  printf("rx from mlc %04X (%s %02X)\n", data, BIT(data, 11) ? "command" : "data", data & 255);
 
 	if (BIT(data, 11)) switch (data & 255)
 	{
@@ -314,7 +314,7 @@ void hle_device_base::hil_write(uint16_t data)
 	case HPHIL_POL:
 		if (!m_fifo.empty())
 		{
-			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);	// Keycode Set 1, no coordinate data
+			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
 			frames = 1;
 			while (!m_fifo.empty())
 			{
@@ -348,18 +348,18 @@ void hle_device_base::hil_write(uint16_t data)
 
 	if (!m_passthru)
 		m_hp_hil_mlc->hil_write(data);
-//	else
-//		m_next->hil_write(data);
+//  else
+//      m_next->hil_write(data);
 }
 
 void hle_device_base::transmit_byte(uint8_t byte)
 {
 	if (!m_fifo.full()) {
-//		printf("queuing %02X\n", byte);
+//      printf("queuing %02X\n", byte);
 		m_fifo.enqueue(byte);
 	}
-//	else
-//		printf("queuing fail (fifo full)\n");
+//  else
+//      printf("queuing fail (fifo full)\n");
 }
 
 /*--------------------------------------------------

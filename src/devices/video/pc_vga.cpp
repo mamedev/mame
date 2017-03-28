@@ -331,7 +331,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.gc.memory_map_sel));
 	save_item(NAME(vga.gc.host_oe));
 	save_item(NAME(vga.gc.chain_oe));
-   
+
 	save_item(NAME(vga.attribute.index));
 	save_item(NAME(vga.attribute.data));
 	save_item(NAME(vga.attribute.state));

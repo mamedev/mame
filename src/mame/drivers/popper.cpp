@@ -245,8 +245,8 @@ static const res_net_decode_info popper_decode_info =
 static const res_net_info popper_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
- 	{
- 			{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
+	{
+			{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
 			{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
 			{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } }
 	}
@@ -389,7 +389,7 @@ WRITE8_MEMBER( popper_state::ay1_w )
 
 WRITE8_MEMBER( popper_state::nmi_control_w )
 {
-//	logerror("nmi_control_w: %02x\n", data);
+//  logerror("nmi_control_w: %02x\n", data);
 	m_nmi_enable = data & 1;
 }
 

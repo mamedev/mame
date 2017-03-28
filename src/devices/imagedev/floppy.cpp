@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "floppy.h"
 
-#include "speaker.cpp"
+#include "speaker.h"
 #include "formats/imageutl.h"
 #include "zippath.h"
 

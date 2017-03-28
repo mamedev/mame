@@ -5,27 +5,27 @@
     MM5740 Keyboard Encoder emulation
 
 **********************************************************************
-			    _____   _____
-		    B3   1 |*    \_/     | 40  B4
-		   Vll   2 |             | 39  B9
-		 Clock   3 |             | 38  B2
-		    X9   4 |             | 37  B1
-		    X8   5 |             | 36  B8
-		    X7   6 |             | 35  B7
-		    X6   7 |             | 34  B6
-		    X5   8 |             | 33  B5
-		    X4   9 |             | 32  Vss
-		    X3  10 |    MM5740   | 31  Y9
-		    X2  11 |             | 30  Y8
-		    X1  12 |             | 29  Y7
+                _____   _____
+            B3   1 |*    \_/     | 40  B4
+           Vll   2 |             | 39  B9
+         Clock   3 |             | 38  B2
+            X9   4 |             | 37  B1
+            X8   5 |             | 36  B8
+            X7   6 |             | 35  B7
+            X6   7 |             | 34  B6
+            X5   8 |             | 33  B5
+            X4   9 |             | 32  Vss
+            X3  10 |    MM5740   | 31  Y9
+            X2  11 |             | 30  Y8
+            X1  12 |             | 29  Y7
     Data Strobe Output  13 |             | 28  Y6
    Data Strobe Control  14 |             | 27  Y5
-	 Output Enable  15 |             | 26  Y4
-		Repeat  16 |             | 25  Y3
+     Output Enable  15 |             | 26  Y4
+        Repeat  16 |             | 25  Y3
        Key Bounce Mask  17 |             | 24  Y2
-		   Vgg  18 |             | 23  Y1
-	       Control  19 |             | 22  Y0
-	Shift Lock I/O  20 |_____________| 21  Shift
+           Vgg  18 |             | 23  Y1
+           Control  19 |             | 22  Y0
+    Shift Lock I/O  20 |_____________| 21  Shift
 
 Name                 Pin No.     Function
 ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ Name                 Pin No.     Function
 X1-X9                4-12        Output - Drives the key switch matrix.
 
 Y1-Y10               22-31       Inputs - connect to the X drive lines with
-				 the key switch matrix.
+                 the key switch matrix.
 
 B1-B9                1,33-40     Tri-stated data outputs.
 
@@ -44,10 +44,10 @@ Data Strobe Control  14          Input to control data strobe output pulse width
 Output Enable        15          Input to control the chip's TRI-STATE output
 
 Repeat               16          Each cycle of this signal will issue
-				 a new data strobe for the pressed key.
+                 a new data strobe for the pressed key.
 
 Key-Bounce Mask      17          Use capacitor on this chip to provide
-				 key debouncing
+                 key debouncing
 
 Shift                21          Shift key pressed
 
@@ -55,9 +55,9 @@ Control              19          Control key pressed
 
 Shift Lock I/O       20          Togglable input to signify shift (NOT caps) lock.
 
-Clock                3           A TTL compatible clock signal 
+Clock                3           A TTL compatible clock signal
 
-Vss                  32          +5.0V 
+Vss                  32          +5.0V
 
 Vll                  2           Ground
 
@@ -67,10 +67,10 @@ Vgg                  18          -12V
 **********************************************************************/
 
 /* TODO:
-	Support Key-bounce mask
-	Support Repeat function
-	Support shift lock
-	Support additional internal ROMs
+    Support Key-bounce mask
+    Support Repeat function
+    Support shift lock
+    Support additional internal ROMs
 */
 
 #pragma once
@@ -111,7 +111,7 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	template<typename Object> static devcb_base &set_x_cb(device_t &device, Object &&object, uint8_t i) 
+	template<typename Object> static devcb_base &set_x_cb(device_t &device, Object &&object, uint8_t i)
 	{
 		assert(i<9); return downcast<mm5740_device &>(device).m_read_x[i].set_callback(std::forward<Object>(object));
 	}

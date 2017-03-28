@@ -212,8 +212,8 @@ void mame_options::parse_slot_devices(emu_options &options, std::function<void(e
 
 //-------------------------------------------------
 //  reevaluate_slot_options - based on recent changes
-//	in what images are mounted, give drivers a chance
-//	to specify new default slot options
+//  in what images are mounted, give drivers a chance
+//  to specify new default slot options
 //-------------------------------------------------
 
 bool mame_options::reevaluate_slot_options(emu_options &options)
@@ -272,7 +272,7 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	if (!options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, error_string))
 		return false;
 
-	// identify any options as a result of softlists 
+	// identify any options as a result of softlists
 	auto softlist_opts = evaluate_initial_softlist_options(options);
 
 	// assemble a "value specifier" that will be used to specify options set up as a consequence
@@ -401,13 +401,13 @@ std::map<std::string, std::string> mame_options::evaluate_initial_softlist_optio
 						}
 
 						// identify other shared features specified as '<<slot name>>_default'
-						// 
+						//
 						// example from SMS:
 						//
-						//	<software name = "alexbmx">
-						//		...
-						//		<sharedfeat name = "ctrl1_default" value = "paddle" />
-						//	</software>
+						//  <software name = "alexbmx">
+						//      ...
+						//      <sharedfeat name = "ctrl1_default" value = "paddle" />
+						//  </software>
 						for (const feature_list_item &fi : swinfo->shared_info())
 						{
 							const std::string default_suffix = "_default";

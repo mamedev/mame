@@ -2,40 +2,40 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.
+    BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.
 
-	Apparently had at least four hardware revisions, A-D, but which ROM
-	revisions support which hardware is unclear.  A Versabus slot, and
-	various hardware and software options are mentioned in the docs.  Best
-	guesses follow.
+    Apparently had at least four hardware revisions, A-D, but which ROM
+    revisions support which hardware is unclear.  A Versabus slot, and
+    various hardware and software options are mentioned in the docs.  Best
+    guesses follow.
 
-	Onboard hardware (common to all revisions) is
-	- 32K ROM
-	- 128K RAM (includes frame buffer)
-	- 3 serial ports, each driven by 6850 ACIA
-	- some kind of baud rate generator, possibly COM8016
-	- sync serial port, driven by 6854 but apparently never supported by ROM
-	- 682x PIA
-	- AY-3-891x PSG
-	- ER2055 EAROM
-	- DEC VT100 keyboard interface
+    Onboard hardware (common to all revisions) is
+    - 32K ROM
+    - 128K RAM (includes frame buffer)
+    - 3 serial ports, each driven by 6850 ACIA
+    - some kind of baud rate generator, possibly COM8016
+    - sync serial port, driven by 6854 but apparently never supported by ROM
+    - 682x PIA
+    - AY-3-891x PSG
+    - ER2055 EAROM
+    - DEC VT100 keyboard interface
 
-	Rev A has additional 4th serial port for mouse (not supported by ROM 1.25).
-	Rev A has 40 hz realtime clock, the rest use 1040 hz.
-	Rev A-C use AY-3-8912 (with one external PIO port, to connect the EAROM).
-	Rev D uses AY-3-8913 (no external ports; EAROM is wired to TBD).
-	Rev B-D have onboard 8035 to talk to parallel printer and mouse.
-	Rev B-D have more memory (at least up to 512K).
+    Rev A has additional 4th serial port for mouse (not supported by ROM 1.25).
+    Rev A has 40 hz realtime clock, the rest use 1040 hz.
+    Rev A-C use AY-3-8912 (with one external PIO port, to connect the EAROM).
+    Rev D uses AY-3-8913 (no external ports; EAROM is wired to TBD).
+    Rev B-D have onboard 8035 to talk to parallel printer and mouse.
+    Rev B-D have more memory (at least up to 512K).
 
-	ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
+    ROM 1.25 doesn't support mouse, setup mode, pixel data upload and autowrap.
 
-	Missing/incorrect emulation:
-		Bidirectional keyboard interface (to drive LEDs and speaker).
-		8035.
-		EAROM.
-		1.25 only -- clksync() is dummied out -- causes watchdog resets.
-		Selectable memory size.
-		Video enable/reverse video switch.
+    Missing/incorrect emulation:
+        Bidirectional keyboard interface (to drive LEDs and speaker).
+        8035.
+        EAROM.
+        1.25 only -- clksync() is dummied out -- causes watchdog resets.
+        Selectable memory size.
+        Video enable/reverse video switch.
 
 ****************************************************************************/
 
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
 	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
 	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
 	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
-//	AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
+//  AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
 	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
 	AM_RANGE(0x380000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
@@ -247,14 +247,14 @@ WRITE8_MEMBER(bitgraph_state::pia_pa_w)
 }
 
 /*
-	B0	O: BC1  to noisemaker.
-	B1	O: BDIR to noisemaker.
-	B2	O: Clock for EAROM.
-	B3	O: CS1   for EAROM.
-	B4	O: Enable HDLC Xmt interrupt.
-	B5	O: Enable HDLC Rcv interrupt.
-	B6	O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
-	B7	I: EVEN field ??
+    B0  O: BC1  to noisemaker.
+    B1  O: BDIR to noisemaker.
+    B2  O: Clock for EAROM.
+    B3  O: CS1   for EAROM.
+    B4  O: Enable HDLC Xmt interrupt.
+    B5  O: Enable HDLC Rcv interrupt.
+    B6  O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
+    B7  I: EVEN field ??
 */
 READ8_MEMBER(bitgraph_state::pia_pb_r)
 {
@@ -423,18 +423,18 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
-//	AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
+//  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 #endif
 
 /*
-	p4	O: Centronics data 3..0
-	p5	O: Centronics data 7..4
-	p6	O: Centronics control
-	p7	I: Centronics status
+    p4  O: Centronics data 3..0
+    p5  O: Centronics data 7..4
+    p6  O: Centronics control
+    p7  I: Centronics status
 */
 WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 {

@@ -5,12 +5,12 @@
     Aristocrat MK5 / MKV hardware
     possibly 'Acorn Archimedes on a chip' hardware
 
-	Current significant issues:
-	 - Games run twice as fast as they should, music is double speed etc.
-	   There are threads that say when running in VGA mode an original AA
-	   will play music etc. at half the expected speed, so it is likely
-	   that the way the timers work differs in this mode (25hz instead of 50?)
-	 - Games lock up after 50 spins
+    Current significant issues:
+     - Games run twice as fast as they should, music is double speed etc.
+       There are threads that say when running in VGA mode an original AA
+       will play music etc. at half the expected speed, so it is likely
+       that the way the timers work differs in this mode (25hz instead of 50?)
+     - Games lock up after 50 spins
 
     Note: ARM250 mapping is not identical to plain AA
 
@@ -1453,7 +1453,7 @@ static INPUT_PORTS_START(wamazona)
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E) PORT_NAME("Diamond")
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T) PORT_NAME("Club")
 INPUT_PORTS_END
 
@@ -1468,7 +1468,7 @@ static INPUT_PORTS_START(sbuk2)
 	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
@@ -3572,7 +3572,7 @@ ROM_START( kgbirda5 )
 	ROM_LOAD32_WORD( "0200024v.u11", 0x000002, 0x80000, CRC(52791ad8) SHA1(6e4cf553b355f03ef69ef3c4e2816bbd0cbe6599) )
 	ROM_LOAD32_WORD( "0200024v.u8",  0x100000, 0x80000, CRC(c0477ae3) SHA1(5005944b8b28553dd959192d614be7f1b6228a30) )
 	ROM_LOAD32_WORD( "0200024v.u12", 0x100002, 0x80000, CRC(df176c5a) SHA1(dcaecdefb7c880b9425a6445dbed969968fe3d1c) )
-	
+
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
@@ -5306,11 +5306,11 @@ ROM_END
 ROM_START( swhr2 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-            Checksum code found at 0x000b68
-            0x000000-0x05b507 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-                Expected Checksum   0x757b4b7c
-                Calculated Checksum 0x757b4b7c  (OK)
-            0x05b508-0x0c43af is the non-Checksummed range (unusual endpoint)
+	        Checksum code found at 0x000b68
+	        0x000000-0x05b507 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	            Expected Checksum   0x757b4b7c
+	            Calculated Checksum 0x757b4b7c  (OK)
+	        0x05b508-0x0c43af is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200465v.u7",  0x000000, 0x80000, CRC(23350042) SHA1(fd839a4835358057a5ee1fcaf716f2443461352d) )
@@ -5491,7 +5491,7 @@ ROM_START( toutango )
 	ROM_LOAD32_WORD( "0100782v.u13", 0x200002, 0x80000, CRC(f8a67a69) SHA1(b1a28047cb4572ae15359c30f71cafa4bd70658c) )
 	ROM_LOAD32_WORD( "0100782v.u10", 0x300000, 0x80000, CRC(e6528de7) SHA1(b3aa1937f0b673ba2cfa68acc7cb540ebefc66d4) )
 	ROM_LOAD32_WORD( "0100782v.u14", 0x300002, 0x80000, CRC(69f2acde) SHA1(cda52548e675a06677a2d9fee89b33f9abb96f64) )
-	
+
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
@@ -6079,7 +6079,7 @@ GAMEL( 1997, pengpayb,  pengpay,  aristmk5,     swhr2,    aristmk5_state, aristm
 GAMEL( 1995, pengpayc,  pengpay,  aristmk5,     wcougar,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0100113V, NSW/ACT)",             MACHINE_FLAGS, layout_wcougar )   // 586, A - 12/10/95
 GAMEL( 1997, pengpayu,  pengpay,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (BHI0417-03, US)",            MACHINE_FLAGS, layout_aristmk5_us ) // 586/7(b), B - 14/07/97
 GAMEL( 2001, pengpuck,  pengpay,  aristmk5_usa, pengpuck, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays - Penguin Pucks (EHG1257, US)", MACHINE_FLAGS, layout_pengpuck )  // MV4122/1, C - 19/01/01
-GAMEL( 1998, petshop,	aristmk5, aristmk5,     petshop,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                 MACHINE_FLAGS, layout_petshop )   // 618/1, A - 17/04/98
+GAMEL( 1998, petshop,   aristmk5, aristmk5,     petshop,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100731V, NSW/ACT)",                 MACHINE_FLAGS, layout_petshop )   // 618/1, A - 17/04/98
 GAMEL( 1995, phantpay,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",             MACHINE_FLAGS, layout_swhr2 )     // 570/1, E - 12/09/95
 GAMEL( 1998, penpir,    aristmk5, aristmk5,     kgalah,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0100674V, NSW/ACT)",           MACHINE_FLAGS, layout_kgalah )    // 619/1, A - 31/03/98
 GAMEL( 1998, penpira,   penpir,   aristmk5,     snowcat,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pirate (0200578V, NSW/ACT)",           MACHINE_FLAGS, layout_snowcat )   // 619, A - 27/02/98

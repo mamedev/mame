@@ -2,9 +2,9 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-	formats/asst128_dsk.h
+    formats/asst128_dsk.h
 
-	asst128 format
+    asst128 format
 
 *********************************************************************/
 

@@ -983,7 +983,7 @@ inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 		*result = (*m_memory.read_byte)(*m_program, address);
 		return true;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
@@ -1022,7 +1022,7 @@ inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 		*result = (*m_memory.read_word)(*m_program, address);
 		return true;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
@@ -1061,7 +1061,7 @@ inline bool mips3_device::RWORD(offs_t address, uint32_t *result)
 		*result = (*m_memory.read_dword)(*m_program, address);
 		return true;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
@@ -1100,7 +1100,7 @@ inline bool mips3_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 		*result = (*m_memory.read_dword_masked)(*m_program, address, mem_mask);
 		return true;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
@@ -1157,7 +1157,7 @@ inline bool mips3_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint6
 		*result = (*m_memory.read_qword_masked)(*m_program, address, mem_mask);
 		return true;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
 	{
@@ -1186,7 +1186,7 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 		(*m_memory.write_byte)(*m_program, address, data);
 		return;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
@@ -1265,7 +1265,7 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 		(*m_memory.write_dword)(*m_program, address, data);
 		return;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
@@ -1305,7 +1305,7 @@ inline void mips3_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t m
 		(*m_memory.write_dword_masked)(*m_program, address, data, mem_mask);
 		return;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{
@@ -1365,7 +1365,7 @@ inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t
 		(*m_memory.write_qword_masked)(*m_program, address, data, mem_mask);
 		return;
 	}
-	
+
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
 	{

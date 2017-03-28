@@ -81,7 +81,7 @@ READ8_MEMBER(tms1024_device::read_h)
 		// read selected port data
 		if (m_s != 0)
 			m_h = (m_read_port[m_s-1])((offs_t)(m_s-1)) & 0xf;
-		
+
 		// high-impedance otherwise
 	}
 
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER(tms1024_device::write_std)
 	{
 		if (m_s != 0)
 			(m_write_port[m_s-1])((offs_t)(m_s-1), m_h);
-		
+
 		else
 		{
 			// reset all ports

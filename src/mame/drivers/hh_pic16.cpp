@@ -431,7 +431,7 @@ void pabball_state::prepare_display()
 	u16 sel = m_c & 0xf;
 	if (sel & 8) sel &= 9;
 	sel = 1 << sel;
-	
+
 	// CD4028 9 is 7seg
 	set_display_segmask(0x200, 0xff);
 	display_matrix(8, 10, m_b, sel);
@@ -448,10 +448,10 @@ WRITE8_MEMBER(pabball_state::write_c)
 {
 	// C2: RTCC pin
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 2 & 1);
-	
+
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
-	
+
 	// C0-C3: CD4028 A-D
 	m_c = data;
 	prepare_display();
@@ -1535,7 +1535,7 @@ WRITE8_MEMBER(us2pfball_state::write_c)
 {
 	// C7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
-	
+
 	// C0-C6: digit segments
 	m_c = data;
 	prepare_display();

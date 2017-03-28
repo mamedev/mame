@@ -2,12 +2,12 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Poisk-1 sound card.  DAC, ADC, MIDI in/out and 6 music channels.
+    Poisk-1 sound card.  DAC, ADC, MIDI in/out and 6 music channels.
 
-	Memory-mapped, uses IRQ3 and IRQ7, no DMA.
+    Memory-mapped, uses IRQ3 and IRQ7, no DMA.
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -141,7 +141,7 @@ READ8_MEMBER(p1_sound_device::adc_r)
 
 WRITE8_MEMBER(p1_sound_device::dac_w)
 {
-//	logerror("DAC write: %02x <- %02x\n", offset>>1, data);
+//  logerror("DAC write: %02x <- %02x\n", offset>>1, data);
 	m_dac_data[offset >> 1] = data;
 	m_isa->irq7_w(CLEAR_LINE);
 }

@@ -2,22 +2,22 @@
 // copyright-holders:Robbbert, Mark Garlanger
 /***************************************************************************
 
-	Heathkit H19
+    Heathkit H19
 
-	A smart terminal designed and manufactured by Heath Company.
+    A smart terminal designed and manufactured by Heath Company.
 
-	The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
-	mask-programmed keyboard controller. The output of this passes
-	through a rom.
+    The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
+    mask-programmed keyboard controller. The output of this passes
+    through a rom.
 
-	Input can also come from the serial port (a 8250).
-	Either device will signal an interrupt to the CPU when a key
-	is pressed/data is received.
+    Input can also come from the serial port (a 8250).
+    Either device will signal an interrupt to the CPU when a key
+    is pressed/data is received.
 
-	TODO:
-	- speed up emulation
-	- update SW401 baud rate options for Watz ROM
-	- update SW401 & SW402 definitions for Super-19 ROM
+    TODO:
+    - speed up emulation
+    - update SW401 baud rate options for Watz ROM
+    - update SW401 & SW402 definitions for Super-19 ROM
 
 ****************************************************************************/
 /***************************************************************************
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( h19 )
 
 	PORT_START("MODIFIERS")
-	// bit 0 connects to B8 of MM5740 - low if either shift key is 
+	// bit 0 connects to B8 of MM5740 - low if either shift key is
 	// bit 7 is low if a key is pressed
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8) 
+	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
