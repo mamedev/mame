@@ -38,7 +38,7 @@
 		--if prj.flags is required as it is not set at project level for tests???
 		--vs200x generator seems to swap a config for the prj in test setup
 		if prj.flags and prj.flags.Managed then
-            local frameworkVersion = prj.framework or "4.0"
+			local frameworkVersion = prj.framework or "4.0"
 			_p(2, '<TargetFrameworkVersion>v%s</TargetFrameworkVersion>', frameworkVersion)
 			_p(2, '<Keyword>ManagedCProj</Keyword>')
 		elseif vstudio.iswinrt() then
@@ -135,6 +135,14 @@
 			_p(1,'<ImportGroup '..if_config_and_platform() ..' Label="PropertySheets">'
 					,premake.esc(cfginfo.name))
 				_p(2,'<Import Project="$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props" Condition="exists(\'$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\')" Label="LocalAppDataPlatform" />')
+
+			if #cfg.propertysheets > 0 then
+				local dirs = cfg.propertysheets
+				for _, dir in ipairs(dirs) do
+					_p(2,'<Import Project="%s" />', path.translate(dir))
+				end
+			end
+
 			_p(1,'</ImportGroup>')
 		end
 	end
@@ -151,7 +159,12 @@
 			local cfg = premake.getconfig(prj, cfginfo.src_buildcfg, cfginfo.src_platform)
 			local target = cfg.buildtarget
 			local outdir = add_trailing_backslash(target.directory)
-			local intdir = add_trailing_backslash(cfg.objectsdir)
+			local intdir = add_trailing_backslash(iif(action.vstudio.intDirAbsolute
+							, path.translate(
+								  path.join(prj.solution.location, cfg.objectsdir)
+								, '\\')
+							, cfg.objectsdir
+							))
 
 			_p(1,'<PropertyGroup '..if_config_and_platform() ..'>', premake.esc(cfginfo.name))
 
@@ -176,11 +189,17 @@
 				_p(2, '<LibraryWPath>$(Console_SdkLibPath);$(Console_SdkWindowsMetadataPath)</LibraryWPath>')
 				_p(2, '<IncludePath>$(Console_SdkIncludeRoot)</IncludePath>')
 				_p(2, '<ExecutablePath>$(Console_SdkRoot)bin;$(VCInstallDir)bin\\x86_amd64;$(VCInstallDir)bin;$(WindowsSDK_ExecutablePath_x86);$(VSInstallDir)Common7\\Tools\\bin;$(VSInstallDir)Common7\\tools;$(VSInstallDir)Common7\\ide;$(ProgramFiles)\\HTML Help Workshop;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);</ExecutablePath>')
-                if cfg.imagepath then
-                    _p(2, '<LayoutDir>%s</LayoutDir>', cfg.imagepath)
-                else
-                    _p(2, '<LayoutDir>%s</LayoutDir>', prj.name)
-                end
+
+				if cfg.imagepath then
+					_p(2, '<LayoutDir>%s</LayoutDir>', cfg.imagepath)
+				else
+					_p(2, '<LayoutDir>%s</LayoutDir>', prj.name)
+				end
+
+				if cfg.pullmappingfile ~= nil then
+					_p(2,'<PullMappingFile>%s</PullMappingFile>', premake.esc(cfg.pullmappingfile))
+				end
+
 				_p(2, '<LayoutExtensionFilter>*.pdb;*.ilk;*.exp;*.lib;*.winmd;*.appxrecipe;*.pri;*.idb</LayoutExtensionFilter>')
 				_p(2, '<IsolateConfigurationsOnDeploy>true</IsolateConfigurationsOnDeploy>')
 			end
@@ -232,6 +251,13 @@
 		if #includedirs> 0 then
 			_p(indent,'<AdditionalIncludeDirectories>%s;%%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
 					,premake.esc(path.translate(table.concat(includedirs, ";"), '\\')))
+		end
+	end
+
+	local function using_dirs(indent,cfg)
+		if #cfg.usingdirs > 0 then
+			_p(indent,'<AdditionalUsingDirectories>%s;%%(AdditionalUsingDirectories)</AdditionalUsingDirectories>'
+					,premake.esc(path.translate(table.concat(cfg.usingdirs, ";"), '\\')))
 		end
 	end
 
@@ -369,6 +395,7 @@
 		_p(3,'<Optimization>%s</Optimization>',optimisation(cfg))
 
 		include_dirs(3, cfg)
+		using_dirs(3, cfg)
 		preprocessor(3, cfg)
 		minimal_build(cfg)
 
@@ -481,7 +508,7 @@
 	end
 
 	local function item_def_lib(cfg)
-       -- The Xbox360 project files are stored in another place in the project file.
+		-- The Xbox360 project files are stored in another place in the project file.
 		if cfg.kind == 'StaticLib' and cfg.platform ~= "Xbox360" then
 			_p(1,'<Lib>')
 				_p(2,'<OutputFile>$(OutDir)%s</OutputFile>',cfg.buildtarget.name)
@@ -623,10 +650,12 @@
 			_p(tab, '<AdditionalDependencies>%s;%s</AdditionalDependencies>'
 				, deps
 				, iif(cfg.platform == "Durango"
-					, '$(XboxExtensionsDependencies)'
+					, '%(XboxExtensionsDependencies)'
 					, '%(AdditionalDependencies)'
 					)
 				)
+		elseif cfg.platform == "Durango" then
+			_p(tab, '<AdditionalDependencies>%%(XboxExtensionsDependencies)</AdditionalDependencies>')
 		end
 	end
 
@@ -669,7 +698,7 @@
 
 			local foundAppxManifest = false
 			for file in premake.project.eachfile(prj, true) do
-				if path.isSourceFileVS(file.name) then
+				if path.issourcefilevs(file.name) then
 					table.insert(sortedfiles.ClCompile, file)
 				elseif path.iscppheader(file.name) then
 					if not table.icontains(prj.removefiles, file) then
@@ -677,6 +706,8 @@
 					end
 				elseif path.isresourcefile(file.name) then
 					table.insert(sortedfiles.ResourceCompile, file)
+				elseif path.isimagefile(file.name) then
+					table.insert(sortedfiles.Image, file)
 				elseif path.isappxmanifest(file.name) then
 					foundAppxManifest = true
 					table.insert(sortedfiles.AppxManifest, file)
@@ -1001,6 +1032,7 @@
 
 			vc2010.files(prj)
 			vc2010.projectReferences(prj)
+			vc2010.sdkReferences(prj)
 			vc2010.masmfiles(prj)
 
 			_p(1,'<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.targets" />')
@@ -1070,6 +1102,20 @@
 		_p(1,'</ItemGroup>')
 	end
 
+--
+-- Generate the list of SDK references
+--
+
+	function vc2010.sdkReferences(prj)
+		local refs = prj.sdkreferences
+		if #refs > 0 then
+			_p(1,'<ItemGroup>')
+			for _, ref in ipairs(refs) do
+				_p(2,'<SDKReference Include=\"%s\" />', ref)
+			end
+			_p(1,'</ItemGroup>')
+		end
+	end
 
 --
 -- Generate the .vcxproj.user file
@@ -1100,6 +1146,10 @@
 			if cfg.flags.DebugEnvsDontMerge then
 				_p(2, '<LocalDebuggerMergeEnvironment>false</LocalDebuggerMergeEnvironment>')
 			end
+		end
+
+		if cfg.deploymode then
+			_p('    <DeployMode>%s</DeployMode>', cfg.deploymode)
 		end
 	end
 

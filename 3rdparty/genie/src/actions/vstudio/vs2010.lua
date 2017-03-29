@@ -1,23 +1,21 @@
 --
--- vs2012.lua
--- Baseline support for Visual Studio 2012.
+-- vs2010.lua
+-- Baseline support for Visual Studio 2010.
 -- Copyright (c) 2013 Jason Perkins and the Premake project
 --
 
-	premake.vstudio.vc2012 = {}
-	local vc2012 = premake.vstudio.vc2012
+	local vc2010 = premake.vstudio.vc2010
 	local vstudio = premake.vstudio
 
-
 ---
--- Register a command-line action for Visual Studio 2012.
+-- Register a command-line action for Visual Studio 2010.
 ---
 
 	newaction
 	{
-		trigger         = "vs2012",
-		shortname       = "Visual Studio 2012",
-		description     = "Generate Microsoft Visual Studio 2012 project files",
+		trigger         = "vs2010",
+		shortname       = "Visual Studio 2010",
+		description     = "Generate Microsoft Visual Studio 2010 project files",
 		os              = "windows",
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
@@ -44,17 +42,16 @@
 			end
 		end,
 
-
 		oncleansolution = premake.vstudio.cleansolution,
 		oncleanproject  = premake.vstudio.cleanproject,
 		oncleantarget   = premake.vstudio.cleantarget,
 
 		vstudio = {
-			solutionVersion = "12",
-			targetFramework = "4.5",
+			productVersion  = "8.0.30703",
+			solutionVersion = "11",
+			targetFramework = "4.0",
 			toolsVersion    = "4.0",
 			supports64bitEditContinue = false,
 			intDirAbsolute  = false,
 		}
 	}
-
