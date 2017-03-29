@@ -123,6 +123,7 @@ public:
 
 protected:
 		// device-level overrides
+		virtual void device_start() override;
 		virtual void device_reset() override;
 		uint8_t dack_r(int line);
 		void dack_w(int line, uint8_t data);
