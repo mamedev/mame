@@ -152,8 +152,10 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
       2 different sets with different data/code. The names have been corrected
       to known files names where the code matched.
 
-     Rom numbers B04-30 through B04-36 are currently missing so this would
+     Rom numbers B04-30 through B04-35 are currently missing, this would
      imply a missing and unknown program set currently not dumped.
+     Rom nuber B04-36 (and B04-36-1) "should" be the missing Japanese region
+     program rom for the latest code base.
 ***************************************************************************/
 
 #include "emu.h"
