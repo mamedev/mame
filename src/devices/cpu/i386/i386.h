@@ -1550,6 +1550,14 @@ public:
 	// construction/destruction
 	i386ex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE16_MEMBER(set_pin_configuration);
+	DECLARE_WRITE16_MEMBER(set_timer_configuration);
+	DECLARE_WRITE16_MEMBER(set_serial_io_configuration);
+	DECLARE_WRITE16_MEMBER(set_dma_configuration);
+	DECLARE_READ16_MEMBER(get_interrupt_configuration);
+	DECLARE_WRITE16_MEMBER(set_interrupt_configuration);
+	DECLARE_WRITE16_MEMBER(chip_select_unit_w);
+	DECLARE_WRITE16_MEMBER(set_clock_prescaler);
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -1564,6 +1572,9 @@ protected:
 		}
 	}
 private:
+	uint16 m_INTCFG;
+	uint16 m_CS_address[8];
+	uint16 m_CS_mask[8];
 	required_device<pic8259_device> m_pic8259_slave;
 };
 

@@ -2,13 +2,15 @@
 // copyright-holders:publicdomain
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/ins8250.h"
 
 /*
 CPU Board:
 
 U1  BRIGHT BM29F040-90NC                    | 4 MEGABIT (512K × 8) 5 VOLT SECTOR ERASE CMOS FLASH MEMORY
-U5  NEW2001-16 1B9285LT M002646             | (custom / ROM ?)
-U4  HB993200-32                             | (custom / ROM ?)
+U5  NEW2001-16 1B9285LT M002646             | undumped maskROM
+U4  HB993200-32                             | undumped maskROM
 U2  EliteMT LP621024DM-70LL 0021S B3P14BA   | 128K X 8 BIT CMOS SRAM
 U3  EliteMT LP621024DM-70LL 0021S B3P14BA   | 128K X 8 BIT CMOS SRAM
 U10 Motorola AC139 XAA021 (16pin smd)       | ? (DUAL 1-OF-4 DECODER/DEMULTIPLEXER ?)
@@ -28,14 +30,59 @@ U19  ?????                                  | ?
 Audio Module Board:
 
 ?
+
+Front Panel:
+
+Atmega AT89C51 mcu (protected ?)
 */
 
 class vmp3700_state : public driver_device
 {
 public:
 	vmp3700_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		  , m_port1(0)
+		  , m_port2(0)
+		  , m_port3(0)
+		  , m_maskrom_bank(0) { }
+        DECLARE_READ16_MEMBER(p1_data_r);
+        DECLARE_READ16_MEMBER(p2_data_r);
+        DECLARE_READ16_MEMBER(p3_data_r);
+        DECLARE_WRITE16_MEMBER(p1_data_w);
+        DECLARE_WRITE16_MEMBER(p2_data_w);
+        DECLARE_WRITE16_MEMBER(p3_data_w);
+        DECLARE_READ16_MEMBER(p1_dir_r);
+        DECLARE_READ16_MEMBER(p2_dir_r);
+        DECLARE_READ16_MEMBER(p3_dir_r);
+        DECLARE_WRITE16_MEMBER(p1_dir_w);
+        DECLARE_WRITE16_MEMBER(p2_dir_w);
+        DECLARE_WRITE16_MEMBER(p3_dir_w);
+        DECLARE_READ16_MEMBER(p1_config_r);
+        DECLARE_READ16_MEMBER(p2_config_r);
+        DECLARE_READ16_MEMBER(p3_config_r);
+        DECLARE_WRITE16_MEMBER(p1_config_w);
+        DECLARE_WRITE16_MEMBER(p2_config_w);
+        DECLARE_WRITE16_MEMBER(p3_config_w);
+	DECLARE_WRITE16_MEMBER(vcd_decoder_w);
+private:
+	uint16 m_port1;
+	uint16 m_port2;
+	uint16 m_port3;
+	uint16 m_port1_config;
+	uint16 m_port2_config;
+	uint16 m_port3_config;
+	uint16 m_port1_direction;
+	uint16 m_port2_direction;
+	uint16 m_port3_direction;
+	uint8 m_maskrom_bank;
 };
+
+WRITE16_MEMBER( vmp3700_state::vcd_decoder_w )
+{
+        //TODO: Implement-me!
+	//logerror("[VCD DECODER - Winbond W9925QF-K] write %02X '%c'\n", data & 0xFF, data & 0xFF);
+}
+
 
 //          ADH  ADL |   MSKH MSKL |                address | SMM | bits | MEM | RDY | RES. | WAIT STATE
 // CS0:  0x0000 0503 | 0x0001 FC01 |     000 << 11 = 000000 |   1 |    8 |   1 |   0 |   00 | 00011
@@ -48,18 +95,126 @@ public:
 // UCS:  0x0008 0503 | 0x0007 FC01 |    1000 << 11 = 800000 |   1 |    8 |   1 |   0 |   00 | 00011
 //SS:SP => C9E0 + 0400 = 0xCDE0
 
-static ADDRESS_MAP_START(vmp3700_map, AS_PROGRAM, 16, vmp3700_state )
+static ADDRESS_MAP_START(vmp3700_mem_map, AS_PROGRAM, 16, vmp3700_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM //CS0 128k SRAM at U2
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM //CS0 128k SRAM at U2
+	AM_RANGE(0x20000, 0x2ffff) AM_RAM //CS1 128k SRAM at U3
+//	AM_RANGE(0x40000, 0x40fff) AM_? //CS3 U15-pin3 (Winbond W9925QF-K) ?
+	//AM_RANGE(0x50000, 0x50fff) AM_ROM AM_REGION("maskrom_u5", 0) //CS5 U5-pin12 MX23C6410
+//	AM_RANGE(0x60000, 0x607ff) AM_? //CS6 
+	AM_RANGE(0x68000, 0x687ff) AM_WRITE(vcd_decoder_w) //CS2 U15-pin3 (Winbond W9925QF-K VCD Decoder) ?
+	//AM_RANGE(0x70000, 0x70fff) AM_ROM AM_REGION("maskrom_u4", 0) //CS4 U4-pin12 MX23C6410
+
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("bios", 0) //UCS 512k
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM //CS1 128k SRAM at U3
-//	AM_RANGE(0x400000, 0x40ffff) AM_? //CS3 64k U15-pin3 (Winbond W9925QF-K)
-	AM_RANGE(0x500000, 0x50ffff) AM_ROM AM_REGION("maskrom_u5", 0) //CS5 64k U5-pin12 MX23C6410
-//	AM_RANGE(0x600000, 0x607fff) AM_? //CS6 32k
-//	AM_RANGE(0x610000, 0x617fff) AM_? //CS2 32k
-	AM_RANGE(0x700000, 0x70ffff) AM_ROM AM_REGION("maskrom_u4", 0) //CS4 64k U4-pin12 MX23C6410
 	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x3780000) AM_ROM AM_REGION("bios", 0) //UCS 512k
 ADDRESS_MAP_END
+
+/*
+[:maincpu] CS0# address: 000000 mask: 0007FF
+[:maincpu] CS1# address: 020000 mask: 0007FF
+[:maincpu] CS2# address: 068000 mask: 0007FF
+[:maincpu] CS3# address: 040000 mask: 0007FF
+[:maincpu] CS4# address: 070000 mask: 0007FF
+[:maincpu] CS5# address: 050000 mask: 0007FF
+[:maincpu] CS6# address: 060000 mask: 0007FF
+[:maincpu] CS7# address: 080000 mask: 0007FF
+*/
+
+static ADDRESS_MAP_START( frontpanel_mem_map, AS_PROGRAM, 8, vmp3700_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("frontpanel", 0) // mcu (protected?)
+ADDRESS_MAP_END
+
+
+#define P1CFG 0xf820
+#define P2CFG 0xf822
+#define P3CFG 0xf824
+
+#define P1DIR 0xf864
+#define P2DIR 0xf86c
+#define P3DIR 0xf874
+
+#define P1LTC 0xf862
+#define P2LTC 0xf86a
+#define P3LTC 0xf872
+
+#define P1PIN 0xf860
+#define P2PIN 0xf868
+#define P3PIN 0xf870
+
+static ADDRESS_MAP_START(vmp3700_io_map, AS_IO, 16, vmp3700_state )
+	AM_RANGE(P1LTC, P1LTC+1) AM_READWRITE(p1_data_r, p1_data_w)
+	AM_RANGE(P2LTC, P2LTC+1) AM_READWRITE(p2_data_r, p2_data_w)
+	AM_RANGE(P3LTC, P3LTC+1) AM_READWRITE(p3_data_r, p3_data_w)
+	AM_RANGE(P1DIR, P1DIR+1) AM_READWRITE(p1_dir_r, p1_dir_w)
+	AM_RANGE(P2DIR, P2DIR+1) AM_READWRITE(p2_dir_r, p2_dir_w)
+	AM_RANGE(P3DIR, P3DIR+1) AM_READWRITE(p3_dir_r, p3_dir_w)
+	AM_RANGE(P1CFG, P1CFG+1) AM_READWRITE(p1_config_r, p1_config_w)
+	AM_RANGE(P2CFG, P2CFG+1) AM_READWRITE(p2_config_r, p2_config_w)
+	AM_RANGE(P3CFG, P3CFG+1) AM_READWRITE(p3_config_r, p3_config_w)
+ADDRESS_MAP_END
+
+
+/*********************************************************
+  Parallel Port I/O Handling:
+
+  Note : The ports are 8 bits, but the I/O bus is 16 bits
+         Thus, only the low 8 bits are used.
+**********************************************************/
+
+static void bit_pattern(char* bits, int n, int data){
+	int i;
+	for (i=0; i<n; i++){
+		bits[n-1-i] = (data & (1<<i)) ? '1' : '0';
+	}
+	bits[n] = '\0';
+}
+
+//---------------- PnLTC handlers: -------------------------
+
+// JP2: (front panel connector)
+// 1: GND 
+// 2: RXD1
+// 3: (TXD1, via 74139)
+// 4: 5V (?)
+
+// 74139
+// ENABLE (pin15): CPU TXD1
+// SELECTs A2/B2 => CPU pin 108 = P1.6
+// 2Y0: JP2 - pin 3 (Front Panel)
+// 2Y3: JP3 - pin 5 (Audio Module)
+
+// KD16901A - U4-soundboard Alternative Part number S5A1901H02 "Audio Effect Processor"
+
+READ16_MEMBER( vmp3700_state::p1_data_r )
+{
+	//TODO: Implement-me!
+        return m_port1;
+}
+
+WRITE16_MEMBER( vmp3700_state::p1_data_w )
+{
+	//TODO: Implement-me!
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	logerror("Port 1 data write:\t %02X [%s]\n", data, bits);
+	logerror("Serial port #1 routed to: %s\n", BIT(data, 6) ? "Audio Module" : "Front Panel");
+	m_port1 = data;
+}
+
+READ16_MEMBER( vmp3700_state::p2_data_r )
+{
+	//TODO: Implement-me!
+        return m_port2;
+}
+
+WRITE16_MEMBER( vmp3700_state::p2_data_w )
+{
+	//TODO: Implement-me!
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	logerror("Port 2 data write:\t %02X [%s]\n", data, bits);
+	m_port2 = data;
+}
 
 /*
 MaskROM pinout (for bankswitching):
@@ -68,13 +223,134 @@ MaskROM pinout (for bankswitching):
    A19 = P3.4 pin 84
    A20 = P3.5 pin 85
 U4 A21 = P3.6 pin 86
-
 */
 
-static MACHINE_CONFIG_START( vmp3700, vmp3700_state )
+READ16_MEMBER( vmp3700_state::p3_data_r )
+{
+        return m_port3;
+}
+
+WRITE16_MEMBER( vmp3700_state::p3_data_w )
+{
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	m_maskrom_bank = (data >> 2) & 0x1f;
+
+	logerror("Port 3 data write:\t %02X [%s] -- BANK SELECTION: %d\n", data, bits, m_maskrom_bank);
+	m_port3 = data;
+}
+
+//---------------- PnDIR handlers: -------------------------
+
+READ16_MEMBER( vmp3700_state::p1_dir_r )
+{
+	//TODO: Implement-me!
+        return m_port1_direction;
+}
+
+WRITE16_MEMBER( vmp3700_state::p1_dir_w )
+{
+	//TODO: Implement-me!
+	char bits[9];
+	bit_pattern(bits, 8, data);
+	logerror("Port 1 direction:\t %02X [%s]\n", data, bits);
+	m_port1_direction = data;
+}
+
+READ16_MEMBER( vmp3700_state::p2_dir_r )
+{
+	//TODO: Implement-me!
+        return m_port2_direction;
+}
+
+WRITE16_MEMBER( vmp3700_state::p2_dir_w )
+{
+	//TODO: Implement-me!
+	char bits[9];
+	bit_pattern(bits, 8, data);
+	logerror("Port 2 direction:\t %02X [%s]\n", data, bits);
+	m_port2_direction = data;
+}
+
+READ16_MEMBER( vmp3700_state::p3_dir_r )
+{
+	//TODO: Implement-me!
+        return m_port3_direction;
+}
+
+WRITE16_MEMBER( vmp3700_state::p3_dir_w )
+{
+	//TODO: Implement-me!
+	char bits[9];
+	bit_pattern(bits, 8, data);
+	logerror("Port 3 direction:\t %02X [%s]\n", data, bits);
+	m_port3_direction = data;
+}
+
+//---------------- PnCFG handlers: -------------------------
+
+READ16_MEMBER( vmp3700_state::p1_config_r )
+{
+	//TODO: Implement-me!
+        return m_port1_config;
+}
+
+WRITE16_MEMBER( vmp3700_state::p1_config_w )
+{
+	//TODO: Implement-me!
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	logerror("Port 1 config:\t %02X [%s]\n", data, bits);
+	m_port1_config = data;
+}
+
+READ16_MEMBER( vmp3700_state::p2_config_r )
+{
+	//TODO: Implement-me!
+        return m_port2_config;
+}
+
+WRITE16_MEMBER( vmp3700_state::p2_config_w )
+{
+	//TODO: Implement-me!
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	logerror("Port 2 config:\t %02X [%s]\n", data, bits);
+	m_port2_config = data;
+}
+
+READ16_MEMBER( vmp3700_state::p3_config_r )
+{
+	//TODO: Implement-me!
+        return m_port3_config;
+}
+
+WRITE16_MEMBER( vmp3700_state::p3_config_w )
+{
+	//TODO: Implement-me!
+        char bits[9];
+        bit_pattern(bits, 8, data);
+	logerror("Port 3 config:\t %02X [%s]\n", data, bits);
+	m_port3_config = data;
+}
+
+
+static MACHINE_CONFIG_START( vmp3700 )
 	MCFG_CPU_ADD("maincpu", I386EX, XTAL_48MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(vmp3700_map)
-	//MCFG_CPU_IO_MAP(vmp3700_io)
+	MCFG_CPU_PROGRAM_MAP(vmp3700_mem_map)
+	MCFG_CPU_IO_MAP(vmp3700_io_map)
+
+	MCFG_CPU_ADD("mcu", AT89C4051, XTAL_12MHz) /* Atmel "AT89C51 20PC 9927" mcu */
+                                                   /* with xtal labeled "SB12.000" */
+	MCFG_CPU_PROGRAM_MAP(frontpanel_mem_map)
+//	MCFG_MCS51_SERIAL_RX_CB(DEVWRITELINE("maincpu:uart1", ins8250_uart_device, rx_w))
+//	MCFG_MCS51_SERIAL_TX_CB(DEVREADLINE("maincpu:uart1", ins8250_uart_device, tx_w))
+
+//        MCFG_DEVICE_MODIFY("maincpu:uart1")
+//        MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("mcu", _device, write_txd))
+
+        //TODO: - video chips
+        //      - sound board
 MACHINE_CONFIG_END
 
 ROM_START( vmp3700 )
@@ -86,6 +362,9 @@ ROM_START( vmp3700 )
 
 	ROM_REGION(0x800000,"maskrom_u5", 0)
 	ROM_LOAD("new2001-16.u5", 0x00000, 0x800000, NO_DUMP)
+
+	ROM_REGION(0x1000,"frontpanel", 0)
+	ROM_LOAD("at89c51.u5", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT                 INIT     COMPANY            FULLNAME */

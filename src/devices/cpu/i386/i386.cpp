@@ -24,6 +24,8 @@
 #include "x87priv.h"
 #include "cycles.h"
 #include "i386ops.h"
+#include "machine/pit8253.h"
+#include "machine/ins8250.h"
 
 #include "debugger.h"
 #include "debug/debugcpu.h"
@@ -70,23 +72,319 @@ i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+
+const address_space_config *i386ex_device::memory_space_config(address_spacenum spacenum) const
+{
+        switch (spacenum)
+        {
+                case AS_IO: return &m_io_space_config;
+                default: return i386_device::memory_space_config(spacenum);
+        }
+}
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+READ8_MEMBER( i386EX_device::get_slave_ack )
+{
+        if (offset==2) // IRQ = 2
+                return m_pic8259_slave->acknowledge();
+
+        return 0x00;
+}
+
+//':maincpu' (000F7254) =>  P3CFG = 00
+//':maincpu' (000F7647) =>  TMRCFG = 00
+//':maincpu' (000F75D8) =>  SIOCFG = C7
+
+// SIOCFG: 1100 0111
+// 7: 1 = SIO1-Clear-to-send = external pin RTS1# (PINCFG.0 = 1)
+// 6: 1 = SIO0-Clear-to-send = external pin RTS0# (P1CFG.1 == 1 ?)
+// 5: 0 = RESERVED
+// 4: 0 = RESERVED
+// 3: 0 = RESERVED 
+// 2: 1 = SSIO-Baud-CLK-IN = SERCLK
+// 1: 1 = SIO1-Baud-CLK-IN = SERCLK
+// 0: 1 = SIO0-Baud-CLK-IN = SERCLK
+
+WRITE16_MEMBER( i386EX_device::set_clock_prescaler )
+{
+#define CLK2 48000000
+//TODO: use CLK2 value from the CPU configured master clock value.
+        uint32 PSCLK = CLK2/((data & 0x1ff) + 2);
+	logerror("Setting clock prescaler: PSCLK = %f MHz\n", float(PSCLK)/1000000);
+}
+
+WRITE16_MEMBER( i386EX_device::set_pin_configuration )
+{
+	//This register selects which signals are multiplexed to the
+	// multi-funcion pins of the CPU package.
+
+	//This driver is currently hardcoded to the settings used by VMP3700, as indicated below:
+	// PINCFG = 3F: 0011 1111
+	// PINCFG.7: 0 = RESERVED 
+	// PINCFG.6: 0 = PinMode 6: CS6#
+	// PINCFG.5: 1 = PinMode 5: TMROUT2, TMRCLK2, and TMRGATE2
+	// PINCFG.4: 1 = PinMode 4: CS5#
+	// PINCFG.3: 1 = PinMode 3: CTS1#
+	// PINCFG.2: 1 = PinMode 2: TXD1
+	// PINCFG.1: 1 = PinMode 1: DTR1#
+	// PINCFG.0: 1 = PinMode 0: RTS1#
+
+	//TODO: Implement handling the signals identified below:
+	logerror("Setting PINCFG: %02X\n"
+                 "\tPM0: %s\n"
+                 "\tPM1: %s\n"
+                 "\tPM2: %s\n"
+                 "\tPM3: %s\n"
+                 "\tPM4: %s\n"
+                 "\tPM5: %s\n"
+                 "\tPM6: %s\n",
+		 data,
+		 (BIT(data, 0) ? "RTS1#" : "SSIOTX"),
+		 (BIT(data, 1) ? "DTR1#" : "SRXCLK"),
+		 (BIT(data, 2) ? "TXD1#" : "DACK1#"),
+		 (BIT(data, 3) ? "CTS1#" : "EOP#"),
+		 (BIT(data, 4) ? "CS5#" : "DACK0#"),
+		 (BIT(data, 5) ? "TMROUT2, TMRCLK2 and TMRGATE2" : "PEREQ, BUSY# and ERROR#"),
+		 (BIT(data, 6) ? "REFRESH#" : "CS6#"));
+}
+
+READ16_MEMBER( i386EX_device::get_interrupt_configuration )
+{
+	return m_INTCFG;
+}
+
+WRITE16_MEMBER( i386EX_device::set_interrupt_configuration )
+{
+        //This register selects the configuration of the Interrupt Controller Unit
+        //This driver is currently hardcoded to the settings used by VMP3700, as indicated below:
+	//':maincpu' (000F729A) =>  INTCFG = 00
+
+        //TODO: Implement handling the signals identified below:
+	m_INTCFG = data;
+        logerror("Setting INTCFG: %02X\n"
+                 "\tCE - Cascade Enable: %s\n"
+                 "\tIR3 - Internal Master IR3 Connection: %s\n"
+                 "\tIR4 - Internal Master IR4 Connection: %s\n"
+                 "\tSWAP - INT6/DMAINT Connection: %s\n"
+                 "\tIR6 - Internal Slave IR6 Connection: %s\n"
+                 "\tIR4/IR5 - Internal Slave IR4 or IR5 Connection: %s\n"
+                 "\tIR1 - Internal Slave IR1 Connection: %s\n"
+                 "\tIR0 - Internal Slave IR0 Connection: %s\n",
+                 data,
+                 (BIT(data, 7) ? "1" : "0"),
+                 (BIT(data, 6) ? "1" : "0"),
+                 (BIT(data, 5) ? "1" : "0"),
+                 (BIT(data, 4) ? "1" : "0"),
+                 (BIT(data, 3) ? "1" : "0"),
+                 (BIT(data, 2) ? "1" : "0"),
+                 (BIT(data, 1) ? "1" : "0"),
+                 (BIT(data, 0) ? "1" : "0"));
+}
+
+
+WRITE16_MEMBER( i386EX_device::set_dma_configuration )
+{
+        //This register selects the configuration of the DMA Controller Unit
+
+        //TODO: Implement handling the signals identified below:
+        logerror("Setting DMACFG: %02X\n", data);
+/*                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n",
+                 "\t: %s\n",
+                 data,
+                 (BIT(data, 7) ? "1" : "0"),
+                 (BIT(data, 6) ? "1" : "0"),
+                 (BIT(data, 5) ? "1" : "0"),
+                 (BIT(data, 4) ? "1" : "0"),
+                 (BIT(data, 3) ? "1" : "0"),
+                 (BIT(data, 2) ? "1" : "0"),
+                 (BIT(data, 1) ? "1" : "0"),
+                 (BIT(data, 0) ? "1" : "0"));
+*/
+}
+
+WRITE16_MEMBER( i386EX_device::set_timer_configuration )
+{
+        //This register selects the configuration of the Timer Controller Unit
+
+        //TODO: Implement handling the signals identified below:
+        logerror("Setting TMRCFG: %02X\n", data);
+/*                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n",
+                 "\t: %s\n",
+                 data,
+                 (BIT(data, 7) ? "1" : "0"),
+                 (BIT(data, 6) ? "1" : "0"),
+                 (BIT(data, 5) ? "1" : "0"),
+                 (BIT(data, 4) ? "1" : "0"),
+                 (BIT(data, 3) ? "1" : "0"),
+                 (BIT(data, 2) ? "1" : "0"),
+                 (BIT(data, 1) ? "1" : "0"),
+                 (BIT(data, 0) ? "1" : "0"));
+*/
+}
+
+WRITE16_MEMBER( i386EX_device::set_serial_io_configuration )
+{
+        //This register selects the configuration of the Serial I/O Controller Unit
+
+        //TODO: Implement handling the signals identified below:
+        logerror("Setting SIOCFG: %02X\n", data);
+/*                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n"
+                 "\t: %s\n",
+                 "\t: %s\n",
+                 data,
+                 (BIT(data, 7) ? "1" : "0"),
+                 (BIT(data, 6) ? "1" : "0"),
+                 (BIT(data, 5) ? "1" : "0"),
+                 (BIT(data, 4) ? "1" : "0"),
+                 (BIT(data, 3) ? "1" : "0"),
+                 (BIT(data, 2) ? "1" : "0"),
+                 (BIT(data, 1) ? "1" : "0"),
+                 (BIT(data, 0) ? "1" : "0"));
+*/
+}
+
+
+WRITE16_MEMBER( i386EX_device::chip_select_unit_w )
+{
+	// Chip Select Unit
+	// TODO: The memory map is currently hardcoded in the VMP3700 driver
+
+	uint8 which = (offset>>2) & 0x7;
+	uint8 reg = (offset) & 0x03;
+	switch (reg){
+		case 0: //Low Address: CSnADL (n = 0-6), UCSADL
+			m_CS_address[which] = (m_CS_address[which] & 0x7fe0) | ((data >> 11) & 0x1f);
+			break;
+		case 1: //High Address: CSnADH (n = 0-6), UCSADH
+			m_CS_address[which] = ((data & 0x3ff) << 5) | (m_CS_address[which] & 0x1f);
+			break;
+//		default:
+//			logerror("Not implemented (CSU registers).\n");
+	}
+	if ((offset & 0x3) == 0x3){
+		logerror("CS%d# address: %08X mask: %08X\n",
+		          which,
+		          m_CS_address[which] << 11,
+		          (m_CS_mask[which] << 11) | 0x7ff);
+	}
+}
+
 ADDRESS_MAP_START( io_map, AS_IO, 16, i386EX_device )
 //        AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
         AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
         AM_RANGE(0x0022, 0x0023) AM_NOP // TODO: Implement-me: Setup Extended I/O
+        AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
         AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+//        AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("uart1", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM2)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("uart0", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM1)
         AM_RANGE(0xf020, 0xf03f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0xf040, 0xf05f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
         AM_RANGE(0xf0a0, 0xf0bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
-        AM_RANGE(0xf400, 0xf43f) AM_NOP // TODO: Implement-me: Chip Select Unit
-//        AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
-//        AM_RANGE(0x0060, 0x0061) AM_READWRITE8(portb_r, portb_w, 0xff00)
-//        AM_RANGE(0x0060, 0x0061) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, data_r, data_w, 0x00ff)
-//        AM_RANGE(0x0064, 0x0065) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0x00ff)
-//        AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
-//        AM_RANGE(0x0080, 0x009f) AM_READWRITE8(page8_r, page8_w, 0xffff)
-//        AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
+        AM_RANGE(0xf400, 0xf43f) AM_WRITE(chip_select_unit_w) //TODO: read ?
+        //AM_RANGE(0xf480, 0xf48b) AM_NOP // TODO: Implement-me: Synchrounous Serial Unit
+        //AM_RANGE(0xf4a0, 0xf4a7) AM_NOP // TODO: Implement-me: Refresh Control Unit
+        //AM_RANGE(0xf4c0, 0xf4cb) AM_NOP // TODO: Implement-me: Watchdot Timer Unit
+	AM_RANGE(0xf4f8, 0xf4ff) AM_DEVREADWRITE8("uart0", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 0 (COM1)
+        //AM_RANGE(0xf800, 0xf803) AM_NOP // TODO: Implement-me: Power Management
+        AM_RANGE(0xf804, 0xf805) AM_WRITE(set_clock_prescaler)
+        //AM_RANGE(0xf820, 0xf825) AM_NOP // TODO: Device Configuration Registers (move here code from vmp3700 driver.)
+        AM_RANGE(0xf826, 0xf827) AM_WRITE(set_pin_configuration)//(TODO: READ)
+        AM_RANGE(0xf830, 0xf831) AM_WRITE(set_dma_configuration) // DMA Configuration Register (TODO: READ)
+        AM_RANGE(0xf832, 0xf833) AM_READWRITE(get_interrupt_configuration, set_interrupt_configuration) // Interrupt Configuration Register
+        AM_RANGE(0xf834, 0xf835) AM_WRITE(set_timer_configuration) // Timer Configuration Register (TODO: READ)
+        AM_RANGE(0xf836, 0xf837) AM_WRITE(set_serial_io_configuration) // SIO and SSIO Configuration Register(TODO: READ)
+        //AM_RANGE(0xf860, 0xf875) AM_NOP // TODO: Parallel I/O Ports (move here code from vmp3700 driver.)
+	AM_RANGE(0xf8f8, 0xf8ff) AM_DEVREADWRITE8("uart1", ns16450_device, ins8250_r, ins8250_w, 0x00ff) //Asynchronous Serial I/O Channel 1 (COM2)
 //        AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff)
 ADDRESS_MAP_END
+
+
+// Serial port setup:
+//
+// [:maincpu] ':maincpu' (000F7703): unmapped io memory write to F8FA = 8000 & FF00
+// [:maincpu] ':maincpu' (000F7710): unmapped io memory write to F8F8 = 0000 & FF00
+// [:maincpu] ':maincpu' (000F7717): unmapped io memory write to F8F8 = 0018 & 00FF
+// [:maincpu] ':maincpu' (000F771D): unmapped io memory write to F8FA = 0300 & FF00
+// [:maincpu] ':maincpu' (000F7723): unmapped io memory write to F8FC = 0003 & 00FF
+// [:maincpu] ':maincpu' (000F7729): unmapped io memory write to F8F8 = 0100 & FF00
+//
+// Meaning:
+// F8FB (LCR1 = Serial Line #1 Control Register) = 80
+//      
+// F8F9 (DLH1) = 00 (0x18 >> 8 == 00)
+// F8F8 (DLL1) = 18 (ss:[bp - 02h] with SS:BP = 0C9E:03DA)
+//
+// F8FB (LCR1) = 03
+//
+// F8FC (MCR1 = Modem Control #1 Register) = 03
+//     Normal mode.
+//     
+// F8F9 () = 01
+// 
+//  SERCLK = 48MHz/4 = 12MHz
+//  baud-rate output freq = BCLKIN/(0x18) = SERCLK/24 = 500kHz
+//  500kHz / 16 = 31250 baud
+//  1 stop-bit, 8bit, no parity.
+
+static MACHINE_CONFIG_FRAGMENT( i386ex )
+	// Asynch Serial I/O ports:
+	MCFG_DEVICE_ADD("uart0", NS16450, DERIVED_CLOCK(1, 2))
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir4_w)) //UART0 interrupt. TODO: (mux:SIOINT0/INT9)
+	MCFG_DEVICE_ADD("uart1", NS16450, DERIVED_CLOCK(1, 2)/0x18) // <-- hardcoded value based on vmp3700 boot code
+	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w)) //UART1 interrupt. TODO: (mux:SIOINT1/INT8)
+
+	// Programmable Interval Timer:
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(DERIVED_CLOCK(1, 2))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(DERIVED_CLOCK(1, 2))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
+	MCFG_PIT8253_CLK2(DERIVED_CLOCK(1, 2))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+
+	// Programmable Interrupt Controllers:
+        MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(DEVICE_SELF, 0), VCC, READ8(i386EX_device, get_slave_ack) )
+        MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
+
+        //TODO: (mux:Vss/INT0) DEVWRITELINE("pic8259_master", pic8259_device, ir1_w)
+        //TODO: (mux:Vss/INT1) DEVWRITELINE("pic8259_master", pic8259_device, ir5_w)
+        //TODO: (mux:Vss/INT2) DEVWRITELINE("pic8259_master", pic8259_device, ir6_w)
+        //TODO: (mux:Vss/INT3) DEVWRITELINE("pic8259_master", pic8259_device, ir7_w)
+
+        //TODO: (mux:Vss/INT4) DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)
+        //(*vmp3700) TODO: (mux:SSIOINT/INT5) DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w)
+        //(*vmp3700) TODO: (mux:DMAINT/INT6) DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w)
+        //TODO: (mux:Vss/INT6/DMAINT) DEVWRITELINE("pic8259_slave", pic8259_device, ir5_w)
+        //TODO: (mux:Vss/INT7) DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w)
+        //TODO: WDTOUT DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w)
+MACHINE_CONFIG_END
+
+machine_config_constructor i386EX_device::device_mconfig_additions() const
+{
+        return MACHINE_CONFIG_NAME( i386ex );
+}
 
 i386EX_device::i386EX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I386EX, "I386EX", tag, owner, clock, "i386ex", __FILE__, 16, 26, 16)
@@ -2577,6 +2875,11 @@ void i386EX_device::device_reset()
 	m_CPL = 0;
 
 	CHANGE_PC(m_eip);
+
+	for (int i=0; i<8; i++){
+		m_CS_address[i] = 0;
+		m_CS_mask[i] = 0;
+	}
 }
 
 void i386_device::enter_smm()
