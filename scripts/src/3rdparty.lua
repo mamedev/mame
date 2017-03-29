@@ -769,6 +769,11 @@ project "bx"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
+	configuration {"linux*" }
+		buildoptions {
+			"-Wstrict-overflow=0",
+		}
+		
 	configuration { }
 
 	includedirs {
