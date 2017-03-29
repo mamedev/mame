@@ -174,7 +174,7 @@ ex:  0=the 054156 generates the syncs, 1=it's externally done (by a CCU for inst
 ez:  external ram present for linescroll?
 dms: 0=four layers, 1=two layers
 [a-d]f[hv]: 1=bit for horizontal/vertical character flipping present in layer a-d
-cr: 00=normal mode, 11=read character rom more, other unknown (used for character ram access)
+cr: 00=normal mode, 11=read character rom mode, other unknown (used for character ram access)
 sb: 000 = banking disabled
     001 = banking keyed on bits b,a of the character code
     010 = banking keyed on bits 9,8 of the character code
@@ -211,8 +211,8 @@ position is controller by m?h.  Linescroll and 8-line block scroll
 uses either a page or external dedicated ram to store the positions.
 There are 4x512 (0x800) positions, 512 for each layer, using exactly
 one page.  The positions are indexed by the tilemap line numbers and
-the layer number, the vertical scroll position has no influence.  In
-8-line mode, holes are left between each position (e.g. the IC zeroes
+the layer number, the vertical scroll position has no influence.  Or not.
+In 8-line mode, holes are left between each position (e.g. the IC zeroes
 the three bottom address bits when reading the offset).
 
 
@@ -1413,12 +1413,43 @@ void k054156_056832_device::bitmap_update(bitmap_ind16 *bitmap, const rectangle 
 	//	static const int xdelta[4] = { 24+0, 24+4, 24+6, 24+8 };
 	if(0)
 	logerror("draw layer %d scroll = %03x %03x\n", layer, m_mh[layer] & 0xfff, m_mv[layer] & 0x7ff);
-	switch(m_reg1l & 0x30) {
-	case 0x00: draw_line_block<false, false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer]); break;
-	case 0x10: draw_line_block<true , false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer] + m_offh); break;
-	case 0x20: draw_line_block<false, true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer]); break;
-	case 0x30: draw_line_block<true , true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer] + m_offh); break;
-	}			
+
+	switch((m_rzs >> (2*layer)) & 3) {
+	case 0: {
+		const uint32_t *sbase = m_cur_linescroll_page + 512 * layer;
+		switch(m_reg1l & 0x30) {
+		case 0x00:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<false, false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[(y + m_mv[layer]+1) & 511] - xdelta[layer]);
+			break;
+		case 0x10:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<true , false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[y & 511] - xdelta[layer] + m_offh);
+			break;
+		case 0x20:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<false, true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[y & 511] - xdelta[layer]);
+			break;
+		case 0x30:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<true , true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[y & 511] - xdelta[layer] + m_offh);
+			break;
+		}
+		break;
+	}
+	case 2:
+		logerror("blockscroll on %d\n", layer);
+		break;
+	case 1:
+	case 3:
+		switch(m_reg1l & 0x30) {
+		case 0x00: draw_line_block<false, false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer]); break;
+		case 0x10: draw_line_block<true , false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer] + m_offh); break;
+		case 0x20: draw_line_block<false, true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer]); break;
+		case 0x30: draw_line_block<true , true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer] + m_offh); break;
+		}
+		break;
+	}
 }
 
 void k054156_056832_device::decode_character_roms()

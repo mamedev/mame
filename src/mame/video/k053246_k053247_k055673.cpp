@@ -722,15 +722,27 @@ void k053246_055673_device::bitmap_update(bitmap_ind16 *bcolor, bitmap_ind16 *ba
 				goto skip;
 
 			uint32_t info_ns, info_s;
-			uint16_t trans_mask;
+			uint16_t trans_mask, mixbri;
 			if(!m_is_053247) {
 				info_s = ((spr[6] & 0xf00) << 8) | ((spr[6] & 0x0ff) << bpp) | coreg;
 				info_ns = info_s & (m_oms & 0x20 ? 0x3ffff : 0x7ffff);
 				trans_mask = (0xff << ((atrbk >> 8) & 7)) & shadow_color;
+				mixbri = 0;
+				switch(atrbk & 0x0c0) {
+				case 0x000: mixbri |= (atrbk & 0x030) << 8; break;
+				case 0x040: mixbri |= (atrbk & 0x010) << 8; break;
+				default: logerror("unhandled mix atrbk %x\n", atrbk);
+				}
+				switch(atrbk & 0x00c) {
+				case 0x000: mixbri |= (atrbk & 0x003) << 10; break;
+				case 0x004: mixbri |= (atrbk & 0x001) << 10; break;
+				default: logerror("unhandled bri atrbk %x\n", atrbk);
+				}
 			} else {
 				info_s  = (spr[6] & 0xfff) << 4;
 				info_ns = info_s & (m_oms & 0x20 ? 0x3fff : 0x7fff);
 				trans_mask = shadow_color;
+				mixbri = 0;
 			}
 
 #if 0
@@ -742,7 +754,10 @@ void k053246_055673_device::bitmap_update(bitmap_ind16 *bcolor, bitmap_ind16 *ba
 			m_wiring_cb(info_ns, color, noshadow_attr);
 			m_wiring_cb(info_s,  color, shadow_attr);
 
-			//		logerror("tbid %x color %x ns %x s %x\n", tile_base_id, color, noshadow_attr, shadow_attr);
+			noshadow_attr |= mixbri;
+			shadow_attr   |= mixbri;
+
+			//			logerror("tbid %x color %x ns %x s %x atrbk %x [%x %x %x %x]\n", tile_base_id, color, noshadow_attr, shadow_attr, atrbk, m_atrbk[0], m_atrbk[1], m_atrbk[2], m_atrbk[3]);
 
 			//		uint16_t color          = info_ns & 0x1ff;
 			//		uint16_t noshadow_attr  = ((info_ns & 0xc000) >> 6) | ((info_ns >> 8) & 0x3e);
