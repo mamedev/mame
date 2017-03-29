@@ -289,8 +289,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		throw emu_fatalerror("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map", string, width, m_map.m_databits);
 
 	// if map is narrower than 64 bits, check the mask width as well
-	// disabled because it breaks f.i. isa8_device::install_device, and the fix is nonobvious
-	if (false && m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
+	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
 		throw emu_fatalerror("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
 
 	// the mask must represent whole units of width
