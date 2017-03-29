@@ -188,7 +188,7 @@ int main(std::vector<std::string> &args)
 int main(int argc, char** argv)
 {
 	std::vector<std::string> args(argv, argv+argc);
-#endif	
+#endif
 	int res = 0;
 
 	// disable I/O buffering
