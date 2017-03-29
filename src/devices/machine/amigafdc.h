@@ -3,7 +3,6 @@
 #ifndef AMIGAFDC_H
 #define AMIGAFDC_H
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 
 #define MCFG_AMIGA_FDC_INDEX_CALLBACK(_write) \

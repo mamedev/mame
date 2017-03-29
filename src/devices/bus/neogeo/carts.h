@@ -9,7 +9,6 @@
 #ifndef __NEOGEO_CARTS_H__
 #define __NEOGEO_CARTS_H__
 
-#include "emu.h"
 
 
 // supported devices

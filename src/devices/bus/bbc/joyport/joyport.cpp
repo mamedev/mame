@@ -6,6 +6,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "joyport.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_JOYPORT_SLOT = &device_creator<bbc_joyport_slot_device>;
+const device_type BBC_JOYPORT_SLOT = device_creator<bbc_joyport_slot_device>;
 
 
 //**************************************************************************

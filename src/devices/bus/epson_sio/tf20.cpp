@@ -12,6 +12,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "tf20.h"
 
 #define XTAL_CR1    XTAL_8MHz
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_TF20 = &device_creator<epson_tf20_device>;
+const device_type EPSON_TF20 = device_creator<epson_tf20_device>;
 
 //-------------------------------------------------
 //  address maps

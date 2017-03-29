@@ -64,6 +64,8 @@
   35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
   42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
+ *89      HD44801C  1985, CXG Advanced Portachess
+
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
@@ -84,17 +86,19 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/gen_latch.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "pairmtch.lh"
 #include "sag.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -428,11 +432,11 @@ static INPUT_PORTS_START( bambball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Display")
 
 	PORT_START("IN.3") // D10 port R0x
-	PORT_CONFNAME( 0x07, 0x01, "Skill Level")
+	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -563,10 +567,10 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port D
-	PORT_CONFNAME( 0x0001, 0x0000, "Players" )
+	PORT_CONFNAME( 0x0001, 0x0000, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0001, "2" )
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START )
@@ -1852,10 +1856,10 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0040, DEF_STR( On ) )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_CONFNAME( 0x0800, 0x0800, "Players" )
+	PORT_CONFNAME( 0x0800, 0x0800, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0800, "1" )
 	PORT_CONFSETTING(      0x0000, "2" )
-	PORT_CONFNAME( 0x3000, 0x2000, "Skill Level" )
+	PORT_CONFNAME( 0x3000, 0x2000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x2000, "1" )
 	PORT_CONFSETTING(      0x1000, "2" )
 	PORT_CONFSETTING(      0x0000, "3" )
@@ -1962,7 +1966,7 @@ READ16_MEMBER(alnattck_state::input_r)
 
 static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.0") // D7 line D5
-	PORT_CONFNAME( 0x20, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
 
@@ -2019,6 +2023,7 @@ MACHINE_CONFIG_END
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
+  * RC circuit for speaker volume decay
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
 ***************************************************************************/
@@ -2034,8 +2039,9 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	int m_speaker_volume;
+	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
 
 protected:
 	virtual void machine_start() override;
@@ -2043,19 +2049,20 @@ protected:
 
 // handlers
 
-// Sound is controlled by two pins: D3 for pitch, and R13 for on/off. When turned
-// off, it does not mute instantly, but volume slowly decays. Until we emulate it
-// with discrete audio, this crude simulation will do.
+void cdkong_state::speaker_decay_reset()
+{
+	if (m_r[1] & 8)
+		m_speaker_volume = 1.0;
 
-#define CDKONG_SPEAKER_MAX 0x10000
-#define CDKONG_SPEAKER_DECAY 50
+	m_speaker->set_output_gain(0, m_speaker_volume);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
-	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
-	m_speaker_volume /= 2;
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_decay_reset();
+	m_speaker_volume /= 1.015;
 }
-
 
 void cdkong_state::prepare_display()
 {
@@ -2066,8 +2073,8 @@ void cdkong_state::prepare_display()
 WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
-	if (offset == HMCS40_PORT_R1X && data & 8)
-		m_speaker_volume = CDKONG_SPEAKER_MAX;
+	m_r[offset] = data;
+	speaker_decay_reset();
 
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
@@ -2099,7 +2106,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 void cdkong_state::machine_start()
 {
@@ -2136,7 +2142,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
 
 
@@ -2148,6 +2154,7 @@ MACHINE_CONFIG_END
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
+  * discrete sound (when alien attacks)
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
   Select game mode on start:
@@ -2223,7 +2230,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN.1") // R11 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2343,7 +2350,7 @@ READ8_MEMBER(cpacman_state::input_r)
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2460,7 +2467,7 @@ READ8_MEMBER(cmspacmn_state::input_r)
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2599,7 +2606,7 @@ static INPUT_PORTS_START( sag )
 	PORT_START("IN.2") // D4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
-	PORT_CONFNAME( 0x04, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 
@@ -2619,7 +2626,7 @@ static INPUT_PORTS_START( sag )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
 
 	PORT_START("FAKE") // shared D3/D5
-	PORT_CONFNAME( 0x03, 0x01, "Players" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "Demo" )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
@@ -2731,10 +2738,10 @@ static INPUT_PORTS_START( egalaxn2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFNAME( 0x0c, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" ) // for Demo mode: need to hold down Fire button at power-on
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
@@ -2815,10 +2822,10 @@ static INPUT_PORTS_START( epacman2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFNAME( 0x0c, 0x04, "Players" )
+	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
@@ -2964,13 +2971,13 @@ static INPUT_PORTS_START( eturtles )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.5") // D6 INT0/1
-	PORT_CONFNAME( 0x03, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x02, "0 (Demo)" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
@@ -3087,11 +3094,11 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
@@ -3341,7 +3348,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
-	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0010, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "A" )
 	PORT_CONFSETTING(      0x0010, "B" )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -4054,7 +4061,7 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // port D
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level")
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -4460,7 +4467,7 @@ CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Banda
 CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )

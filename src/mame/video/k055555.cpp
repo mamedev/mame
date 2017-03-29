@@ -140,20 +140,10 @@ int k055555_device::K055555_get_palette_index(int idx)
 
 
 
-const device_type K055555 = &device_creator<k055555_device>;
+const device_type K055555 = device_creator<k055555_device>;
 
 k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K055555, "K055555 Priority Encoder", tag, owner, clock, "k055555", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k055555_device::device_config_complete()
 {
 }
 

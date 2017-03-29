@@ -48,6 +48,7 @@ Implements WD2010 / WD1010 controller basics.
 // --------------------------------------------------------
 
 
+#include "emu.h"
 #include "machine/wd2010.h"
 
 //**************************************************************************
@@ -131,7 +132,7 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WD2010 = &device_creator<wd2010_device>;
+const device_type WD2010 = device_creator<wd2010_device>;
 
 
 //**************************************************************************

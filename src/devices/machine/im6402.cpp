@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "im6402.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IM6402 = &device_creator<im6402_device>;
+const device_type IM6402 = device_creator<im6402_device>;
 
 
 

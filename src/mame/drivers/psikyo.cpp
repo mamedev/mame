@@ -66,12 +66,14 @@ This was pointed out by Bart Puype
 *****/
 
 #include "emu.h"
+#include "includes/psikyo.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 #include "sound/okim6295.h"
-#include "includes/psikyo.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -1045,7 +1047,7 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1088,7 +1090,7 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1120,7 +1122,7 @@ static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based o
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo_bootleg)
-	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1165,7 +1167,7 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)

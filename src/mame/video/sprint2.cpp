@@ -118,7 +118,7 @@ uint32_t sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind1
 	uint8_t *video_ram = m_video_ram;
 	int i;
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(*m_screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 
@@ -135,7 +135,7 @@ uint32_t sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind1
 }
 
 
-void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
 {
 	// rising edge
 	if (state)
@@ -166,7 +166,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			/* check for sprite-tilemap collisions */
 
-			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
+			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
 
 			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				get_sprite_code(video_ram, i),

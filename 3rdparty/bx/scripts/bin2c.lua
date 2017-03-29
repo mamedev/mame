@@ -16,6 +16,10 @@ project "bin2c"
 		"../tools/bin2c/**.h",
 	}
 
+	links {
+		"bx",
+	}
+
 	configuration { "mingw-*" }
 		targetextension ".exe"
 

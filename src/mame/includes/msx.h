@@ -9,7 +9,6 @@
 #ifndef __MSX_H__
 #define __MSX_H__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"

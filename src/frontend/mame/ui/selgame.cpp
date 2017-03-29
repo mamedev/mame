@@ -803,7 +803,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 		{
 			if ((driver->flags & MACHINE_TYPE_ARCADE) == 0)
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config().root_device()))
+				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
 					if (!swlistdev.get_info().empty())
 					{
 						menu::stack_push<menu_select_software>(ui(), container(), driver);
@@ -900,7 +900,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		driver_enumerator drv(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drv);
 		drv.next();
-		software_list_device *swlist = software_list_device::find_by_name(drv.config(), ui_swinfo->listname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(*drv.config(), ui_swinfo->listname.c_str());
 		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);

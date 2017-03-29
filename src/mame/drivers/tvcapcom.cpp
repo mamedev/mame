@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "screen.h"
 
 class tvcapcom_state : public driver_device
 {

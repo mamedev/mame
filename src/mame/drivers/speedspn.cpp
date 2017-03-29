@@ -22,8 +22,12 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/speedspn.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*** README INFO **************************************************************
 

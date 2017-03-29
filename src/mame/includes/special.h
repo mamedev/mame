@@ -9,7 +9,6 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "audio/special.h"

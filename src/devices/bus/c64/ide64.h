@@ -12,7 +12,6 @@
 #define __IDE64__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/ds1302.h"
 #include "machine/ataintf.h"

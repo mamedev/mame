@@ -62,22 +62,12 @@ reads from 0x0006, and only uses bit 1.
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K051733 = &device_creator<k051733_device>;
+const device_type K051733 = device_creator<k051733_device>;
 
 k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051733, "K051733 Protection", tag, owner, clock, "k051733", __FILE__),
 	//m_ram[0x20],
 	m_rng(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k051733_device::device_config_complete()
 {
 }
 

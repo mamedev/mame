@@ -21,6 +21,9 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "spyhunttec.lh"
 
 class spyhuntertec_state : public driver_device

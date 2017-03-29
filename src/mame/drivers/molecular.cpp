@@ -47,11 +47,13 @@ TODO:
 
 ***********************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define I86_CLOCK XTAL_24MHz
 #define Z80_CLOCK XTAL_16MHz

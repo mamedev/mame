@@ -10,7 +10,6 @@
 #ifndef TRANSTAPE_H_
 #define TRANSTAPE_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 
 class cpc_transtape_device  : public device_t,

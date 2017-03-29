@@ -256,6 +256,7 @@ uint16_t ti99_datamux_device::debugger_read(address_space& space, uint16_t addr)
 					m_gromport->romgq_line(ASSERT_LINE);
 					m_gromport->readz(space, addrb+1, &lval);
 					m_gromport->readz(space, addrb, &hval);
+					m_gromport->romgq_line(CLEAR_LINE);
 				}
 				m_peb->memen_in(ASSERT_LINE);
 				m_peb->readz(space, addrb+1, &lval);
@@ -300,6 +301,7 @@ void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, ui
 				m_gromport->romgq_line(ASSERT_LINE);
 				m_gromport->write(space, addr+1, data & 0xff);
 				m_gromport->write(space, addr, (data>>8) & 0xff);
+				m_gromport->romgq_line(CLEAR_LINE);
 			}
 
 			m_peb->memen_in(ASSERT_LINE);
@@ -322,7 +324,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 	uint16_t value = 0;
 
 	// Care for debugger
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		return debugger_read(space, offset);
 	}
@@ -371,7 +373,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		debugger_write(space, offset, data);
 		return;
@@ -634,4 +636,4 @@ ioport_constructor ti99_datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-const device_type DATAMUX = &device_creator<ti99_datamux_device>;
+const device_type DATAMUX = device_creator<ti99_datamux_device>;

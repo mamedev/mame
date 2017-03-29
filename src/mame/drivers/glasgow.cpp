@@ -44,8 +44,11 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "glasgow.lh"
 #include "sound/beep.h"
+#include "speaker.h"
+
+#include "glasgow.lh"
+
 
 class glasgow_state : public driver_device
 {

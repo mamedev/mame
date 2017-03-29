@@ -41,23 +41,25 @@
 #include "emu.h"
 #include "mc6845.h"
 
+#include "screen.h"
+
 
 #define LOG     (0)
 
 
-const device_type MC6845 = &device_creator<mc6845_device>;
-const device_type MC6845_1 = &device_creator<mc6845_1_device>;
-const device_type R6545_1 = &device_creator<r6545_1_device>;
-const device_type C6545_1 = &device_creator<c6545_1_device>;
-const device_type H46505 = &device_creator<h46505_device>;
-const device_type HD6845 = &device_creator<hd6845_device>;
-const device_type SY6545_1 = &device_creator<sy6545_1_device>;
-const device_type SY6845E = &device_creator<sy6845e_device>;
-const device_type HD6345 = &device_creator<hd6345_device>;
-const device_type AMS40041 = &device_creator<ams40041_device>;
-const device_type AMS40489 = &device_creator<ams40489_device>;
-const device_type MOS8563 = &device_creator<mos8563_device>;
-const device_type MOS8568 = &device_creator<mos8568_device>;
+const device_type MC6845 = device_creator<mc6845_device>;
+const device_type MC6845_1 = device_creator<mc6845_1_device>;
+const device_type R6545_1 = device_creator<r6545_1_device>;
+const device_type C6545_1 = device_creator<c6545_1_device>;
+const device_type H46505 = device_creator<h46505_device>;
+const device_type HD6845 = device_creator<hd6845_device>;
+const device_type SY6545_1 = device_creator<sy6545_1_device>;
+const device_type SY6845E = device_creator<sy6845e_device>;
+const device_type HD6345 = device_creator<hd6345_device>;
+const device_type AMS40041 = device_creator<ams40041_device>;
+const device_type AMS40489 = device_creator<ams40489_device>;
+const device_type MOS8563 = device_creator<mos8563_device>;
+const device_type MOS8568 = device_creator<mos8568_device>;
 
 
 /* mode macros */
@@ -438,12 +440,6 @@ READ_LINE_MEMBER( mc6845_device::de_r )
 READ_LINE_MEMBER( mc6845_device::cursor_r )
 {
 	return m_cur;
-}
-
-
-READ_LINE_MEMBER( mc6845_device::cursor_state_r )
-{
-	return m_cursor_state;
 }
 
 
@@ -954,7 +950,7 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 		uint8_t cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		uint16_t ma = (cr << 8) | cc;
 
-		m_update_row_cb(bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 	else
 	{
@@ -988,7 +984,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}

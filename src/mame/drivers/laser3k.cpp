@@ -35,8 +35,10 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/kb3600.h"
-#include "sound/speaker.h"
 #include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 enum
 {

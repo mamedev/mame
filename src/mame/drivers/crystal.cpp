@@ -184,10 +184,12 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "video/vrender0.h"
 #include "machine/ds1302.h"
-#include "sound/vrender0.h"
 #include "machine/nvram.h"
+#include "sound/vrender0.h"
+#include "video/vrender0.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define IDLE_LOOP_SPEEDUP
 
@@ -206,7 +208,7 @@ public:
 		m_vr0(*this, "vr0"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
-		{ }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_sysregs;
@@ -277,7 +279,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_crystal(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_crystal);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
@@ -978,7 +980,7 @@ uint32_t crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(crystal_state::screen_vblank_crystal)
 {
 	// rising edge
 	if (state)
@@ -1321,7 +1323,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
-	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)

@@ -26,7 +26,6 @@
 #ifndef __PET_USER_PORT__
 #define __PET_USER_PORT__
 
-#include "emu.h"
 
 
 #define MCFG_PET_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \

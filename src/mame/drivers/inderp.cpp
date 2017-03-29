@@ -18,6 +18,7 @@ DISPLAY: 6-digit, both 9-segment & 7-segment panels with direct segment access
 SOUND:   simple tones, needs comparison with real machine
  */
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6502/m6502.h"
 

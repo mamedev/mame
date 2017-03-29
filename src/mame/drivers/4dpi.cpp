@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "cpu/mips/r3000.h"
+#include "screen.h"
 
 
 struct ip6_regs_t

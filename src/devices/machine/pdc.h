@@ -11,7 +11,6 @@
 #ifndef __R9751_PDC_H__
 #define __R9751_PDC_H__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"

@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_SLOT_CARDS_H__
 #define __SVI3X8_SLOT_CARDS_H__
 
-#include "emu.h"
 #include "sv801.h"
 #include "sv802.h"
 #include "sv803.h"

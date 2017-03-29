@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "memexp.h"
 
 
@@ -15,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MEMEXP_SLOT = &device_creator<memexp_slot_device>;
+const device_type MEMEXP_SLOT = device_creator<memexp_slot_device>;
 
 
 //**************************************************************************

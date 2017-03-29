@@ -89,4 +89,53 @@
 		</part>
 	</software>
 
+	<software name="midway">
+		<description>Midway Campaign</description>
+		<year>1980</year>
+		<publisher>Avalon Hill</publisher>
+		<!-- Side A: MIDWAY CAMPAIGN -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="27938166">
+				<rom name="midway campaign (1980)(avalon hill).wav" size="27938166" crc="612a1ea2" sha1="8f373fe651218f5ce101ad0037e3139f02f4488b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robbers">
+		<description>Robbers of the Lost Tomb</description>
+		<year>1983</year>
+		<publisher>Timeworks</publisher>
+		<!-- Side A: ROBBERS -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="31528432">
+				<rom name="robbers of the lost tomb (1983)(timeworks).wav" size="31528432" crc="e8cfcd15" sha1="d911428f4482d1d0de2d7871c559770ba7e46ff8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smoothtk">
+		<description>Smoothtalker 64</description>
+		<year>1983</year>
+		<publisher>Personal Peripheral Products</publisher>
+		<!-- Side A: SMOOTHTALKER 64, WORDS.SEQ -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="22835564">
+				<rom name="smoothtalker 64 (1983)(personal peripheral products).wav" size="22835564" crc="e349f820" sha1="b6c0358222aef627873c7d72a75850f8f29b3aff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speakez">
+		<description>Speakeasy</description>
+		<year>1983</year>
+		<publisher>Personal Peripheral Products</publisher>
+		<!-- Side A: PHONEME EDIT/T, PHONEME SPK/T, PHONEME EDIT/D, PHONEME SPK/D -->
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="31407810">
+				<rom name="speakeasy (1983)(personal peripheral products).wav" size="31407810" crc="bf2abcdc" sha1="6cbcfaba76d31cf8c8d659c6913c077c1f47bcb2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>

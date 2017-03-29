@@ -20,6 +20,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 #define MASTER_CLOCK    XTAL_12_096MHz
 #define PIXEL_CLOCK     (MASTER_CLOCK / 2)

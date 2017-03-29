@@ -35,8 +35,8 @@
 #define PSW     m_psw.b.l
 
 
-const device_type T11 = &device_creator<t11_device>;
-const device_type K1801VM2 = &device_creator<k1801vm2_device>;
+const device_type T11 = device_creator<t11_device>;
+const device_type K1801VM2 = device_creator<k1801vm2_device>;
 
 
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

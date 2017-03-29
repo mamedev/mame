@@ -50,11 +50,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lwings.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/lwings.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
  * device and some small changes to the memory map and videohardware.
@@ -935,7 +938,7 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
@@ -991,7 +994,7 @@ static MACHINE_CONFIG_START( fball, lwings_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // the 16-pixel black border on left edge is correct, test mode actually uses that area
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)

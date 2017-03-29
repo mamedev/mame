@@ -18,7 +18,7 @@
 // because the implementation is video dependant, this is just a
 // register-handling shell.
 
-const device_type K054338 = &device_creator<k054338_device>;
+const device_type K054338 = device_creator<k054338_device>;
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054338, "K054338 Mixer", tag, owner, clock, "k054338", __FILE__),

@@ -6,6 +6,7 @@
 //
 //====================================================================
 
+#include "emu.h"
 #include "diagnostics_module.h"
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)

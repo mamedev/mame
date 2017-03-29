@@ -2,9 +2,10 @@
 // copyright-holders:Carl
 // psx multitap emulation
 
+#include "emu.h"
 #include "multitap.h"
 
-const device_type PSX_MULTITAP = &device_creator<psx_multitap_device>;
+const device_type PSX_MULTITAP = device_creator<psx_multitap_device>;
 
 psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	device_t(mconfig, PSX_MULTITAP, "Playstation Multitap", tag, owner, clock, "psx_multitap", __FILE__),

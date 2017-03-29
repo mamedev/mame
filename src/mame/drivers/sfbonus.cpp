@@ -274,11 +274,14 @@ MH86171 Color Palette RAMDAC
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "pirpok2.lh"
-#include "machine/nvram.h"
+
 
 class sfbonus_state : public driver_device
 {

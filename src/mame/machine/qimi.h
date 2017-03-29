@@ -11,7 +11,6 @@
 #ifndef __QIMI__
 #define __QIMI__
 
-#include "emu.h"
 
 
 

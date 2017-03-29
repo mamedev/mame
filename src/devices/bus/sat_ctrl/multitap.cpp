@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "multitap.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_MULTITAP = &device_creator<saturn_multitap_device>;
+const device_type SATURN_MULTITAP = device_creator<saturn_multitap_device>;
 
 
 //**************************************************************************

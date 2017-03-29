@@ -44,7 +44,7 @@ CPU_DISASSEMBLE( pdp8 );
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-const device_type PDP8CPU = &device_creator<pdp8_device>;
+const device_type PDP8CPU = device_creator<pdp8_device>;
 
 //-------------------------------------------------
 //  pdp8_device - constructor

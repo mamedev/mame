@@ -60,7 +60,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(munchmo);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(generic_irq_ack);
 	void draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );

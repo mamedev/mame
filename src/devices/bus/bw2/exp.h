@@ -39,7 +39,6 @@
 #ifndef __BW2_EXPANSION_SLOT__
 #define __BW2_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

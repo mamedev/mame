@@ -34,10 +34,7 @@
 */
 
 #include "emu.h"
-
-#include "machine/mc68901.h"
 #include "includes/x68k.h"
-#include "machine/ram.h"
 
 
 PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
@@ -391,6 +388,8 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 			data = m_crtc.reg[9];
 			irq_time = m_screen->time_until_pos((data) / m_crtc.vmultiple,2);
 
+			if(data != m_screen->vpos())
+				m_mfpdev->i6_w(1);
 			if(irq_time.as_double() > 0)
 				m_raster_irq->adjust(irq_time, (data) / m_crtc.vmultiple);
 		}

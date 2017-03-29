@@ -34,7 +34,6 @@
 #ifndef __MOS7360__
 #define __MOS7360__
 
-#include "emu.h"
 
 
 

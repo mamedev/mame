@@ -14,7 +14,6 @@
 #ifndef __TI32K__
 #define __TI32K__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/ram.h"
 

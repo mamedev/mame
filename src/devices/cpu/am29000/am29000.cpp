@@ -19,7 +19,7 @@
 #include "am29000.h"
 
 
-const device_type AM29000 = &device_creator<am29000_cpu_device>;
+const device_type AM29000 = device_creator<am29000_cpu_device>;
 
 
 /***************************************************************************

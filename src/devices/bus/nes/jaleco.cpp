@@ -23,6 +23,8 @@
 
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
+#include "speaker.h"
+
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -37,18 +39,18 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_JF11 = &device_creator<nes_jf11_device>;
-const device_type NES_JF16 = &device_creator<nes_jf16_device>;
-const device_type NES_JF17 = &device_creator<nes_jf17_device>;
-const device_type NES_JF19 = &device_creator<nes_jf19_device>;
-const device_type NES_SS88006 = &device_creator<nes_ss88006_device>;
-const device_type NES_JF13 = &device_creator<nes_jf13_device>;
-const device_type NES_JF17_ADPCM = &device_creator<nes_jf17_adpcm_device>;
-const device_type NES_JF19_ADPCM = &device_creator<nes_jf19_adpcm_device>;
-const device_type NES_JF23 = &device_creator<nes_jf23_device>;
-const device_type NES_JF24 = &device_creator<nes_jf24_device>;
-const device_type NES_JF29 = &device_creator<nes_jf29_device>;
-const device_type NES_JF33 = &device_creator<nes_jf33_device>;
+const device_type NES_JF11 = device_creator<nes_jf11_device>;
+const device_type NES_JF16 = device_creator<nes_jf16_device>;
+const device_type NES_JF17 = device_creator<nes_jf17_device>;
+const device_type NES_JF19 = device_creator<nes_jf19_device>;
+const device_type NES_SS88006 = device_creator<nes_ss88006_device>;
+const device_type NES_JF13 = device_creator<nes_jf13_device>;
+const device_type NES_JF17_ADPCM = device_creator<nes_jf17_adpcm_device>;
+const device_type NES_JF19_ADPCM = device_creator<nes_jf19_adpcm_device>;
+const device_type NES_JF23 = device_creator<nes_jf23_device>;
+const device_type NES_JF24 = device_creator<nes_jf24_device>;
+const device_type NES_JF29 = device_creator<nes_jf29_device>;
+const device_type NES_JF33 = device_creator<nes_jf33_device>;
 
 
 nes_jf11_device::nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

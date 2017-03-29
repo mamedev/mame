@@ -11,7 +11,6 @@
 #ifndef __VTECH_MEMEXP_MEMORY__
 #define __VTECH_MEMEXP_MEMORY__
 
-#include "emu.h"
 #include "memexp.h"
 
 

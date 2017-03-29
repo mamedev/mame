@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "fdc.h"
 
 
@@ -34,7 +35,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEWBRAIN_FDC = &device_creator<newbrain_fdc_t>;
+const device_type NEWBRAIN_FDC = device_creator<newbrain_fdc_t>;
 
 
 //-------------------------------------------------

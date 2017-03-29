@@ -9,6 +9,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "4cga.h"
 
 
@@ -17,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4CGA = &device_creator<c64_4cga_device>;
+const device_type C64_4CGA = device_creator<c64_4cga_device>;
 
 
 static INPUT_PORTS_START( c64_4player )

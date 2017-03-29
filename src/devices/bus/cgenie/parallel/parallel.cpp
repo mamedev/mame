@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "parallel.h"
 
 
@@ -15,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PARALLEL_SLOT = &device_creator<parallel_slot_device>;
+const device_type PARALLEL_SLOT = device_creator<parallel_slot_device>;
 
 
 //**************************************************************************

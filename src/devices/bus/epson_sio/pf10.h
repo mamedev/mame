@@ -13,7 +13,6 @@
 #ifndef __PF10_H__
 #define __PF10_H__
 
-#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/upd765.h"
 #include "epson_sio.h"

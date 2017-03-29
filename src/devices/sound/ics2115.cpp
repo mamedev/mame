@@ -15,7 +15,7 @@
 //#define ICS2115_ISOLATE 6
 
 // device type definition
-const device_type ICS2115 = &device_creator<ics2115_device>;
+const device_type ICS2115 = device_creator<ics2115_device>;
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),

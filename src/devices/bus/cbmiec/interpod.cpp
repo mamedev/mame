@@ -57,6 +57,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "interpod.h"
 
 
@@ -75,7 +76,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type INTERPOD = &device_creator<interpod_device>;
+const device_type INTERPOD = device_creator<interpod_device>;
 
 
 

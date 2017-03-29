@@ -11,7 +11,6 @@
 #ifndef __VICTOR_9000_FDC__
 #define __VICTOR_9000_FDC__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"

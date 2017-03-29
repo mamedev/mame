@@ -4,7 +4,7 @@
 #include "cpu/m6800/m6800.h"
 #include "audio/hyprolyb.h"
 
-const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
+const device_type HYPROLYB_ADPCM = device_creator<hyprolyb_adpcm_device>;
 
 hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock, "hyprolyb_adpcm", __FILE__),

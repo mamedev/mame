@@ -73,9 +73,9 @@
 #define P_OUT(A,V)      TMS32010_Out(A,V)
 
 
-const device_type TMS32010 = &device_creator<tms32010_device>;
-const device_type TMS32015 = &device_creator<tms32015_device>;
-const device_type TMS32016 = &device_creator<tms32016_device>;
+const device_type TMS32010 = device_creator<tms32010_device>;
+const device_type TMS32015 = device_creator<tms32015_device>;
+const device_type TMS32016 = device_creator<tms32016_device>;
 
 
 /****************************************************************************

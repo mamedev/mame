@@ -11,7 +11,6 @@
 #ifndef __ADAM_IDE__
 #define __ADAM_IDE__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/ataintf.h"
 #include "machine/latch.h"

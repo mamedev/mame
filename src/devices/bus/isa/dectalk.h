@@ -3,7 +3,6 @@
 #ifndef ISA_DECTALK_H_
 #define ISA_DECTALK_H_
 
-#include "emu.h"
 #include "isa.h"
 #include "sound/dac.h"
 #include "cpu/i86/i186.h"

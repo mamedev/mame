@@ -44,20 +44,20 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_SACHEN_SA009 = &device_creator<nes_sachen_sa009_device>;
-const device_type NES_SACHEN_SA0036 = &device_creator<nes_sachen_sa0036_device>;
-const device_type NES_SACHEN_SA0037 = &device_creator<nes_sachen_sa0037_device>;
-const device_type NES_SACHEN_SA72007 = &device_creator<nes_sachen_sa72007_device>;
-const device_type NES_SACHEN_SA72008 = &device_creator<nes_sachen_sa72008_device>;
-const device_type NES_SACHEN_TCA01 = &device_creator<nes_sachen_tca01_device>;
-const device_type NES_SACHEN_TCU01 = &device_creator<nes_sachen_tcu01_device>;
-const device_type NES_SACHEN_TCU02 = &device_creator<nes_sachen_tcu02_device>;
-const device_type NES_SACHEN_74X374 = &device_creator<nes_sachen_74x374_device>;
-const device_type NES_SACHEN_74X374_ALT = &device_creator<nes_sachen_74x374_alt_device>;
-const device_type NES_SACHEN_8259A = &device_creator<nes_sachen_8259a_device>;
-const device_type NES_SACHEN_8259B = &device_creator<nes_sachen_8259b_device>;
-const device_type NES_SACHEN_8259C = &device_creator<nes_sachen_8259c_device>;
-const device_type NES_SACHEN_8259D = &device_creator<nes_sachen_8259d_device>;
+const device_type NES_SACHEN_SA009 = device_creator<nes_sachen_sa009_device>;
+const device_type NES_SACHEN_SA0036 = device_creator<nes_sachen_sa0036_device>;
+const device_type NES_SACHEN_SA0037 = device_creator<nes_sachen_sa0037_device>;
+const device_type NES_SACHEN_SA72007 = device_creator<nes_sachen_sa72007_device>;
+const device_type NES_SACHEN_SA72008 = device_creator<nes_sachen_sa72008_device>;
+const device_type NES_SACHEN_TCA01 = device_creator<nes_sachen_tca01_device>;
+const device_type NES_SACHEN_TCU01 = device_creator<nes_sachen_tcu01_device>;
+const device_type NES_SACHEN_TCU02 = device_creator<nes_sachen_tcu02_device>;
+const device_type NES_SACHEN_74X374 = device_creator<nes_sachen_74x374_device>;
+const device_type NES_SACHEN_74X374_ALT = device_creator<nes_sachen_74x374_alt_device>;
+const device_type NES_SACHEN_8259A = device_creator<nes_sachen_8259a_device>;
+const device_type NES_SACHEN_8259B = device_creator<nes_sachen_8259b_device>;
+const device_type NES_SACHEN_8259C = device_creator<nes_sachen_8259c_device>;
+const device_type NES_SACHEN_8259D = device_creator<nes_sachen_8259d_device>;
 
 
 nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -14,7 +14,6 @@
 #ifndef __SMS_CONTROL_PORT__
 #define __SMS_CONTROL_PORT__
 
-#include "emu.h"
 
 
 

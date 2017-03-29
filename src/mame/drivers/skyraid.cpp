@@ -7,9 +7,12 @@ Atari Sky Raider driver
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/skyraid.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
-#include "includes/skyraid.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

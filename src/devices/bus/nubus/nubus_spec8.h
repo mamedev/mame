@@ -5,7 +5,6 @@
 #ifndef __NUBUS_SPEC8S3_H__
 #define __NUBUS_SPEC8S3_H__
 
-#include "emu.h"
 #include "nubus.h"
 
 //**************************************************************************

@@ -53,13 +53,16 @@ Dip locations verified with manual for ddragon & ddragon2
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ddragon.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/ddragon.h"
+#include "sound/ym2151.h"
+
+#include "speaker.h"
 
 
 #define MAIN_CLOCK      XTAL_12MHz
@@ -732,6 +735,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddungeon )
 	PORT_INCLUDE(ddragon)
 
+	// Dangerous Dungeons installation guide recommends 4-way joystick "for maximum profits"
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
@@ -816,7 +832,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( toffy )
-	PORT_INCLUDE(ddragon)
+	PORT_INCLUDE(ddungeon)
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )

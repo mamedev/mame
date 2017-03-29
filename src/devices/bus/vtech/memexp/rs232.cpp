@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "rs232.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type RS232_INTERFACE = &device_creator<rs232_interface_device>;
+const device_type RS232_INTERFACE = device_creator<rs232_interface_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

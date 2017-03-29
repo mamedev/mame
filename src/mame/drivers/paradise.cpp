@@ -87,8 +87,11 @@ sticker from Jan 95 and factory sticker 94*41.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/paradise.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

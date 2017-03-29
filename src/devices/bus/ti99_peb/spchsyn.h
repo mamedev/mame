@@ -13,7 +13,6 @@
 #ifndef __TISPEECH__
 #define __TISPEECH__
 
-#include "emu.h"
 #include "peribox.h"
 #include "sound/tms5220.h"
 

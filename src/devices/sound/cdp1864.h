@@ -32,14 +32,15 @@
 
 **********************************************************************/
 
+#ifndef MAME_DEVICES_SOUND_CDP1864_H
+#define MAME_DEVICES_SOUND_CDP1864_H
+
 #pragma once
 
-#ifndef __CDP1864__
-#define __CDP1864__
-
-#include "emu.h"
 #include "machine/rescap.h"
 #include "video/resnet.h"
+
+#include "screen.h"
 
 
 
@@ -203,6 +204,4 @@ private:
 // device type definition
 extern const device_type CDP1864;
 
-
-
-#endif
+#endif // MAME_DEVICES_SOUND_CDP1864_H

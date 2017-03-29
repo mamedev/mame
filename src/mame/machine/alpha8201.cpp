@@ -271,12 +271,13 @@ Notes:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "alpha8201.h"
 
 /**************************************************************************/
 
-const device_type ALPHA_8201 = &device_creator<alpha_8201_device>;
+const device_type ALPHA_8201 = device_creator<alpha_8201_device>;
 
 //-------------------------------------------------
 //  alpha_8201_device - constructor

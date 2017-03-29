@@ -11,7 +11,7 @@
 #include "vboy.h"
 
 // device type definition
-const device_type VBOYSND = &device_creator<vboysnd_device>;
+const device_type VBOYSND = device_creator<vboysnd_device>;
 
 //#define LAME_COMPILER_BUG
 

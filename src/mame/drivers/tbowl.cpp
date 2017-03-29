@@ -15,10 +15,14 @@ Might be some priority glitches
 ***/
 
 #include "emu.h"
+#include "includes/tbowl.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
+
 #include "rendlay.h"
-#include "includes/tbowl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(tbowl_state::coincounter_w)

@@ -45,13 +45,13 @@ void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
-const device_type ARM7 = &device_creator<arm7_cpu_device>;
-const device_type ARM7_BE = &device_creator<arm7_be_cpu_device>;
-const device_type ARM7500 = &device_creator<arm7500_cpu_device>;
-const device_type ARM9 = &device_creator<arm9_cpu_device>;
-const device_type ARM920T = &device_creator<arm920t_cpu_device>;
-const device_type PXA255 = &device_creator<pxa255_cpu_device>;
-const device_type SA1110 = &device_creator<sa1110_cpu_device>;
+const device_type ARM7 = device_creator<arm7_cpu_device>;
+const device_type ARM7_BE = device_creator<arm7_be_cpu_device>;
+const device_type ARM7500 = device_creator<arm7500_cpu_device>;
+const device_type ARM9 = device_creator<arm9_cpu_device>;
+const device_type ARM920T = device_creator<arm920t_cpu_device>;
+const device_type PXA255 = device_creator<pxa255_cpu_device>;
+const device_type SA1110 = device_creator<sa1110_cpu_device>;
 
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -655,6 +655,7 @@ void arm7_cpu_device::execute_run()
 
 			insn = m_direct->read_dword(raddr);
 
+			int op_offset = 0;
 			/* process condition codes for this instruction */
 			if ((insn >> INSN_COND_SHIFT) != COND_AL)
 			{
@@ -717,13 +718,17 @@ void arm7_cpu_device::execute_run()
 							{ UNEXECUTED();  goto skip_exec; }
 						break;
 					case COND_NV:
-						{ UNEXECUTED();  goto skip_exec; }
+						if (m_archRev < 5)
+						  { UNEXECUTED();  goto skip_exec; }
+						else
+							op_offset = 0x10;
+						break;
 				}
 			}
 			/*******************************************************************/
 			/* If we got here - condition satisfied, so decode the instruction */
 			/*******************************************************************/
-			(this->*ops_handler[((insn & 0xF000000) >> 24)])(insn);
+			(this->*ops_handler[((insn & 0xF000000) >> 24) + op_offset])(insn);
 		}
 
 skip_exec:

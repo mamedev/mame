@@ -37,6 +37,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "opus3.h"
 
 
@@ -44,7 +45,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS3 = &device_creator<bbc_opus3_device>;
+const device_type BBC_OPUS3 = device_creator<bbc_opus3_device>;
 
 
 //-------------------------------------------------

@@ -11,6 +11,7 @@
 #include "sound/astrocde.h"
 #include "sound/samples.h"
 #include "sound/votrax.h"
+#include "screen.h"
 
 #define ASTROCADE_CLOCK     (XTAL_14_31818MHz/2)
 

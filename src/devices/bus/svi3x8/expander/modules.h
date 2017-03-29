@@ -11,7 +11,6 @@
 #ifndef __SVI_EXPANDER_MODULES_H__
 #define __SVI_EXPANDER_MODULES_H__
 
-#include "emu.h"
 #include "sv601.h"
 #include "sv602.h"
 #include "sv603.h"

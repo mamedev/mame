@@ -11,7 +11,6 @@
 #ifndef __SUPERCPU__
 #define __SUPERCPU__
 
-#include "emu.h"
 #include "exp.h"
 #include "cpu/g65816/g65816.h"
 

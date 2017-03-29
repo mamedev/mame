@@ -16,21 +16,11 @@
 #define MASK_SWITCHES ( 7 )
 #define MASK_COUNTER ( 0xfff )
 
-const device_type UPD4701 = &device_creator<upd4701_device>;
+const device_type UPD4701 = device_creator<upd4701_device>;
 
 upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD4701, "uPD4701 Encoder", tag, owner, clock, "upd4701", __FILE__), m_cs(0), m_xy(0), m_ul(0), m_resetx(0), m_resety(0), m_latchx(0), m_latchy(0),
 	m_startx(0), m_starty(0), m_x(0), m_y(0), m_switches(0), m_latchswitches(0), m_cf(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd4701_device::device_config_complete()
 {
 }
 

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dm9368.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITION
 //**************************************************************************
 
-const device_type DM9368 = &device_creator<dm9368_device>;
+const device_type DM9368 = device_creator<dm9368_device>;
 
 
 

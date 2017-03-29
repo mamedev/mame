@@ -3,7 +3,6 @@
 #ifndef I8271N_H_
 #define I8271N_H_
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
 

@@ -11,7 +11,6 @@
 #ifndef __EPSON_EX800__
 #define __EPSON_EX800__
 
-#include "emu.h"
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/beep.h"

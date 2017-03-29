@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nsmdsa.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MDS_A = &device_creator<s100_mds_a_device>;
+const device_type S100_MDS_A = device_creator<s100_mds_a_device>;
 
 
 //-------------------------------------------------

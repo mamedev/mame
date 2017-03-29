@@ -410,20 +410,22 @@
 ***********************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/3812intf.h"
+#include "video/mc6845.h"
+//#include "sound/dac.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "suprstar.lh"
+
+
 #define MASTER_CLOCK    XTAL_16MHz
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/4  /* guess */
 #define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */
-
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/3812intf.h"
-//#include "sound/dac.h"
-
-#include "suprstar.lh"
 
 
 class amaticmg_state : public driver_device

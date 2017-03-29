@@ -139,6 +139,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 #include "emu.h"
 #include "includes/seta.h"
+#include "screen.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
 static const game_offset game_offsets[] =
@@ -1061,7 +1062,7 @@ uint32_t seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(seta_state::screen_vblank_setaroul)
 {
 	// rising edge
 	if (state)

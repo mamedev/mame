@@ -3,7 +3,10 @@
 
 /* Williams WPC Fliptronics I */
 
+#include "emu.h"
 #include "includes/wpc_flip1.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wpc_flip1_map, AS_PROGRAM, 8, wpc_flip1_state )

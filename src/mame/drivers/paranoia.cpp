@@ -36,14 +36,18 @@ HuC6280A (Hudson)
 ****************************************************************************/
 
 #include "emu.h"
+#include "machine/pcecommn.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
-#include "machine/pcecommn.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class paranoia_state : public pce_common_state
 {

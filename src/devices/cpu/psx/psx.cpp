@@ -66,11 +66,11 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "psx.h"
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
+#include "debugger.h"
 
 #define LOG_BIOSCALL ( 0 )
 
@@ -165,12 +165,12 @@ static const char *const delayn[] =
 };
 
 // device type definition
-const device_type CXD8530AQ = &device_creator<cxd8530aq_device>;
-const device_type CXD8530BQ = &device_creator<cxd8530bq_device>;
-const device_type CXD8530CQ = &device_creator<cxd8530cq_device>;
-const device_type CXD8661R = &device_creator<cxd8661r_device>;
-const device_type CXD8606BQ = &device_creator<cxd8606bq_device>;
-const device_type CXD8606CQ = &device_creator<cxd8606cq_device>;
+const device_type CXD8530AQ = device_creator<cxd8530aq_device>;
+const device_type CXD8530BQ = device_creator<cxd8530bq_device>;
+const device_type CXD8530CQ = device_creator<cxd8530cq_device>;
+const device_type CXD8661R = device_creator<cxd8661r_device>;
+const device_type CXD8606BQ = device_creator<cxd8606bq_device>;
+const device_type CXD8606CQ = device_creator<cxd8606cq_device>;
 
 static const uint32_t mtc0_writemask[]=
 {
@@ -194,14 +194,14 @@ static const uint32_t mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	if( !space.debugger_access() )
+	if( !machine().side_effect_disabled() )
 		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	if( !space.debugger_access() )
+	if( !machine().side_effect_disabled() )
 		m_berr = 1;
 }
 
@@ -1762,17 +1762,17 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 }
 
 cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530AQ, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
 {
 }
 
 cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530BQ, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
 {
 }
 
 cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530CQ, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
 {
 }
 

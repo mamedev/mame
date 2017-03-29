@@ -38,7 +38,7 @@ enum
     DEVICE INTERFACE
 ***************************************************************************/
 
-const device_type MOS6530 = &device_creator<mos6530_device>;
+const device_type MOS6530 = device_creator<mos6530_device>;
 
 mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MOS6530, "MOS6530 RRIOT", tag, owner, clock, "mos6530", __FILE__),

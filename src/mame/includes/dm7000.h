@@ -3,7 +3,6 @@
 #ifndef DM7000_H_
 #define DM7000_H_
 
-#include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/terminal.h"
 

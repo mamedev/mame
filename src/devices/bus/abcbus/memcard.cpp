@@ -54,6 +54,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "memcard.h"
 
 
@@ -62,7 +63,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_MEMORY_CARD = &device_creator<abc_memory_card_t>;
+const device_type ABC_MEMORY_CARD = device_creator<abc_memory_card_t>;
 
 
 //-------------------------------------------------

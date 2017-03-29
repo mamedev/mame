@@ -25,8 +25,12 @@
 */
 
 
+#include "emu.h"
 #include "includes/tek405x.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS

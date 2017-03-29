@@ -20,7 +20,7 @@
 
 
 // device type definition
-const device_type BEEP = &device_creator<beep_device>;
+const device_type BEEP = device_creator<beep_device>;
 
 
 //**************************************************************************

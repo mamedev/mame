@@ -34,6 +34,7 @@
 #include "sound/3812intf.h"
 #include "sound/volt_reg.h"
 #include "video/v9938.h"
+#include "speaker.h"
 
 
 class csplayh5_state : public driver_device

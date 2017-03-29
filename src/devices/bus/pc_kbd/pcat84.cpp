@@ -24,6 +24,7 @@
 
 */
 
+#include "emu.h"
 #include "pcat84.h"
 
 
@@ -40,8 +41,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_IBM_PC_AT_84 = &device_creator<ibm_pc_at_84_keyboard_device>;
-const device_type PC_KBD_IBM_3270PC_122 = &device_creator<ibm_3270pc_122_keyboard_device>;
+const device_type PC_KBD_IBM_PC_AT_84 = device_creator<ibm_pc_at_84_keyboard_device>;
+const device_type PC_KBD_IBM_3270PC_122 = device_creator<ibm_3270pc_122_keyboard_device>;
 
 
 //-------------------------------------------------

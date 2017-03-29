@@ -6,10 +6,11 @@
 
 */
 
-#ifndef _HH_TMS1K_H_
-#define _HH_TMS1K_H_
+#ifndef MAME_INCLUDES_HH_TMS1K_H
+#define MAME_INCLUDES_HH_TMS1K_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/tms1000/tms1000.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"
@@ -17,7 +18,7 @@
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 
 class hh_tms1k_state : public driver_device
@@ -88,5 +89,4 @@ enum
 	lDP = 0x80
 };
 
-
-#endif /* _HH_TMS1K_H_ */
+#endif // MAME_INCLUDES_HH_TMS1K_H

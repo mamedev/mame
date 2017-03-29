@@ -17,13 +17,13 @@
 //  crvision_rom_device - constructor
 //-------------------------------------------------
 
-const device_type CRVISION_ROM_4K = &device_creator<crvision_rom_device>;
-const device_type CRVISION_ROM_6K = &device_creator<crvision_rom6k_device>;
-const device_type CRVISION_ROM_8K = &device_creator<crvision_rom8k_device>;
-const device_type CRVISION_ROM_10K = &device_creator<crvision_rom10k_device>;
-const device_type CRVISION_ROM_12K = &device_creator<crvision_rom12k_device>;
-const device_type CRVISION_ROM_16K = &device_creator<crvision_rom16k_device>;
-const device_type CRVISION_ROM_18K = &device_creator<crvision_rom18k_device>;
+const device_type CRVISION_ROM_4K = device_creator<crvision_rom_device>;
+const device_type CRVISION_ROM_6K = device_creator<crvision_rom6k_device>;
+const device_type CRVISION_ROM_8K = device_creator<crvision_rom8k_device>;
+const device_type CRVISION_ROM_10K = device_creator<crvision_rom10k_device>;
+const device_type CRVISION_ROM_12K = device_creator<crvision_rom12k_device>;
+const device_type CRVISION_ROM_16K = device_creator<crvision_rom16k_device>;
+const device_type CRVISION_ROM_18K = device_creator<crvision_rom18k_device>;
 
 
 crvision_rom_device::crvision_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

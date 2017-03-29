@@ -15,12 +15,14 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6522via.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "sound/beep.h"
 #include "imagedev/snapquik.h"
+#include "machine/6522via.h"
+#include "sound/beep.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jr100_state : public driver_device

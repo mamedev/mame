@@ -133,14 +133,16 @@ we have no way of knowing which is the later/corrected version.
 **************************************************************************/
 
 #include "emu.h"
-#include "video/k053250.h"
+#include "includes/mystwarr.h"
 #include "includes/konamigx.h"
+#include "includes/konamipt.h"
+#include "video/k053250.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/mystwarr.h"
+#include "speaker.h"
 
 
 

@@ -44,6 +44,7 @@ CPU/Video Board Parts:
 #include "includes/sbasketb.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -51,6 +52,9 @@ CPU/Video Board Parts:
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 {

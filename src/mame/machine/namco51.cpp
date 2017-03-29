@@ -58,6 +58,7 @@
 
 #include "emu.h"
 #include "namco51.h"
+#include "screen.h"
 
 
 #define VERBOSE 0
@@ -340,7 +341,7 @@ ROM_START( namco_51xx )
 	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
 ROM_END
 
-const device_type NAMCO_51XX = &device_creator<namco_51xx_device>;
+const device_type NAMCO_51XX = device_creator<namco_51xx_device>;
 
 namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_51XX, "Namco 51xx", tag, owner, clock, "namco51", __FILE__),

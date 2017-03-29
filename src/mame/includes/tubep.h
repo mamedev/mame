@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class tubep_state : public driver_device
 {

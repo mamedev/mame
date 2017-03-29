@@ -33,6 +33,7 @@ Lower board (MGP_01):
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "video/resnet.h"
+#include "screen.h"
 
 #include "monzagp.lh"
 

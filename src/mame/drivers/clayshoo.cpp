@@ -20,6 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 
 class clayshoo_state : public driver_device

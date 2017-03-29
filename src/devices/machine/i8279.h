@@ -35,7 +35,6 @@
 #ifndef __I8279__
 #define __I8279__
 
-#include "emu.h"
 
 
 

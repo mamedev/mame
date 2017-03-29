@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "screen.h"
+
 #include <ctype.h>
 
 
@@ -131,16 +133,18 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	if (owner != nullptr)
 	{
 		// allocate the new device
-		device_t *device = (*type)(*this, tag, owner, clock);
+		std::unique_ptr<device_t> device = type(*this, tag, owner, clock);
 
 		// append it to the owner's list
-		return &config_new_device(owner->subdevices().m_list.append(*device));
+		return &config_new_device(owner->subdevices().m_list.append(*device.release()));
 	}
-
-	// allocate the root device directly
-	assert(m_root_device == nullptr);
-	m_root_device.reset((*type)(*this, tag, nullptr, clock));
-	return &config_new_device(*m_root_device);
+	else
+	{
+		// allocate the root device directly
+		assert(!m_root_device);
+		m_root_device = type(*this, tag, nullptr, clock);
+		return &config_new_device(*m_root_device);
+	}
 }
 
 
@@ -159,19 +163,21 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
 		return device_add(owner, tag, type, clock);
 	}
+	else
+	{
+		// make sure we have the old device's actual owner
+		owner = old_device->owner();
+		assert(owner != nullptr);
 
-	// make sure we have the old device's actual owner
-	owner = old_device->owner();
-	assert(owner != nullptr);
+		// remove references to the old device
+		remove_references(*old_device);
 
-	// remove references to the old device
-	remove_references(*old_device);
+		// allocate the new device
+		std::unique_ptr<device_t> new_device = type(*this, tag, owner, clock);
 
-	// allocate the new device
-	device_t *new_device = (*type)(*this, tag, owner, clock);
-
-	// substitute it for the old one in the owner's list
-	return &config_new_device(owner->subdevices().m_list.replace_and_remove(*new_device, *old_device));
+		// substitute it for the old one in the owner's list
+		return &config_new_device(owner->subdevices().m_list.replace_and_remove(*new_device.release(), *old_device));
+	}
 }
 
 

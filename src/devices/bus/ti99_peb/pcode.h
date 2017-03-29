@@ -15,7 +15,6 @@
 #ifndef __PCODE__
 #define __PCODE__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/tmc0430.h"
 

@@ -116,9 +116,10 @@ namespace bgfx
 			BX_UNUSED(_filePath, _width, _height, _pitch, _data, _size, _yflip);
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
-			char* filePath = (char*)alloca(strlen(_filePath)+5);
-			strcpy(filePath, _filePath);
-			strcat(filePath, ".tga");
+			const size_t len = bx::strnlen(_filePath)+5;
+			char* filePath = (char*)alloca(len);
+			bx::strlncpy(filePath, len, _filePath);
+			bx::strlncat(filePath, len, ".tga");
 
 			bx::CrtFileWriter writer;
 			if (bx::open(&writer, filePath) )
@@ -391,7 +392,7 @@ namespace bgfx
 
 		if (BX_UNLIKELY(NULL == g_callback) )
 		{
-			dbgPrintfVargs(_format, argList);
+			bx::debugPrintfVargs(_format, argList);
 			abort();
 		}
 		else
@@ -419,7 +420,7 @@ namespace bgfx
 
 		if (BX_UNLIKELY(NULL == g_callback) )
 		{
-			dbgPrintfVargs(_format, argList);
+			bx::debugPrintfVargs(_format, argList);
 		}
 		else
 		{
@@ -526,7 +527,7 @@ namespace bgfx
 			return _default;
 		}
 
-		if (0 == strncmp(ptr, "0m", 2) )
+		if (0 == bx::strncmp(ptr, "0m", 2) )
 		{
 			_ptr = ptr + 2;
 			return _default;
@@ -544,13 +545,16 @@ namespace bgfx
 	{
 		if (_x < m_width && _y < m_height)
 		{
-			char* temp = (char*)alloca(m_width);
-
-			uint32_t num = bx::vsnprintf(temp, m_width, _format, _argList);
+			va_list argListCopy;
+			va_copy(argListCopy, _argList);
+			uint32_t num = bx::vsnprintf(NULL, 0, _format, argListCopy) + 1;
+			char* temp = (char*)alloca(num);
+			va_copy(argListCopy, _argList);
+			num = bx::vsnprintf(temp, num, _format, argListCopy);
 
 			uint8_t attr = _attr;
 			uint8_t* mem = &m_mem[(_y*m_width+_x)*2];
-			for (uint32_t ii = 0, xx = _x; ii < num && xx < m_width; ++ii, ++xx)
+			for (uint32_t ii = 0, xx = _x; ii < num && xx < m_width; ++ii)
 			{
 				char ch = temp[ii];
 				if (BX_UNLIKELY(ch == '\x1b') )
@@ -564,6 +568,7 @@ namespace bgfx
 					mem[0] = ch;
 					mem[1] = attr;
 					mem += 2;
+					++xx;
 				}
 			}
 		}
@@ -1067,7 +1072,7 @@ namespace bgfx
 
 	void UniformBuffer::writeMarker(const char* _marker)
 	{
-		uint16_t num = (uint16_t)strlen(_marker)+1;
+		uint16_t num = (uint16_t)bx::strnlen(_marker)+1;
 		uint32_t opcode = encodeOpcode(bgfx::UniformType::Count, 0, num, true);
 		write(opcode);
 		write(_marker, num);
@@ -2577,7 +2582,7 @@ namespace bgfx
 		g_caps.limits.maxDynamicIndexBuffers  = BGFX_CONFIG_MAX_DYNAMIC_INDEX_BUFFERS;
 		g_caps.limits.maxDynamicVertexBuffers = BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS;
 		g_caps.limits.maxUniforms             = BGFX_CONFIG_MAX_UNIFORMS;
-		g_caps.limits.maxOcclusionQueries     = BGFX_CONFIG_MAX_OCCUSION_QUERIES;
+		g_caps.limits.maxOcclusionQueries     = BGFX_CONFIG_MAX_OCCLUSION_QUERIES;
 		g_caps.limits.maxFBAttachments        = 1;
 
 		g_caps.vendorId = _vendorId;
@@ -3062,8 +3067,8 @@ error:
 		if (!formatSupported)
 		{
 			_err->setError(BGFX_ERROR_TEXTURE_VALIDATION
-				, "Texture array is not supported! "
-				  "Use bgfx::getCaps to check BGFX_CAPS_TEXTURE_2D_ARRAY backend renderer capabilities."
+				, "Texture format is not supported! "
+				  "Use bgfx::isTextureValid to check support for texture format before creating it."
 				);
 			return;
 		}
@@ -4067,14 +4072,14 @@ void bgfx_topology_sort_tri_list(bgfx_topology_sort_t _sort, void* _dst, uint32_
 	bgfx::topologySortTriList(bgfx::TopologySort::Enum(_sort), _dst, _dstSize, _dir, _pos, _vertices, _stride, _indices, _numIndices, _index32);
 }
 
-BGFX_C_API void bgfx_image_swizzle_bgra8(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
+BGFX_C_API void bgfx_image_swizzle_bgra8(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src)
 {
-	bgfx::imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
+	bgfx::imageSwizzleBgra8(_dst, _width, _height, _pitch, _src);
 }
 
-BGFX_C_API void bgfx_image_rgba8_downsample_2x2(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst)
+BGFX_C_API void bgfx_image_rgba8_downsample_2x2(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src)
 {
-	bgfx::imageRgba8Downsample2x2(_width, _height, _pitch, _src, _dst);
+	bgfx::imageRgba8Downsample2x2(_dst, _width, _height, _pitch, _src);
 }
 
 BGFX_C_API uint8_t bgfx_get_supported_renderers(uint8_t _max, bgfx_renderer_type_t* _enum)

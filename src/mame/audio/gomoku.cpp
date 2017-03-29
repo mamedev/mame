@@ -16,7 +16,7 @@ static const int defgain = 48;
 
 
 // device type definition
-const device_type GOMOKU = &device_creator<gomoku_sound_device>;
+const device_type GOMOKU = device_creator<gomoku_sound_device>;
 
 
 //**************************************************************************

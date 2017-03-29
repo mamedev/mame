@@ -18,7 +18,7 @@
 #include "includes/legionna.h"
 
 
-const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
+const device_type SEIBU_COP_BOOTLEG = device_creator<seibu_cop_bootleg_device>;
 
 READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
 {
@@ -257,16 +257,6 @@ seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig
 const address_space_config *seibu_cop_bootleg_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : nullptr;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_cop_bootleg_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------

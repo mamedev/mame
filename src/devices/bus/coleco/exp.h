@@ -30,7 +30,6 @@
 #ifndef __COLECOVISION_CARTRIDGE_SLOT__
 #define __COLECOVISION_CARTRIDGE_SLOT__
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 
@@ -74,7 +73,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 
 	// image-level overrides
@@ -88,7 +86,7 @@ protected:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return ":coleco_cart"; }
+	virtual const char *image_interface() const override { return "coleco_cart"; }
 	virtual const char *file_extensions() const override { return "rom,col,bin"; }
 
 	// slot interface overrides

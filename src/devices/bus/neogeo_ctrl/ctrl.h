@@ -12,7 +12,6 @@
 #ifndef __NEOGEO_CONTROL_PORT__
 #define __NEOGEO_CONTROL_PORT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

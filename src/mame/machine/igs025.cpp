@@ -22,14 +22,6 @@ igs025_device::igs025_device(const machine_config &mconfig, const char *tag, dev
 	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
 }
 
-void igs025_device::device_config_complete()
-{
-}
-
-void igs025_device::device_validity_check(validity_checker &valid) const
-{
-}
-
 void igs025_device::no_callback_setup()
 {
 	printf("igs025 trigger external callback with no external callback setup\n");
@@ -364,4 +356,4 @@ void igs025_device::killbld_protection_calculate_hilo()
 
 
 
-const device_type IGS025 = &device_creator<igs025_device>;
+const device_type IGS025 = device_creator<igs025_device>;

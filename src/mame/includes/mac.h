@@ -26,6 +26,7 @@
 #include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"

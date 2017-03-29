@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "geocable.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
+const device_type C64_GEOCABLE = device_creator<c64_geocable_device>;
 
 
 //-------------------------------------------------

@@ -91,7 +91,7 @@ ALLOW_SAVE_TYPE(huc6270_device::huc6270_h_state);
 #define HUC6270_CR          0x01    /* Set when sprite #0 overlaps with another sprite */
 
 
-const device_type HUC6270 = &device_creator<huc6270_device>;
+const device_type HUC6270 = device_creator<huc6270_device>;
 
 
 const uint8_t huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };

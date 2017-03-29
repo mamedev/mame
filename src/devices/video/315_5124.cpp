@@ -105,9 +105,9 @@ static const uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
 static const uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 
 
-const device_type SEGA315_5124 = &device_creator<sega315_5124_device>;
-const device_type SEGA315_5246 = &device_creator<sega315_5246_device>;
-const device_type SEGA315_5378 = &device_creator<sega315_5378_device>;
+const device_type SEGA315_5124 = device_creator<sega315_5124_device>;
+const device_type SEGA315_5246 = device_creator<sega315_5246_device>;
+const device_type SEGA315_5378 = device_creator<sega315_5378_device>;
 
 
 PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
@@ -565,7 +565,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	/* Return read buffer contents */
 	temp = m_buffer;
 
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		/* Load read buffer */
 		m_buffer = this->space().read_byte(m_addr & 0x3fff);
@@ -632,7 +632,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 	check_pending_flags();
 	temp = m_status;
 
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		/* Clear pending write flag */
 		m_pending_reg_write = 0;

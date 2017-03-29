@@ -65,11 +65,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/groundfx.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
-#include "includes/groundfx.h"
+#include "screen.h"
 
 
 /***********************************************************

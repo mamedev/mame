@@ -11,9 +11,9 @@
 #define NL_CONVERT_H_
 
 #include <memory>
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/pparser.h"
+#include "../plib/pstring.h"
+#include "../plib/plists.h"
+#include "../plib/pparser.h"
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -23,7 +23,6 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t();
 	virtual ~nl_convert_base_t();
 
 	const pstringbuffer &result() { return m_buf.str(); }
@@ -31,6 +30,7 @@ public:
 	virtual void convert(const pstring &contents) = 0;
 
 protected:
+	nl_convert_base_t();
 
 	void add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias);
 
@@ -55,18 +55,18 @@ private:
 	struct net_t
 	{
 	public:
-		net_t(const pstring &aname)
+		explicit net_t(const pstring &aname)
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		plib::pstring_vector_t &terminals() { return m_terminals; }
+		std::vector<pstring> &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		plib::pstring_vector_t m_terminals;
+		std::vector<pstring> m_terminals;
 	};
 
 	struct dev_t
@@ -140,7 +140,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 public:
 
 	nl_convert_spice_t() : nl_convert_base_t() {}
-	~nl_convert_spice_t()
+	virtual ~nl_convert_spice_t() override
 	{
 	}
 
@@ -159,7 +159,7 @@ class nl_convert_eagle_t : public nl_convert_base_t
 public:
 
 	nl_convert_eagle_t() : nl_convert_base_t() {}
-	~nl_convert_eagle_t()
+	virtual ~nl_convert_eagle_t() override
 	{
 	}
 
@@ -195,7 +195,7 @@ class nl_convert_rinf_t : public nl_convert_base_t
 public:
 
 	nl_convert_rinf_t() : nl_convert_base_t() {}
-	~nl_convert_rinf_t()
+	virtual ~nl_convert_rinf_t() override
 	{
 	}
 

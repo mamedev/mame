@@ -5,7 +5,6 @@
 #ifndef __ZNMCU_H__
 #define __ZNMCU_H__
 
-#include "emu.h"
 
 extern const device_type ZNMCU;
 

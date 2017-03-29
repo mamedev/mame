@@ -7,10 +7,13 @@
 /* and preliminary sound hookup by R. Belmont + fixes by Pierpaolo Prazzoli */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "includes/silkroad.h"
+
+#include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*
 

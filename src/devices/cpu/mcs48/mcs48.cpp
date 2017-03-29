@@ -149,25 +149,25 @@ T0 output clock
 
 
 
-const device_type I8021 = &device_creator<i8021_device>;
-const device_type I8022 = &device_creator<i8022_device>;
-const device_type I8035 = &device_creator<i8035_device>;
-const device_type I8048 = &device_creator<i8048_device>;
-const device_type I8648 = &device_creator<i8648_device>;
-const device_type I8748 = &device_creator<i8748_device>;
-const device_type I8039 = &device_creator<i8039_device>;
-const device_type I8049 = &device_creator<i8049_device>;
-const device_type I8749 = &device_creator<i8749_device>;
-const device_type I8040 = &device_creator<i8040_device>;
-const device_type I8050 = &device_creator<i8050_device>;
-const device_type I8041 = &device_creator<i8041_device>;
-const device_type I8741 = &device_creator<i8741_device>;
-const device_type I8042 = &device_creator<i8042_device>;
-const device_type I8242 = &device_creator<i8242_device>;
-const device_type I8742 = &device_creator<i8742_device>;
-const device_type MB8884 = &device_creator<mb8884_device>;
-const device_type N7751 = &device_creator<n7751_device>;
-const device_type M58715 = &device_creator<m58715_device>;
+const device_type I8021 = device_creator<i8021_device>;
+const device_type I8022 = device_creator<i8022_device>;
+const device_type I8035 = device_creator<i8035_device>;
+const device_type I8048 = device_creator<i8048_device>;
+const device_type I8648 = device_creator<i8648_device>;
+const device_type I8748 = device_creator<i8748_device>;
+const device_type I8039 = device_creator<i8039_device>;
+const device_type I8049 = device_creator<i8049_device>;
+const device_type I8749 = device_creator<i8749_device>;
+const device_type I8040 = device_creator<i8040_device>;
+const device_type I8050 = device_creator<i8050_device>;
+const device_type I8041 = device_creator<i8041_device>;
+const device_type I8741 = device_creator<i8741_device>;
+const device_type I8042 = device_creator<i8042_device>;
+const device_type I8242 = device_creator<i8242_device>;
+const device_type I8742 = device_creator<i8742_device>;
+const device_type MB8884 = device_creator<mb8884_device>;
+const device_type N7751 = device_creator<n7751_device>;
+const device_type M58715 = device_creator<m58715_device>;
 
 
 /***************************************************************************

@@ -346,21 +346,20 @@ for rule listed commands are executed.
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_input_file_ - source file that should be "compiled" with custom task
-_output_file_ - generated file name
-_dependency_ - additional dependencies, that can be used as parameters to commands
-_command_ - command list, special functions in commands are :
-		$(<) - input file
-		$(@) - output file
-		$(1) - $(9) - additional dependencies
+_input_file_ - source file that should be "compiled" with custom task  
+_output_file_ - generated file name  
+_dependency_ - additional dependencies, that can be used as parameters to commands  
+_command_ - command list, special functions in commands are :  
+    $(<) - input file  
+    $(@) - output file  
+    $(1) - $(9) - additional dependencies
 
 #### Examples
 
 ```lua
 custombuildtask {
-		{ ROOT_DIR .. "version.txt" , GEN_DIR .. "src/version.inc",   { ROOT_DIR .. "version.py" }, {"@echo Generating version.inc file...", "python $(1) $(<) > $(@)" }},
-	}
-	
+        { ROOT_DIR .. "version.txt" , GEN_DIR .. "src/version.inc",   { ROOT_DIR .. "version.py" }, {"@echo Generating version.inc file...", "python $(1) $(<) > $(@)" }},
+    }
 ```
 
 [Back to top](#table-of-contents)
@@ -376,7 +375,7 @@ Specifies a list of arguments to pas to the application when run under the debug
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_args_ - list of arguments to pas to the executable while debugging
+_args_ - list of arguments to pass to the executable while debugging
 
 #### Examples
 ```lua
@@ -427,13 +426,13 @@ defines { "CALLSPEC=__dllexport" }
 [Back to top](#table-of-contents)
 
 ---
-### dependency({_main_file, _depending_of_}...)
+### dependency({_main_file_, _depending_of_}...)
 GMAKE specific adds dependency between source file and any other file.
 
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_main_file - name of source file that depends of other file
+_main_file_ - name of source file that depends of other file  
 _depending_of_ - name of dependency file
 
 #### Examples
@@ -596,8 +595,8 @@ framework "3.0"
 Implements an immediate `if` clause, returning one of two possible values.
 
 #### Arguments
-_condition_ - logical condition to test
-_trueval_ - value to return if _condition_ evaluates to `true`
+_condition_ - logical condition to test  
+_trueval_ - value to return if _condition_ evaluates to `true`  
 _falseval_ - value to return if _condition_ evaluates to `false`
 
 #### Examples
@@ -859,7 +858,7 @@ configuration "macosx"
 --- OS X frameworks need the extension to be handled properly
     links { "Cocoa.framework", "png" }
 ```
-In a solution with two projects, link the library into the executable. Note that the project name is used to specify the link. GENie will automatically figure out the correect library file name and directory and create a project dependency.
+In a solution with two projects, link the library into the executable. Note that the project name is used to specify the link. GENie will automatically figure out the correct library file name and directory and create a project dependency.
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -908,7 +907,7 @@ _path_ - directory into which files should be generated, relative to the current
 solution "MySolution"
     location "../build"
 ```
-If you plan to build with multiple tools from the same source tree, you might want to split up the project files by toolset. The _ACTION global variable contains the current toolset identifier, as specified on the command line. Note that Lua sytax requires parentheses around the function parameters in this case.
+If you plan to build with multiple tools from the same source tree, you might want to split up the project files by toolset. The _ACTION global variable contains the current toolset identifier, as specified on the command line. Note that Lua syntax requires parentheses around the function parameters in this case.
 ```lua
 location ("../build/" .. _ACTION)
 ```
@@ -1116,7 +1115,7 @@ _id_ - one of "bsd", "linux", "macosx", "solaris", or "windows"
 **Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
 
 #### Return Value
-`true` if the supplied _id_ matches the current operating system identifer, `false` otherwise.
+`true` if the supplied _id_ matches the current operating system identifier, `false` otherwise.
 
 [Back to top](#table-of-contents)
 
@@ -1146,7 +1145,7 @@ Checks for the existence of a directory.
 _path_ - the file system path to check
 
 #### Return Value
-`true` if a matching directory is found
+`true` if a matching directory is found  
 `false` if there is no such file system path, or if the path points to a file
 
 [Back to top](#table-of-contents)
@@ -1159,8 +1158,9 @@ Checks for the existence of a file.
 _path_ - the file system path to check
 
 #### Return Value
-`true` if a matching file is found
+`true` if a matching file is found  
 `false` if there is no such file system path or if the path points to a directory instead of a file
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1206,7 +1206,7 @@ Creates a new directory.
 _path_ - path to be created
 
 #### Return Value
-`true` if successful
+`true` if successful  
 `nil` and an error message otherwise
 
 [Back to top](#table-of-contents)
@@ -1235,8 +1235,7 @@ description
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_fname_ - name of the file being searched, followed by one or more path sets to be searched
-
+_fname_ - name of the file being searched, followed by one or more path sets to be searched  
 _paths_ - the match format of the PATH environment variable: a colon-delimited list of path. On Windows, you may use a semicolon-delimited list if drive letters might be included
 
 #### Return Value
@@ -1257,7 +1256,7 @@ Removes an existing directory as well as any files or subdirectories it contains
 _path_ - file system path to be removed
 
 #### Return Value
-`true` if successful
+`true` if successful  
 `nil` and an error message otherwise
 
 [Back to top](#table-of-contents)
@@ -1391,7 +1390,7 @@ File name and extension without directory information
 Computes relative path from one directory to another.
 
 #### Arguments
-_src_ - originating directory
+_src_ - originating directory  
 _dest_ - target directory
 
 #### Return Value
@@ -1407,7 +1406,7 @@ Returns whether or not a path is absolute.
 _path_ - path to check
 
 #### Return Value
-`true` if path is absolute
+`true` if path is absolute  
 `false` otherwise
 
 [Back to top](#table-of-contents)
@@ -1420,7 +1419,7 @@ Determines whether file is a C source code file, based on extension.
 _path_ - path to check
 
 #### Return Value
-`true` if path uses a C file extension
+`true` if path uses a C file extension  
 `false` otherwise
 
 [Back to top](#table-of-contents)
@@ -1433,7 +1432,7 @@ Determines whether a file is a C++ source code file, based on extension.
 _path_ - path to check
 
 #### Return Value
-`true` if path uses a C++ file extension
+`true` if path uses a C++ file extension  
 `false` otherwise
 
 [Back to top](#table-of-contents)
@@ -1446,7 +1445,7 @@ Determines whether a path represends a Windows resource file, based on extension
 _path_ - path to check
 
 #### Return Value
-`true` if path uses a well-known Windows resource file extension
+`true` if path uses a well-known Windows resource file extension  
 `false` otherwise
 
 [Back to top](#table-of-contents)
@@ -1458,7 +1457,7 @@ Joins two path portions together into a single path.
 **Note:** if _trailing_ is an absolute path, then _leading_ is ignored and the absolute path is returned.
 
 #### Arguments
-_leading_ - beginning portion of the path
+_leading_ - beginning portion of the path  
 _trailing_ - ending portion of the path
 
 #### Return Value
@@ -1482,8 +1481,8 @@ p = path.join("MySolution", "$(ProjectDir)")
 Takes a relative path and makes it relative to a different location.
 
 #### Arguments
-_path_ - path to be modified
-_oldbase_ - original base directory, from which _path_ is relative
+_path_ - path to be modified  
+_oldbase_ - original base directory, from which _path_ is relative  
 _newbase_ - the new base directory, from where the resulting path should be relative
 
 #### Return Value
@@ -1496,11 +1495,12 @@ Rebased path
 Converts the separators in a path.
 
 #### Arguments
-_path_ - path to modify
+_path_ - path to modify  
 _newsep_ - new path separator. Defaults to current environment default.
 
 #### Return Value
 Modified path
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1553,7 +1553,12 @@ _identifiers_ - list of hardware platform specifiers from this list:
 * _Universal32_ - like _Universal_ above, but targeting only 32-bit platforms
 * _Universal64_ - like _Universal_ above, but targeting only 64-bit platforms
 * _PS3_ - Playstation 3
+* _WiiDev_ - Wii
 * _Xbox360_ - Xbox 360 compiler and linker under Visual Studio
+* _PowerPC_ - PowerPC processors
+* _ARM_ - ARM-based processors
+* _Orbis_ - Playstation 4
+* _Durango_ - Xbox One
 
 #### Return Value
 Current list of target platforms for the active solution
@@ -1666,7 +1671,7 @@ configuration "not windows"
 Prints a formatted string
 
 #### Arguments
-_format_ - formatting string, containing C `printf()` formatting codes
+_format_ - formatting string, containing C `printf()` formatting codes  
 _args_ - arguments to be substituted into the format string
 
 [Back to top](#table-of-contents)
@@ -1774,7 +1779,7 @@ configuration { "linux", "gmake" }
 
 ---
 ### solution(_name_)
-Creates a new solution and makes it active. Solutions are the top-level opjects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
+Creates a new solution and makes it active. Solutions are the top-level objects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
 
 #### Arguments
 _name_ - unique name for the solution. If a solution with the given name already exists, it is made active and returned. This value will be used as the file name of the generated solution file.
@@ -1817,11 +1822,11 @@ end
 Checks if the given _haystack_ string ends with _needle_.
 
 #### Arguments
-_haystack_ - string to search within
+_haystack_ - string to search within  
 _needle_   - string to check ending of _haystack_ against
 
 #### Return Value
-`true`  - _haystack_ ends with _needle_
+`true`  - _haystack_ ends with _needle_  
 `false` - _haystack_ does not end with _needle_
 
 [Back to top](#table-of-contents)
@@ -1831,7 +1836,7 @@ _needle_   - string to check ending of _haystack_ against
 Breaks a string into an array of strings, formed by splitting _str_ on _pattern_.
 
 #### Arguments
-_str_     - string to be split
+_str_     - string to be split  
 _pattern_ - separator pattern at which to split; may use Lua's pattern matching syntax
 
 #### Return Value
@@ -1844,8 +1849,8 @@ List of substrings
 Finds the last instance of a pattern within a string.
 
 #### Arguments
-_str_     - string to be searched
-_pattern_ - pattern to search for; may use Lua's pattern matching syntax
+_str_     - string to be searched  
+_pattern_ - pattern to search for; may use Lua's pattern matching syntax  
 _plain_   - whether or not plain string comparison should be used (rather than pattern-matching)
 
 #### Return Value
@@ -1858,11 +1863,11 @@ The matching pattern, if found, or `nil`
 Checks if the given _haystack_ starts with _needle_.
 
 #### Arguments
-_haystack_ - string to search within
+_haystack_ - string to search within  
 _needle_   - string to check start of _haystack_ against
 
 #### Return Value
-`true`  - _haystack_ starts with _needle_
+`true`  - _haystack_ starts with _needle_  
 `false` - _haystack_ does not start with _needle_
 
 [Back to top](#table-of-contents)
@@ -1872,11 +1877,11 @@ _needle_   - string to check start of _haystack_ against
 Determines if a _array_ contains _value_.
 
 #### Arguments
-_array_ - table to test for _value_
+_array_ - table to test for _value_  
 _value_ - _value_ being tested for
 
 #### Return Value
-`true`  - _array_ contains _value_
+`true`  - _array_ contains _value_  
 `false` - _array_ does not contain _value_
 
 [Back to top](#table-of-contents)
@@ -1886,9 +1891,9 @@ _value_ - _value_ being tested for
 Merges an array of items into a single formatted string.
 
 #### Arguments
-_array_   - table to be converted into a string
-_before_  - string to be inserted before each item
-_after_   - string to be inserted after each item
+_array_   - table to be converted into a string  
+_before_  - string to be inserted before each item  
+_after_   - string to be inserted after each item  
 _between_ - string to be inserted between each item
 
 #### Return Value
@@ -2013,7 +2018,7 @@ Places files into groups for "virtual paths", rather than mirroring the filesyst
 #### Arguments
 Table of values, where keys (_groups_) are strings and values (_pattern_) are lists of file system patterns.
 
-_group_   - name for the new group
+_group_   - name for the new group  
 _pattern_ - file system pattern for matching file names
 
 #### Examples
@@ -2035,7 +2040,7 @@ It is also possible to include the file's path in the virtual group. Using this 
 vpaths { ["Headers/*"] = "**.h" }
 ```
 
-Any directory information explicitly provided in the pattern will be remvoed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
+Any directory information explicitly provided in the pattern will be removed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
 ```lua
 vpaths { ["Headers/*"] = "src/**.h" }
 ```

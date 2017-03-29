@@ -23,8 +23,8 @@
 // - Speed is all wrong
 
 
-const device_type MIE = &device_creator<mie_device>;
-const device_type MIE_JVS = &device_creator<mie_jvs_device>;
+const device_type MIE = device_creator<mie_device>;
+const device_type MIE_JVS = device_creator<mie_jvs_device>;
 
 static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM

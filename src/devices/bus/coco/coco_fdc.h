@@ -11,7 +11,6 @@
 #ifndef MAME_DEVICES_BUS_COCO_FDC_H
 #define MAME_DEVICES_BUS_COCO_FDC_H
 
-#include "emu.h"
 #include "cococart.h"
 #include "imagedev/floppy.h"
 

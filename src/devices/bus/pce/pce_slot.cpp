@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCE_CART_SLOT = &device_creator<pce_cart_slot_device>;
+const device_type PCE_CART_SLOT = device_creator<pce_cart_slot_device>;
 
 //**************************************************************************
 //    PCE cartridges Interface
@@ -162,18 +162,6 @@ void pce_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_pce_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  PCE PCB
@@ -227,11 +215,11 @@ image_init_result pce_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint32_t offset;
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint8_t *ROM;
 
 		// From fullpath, check for presence of a header and skip it
-		if (software_entry() == nullptr && (len % 0x4000) == 512)
+		if (!loaded_through_softlist() && (len % 0x4000) == 512)
 		{
 			logerror("Rom-header found, skipping\n");
 			offset = 512;
@@ -242,7 +230,7 @@ image_init_result pce_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -263,7 +251,7 @@ image_init_result pce_cart_slot_device::call_load()
 
 		m_cart->rom_map_setup(len);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			m_type = get_cart_type(ROM, len);
 		else
 		{

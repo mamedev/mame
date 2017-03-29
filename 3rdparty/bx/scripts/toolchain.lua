@@ -532,20 +532,26 @@ function toolchain(_buildDir, _libDir)
 		"__STDC_CONSTANT_MACROS",
 	}
 
-	configuration { "qbs" }
-		flags {
-			"ExtraWarnings",
-		}
-
 	configuration { "Debug" }
 		targetsuffix "Debug"
+		defines {
+			"_DEBUG",
+		}
 
 	configuration { "Release" }
 		flags {
 			"NoBufferSecurityCheck",
 			"OptimizeSpeed",
 		}
+		defines {
+			"NDEBUG",
+		}
 		targetsuffix "Release"
+
+	configuration { "qbs" }
+		flags {
+			"ExtraWarnings",
+		}
 
 	configuration { "vs*", "x32" }
 		flags {

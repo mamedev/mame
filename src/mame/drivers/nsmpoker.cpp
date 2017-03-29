@@ -58,12 +58,13 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_22_1184MHz
-
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_22_1184MHz
 
 
 class nsmpoker_state : public driver_device

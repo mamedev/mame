@@ -26,9 +26,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type GENERIC_ROM_PLAIN  = &device_creator<generic_rom_plain_device>;
-const device_type GENERIC_ROM_LINEAR = &device_creator<generic_rom_linear_device>;
-const device_type GENERIC_ROMRAM_PLAIN = &device_creator<generic_romram_plain_device>;
+const device_type GENERIC_ROM_PLAIN  = device_creator<generic_rom_plain_device>;
+const device_type GENERIC_ROM_LINEAR = device_creator<generic_rom_linear_device>;
+const device_type GENERIC_ROMRAM_PLAIN = device_creator<generic_romram_plain_device>;
 
 
 generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

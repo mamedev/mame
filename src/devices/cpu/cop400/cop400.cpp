@@ -58,23 +58,23 @@
 #include "cop400.h"
 
 
-const device_type COP401 = &device_creator<cop401_cpu_device>;
-const device_type COP410 = &device_creator<cop410_cpu_device>;
-const device_type COP411 = &device_creator<cop411_cpu_device>;
-const device_type COP402 = &device_creator<cop402_cpu_device>;
-const device_type COP420 = &device_creator<cop420_cpu_device>;
-const device_type COP421 = &device_creator<cop421_cpu_device>;
-const device_type COP422 = &device_creator<cop422_cpu_device>;
-const device_type COP404L = &device_creator<cop404l_cpu_device>;
-const device_type COP444L = &device_creator<cop444l_cpu_device>;
-const device_type COP445L = &device_creator<cop445l_cpu_device>;
-const device_type COP404C = &device_creator<cop404c_cpu_device>;
-const device_type COP424C = &device_creator<cop424c_cpu_device>;
-const device_type COP425C = &device_creator<cop425c_cpu_device>;
-const device_type COP426C = &device_creator<cop426c_cpu_device>;
-const device_type COP444C = &device_creator<cop444c_cpu_device>;
-const device_type COP445C = &device_creator<cop445c_cpu_device>;
-const device_type COP446C = &device_creator<cop446c_cpu_device>;
+const device_type COP401 = device_creator<cop401_cpu_device>;
+const device_type COP410 = device_creator<cop410_cpu_device>;
+const device_type COP411 = device_creator<cop411_cpu_device>;
+const device_type COP402 = device_creator<cop402_cpu_device>;
+const device_type COP420 = device_creator<cop420_cpu_device>;
+const device_type COP421 = device_creator<cop421_cpu_device>;
+const device_type COP422 = device_creator<cop422_cpu_device>;
+const device_type COP404L = device_creator<cop404l_cpu_device>;
+const device_type COP444L = device_creator<cop444l_cpu_device>;
+const device_type COP445L = device_creator<cop445l_cpu_device>;
+const device_type COP404C = device_creator<cop404c_cpu_device>;
+const device_type COP424C = device_creator<cop424c_cpu_device>;
+const device_type COP425C = device_creator<cop425c_cpu_device>;
+const device_type COP426C = device_creator<cop426c_cpu_device>;
+const device_type COP444C = device_creator<cop444c_cpu_device>;
+const device_type COP445C = device_creator<cop445c_cpu_device>;
+const device_type COP446C = device_creator<cop446c_cpu_device>;
 
 
 

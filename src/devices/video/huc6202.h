@@ -9,7 +9,6 @@
 #ifndef __HUC6202_H_
 #define __HUC6202_H_
 
-#include "emu.h"
 
 
 #define MCFG_HUC6202_NEXT_PIXEL_0_CB(_devcb) \

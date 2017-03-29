@@ -37,9 +37,9 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_JY_TYPEA = &device_creator<nes_jy_typea_device>;
-const device_type NES_JY_TYPEB = &device_creator<nes_jy_typeb_device>;
-const device_type NES_JY_TYPEC = &device_creator<nes_jy_typec_device>;
+const device_type NES_JY_TYPEA = device_creator<nes_jy_typea_device>;
+const device_type NES_JY_TYPEB = device_creator<nes_jy_typeb_device>;
+const device_type NES_JY_TYPEC = device_creator<nes_jy_typec_device>;
 
 
 nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

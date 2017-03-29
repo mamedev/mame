@@ -19,8 +19,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2zipdrive.h"
-#include "includes/apple2.h"
 #include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ZIPDRIVE = &device_creator<a2bus_zipdrive_device>;
+const device_type A2BUS_ZIPDRIVE = device_creator<a2bus_zipdrive_device>;
 
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"

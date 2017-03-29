@@ -23,11 +23,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gng.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/gng.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(gng_state::gng_bankswitch_w)
@@ -360,7 +363,7 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gng_state, screen_update_gng)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gng)

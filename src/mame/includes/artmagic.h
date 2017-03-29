@@ -5,8 +5,9 @@
     Art & Magic hardware
 
 **************************************************************************/
-#include "sound/okim6295.h"
 #include "cpu/tms34010/tms34010.h"
+#include "sound/okim6295.h"
+#include "video/tlc34076.h"
 
 class artmagic_state : public driver_device
 {
@@ -17,15 +18,16 @@ public:
 	};
 
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_oki_region(*this, "oki"),
-		m_tms(*this, "tms"),
-		m_tlc34076(*this, "tlc34076"),
-		m_control(*this, "control"),
-		m_vram0(*this, "vram0"),
-		m_vram1(*this, "vram1") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_oki_region(*this, "oki")
+		, m_tms(*this, "tms")
+		, m_tlc34076(*this, "tlc34076")
+		, m_control(*this, "control")
+		, m_vram0(*this, "vram0")
+		, m_vram1(*this, "vram1")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;

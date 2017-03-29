@@ -47,8 +47,14 @@
 */
 
 
+#include "emu.h"
 #include "includes/xerox820.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
 /* Read/Write Handlers */
 
 void xerox820_state::bankswitch(int bank)

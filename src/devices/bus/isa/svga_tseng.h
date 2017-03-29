@@ -5,7 +5,6 @@
 #ifndef __ISA_SVGA_ET4K_H__
 #define __ISA_SVGA_ET4K_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "video/pc_vga.h"
 

@@ -11,7 +11,6 @@
 #ifndef __C64_NL10_INTERFACE__
 #define __C64_NL10_INTERFACE__
 
-#include "emu.h"
 #include "cbmiec.h"
 
 

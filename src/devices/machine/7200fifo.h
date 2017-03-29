@@ -50,7 +50,6 @@ The following chips are functionally equivalent and pin-compatible.
 #ifndef _7200FIFO_H
 #define _7200FIFO_H
 
-#include "emu.h"
 
 
 //**************************************************************************

@@ -179,15 +179,18 @@ TODO!
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/taito_b.h"
 #include "includes/taitoipt.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
-#include "includes/taito_b.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
 {
@@ -1937,7 +1940,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -1993,7 +1996,7 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2068,7 +2071,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2124,7 +2127,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2181,7 +2184,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2243,7 +2246,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rambo3)
@@ -2300,7 +2303,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2362,7 +2365,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2424,7 +2427,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2480,7 +2483,7 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2542,7 +2545,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2598,7 +2601,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2659,7 +2662,7 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2715,7 +2718,7 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2780,7 +2783,7 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2843,7 +2846,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
@@ -2898,7 +2901,7 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
-	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitob_state, screen_vblank_taitob))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)

@@ -24,7 +24,7 @@
 static const int block_size = 128;
 static const int card_size = block_size * 1024;
 
-const device_type PSXCARD = &device_creator<psxcard_device>;
+const device_type PSXCARD = device_creator<psxcard_device>;
 
 enum transfer_states
 {
@@ -102,11 +102,6 @@ void psxcard_device::device_reset()
 	m_rx = true;
 	m_ack = true;
 	m_owner->ack();
-}
-
-void psxcard_device::device_config_complete()
-{
-	update_names(PSXCARD, "memcard", "mc");
 }
 
 //

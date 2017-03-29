@@ -60,7 +60,6 @@
 #ifndef TTL7404_H
 #define TTL7404_H
 
-#include "emu.h"
 
 #define MCFG_7404_Y1_CB(_devcb) \
 	devcb = &ttl7404_device::set_y1_cb(*device, DEVCB_##_devcb);

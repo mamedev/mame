@@ -13,7 +13,6 @@
 #define __HD63484__
 
 
-#include "emu.h"
 
 
 typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)> hd63484_display_delegate;

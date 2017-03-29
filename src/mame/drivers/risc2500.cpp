@@ -17,6 +17,8 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "risc2500.lh"
 
@@ -333,6 +335,6 @@ ROM_START( montreux )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY     FULLNAME     FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek"  , "RISC 2500", MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, driver_device,  0,  "Mephisto", "Montreux" , MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY   FULLNAME     FLAGS */
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek", "RISC 2500", MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_CLICKABLE_ARTWORK )

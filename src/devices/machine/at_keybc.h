@@ -11,7 +11,6 @@
 #ifndef __AT_KEYBC_H__
 #define __AT_KEYBC_H__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 

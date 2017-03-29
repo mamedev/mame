@@ -200,18 +200,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/esqvfd.h"
+
 #include "machine/68340.h"
 #include "sound/es5506.h"
 
-#include "machine/esqvfd.h"
+#include "speaker.h"
+
 
 class esqmr_state : public driver_device
 {
 public:
 	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_sq1vfd(*this, "sq1vfd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sq1vfd(*this, "sq1vfd")
 	{ }
 
 	required_device<m68340cpu_device> m_maincpu;

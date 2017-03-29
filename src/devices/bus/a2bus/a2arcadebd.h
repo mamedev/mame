@@ -11,7 +11,6 @@
 #ifndef __A2BUS_ARCADEBOARD__
 #define __A2BUS_ARCADEBOARD__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"

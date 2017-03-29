@@ -60,7 +60,7 @@ You can interact with the variables like this:
 		return 0;
 	}
 
-From this example, you can see that there's many ways to pull out the varaibles you want. You can get  For example, to determine if a nested variable exists or not, you can use ``auto`` to capture the value of a ``table[key]`` lookup, and then use the ``.valid()`` method:
+From this example, you can see that there's many ways to pull out the varaibles you want. For example, to determine if a nested variable exists or not, you can use ``auto`` to capture the value of a ``table[key]`` lookup, and then use the ``.valid()`` method:
 
 .. code-block:: cpp
 	:caption: safe lookup
@@ -83,7 +83,7 @@ This comes in handy when you want to check if a nested variable exists. You can 
 		// Branch not taken: value is not an integer
 	}
 
-	sol::optoinal<bool> is_a_boolean = lua["config"]["fullscreen"];
+	sol::optional<bool> is_a_boolean = lua["config"]["fullscreen"];
 	if (is_a_boolean) {
 		// Branch taken: the value is a boolean
 	}

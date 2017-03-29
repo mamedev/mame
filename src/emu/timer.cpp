@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -26,7 +27,7 @@
 //  LIVE TIMER DEVICE
 //**************************************************************************
 
-const device_type TIMER = &device_creator<timer_device>;
+const device_type TIMER = device_creator<timer_device>;
 
 //-------------------------------------------------
 //  timer_device - constructor

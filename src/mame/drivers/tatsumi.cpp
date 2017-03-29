@@ -140,11 +140,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/nec/nec.h"
 #include "includes/tatsumi.h"
-#include "sound/ym2151.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "roundup5.lh"
 

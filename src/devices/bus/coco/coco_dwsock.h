@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef _DWSOCK_H_
-#define _DWSOCK_H_
+#ifndef MAME_DEVICES_BUS_COCO_DWSOCKH_H
+#define MAME_DEVICES_BUS_COCO_DWSOCKH_H
 
-#include "emu.h"
 #include "osdcore.h"
 
 //**************************************************************************
@@ -68,6 +67,6 @@ private:
 extern const device_type COCO_DWSOCK;
 
 // device iterator
-typedef device_type_iterator<&device_creator<beckerport_device>, beckerport_device> beckerport_device_iterator;
+typedef device_type_iterator<beckerport_device> beckerport_device_iterator;
 
-#endif /* _DWSOCK_H_ */
+#endif // MAME_DEVICES_BUS_COCO_DWSOCKH_H

@@ -49,7 +49,7 @@ namespace sol {
 		key_type key;
 
 		template<typename T>
-		proxy(Table table, T&& key) : tbl(table), key(std::forward<T>(key)) {}
+		proxy(Table table, T&& k) : tbl(table), key(std::forward<T>(k)) {}
 
 		template<typename T>
 		proxy& set(T&& item) {
@@ -114,7 +114,7 @@ namespace sol {
 		}
 
 		bool valid() const {
-			stack::push_pop(tbl);
+			auto pp = stack::push_pop(tbl);
 			auto p = stack::probe_get_field<std::is_same<meta::unqualified_t<Table>, global_table>::value>(tbl.lua_state(), key, lua_gettop(tbl.lua_state()));
 			lua_pop(tbl.lua_state(), p.levels);
 			return p;
@@ -146,31 +146,31 @@ namespace sol {
 	}
 
 	template<typename Table, typename Key>
-	inline bool operator==(nil_t, const proxy<Table, Key>& right) {
+	inline bool operator==(lua_nil_t, const proxy<Table, Key>& right) {
 		return !right.valid();
 	}
 
 	template<typename Table, typename Key>
-	inline bool operator==(const proxy<Table, Key>& right, nil_t) {
+	inline bool operator==(const proxy<Table, Key>& right, lua_nil_t) {
 		return !right.valid();
 	}
 
 	template<typename Table, typename Key>
-	inline bool operator!=(nil_t, const proxy<Table, Key>& right) {
+	inline bool operator!=(lua_nil_t, const proxy<Table, Key>& right) {
 		return right.valid();
 	}
 
 	template<typename Table, typename Key>
-	inline bool operator!=(const proxy<Table, Key>& right, nil_t) {
+	inline bool operator!=(const proxy<Table, Key>& right, lua_nil_t) {
 		return right.valid();
 	}
 
 	namespace stack {
 		template <typename Table, typename Key>
 		struct pusher<proxy<Table, Key>> {
-			static int push(lua_State*, const proxy<Table, Key>& p) {
+			static int push(lua_State* L, const proxy<Table, Key>& p) {
 				sol::reference r = p;
-				return r.push();
+				return r.push(L);
 			}
 		};
 	} // stack

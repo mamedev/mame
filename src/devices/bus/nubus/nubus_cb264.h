@@ -5,7 +5,6 @@
 #ifndef __NUBUS_CB264_H__
 #define __NUBUS_CB264_H__
 
-#include "emu.h"
 #include "nubus.h"
 
 //**************************************************************************

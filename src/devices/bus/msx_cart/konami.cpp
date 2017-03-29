@@ -2,15 +2,18 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "konami.h"
-#include "sound/volt_reg.h"
 
-const device_type MSX_CART_KONAMI = &device_creator<msx_cart_konami>;
-const device_type MSX_CART_KONAMI_SCC = &device_creator<msx_cart_konami_scc>;
-const device_type MSX_CART_GAMEMASTER2 = &device_creator<msx_cart_gamemaster2>;
-const device_type MSX_CART_SYNTHESIZER = &device_creator<msx_cart_synthesizer>;
-const device_type MSX_CART_SOUND_SNATCHER = &device_creator<msx_cart_konami_sound_snatcher>;
-const device_type MSX_CART_SOUND_SDSNATCHER = &device_creator<msx_cart_konami_sound_sdsnatcher>;
-const device_type MSX_CART_KEYBOARD_MASTER = &device_creator<msx_cart_keyboard_master>;
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
+
+const device_type MSX_CART_KONAMI = device_creator<msx_cart_konami>;
+const device_type MSX_CART_KONAMI_SCC = device_creator<msx_cart_konami_scc>;
+const device_type MSX_CART_GAMEMASTER2 = device_creator<msx_cart_gamemaster2>;
+const device_type MSX_CART_SYNTHESIZER = device_creator<msx_cart_synthesizer>;
+const device_type MSX_CART_SOUND_SNATCHER = device_creator<msx_cart_konami_sound_snatcher>;
+const device_type MSX_CART_SOUND_SDSNATCHER = device_creator<msx_cart_konami_sound_sdsnatcher>;
+const device_type MSX_CART_KEYBOARD_MASTER = device_creator<msx_cart_keyboard_master>;
 
 
 msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

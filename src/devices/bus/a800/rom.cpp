@@ -18,16 +18,16 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A800_ROM = &device_creator<a800_rom_device>;
-const device_type A800_ROM_BBSB = &device_creator<a800_rom_bbsb_device>;
-const device_type A800_ROM_WILLIAMS = &device_creator<a800_rom_williams_device>;
-const device_type A800_ROM_EXPRESS = &device_creator<a800_rom_express_device>;
-const device_type A800_ROM_TURBO = &device_creator<a800_rom_turbo_device>;
-const device_type A800_ROM_TELELINK2 = &device_creator<a800_rom_telelink2_device>;
-const device_type A800_ROM_MICROCALC = &device_creator<a800_rom_microcalc_device>;
-const device_type XEGS_ROM = &device_creator<xegs_rom_device>;
-const device_type A5200_ROM_2CHIPS = &device_creator<a5200_rom_2chips_device>;
-const device_type A5200_ROM_BBSB = &device_creator<a5200_rom_bbsb_device>;
+const device_type A800_ROM = device_creator<a800_rom_device>;
+const device_type A800_ROM_BBSB = device_creator<a800_rom_bbsb_device>;
+const device_type A800_ROM_WILLIAMS = device_creator<a800_rom_williams_device>;
+const device_type A800_ROM_EXPRESS = device_creator<a800_rom_express_device>;
+const device_type A800_ROM_TURBO = device_creator<a800_rom_turbo_device>;
+const device_type A800_ROM_TELELINK2 = device_creator<a800_rom_telelink2_device>;
+const device_type A800_ROM_MICROCALC = device_creator<a800_rom_microcalc_device>;
+const device_type XEGS_ROM = device_creator<xegs_rom_device>;
+const device_type A5200_ROM_2CHIPS = device_creator<a5200_rom_2chips_device>;
+const device_type A5200_ROM_BBSB = device_creator<a5200_rom_bbsb_device>;
 
 
 a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

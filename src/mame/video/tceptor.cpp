@@ -544,7 +544,7 @@ uint32_t tceptor_state::screen_update_tceptor_3d_right(screen_device &screen, bi
 }
 
 
-void tceptor_state::screen_eof_tceptor(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 {
 	// rising edge
 	if (state)

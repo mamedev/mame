@@ -7,6 +7,8 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class igs_fear_state : public driver_device

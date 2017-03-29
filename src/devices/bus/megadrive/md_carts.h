@@ -11,7 +11,6 @@
 #ifndef __MD_CARTS_H__
 #define __MD_CARTS_H__
 
-#include "emu.h"
 
 #include "rom.h"
 #include "svp.h"

@@ -83,6 +83,8 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
 #include "video/kaneko_tmap.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sandscrp_state : public driver_device
@@ -126,7 +128,7 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
@@ -186,7 +188,7 @@ INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 }
 
 
-void sandscrp_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sandscrp_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -489,7 +491,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ram.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_RAM = &device_creator<adam_ram_expansion_device>;
+const device_type ADAM_RAM = device_creator<adam_ram_expansion_device>;
 
 
 

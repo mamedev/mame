@@ -91,6 +91,9 @@ Notes:
 
 #include "sound/2203intf.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 // very preliminary quizpun2 protection simulation
 

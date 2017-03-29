@@ -12,11 +12,13 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
-
 #include "sound/okim6295.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 class eolith16_state : public eolith_state

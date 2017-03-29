@@ -105,10 +105,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/atarifb.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "atarifb.lh"
 #include "atarifb4.lh"

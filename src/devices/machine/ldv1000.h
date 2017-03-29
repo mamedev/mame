@@ -27,7 +27,7 @@
 	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
 
 #define MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(_cb) \
-	downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
+	devcb = &downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
 
 
 
@@ -53,7 +53,7 @@ public:
 	// construction/destruction
 	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _cmd_strobe_cb> void set_command_strobe_callback(_cmd_strobe_cb latch) { m_command_strobe_cb.set_callback(latch); }
+	template<class _cmd_strobe_cb> devcb_base &set_command_strobe_callback(_cmd_strobe_cb latch) { return m_command_strobe_cb.set_callback(latch); }
 
 	// input and output
 	void data_w(uint8_t data);

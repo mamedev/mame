@@ -5,7 +5,6 @@
 #ifndef __V1050__
 #define __V1050__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"

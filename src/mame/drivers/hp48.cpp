@@ -10,9 +10,13 @@
 
 #include "emu.h"
 #include "includes/hp48.h"
+
 #include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* TODO:
    - IR I/O port

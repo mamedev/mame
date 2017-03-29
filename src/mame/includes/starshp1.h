@@ -19,6 +19,7 @@
  */
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 
 #define STARSHP1_MASTER_CLOCK       (12096000)
@@ -86,7 +87,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(starshp1);
 	uint32_t screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_starshp1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_starshp1);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
 	void set_pens();
 	void draw_starfield(bitmap_ind16 &bitmap);

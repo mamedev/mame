@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+#ifndef MAME_DEVICE_BUS_ISA_CGA_H
+#define MAME_DEVICE_BUS_ISA_CGA_H
+
 #pragma once
 
-#ifndef __ISA_CGA_H__
-#define __ISA_CGA_H__
-
-#include "emu.h"
 #include "isa.h"
 #include "video/mc6845.h"
+#include "screen.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -286,4 +287,4 @@ private:
 // device type definition
 extern const device_type ISA8_CGA_M24;
 
-#endif  /* __ISA_CGA_H__ */
+#endif  // MAME_DEVICE_BUS_ISA_CGA_H

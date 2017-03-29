@@ -83,7 +83,7 @@ struct X1_010_CHANNEL {
 //static short  *mixer_buffer = nullptr;
 
 
-const device_type X1_010 = &device_creator<x1_010_device>;
+const device_type X1_010 = device_creator<x1_010_device>;
 
 x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),

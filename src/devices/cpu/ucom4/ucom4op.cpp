@@ -3,6 +3,7 @@
 
 // uCOM-4 opcode handlers
 
+#include "emu.h"
 #include "ucom4.h"
 
 

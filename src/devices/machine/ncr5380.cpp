@@ -72,7 +72,7 @@ static int get_cmd_len(int cbyte)
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR5380 = &device_creator<ncr5380_device>;
+const device_type NCR5380 = device_creator<ncr5380_device>;
 
 //-------------------------------------------------
 //  ncr5380_device - constructor/destructor

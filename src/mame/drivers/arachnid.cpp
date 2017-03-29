@@ -61,10 +61,11 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "machine/ram.h"
 #include "machine/6840ptm.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
 #include "video/tms9928a.h"
-#include "sound/speaker.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define M6809_TAG       "u3"

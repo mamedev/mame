@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "konamihs.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_KONAMIHS = &device_creator<nes_konamihs_device>;
+const device_type NES_KONAMIHS = device_creator<nes_konamihs_device>;
 
 
 static INPUT_PORTS_START( nes_konamihs )

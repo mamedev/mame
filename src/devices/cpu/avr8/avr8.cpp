@@ -567,10 +567,10 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type ATMEGA88 = &device_creator<atmega88_device>;
-const device_type ATMEGA644 = &device_creator<atmega644_device>;
-const device_type ATMEGA1280 = &device_creator<atmega1280_device>;
-const device_type ATMEGA2560 = &device_creator<atmega2560_device>;
+const device_type ATMEGA88 = device_creator<atmega88_device>;
+const device_type ATMEGA644 = device_creator<atmega644_device>;
+const device_type ATMEGA1280 = device_creator<atmega1280_device>;
+const device_type ATMEGA2560 = device_creator<atmega2560_device>;
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP

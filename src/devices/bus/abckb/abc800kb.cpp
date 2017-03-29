@@ -68,6 +68,7 @@ XR22-050-3B Pinout
 
 */
 
+#include "emu.h"
 #include "abc800kb.h"
 
 
@@ -84,7 +85,7 @@ XR22-050-3B Pinout
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC800_KEYBOARD = &device_creator<abc800_keyboard_device>;
+const device_type ABC800_KEYBOARD = device_creator<abc800_keyboard_device>;
 
 
 //-------------------------------------------------

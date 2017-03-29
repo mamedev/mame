@@ -54,7 +54,7 @@ static wav_file* wavraw; // Raw waveform
                         Gaelco GAE1 sound device
   ============================================================================*/
 
-const device_type GAELCO_GAE1 = &device_creator<gaelco_gae1_device>;
+const device_type GAELCO_GAE1 = device_creator<gaelco_gae1_device>;
 
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gaelco_gae1_device(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock, "gaelco_gae1", __FILE__)
@@ -264,7 +264,7 @@ void gaelco_gae1_device::device_stop()
                         Gaelco CG-1V sound device
   ============================================================================*/
 
-const device_type GAELCO_CG1V = &device_creator<gaelco_cg1v_device>;
+const device_type GAELCO_CG1V = device_creator<gaelco_cg1v_device>;
 
 gaelco_cg1v_device::gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gaelco_gae1_device(mconfig, GAELCO_CG1V, "Gaelco CG1V", tag, owner, clock, "gaelco_cg1v", __FILE__)

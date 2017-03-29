@@ -4,6 +4,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo/rom.h"
 #include "bus/neogeo/fatfury2.h"

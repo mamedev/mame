@@ -12,7 +12,6 @@
 #ifndef __PSXSIO_H__
 #define __PSXSIO_H__
 
-#include "emu.h"
 
 extern const device_type PSX_SIO0;
 extern const device_type PSX_SIO1;

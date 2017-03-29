@@ -6,7 +6,6 @@
 #ifndef INTERPRO_MCGA_H_
 #define INTERPRO_MCGA_H_
 
-#include "emu.h"
 
 // mcga control register
 #define MCGA_CTRL_OPTMASK    0x00000003
@@ -19,7 +18,7 @@
 #define MCGA_CTRL_WRPROT     0x00008000
 
 // mcga error register
-#define MCGA_ERROR_VALID	0x00008000
+#define MCGA_ERROR_VALID    0x00008000
 
 class interpro_mcga_device : public device_t
 {

@@ -1675,7 +1675,7 @@ WRITE8_MEMBER( ym2413_device::data_port_w )
 	write_reg(address, data);
 }
 
-const device_type YM2413 = &device_creator<ym2413_device>;
+const device_type YM2413 = device_creator<ym2413_device>;
 
 ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM2413, "YM2413", tag, owner, clock, "ym2413", __FILE__),

@@ -82,9 +82,11 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "dolphunk.lh"
 
 

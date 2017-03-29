@@ -10,7 +10,6 @@
 #ifndef __K573NPU_H__
 #define __K573NPU_H__
 
-#include "emu.h"
 
 extern const device_type KONAMI_573_NETWORK_PCB_UNIT;
 

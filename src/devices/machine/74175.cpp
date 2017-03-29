@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "74175.h"
 
-const device_type TTL74174 = &device_creator<ttl74174_device>;
-const device_type TTL74175 = &device_creator<ttl74175_device>;
+const device_type TTL74174 = device_creator<ttl74174_device>;
+const device_type TTL74175 = device_creator<ttl74175_device>;
 
 ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

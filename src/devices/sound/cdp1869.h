@@ -73,12 +73,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_DEVICES_SOUND_CDP1869_H
+#define MAME_DEVICES_SOUND_CDP1869_H
+
 #pragma once
 
-#ifndef __CDP1869__
-#define __CDP1869__
-
-#include "emu.h"
+#include "screen.h"
 
 
 
@@ -299,4 +299,4 @@ extern const device_type CDP1869;
 
 
 
-#endif
+#endif // MAME_DEVICES_SOUND_CDP1869_H

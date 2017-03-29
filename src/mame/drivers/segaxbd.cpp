@@ -262,15 +262,23 @@ ROMs:
 
 #include "emu.h"
 #include "includes/segaxbd.h"
+#include "includes/segaipt.h"
+
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
-const device_type SEGA_XBD_PCB = &device_creator<segaxbd_state>;
+
+const device_type SEGA_XBD_PCB = device_creator<segaxbd_state>;
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__),
+		: segaxbd_state(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__)
+{
+}
+
+segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 			m_maincpu(*this, "maincpu"),
 			m_subcpu(*this, "subcpu"),
 			m_soundcpu(*this, "soundcpu"),
@@ -1866,10 +1874,10 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_REGULAR_DEVICE = &device_creator<segaxbd_regular_state>;
+const device_type SEGA_XBD_REGULAR_DEVICE = device_creator<segaxbd_regular_state>;
 
 segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_REGULAR_DEVICE, "Sega X-Board PCB regular", tag, owner, clock, "segakbd_pcb_regular", __FILE__)
 {
 }
 
@@ -1892,10 +1900,10 @@ static MACHINE_CONFIG_FRAGMENT( xboard_fd1094 )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_FD1094_DEVICE = &device_creator<segaxbd_fd1094_state>;
+const device_type SEGA_XBD_FD1094_DEVICE = device_creator<segaxbd_fd1094_state>;
 
 segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_FD1094_DEVICE, "Sega X-Board PCB FD1094", tag, owner, clock, "segakbd_pcb_fd1094", __FILE__)
 {
 }
 
@@ -1934,10 +1942,10 @@ static MACHINE_CONFIG_FRAGMENT( lastsurv_fd1094 )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = &device_creator<segaxbd_lastsurv_fd1094_state>;
+const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = device_creator<segaxbd_lastsurv_fd1094_state>;
 
 segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_FD1094_DEVICE, "Sega X-Board Last Survivor PCB FD1094", tag, owner, clock, "segakbd_pcb_lastsurv_fd1094", __FILE__)
 {
 }
 
@@ -1964,10 +1972,10 @@ static MACHINE_CONFIG_FRAGMENT( lastsurv )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_LASTSURV_DEVICE = &device_creator<segaxbd_lastsurv_state>;
+const device_type SEGA_XBD_LASTSURV_DEVICE = device_creator<segaxbd_lastsurv_state>;
 
 segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_DEVICE, "Sega X-Board Last Survivor PCB", tag, owner, clock, "segakbd_pcb_lastsurv", __FILE__)
 {
 }
 
@@ -2007,10 +2015,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp_fd1094 )
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_SMGP_FD1094_DEVICE = &device_creator<segaxbd_smgp_fd1094_state>;
+const device_type SEGA_XBD_SMGP_FD1094_DEVICE = device_creator<segaxbd_smgp_fd1094_state>;
 
 segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP_FD1094_DEVICE, "Sega X-Board SMGP PCB FD1094", tag, owner, clock, "segakbd_pcb_smgp_fd1094", __FILE__)
 {
 }
 
@@ -2050,10 +2058,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp )
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_SMGP_DEVICE = &device_creator<segaxbd_smgp_state>;
+const device_type SEGA_XBD_SMGP_DEVICE = device_creator<segaxbd_smgp_state>;
 
 segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP_DEVICE, "Sega X-Board SMGP PCB", tag, owner, clock, "segakbd_pcb_smgp", __FILE__)
 {
 }
 
@@ -2076,10 +2084,10 @@ static MACHINE_CONFIG_FRAGMENT( rascot  )
 	MCFG_CPU_IO_MAP(rascot_z80_portmap)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_RASCOT_DEVICE = &device_creator<segaxbd_rascot_state>;
+const device_type SEGA_XBD_RASCOT_DEVICE = device_creator<segaxbd_rascot_state>;
 
 segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, tag, owner, clock)
+	: segaxbd_state(mconfig, SEGA_XBD_RASCOT_DEVICE, "Sega X-Board Royal Ascot PCB", tag, owner, clock, "segakbd_pcb_rascot", __FILE__)
 {
 }
 

@@ -5,7 +5,6 @@
 #ifndef __NUBUS_PROCOLOR816_H__
 #define __NUBUS_PROCOLOR816_H__
 
-#include "emu.h"
 #include "nubus.h"
 
 //**************************************************************************

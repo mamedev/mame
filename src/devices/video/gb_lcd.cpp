@@ -158,6 +158,9 @@ TODO:
 #include "emu.h"
 #include "video/gb_lcd.h"
 
+#include "screen.h"
+
+
 #define ENABLE_LOGGING 0
 #define LOG(x) do { if (ENABLE_LOGGING) logerror x; } while(0)
 
@@ -309,10 +312,10 @@ static const uint8_t ags_oam_fingerprint[0x100] = {
 #endif
 
 
-const device_type DMG_PPU = &device_creator<dmg_ppu_device>;
-const device_type MGB_PPU = &device_creator<mgb_ppu_device>;
-const device_type SGB_PPU = &device_creator<sgb_ppu_device>;
-const device_type CGB_PPU = &device_creator<cgb_ppu_device>;
+const device_type DMG_PPU = device_creator<dmg_ppu_device>;
+const device_type MGB_PPU = device_creator<mgb_ppu_device>;
+const device_type SGB_PPU = device_creator<sgb_ppu_device>;
+const device_type CGB_PPU = device_creator<cgb_ppu_device>;
 
 
 
@@ -2883,7 +2886,7 @@ void dmg_ppu_device::lcd_switch_on(uint8_t new_data)
 
 READ8_MEMBER(dmg_ppu_device::vram_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		LOG(("vram_r: offset=0x%04x\n", offset));
@@ -2905,7 +2908,7 @@ WRITE8_MEMBER(dmg_ppu_device::vram_w)
 
 READ8_MEMBER(dmg_ppu_device::oam_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		LOG(("oam_r: offset=0x%02x\n", offset));
@@ -2928,7 +2931,7 @@ WRITE8_MEMBER(dmg_ppu_device::oam_w)
 
 READ8_MEMBER(dmg_ppu_device::video_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		if (offset == 1) LOG(("STAT read\n"));
@@ -3200,7 +3203,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 
 READ8_MEMBER(cgb_ppu_device::video_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		update_state();
 		if (offset == 1) LOG(("STAT read\n"));

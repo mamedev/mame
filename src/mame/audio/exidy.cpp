@@ -7,10 +7,12 @@
 *************************************************************************/
 
 #include "emu.h"
+#include "audio/exidy.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
 #include "cpu/m6502/m6502.h"
-#include "audio/exidy.h"
+#include "speaker.h"
 
 
 
@@ -203,7 +205,7 @@ void exidy_sound_device::common_sh_start()
 	sh6840_register_state_globals();
 }
 
-const device_type EXIDY = &device_creator<exidy_sound_device>;
+const device_type EXIDY = device_creator<exidy_sound_device>;
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock, "exidy_sfx", __FILE__),
@@ -227,16 +229,6 @@ exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_typ
 		m_sh6840_clocks_per_sample(0),
 		m_sh6840_clock_count(0),
 		m_sfxctrl(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void exidy_sound_device::device_config_complete()
 {
 }
 
@@ -667,20 +659,10 @@ WRITE8_MEMBER( venture_sound_device::filter_w )
  *************************************/
 
 
-const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
+const device_type EXIDY_VENTURE = device_creator<venture_sound_device>;
 
 venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock, "venture_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void venture_sound_device::device_config_complete()
 {
 }
 
@@ -922,21 +904,11 @@ WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 }
 
 
-const device_type EXIDY_VICTORY = &device_creator<victory_sound_device>;
+const device_type EXIDY_VICTORY = device_creator<victory_sound_device>;
 
 victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock, "victory_sound", __FILE__),
 	m_victory_sound_response_ack_clk(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void victory_sound_device::device_config_complete()
 {
 }
 

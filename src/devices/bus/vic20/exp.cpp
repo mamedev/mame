@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_EXPANSION_SLOT = &device_creator<vic20_expansion_slot_device>;
+const device_type VIC20_EXPANSION_SLOT = device_creator<vic20_expansion_slot_device>;
 
 
 
@@ -111,7 +112,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if (is_filetype("20")) fread(m_card->m_blk1, 0x2000);
 			else if (is_filetype("40")) fread(m_card->m_blk2, 0x2000);
@@ -202,6 +203,8 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "vic1111.h"
 #include "vic1112.h"
 #include "vic1210.h"
+#include "videopak.h"
+#include "speakeasy.h"
 
 SLOT_INTERFACE_START( vic20_expansion_cards )
 	SLOT_INTERFACE("exp", VIC1010)
@@ -209,6 +212,8 @@ SLOT_INTERFACE_START( vic20_expansion_cards )
 	SLOT_INTERFACE("8k", VIC1110)
 	SLOT_INTERFACE("16k", VIC1111)
 	SLOT_INTERFACE("fe3", VIC20_FE3)
+	SLOT_INTERFACE("speakez", VIC20_SPEAKEASY)
+	SLOT_INTERFACE("videopak", VIC20_VIDEO_PAK)
 
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)

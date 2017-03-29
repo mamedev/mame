@@ -14,7 +14,6 @@
 #ifndef __TMS9902_H__
 #define __TMS9902_H__
 
-#include "emu.h"
 
 // Serial control protocol values
 #define TYPE_TMS9902 0x01

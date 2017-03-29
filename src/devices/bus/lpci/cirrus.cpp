@@ -73,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CIRRUS = &device_creator<cirrus_device>;
+const device_type CIRRUS = device_creator<cirrus_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

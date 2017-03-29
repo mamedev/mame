@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "kizuna4p.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_KIZ4P = &device_creator<neogeo_kizuna4p_device>;
+const device_type NEOGEO_KIZ4P = device_creator<neogeo_kizuna4p_device>;
 
 
 static INPUT_PORTS_START( neogeo_kiz4p )

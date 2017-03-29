@@ -5,7 +5,6 @@
 #ifndef __SOFTBOX__
 #define __SOFTBOX__
 
-#include "emu.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/imi7000/imi7000.h"
 #include "cpu/z80/z80.h"

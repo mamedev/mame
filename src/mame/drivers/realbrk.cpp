@@ -44,10 +44,12 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/realbrk.h"
+
+#include "cpu/m68000/m68000.h"
 #include "sound/ym2413.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
 /* Read 4 ten bit dip switches */

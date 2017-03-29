@@ -228,8 +228,7 @@ namespace detail
 namespace detail
 {
 	template <typename CTy, typename CTr, template <typename, precision> class M, typename T, precision P>
-	GLM_FUNC_QUALIFIER std::basic_ostream<CTy, CTr>&
-	print_matrix_on(std::basic_ostream<CTy, CTr>& os, M<T,P> const& a)
+	GLM_FUNC_QUALIFIER std::basic_ostream<CTy, CTr>& print_matrix_on(std::basic_ostream<CTy, CTr>& os, M<T,P> const& a)
 	{
 		typename std::basic_ostream<CTy,CTr>::sentry const cerberus(os);
 
@@ -371,8 +370,7 @@ namespace detail
 namespace detail
 {
 	template <typename CTy, typename CTr, template <typename, precision> class M, typename T, precision P>
-	GLM_FUNC_QUALIFIER std::basic_ostream<CTy, CTr>&
-	print_matrix_pair_on(std::basic_ostream<CTy, CTr>& os, std::pair<M<T, P> const, M<T, P> const> const& a)
+	GLM_FUNC_QUALIFIER std::basic_ostream<CTy, CTr>& print_matrix_pair_on(std::basic_ostream<CTy, CTr>& os, std::pair<M<T, P> const, M<T, P> const> const& a)
 	{
 		typename std::basic_ostream<CTy,CTr>::sentry const cerberus(os);
 

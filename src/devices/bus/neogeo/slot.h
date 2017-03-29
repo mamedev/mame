@@ -3,7 +3,6 @@
 #ifndef __NEOGEO_SLOT_H
 #define __NEOGEO_SLOT_H
 
-#include "emu.h"
 #include "softlist_dev.h"
 
 
@@ -192,7 +191,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

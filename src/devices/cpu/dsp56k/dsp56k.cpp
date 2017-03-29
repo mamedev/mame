@@ -31,6 +31,7 @@
     - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
+#include "emu.h"
 #include "opcode.h"
 
 #include "emu.h"
@@ -101,7 +102,7 @@ enum
 };
 
 
-const device_type DSP56156 = &device_creator<dsp56k_device>;
+const device_type DSP56156 = device_creator<dsp56k_device>;
 
 
 /****************************************************************************

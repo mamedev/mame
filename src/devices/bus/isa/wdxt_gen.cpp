@@ -43,6 +43,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wdxt_gen.h"
 
 
@@ -61,7 +62,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WDXT_GEN = &device_creator<wdxt_gen_device>;
+const device_type ISA8_WDXT_GEN = device_creator<wdxt_gen_device>;
 
 
 //-------------------------------------------------

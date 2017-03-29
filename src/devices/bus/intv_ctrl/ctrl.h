@@ -12,7 +12,6 @@
 #ifndef __INTV_CONTROL_PORT__
 #define __INTV_CONTROL_PORT__
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

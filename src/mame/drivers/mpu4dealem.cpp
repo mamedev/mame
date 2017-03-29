@@ -15,17 +15,20 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 #include "emu.h"
 #include "includes/mpu4.h"
+
 #include "video/resnet.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mpu4dealem_state : public mpu4_state
 {
 public:
 	mpu4dealem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mpu4_state(mconfig, type, tag),
-			m_dealem_videoram(*this, "dealem_videoram"),
-		m_gfxdecode(*this, "gfxdecode")
+		: mpu4_state(mconfig, type, tag)
+		, m_dealem_videoram(*this, "dealem_videoram")
+		, m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 

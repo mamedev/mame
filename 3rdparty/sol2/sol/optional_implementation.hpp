@@ -110,18 +110,23 @@
 #   define OPTIONAL_CONSTEXPR_INIT_LIST
 # endif
 
-# if defined TR2_OPTIONAL_CLANG_3_5_AND_HIGHTER_ && (defined __cplusplus) && (__cplusplus != 201103L)
+# if defined(TR2_OPTIONAL_MSVC_2015_AND_HIGHER___) || (defined TR2_OPTIONAL_CLANG_3_5_AND_HIGHTER_ && (defined __cplusplus) && (__cplusplus != 201103L))
 #   define OPTIONAL_HAS_MOVE_ACCESSORS 1
 # else
 #   define OPTIONAL_HAS_MOVE_ACCESSORS 0
 # endif
 
 # // In C++11 constexpr implies const, so we need to make non-const members also non-constexpr
-# if (defined __cplusplus) && (__cplusplus == 201103L)
+# if defined(TR2_OPTIONAL_MSVC_2015_AND_HIGHER___) || ((defined __cplusplus) && (__cplusplus == 201103L))
 #   define OPTIONAL_MUTABLE_CONSTEXPR
 # else
 #   define OPTIONAL_MUTABLE_CONSTEXPR constexpr
 # endif
+
+# if defined TR2_OPTIONAL_MSVC_2015_AND_HIGHER___
+#pragma warning( push )
+#pragma warning( disable : 4814 )
+#endif
 
 namespace sol {
 
@@ -282,18 +287,17 @@ namespace sol {
 
 
 	template <class T>
-	struct optional_base
-	{
-		bool init_;
+	struct alignas(T) optional_base {
 		char storage_[sizeof(T)];
+		bool init_;
 
-		constexpr optional_base() noexcept : init_(false), storage_() {};
+		constexpr optional_base() noexcept : storage_(), init_(false) {};
 
-		explicit optional_base(const T& v) : init_(true), storage_() {
+		explicit optional_base(const T& v) : storage_(), init_(true) {
 			new (&storage())T(v);
 		}
 
-		explicit optional_base(T&& v) : init_(true), storage_() {
+		explicit optional_base(T&& v) : storage_(), init_(true) {
 			new (&storage())T(constexpr_move(v));
 		}
 
@@ -331,17 +335,16 @@ namespace sol {
 	using constexpr_optional_base = optional_base<T>;
 #else
 	template <class T>
-	struct constexpr_optional_base
-	{
-		bool init_;
+	struct alignas(T) constexpr_optional_base {
 		char storage_[sizeof(T)];
-		constexpr constexpr_optional_base() noexcept : init_(false), storage_() {}
+		bool init_;
+		constexpr constexpr_optional_base() noexcept : storage_(), init_(false) {}
 
-		explicit constexpr constexpr_optional_base(const T& v) : init_(true), storage_() {
+		explicit constexpr constexpr_optional_base(const T& v) : storage_(), init_(true) {
 			new (&storage())T(v);
 		}
 
-		explicit constexpr constexpr_optional_base(T&& v) : init_(true), storage_() {
+		explicit constexpr constexpr_optional_base(T&& v) : storage_(), init_(true) {
 			new (&storage())T(constexpr_move(v));
 		}
 
@@ -1120,6 +1123,11 @@ namespace std
 		}
 	};
 }
+
+# if defined TR2_OPTIONAL_MSVC_2015_AND_HIGHER___
+#pragma warning( pop )
+#endif
+
 
 # undef TR2_OPTIONAL_REQUIRES
 # undef TR2_OPTIONAL_ASSERTED_EXPRESSION

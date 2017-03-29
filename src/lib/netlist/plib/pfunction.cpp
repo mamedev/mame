@@ -5,16 +5,17 @@
  *
  */
 
-#include <cmath>
-#include <stack>
 #include "pfunction.h"
 #include "pfmtlog.h"
 #include "putil.h"
 #include "pexception.h"
 
+#include <cmath>
+#include <stack>
+
 namespace plib {
 
-void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile(const std::vector<pstring> &inputs, const pstring &expr)
 {
 	if (expr.startsWith("rpn:"))
 		compile_postfix(inputs, expr.substr(4));
@@ -22,14 +23,14 @@ void pfunction::compile(const std::vector<pstring> &inputs, const pstring expr)
 		compile_infix(inputs, expr);
 }
 
-void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile_postfix(const std::vector<pstring> &inputs, const pstring &expr)
 {
-	plib::pstring_vector_t cmds(expr, " ");
+	std::vector<pstring> cmds(plib::psplit(expr, " "));
 	compile_postfix(inputs, cmds, expr);
 }
 
 void pfunction::compile_postfix(const std::vector<pstring> &inputs,
-		const std::vector<pstring> &cmds, const pstring expr)
+		const std::vector<pstring> &cmds, const pstring &expr)
 {
 	m_precompiled.clear();
 	int stk = 0;
@@ -83,13 +84,13 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 
 static int get_prio(pstring v)
 {
-	if (v == "(" or v == ")")
+	if (v == "(" || v == ")")
 		return 1;
 	else if (v.left(v.begin()+1) >= "a" && v.left(v.begin()+1) <= "z")
 		return 0;
-	else if (v == "*" or v == "/")
+	else if (v == "*" || v == "/")
 		return 20;
-	else if (v == "+" or v == "-")
+	else if (v == "+" || v == "-")
 		return 10;
 	else if (v == "^")
 		return 30;
@@ -106,13 +107,13 @@ static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
 	return res;
 }
 
-void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring expr)
+void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring &expr)
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	plib::pstring_vector_t sexpr(expr.replace(" ",""), sep);
+	std::vector<pstring> sexpr(plib::psplit(expr.replace(" ",""), sep));
 	std::stack<pstring> opstk;
-	plib::pstring_vector_t postfix;
+	std::vector<pstring> postfix;
 
 	//printf("dbg: %s\n", expr.c_str());
 	for (unsigned i = 0; i < sexpr.size(); i++)

@@ -20,10 +20,13 @@
 
 #include "machine/6821pia.h"
 
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/pokey.h"
 
 #include "video/gtia.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #include "maxaflex.lh"
 

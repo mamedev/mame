@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cmdhd.h"
 #include "machine/msm6242.h"
 
@@ -28,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CMD_HD = &device_creator<cmd_hd_device>;
+const device_type CMD_HD = device_creator<cmd_hd_device>;
 
 
 //-------------------------------------------------

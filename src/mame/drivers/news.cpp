@@ -16,9 +16,12 @@ driver by David Haywood
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/news.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( news_map, AS_PROGRAM, 8, news_state )

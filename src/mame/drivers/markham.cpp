@@ -11,9 +11,12 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/markham.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/markham.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(markham_state::markham_e004_r)

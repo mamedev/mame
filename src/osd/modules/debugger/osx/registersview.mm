@@ -8,6 +8,7 @@
 
 #import "registersview.h"
 
+#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"

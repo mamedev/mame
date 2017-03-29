@@ -18,9 +18,13 @@ ToDo:
 **************************************************************************************/
 
 
+#include "emu.h"
 #include "includes/cybiko.h"
-#include "rendlay.h"
+
 #include "bus/rs232/rs232.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |

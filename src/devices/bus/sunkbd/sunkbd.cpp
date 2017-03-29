@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
+#include "emu.h"
 #include "sunkbd.h"
 
 
-device_type const SUNKBD_PORT = &device_creator<sun_keyboard_port_device>;
+device_type const SUNKBD_PORT = device_creator<sun_keyboard_port_device>;
 
 
 int const device_sun_keyboard_port_interface::START_BIT_COUNT;
@@ -68,7 +69,7 @@ void sun_keyboard_port_device::device_start()
 
 WRITE_LINE_MEMBER( sun_keyboard_port_device::write_txd )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_txd(state);
 }
 

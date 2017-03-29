@@ -11,7 +11,6 @@
 #ifndef __PCF8593_H__
 #define __PCF8593_H__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

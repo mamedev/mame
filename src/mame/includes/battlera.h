@@ -5,6 +5,7 @@
 #include "sound/msm5205.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
+#include "screen.h"
 
 #define MAIN_CLOCK      21477270
 

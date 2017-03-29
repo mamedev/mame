@@ -49,6 +49,9 @@ So this is the correct behavior of real hardware, not an emulation bug.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/nemesis.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -57,8 +60,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/k051649.h"
-#include "includes/nemesis.h"
-#include "includes/konamipt.h"
+#include "speaker.h"
 
 #include "konamigt.lh"
 

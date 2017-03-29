@@ -15,6 +15,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "plus3.h"
 #include "softlist.h"
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_PLUS3 = &device_creator<electron_plus3_device>;
+const device_type ELECTRON_PLUS3 = device_creator<electron_plus3_device>;
 
 
 //-------------------------------------------------

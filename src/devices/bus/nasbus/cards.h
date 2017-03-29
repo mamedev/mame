@@ -11,7 +11,6 @@
 #ifndef __NASBUS_CARDS_H__
 #define __NASBUS_CARDS_H__
 
-#include "emu.h"
 
 #include "avc.h"
 #include "floppy.h"

@@ -48,9 +48,8 @@
 
 //#include "osdepend.h"
 
-#include "emu.h"
 //#include "bitmap.h"
-//#include "screen.h"
+#include "screen.h"
 
 #include <math.h>
 #include <map>

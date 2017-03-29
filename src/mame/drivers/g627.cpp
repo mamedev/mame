@@ -39,10 +39,14 @@ ToDo:
 *******************************************************************************/
 
 
-#include "machine/genpin.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/genpin.h"
 #include "machine/i8155.h"
 #include "sound/astrocde.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "g627.lh"
 
 

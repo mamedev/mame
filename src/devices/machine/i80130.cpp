@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "i80130.h"
 
 
@@ -15,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type I80130 = &device_creator<i80130_device>;
+const device_type I80130 = device_creator<i80130_device>;
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 16, i80130_device )

@@ -181,8 +181,14 @@ extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 #endif
 
 // translated to utf8_main
-int main(int argc, char *argv[])
+#if defined(SDLMAME_WIN32)
+int main(std::vector<std::string> &args)
 {
+#else
+int main(int argc, char** argv)
+{
+	std::vector<std::string> args(argv, argv+argc);
+#endif
 	int res = 0;
 
 	// disable I/O buffering
@@ -210,7 +216,7 @@ int main(int argc, char *argv[])
 		sdl_options options;
 		sdl_osd_interface osd(options);
 		osd.register_options();
-		res = emulator_info::start_frontend(options, osd, argc, argv);
+		res = emulator_info::start_frontend(options, osd, args);
 	}
 
 #ifdef SDLMAME_UNIX

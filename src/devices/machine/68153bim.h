@@ -33,7 +33,6 @@
 #ifndef MC68153BIM_H
 #define MC68153BIM_H
 
-#include "emu.h"
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS

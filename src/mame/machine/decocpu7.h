@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_cpu7_device : public m6502_device {
@@ -23,4 +22,4 @@ protected:
 
 };
 
-static const device_type DECO_CPU7 = &device_creator<deco_cpu7_device>;
+extern const device_type DECO_CPU7;

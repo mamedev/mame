@@ -27,7 +27,7 @@ inline void ATTR_PRINTF( 3, 4 ) ds1204_device::verboselog( int n_level, const ch
 }
 
 // device type definition
-const device_type DS1204 = &device_creator<ds1204_device>;
+const device_type DS1204 = device_creator<ds1204_device>;
 
 ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t( mconfig, DS1204, "DS1204", tag, owner, clock, "ds1204", __FILE__ ),

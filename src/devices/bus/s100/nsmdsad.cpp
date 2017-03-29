@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nsmdsad.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MDS_AD = &device_creator<s100_mds_ad_device>;
+const device_type S100_MDS_AD = device_creator<s100_mds_ad_device>;
 
 
 //-------------------------------------------------

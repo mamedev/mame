@@ -6,20 +6,22 @@
  *
  ****************************************************************************/
 
-#ifndef GENPC_H_
-#define GENPC_H_
+#ifndef MAME_DEVICES_MACHINE_GENPC_H
+#define MAME_DEVICES_MACHINE_GENPC_H
 
-#include "machine/ins8250.h"
-#include "machine/i8255.h"
+#include "imagedev/cassette.h"
 #include "machine/am9517a.h"
+#include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
+
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
@@ -30,6 +32,7 @@ class ibm5160_mb_device : public device_t
 public:
 	// construction/destruction
 	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
@@ -39,19 +42,21 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
+	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 public:
-	required_device<cpu_device>  m_maincpu;
-	required_device<pic8259_device>  m_pic8259;
-	required_device<am9517a_device>  m_dma8237;
-	required_device<pit8253_device>  m_pit8253;
-	optional_device<i8255_device>  m_ppi8255;
-	required_device<speaker_sound_device>  m_speaker;
-	required_device<isa8_device>  m_isabus;
-	optional_device<pc_kbdc_device>  m_pc_kbdc;
-	required_device<ram_device> m_ram;
+	required_device<cpu_device>             m_maincpu;
+	required_device<pic8259_device>         m_pic8259;
+	required_device<am9517a_device>         m_dma8237;
+	required_device<pit8253_device>         m_pit8253;
+	optional_device<i8255_device>           m_ppi8255;
+	required_device<speaker_sound_device>   m_speaker;
+	required_device<isa8_device>            m_isabus;
+	optional_device<pc_kbdc_device>         m_pc_kbdc;
+	required_device<ram_device>             m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
@@ -135,6 +140,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
+	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	// device-level overrides
 
 	required_device<cassette_image_device>  m_cassette;
@@ -186,10 +193,13 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
+protected:
+	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
 extern const device_type PCNOPPI_MOTHERBOARD;
 
-#endif /* GENPC_H_ */
+#endif // MAME_DEVICES_MACHINE_GENPC_H

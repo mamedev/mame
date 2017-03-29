@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
+#include "screen.h"
 
 
 //**************************************************************************

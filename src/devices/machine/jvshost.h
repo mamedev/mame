@@ -3,7 +3,6 @@
 #ifndef __JVSHOST_H__
 #define __JVSHOST_H__
 
-#include "emu.h"
 
 class jvs_device;
 

@@ -52,6 +52,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/mikromik.h"
 #include "softlist.h"
 

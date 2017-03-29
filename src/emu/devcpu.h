@@ -70,8 +70,6 @@ class cpu_device :  public device_t,
 					public device_state_interface,
 					public device_disasm_interface
 {
-	friend resource_pool_object<cpu_device>::~resource_pool_object();
-
 public:
 	// configuration helpers
 	static void static_set_force_no_drc(device_t &device, bool value);

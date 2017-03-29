@@ -11,7 +11,6 @@
 #ifndef __XSU_CARDS_H__
 #define __XSU_CARDS_H__
 
-#include "emu.h"
 
 #include "cga.h"
 // storage

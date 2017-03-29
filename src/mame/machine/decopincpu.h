@@ -9,7 +9,6 @@
 #ifndef DECOPINCPU_H_
 #define DECOPINCPU_H_
 
-#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"

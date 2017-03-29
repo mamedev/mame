@@ -11,7 +11,6 @@
 #ifndef __CBM2_GRAPHIC__
 #define __CBM2_GRAPHIC__
 
-#include "emu.h"
 #include "exp.h"
 #include "video/ef9365.h"
 

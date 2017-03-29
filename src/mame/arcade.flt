@@ -225,6 +225,7 @@ cliffhgr.cpp
 cloak.cpp
 cloud9.cpp
 clowndwn.cpp
+clpoker.cpp
 clshroad.cpp
 cmmb.cpp
 cninja.cpp
@@ -413,6 +414,7 @@ galaxia.cpp
 galaxian.cpp
 galaxold.cpp
 galgame.cpp
+galgames.cpp
 galivan.cpp
 galpani2.cpp
 galpani3.cpp
@@ -591,6 +593,7 @@ konamigv.cpp
 konamigx.cpp
 konamim2.cpp
 konendev.cpp
+konmedal.cpp
 kontest.cpp
 kopunch.cpp
 ksayakyu.cpp
@@ -1103,6 +1106,7 @@ stactics.cpp
 stadhero.cpp
 starcrus.cpp
 starfire.cpp
+stargame.cpp
 starshp1.cpp
 starwars.cpp
 statriv2.cpp

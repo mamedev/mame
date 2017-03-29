@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/suprridr.h"
+#include "screen.h"
 
 
 /*************************************

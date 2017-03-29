@@ -39,11 +39,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/hnayayoi.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "machine/nvram.h"
-#include "includes/hnayayoi.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(hnayayoi_state::keyboard_0_r)

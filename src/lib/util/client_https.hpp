@@ -56,7 +56,7 @@ namespace webpp {
 							socket = std::make_unique<HTTPS>(io_context, m_context);
 						}
 
-						auto timer = get_timeout_timer();
+						auto timer = get_timeout_timer(config.timeout_connect);
 						asio::async_connect(socket->lowest_layer(), it, [this, timer]
 								(const std::error_code &ec, asio::ip::tcp::resolver::iterator /*it*/) {
 							if (timer)

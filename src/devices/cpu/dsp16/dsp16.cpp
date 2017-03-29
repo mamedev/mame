@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type DSP16 = &device_creator<dsp16_device>;
+const device_type DSP16 = device_creator<dsp16_device>;
 
 
 //-------------------------------------------------

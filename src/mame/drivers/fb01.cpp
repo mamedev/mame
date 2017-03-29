@@ -7,14 +7,19 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "machine/nvram.h"
-#include "video/hd44780.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
+
 #include "bus/midi/midi.h"
+#include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/nvram.h"
+#include "sound/ym2151.h"
+#include "video/hd44780.h"
+
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "fb01.lh"
 
 

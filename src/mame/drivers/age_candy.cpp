@@ -13,6 +13,7 @@ Device is a 27c256   location U3
 */
 
 #include "emu.h"
+#include "speaker.h"
 
 
 class age_candy_state : public driver_device

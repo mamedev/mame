@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "4tba.h"
 
 
@@ -16,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4TBA = &device_creator<c64_4tba_device>;
+const device_type C64_4TBA = device_creator<c64_4tba_device>;
 
 
 //-------------------------------------------------

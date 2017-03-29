@@ -9,8 +9,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i4004/i4004.h"
 #include "includes/busicom.h"
+
+#include "cpu/i4004/i4004.h"
+#include "screen.h"
 
 
 uint8_t busicom_state::get_bit_selected(uint32_t val,int num)

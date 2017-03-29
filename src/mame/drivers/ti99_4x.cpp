@@ -52,8 +52,10 @@
 #include "bus/ti99x/joyport.h"
 
 #include "bus/ti99_peb/peribox.h"
-#include "softlist.h"
 #include "machine/ram.h"
+
+#include "softlist.h"
+#include "speaker.h"
 
 // Debugging
 #define TRACE_READY 0
@@ -68,6 +70,14 @@ class ti99_4x_state : public driver_device
 public:
 	ti99_4x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_keyboard_column(0),
+		m_check_alphalock(false),
+		m_nready_combined(0),
+		m_nready_prev(0),
+		m_model(0),
+		m_int1(0),
+		m_int2(0),
+		m_int12(0),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
 		m_gromport(*this, GROMPORT_TAG),
@@ -294,7 +304,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_START( "LOADINT ")
+	PORT_START( "LOADINT")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_4x_state, load_interrupt, 1)
 
 	PORT_START("COL0")  // col 0

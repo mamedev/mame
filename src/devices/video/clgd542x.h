@@ -6,7 +6,6 @@
 
 */
 
-#include "emu.h"
 #include "video/pc_vga.h"
 
 MACHINE_CONFIG_EXTERN( pcvideo_cirrus_gd5428 );

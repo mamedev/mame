@@ -12,7 +12,6 @@
 #define __KINGSOFT__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

@@ -23,7 +23,6 @@
 #ifndef DEVICES_MACHINE_74157_H
 #define DEVICES_MACHINE_74157_H
 
-#include "emu.h"
 
 
 //**************************************************************************

@@ -27,8 +27,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "pgc.h"
+
+#include "screen.h"
+
 
 #define VERBOSE_PGC     1
 
@@ -164,7 +166,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_PGC = &device_creator<isa8_pgc_device>;
+const device_type ISA8_PGC = device_creator<isa8_pgc_device>;
 
 
 //-------------------------------------------------

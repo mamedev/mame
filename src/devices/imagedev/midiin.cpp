@@ -16,7 +16,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIIN = &device_creator<midiin_device>;
+const device_type MIDIIN = device_creator<midiin_device>;
 
 /*-------------------------------------------------
     ctor
@@ -56,15 +56,6 @@ void midiin_device::device_reset()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rcv_rate(0);
 	set_tra_rate(31250);
-}
-
-/*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void midiin_device::device_config_complete(void)
-{
-	update_names();
 }
 
 /*-------------------------------------------------

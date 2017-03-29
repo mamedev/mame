@@ -191,13 +191,15 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "crd"; }
+	virtual const char *custom_instance_name() const override { return "port"; }
+	virtual const char *custom_brief_instance_name() const override { return "p"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 private:
 	void hp48_fill_port();

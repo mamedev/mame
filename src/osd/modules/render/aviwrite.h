@@ -11,7 +11,6 @@
 #ifndef __RENDER_AVIWRITE__
 #define __RENDER_AVIWRITE__
 
-#include "emu.h"
 #include "aviio.h"
 
 class running_machine;

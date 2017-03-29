@@ -35,6 +35,8 @@ ft5_v6_c4.u58 /
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class koftball_state : public driver_device

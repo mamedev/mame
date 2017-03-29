@@ -114,7 +114,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 { \
 	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	if (owner == nullptr) owner = config.device_add(nullptr, "root", &driver_device_creator<_class>, 0);
+	if (owner == nullptr) owner = config.device_add(nullptr, "root", driver_device_creator<_class>, 0);
 
 /**
  @def MACHINE_CONFIG_FRAGMENT(_name)
@@ -157,7 +157,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 { \
 	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	if (owner == nullptr) owner = config.device_add(nullptr, "root", &driver_device_creator<_class>, 0); \
+	if (owner == nullptr) owner = config.device_add(nullptr, "root", driver_device_creator<_class>, 0); \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device);
 
 /**

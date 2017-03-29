@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"

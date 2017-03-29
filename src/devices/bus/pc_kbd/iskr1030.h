@@ -11,7 +11,6 @@
 #ifndef __PC_KBD_ISKR_1030__
 #define __PC_KBD_ISKR_1030__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
 #include "machine/rescap.h"

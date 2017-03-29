@@ -16,6 +16,7 @@
 #define __GALAXOLD_H__
 
 #include "machine/7474.h"
+#include "screen.h"
 
 /* star circuit */
 #define STAR_COUNT  252
@@ -186,7 +187,6 @@ public:
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_VIDEO_START(drivfrcg);
 	DECLARE_VIDEO_START(racknrol);
-	DECLARE_VIDEO_START(batman2);
 	DECLARE_VIDEO_START(mooncrst);
 	DECLARE_VIDEO_START(scrambold);
 	DECLARE_VIDEO_START(newsin7);
@@ -222,7 +222,6 @@ public:
 	void video_start_common();
 	void pisces_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void mooncrst_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void batman2_modify_charcode(uint16_t *code, uint8_t x);
 	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void harem_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);

@@ -16,7 +16,6 @@
 #ifndef __MAPPER8__
 #define __MAPPER8__
 
-#include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
 #include "video/tms9928a.h"
@@ -210,6 +209,10 @@ public:
 	DECLARE_WRITE8_MEMBER( cruwrite );
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
+	// Debugger support
+	bool hexbus_access_debug();
+	bool intdsr_access_debug();
+
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( msast_in );
 	DECLARE_WRITE_LINE_MEMBER( lascs_in );
@@ -293,6 +296,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( set_address );
+
+	// Debugger support
+	int get_physical_address_debug(offs_t offset);
+	void mapper_access_debug(int data);
 
 	DECLARE_WRITE_LINE_MEMBER( srdy_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
@@ -397,6 +404,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
+
+	// Memory space for debugger access
+	DECLARE_READ8_MEMBER( debugger_read );
+	DECLARE_WRITE8_MEMBER( debugger_write );
 
 	// I/O space
 	DECLARE_READ8Z_MEMBER( crureadz );
@@ -514,6 +525,7 @@ private:
 
 	// Debugging
 	int m_last_ready;
+	line_state m_crus_debug;
 
 	// System GROM library
 	tmc0430_device* m_sgrom[3];

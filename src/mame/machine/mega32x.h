@@ -161,7 +161,6 @@ private:
 	int m_32x_videopriority;
 	uint32_t m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
-//  virtual void device_config_complete();
 	int m_32x_adapter_enabled;
 	int m_32x_access_auth;
 	int m_32x_screenshift;

@@ -40,7 +40,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DSBZ80 = &device_creator<dsbz80_device>;
+const device_type DSBZ80 = device_creator<dsbz80_device>;
 
 
 //-------------------------------------------------

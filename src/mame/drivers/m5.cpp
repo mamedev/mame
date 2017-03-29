@@ -275,24 +275,21 @@ Few other notes:
 
 
 #include "emu.h"
+#include "includes/m5.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/m5_dsk.h"
-#include "formats/sord_cas.h"
-#include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/i8255.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h" //brno mod
-#include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "bus/m5/slot.h"
-#include "bus/m5/rom.h"
-#include "softlist.h"
-#include "includes/m5.h"
 
+#include "bus/m5/rom.h"
+
+#include "softlist.h"
+#include "speaker.h"
+
+#include "formats/m5_dsk.h"
+#include "formats/sord_cas.h"
 
 
 

@@ -5,7 +5,6 @@
 #ifndef __AUDIO_ZACCARIA_H__
 #define __AUDIO_ZACCARIA_H__
 
-#include "emu.h"
 #include "machine/6821pia.h"
 #include "machine/netlist.h"
 #include "sound/ay8910.h"

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/tceptor.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
@@ -19,7 +20,10 @@
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 #include "tceptor2.lh"
+
 
 /*******************************************************************/
 
@@ -400,7 +404,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor_3d_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tceptor_state, screen_eof_tceptor)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tceptor_state, screen_vblank_tceptor))
 	MCFG_SCREEN_PALETTE("palette")
 
 

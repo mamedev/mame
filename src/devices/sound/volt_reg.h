@@ -11,7 +11,6 @@
 #ifndef __VOLTAGE_REGULATOR_H__
 #define __VOLTAGE_REGULATOR_H__
 
-#include "emu.h"
 
 #define MCFG_VOLTAGE_REGULATOR_OUTPUT(_output) \
 	voltage_regulator_device::set_output(*device, _output);

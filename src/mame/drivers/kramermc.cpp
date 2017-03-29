@@ -10,9 +10,12 @@
 
 
 #include "emu.h"
+#include "includes/kramermc.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "includes/kramermc.h"
+#include "screen.h"
+
 
 static GFXDECODE_START( kramermc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, kramermc_charlayout, 0, 1 )

@@ -11,7 +11,6 @@
 #ifndef __NASBUS_FLOPPY_H__
 #define __NASBUS_FLOPPY_H__
 
-#include "emu.h"
 #include "nasbus.h"
 #include "machine/wd_fdc.h"
 

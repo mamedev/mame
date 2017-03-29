@@ -11,7 +11,6 @@
 #ifndef __NEWBRAIN_FDC__
 #define __NEWBRAIN_FDC__
 
-#include "emu.h"
 #include "exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"

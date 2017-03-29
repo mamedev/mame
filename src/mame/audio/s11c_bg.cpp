@@ -7,12 +7,13 @@
  *      Author: bsr
  */
 
+#include "emu.h"
 #include "s11c_bg.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
 
-const device_type S11C_BG = &device_creator<s11c_bg_device>;
+const device_type S11C_BG = device_creator<s11c_bg_device>;
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),

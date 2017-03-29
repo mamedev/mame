@@ -76,11 +76,12 @@
 
 
 #include "emu.h"
+#include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "includes/foodf.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        12096000

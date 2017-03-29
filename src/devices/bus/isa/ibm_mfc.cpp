@@ -18,9 +18,11 @@
 
 #include "emu.h"
 #include "ibm_mfc.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/pit8253.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
@@ -61,7 +63,7 @@ enum
 //  Globals
 //-------------------------------------------------
 
-const device_type ISA8_IBM_MFC = &device_creator<isa8_ibm_mfc_device>;
+const device_type ISA8_IBM_MFC = device_creator<isa8_ibm_mfc_device>;
 
 
 //-------------------------------------------------

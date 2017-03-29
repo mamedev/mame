@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_SKNSSPR_H
+#define MAME_VIDEO_SKNSSPR_H
 
 class sknsspr_device : public device_t,
 							public device_video_interface
@@ -21,3 +23,5 @@ private:
 };
 
 extern const device_type SKNS_SPRITE;
+
+#endif // MAME_VIDEO_SKNSSPR_H

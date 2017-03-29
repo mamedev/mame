@@ -38,7 +38,9 @@
     Raphael Nabet, 2000-2003
 */
 
+#include "emu.h"
 #include "includes/lisa.h"
+#include "screen.h"
 
 
 /*

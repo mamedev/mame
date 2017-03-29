@@ -20,7 +20,7 @@ namespace glm
 
 #	if !GLM_HAS_DEFAULTED_FUNCTIONS || !defined(GLM_FORCE_NO_CTOR_INIT)
 		template <typename T, precision P>
-		GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2()
+		GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2()
 #			ifndef GLM_FORCE_NO_CTOR_INIT
 				: x(0), y(0)
 #			endif
@@ -29,14 +29,14 @@ namespace glm
 
 #	if !GLM_HAS_DEFAULTED_FUNCTIONS
 		template <typename T, precision P>
-		GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec2<T, P> const & v)
+		GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec2<T, P> const & v)
 			: x(v.x), y(v.y)
 		{}
 #	endif//!GLM_HAS_DEFAULTED_FUNCTIONS
 
 	template <typename T, precision P>
 	template <precision Q>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec2<T, Q> const & v)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec2<T, Q> const & v)
 		: x(v.x), y(v.y)
 	{}
 
@@ -47,12 +47,12 @@ namespace glm
 	{}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(T scalar)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(T scalar)
 		: x(scalar), y(scalar)
 	{}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(T s1, T s2)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(T s1, T s2)
 		: x(s1), y(s2)
 	{}
 
@@ -60,14 +60,14 @@ namespace glm
 
 	template <typename T, precision P>
 	template <typename A, typename B>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(A a, B b)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(A a, B b)
 		: x(static_cast<T>(a))
 		, y(static_cast<T>(b))
 	{}
 
 	template <typename T, precision P>
 	template <typename A, typename B>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec1<A, P> const & a, tvec1<B, P> const & b)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec1<A, P> const & a, tvec1<B, P> const & b)
 		: x(static_cast<T>(a.x))
 		, y(static_cast<T>(b.x))
 	{}
@@ -76,32 +76,26 @@ namespace glm
 
 	template <typename T, precision P>
 	template <typename U, precision Q>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec2<U, Q> const & v)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec2<U, Q> const & v)
 		: x(static_cast<T>(v.x))
 		, y(static_cast<T>(v.y))
 	{}
 
 	template <typename T, precision P>
 	template <typename U, precision Q>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec3<U, Q> const & v)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec3<U, Q> const & v)
 		: x(static_cast<T>(v.x))
 		, y(static_cast<T>(v.y))
 	{}
 
 	template <typename T, precision P>
 	template <typename U, precision Q>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR tvec2<T, P>::tvec2(tvec4<U, Q> const & v)
+	GLM_FUNC_QUALIFIER GLM_CONSTEXPR_CTOR tvec2<T, P>::tvec2(tvec4<U, Q> const & v)
 		: x(static_cast<T>(v.x))
 		, y(static_cast<T>(v.y))
 	{}
 
 	// -- Component accesses --
-
-	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename tvec2<T, P>::length_type tvec2<T, P>::length() const
-	{
-		return 2;
-	}
 
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER T & tvec2<T, P>::operator[](typename tvec2<T, P>::length_type i)

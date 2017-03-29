@@ -14,7 +14,6 @@
 #ifndef __MFMHDFMT__
 #define __MFMHDFMT__
 
-#include "emu.h"
 #include "chd.h"
 
 const chd_metadata_tag MFM_HARD_DISK_METADATA_TAG = CHD_MAKE_TAG('G','D','D','I');

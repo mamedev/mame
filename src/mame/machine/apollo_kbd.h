@@ -13,7 +13,6 @@
 #ifndef __APOLLO_KBD_H__
 #define __APOLLO_KBD_H__
 
-#include "emu.h"
 #include "sound/beep.h"
 
 // BSD-derived systems get very sad when you party with system reserved names.

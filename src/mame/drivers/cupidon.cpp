@@ -15,7 +15,8 @@
 
 #include "emu.h"
 #include "machine/68340.h"
-
+#include "screen.h"
+#include "speaker.h"
 
 
 class cupidon_state : public driver_device

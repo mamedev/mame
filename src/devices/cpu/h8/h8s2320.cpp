@@ -3,15 +3,15 @@
 #include "emu.h"
 #include "h8s2320.h"
 
-const device_type H8S2320 = &device_creator<h8s2320_device>;
-const device_type H8S2321 = &device_creator<h8s2321_device>;
-const device_type H8S2322 = &device_creator<h8s2322_device>;
-const device_type H8S2323 = &device_creator<h8s2323_device>;
-const device_type H8S2324 = &device_creator<h8s2324_device>;
-const device_type H8S2326 = &device_creator<h8s2326_device>;
-const device_type H8S2327 = &device_creator<h8s2327_device>;
-const device_type H8S2328 = &device_creator<h8s2328_device>;
-const device_type H8S2329 = &device_creator<h8s2329_device>;
+const device_type H8S2320 = device_creator<h8s2320_device>;
+const device_type H8S2321 = device_creator<h8s2321_device>;
+const device_type H8S2322 = device_creator<h8s2322_device>;
+const device_type H8S2323 = device_creator<h8s2323_device>;
+const device_type H8S2324 = device_creator<h8s2324_device>;
+const device_type H8S2326 = device_creator<h8s2326_device>;
+const device_type H8S2327 = device_creator<h8s2327_device>;
+const device_type H8S2328 = device_creator<h8s2328_device>;
+const device_type H8S2329 = device_creator<h8s2329_device>;
 
 
 h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

@@ -15,7 +15,6 @@
 #ifndef __TMS9901_H__
 #define __TMS9901_H__
 
-#include "emu.h"
 
 extern const device_type TMS9901;
 

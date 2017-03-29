@@ -6,7 +6,9 @@
  */
 
 #include "nld_matrix_solver.h"
-#include "plib/putil.h"
+#include "../plib/putil.h"
+
+#include <cmath>  // <<= needed by windows build
 
 namespace netlist
 {
@@ -64,7 +66,7 @@ void terms_for_net_t::set_pointers()
 	for (unsigned i = 0; i < count(); i++)
 	{
 		m_terms[i]->set_ptrs(&m_gt[i], &m_go[i], &m_Idr[i]);
-		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().m_cur_Analog.ptr();
+		m_connected_net_V[i] = m_terms[i]->m_otherterm->net().Q_Analog_state_ptr();
 	}
 }
 
@@ -121,7 +123,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
 			{
-				case terminal_t::TERMINAL:
+				case detail::terminal_type::TERMINAL:
 					if (p->device().is_timestep())
 						if (!plib::container::contains(m_step_devices, &p->device()))
 							m_step_devices.push_back(&p->device());
@@ -134,7 +136,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 					}
 					log().debug("Added terminal {1}\n", p->name());
 					break;
-				case terminal_t::INPUT:
+				case detail::terminal_type::INPUT:
 					{
 						proxied_analog_output_t *net_proxy_output = nullptr;
 						for (auto & input : m_inps)
@@ -153,12 +155,12 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
 						net_proxy_output->net().add_terminal(*p);
-						// FIXME: repeated
+						// FIXME: repeated calling - kind of brute force
 						net_proxy_output->net().rebuild_list();
 						log().debug("Added input\n");
 					}
 					break;
-				case terminal_t::OUTPUT:
+				case detail::terminal_type::OUTPUT:
 					log().fatal(MF_1_UNHANDLED_ELEMENT_1_FOUND,
 							p->name());
 					break;
@@ -206,7 +208,7 @@ void matrix_solver_t::setup_matrix()
 	 * literature but I have found no articles about Gauss Seidel.
 	 *
 	 * For Gaussian Elimination however increasing order is better suited.
-	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	 * NOTE: Even better would be to sort on elements right of the matrix diagonal.
 	 *
 	 */
 
@@ -374,22 +376,22 @@ void matrix_solver_t::reset()
 void matrix_solver_t::update() NL_NOEXCEPT
 {
 	const netlist_time new_timestep = solve();
+	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices() && new_timestep > netlist_time::zero())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(new_timestep);
+		m_Q_sync.net().toggle_and_push_to_queue(new_timestep);
 	}
 }
 
 void matrix_solver_t::update_forced()
 {
 	ATTR_UNUSED const netlist_time new_timestep = solve();
+	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices())
 	{
-		m_Q_sync.net().force_queue_execution();
-		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
+		m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_min_timestep));
 	}
 }
 
@@ -402,7 +404,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 
 void matrix_solver_t::solve_base()
 {
-	m_stat_vsolver_calls++;
+	++m_stat_vsolver_calls;
 	if (has_dynamic_devices())
 	{
 		unsigned this_resched;
@@ -420,8 +422,7 @@ void matrix_solver_t::solve_base()
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
 			log().warning(MW_1_NEWTON_LOOPS_EXCEEDED_ON_NET_1, this->name());
-			m_Q_sync.net().toggle_new_Q();
-			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
+			m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
 		}
 	}
 	else
@@ -445,7 +446,6 @@ const netlist_time matrix_solver_t::solve()
 	step(delta);
 	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
-	update_inputs();
 
 	return next_time_step;
 }
@@ -486,10 +486,6 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 
 	if (m_params.m_dynamic_ts)
 	{
-		/*
-		 * FIXME: We should extend the logic to use either all nets or
-		 *        only output nets.
-		 */
 		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];

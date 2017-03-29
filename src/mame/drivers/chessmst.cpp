@@ -11,16 +11,20 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "chessmst.lh"
-#include "chessmstdm.lh"
+#include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
+
+#include "chessmst.lh"
+#include "chessmstdm.lh"
 
 
 class chessmst_state : public driver_device

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wangpc.h"
 
 
@@ -13,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_BUS = &device_creator<wangpcbus_device>;
-const device_type WANGPC_BUS_SLOT = &device_creator<wangpcbus_slot_device>;
+const device_type WANGPC_BUS = device_creator<wangpcbus_device>;
+const device_type WANGPC_BUS_SLOT = device_creator<wangpcbus_slot_device>;
 
 
 

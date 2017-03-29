@@ -10,10 +10,11 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "machine/7200fifo.h"
 
 
-const device_type FIFO7200 = &device_creator<fifo7200_device>;
+const device_type FIFO7200 = device_creator<fifo7200_device>;
 
 //-------------------------------------------------
 //  fifo7200_device - constructor
@@ -58,7 +59,7 @@ void fifo7200_device::device_start()
 void fifo7200_device::device_reset()
 {
 	// master reset
-	m_buffer.clear();
+	std::fill(m_buffer.begin(), m_buffer.end(), 0);
 	m_read_ptr = 0;
 	m_write_ptr = 0;
 

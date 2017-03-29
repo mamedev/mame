@@ -30,7 +30,7 @@ t=tile, p=palette
 #include "vs920a.h"
 
 
-const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
+const device_type VS920A = device_creator<vs920a_text_tilemap_device>;
 
 vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),

@@ -5,7 +5,6 @@
 #ifndef __ISA_MPU401_H__
 #define __ISA_MPU401_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/mpu401.h"
 

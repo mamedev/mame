@@ -6,7 +6,7 @@
 
 #define MAX_AMPLITUDE  0x7fff
 
-const device_type CHANNELF_SOUND = &device_creator<channelf_sound_device>;
+const device_type CHANNELF_SOUND = device_creator<channelf_sound_device>;
 
 channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CHANNELF_SOUND, "Channel F Sound", tag, owner, clock, "channelf_sound", __FILE__),
@@ -19,16 +19,6 @@ channelf_sound_device::channelf_sound_device(const machine_config &mconfig, cons
 		m_sample_counter(0),
 		m_forced_ontime(0),
 		m_min_ontime(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void channelf_sound_device::device_config_complete()
 {
 }
 

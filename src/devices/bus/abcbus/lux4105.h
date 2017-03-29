@@ -12,7 +12,6 @@
 #define __LUXOR_4105__
 
 
-#include "emu.h"
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
 

@@ -9,7 +9,6 @@
 #ifndef SYMBFAC2_H_
 #define SYMBFAC2_H_
 
-#include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/ds128x.h"
 #include "machine/nvram.h"

@@ -6,13 +6,14 @@
 
 */
 
+#include "emu.h"
 #include "vt82c496.h"
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type VT82C496 = &device_creator<vt82c496_device>;
+const device_type VT82C496 = device_creator<vt82c496_device>;
 
 
 vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

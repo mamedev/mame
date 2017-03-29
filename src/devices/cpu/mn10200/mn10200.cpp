@@ -36,7 +36,7 @@ enum mn10200_flag
 };
 
 
-const device_type MN1020012A = &device_creator<mn1020012a_device>;
+const device_type MN1020012A = device_creator<mn1020012a_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )

@@ -11,7 +11,6 @@
 #ifndef __V1050_KEYBOARD__
 #define __V1050_KEYBOARD__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 

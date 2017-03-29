@@ -42,6 +42,7 @@ TODO: boot tests fail
 #include "video/mc6845.h"
 #include "machine/terminal.h"
 //#include "machine/ins8250.h"
+#include "screen.h"
 
 #define HP9816_CHDIMX 8
 #define HP9816_CHDIMY 16

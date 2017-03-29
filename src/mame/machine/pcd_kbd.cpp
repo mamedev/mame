@@ -1,8 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "pcd_kbd.h"
 
-const device_type PCD_KEYBOARD = &device_creator<pcd_keyboard_device>;
+#include "cpu/mcs48/mcs48.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+const device_type PCD_KEYBOARD = device_creator<pcd_keyboard_device>;
 
 ROM_START( pcd_keyboard )
 	ROM_REGION(0x1000, "mcu", 0)

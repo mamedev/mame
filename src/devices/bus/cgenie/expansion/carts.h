@@ -11,7 +11,6 @@
 #ifndef __CGENIE_EXPANSION_CARTS_H__
 #define __CGENIE_EXPANSION_CARTS_H__
 
-#include "emu.h"
 
 #include "floppy.h"
 

@@ -156,16 +156,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kangaroo.h"
+
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/kangaroo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_10MHz
-
-
 
 
 

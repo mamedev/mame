@@ -65,6 +65,7 @@ unknown cycle: CME, SSE, SSS
 
 */
 
+#include "emu.h"
 #include "tms1k_base.h"
 #include "debugger.h"
 

@@ -3,7 +3,6 @@
 #ifndef _AD1848_H_
 #define _AD1848_H_
 
-#include "emu.h"
 #include "sound/dac.h"
 
 #define MCFG_AD1848_IRQ_CALLBACK(_cb) \

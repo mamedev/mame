@@ -149,10 +149,14 @@ TODO:
 */
 
 #include "emu.h"
-#include "coreutil.h"
-#include "includes/saturn.h"
 #include "machine/smpc.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
 #include "machine/eepromser.h"
+#include "screen.h"
+
+#include "coreutil.h"
+
 
 #define LOG_SMPC 0
 #define LOG_PAD_CMD 0
@@ -873,7 +877,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 		{
 			uint8_t cur_ddr;
 
-			if (((m_ctrl1 && m_ctrl1->read_id(0) != 0x02) || (m_ctrl2 && m_ctrl2->read_id(0) != 0x02)) && !(space.debugger_access()))
+			if (((m_ctrl1 && m_ctrl1->read_id(0) != 0x02) || (m_ctrl2 && m_ctrl2->read_id(0) != 0x02)) && !(machine().side_effect_disabled()))
 			{
 				popmessage("Warning: read with SH-2 direct mode with a non-pad device");
 				return 0;

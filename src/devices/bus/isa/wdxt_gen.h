@@ -19,7 +19,6 @@
 #define __ISA8_WDXT_GEN__
 
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "isa.h"
 #include "machine/wd11c00_17.h"

@@ -13,7 +13,7 @@ TODO:
 #include "ym2148.h"
 
 
-const device_type YM2148 = &device_creator<ym2148_device>;
+const device_type YM2148 = device_creator<ym2148_device>;
 
 
 ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

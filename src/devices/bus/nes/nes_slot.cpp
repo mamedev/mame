@@ -93,7 +93,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
+const device_type NES_CART_SLOT = device_creator<nes_cart_slot_device>;
 
 
 //**************************************************************************
@@ -769,18 +769,6 @@ void nes_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_nes_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nes_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 void nes_cart_slot_device::pcb_start(uint8_t *ciram_ptr)
 {
@@ -833,7 +821,7 @@ image_init_result nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			char magic[4];
 

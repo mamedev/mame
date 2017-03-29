@@ -81,19 +81,18 @@
 
 #include "emu.h"
 #include "includes/mz700.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/z80pio.h"
 #include "machine/74145.h"
-#include "bus/centronics/ctronics.h"
 #include "sound/sn76496.h"
-#include "sound/speaker.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "formats/mz_cas.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/mz_cas.h"
+
 
 /***************************************************************************
     TIMER DEVICE CALLBACKS

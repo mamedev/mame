@@ -18,8 +18,10 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/ay8910.h"
 #include "machine/i8279.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "marywu.lh"
 
 class marywu_state : public driver_device

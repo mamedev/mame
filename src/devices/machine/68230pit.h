@@ -37,7 +37,6 @@
 #ifndef __68230PIT_H__
 #define __68230PIT_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

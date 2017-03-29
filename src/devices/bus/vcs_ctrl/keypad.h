@@ -11,7 +11,6 @@
 #ifndef __VCS_KEYPAD__
 #define __VCS_KEYPAD__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

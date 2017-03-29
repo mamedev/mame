@@ -34,7 +34,6 @@
 #ifndef __I8257__
 #define __I8257__
 
-#include "emu.h"
 
 
 

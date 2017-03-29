@@ -74,6 +74,7 @@
  * source: http://download.adaptec.com/pdfs/installation_guides/1540cfig.pdf
  */
 
+#include "emu.h"
 #include "aha1542.h"
 #include "cpu/z80/z80.h"
 
@@ -133,7 +134,7 @@
 #define CMD_EXTBIOS     0x28    // return extended BIOS information
 #define CMD_MBENABLE    0x29    // set mailbox interface enable
 
-const device_type AHA1542 = &device_creator<aha1542_device>;
+const device_type AHA1542 = device_creator<aha1542_device>;
 
 #define Z84C0010_TAG "u5"
 

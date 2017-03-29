@@ -12,9 +12,13 @@ palazzol@home.com
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/starcrus.h"
+
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
-#include "includes/starcrus.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( starcrus_map, AS_PROGRAM, 8, starcrus_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM

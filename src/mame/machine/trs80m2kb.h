@@ -11,7 +11,6 @@
 #ifndef __TRS80M2_KEYBOARD__
 #define __TRS80M2_KEYBOARD__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 

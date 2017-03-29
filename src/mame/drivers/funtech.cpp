@@ -21,10 +21,14 @@ and an unpopulated position for a YM2413 or UM3567
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "fts2in1.lh"
 
 

@@ -6,11 +6,12 @@
 */
 
 
-
 #include "emu.h"
 #include "toaplan_scu.h"
+#include "screen.h"
 
-const device_type TOAPLAN_SCU = &device_creator<toaplan_scu_device>;
+
+const device_type TOAPLAN_SCU = device_creator<toaplan_scu_device>;
 
 const gfx_layout toaplan_scu_device::spritelayout =
 {

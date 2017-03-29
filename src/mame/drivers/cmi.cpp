@@ -99,21 +99,28 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+#include "emu.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
-#include "machine/clock.h"
-#include "machine/7474.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/mos6551.h"
+#include "machine/7474.h"
+#include "machine/clock.h"
 #include "machine/i8214.h"
-#include "machine/wd_fdc.h"
-#include "machine/msm5832.h"
 #include "machine/input_merger.h"
+#include "machine/mos6551.h"
+#include "machine/msm5832.h"
+#include "machine/wd_fdc.h"
+
 #include "video/dl1416.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define Q209_CPU_CLOCK      4000000 // ?
 
@@ -291,7 +298,7 @@ private:
 	int     m_irq_state;
 };
 
-const device_type CMI01A_CHANNEL_CARD = &device_creator<cmi01a_device>;
+const device_type CMI01A_CHANNEL_CARD = device_creator<cmi01a_device>;
 
 cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CMI01A_CHANNEL_CARD, "Fairlight CMI-01A Channel Card", tag, owner, clock, "cmi_01a", __FILE__)
@@ -829,7 +836,7 @@ void cmi_state::video_write(int offset)
 
 READ8_MEMBER( cmi_state::video_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return m_video_data;
 
 	m_video_data = m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
@@ -875,7 +882,7 @@ WRITE8_MEMBER( cmi_state::vram_w )
 
 READ8_MEMBER( cmi_state::vram_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return m_video_ram[offset];
 
 	/* Latch the current video position */
@@ -944,7 +951,7 @@ READ8_MEMBER( cmi_state::irq_ram_r )
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return m_scratch_ram[cpunum][0xf8 + offset];
 
 	if (m_m6809_bs_hack_cnt > 0 && m_m6809_bs_hack_cpu == cpunum)
@@ -1580,7 +1587,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 
 READ8_MEMBER( cmi_state::fdc_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	if (offset == 0)
@@ -2002,7 +2009,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 
 READ8_MEMBER( cmi01a_device::read )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	uint8_t data = 0;
@@ -2076,7 +2083,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
 
 READ8_MEMBER( cmi_state::cmi02_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	if (offset <= 0x1f)
@@ -2438,6 +2445,11 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 
 WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 {
+	// low 7 bits connected to alphanumeric display data lines
+	m_dp1->data_w(data & 0x7f);
+	m_dp2->data_w(data & 0x7f);
+	m_dp3->data_w(data & 0x7f);
+
 	/*
 	int bk = data;
 	int bit = 0;
@@ -2453,6 +2465,20 @@ WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 
 WRITE8_MEMBER( cmi_state::cmi10_u20_b_w )
 {
+	// connected to alphanumeric display control lines
+	uint8_t const addr = bitswap<2>(data, 0, 1);
+
+	m_dp1->ce_w(BIT(data, 6));
+	m_dp1->cu_w(BIT(data, 7));
+	m_dp1->addr_w(addr);
+
+	m_dp2->ce_w(BIT(data, 4));
+	m_dp2->cu_w(BIT(data, 5));
+	m_dp2->addr_w(addr);
+
+	m_dp3->ce_w(BIT(data, 2));
+	m_dp3->cu_w(BIT(data, 3));
+	m_dp3->addr_w(addr);
 }
 
 READ_LINE_MEMBER( cmi_state::cmi10_u20_cb1_r )
@@ -2470,28 +2496,10 @@ READ_LINE_MEMBER( cmi_state::cmi10_u20_cb1_r )
 
 WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 {
-	uint8_t data = m_cmi10_pia_u20->a_output() & 0x7f;
-	uint8_t b_port = m_cmi10_pia_u20->b_output();
-	int addr = (BIT(b_port, 0) << 1) | BIT(b_port, 1);
-	address_space &space = m_maincpu1->space(AS_PROGRAM); // Just needed to call data_w
-
-	/* DP1 */
-	m_dp1->ce_w(BIT(b_port, 6));
-	m_dp1->cu_w(BIT(b_port, 7));
+	// connected to alphanumeric display write strobe
 	m_dp1->wr_w(state);
-	m_dp1->data_w(space, addr, data, 0xff);
-
-	/* DP2 */
-	m_dp2->ce_w(BIT(b_port, 4));
-	m_dp2->cu_w(BIT(b_port, 5));
 	m_dp2->wr_w(state);
-	m_dp2->data_w(space, addr & 3, data, 0xff);
-
-	/* DP3 */
-	m_dp3->ce_w(BIT(b_port, 2));
-	m_dp3->cu_w(BIT(b_port, 3));
 	m_dp3->wr_w(state);
-	m_dp3->data_w(space, addr & 3, data, 0xff);
 }
 
 WRITE16_MEMBER( cmi_state::cmi_iix_update_dp1 )

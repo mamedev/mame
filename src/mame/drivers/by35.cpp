@@ -66,13 +66,18 @@ ToDo:
 *********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "by35.lh"
-#include "by35_playboy.lh"
 #include "sound/discrete.h"
 #include "render.h"
+#include "speaker.h"
+
+#include "by35.lh"
+#include "by35_playboy.lh"
+
 
 class by35_state : public genpin_class
 {

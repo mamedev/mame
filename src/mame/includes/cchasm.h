@@ -11,6 +11,7 @@
 #include "machine/z80ctc.h"
 #include "sound/dac.h"
 #include "video/vector.h"
+#include "screen.h"
 
 class cchasm_state : public driver_device
 {

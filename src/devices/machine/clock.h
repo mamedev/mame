@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 
 #define MCFG_CLOCK_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, CLOCK, _clock)

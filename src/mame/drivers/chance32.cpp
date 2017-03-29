@@ -22,6 +22,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "chance32.lh"
 

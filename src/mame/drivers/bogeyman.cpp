@@ -14,8 +14,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/bogeyman.h"
+
+#include "cpu/m6502/m6502.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Read/Write Handlers */

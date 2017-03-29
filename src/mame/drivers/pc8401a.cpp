@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/pc8401a.h"
 
 /*
@@ -672,6 +673,6 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, driver_device, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, driver_device, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
+COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, driver_device, 0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

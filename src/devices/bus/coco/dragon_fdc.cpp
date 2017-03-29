@@ -69,7 +69,6 @@
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "includes/coco.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
@@ -298,7 +297,7 @@ namespace
 	};
 };
 
-const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
+const device_type DRAGON_FDC = device_creator<dragon_fdc_device>;
 
 
 //**************************************************************************
@@ -330,4 +329,4 @@ namespace
 	};
 };
 
-const device_type SDTANDY_FDC = &device_creator<sdtandy_fdc_device>;
+const device_type SDTANDY_FDC = device_creator<sdtandy_fdc_device>;

@@ -11,7 +11,6 @@
 #ifndef __C2N__
 #define __C2N__
 
-#include "emu.h"
 #include "cass.h"
 #include "formats/cbm_tap.h"
 #include "imagedev/cassette.h"

@@ -3,7 +3,6 @@
 #ifndef __STEREO_FX__
 #define __STEREO_FX__
 
-#include "emu.h"
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"

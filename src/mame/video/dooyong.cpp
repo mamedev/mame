@@ -14,9 +14,9 @@
    when the x scroll moves out of range (trying to decode the whole lot
    at once uses hundreds of megabytes of RAM). */
 
-device_type const DOOYONG_ROM_TILEMAP = &device_creator<dooyong_rom_tilemap_device>;
-device_type const RSHARK_ROM_TILEMAP = &device_creator<rshark_rom_tilemap_device>;
-device_type const DOOYONG_RAM_TILEMAP = &device_creator<dooyong_ram_tilemap_device>;
+device_type const DOOYONG_ROM_TILEMAP = device_creator<dooyong_rom_tilemap_device>;
+device_type const RSHARK_ROM_TILEMAP = device_creator<rshark_rom_tilemap_device>;
+device_type const DOOYONG_RAM_TILEMAP = device_creator<dooyong_ram_tilemap_device>;
 
 
 dooyong_tilemap_device_base::dooyong_tilemap_device_base(

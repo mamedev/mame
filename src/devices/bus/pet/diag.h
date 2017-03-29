@@ -11,7 +11,6 @@
 #ifndef __PET_USER_DIAG__
 #define __PET_USER_DIAG__
 
-#include "emu.h"
 #include "user.h"
 
 

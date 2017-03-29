@@ -256,8 +256,9 @@ Logic:
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/cage.h"
 #include "includes/metalmx.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -11,7 +11,6 @@
 #ifndef __BML3BUS_KANJI__
 #define __BML3BUS_KANJI__
 
-#include "emu.h"
 #include "bml3bus.h"
 
 //**************************************************************************

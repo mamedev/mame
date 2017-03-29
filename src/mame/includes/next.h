@@ -5,7 +5,6 @@
 #ifndef __NEXT__
 #define __NEXT__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
@@ -114,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mo_drq);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	void vblank_w(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	struct dma_slot {

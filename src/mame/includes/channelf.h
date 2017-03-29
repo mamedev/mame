@@ -9,7 +9,6 @@
 #ifndef CHANNELF_H_
 #define CHANNELF_H_
 
-#include "emu.h"
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
 

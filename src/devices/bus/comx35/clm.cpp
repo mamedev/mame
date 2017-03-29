@@ -44,7 +44,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "clm.h"
+#include "screen.h"
 
 
 
@@ -62,7 +64,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_CLM = &device_creator<comx_clm_device>;
+const device_type COMX_CLM = device_creator<comx_clm_device>;
 
 
 //-------------------------------------------------

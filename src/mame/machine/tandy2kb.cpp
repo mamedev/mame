@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "tandy2kb.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TANDY2K_KEYBOARD = &device_creator<tandy2k_keyboard_device>;
+const device_type TANDY2K_KEYBOARD = device_creator<tandy2k_keyboard_device>;
 
 
 

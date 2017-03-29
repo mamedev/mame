@@ -84,10 +84,10 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type ATARI_JSA_I = &device_creator<atari_jsa_i_device>;
-extern const device_type ATARI_JSA_II = &device_creator<atari_jsa_ii_device>;
-extern const device_type ATARI_JSA_III = &device_creator<atari_jsa_iii_device>;
-extern const device_type ATARI_JSA_IIIS = &device_creator<atari_jsa_iiis_device>;
+const device_type ATARI_JSA_I = device_creator<atari_jsa_i_device>;
+const device_type ATARI_JSA_II = device_creator<atari_jsa_ii_device>;
+const device_type ATARI_JSA_III = device_creator<atari_jsa_iii_device>;
+const device_type ATARI_JSA_IIIS = device_creator<atari_jsa_iiis_device>;
 
 
 

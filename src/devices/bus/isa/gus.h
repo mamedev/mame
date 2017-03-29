@@ -42,7 +42,6 @@
 #ifndef __ISA_GUS_H__
 #define __ISA_GUS_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/6850acia.h"
 

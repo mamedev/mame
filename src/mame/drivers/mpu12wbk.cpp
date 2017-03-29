@@ -205,14 +205,16 @@
 
 *****************************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_8MHz
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
 //#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_8MHz
 
 
 class mpu12wbk_state : public driver_device

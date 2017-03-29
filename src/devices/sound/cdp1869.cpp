@@ -56,7 +56,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type CDP1869 = &device_creator<cdp1869_device>;
+const device_type CDP1869 = device_creator<cdp1869_device>;
 
 // I/O map
 DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )

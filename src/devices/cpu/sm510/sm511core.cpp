@@ -6,13 +6,14 @@
 
 */
 
+#include "emu.h"
 #include "sm510.h"
 #include "debugger.h"
 
 
 // MCU types
-const device_type SM511 = &device_creator<sm511_device>;
-const device_type SM512 = &device_creator<sm512_device>;
+const device_type SM511 = device_creator<sm511_device>;
+const device_type SM512 = device_creator<sm512_device>;
 
 
 // internal memory maps

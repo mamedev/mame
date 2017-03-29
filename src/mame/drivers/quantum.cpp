@@ -56,6 +56,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "sound/discrete.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class quantum_state : public driver_device

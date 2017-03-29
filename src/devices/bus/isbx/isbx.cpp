@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "isbx.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISBX_SLOT = &device_creator<isbx_slot_device>;
+const device_type ISBX_SLOT = device_creator<isbx_slot_device>;
 
 
 

@@ -11,7 +11,6 @@
 #ifndef __DIAG264_IEC_LOOPBACK__
 #define __DIAG264_IEC_LOOPBACK__
 
-#include "emu.h"
 #include "cbmiec.h"
 
 

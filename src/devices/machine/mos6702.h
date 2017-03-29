@@ -24,7 +24,6 @@
 #ifndef __MOS6702__
 #define __MOS6702__
 
-#include "emu.h"
 
 
 

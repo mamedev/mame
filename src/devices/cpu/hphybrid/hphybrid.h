@@ -77,7 +77,7 @@
 
 // PA changed callback
 #define MCFG_HPHYBRID_PA_CHANGED(_devcb) \
-		hp_hybrid_cpu_device::set_pa_changed_func(*device , DEVCB_##_devcb);
+	devcb = &hp_hybrid_cpu_device::set_pa_changed_func(*device , DEVCB_##_devcb);
 
 class hp_hybrid_cpu_device : public cpu_device
 {

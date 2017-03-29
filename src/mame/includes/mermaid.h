@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 
 class mermaid_state : public driver_device
 {
@@ -95,7 +96,7 @@ public:
 	DECLARE_PALETTE_INIT(mermaid);
 	DECLARE_PALETTE_INIT(rougien);
 	uint32_t screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_mermaid(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mermaid);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint8_t collision_check( rectangle& rect );

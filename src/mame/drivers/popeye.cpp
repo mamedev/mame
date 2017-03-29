@@ -18,11 +18,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "includes/popeye.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/netlist.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "netlist/devices/net_lib.h"
+
 
 /* This is the output stage of the audio circuit.
  * It is solely an impedance changer and could be left away

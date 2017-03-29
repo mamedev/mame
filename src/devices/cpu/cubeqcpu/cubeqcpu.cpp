@@ -70,9 +70,9 @@ enum alu_dst
 ***************************************************************************/
 
 
-const device_type CQUESTSND = &device_creator<cquestsnd_cpu_device>;
-const device_type CQUESTROT = &device_creator<cquestrot_cpu_device>;
-const device_type CQUESTLIN = &device_creator<cquestlin_cpu_device>;
+const device_type CQUESTSND = device_creator<cquestsnd_cpu_device>;
+const device_type CQUESTROT = device_creator<cquestrot_cpu_device>;
+const device_type CQUESTLIN = device_creator<cquestlin_cpu_device>;
 
 
 cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

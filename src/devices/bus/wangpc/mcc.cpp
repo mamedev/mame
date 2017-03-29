@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "mcc.h"
 
 
@@ -47,7 +48,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_MCC = &device_creator<wangpc_mcc_device>;
+const device_type WANGPC_MCC = device_creator<wangpc_mcc_device>;
 
 
 //-------------------------------------------------

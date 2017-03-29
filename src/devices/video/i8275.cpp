@@ -14,7 +14,10 @@
 
 */
 
+#include "emu.h"
 #include "i8275.h"
+
+#include "screen.h"
 
 
 
@@ -79,7 +82,7 @@ const int i8275_device::character_attribute[3][16] =
 //**************************************************************************
 
 // device type definition
-const device_type I8275 = &device_creator<i8275_device>;
+const device_type I8275 = device_creator<i8275_device>;
 
 
 

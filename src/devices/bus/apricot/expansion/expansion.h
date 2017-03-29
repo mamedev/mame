@@ -46,7 +46,6 @@
 #ifndef __APRICOT_EXPANSION_H__
 #define __APRICOT_EXPANSION_H__
 
-#include "emu.h"
 
 
 //**************************************************************************

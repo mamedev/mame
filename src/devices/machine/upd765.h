@@ -3,7 +3,6 @@
 #ifndef __UPD765_F_H__
 #define __UPD765_F_H__
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
 

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "bn1541.h"
 
 
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_BN1541 = &device_creator<c64_bn1541_device>;
+const device_type C64_BN1541 = device_creator<c64_bn1541_device>;
 
 
 

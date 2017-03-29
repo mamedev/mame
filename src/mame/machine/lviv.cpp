@@ -12,18 +12,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
 #include "includes/lviv.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
+
+#include "cpu/i8085/i8085.h"
+
 
 #define LVIV_SNAPSHOT_SIZE  82219
-
-
-
 
 
 void lviv_state::lviv_update_memory ()

@@ -10,7 +10,6 @@
 #ifndef __BBC_OPUS3__
 #define __BBC_OPUS3__
 
-#include "emu.h"
 #include "1mhzbus.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

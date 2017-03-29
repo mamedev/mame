@@ -12,7 +12,6 @@
 #define __SEGA_SK1100__
 
 
-#include "emu.h"
 #include "sg1000exp.h"
 #include "formats/sc3000_bit.h"
 #include "imagedev/cassette.h"

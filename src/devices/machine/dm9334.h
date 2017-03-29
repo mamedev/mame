@@ -70,7 +70,6 @@
 #ifndef DM9334_H
 #define DM9334_H
 
-#include "emu.h"
 
 #define MCFG_DM9334_OUTPUT_CB(_devcb) \
 	devcb = &dm9334_device::set_out_cb(*device, DEVCB_##_devcb);

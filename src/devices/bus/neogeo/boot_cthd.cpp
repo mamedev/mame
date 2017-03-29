@@ -16,7 +16,7 @@
 //  neogeo_cthd2k3_cart - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_CTHD2K3_CART = &device_creator<neogeo_cthd2k3_cart>;
+const device_type NEOGEO_CTHD2K3_CART = device_creator<neogeo_cthd2k3_cart>;
 
 
 neogeo_cthd2k3_cart::neogeo_cthd2k3_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
@@ -74,7 +74,7 @@ void neogeo_cthd2k3_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  **************************************************/
 
 
-const device_type NEOGEO_CT2K3SP_CART = &device_creator<neogeo_ct2k3sp_cart>;
+const device_type NEOGEO_CT2K3SP_CART = device_creator<neogeo_ct2k3sp_cart>;
 
 neogeo_ct2k3sp_cart::neogeo_ct2k3sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_CT2K3SP_CART, "Neo Geo CTHD 2003 Sp Cart", tag, owner, clock, "neocart_ct2k3sp", __FILE__)
@@ -90,7 +90,7 @@ void neogeo_ct2k3sp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  ct2k3sa
  **************************************************/
 
-const device_type NEOGEO_CT2K3SA_CART = &device_creator<neogeo_ct2k3sa_cart>;
+const device_type NEOGEO_CT2K3SA_CART = device_creator<neogeo_ct2k3sa_cart>;
 
 neogeo_ct2k3sa_cart::neogeo_ct2k3sa_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_CT2K3SA_CART, "Neo Geo CTHD 2003 Sp Alt Cart", tag, owner, clock, "neocart_ct2k3sa", __FILE__)
@@ -107,7 +107,7 @@ void neogeo_ct2k3sa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  matrimbl
  **************************************************/
 
-const device_type NEOGEO_MATRIMBL_CART = &device_creator<neogeo_matrimbl_cart>;
+const device_type NEOGEO_MATRIMBL_CART = device_creator<neogeo_matrimbl_cart>;
 
 neogeo_matrimbl_cart::neogeo_matrimbl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_MATRIMBL_CART, "Neo Geo Matrimelee Bootleg Cart", tag, owner, clock, "neocart_matrimbl", __FILE__),

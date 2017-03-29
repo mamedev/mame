@@ -12,7 +12,7 @@ static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
 	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
 MACHINE_CONFIG_END
 
-const device_type EL2_3C503 = &device_creator<el2_3c503_device>;
+const device_type EL2_3C503 = device_creator<el2_3c503_device>;
 
 machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(el2_3c503_config);

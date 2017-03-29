@@ -220,10 +220,13 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
+#include "includes/airbustr.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/airbustr.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 READ8_MEMBER(airbustr_state::devram_r)
@@ -597,7 +600,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(airbustr_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(airbustr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airbustr)

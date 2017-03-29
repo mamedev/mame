@@ -68,8 +68,10 @@ we currently simulate this as the PIC is read protected.
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ttchamp_state : public driver_device

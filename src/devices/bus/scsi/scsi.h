@@ -6,7 +6,6 @@
 #ifndef _SCSI_H_
 #define _SCSI_H_
 
-#include "emu.h"
 #include "machine/buffer.h"
 #include "machine/latch.h"
 

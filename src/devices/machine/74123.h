@@ -50,7 +50,6 @@
 #ifndef __TTL74123_H__
 #define __TTL74123_H__
 
-#include "emu.h"
 
 
 

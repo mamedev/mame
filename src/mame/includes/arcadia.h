@@ -9,12 +9,13 @@
 #ifndef ARCADIA_H_
 #define ARCADIA_H_
 
-#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "audio/arcadia.h"
 
 #include "bus/arcadia/slot.h"
 #include "bus/arcadia/rom.h"
+
+#include "screen.h"
 
 // space vultures sprites above
 // combat below and invisible

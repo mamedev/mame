@@ -11,7 +11,7 @@
 
 
 // device type definition
-const device_type GRIDLEE = &device_creator<gridlee_sound_device>;
+const device_type GRIDLEE = device_creator<gridlee_sound_device>;
 
 
 //**************************************************************************

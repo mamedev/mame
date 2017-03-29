@@ -2,13 +2,8 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
-#include "machine/pic8259.h"
-#include "machine/idectrl.h"
-#include "video/poly.h"
-#include "bitmap.h"
-#include "includes/xbox_nv2a.h"
-#include "includes/xbox.h"
 #include "includes/xbox_usb.h"
+#include "includes/xbox.h"
 
 //#define LOG_OHCI
 
@@ -43,7 +38,7 @@ static const char *const usbregnames[] = {
 };
 #endif
 
-const device_type OHCI_USB_CONTROLLER = &device_creator<ohci_usb_controller>;
+const device_type OHCI_USB_CONTROLLER = device_creator<ohci_usb_controller>;
 
 ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_USB_CONTROLLER, "OHCI USB CONTROLLER", tag, owner, clock, "ohciusb", __FILE__),
@@ -1391,7 +1386,7 @@ const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
 const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
 
-const device_type OHCI_GAME_CONTROLLER = &device_creator<ohci_game_controller_device>;
+const device_type OHCI_GAME_CONTROLLER = device_creator<ohci_game_controller_device>;
 
 ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_GAME_CONTROLLER, "OHCI Game Controller", tag, owner, clock, "ohci_gc", __FILE__),

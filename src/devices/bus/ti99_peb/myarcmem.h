@@ -13,7 +13,6 @@
 #ifndef __MYARCMEM__
 #define __MYARCMEM__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/ram.h"
 

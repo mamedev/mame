@@ -167,7 +167,7 @@ static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
 
 // device type definition
-const device_type POKEY = &device_creator<pokey_device>;
+const device_type POKEY = device_creator<pokey_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

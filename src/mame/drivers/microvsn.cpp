@@ -16,14 +16,16 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 ****************************************************************************/
 
 #include "emu.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/tms1000/tms1100.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
 #include "softlist.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define LOG 0
 
@@ -45,7 +47,7 @@ public:
 	DECLARE_MACHINE_START(microvision);
 	DECLARE_MACHINE_RESET(microvision);
 
-	void screen_vblank(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
 
 	// i8021 interface
@@ -251,7 +253,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void microvision_state::screen_vblank(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(microvision_state::screen_vblank)
 {
 	if ( state )
 	{
@@ -516,7 +518,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 	}
 
 	/* Read cartridge */
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if (image.fread(rom1, file_size) != file_size)
 		{
@@ -658,7 +660,7 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_MACHINE_RESET_OVERRIDE(microvision_state, microvision )
 
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(microvision_state, screen_vblank)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(microvision_state, screen_vblank))
 	MCFG_SCREEN_SIZE(16, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
 	MCFG_SCREEN_PALETTE("palette")

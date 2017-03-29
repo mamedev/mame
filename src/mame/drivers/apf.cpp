@@ -69,20 +69,24 @@ ToDo:
 ******************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "video/mc6847.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "machine/6821pia.h"
-#include "machine/wd_fdc.h"
-#include "imagedev/cassette.h"
 #include "formats/apf_apt.h"
+#include "imagedev/cassette.h"
+#include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6847.h"
 
 #include "bus/apf/slot.h"
 #include "bus/apf/rom.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class apf_state : public driver_device
 {

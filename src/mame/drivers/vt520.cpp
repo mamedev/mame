@@ -9,8 +9,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/ram.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/ram.h"
+#include "screen.h"
 
 
 class vt520_state : public driver_device

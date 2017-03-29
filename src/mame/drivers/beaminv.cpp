@@ -55,6 +55,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
+
 #include "beaminv.lh"
 
 

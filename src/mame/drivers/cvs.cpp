@@ -96,6 +96,7 @@ Todo & FIXME:
 #include "includes/cvs.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /* Turn to 1 so all inputs are always available (this shall only be a debug feature) */

@@ -7,11 +7,14 @@ Ping Pong (c) 1985 Konami
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pingpong.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/pingpong.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

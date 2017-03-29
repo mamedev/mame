@@ -20,7 +20,6 @@
 #ifndef __JOYPORT__
 #define __JOYPORT__
 
-#include "emu.h"
 
 extern const device_type JOYPORT;
 

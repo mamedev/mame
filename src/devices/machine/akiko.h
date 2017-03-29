@@ -17,7 +17,6 @@
 #ifndef __AKIKO_H__
 #define __AKIKO_H__
 
-#include "emu.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 
@@ -26,9 +25,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AKIKO_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, AKIKO, 0) \
-	akiko_device::set_cputag(*device, _cputag);
+#define MCFG_AKIKO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AKIKO, 0)
+
+#define MCFG_AKIKO_MEM_READ_CB(_devcb) \
+	devcb = &akiko_device::set_mem_r_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_AKIKO_MEM_WRITE_CB(_devcb) \
+	devcb = &akiko_device::set_mem_w_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_AKIKO_INT_CB(_devcb) \
+	devcb = &akiko_device::set_int_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AKIKO_SCL_HANDLER(_devcb) \
 	devcb = &akiko_device::set_scl_handler(*device, DEVCB_##_devcb);
@@ -53,6 +60,15 @@ public:
 	~akiko_device() {}
 
 	// callbacks
+	template<class _Object> static devcb_base &set_mem_r_callback(device_t &device, _Object object)
+		{ return downcast<akiko_device &>(device).m_mem_r.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_mem_w_callback(device_t &device, _Object object)
+		{ return downcast<akiko_device &>(device).m_mem_w.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_int_w_callback(device_t &device, _Object object)
+		{ return downcast<akiko_device &>(device).m_int_w.set_callback(object); }
+
 	template<class _Object> static devcb_base &set_scl_handler(device_t &device, _Object object)
 		{ return downcast<akiko_device &>(device).m_scl_w.set_callback(object); }
 
@@ -65,9 +81,6 @@ public:
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
 
-	// inline configuration
-	static void set_cputag(device_t &device, const char *tag);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,9 +91,6 @@ protected:
 private:
 	// 1X CDROM sector time in msec (300KBps)
 	static const int CD_SECTOR_TIME = (1000/((150*1024)/2048));
-
-	// internal state
-	address_space *m_space;
 
 	// chunky to planar converter
 	uint32_t m_c2p_input_buffer[8];
@@ -123,6 +133,9 @@ private:
 	void nvram_write(uint32_t data);
 	uint32_t nvram_read();
 
+	uint8_t mem_r8(offs_t offset);
+	void mem_w8(offs_t offset, uint8_t data);
+
 	void c2p_write(uint32_t data);
 	uint32_t c2p_read();
 
@@ -141,12 +154,13 @@ private:
 	TIMER_CALLBACK_MEMBER( cd_delayed_cmd );
 	void update_cdrom();
 
-	// i2c interface
+	// interface
+	devcb_read16 m_mem_r;
+	devcb_write16 m_mem_w;
+	devcb_write_line m_int_w;
 	devcb_write_line m_scl_w;
 	devcb_read_line m_sda_r;
 	devcb_write_line m_sda_w;
-
-	const char *m_cputag;
 };
 
 // device type definition

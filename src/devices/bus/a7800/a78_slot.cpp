@@ -33,7 +33,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
+const device_type A78_CART_SLOT = device_creator<a78_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -135,18 +135,6 @@ a78_cart_slot_device::~a78_cart_slot_device()
 void a78_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_a78_cart_interface  *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void a78_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -349,7 +337,7 @@ image_init_result a78_cart_slot_device::call_load()
 	{
 		uint32_t len;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? true : false;

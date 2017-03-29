@@ -4,7 +4,7 @@
 #include "dooly.h"
 
 
-const device_type MSX_CART_DOOLY = &device_creator<msx_cart_dooly>;
+const device_type MSX_CART_DOOLY = device_creator<msx_cart_dooly>;
 
 
 msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

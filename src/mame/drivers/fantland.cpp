@@ -47,6 +47,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 #include "emu.h"
 #include "includes/fantland.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
@@ -54,6 +55,8 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

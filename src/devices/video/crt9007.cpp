@@ -34,13 +34,15 @@
 #include "emu.h"
 #include "crt9007.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CRT9007 = &device_creator<crt9007_t>;
+const device_type CRT9007 = device_creator<crt9007_t>;
 
 
 

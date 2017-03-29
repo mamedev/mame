@@ -21,6 +21,7 @@
 
 */
 
+#include "emu.h"
 #include "fcc.h"
 
 
@@ -36,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_FCC = &device_creator<c64_final_chesscard_device>;
+const device_type C64_FCC = device_creator<c64_final_chesscard_device>;
 
 
 //-------------------------------------------------

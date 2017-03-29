@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mos6702.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6702 = &device_creator<mos6702_device>;
+const device_type MOS6702 = device_creator<mos6702_device>;
 
 
 

@@ -44,7 +44,6 @@
 #ifndef __TTL7474_H__
 #define __TTL7474_H__
 
-#include "emu.h"
 
 
 

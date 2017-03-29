@@ -123,11 +123,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "includes/sauro.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/3812intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)

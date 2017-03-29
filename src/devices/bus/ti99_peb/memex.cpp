@@ -12,6 +12,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "memex.h"
 
 #define RAMREGION "ram2meg"
@@ -157,4 +158,4 @@ ioport_constructor geneve_memex_device::device_input_ports() const
 	return INPUT_PORTS_NAME( memex );
 }
 
-const device_type TI99_MEMEX = &device_creator<geneve_memex_device>;
+const device_type TI99_MEMEX = device_creator<geneve_memex_device>;

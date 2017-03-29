@@ -940,7 +940,7 @@ WRITE8_MEMBER( ymz280b_device::write )
 }
 
 
-const device_type YMZ280B = &device_creator<ymz280b_device>;
+const device_type YMZ280B = device_creator<ymz280b_device>;
 
 ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock, "ymz280b", __FILE__),
@@ -961,14 +961,4 @@ ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, d
 		m_ext_write_handler(*this)
 {
 	memset(m_voice, 0, sizeof(m_voice));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymz280b_device::device_config_complete()
-{
 }

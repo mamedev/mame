@@ -9,6 +9,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
 #include "emucore.h"

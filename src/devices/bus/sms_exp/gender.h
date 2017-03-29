@@ -12,7 +12,6 @@
 #define __SMS_GENDER_ADAPTER__
 
 
-#include "emu.h"
 #include "smsexp.h"
 #include "bus/sega8/sega8_slot.h"
 

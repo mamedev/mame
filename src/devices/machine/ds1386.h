@@ -56,7 +56,6 @@
 #ifndef DS1386_H
 #define DS1386_H
 
-#include "emu.h"
 
 // handlers
 

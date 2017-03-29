@@ -12,6 +12,7 @@ BOARDS:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "dmac.h"
 
 
@@ -26,7 +27,7 @@ BOARDS:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DMAC = &device_creator<dmac_device>;
+const device_type DMAC = device_creator<dmac_device>;
 
 
 //**************************************************************************

@@ -18,7 +18,7 @@
 
 
 // device type definition
-const device_type BSMT2000 = &device_creator<bsmt2000_device>;
+const device_type BSMT2000 = device_creator<bsmt2000_device>;
 
 
 //**************************************************************************

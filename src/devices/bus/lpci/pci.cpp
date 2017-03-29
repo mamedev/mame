@@ -80,7 +80,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCI_BUS = &device_creator<pci_bus_device>;
+const device_type PCI_BUS = device_creator<pci_bus_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -311,7 +311,7 @@ pci_device_interface::~pci_device_interface()
 }
 
 
-const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
+const device_type PCI_CONNECTOR = device_creator<pci_connector>;
 
 
 pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

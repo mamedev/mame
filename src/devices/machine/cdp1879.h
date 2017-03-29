@@ -11,7 +11,6 @@
 #ifndef __CDP1879_H__
 #define __CDP1879_H__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

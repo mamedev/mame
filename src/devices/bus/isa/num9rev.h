@@ -5,7 +5,6 @@
 #ifndef __NUM9REV_H__
 #define __NUM9REV_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "video/upd7220.h"
 #include "machine/bankdev.h"

@@ -6,18 +6,18 @@
  *
  ****************************************************************************/
 
-#ifndef PK8020_H_
-#define PK8020_H_
+#ifndef MAME_INCLUDES_PK8020_H
+#define MAME_INCLUDES_PK8020_H
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/i8251.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 
 class pk8020_state : public driver_device
@@ -103,4 +103,4 @@ protected:
 	void pk8020_set_bank(uint8_t data);
 };
 
-#endif /* pk8020_H_ */
+#endif // MAME_INCLUDES_PK8020_H

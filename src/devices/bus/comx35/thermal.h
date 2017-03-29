@@ -11,7 +11,6 @@
 #ifndef __COMX_THM__
 #define __COMX_THM__
 
-#include "emu.h"
 #include "exp.h"
 
 

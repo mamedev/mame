@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
 
 
 class dms5000_state : public driver_device

@@ -21,6 +21,8 @@ PAL16R6A 11H
 */
 
 #include "emu.h"
+#include "includes/dietgo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
@@ -28,7 +30,8 @@ PAL16R6A 11H
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"
-#include "includes/dietgo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )

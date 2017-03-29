@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "wordpro.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WORDPRO = &device_creator<wordpro_device>;
+const device_type WORDPRO = device_creator<wordpro_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

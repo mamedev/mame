@@ -15,18 +15,18 @@
 //  sns_rom_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM = &device_creator<sns_rom_device>;
-const device_type SNS_LOROM_OBC1 = &device_creator<sns_rom_obc1_device>;
+const device_type SNS_LOROM = device_creator<sns_rom_device>;
+const device_type SNS_LOROM_OBC1 = device_creator<sns_rom_obc1_device>;
 // LoROM pirate carts with protection
-const device_type SNS_LOROM_POKEMON = &device_creator<sns_rom_pokemon_device>;
-const device_type SNS_LOROM_TEKKEN2 = &device_creator<sns_rom_tekken2_device>;
-const device_type SNS_LOROM_SOULBLAD = &device_creator<sns_rom_soulblad_device>;
-const device_type SNS_LOROM_BANANA = &device_creator<sns_rom_banana_device>;
-const device_type SNS_LOROM_BUGSLIFE = &device_creator<sns_rom_bugs_device>;
+const device_type SNS_LOROM_POKEMON = device_creator<sns_rom_pokemon_device>;
+const device_type SNS_LOROM_TEKKEN2 = device_creator<sns_rom_tekken2_device>;
+const device_type SNS_LOROM_SOULBLAD = device_creator<sns_rom_soulblad_device>;
+const device_type SNS_LOROM_BANANA = device_creator<sns_rom_banana_device>;
+const device_type SNS_LOROM_BUGSLIFE = device_creator<sns_rom_bugs_device>;
 // LoROM pirate multicarts
-const device_type SNS_LOROM_MCPIR1 = &device_creator<sns_rom_mcpirate1_device>;
-const device_type SNS_LOROM_MCPIR2 = &device_creator<sns_rom_mcpirate2_device>;
-const device_type SNS_LOROM_20COL = &device_creator<sns_rom_20col_device>;
+const device_type SNS_LOROM_MCPIR1 = device_creator<sns_rom_mcpirate1_device>;
+const device_type SNS_LOROM_MCPIR2 = device_creator<sns_rom_mcpirate2_device>;
+const device_type SNS_LOROM_20COL = device_creator<sns_rom_20col_device>;
 
 
 sns_rom_device::sns_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

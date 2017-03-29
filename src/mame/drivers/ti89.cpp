@@ -17,13 +17,15 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/ti89.h"
-#include "machine/nvram.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 uint8_t ti68k_state::keypad_r()
 {

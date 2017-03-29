@@ -14,7 +14,7 @@ namespace glm
 		typename genType::value_type d = glm::dot(dir, planeNormal);
 		typename genType::value_type Epsilon = std::numeric_limits<typename genType::value_type>::epsilon();
 
-		if(d < Epsilon)
+		if(d < -Epsilon)
 		{
 			intersectionDistance = glm::dot(planeOrig - orig, planeNormal) / d;
 			return true;

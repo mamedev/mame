@@ -11,6 +11,7 @@
 * TODO
 *   - too long to list
 */
+#include "emu.h"
 #include "interpro_mcga.h"
 
 #define VERBOSE 0
@@ -24,7 +25,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, interpro_mcga_device)
   AM_RANGE(0x00, 0x3f) AM_READWRITE16(read, write, 0xffff)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_MCGA = &device_creator<interpro_mcga_device>;
+const device_type INTERPRO_MCGA = device_creator<interpro_mcga_device>;
 
 interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_MCGA, "InterPro MCGA", tag, owner, clock, "mcga", __FILE__)
@@ -68,8 +69,8 @@ WRITE16_MEMBER(interpro_mcga_device::write)
 			   // HACK: set or clear error status depending on ENMMBE bit
 		if (data & MCGA_CTRL_ENMMBE)
 			m_reg[4] |= MCGA_ERROR_VALID;
-		//		else
-		//			m_reg[4] &= ~MCGA_ERROR_VALID;
+		//      else
+		//          m_reg[4] &= ~MCGA_ERROR_VALID;
 
 	default:
 		m_reg[offset] = data;

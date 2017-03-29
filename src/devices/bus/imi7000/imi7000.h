@@ -31,7 +31,6 @@
 #ifndef __IMI7000_BUS__
 #define __IMI7000_BUS__
 
-#include "emu.h"
 
 
 

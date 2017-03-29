@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "kingsoft.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_KINGSOFT = &device_creator<c64_kingsoft_cartridge_device>;
+const device_type C64_KINGSOFT = device_creator<c64_kingsoft_cartridge_device>;
 
 
 

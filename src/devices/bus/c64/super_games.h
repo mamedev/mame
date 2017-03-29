@@ -12,7 +12,6 @@
 #define __SUPER_GAMES__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

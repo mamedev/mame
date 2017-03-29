@@ -48,13 +48,14 @@
 
 #include "emu.h"
 #include "maria.h"
+#include "screen.h"
 
 
 #define TRIGGER_HSYNC   64717
 
 #define READ_MEM(x) space.read_byte(x)
 
-const device_type ATARI_MARIA = &device_creator<atari_maria_device>;
+const device_type ATARI_MARIA = device_creator<atari_maria_device>;
 
 
 

@@ -17,7 +17,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_HISCORE = &device_creator<a78_hiscore_device>;
+const device_type A78_HISCORE = device_creator<a78_hiscore_device>;
 
 
 a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

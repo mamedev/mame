@@ -12,7 +12,7 @@
 #include "snapquik.h"
 
 // device type definition
-const device_type SNAPSHOT = &device_creator<snapshot_image_device>;
+const device_type SNAPSHOT = device_creator<snapshot_image_device>;
 
 //-------------------------------------------------
 //  snapshot_image_device - constructor
@@ -47,18 +47,6 @@ snapshot_image_device::~snapshot_image_device()
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snapshot_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 /*-------------------------------------------------
     TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload)
 -------------------------------------------------*/
@@ -90,7 +78,7 @@ image_init_result snapshot_image_device::call_load()
 }
 
 // device type definition
-const device_type QUICKLOAD = &device_creator<quickload_image_device>;
+const device_type QUICKLOAD = device_creator<quickload_image_device>;
 
 //-------------------------------------------------
 //  quickload_image_device - constructor

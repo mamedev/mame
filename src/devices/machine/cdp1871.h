@@ -34,7 +34,6 @@
 #ifndef __CDP1871__
 #define __CDP1871__
 
-#include "emu.h"
 
 
 

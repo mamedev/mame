@@ -1,11 +1,11 @@
 //
-//Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
-//Copyright (C) 2013 LunarG, Inc.
-//All rights reserved.
+// Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
+// Copyright (C) 2013 LunarG, Inc.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -19,18 +19,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 /****************************************************************************\
 Copyright (c) 2002, NVIDIA Corporation.
@@ -57,7 +57,7 @@ Except as expressly stated in this notice, no other rights or licenses
 express or implied, are granted by NVIDIA herein, including but not
 limited to any patent rights that may be infringed by your derivative
 works or by other works in which the NVIDIA Software may be
-incorporated. No hardware is licensed hereunder. 
+incorporated. No hardware is licensed hereunder.
 
 THE NVIDIA SOFTWARE IS BEING PROVIDED ON AN "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -113,7 +113,7 @@ int TPpContext::CPPdefine(TPpToken* ppToken)
         mac.emptyArgs = 1;
         do {
             token = scanToken(ppToken);
-            if (mac.args.size() == 0 && token == ')') 
+            if (mac.args.size() == 0 && token == ')')
                 break;
             if (token != PpAtomIdentifier) {
                 parseContext.ppError(ppToken->loc, "bad argument", "#define", "");
@@ -177,7 +177,7 @@ int TPpContext::CPPdefine(TPpToken* ppToken)
                     newToken = ReadToken(mac.body, &newPpToken);
                     if (oldToken != newToken || oldPpToken != newPpToken) {
                         parseContext.ppError(defineLoc, "Macro redefined; different substitutions:", "#define", atomStrings.getString(defAtom));
-                        break; 
+                        break;
                     }
                 } while (newToken > 0);
             }
@@ -238,8 +238,8 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
 
         int nextAtom = atomStrings.getAtom(ppToken->name);
         if (nextAtom == PpAtomIf || nextAtom == PpAtomIfdef || nextAtom == PpAtomIfndef) {
-            depth++; 
-            ifdepth++; 
+            depth++;
+            ifdepth++;
             elsetracker++;
         } else if (nextAtom == PpAtomEndif) {
             token = extraTokenCheck(nextAtom, ppToken, scanToken(ppToken));
@@ -247,7 +247,7 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
             --elsetracker;
             if (depth == 0) {
                 // found the #endif we are looking for
-                if (ifdepth) 
+                if (ifdepth)
                     --ifdepth;
                 break;
             }
@@ -461,7 +461,7 @@ int TPpContext::eval(int token, int precedence, bool shortCircuit, int& res, boo
 
     // Perform evaluation of binary operation, if there is one, otherwise we are done.
     while (! err) {
-        if (token == ')' || token == '\n') 
+        if (token == ')' || token == '\n')
             break;
         int op;
         for (op = NUM_ELEMENTS(binop) - 1; op >= 0; op--) {
@@ -523,7 +523,7 @@ int TPpContext::evalToToken(int token, bool shortCircuit, int& res, bool& err, T
 }
 
 // Handle #if
-int TPpContext::CPPif(TPpToken* ppToken) 
+int TPpContext::CPPif(TPpToken* ppToken)
 {
     int token = scanToken(ppToken);
     elsetracker++;
@@ -554,7 +554,7 @@ int TPpContext::CPPifdef(int defined, TPpToken* ppToken)
     if (token != PpAtomIdentifier) {
         if (defined)
             parseContext.ppError(ppToken->loc, "must be followed by macro name", "#ifdef", "");
-        else 
+        else
             parseContext.ppError(ppToken->loc, "must be followed by macro name", "#ifndef", "");
     } else {
         MacroSymbol* macro = lookupMacroDef(atomStrings.getAtom(ppToken->name));
@@ -571,51 +571,82 @@ int TPpContext::CPPifdef(int defined, TPpToken* ppToken)
     return token;
 }
 
-// Handle #include
+// Handle #include ...
+// TODO: Handle macro expansions for the header name
 int TPpContext::CPPinclude(TPpToken* ppToken)
 {
     const TSourceLoc directiveLoc = ppToken->loc;
+    bool startWithLocalSearch = true; // to additionally include the extra "" paths
     int token = scanToken(ppToken);
-    if (token != PpAtomConstString) {
-        // TODO: handle angle brackets.
-        parseContext.ppError(directiveLoc, "must be followed by a file designation", "#include", "");
-    } else {
-        // Make a copy of the name because it will be overwritten by the next token scan.
-        const std::string filename = ppToken->name;
-        token = scanToken(ppToken);
-        if (token != '\n' && token != EndOfInput) {
-            parseContext.ppError(ppToken->loc, "extra content after file designation", "#include", "");
-        } else {
-            TShader::Includer::IncludeResult* res = includer.include(filename.c_str(), TShader::Includer::EIncludeRelative, currentSourceFile.c_str(), includeStack.size() + 1);
-            if (res && !res->file_name.empty()) {
-                if (res->file_data && res->file_length) {
-                    const bool forNextLine = parseContext.lineDirectiveShouldSetNextLine();
-                    std::ostringstream prologue;
-                    std::ostringstream epilogue;
-                    prologue << "#line " << forNextLine << " " << "\"" << res->file_name << "\"\n";
-                    epilogue << (res->file_data[res->file_length - 1] == '\n'? "" : "\n") << "#line " << directiveLoc.line + forNextLine << " " << directiveLoc.getStringNameOrNum() << "\n";
-                    pushInput(new TokenizableIncludeFile(directiveLoc, prologue.str(), res, epilogue.str(), this));
-                }
-                // At EOF, there's no "current" location anymore.
-                if (token != EndOfInput) parseContext.setCurrentColumn(0);
-                // Don't accidentally return EndOfInput, which will end all preprocessing.
-                return '\n';
-            } else {
-                std::string message =
-                    res ? std::string(res->file_data, res->file_length)
-                        : std::string("Could not process include directive");
-                parseContext.ppError(directiveLoc, message.c_str(), "#include", "");
-                if (res) {
-                    includer.releaseInclude(res);
-                }
-            }
-        }
+
+    // handle <header-name>-style #include
+    if (token == '<') {
+        startWithLocalSearch = false;
+        token = scanHeaderName(ppToken, '>');
     }
+    // otherwise ppToken already has the header name and it was "header-name" style
+
+    if (token != PpAtomConstString) {
+        parseContext.ppError(directiveLoc, "must be followed by a header name", "#include", "");
+        return token;
+    }
+
+    // Make a copy of the name because it will be overwritten by the next token scan.
+    const std::string filename = ppToken->name;
+
+    // See if the directive was well formed
+    token = scanToken(ppToken);
+    if (token != '\n') {
+        if (token == EndOfInput)
+            parseContext.ppError(ppToken->loc, "expected newline after header name:", "#include", "%s", filename.c_str());
+        else
+            parseContext.ppError(ppToken->loc, "extra content after header name:", "#include", "%s", filename.c_str());
+        return token;
+    }
+
+    // Process well-formed directive
+
+    // Find the inclusion, first look in "Local" ("") paths, if requested,
+    // otherwise, only search the "System" (<>) paths.
+    TShader::Includer::IncludeResult* res = nullptr;
+    if (startWithLocalSearch)
+        res = includer.includeLocal(filename.c_str(), currentSourceFile.c_str(), includeStack.size() + 1);
+    if (! res || res->headerName.empty()) {
+        includer.releaseInclude(res);
+        res = includer.includeSystem(filename.c_str(), currentSourceFile.c_str(), includeStack.size() + 1);
+    }
+
+    // Process the results
+    if (res && !res->headerName.empty()) {
+        if (res->headerData && res->headerLength) {
+            // path for processing one or more tokens from an included header, hand off 'res'
+            const bool forNextLine = parseContext.lineDirectiveShouldSetNextLine();
+            std::ostringstream prologue;
+            std::ostringstream epilogue;
+            prologue << "#line " << forNextLine << " " << "\"" << res->headerName << "\"\n";
+            epilogue << (res->headerData[res->headerLength - 1] == '\n'? "" : "\n") <<
+                "#line " << directiveLoc.line + forNextLine << " " << directiveLoc.getStringNameOrNum() << "\n";
+            pushInput(new TokenizableIncludeFile(directiveLoc, prologue.str(), res, epilogue.str(), this));
+            // There's no "current" location anymore.
+            parseContext.setCurrentColumn(0);
+        } else {
+            // things are okay, but there is nothing to process
+            includer.releaseInclude(res);
+        }
+    } else {
+        // error path, clean up
+        std::string message =
+            res ? std::string(res->headerData, res->headerLength)
+                : std::string("Could not process include directive");
+        parseContext.ppError(directiveLoc, message.c_str(), "#include", "for header name: %s", filename.c_str());
+        includer.releaseInclude(res);
+    }
+
     return token;
 }
 
 // Handle #line
-int TPpContext::CPPline(TPpToken* ppToken) 
+int TPpContext::CPPline(TPpToken* ppToken)
 {
     // "#line must have, after macro substitution, one of the following forms:
     // "#line line
@@ -673,7 +704,7 @@ int TPpContext::CPPline(TPpToken* ppToken)
 }
 
 // Handle #error
-int TPpContext::CPPerror(TPpToken* ppToken) 
+int TPpContext::CPPerror(TPpToken* ppToken)
 {
     int token = scanToken(ppToken);
     std::string message;
@@ -696,7 +727,7 @@ int TPpContext::CPPerror(TPpToken* ppToken)
         token = scanToken(ppToken);
     }
     parseContext.notifyErrorDirective(loc.line, message.c_str());
-    //store this msg into the shader's information log..set the Compile Error flag!!!!
+    // store this msg into the shader's information log..set the Compile Error flag!!!!
     parseContext.ppError(loc, message.c_str(), "#error", "");
 
     return '\n';
@@ -850,7 +881,7 @@ int TPpContext::readCPPline(TPpToken* ppToken)
             if (elseSeen[elsetracker])
                 parseContext.ppError(ppToken->loc, "#elif after #else", "#elif", "");
             // this token is really a dont care, but we still need to eat the tokens
-            token = scanToken(ppToken); 
+            token = scanToken(ppToken);
             while (token != '\n' && token != EndOfInput)
                 token = scanToken(ppToken);
             token = CPPelse(0, ppToken);
@@ -911,6 +942,38 @@ int TPpContext::readCPPline(TPpToken* ppToken)
     return token;
 }
 
+// Context-dependent parsing of a #include <header-name>.
+// Assumes no macro expansions etc. are being done; the name is just on the current input.
+// Always creates a name and returns PpAtomicConstString, unless we run out of input.
+int TPpContext::scanHeaderName(TPpToken* ppToken, char delimit)
+{
+    bool tooLong = false;
+
+    if (inputStack.empty())
+        return EndOfInput;
+
+    int len = 0;
+    ppToken->name[0] = '\0';
+    do {
+        int ch = inputStack.back()->getch();
+
+        // done yet?
+        if (ch == delimit) {
+            ppToken->name[len] = '\0';
+            if (tooLong)
+                parseContext.ppError(ppToken->loc, "header name too long", "", "");
+            return PpAtomConstString;
+        } else if (ch == EndOfInput)
+            return EndOfInput;
+
+        // found a character to expand the name with
+        if (len < MaxTokenLength)
+            ppToken->name[len++] = (char)ch;
+        else
+            tooLong = true;
+    } while (true);
+}
+
 // Macro-expand a macro argument 'arg' to create 'expandedArg'.
 // Does not replace 'arg'.
 // Returns nullptr if no expanded argument is created.
@@ -934,17 +997,25 @@ TPpContext::TokenStream* TPpContext::PrescanMacroArg(TokenStream& arg, TPpToken*
     TokenStream* expandedArg = new TokenStream;
     pushInput(new tMarkerInput(this));
     pushTokenStreamInput(arg);
-    while ((token = scanToken(ppToken)) != tMarkerInput::marker) {
+    while ((token = scanToken(ppToken)) != tMarkerInput::marker && token != EndOfInput) {
         if (token == PpAtomIdentifier && MacroExpand(ppToken, false, newLineOkay) != 0)
             continue;
         RecordToken(*expandedArg, token, ppToken);
     }
-    popInput();
+
+    if (token == EndOfInput) {
+        // MacroExpand ate the marker, so had bad input, recover
+        delete expandedArg;
+        expandedArg = nullptr;
+    } else {
+        // remove the marker
+        popInput();
+    }
 
     return expandedArg;
 }
 
-// 
+//
 // Return the next token for a macro expansion, handling macro arguments,
 // whose semantics are dependent on being adjacent to ##.
 //
@@ -1053,7 +1124,7 @@ int TPpContext::tZeroInput::scan(TPpToken* ppToken)
 // Check a token to see if it is a macro that should be expanded.
 // If it is, and defined, push a tInput that will produce the appropriate expansion
 // and return 1.
-// If it is, but undefined, and expandUndef is requested, push a tInput that will 
+// If it is, but undefined, and expandUndef is requested, push a tInput that will
 // expand to 0 and return -1.
 // Otherwise, return 0 to indicate no expansion, which is not necessarily an error.
 //
@@ -1133,7 +1204,7 @@ int TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, bool newLineOka
             depth = 0;
             while (1) {
                 token = scanToken(ppToken);
-                if (token == EndOfInput) {
+                if (token == EndOfInput || token == tMarkerInput::marker) {
                     parseContext.ppError(loc, "End of input in macro", "macro expansion", atomStrings.getString(macroAtom));
                     delete in;
                     return 0;

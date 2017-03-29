@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "memoryviewinfo.h"
 
 #include "debug/dvmemory.h"

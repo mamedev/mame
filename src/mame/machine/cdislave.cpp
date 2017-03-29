@@ -28,7 +28,7 @@ TODO:
 #include "includes/cdi.h"
 
 // device type definition
-const device_type MACHINE_CDISLAVE = &device_creator<cdislave_device>;
+const device_type MACHINE_CDISLAVE = device_creator<cdislave_device>;
 
 
 #if ENABLE_VERBOSE_LOG

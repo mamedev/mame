@@ -11,7 +11,6 @@
 #ifndef __VP620__
 #define __VP620__
 
-#include "emu.h"
 #include "byteio.h"
 #include "machine/keyboard.h"
 

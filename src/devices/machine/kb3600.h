@@ -56,7 +56,6 @@
 #ifndef __AY3600__
 #define __AY3600__
 
-#include "emu.h"
 
 
 

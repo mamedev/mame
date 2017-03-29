@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_helifire)
-	MCFG_SCREEN_VBLANK_DRIVER(n8080_state, screen_eof_helifire)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n8080_state, screen_vblank_helifire))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8 + 0x400)

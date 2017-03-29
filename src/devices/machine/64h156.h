@@ -59,7 +59,6 @@
 #ifndef __C64H156__
 #define __C64H156__
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
@@ -122,6 +121,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

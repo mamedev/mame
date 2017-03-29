@@ -9,7 +9,6 @@
 #ifndef __MC6845__
 #define __MC6845__
 
-#include "emu.h"
 
 
 #define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock) \
@@ -141,7 +140,6 @@ public:
 
 	// read cursor line state
 	DECLARE_READ_LINE_MEMBER( cursor_r );
-	DECLARE_READ_LINE_MEMBER( cursor_state_r );
 
 	// read horizontal sync line state
 	DECLARE_READ_LINE_MEMBER( hsync_r );

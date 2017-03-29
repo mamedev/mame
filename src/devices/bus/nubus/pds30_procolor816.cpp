@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "pds30_procolor816.h"
+#include "screen.h"
 
 #define PROCOLOR816_SCREEN_NAME "cb264_screen"
 #define PROCOLOR816_ROM_REGION  "cb264_rom"
@@ -37,7 +38,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_PROCOLOR816 = &device_creator<nubus_procolor816_device>;
+const device_type PDS030_PROCOLOR816 = device_creator<nubus_procolor816_device>;
 
 
 //-------------------------------------------------

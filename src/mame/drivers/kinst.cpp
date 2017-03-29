@@ -131,11 +131,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
+#include "audio/dcs.h"
+
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/mips/mips3.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
-#include "audio/dcs.h"
+#include "screen.h"
 
 
 class kinst_state : public driver_device

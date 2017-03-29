@@ -360,6 +360,7 @@ D                                                                               
 
 #include "emu.h"
 #include "includes/equites.h"
+
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
@@ -368,6 +369,7 @@ D                                                                               
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
 
@@ -781,7 +783,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Settings") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) // settings
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )

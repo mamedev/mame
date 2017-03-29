@@ -24,6 +24,7 @@ References:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
@@ -32,6 +33,9 @@ References:
 #include "machine/netlist.h"
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
+
+#include "screen.h"
+
 
 #define CPU_TAG         "maincpu"
 #define NETLIST_TAG     "videobrd"
@@ -44,10 +48,12 @@ References:
 #define MISCKEYS_TAG    "misc_keys"
 #define SCREEN_TAG      "screen"
 #define BAUD_PROM_TAG   "u39"
-#define NL_PROM_TAG     "videobrd:u71"
-#define NL_EPROM_TAG    "videobrd:u78"
-#define VIDEO_PROM_TAG  "u71"
-#define CHAR_EPROM_TAG  "u78"
+//#define NL_PROM_TAG     "videobrd:u71"
+//#define NL_EPROM_TAG    "videobrd:u78"
+// VIDEO_PROM at u71
+#define VIDEO_PROM_TAG  NETLIST_TAG ":u90_702128_82s129.bin"
+// CHAR_EPROM at u78
+#define CHAR_EPROM_TAG  NETLIST_TAG ":u83_chr.bin"
 #define VIDEO_OUT_TAG   "videobrd:video_out"
 #define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
@@ -79,8 +85,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CPU_TAG)
 		, m_video_board(*this, NETLIST_TAG)
-		, m_u71(*this, NL_PROM_TAG)
-		, m_u78(*this, NL_EPROM_TAG)
 		, m_u9(*this, "videobrd:u9")
 		, m_u10(*this, "videobrd:u10")
 		, m_u11(*this, "videobrd:u11")
@@ -164,8 +168,6 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device_t> m_video_board;
-	required_device<netlist_mame_rom_t> m_u71;
-	required_device<netlist_mame_rom_t> m_u78;
 	required_device<netlist_ram_pointer_t> m_u9;
 	required_device<netlist_ram_pointer_t> m_u10;
 	required_device<netlist_ram_pointer_t> m_u11;
@@ -711,9 +713,6 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
-
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG, "u90_702128_82s129.bin", 0x0000, 0x0100)
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG, "u83_chr.bin", 0x0000, 0x0800)
 
 	// First 1K
 	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u22", "u22")

@@ -145,11 +145,12 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/pic8259.h"
-#include "machine/6821pia.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
+#include "machine/6821pia.h"
+#include "machine/pic8259.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class z100_state : public driver_device
 {

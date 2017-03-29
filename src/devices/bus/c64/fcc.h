@@ -11,7 +11,6 @@
 #ifndef __FCC__
 #define __FCC__
 
-#include "emu.h"
 #include "exp.h"
 #include "cpu/m6502/m65sc02.h"
 

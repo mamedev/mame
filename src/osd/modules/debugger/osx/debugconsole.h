@@ -10,7 +10,6 @@
 
 #import "debugwindowhandler.h"
 
-#include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 

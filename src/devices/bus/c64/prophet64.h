@@ -11,7 +11,6 @@
 #ifndef __PROPHET64__
 #define __PROPHET64__
 
-#include "emu.h"
 #include "exp.h"
 
 

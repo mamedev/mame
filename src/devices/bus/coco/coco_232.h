@@ -5,7 +5,6 @@
 #ifndef __COCO_232_H__
 #define __COCO_232_H__
 
-#include "emu.h"
 #include "cococart.h"
 #include "machine/mos6551.h"
 

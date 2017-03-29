@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rex_ep256.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REX_EP256 = &device_creator<c64_rex_ep256_cartridge_device>;
+const device_type C64_REX_EP256 = device_creator<c64_rex_ep256_cartridge_device>;
 
 
 //-------------------------------------------------

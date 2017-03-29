@@ -354,7 +354,9 @@ Quick review of the system16 hardware:
 
 #include "emu.h"
 #include "segaic16.h"
+
 #include "video/resnet.h"
+#include "screen.h"
 
 
 
@@ -371,7 +373,7 @@ Quick review of the system16 hardware:
 
 
 
-const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
+const device_type SEGAIC16VID = device_creator<segaic16_video_device>;
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),

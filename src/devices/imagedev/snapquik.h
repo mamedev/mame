@@ -44,7 +44,6 @@ public:
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	snapquick_load_delegate m_load;                 /* loading function */

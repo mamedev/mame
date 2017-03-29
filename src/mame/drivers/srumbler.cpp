@@ -13,11 +13,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/srumbler.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/srumbler.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(srumbler_state::bankswitch_w)
@@ -261,7 +264,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)

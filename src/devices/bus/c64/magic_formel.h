@@ -11,7 +11,6 @@
 #ifndef __MAGIC_FORMEL__
 #define __MAGIC_FORMEL__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/6821pia.h"
 

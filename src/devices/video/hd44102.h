@@ -11,7 +11,6 @@
 #ifndef __HD44102__
 #define __HD44102__
 
-#include "emu.h"
 
 
 

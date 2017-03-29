@@ -22,8 +22,12 @@
 
 #include "emu.h"
 #include "includes/psion.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
@@ -134,7 +138,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 /* Read/Write common */
 void psion_state::io_rw(address_space &space, uint16_t offset)
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return;
 
 	switch (offset & 0xffc0)

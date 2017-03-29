@@ -56,9 +56,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type WILLIAMS_NARC_SOUND = &device_creator<williams_narc_sound_device>;
-extern const device_type WILLIAMS_CVSD_SOUND = &device_creator<williams_cvsd_sound_device>;
-extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_sound_device>;
+const device_type WILLIAMS_NARC_SOUND = device_creator<williams_narc_sound_device>;
+const device_type WILLIAMS_CVSD_SOUND = device_creator<williams_cvsd_sound_device>;
+const device_type WILLIAMS_ADPCM_SOUND = device_creator<williams_adpcm_sound_device>;
 
 
 

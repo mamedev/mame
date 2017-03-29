@@ -11,7 +11,6 @@
 #ifndef __ADAM_SPI__
 #define __ADAM_SPI__
 
-#include "emu.h"
 #include "adamnet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"

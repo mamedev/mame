@@ -106,30 +106,36 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
-#include "video/scn2674.h"
-#include "machine/am9517a.h"
-#include "machine/pic8259.h"
-#include "machine/mc146818.h"
-#include "machine/i8255.h"
-#include "machine/wd_fdc.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
 #include "imagedev/floppy.h"
-#include "machine/pit8253.h"
-#include "sound/speaker.h"
-#include "machine/z80dart.h"
-#include "machine/octo_kbd.h"
+#include "machine/am9517a.h"
 #include "machine/bankdev.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/mc146818.h"
+#include "machine/octo_kbd.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "sound/spkrdev.h"
+#include "video/scn2674.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/centronics/comxpl80.h"
 #include "bus/centronics/epson_ex800.h"
 #include "bus/centronics/epson_lx800.h"
 #include "bus/centronics/epson_lx810l.h"
 #include "bus/centronics/printer.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class octopus_state : public driver_device
 {

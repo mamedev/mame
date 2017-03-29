@@ -11,7 +11,6 @@
 #ifndef __A2EAUX_RAMWORKS3__
 #define __A2EAUX_RAMWORKS3__
 
-#include "emu.h"
 #include "a2eauxslot.h"
 
 //**************************************************************************

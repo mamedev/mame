@@ -12,10 +12,12 @@
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/ram.h"
 #include "video/atarist.h"
 #include "includes/atarist.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/ram.h"
+#include "screen.h"
 
 
 

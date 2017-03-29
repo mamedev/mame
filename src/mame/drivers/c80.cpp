@@ -52,9 +52,14 @@ data of next byte, and so on.
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/c80.h"
+
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "c80.lh"
+
 
 /* Memory Maps */
 

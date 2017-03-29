@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joystick.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_JOYSTICK = &device_creator<vcs_joystick_device>;
+const device_type VCS_JOYSTICK = device_creator<vcs_joystick_device>;
 
 
 static INPUT_PORTS_START( vcs_joystick )

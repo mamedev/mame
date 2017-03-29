@@ -274,13 +274,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/psikyosh.h"
 
 #include "cpu/sh2/sh2.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymf278b.h"
+#include "speaker.h"
 
-#include "includes/psikyosh.h"
 
 static const gfx_layout layout_16x16x4 =
 {
@@ -794,7 +795,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram32_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyosh)
 	MCFG_PALETTE_ADD("palette", 0x5000/4)

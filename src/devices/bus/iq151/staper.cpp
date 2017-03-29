@@ -34,7 +34,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_STAPER = &device_creator<iq151_staper_device>;
+const device_type IQ151_STAPER = device_creator<iq151_staper_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

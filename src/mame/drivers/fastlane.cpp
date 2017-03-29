@@ -12,10 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fastlane.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "includes/fastlane.h"
+
+#include "speaker.h"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {

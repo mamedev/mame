@@ -968,16 +968,20 @@ DIP switches are not verified
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/taito_z.h"
 #include "includes/taitoipt.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
-#include "includes/taito_z.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "contcirc.lh"
 #include "dblaxle.lh"
+
 
 void taitoz_state::parse_cpu_control(  )
 {

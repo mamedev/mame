@@ -216,17 +216,19 @@
 
 *******************************************************************************/
 
-
-#define CPU_CLOCK   XTAL_14_7456MHz
-#define MACH_CLOCK  XTAL_50MHz      // 50.35
-#define COM_CLOCK   XTAL_20MHz
-#define SND_CLOCK   XTAL_16_9344MHz
-
 #include "emu.h"
 #include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define CPU_CLOCK   XTAL_14_7456MHz
+#define MACH_CLOCK  XTAL_50MHz      // 50.35
+#define COM_CLOCK   XTAL_20MHz
+#define SND_CLOCK   XTAL_16_9344MHz
 
 
 class coinmvga_state : public driver_device

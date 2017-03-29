@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "dac76.h"
 
 
@@ -22,7 +23,7 @@ constexpr int dac76_device::m_level[];
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DAC76 = &device_creator<dac76_device>;
+const device_type DAC76 = device_creator<dac76_device>;
 
 
 //**************************************************************************

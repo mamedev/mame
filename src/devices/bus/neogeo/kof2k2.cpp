@@ -16,7 +16,7 @@
 //  neogeo_kof2002_cart - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_K2K2_CART = &device_creator<neogeo_kof2k2type_cart>;
+const device_type NEOGEO_K2K2_CART = device_creator<neogeo_kof2k2type_cart>;
 
 
 neogeo_kof2k2type_cart::neogeo_kof2k2type_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
@@ -67,7 +67,7 @@ machine_config_constructor neogeo_kof2k2type_cart::device_mconfig_additions() co
  kof2002
 **************************************************/
 
-const device_type NEOGEO_K2K2_KOF2002_CART = &device_creator<neogeo_kof2002_cart>;
+const device_type NEOGEO_K2K2_KOF2002_CART = device_creator<neogeo_kof2002_cart>;
 
 neogeo_kof2002_cart::neogeo_kof2002_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_KOF2002_CART, "Neo Geo KOF2002 Cart", tag, owner, clock, "neocart_kof2002", __FILE__)
@@ -83,7 +83,7 @@ void neogeo_kof2002_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_pcm2_prot->swap(ym_region, ym_region_size, 0);
 }
 
-const device_type NEOGEO_K2K2_KF2K2PLS_CART = &device_creator<neogeo_kf2k2pls_cart>;
+const device_type NEOGEO_K2K2_KF2K2PLS_CART = device_creator<neogeo_kf2k2pls_cart>;
 
 /*************************************************
  kf2k2pls
@@ -106,7 +106,7 @@ void neogeo_kf2k2pls_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  matrim
 **************************************************/
 
-const device_type NEOGEO_K2K2_MATRIM_CART = &device_creator<neogeo_matrim_cart>;
+const device_type NEOGEO_K2K2_MATRIM_CART = device_creator<neogeo_matrim_cart>;
 
 neogeo_matrim_cart::neogeo_matrim_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_MATRIM_CART, "Neo Geo Matrimelee Cart", tag, owner, clock, "neocart_matrim", __FILE__)
@@ -125,7 +125,7 @@ void neogeo_matrim_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  samsho5
 **************************************************/
 
-const device_type NEOGEO_K2K2_SAMSHO5_CART = &device_creator<neogeo_samsho5_cart>;
+const device_type NEOGEO_K2K2_SAMSHO5_CART = device_creator<neogeo_samsho5_cart>;
 
 neogeo_samsho5_cart::neogeo_samsho5_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_SAMSHO5_CART, "Neo Geo Samurai Shodown 5 Cart", tag, owner, clock, "neocart_samsho5", __FILE__)
@@ -144,7 +144,7 @@ void neogeo_samsho5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  samsh5sp
 **************************************************/
 
-const device_type NEOGEO_K2K2_SAMSHO5SP_CART = &device_creator<neogeo_samsho5sp_cart>;
+const device_type NEOGEO_K2K2_SAMSHO5SP_CART = device_creator<neogeo_samsho5sp_cart>;
 
 neogeo_samsho5sp_cart::neogeo_samsho5sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_SAMSHO5SP_CART, "Neo Geo Samurai Shodown 5 Special Cart", tag, owner, clock, "neocart_samsh5sp", __FILE__)

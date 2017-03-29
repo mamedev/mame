@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 // slot devices
 #include "bcbattle.h"
@@ -22,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SNES_CONTROL_PORT = &device_creator<snes_control_port_device>;
+const device_type SNES_CONTROL_PORT = device_creator<snes_control_port_device>;
 
 
 //**************************************************************************

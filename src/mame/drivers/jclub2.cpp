@@ -97,10 +97,11 @@ To do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "sound/okim6295.h"
-#include "machine/st0016.h"
-#include "video/st0020.h"
 #include "machine/nvram.h"
+#include "machine/st0016.h"
+#include "sound/okim6295.h"
+#include "video/st0020.h"
+#include "speaker.h"
 
 class darkhors_state : public driver_device
 {

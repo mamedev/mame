@@ -7,7 +7,6 @@
     Phill Harvey-Smith
     2009-11-29.
 */
-#include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
@@ -18,6 +17,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "bus/centronics/ctronics.h"
+#include "screen.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -220,6 +220,6 @@ public:
 	} m_nimbus_mouse;
 
 private:
-	void debug_command(int ref, int params, const char *param[]);
-	void video_debug(int ref, int params, const char *param[]);
+	void debug_command(int ref, const std::vector<std::string> &params);
+	void video_debug(int ref, const std::vector<std::string> &params);
 };

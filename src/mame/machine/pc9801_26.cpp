@@ -13,8 +13,11 @@
 
 #include "emu.h"
 #include "machine/pc9801_26.h"
+
 #include "machine/pic8259.h"
 #include "sound/2203intf.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 
@@ -23,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_26 = &device_creator<pc9801_26_device>;
+const device_type PC9801_26 = device_creator<pc9801_26_device>;
 
 
 

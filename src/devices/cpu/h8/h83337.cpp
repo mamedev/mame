@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "h83337.h"
 
-const device_type H83334 = &device_creator<h83334_device>;
-const device_type H83336 = &device_creator<h83336_device>;
-const device_type H83337 = &device_creator<h83337_device>;
+const device_type H83334 = device_creator<h83334_device>;
+const device_type H83336 = device_creator<h83336_device>;
+const device_type H83337 = device_creator<h83337_device>;
 
 
 h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

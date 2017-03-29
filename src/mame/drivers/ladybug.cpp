@@ -61,9 +61,12 @@ TODO:
  */
 
 #include "emu.h"
+#include "includes/ladybug.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/ladybug.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )

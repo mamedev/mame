@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "ramcard128k.h"
 
 /***************************************************************************
@@ -18,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_RAMCARD128K = &device_creator<a2bus_ssramcard_device>;
+const device_type A2BUS_RAMCARD128K = device_creator<a2bus_ssramcard_device>;
 
 /***************************************************************************
     FUNCTION PROTOTYPES

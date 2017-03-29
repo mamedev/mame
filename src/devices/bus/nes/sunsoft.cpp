@@ -26,6 +26,8 @@
 
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -40,12 +42,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_SUNSOFT_1 = &device_creator<nes_sunsoft_1_device>;
-const device_type NES_SUNSOFT_2 = &device_creator<nes_sunsoft_2_device>;
-const device_type NES_SUNSOFT_3 = &device_creator<nes_sunsoft_3_device>;
-const device_type NES_SUNSOFT_4 = &device_creator<nes_sunsoft_4_device>;
-const device_type NES_SUNSOFT_FME7 = &device_creator<nes_sunsoft_fme7_device>;
-const device_type NES_SUNSOFT_5 = &device_creator<nes_sunsoft_5_device>;
+const device_type NES_SUNSOFT_1 = device_creator<nes_sunsoft_1_device>;
+const device_type NES_SUNSOFT_2 = device_creator<nes_sunsoft_2_device>;
+const device_type NES_SUNSOFT_3 = device_creator<nes_sunsoft_3_device>;
+const device_type NES_SUNSOFT_4 = device_creator<nes_sunsoft_4_device>;
+const device_type NES_SUNSOFT_FME7 = device_creator<nes_sunsoft_fme7_device>;
+const device_type NES_SUNSOFT_5 = device_creator<nes_sunsoft_5_device>;
 
 
 nes_sunsoft_1_device::nes_sunsoft_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -79,7 +81,7 @@ nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, 
 }
 
 nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUNSOFT_4, "NES Cart Sunsoft FME7 PCB", tag, owner, clock, "nes_fme7", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
+					: nes_nrom_device(mconfig, NES_SUNSOFT_FME7, "NES Cart Sunsoft FME7 PCB", tag, owner, clock, "nes_fme7", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
 				{
 }
 
@@ -606,14 +608,14 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 // YM2149F operating in this mode. To use an AY-3-8910 as a substitute,
 // you would need an external divider to reduce the clock speed by half.
 
-#define SUN5_NTSC_CLOCK (21477272.724 / 12)
-
 static MACHINE_CONFIG_FRAGMENT( sun_5b )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("ay", YM2149, SUN5_NTSC_CLOCK/2) // divide by 2 for the internal divider
+	// TODO: this is not how Sunsoft 5B clock signaling works!
+	// The board uses the CLK pin in reality, not hardcoded NTSC values!
+	MCFG_SOUND_ADD("ay", YM2149, (XTAL_21_4772MHz/12)/2) // divide by 2 for the internal divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 

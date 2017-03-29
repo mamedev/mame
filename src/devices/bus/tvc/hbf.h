@@ -5,7 +5,6 @@
 #ifndef __TVC_HBF_H__
 #define __TVC_HBF_H__
 
-#include "emu.h"
 #include "tvc.h"
 #include "machine/wd_fdc.h"
 #include "formats/tvc_dsk.h"

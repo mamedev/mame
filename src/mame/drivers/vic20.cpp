@@ -10,7 +10,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"

@@ -95,17 +95,18 @@
   - emulation of other hardware...?
  ******************************************************************************/
 #include "emu.h"
+// pcw video hardware
+#include "includes/pcw.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
-// upd765 interface
 #include "machine/upd765.h"
-// pcw video hardware
-#include "includes/pcw.h"
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "pcw.lh"
 

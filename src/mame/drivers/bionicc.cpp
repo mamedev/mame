@@ -81,10 +81,13 @@
 ******************************************************************************************/
 
 #include "emu.h"
+#include "includes/bionicc.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
-#include "includes/bionicc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -388,7 +391,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz / 4, 386, 0, 256, 260, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update_bionicc)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)

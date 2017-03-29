@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "megacart.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_MEGACART = &device_creator<vic20_megacart_device>;
+const device_type VIC20_MEGACART = device_creator<vic20_megacart_device>;
 
 
 //-------------------------------------------------

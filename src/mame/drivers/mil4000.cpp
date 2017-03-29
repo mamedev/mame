@@ -107,17 +107,20 @@
 
 *******************************************************************************************/
 
-#define MAIN_CLOCK    XTAL_12MHz
-#define SEC_CLOCK     XTAL_14_31818MHz
-
-#define CPU_CLOCK     MAIN_CLOCK
-
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "mil4000.lh"
+
+
+#define MAIN_CLOCK    XTAL_12MHz
+#define SEC_CLOCK     XTAL_14_31818MHz
+
+#define CPU_CLOCK     MAIN_CLOCK
 
 
 class mil4000_state : public driver_device

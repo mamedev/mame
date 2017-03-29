@@ -216,17 +216,20 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/asuka.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z180/z180.h"
+#include "cpu/z80/z80.h"
+#include "machine/bonzeadv.h"
 #include "machine/watchdog.h"
 #include "sound/2610intf.h"
-#include "sound/ym2151.h"
 #include "sound/msm5205.h"
-#include "includes/asuka.h"
-#include "machine/bonzeadv.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***********************************************************
@@ -804,7 +807,7 @@ void asuka_state::machine_reset()
 	memset(m_cval, 0, 26);
 }
 
-void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
 {
 	// rising edge
 	if (state)
@@ -835,7 +838,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -896,7 +899,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -970,7 +973,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1033,7 +1036,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1103,7 +1106,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1165,7 +1168,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1570,10 +1573,10 @@ ROM_END
 
 ROM_START( cadashi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c21-14it",  0x00000, 0x20000, CRC(d1d9e613) SHA1(296c188daec962bdb4e78e20f1cc4c7d1f4dda09) ) /* need correct Taito ID #s for these roms */
-	ROM_LOAD16_BYTE( "c21-16it",  0x00001, 0x20000, CRC(142256ef) SHA1(9ffc64d7c900bfa0300de9e6d18c7458f4c76ed7) ) /* ID numbers should be at least 26 or higher */
-	ROM_LOAD16_BYTE( "c21-13it",  0x40000, 0x20000, CRC(c9cf6e30) SHA1(872c871cd60e0aa7149660277f67f90748d82743) )
-	ROM_LOAD16_BYTE( "c21-17it",  0x40001, 0x20000, CRC(641fc9dd) SHA1(1497e39f6b250de39ef2785aaca7e68a803612fa) )
+	ROM_LOAD16_BYTE( "c21_27-1.ic11",  0x00000, 0x20000, CRC(d1d9e613) SHA1(296c188daec962bdb4e78e20f1cc4c7d1f4dda09) )
+	ROM_LOAD16_BYTE( "c21_29-1.ic15",  0x00001, 0x20000, CRC(142256ef) SHA1(9ffc64d7c900bfa0300de9e6d18c7458f4c76ed7) )
+	ROM_LOAD16_BYTE( "c21_26-1.ic10",  0x40000, 0x20000, CRC(c9cf6e30) SHA1(872c871cd60e0aa7149660277f67f90748d82743) )
+	ROM_LOAD16_BYTE( "c21_28-1.ic14",  0x40001, 0x20000, CRC(641fc9dd) SHA1(1497e39f6b250de39ef2785aaca7e68a803612fa) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "c128_comal80.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C128_COMAL80 = &device_creator<c128_comal80_cartridge_device>;
+const device_type C128_COMAL80 = device_creator<c128_comal80_cartridge_device>;
 
 
 

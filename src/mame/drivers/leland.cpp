@@ -63,6 +63,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /* Master Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
@@ -2980,36 +2981,36 @@ GAME( 1986, dangerz,  0,       leland,   dangerz, leland_state,  dangerz,  ROT0,
 
 /* small master banks + extra top board, small slave banks */
 GAME( 1987, basebal2, 0,       leland,   basebal2, leland_state, basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
-GAME( 1987, dblplay,  0,       leland,   basebal2, leland_state, dblplay,  ROT0,   "Leland Corp. / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
-GAME( 1988, strkzone, 0,       leland,   basebal2, leland_state, strkzone, ROT0,   "Leland Corp.", "Strike Zone Baseball", 0 )
+GAME( 1987, dblplay,  0,       leland,   basebal2, leland_state, dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
+GAME( 1988, strkzone, 0,       leland,   basebal2, leland_state, strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p, 0,       redline,  redline, leland_state,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
-GAME( 1987, quarterb, 0,       quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corp.", "Quarterback (set 1)", 0 )
-GAME( 1987, quarterba,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
+GAME( 1987, quarterb, 0,       quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (set 1)", 0 )
+GAME( 1987, quarterba,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (set 2)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
-GAME( 1988, viper,    0,       lelandi,  dangerz, leland_state,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )
-GAME( 1988, teamqb,   0,       lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 1)", 0 )
-GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 2)", 0 )
-GAME( 1989, aafb,     0,       lelandi,  teamqb, leland_state,   aafb,     ROT270, "Leland Corp.", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p, leland_state,   aafbd2p,  ROT270, "Leland Corp.", "All American Football (rev D, 2 Players)", 0 )
-GAME( 1989, aafbc,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev B)", MACHINE_NOT_WORKING )
+GAME( 1988, viper,    0,       lelandi,  dangerz, leland_state,  viper,    ROT0,   "Leland Corporation", "Viper", 0 )
+GAME( 1988, teamqb,   0,       lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (set 1)", 0 )
+GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (set 2)", 0 )
+GAME( 1989, aafb,     0,       lelandi,  teamqb, leland_state,   aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
+GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p, leland_state,   aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbc,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
+GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
 
 /* huge master banks, large slave banks, 80186 sound */
-GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road", 0 )
-GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
-GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak (2 Players)", 0 )
-GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 1)", 0 )
-GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 2)", 0 )
+GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road", 0 )
+GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (2 Players)", 0 )
+GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 1)", 0 )
+GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 2)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 1)", 0 )
-GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 2)", 0 )
-GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (Europe)", 0 )
-GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corp. (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corp.", "World Soccer Finals", 0 )
-GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corp.", "Danny Sullivan's Indy Heat", 0 )
-GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corp.", "Brute Force", 0 )
-GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corp.", "Asylum (prototype)", 0 )
+GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 1)", 0 )
+GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 2)", 0 )
+GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
+GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
+GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corporation", "World Soccer Finals", 0 )
+GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat", 0 )
+GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
+GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

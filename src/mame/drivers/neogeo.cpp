@@ -463,9 +463,12 @@
 
 #include "emu.h"
 #include "includes/neogeo.h"
+
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "neogeo.lh"
 
 

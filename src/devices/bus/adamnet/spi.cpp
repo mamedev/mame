@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "spi.h"
 
 
@@ -25,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_SPI = &device_creator<adam_spi_device>;
+const device_type ADAM_SPI = device_creator<adam_spi_device>;
 
 
 //-------------------------------------------------

@@ -24,7 +24,6 @@ TODO:
 #ifndef _MACHINE_CDI68070_H_
 #define _MACHINE_CDI68070_H_
 
-#include "emu.h"
 
 #define ISR_MST     0x80    // Master
 #define ISR_TRX     0x40    // Transmitter

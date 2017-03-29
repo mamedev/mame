@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_PROF180X_H
+#define MAME_INCLUDES_PROF180X_H
+
 #pragma once
 
-#ifndef __PROF180X__
-#define __PROF180X__
+#include "bus/centronics/ctronics.h"
 
 #define HD64180_TAG             "hd64180"
 #define FDC9268_TAG             "fdc9268"
@@ -16,8 +18,8 @@ class prof180x_state : public driver_device
 {
 public:
 	prof180x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_centronics(*this, CENTRONICS_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_centronics(*this, CENTRONICS_TAG)
 	{
 	}
 
@@ -45,4 +47,4 @@ public:
 	int m_mm1;
 };
 
-#endif
+#endif // MAME_INCLUDES_PROF180X_H

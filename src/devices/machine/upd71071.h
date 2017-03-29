@@ -3,7 +3,6 @@
 #ifndef __UPD71071_H__
 #define __UPD71071_H__
 
-#include "emu.h"
 
 
 struct upd71071_reg

@@ -59,7 +59,7 @@ private:
 
 		audio_buffer(int size, int reserve) : size(size + reserve), reserve(reserve) {
 			playpos = writepos = 0;
-			buf = new T[size]();
+			buf = new T[this->size];
 		}
 
 		~audio_buffer() { delete[] buf; }
@@ -130,6 +130,12 @@ private:
 		}
 	};
 
+	enum
+	{
+		LATENCY_MIN = 1,
+		LATENCY_MAX = 5,
+	};
+
 	int                 callback(s16* output_buffer, size_t number_of_frames);
 	static int          _callback(const void*,
 								  void *output_buffer,
@@ -186,6 +192,7 @@ int sound_pa::init(osd_options const &options)
 	m_skip_threshold_ticks  = 0;
 	m_osd_tps               = osd_ticks_per_second();
 	m_buffer_min_ct         = INT_MAX;
+	m_audio_latency         = std::min<int>(std::max<int>(m_audio_latency, LATENCY_MIN), LATENCY_MAX);
 
 	try {
 		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
@@ -415,11 +422,14 @@ void sound_pa::exit()
 		osd_printf_error("PortAudio: Error writing log.\n");
 #endif
 
-	Pa_StopStream(m_pa_stream);
-	err = Pa_Terminate();
+	err = Pa_StopStream(m_pa_stream);  if (err != paNoError) goto error;
+	err = Pa_CloseStream(m_pa_stream); if (err != paNoError) goto error;
 
+	error:
 	if (err != paNoError)
 		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
+
+	Pa_Terminate();
 
 	delete m_ab;
 

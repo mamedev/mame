@@ -19,8 +19,8 @@
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb1_device>;
-const device_type SNS_LOROM_SUPERGB2 = &device_creator<sns_rom_sgb2_device>;
+const device_type SNS_LOROM_SUPERGB = device_creator<sns_rom_sgb1_device>;
+const device_type SNS_LOROM_SUPERGB2 = device_creator<sns_rom_sgb2_device>;
 
 
 sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

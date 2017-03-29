@@ -29,6 +29,8 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "et3400.lh"
 
 

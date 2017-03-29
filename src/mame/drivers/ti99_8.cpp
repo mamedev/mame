@@ -188,6 +188,7 @@ Known Issues (MZ, 2010-11-07)
 #include "bus/ti99_peb/peribox.h"
 
 #include "softlist.h"
+#include "speaker.h"
 
 // Debugging
 #define TRACE_READY 0

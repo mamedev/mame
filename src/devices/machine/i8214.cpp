@@ -12,7 +12,7 @@
 
 
 // device type definition
-const device_type I8214 = &device_creator<i8214_device>;
+const device_type I8214 = device_creator<i8214_device>;
 
 
 //**************************************************************************

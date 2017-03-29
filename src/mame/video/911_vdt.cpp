@@ -17,6 +17,10 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAX_VDT 1
 
 static const gfx_layout fontlayout_7bit =
@@ -141,7 +145,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 	}
 }
 
-const device_type VDT911 = &device_creator<vdt911_device>;
+const device_type VDT911 = device_creator<vdt911_device>;
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),

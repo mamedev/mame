@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "abc1600mac.h"
 
 
@@ -53,7 +54,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC1600_MAC = &device_creator<abc1600_mac_device>;
+const device_type ABC1600_MAC = device_creator<abc1600_mac_device>;
 
 
 DEVICE_ADDRESS_MAP_START( map, 8, abc1600_mac_device )

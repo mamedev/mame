@@ -5,7 +5,6 @@
 #ifndef __DMV_K801_H__
 #define __DMV_K801_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 #include "machine/mc2661.h"
 #include "bus/rs232/rs232.h"

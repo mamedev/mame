@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "imi5000h.h"
 
 
@@ -28,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IMI5000H = &device_creator<imi5000h_device>;
+const device_type IMI5000H = device_creator<imi5000h_device>;
 
 
 //-------------------------------------------------

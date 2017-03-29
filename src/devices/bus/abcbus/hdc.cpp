@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "hdc.h"
 
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_HDC = &device_creator<abc_hdc_device>;
+const device_type ABC_HDC = device_creator<abc_hdc_device>;
 
 
 //-------------------------------------------------

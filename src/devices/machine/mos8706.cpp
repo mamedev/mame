@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mos8706.h"
 
 
@@ -23,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MOS8706 = &device_creator<mos8706_device>;
+const device_type MOS8706 = device_creator<mos8706_device>;
 
 
 

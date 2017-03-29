@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START (hk68v10, hk68v10_state)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", hk68_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

@@ -3,7 +3,6 @@
 #ifndef __JVSDEV_H__
 #define __JVSDEV_H__
 
-#include "emu.h"
 
 #define MCFG_JVS_DEVICE_ADD(_tag, _type, _host) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \

@@ -5,7 +5,6 @@
 #ifndef __3C503_H__
 #define __3C503_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/dp8390.h"
 

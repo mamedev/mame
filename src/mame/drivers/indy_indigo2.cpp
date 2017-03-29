@@ -41,23 +41,25 @@
 \*********************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
-#include "sound/cdda.h"
-#include "machine/sgi.h"
-#include "machine/pckeybrd.h"
-#include "machine/pc_lpt.h"
-#include "machine/8042kbdc.h"
-#include "machine/pit8253.h"
-#include "video/newport.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "bus/rs232/rs232.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
-#include "machine/wd33c93.h"
+#include "cpu/mips/mips3.h"
+#include "machine/8042kbdc.h"
 #include "machine/ds1386.h"
+#include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
+#include "machine/pit8253.h"
+#include "machine/sgi.h"
+#include "machine/wd33c93.h"
 #include "machine/z80scc.h"
-#include "bus/rs232/rs232.h"
+#include "sound/cdda.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/newport.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define SCC_TAG     "scc"
 #define PI1_TAG     "pi1"
@@ -151,8 +153,8 @@ public:
 		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x20) { }
 };
 
-const device_type SGI_IOC2_GUINNESS = &device_creator<ioc2_guinness_device>;
-const device_type SGI_IOC2_FULL_HOUSE = &device_creator<ioc2_full_house_device>;
+const device_type SGI_IOC2_GUINNESS = device_creator<ioc2_guinness_device>;
+const device_type SGI_IOC2_FULL_HOUSE = device_creator<ioc2_full_house_device>;
 
 ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, "SGI IOC2 (Guinness)", tag, owner, clock, "ioc2g", __FILE__)

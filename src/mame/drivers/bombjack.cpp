@@ -98,9 +98,12 @@ Dip Locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bombjack.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/bombjack.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_CALLBACK_MEMBER(bombjack_state::soundlatch_callback)

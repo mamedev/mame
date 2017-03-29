@@ -44,23 +44,18 @@
 
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "includes/apple2e.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ap2_dsk.h"
-#include "formats/ap_dsk35.h"
 #include "includes/apple2gs.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "sound/es5503.h"
-#include "machine/applefdc.h"
-#include "machine/z80scc.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
-#include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
+#include "cpu/g65816/g65816.h"
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
+#include "machine/applefdc.h"
+#include "machine/sonydriv.h"
+#include "machine/z80scc.h"
+#include "sound/es5503.h"
+
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
@@ -79,9 +74,13 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
-#include "bus/rs232/rs232.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
+
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -376,7 +375,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NOOP)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)

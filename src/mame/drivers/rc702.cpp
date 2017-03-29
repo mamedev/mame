@@ -19,19 +19,23 @@ Issues:
 ****************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/upd765.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/7474.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/7474.h"
+#include "machine/am9517a.h"
 #include "machine/clock.h"
-#include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "video/i8275.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -42,6 +46,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 		, m_sio1(*this, "sio1")
 		, m_ctc1(*this, "ctc1")
 		, m_pio(*this, "pio")
@@ -73,7 +78,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
-	uint8_t *m_p_chargen;
 	bool m_q_state;
 	bool m_qbar_state;
 	bool m_drq_state;
@@ -82,6 +86,7 @@ private:
 	bool m_tc;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<z80dart_device> m_sio1;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -244,7 +249,6 @@ DRIVER_INIT_MEMBER( rc702_state, rc702 )
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	m_p_chargen = memregion("chargen")->base();
 	m_palette->set_pen_colors(0, our_palette, ARRAY_LENGTH(our_palette));
 }
 

@@ -3,6 +3,7 @@
 
 // E0C6200 opcode handlers
 
+#include "emu.h"
 #include "e0c6200.h"
 
 

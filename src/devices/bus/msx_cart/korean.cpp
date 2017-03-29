@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "korean.h"
 
-const device_type MSX_CART_KOREAN_80IN1 = &device_creator<msx_cart_korean_80in1>;
-const device_type MSX_CART_KOREAN_90IN1 = &device_creator<msx_cart_korean_90in1>;
-const device_type MSX_CART_KOREAN_126IN1 = &device_creator<msx_cart_korean_126in1>;
+const device_type MSX_CART_KOREAN_80IN1 = device_creator<msx_cart_korean_80in1>;
+const device_type MSX_CART_KOREAN_90IN1 = device_creator<msx_cart_korean_90in1>;
+const device_type MSX_CART_KOREAN_126IN1 = device_creator<msx_cart_korean_126in1>;
 
 
 msx_cart_korean_80in1::msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

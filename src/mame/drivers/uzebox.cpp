@@ -13,12 +13,17 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/avr8/avr8.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
@@ -247,7 +252,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		std::vector<uint8_t> data(size);
 		image.fread(&data[0], size);

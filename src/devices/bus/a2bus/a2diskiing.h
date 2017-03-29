@@ -11,7 +11,6 @@
 #ifndef __A2BUS_DISKIING__
 #define __A2BUS_DISKIING__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"

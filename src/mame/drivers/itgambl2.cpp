@@ -53,12 +53,14 @@
 
 ************************************************************************/
 
-#define MAIN_CLOCK  XTAL_16MHz
-#define SND_CLOCK   XTAL_14_31818MHz
-
 #include "emu.h"
 #include "cpu/h8/h83337.h"
 #include "sound/upd7759.h"
+#include "screen.h"
+#include "speaker.h"
+
+#define MAIN_CLOCK  XTAL_16MHz
+#define SND_CLOCK   XTAL_14_31818MHz
 
 
 class itgambl2_state : public driver_device

@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "hashfile.h"
 #include "pool.h"
 #include "emuopts.h"

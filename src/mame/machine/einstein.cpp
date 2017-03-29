@@ -15,7 +15,7 @@
 ****************************************************************/
 
 
-const device_type EINSTEIN_KEYBOARD_DAISY = &device_creator<einstein_keyboard_daisy_device>;
+const device_type EINSTEIN_KEYBOARD_DAISY = device_creator<einstein_keyboard_daisy_device>;
 
 
 //**************************************************************************
@@ -79,7 +79,7 @@ void einstein_keyboard_daisy_device::z80daisy_irq_reti()
 {
 }
 
-const device_type EINSTEIN_ADC_DAISY = &device_creator<einstein_adc_daisy_device>;
+const device_type EINSTEIN_ADC_DAISY = device_creator<einstein_adc_daisy_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -143,7 +143,7 @@ void einstein_adc_daisy_device::z80daisy_irq_reti()
 }
 
 
-const device_type EINSTEIN_FIRE_DAISY = &device_creator<einstein_fire_daisy_device>;
+const device_type EINSTEIN_FIRE_DAISY = device_creator<einstein_fire_daisy_device>;
 
 
 //**************************************************************************

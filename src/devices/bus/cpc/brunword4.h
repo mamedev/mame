@@ -6,7 +6,6 @@
 
 */
 
-#include "emu.h"
 #include "cpcexp.h"
 
 class cpc_brunword4_device  : public device_t,

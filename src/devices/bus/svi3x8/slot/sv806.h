@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_SLOT_SV806_H__
 #define __SVI3X8_SLOT_SV806_H__
 
-#include "emu.h"
 #include "slot.h"
 #include "video/mc6845.h"
 

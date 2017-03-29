@@ -13,13 +13,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "twintap.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_TWINTAP = &device_creator<snes_twintap_device>;
+const device_type SNES_TWINTAP = device_creator<snes_twintap_device>;
 
 
 static INPUT_PORTS_START( snes_twintap )

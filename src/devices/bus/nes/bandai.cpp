@@ -50,12 +50,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_OEKAKIDS = &device_creator<nes_oekakids_device>;
-const device_type NES_FCG = &device_creator<nes_fcg_device>;
-const device_type NES_LZ93D50 = &device_creator<nes_lz93d50_device>;
-const device_type NES_LZ93D50_24C01 = &device_creator<nes_lz93d50_24c01_device>;
-const device_type NES_LZ93D50_24C02 = &device_creator<nes_lz93d50_24c02_device>;
-const device_type NES_FJUMP2 = &device_creator<nes_fjump2_device>;
+const device_type NES_OEKAKIDS = device_creator<nes_oekakids_device>;
+const device_type NES_FCG = device_creator<nes_fcg_device>;
+const device_type NES_LZ93D50 = device_creator<nes_lz93d50_device>;
+const device_type NES_LZ93D50_24C01 = device_creator<nes_lz93d50_24c01_device>;
+const device_type NES_LZ93D50_24C02 = device_creator<nes_lz93d50_24c02_device>;
+const device_type NES_FJUMP2 = device_creator<nes_fjump2_device>;
 
 
 nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

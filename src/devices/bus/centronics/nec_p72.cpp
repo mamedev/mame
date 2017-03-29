@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ramiro Polla
 
+#include "emu.h"
 #include "nec_p72.h"
 
 
@@ -8,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEC_P72 = &device_creator<nec_p72_t>;
+const device_type NEC_P72 = device_creator<nec_p72_t>;
 
 
 //-------------------------------------------------

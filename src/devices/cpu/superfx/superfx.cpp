@@ -5,7 +5,7 @@
 #include "superfx.h"
 
 
-const device_type SUPERFX = &device_creator<superfx_device>;
+const device_type SUPERFX = device_creator<superfx_device>;
 
 superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SUPERFX, "SuperFX", tag, owner, clock, "superfx", __FILE__)

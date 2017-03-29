@@ -53,14 +53,20 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/tms7000/tms7000.h"
-#include "video/tms3556.h"
-#include "sound/tms5220.h"
+//#include "imagedev/cassette.h"
 #include "machine/spchrom.h"
+#include "sound/tms5220.h"
+#include "video/tms3556.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-//#include "imagedev/cassette.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class exelv_state : public driver_device
 {

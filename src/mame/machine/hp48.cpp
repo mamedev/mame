@@ -9,11 +9,12 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/saturn/saturn.h"
+#include "includes/hp48.h"
 
+#include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"
 
-#include "includes/hp48.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -913,7 +914,7 @@ void hp48_state::hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size )
 
 
 /* ----- card images ------ */
-const device_type HP48_PORT = &device_creator<hp48_port_image_device>;
+const device_type HP48_PORT = device_creator<hp48_port_image_device>;
 
 /* helper for load and create */
 void hp48_port_image_device::hp48_fill_port()
@@ -1013,11 +1014,6 @@ hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, co
 	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
-}
-
-void hp48_port_image_device::device_config_complete()
-{
-	update_names(HP48_PORT, "port", "p");
 }
 
 /***************************************************************************

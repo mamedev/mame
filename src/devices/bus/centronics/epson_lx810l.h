@@ -10,13 +10,13 @@
 #ifndef __EPSON_LX810L__
 #define __EPSON_LX810L__
 
-#include "emu.h"
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
 #include "machine/steppers.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 
 /* The printer starts printing at x offset 44 and stops printing at x

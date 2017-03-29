@@ -11,7 +11,6 @@
 #ifndef __WANGPC_LIC__
 #define __WANGPC_LIC__
 
-#include "emu.h"
 #include "wangpc.h"
 
 

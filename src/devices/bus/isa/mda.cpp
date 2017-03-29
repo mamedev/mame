@@ -8,8 +8,11 @@
 
 #include "emu.h"
 #include "mda.h"
-#include "video/mc6845.h"
+
 #include "machine/pc_lpt.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 #define MDA_SCREEN_NAME "mda_screen"
 #define MDA_MC6845_NAME "mc6845_mda"
@@ -120,7 +123,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_MDA = &device_creator<isa8_mda_device>;
+const device_type ISA8_MDA = device_creator<isa8_mda_device>;
 
 
 //-------------------------------------------------
@@ -558,7 +561,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_HERCULES = &device_creator<isa8_hercules_device>;
+const device_type ISA8_HERCULES = device_creator<isa8_hercules_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -776,7 +779,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_ec1840_0002 )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
 MACHINE_CONFIG_END
 
-const device_type ISA8_EC1840_0002 = &device_creator<isa8_ec1840_0002_device>;
+const device_type ISA8_EC1840_0002 = device_creator<isa8_ec1840_0002_device>;
 
 
 //-------------------------------------------------

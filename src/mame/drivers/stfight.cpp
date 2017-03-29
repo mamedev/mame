@@ -263,6 +263,8 @@ TODO:
 
 #include "sound/2203intf.h"
 
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM

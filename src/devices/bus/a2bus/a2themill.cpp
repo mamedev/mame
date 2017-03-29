@@ -22,8 +22,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2themill.h"
-#include "includes/apple2.h"
 #include "cpu/m6809/m6809.h"
 
 /***************************************************************************
@@ -36,7 +36,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_THEMILL = &device_creator<a2bus_themill_device>;
+const device_type A2BUS_THEMILL = device_creator<a2bus_themill_device>;
 
 #define M6809_TAG         "m6809"
 

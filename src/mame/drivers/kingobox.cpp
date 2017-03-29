@@ -19,10 +19,14 @@ Main CPU:
 
 #include "emu.h"
 #include "includes/kingobox.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(kingofb_state::video_interrupt_w)
 {

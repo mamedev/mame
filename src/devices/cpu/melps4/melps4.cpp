@@ -37,6 +37,7 @@
 
 */
 
+#include "emu.h"
 #include "melps4.h"
 #include "debugger.h"
 

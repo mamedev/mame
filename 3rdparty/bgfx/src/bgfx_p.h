@@ -24,9 +24,6 @@
 
 #include <inttypes.h>
 #include <stdarg.h> // va_list
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <alloca.h>
 
 // Check handle, cannot be bgfx::invalidHandle and must be valid.
@@ -85,9 +82,6 @@ namespace bgfx
 #endif // BX_COMPILER_CLANG_ANALYZER
 
 	void trace(const char* _filePath, uint16_t _line, const char* _format, ...);
-
-	void dbgPrintfVargs(const char* _format, va_list _argList);
-	void dbgPrintf(const char* _format, ...);
 
 	inline bool operator==(const VertexDeclHandle& _lhs, const VertexDeclHandle& _rhs) { return _lhs.idx == _rhs.idx; }
 	inline bool operator==(const UniformHandle& _lhs,    const UniformHandle&    _rhs) { return _lhs.idx == _rhs.idx; }
@@ -291,6 +285,13 @@ namespace bgfx
 		{
 			uint64_t ui64 = *( (uint64_t*)this);
 			return UINT64_C(0) == ui64;
+		}
+
+		bool isZeroArea() const
+		{
+			return 0 == m_width
+				|| 0 == m_height
+				;
 		}
 
 		void intersect(const Rect& _a, const Rect& _b)
@@ -1808,7 +1809,7 @@ namespace bgfx
 		Matrix4 m_view[BGFX_CONFIG_MAX_VIEWS];
 		Matrix4 m_proj[2][BGFX_CONFIG_MAX_VIEWS];
 		uint8_t m_viewFlags[BGFX_CONFIG_MAX_VIEWS];
-		uint8_t m_occlusion[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		uint8_t m_occlusion[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 
 		uint64_t m_sortKeys[BGFX_CONFIG_MAX_DRAW_CALLS+1];
 		RenderItemCount m_sortValues[BGFX_CONFIG_MAX_DRAW_CALLS+1];
@@ -2216,8 +2217,8 @@ namespace bgfx
 				, _width
 				, _height
 				);
-			m_resolution.m_width  = bx::uint32_min(g_caps.limits.maxTextureSize, _width);
-			m_resolution.m_height = bx::uint32_min(g_caps.limits.maxTextureSize, _height);
+			m_resolution.m_width  = bx::uint32_clamp(_width,  1, g_caps.limits.maxTextureSize);
+			m_resolution.m_height = bx::uint32_clamp(_height, 1, g_caps.limits.maxTextureSize);
 			m_resolution.m_flags  = 0
 				| _flags
 				| (g_platformDataChangedSinceReset ? BGFX_RESET_INTERNAL_FORCE : 0)
@@ -3498,7 +3499,7 @@ namespace bgfx
 					cmdbuf.write(handle);
 					cmdbuf.write(uniform.m_type);
 					cmdbuf.write(uniform.m_num);
-					uint8_t len = (uint8_t)strlen(_name)+1;
+					uint8_t len = (uint8_t)bx::strnlen(_name)+1;
 					cmdbuf.write(len);
 					cmdbuf.write(_name, len);
 				}
@@ -3526,7 +3527,7 @@ namespace bgfx
 				cmdbuf.write(handle);
 				cmdbuf.write(_type);
 				cmdbuf.write(_num);
-				uint8_t len = (uint8_t)strlen(_name)+1;
+				uint8_t len = (uint8_t)bx::strnlen(_name)+1;
 				cmdbuf.write(len);
 				cmdbuf.write(_name, len);
 			}
@@ -3581,7 +3582,7 @@ namespace bgfx
 
 		BGFX_API_FUNC(OcclusionQueryResult::Enum getResult(OcclusionQueryHandle _handle) )
 		{
-			BGFX_CHECK_HANDLE("destroyOcclusionQuery", m_occlusionQueryHandle, _handle);
+			BGFX_CHECK_HANDLE("getResult", m_occlusionQueryHandle, _handle);
 
 			switch (m_submit->m_occlusion[_handle.idx])
 			{
@@ -3602,7 +3603,7 @@ namespace bgfx
 		BGFX_API_FUNC(void saveScreenShot(const char* _filePath) )
 		{
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::SaveScreenShot);
-			uint16_t len = (uint16_t)strlen(_filePath)+1;
+			uint16_t len = (uint16_t)bx::strnlen(_filePath)+1;
 			cmdbuf.write(len);
 			cmdbuf.write(_filePath, len);
 		}
@@ -3621,7 +3622,7 @@ namespace bgfx
 		{
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::UpdateViewName);
 			cmdbuf.write(_id);
-			uint16_t len = (uint16_t)strlen(_name)+1;
+			uint16_t len = (uint16_t)bx::strnlen(_name)+1;
 			cmdbuf.write(len);
 			cmdbuf.write(_name, len);
 		}
@@ -4113,7 +4114,7 @@ namespace bgfx
 		bx::HandleAllocT<BGFX_CONFIG_MAX_TEXTURES> m_textureHandle;
 		bx::HandleAllocT<BGFX_CONFIG_MAX_FRAME_BUFFERS> m_frameBufferHandle;
 		bx::HandleAllocT<BGFX_CONFIG_MAX_UNIFORMS> m_uniformHandle;
-		bx::HandleAllocT<BGFX_CONFIG_MAX_OCCUSION_QUERIES> m_occlusionQueryHandle;
+		bx::HandleAllocT<BGFX_CONFIG_MAX_OCCLUSION_QUERIES> m_occlusionQueryHandle;
 
 		struct ShaderRef
 		{

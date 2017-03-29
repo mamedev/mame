@@ -9,9 +9,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
 #include "includes/pecom.h"
+
 
 TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
 {

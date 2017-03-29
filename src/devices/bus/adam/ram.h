@@ -11,7 +11,6 @@
 #ifndef __ADAM_RAM__
 #define __ADAM_RAM__
 
-#include "emu.h"
 #include "exp.h"
 
 

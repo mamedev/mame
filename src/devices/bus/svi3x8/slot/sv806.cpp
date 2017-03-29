@@ -6,14 +6,17 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv806.h"
+
+#include "screen.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV806 = &device_creator<sv806_device>;
+const device_type SV806 = device_creator<sv806_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

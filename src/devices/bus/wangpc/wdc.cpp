@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wdc.h"
 #include "bus/scsi/scsihd.h"
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_WDC = &device_creator<wangpc_wdc_device>;
+const device_type WANGPC_WDC = device_creator<wangpc_wdc_device>;
 
 
 //-------------------------------------------------

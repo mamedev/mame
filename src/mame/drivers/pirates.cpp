@@ -90,10 +90,13 @@ Notes:
 ---*/
 
 #include "emu.h"
+#include "includes/pirates.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/pirates.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(pirates_state::out_w)

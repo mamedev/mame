@@ -66,10 +66,11 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
+#include "machine/pcshare.h"
+#include "screen.h"
 
 
 class gamecstl_state : public pcat_base_state

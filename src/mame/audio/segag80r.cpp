@@ -29,23 +29,13 @@
 #define SEGA005_555_TIMER_FREQ      (1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ        (100000)    /* unknown, just a guess */
 
-const device_type SEGA005 = &device_creator<sega005_sound_device>;
+const device_type SEGA005 = device_creator<sega005_sound_device>;
 
 sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sega005_sound_timer(nullptr),
 		m_sega005_stream(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sega005_sound_device::device_config_complete()
 {
 }
 

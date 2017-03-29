@@ -47,12 +47,16 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sshangha.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/sshangha.h"
 #include "machine/deco146.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define SSHANGHA_HACK   0
 

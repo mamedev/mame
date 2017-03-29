@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "diag.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_DIAGNOSTIC_CONNECTOR = &device_creator<pet_userport_diagnostic_connector_t>;
+const device_type PET_USERPORT_DIAGNOSTIC_CONNECTOR = device_creator<pet_userport_diagnostic_connector_t>;
 
 
 

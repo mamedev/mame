@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tc4" description="Coleco Total Control 4 cartridges">
+<!--
+
+4 cartridges exist. There is no data, the game is determined by K pin connections.
+- Football    (K8, confirmed)
+- Hockey      (K4?)
+- Soccer      (K2?)
+- Basketball  (K1?)
+
+Each cartridge also has a screen overlay attached, but MAME doesn't support this yet
+through the softwarelist.
+
+-->
+
+	<software name="baskball">
+		<description>Basketball</description>
+		<year>1981</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="tc4_cart">
+			<feature name="pinout" value="0x01" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>Football</description>
+		<year>1981</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="tc4_cart">
+			<feature name="pinout" value="0x08" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="hockey">
+		<description>Hockey</description>
+		<year>1981</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="tc4_cart">
+			<feature name="pinout" value="0x04" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>Soccer</description>
+		<year>1981</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="tc4_cart">
+			<feature name="pinout" value="0x02" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+</softwarelist>

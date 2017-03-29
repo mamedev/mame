@@ -32,13 +32,16 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_POLY_H
+#define MAME_DEVICES_VIDEO_POLY_H
+
 #pragma once
 
-#ifndef __POLY_H__
-#define __POLY_H__
+#include "screen.h"
 
 #include <limits.h>
 #include <atomic>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -1318,4 +1321,4 @@ int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int 
 }
 
 
-#endif  // __POLY_H__
+#endif  // MAME_DEVICES_VIDEO_POLY_H

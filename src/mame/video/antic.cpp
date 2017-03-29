@@ -8,7 +8,9 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
+#include "emu.h"
 #include "antic.h"
+#include "screen.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -19,7 +21,7 @@
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 // devices
-const device_type ATARI_ANTIC = &device_creator<antic_device>;
+const device_type ATARI_ANTIC = device_creator<antic_device>;
 
 //-------------------------------------------------
 //  antic_device - constructor

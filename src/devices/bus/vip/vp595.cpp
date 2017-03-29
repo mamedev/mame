@@ -6,7 +6,10 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "vp595.h"
+
+#include "speaker.h"
 
 
 
@@ -23,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP595 = &device_creator<vp595_device>;
+const device_type VP595 = device_creator<vp595_device>;
 
 
 //-------------------------------------------------

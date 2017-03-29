@@ -50,6 +50,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "horizon.h"
 
 #define RAMREGION "ram32k"
@@ -490,4 +491,4 @@ ioport_constructor horizon_ramdisk_device::device_input_ports() const
 	return INPUT_PORTS_NAME(horizon);
 }
 
-const device_type TI99_HORIZON = &device_creator<horizon_ramdisk_device>;
+const device_type TI99_HORIZON = device_creator<horizon_ramdisk_device>;

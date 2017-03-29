@@ -52,7 +52,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/coco.h"
 #include "coco_multi.h"
 #include "coco_232.h"
 #include "coco_orch90.h"
@@ -126,7 +125,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
+const device_type COCO_MULTIPAK = device_creator<coco_multipak_device>;
 
 
 
@@ -161,7 +160,7 @@ void coco_multipak_device::device_start()
 
 	// install $FF7F handler
 	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
-	machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);
+	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);
 
 	// initial state
 	m_select = 0xFF;
@@ -224,6 +223,18 @@ READ8_MEMBER(coco_multipak_device::read)
 WRITE8_MEMBER(coco_multipak_device::write)
 {
 	active_scs_slot()->write(space,offset,data);
+}
+
+
+
+//-------------------------------------------------
+//  set_sound_enable
+//-------------------------------------------------
+
+void coco_multipak_device::set_sound_enable(bool sound_enable)
+{
+	for (cococart_slot_device *slot : m_slots)
+		slot->cart_set_line(cococart_slot_device::line::SOUND_ENABLE, sound_enable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
 
 

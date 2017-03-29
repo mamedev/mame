@@ -12,7 +12,6 @@
 #define __SMS_PADDLE__
 
 
-#include "emu.h"
 #include "smsctrl.h"
 
 

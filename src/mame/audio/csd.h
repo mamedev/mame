@@ -11,7 +11,6 @@
 #ifndef MAME_AUDIO_CSD_H
 #define MAME_AUDIO_CSD_H
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"

@@ -43,8 +43,10 @@ PROMs : NEC B406 (1kx4) x2
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/watchdog.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sbowling_state : public driver_device

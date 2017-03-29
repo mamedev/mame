@@ -17,6 +17,8 @@
 
 #include "video/mc6845.h"
 
+#include "screen.h"
+
 
 #define MAIN_CLOCK_OSC          20000000    /* 20 MHz */
 #define SLITHER_CLOCK_OSC       21300000    /* 21.3 MHz */

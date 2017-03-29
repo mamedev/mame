@@ -9,7 +9,6 @@
 #ifndef ISA_PDS_H_
 #define ISA_PDS_H_
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/i8255.h"
 

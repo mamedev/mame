@@ -9,7 +9,6 @@
 #ifndef _VC4000SND_H_
 #define _VC4000SND_H_
 
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

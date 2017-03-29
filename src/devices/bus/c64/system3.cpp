@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "system3.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SYSTEM3 = &device_creator<c64_system3_cartridge_device>;
+const device_type C64_SYSTEM3 = device_creator<c64_system3_cartridge_device>;
 
 
 

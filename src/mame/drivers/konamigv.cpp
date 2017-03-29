@@ -122,17 +122,20 @@ Notes:
 */
 
 #include "emu.h"
-#include "cdrom.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/am53cf96.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/mb89371.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
-#include "sound/spu.h"
+#include "machine/ram.h"
 #include "sound/cdda.h"
+#include "sound/spu.h"
+#include "video/psx.h"
+#include "speaker.h"
+#include "cdrom.h"
+
 
 class konamigv_state : public driver_device
 {

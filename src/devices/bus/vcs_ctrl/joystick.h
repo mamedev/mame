@@ -11,7 +11,6 @@
 #ifndef __VCS_JOYSTICK__
 #define __VCS_JOYSTICK__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

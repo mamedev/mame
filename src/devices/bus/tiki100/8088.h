@@ -11,7 +11,6 @@
 #ifndef __TIKI100_8088__
 #define __TIKI100_8088__
 
-#include "emu.h"
 #include "bus/tiki100/exp.h"
 #include "cpu/i86/i86.h"
 

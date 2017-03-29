@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "h8_port.h"
 
-const device_type H8_PORT = &device_creator<h8_port_device>;
+const device_type H8_PORT = device_creator<h8_port_device>;
 
 h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_PORT, "H8 digital port", tag, owner, clock, "h8_digital_port", __FILE__),

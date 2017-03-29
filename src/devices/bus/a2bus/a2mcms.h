@@ -13,7 +13,6 @@
 #ifndef __A2BUS_MCMS__
 #define __A2BUS_MCMS__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

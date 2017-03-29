@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "includes/kaneko16.h"
+#include "screen.h"
 
 class galpanic_state : public driver_device
 {
@@ -35,7 +36,7 @@ public:
 	DECLARE_PALETTE_INIT(galpanic);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

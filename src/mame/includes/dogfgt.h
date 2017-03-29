@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "screen.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
 #define BITMAPRAM_SIZE      0x6000

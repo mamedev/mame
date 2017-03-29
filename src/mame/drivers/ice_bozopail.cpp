@@ -18,6 +18,7 @@ http://www.highwaygames.com/arcade-machines/bozo-s-grand-prize-game-6751/
 */
 
 #include "emu.h"
+#include "speaker.h"
 
 class ice_bozopail : public driver_device
 {

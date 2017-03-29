@@ -8,7 +8,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "audio/segam1audio.h"
+#include "speaker.h"
 
 #define M68000_TAG      "m1sndcpu"
 #define MULTIPCM_1_TAG  "m1pcm1"
@@ -62,7 +64,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SEGAM1AUDIO = &device_creator<segam1audio_device>;
+const device_type SEGAM1AUDIO = device_creator<segam1audio_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

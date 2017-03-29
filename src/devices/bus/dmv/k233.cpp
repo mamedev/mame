@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K233 = &device_creator<dmv_k233_device>;
+const device_type DMV_K233 = device_creator<dmv_k233_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

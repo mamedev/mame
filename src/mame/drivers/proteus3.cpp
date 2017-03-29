@@ -45,14 +45,19 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "imagedev/cassette.h"
 #include "sound/wave.h"
+
 #include "bus/rs232/rs232.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class proteus3_state : public driver_device
@@ -61,6 +66,8 @@ public:
 	proteus3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
 		, m_pia(*this, "pia")
 		, m_acia1(*this, "acia1")
 		, m_acia2(*this, "acia2")
@@ -81,14 +88,14 @@ private:
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
-	uint8_t *m_p_chargen;
-	uint8_t *m_p_videoram;
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 	uint8_t m_clockcnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<pia6821_device> m_pia;
 	required_device<acia6850_device> m_acia1; // cassette uart
 	required_device<acia6850_device> m_acia2; // tty keyboard uart
@@ -298,8 +305,6 @@ GFXDECODE_END
 
 void proteus3_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("vram")->base();
 	m_curs_pos = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 1;

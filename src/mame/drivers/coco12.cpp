@@ -23,19 +23,25 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco12.h"
-#include "bus/coco/coco_t4426.h"
+
 #include "bus/coco/coco_232.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_dwsock.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
-#include "bus/coco/coco_dwsock.h"
+#include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_t4426.h"
+
 #include "cpu/m6809/m6809.h"
-#include "formats/coco_cas.h"
 #include "imagedev/cassette.h"
 #include "sound/volt_reg.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/coco_cas.h"
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -102,19 +108,6 @@ static INPUT_PORTS_START( coco_joystick )
 	PORT_START(JOYSTICK_BUTTONS_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button") PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button")  PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, nullptr) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
-INPUT_PORTS_END
-
-
-
-//-------------------------------------------------
-//  INPUT_PORTS( coco_cart_autostart )
-//-------------------------------------------------
-
-INPUT_PORTS_START( coco_cart_autostart )
-	PORT_START(CART_AUTOSTART_TAG)
-	PORT_CONFNAME( 0x01, 0x01, "Cart Auto-Start" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(    0x01, DEF_STR( On ))
 INPUT_PORTS_END
 
 
@@ -238,7 +231,6 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_keyboard )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_cart_autostart )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
 INPUT_PORTS_END

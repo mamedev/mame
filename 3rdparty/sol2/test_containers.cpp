@@ -458,3 +458,35 @@ a.readonly_seq = value;
 )");
 	REQUIRE_FALSE(result.valid());
 }
+
+TEST_CASE("containers/to_args", "Test that the to_args abstractions works") {
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.script("function f (a, b, c, d) print(a, b, c, d) return a, b, c, d end");
+
+	sol::function f = lua["f"];
+	int a, b, c, d;
+
+	std::vector<int> v2{ 3, 4 };
+	sol::tie(a, b, c, d) = f(1, 2, sol::as_args(v2));
+	REQUIRE(a == 1);
+	REQUIRE(b == 2);
+	REQUIRE(c == 3);
+	REQUIRE(d == 4);
+
+	std::set<int> v4{ 7, 6, 8, 5 };
+	sol::tie(a, b, c, d) = f(sol::as_args(v4));
+	REQUIRE(a == 5);
+	REQUIRE(b == 6);
+	REQUIRE(c == 7);
+	REQUIRE(d == 8);
+
+	int v3[] = { 10, 11, 12 };
+	sol::tie(a, b, c, d) = f(9, sol::as_args(v3));
+	REQUIRE(a == 9);
+	REQUIRE(b == 10);
+	REQUIRE(c == 11);
+	REQUIRE(d == 12);
+
+}

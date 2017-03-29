@@ -4,7 +4,6 @@
 #define __A800_CARTS_H
 
 
-#include "emu.h"
 
 #include "rom.h"
 #include "oss.h"

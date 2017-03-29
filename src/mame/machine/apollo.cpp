@@ -28,6 +28,7 @@
  *
  */
 
+#include "emu.h"
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"
@@ -78,7 +79,7 @@ INPUT_PORTS_START( apollo_config )
 	PORT_START( "apollo_config" )
 		PORT_CONFNAME(APOLLO_CONF_SERVICE_MODE, 0x00, "Normal/Service" )
 		PORT_CONFSETTING(0x00, "Service" )
-		PORT_CONFSETTING(APOLLO_CONF_SERVICE_MODE, "Normal " )
+		PORT_CONFSETTING(APOLLO_CONF_SERVICE_MODE, "Normal" )
 
 		PORT_CONFNAME(APOLLO_CONF_DISPLAY, APOLLO_CONF_8_PLANES, "Graphics Controller")
 		PORT_CONFSETTING(APOLLO_CONF_8_PLANES, "8-Plane Color")
@@ -130,29 +131,16 @@ public:
 	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
 	// internal state
 };
 
-extern const device_type APOLLO_CONF;
-
-const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
+const device_type APOLLO_CONF = device_creator<apollo_config_device>;
 
 apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void apollo_config_device::device_config_complete()
 {
 }
 
@@ -726,7 +714,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
 		device_t *owner, uint32_t clock) :
-	mc68681_device(mconfig, tag, owner, clock),
+	mc68681_base_device(mconfig, APOLLO_SIO, "DN3000/DS3500 SIO", tag, owner, clock, "apollo_sio", __FILE__),
 	m_csrb(0),
 	m_ip6(0)
 {
@@ -757,7 +745,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_device::read(space, offset/2, mem_mask);
+	int data = mc68681_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -817,11 +805,11 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_device::write(space, offset/2, data, mem_mask);
+	mc68681_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
-const device_type APOLLO_SIO = &device_creator<apollo_sio>;
+const device_type APOLLO_SIO = device_creator<apollo_sio>;
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -874,7 +862,7 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 /*** Apollo Node ID device ***/
 
 // device type definition
-const device_type APOLLO_NI = &device_creator<apollo_ni> ;
+const device_type APOLLO_NI = device_creator<apollo_ni> ;
 
 //-------------------------------------------------
 //  apollo_ni - constructor
@@ -893,11 +881,6 @@ apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
 
 apollo_ni::~apollo_ni()
 {
-}
-
-void apollo_ni::device_config_complete()
-{
-	update_names(APOLLO_NI, "node_id", "ni");
 }
 
 //-------------------------------------------------
@@ -1280,7 +1263,7 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
  ***************************************************************************/
 
 // device type definition
-const device_type APOLLO_STDIO = &device_creator<apollo_stdio_device> ;
+const device_type APOLLO_STDIO = device_creator<apollo_stdio_device> ;
 
 //-------------------------------------------------
 // apollo_stdio_device - constructor

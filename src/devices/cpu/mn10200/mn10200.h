@@ -13,9 +13,9 @@
 
 // port setup
 #define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
 #define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
 
 enum
 {

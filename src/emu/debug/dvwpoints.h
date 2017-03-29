@@ -27,7 +27,6 @@
 // debug view for watchpoints
 class debug_view_watchpoints : public debug_view
 {
-	friend resource_pool_object<debug_view_watchpoints>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction

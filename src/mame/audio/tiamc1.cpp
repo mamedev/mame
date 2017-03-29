@@ -46,7 +46,7 @@
 
 
 // device type definition
-const device_type TIAMC1 = &device_creator<tiamc1_sound_device>;
+const device_type TIAMC1 = device_creator<tiamc1_sound_device>;
 
 
 //**************************************************************************

@@ -20,7 +20,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_WDT = &device_creator<sh7604_wdt_device>;
+const device_type SH7604_WDT = device_creator<sh7604_wdt_device>;
 
 
 //**************************************************************************
@@ -44,6 +44,12 @@ sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *
 	m_space_config("regs", ENDIANNESS_BIG, 8, 4, 0, nullptr, *ADDRESS_MAP_NAME(wdt_regs))
 
 {
+}
+
+
+const address_space_config *sh7604_wdt_device::memory_space_config(address_spacenum spacenum) const
+{
+	return &m_space_config;
 }
 
 

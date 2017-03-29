@@ -283,16 +283,17 @@ Timings:
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
 #include "includes/lviv.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "formats/lviv_lvt.h"
-#include "machine/ram.h"
+
+#include "cpu/i8085/i8085.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/lviv_lvt.h"
+
 
 /* I/O ports */
 

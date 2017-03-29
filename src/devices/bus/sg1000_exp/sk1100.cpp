@@ -17,6 +17,7 @@ TODO:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "sk1100.h"
 #include "softlist.h"
 
@@ -26,7 +27,7 @@ TODO:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SEGA_SK1100 = &device_creator<sega_sk1100_device>;
+const device_type SEGA_SK1100 = device_creator<sega_sk1100_device>;
 
 
 /*-------------------------------------------------

@@ -12,7 +12,6 @@
 #define __SMS_JOYPAD__
 
 
-#include "emu.h"
 #include "smsctrl.h"
 
 

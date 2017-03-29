@@ -11,7 +11,6 @@
 #ifndef __PLUS4_SID_CARTRIDGE__
 #define __PLUS4_SID_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "sound/mos6581.h"

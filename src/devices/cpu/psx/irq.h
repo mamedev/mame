@@ -12,7 +12,6 @@
 #ifndef __PSXIRQ_H__
 #define __PSXIRQ_H__
 
-#include "emu.h"
 
 extern const device_type PSX_IRQ;
 

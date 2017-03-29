@@ -40,8 +40,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2corvus.h"
-#include "includes/apple2.h"
 #include "imagedev/harddriv.h"
 
 /***************************************************************************
@@ -52,7 +52,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVUS = &device_creator<a2bus_corvus_device>;
+const device_type A2BUS_CORVUS = device_creator<a2bus_corvus_device>;
 
 #define CORVUS_ROM_REGION  "corvus_rom"
 #define CORVUS_HD_TAG      "corvushd"

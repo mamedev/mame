@@ -86,7 +86,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
+const device_type INTV_CART_SLOT = device_creator<intv_cart_slot_device>;
 
 //**************************************************************************
 //    Intellivision Cartridges Interface
@@ -168,18 +168,6 @@ intv_cart_slot_device::~intv_cart_slot_device()
 void intv_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_intv_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void intv_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -391,7 +379,7 @@ image_init_result intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			return load_fullpath();
 		else
 		{

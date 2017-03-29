@@ -11,7 +11,6 @@
 #ifndef __VCS_PADDLES__
 #define __VCS_PADDLES__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

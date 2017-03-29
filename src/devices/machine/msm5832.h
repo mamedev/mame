@@ -23,7 +23,6 @@
 #ifndef __MSM5832__
 #define __MSM5832__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

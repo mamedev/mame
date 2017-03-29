@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-#include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
 class bgfx_slider : public slider_changed_notifier

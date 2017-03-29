@@ -22,7 +22,6 @@
 #ifndef __ISA_AGA_H__
 #define __ISA_AGA_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "cga.h"
 #include "video/mc6845.h"

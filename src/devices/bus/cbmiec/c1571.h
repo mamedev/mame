@@ -11,7 +11,6 @@
 #ifndef __C1571__
 #define __C1571__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
 #include "cpu/m6502/m6502.h"

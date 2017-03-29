@@ -34,6 +34,8 @@ uses s24 style tilemaps (ram based?)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -41,9 +43,9 @@ class segam1_state : public driver_device
 {
 public:
 	segam1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	virtual void video_start() override;
 	uint32_t screen_update_segam1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -9,8 +9,9 @@ To enter service mode, keep 1&2 pressed on reset
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/konamipt.h"
 #include "includes/megazone.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -21,6 +22,8 @@ To enter service mode, keep 1&2 pressed on reset
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(megazone_state::megazone_port_a_r)

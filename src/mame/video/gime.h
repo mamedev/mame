@@ -82,8 +82,8 @@ public:
 	bool update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// interrupt outputs
-	bool firq_r(void) { return m_firq != 0x00; }
-	bool irq_r(void) { return m_irq != 0x00; }
+	bool firq_r() const { return m_firq != 0x00; }
+	bool irq_r() const { return m_irq != 0x00; }
 
 	// interrupt inputs
 	void set_il0(bool value) { set_interrupt_value(INTERRUPT_EI0, value); }
@@ -233,8 +233,8 @@ private:
 
 	// interrupts
 	void interrupt_rising_edge(uint8_t interrupt);
-	void recalculate_irq(void);
-	void recalculate_firq(void);
+	void change_gime_irq(uint8_t data);
+	void change_gime_firq(uint8_t data);
 
 	ATTR_FORCE_INLINE void set_interrupt_value(uint8_t interrupt, bool value)
 	{

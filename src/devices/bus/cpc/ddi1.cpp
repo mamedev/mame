@@ -6,14 +6,14 @@
 
 #include "emu.h"
 #include "ddi1.h"
-#include "includes/amstrad.h"
 #include "softlist.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DDI1 = &device_creator<cpc_ddi1_device>;
+const device_type CPC_DDI1 = device_creator<cpc_ddi1_device>;
 
 static SLOT_INTERFACE_START( ddi1_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )

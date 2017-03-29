@@ -22,7 +22,7 @@
 #include "sparc.h"
 #include "sparcdefs.h"
 
-const device_type MB86901 = &device_creator<mb86901_device>;
+const device_type MB86901 = device_creator<mb86901_device>;
 
 const int mb86901_device::NWINDOWS = 7;
 

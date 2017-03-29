@@ -14,6 +14,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "mufdc.h"
 #include "formats/naslite_dsk.h"
 #include "formats/pc_dsk.h"
@@ -23,8 +24,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_FDC344 = &device_creator<fdc344_device>;
-const device_type ISA8_FDCMAG = &device_creator<fdcmag_device>;
+const device_type ISA8_FDC344 = device_creator<fdc344_device>;
+const device_type ISA8_FDCMAG = device_creator<fdcmag_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

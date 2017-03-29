@@ -11,7 +11,6 @@
 #ifndef __VCS_WHEEL__
 #define __VCS_WHEEL__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

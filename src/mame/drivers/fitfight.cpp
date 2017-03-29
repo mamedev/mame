@@ -84,10 +84,14 @@ Stephh's notes :
 */
 
 #include "emu.h"
+#include "includes/fitfight.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
-#include "includes/fitfight.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER( fitfight_state::hotmindff_unk_r )
 {
@@ -252,12 +256,6 @@ WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
 	//osd_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
 }
-
-static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
-		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(snd_porta_r) AM_WRITE(snd_porta_w)
-		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(snd_portb_r) AM_WRITE(snd_portb_w)
-		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)
-ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 {
@@ -733,9 +731,13 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MCFG_CPU_PROGRAM_MAP(snd_mem)
-	MCFG_CPU_IO_MAP(snd_io)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(fitfight_state, snd_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fitfight_state, snd_porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(fitfight_state, snd_portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(fitfight_state, snd_portb_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(fitfight_state, snd_portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fitfight_state, snd_portc_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
-
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fitfight)
 

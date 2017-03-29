@@ -19,8 +19,6 @@ public:
 
 protected:
 	// device-level overrides
-	void device_config_complete() override;
-
 	void device_start() override;
 
 	void nvram_default() override;

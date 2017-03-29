@@ -31,7 +31,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/tmc2000e.h"
+
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 

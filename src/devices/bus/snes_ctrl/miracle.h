@@ -12,7 +12,6 @@
 #define __SNES_MIRACLE__
 
 
-#include "emu.h"
 #include "ctrl.h"
 #include "bus/midi/midi.h"
 

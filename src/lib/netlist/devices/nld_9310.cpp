@@ -6,6 +6,7 @@
  */
 
 #include "nld_9310.h"
+#include "../nl_base.h"
 
 #define MAXCNT 9
 
@@ -160,7 +161,7 @@ namespace netlist
 		{
 			if (m_cnt < MAXCNT - 1)
 			{
-				m_cnt++;
+				++m_cnt;
 				update_outputs(m_cnt);
 			}
 			else if (m_cnt == MAXCNT - 1)

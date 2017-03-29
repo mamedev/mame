@@ -76,6 +76,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "sound/2203intf.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 class pipeline_state : public driver_device
 {
@@ -88,8 +91,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_vram1(*this, "vram1")
 		, m_vram2(*this, "vram2")
-		{
-		}
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);

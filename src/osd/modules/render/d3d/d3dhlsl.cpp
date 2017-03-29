@@ -25,8 +25,6 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
-#undef min
-#undef max
 #include <utility>
 
 //============================================================

@@ -27,9 +27,10 @@
 
 #include "emu.h"
 #include "seta001.h"
+#include "screen.h"
 
 
-const device_type SETA001_SPRITE = &device_creator<seta001_device>;
+const device_type SETA001_SPRITE = device_creator<seta001_device>;
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SETA001_SPRITE, "Seta SETA001 Sprite", tag, owner, clock, "seta001", __FILE__)

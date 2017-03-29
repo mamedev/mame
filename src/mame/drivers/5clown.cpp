@@ -441,16 +441,18 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
 
 
 class _5clown_state : public driver_device
@@ -874,7 +876,7 @@ static INPUT_PORTS_START( fclown )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Setting") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Setting")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_IMPULSE(3) PORT_NAME("Coin In")

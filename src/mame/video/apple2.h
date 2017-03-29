@@ -6,10 +6,9 @@
 
 *********************************************************************/
 
-#ifndef __A2_VIDEO__
-#define __A2_VIDEO__
+#ifndef MAME_VIDEO_APPLE2_H
+#define MAME_VIDEO_APPLE2_H
 
-#include "emu.h"
 
 class a2_video_device :
 	public device_t
@@ -61,4 +60,4 @@ private:
 // device type definition
 extern const device_type APPLE2_VIDEO;
 
-#endif
+#endif // MAME_VIDEO_APPLE2_H

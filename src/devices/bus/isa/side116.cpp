@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "side116.h"
 
 
@@ -15,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_SIDE116 = &device_creator<side116_device>;
+const device_type ISA8_SIDE116 = device_creator<side116_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

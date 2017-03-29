@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "segatap.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_SEGATAP = &device_creator<saturn_segatap_device>;
+const device_type SATURN_SEGATAP = device_creator<saturn_segatap_device>;
 
 
 //**************************************************************************

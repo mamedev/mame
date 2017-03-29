@@ -350,6 +350,7 @@ Components:
 #include "machine/6850acia.h"
 #include "machine/i8214.h"
 #include "machine/mc6854.h"
+#include "screen.h"
 
 
 namespace {

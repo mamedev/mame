@@ -12,7 +12,6 @@
 #define __SEGA_FM_UNIT__
 
 
-#include "emu.h"
 #include "sound/ym2413.h"
 #include "sound/sn76496.h"
 #include "sg1000exp.h"

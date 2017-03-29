@@ -21,13 +21,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_CDP1861_H
+#define MAME_DEVICES_VIDEO_CDP1861_H
+
 #pragma once
 
-#ifndef __CDP1861__
-#define __CDP1861__
-
-#include "emu.h"
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -141,5 +140,4 @@ private:
 extern const device_type CDP1861;
 
 
-
-#endif
+#endif // MAME_DEVICES_VIDEO_CDP1861_H

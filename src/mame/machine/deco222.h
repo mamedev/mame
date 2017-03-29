@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_222_device : public m6502_device {
@@ -21,8 +20,6 @@ protected:
 	virtual void device_reset() override;
 
 };
-
-static const device_type DECO_222 = &device_creator<deco_222_device>;
 
 
 
@@ -44,4 +41,6 @@ protected:
 
 };
 
-static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
+
+extern const device_type DECO_222;
+extern const device_type DECO_C10707;

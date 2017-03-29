@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "screen.h"
 
 
 class embargo_state : public driver_device

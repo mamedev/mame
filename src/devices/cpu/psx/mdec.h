@@ -12,7 +12,6 @@
 #ifndef __PSXMDEC_H__
 #define __PSXMDEC_H__
 
-#include "emu.h"
 
 extern const device_type PSX_MDEC;
 

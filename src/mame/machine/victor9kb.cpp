@@ -334,6 +334,7 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 
 */
 
+#include "emu.h"
 #include "victor9kb.h"
 
 
@@ -352,7 +353,7 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VICTOR9K_KEYBOARD = &device_creator<victor_9000_keyboard_t>;
+const device_type VICTOR9K_KEYBOARD = device_creator<victor_9000_keyboard_t>;
 
 
 //-------------------------------------------------

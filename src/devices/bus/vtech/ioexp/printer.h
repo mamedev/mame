@@ -13,7 +13,6 @@
 #ifndef __VTECH_IOEXP_PRINTER_H__
 #define __VTECH_IOEXP_PRINTER_H__
 
-#include "emu.h"
 #include "ioexp.h"
 #include "bus/centronics/ctronics.h"
 

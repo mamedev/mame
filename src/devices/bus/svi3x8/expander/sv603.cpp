@@ -6,15 +6,18 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv603.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV603 = &device_creator<sv603_device>;
+const device_type SV603 = device_creator<sv603_device>;
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

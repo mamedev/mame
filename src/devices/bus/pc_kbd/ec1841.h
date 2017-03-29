@@ -11,7 +11,6 @@
 #ifndef __PC_KBD_EC_1841__
 #define __PC_KBD_EC_1841__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
 

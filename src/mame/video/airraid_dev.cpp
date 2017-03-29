@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "airraid_dev.h"
 
-extern const device_type AIRRAID_VIDEO = &device_creator<airraid_video_device>;
+const device_type AIRRAID_VIDEO = device_creator<airraid_video_device>;
 
 airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AIRRAID_VIDEO, "Seibu Air Raid Video", tag, owner, clock, "airraid_vid", __FILE__),

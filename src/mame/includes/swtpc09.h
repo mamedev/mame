@@ -9,7 +9,6 @@
 #ifndef swtpc09_H_
 #define swtpc09_H_
 
-#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/generic.h"
 #include "machine/wd_fdc.h"

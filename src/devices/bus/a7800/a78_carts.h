@@ -3,7 +3,6 @@
 #ifndef __A78_CARTS_H
 #define __A78_CARTS_H
 
-#include "emu.h"
 
 #include "rom.h"
 #include "xboard.h"

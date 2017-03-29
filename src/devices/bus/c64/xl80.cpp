@@ -36,7 +36,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "xl80.h"
+#include "screen.h"
 
 
 
@@ -55,7 +57,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_XL80 = &device_creator<c64_xl80_device>;
+const device_type C64_XL80 = device_creator<c64_xl80_device>;
 
 
 //-------------------------------------------------

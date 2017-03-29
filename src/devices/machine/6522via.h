@@ -18,10 +18,6 @@
 #ifndef __6522VIA_H__
 #define __6522VIA_H__
 
-#include "emu.h"
-
-
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -211,6 +207,14 @@ private:
 
 	emu_timer *m_shift_timer;
 	uint8_t m_shift_counter;
+	enum m_shift_state_t
+	{
+		SHIFTER_IDLE,
+		SHIFTER_SHIFT,
+		SHIFTER_FINISH,
+		SHIFTER_IRQ
+	};
+	m_shift_state_t m_shift_state;
 };
 
 

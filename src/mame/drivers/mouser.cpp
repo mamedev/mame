@@ -15,9 +15,13 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/mouser.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/mouser.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Mouser has external masking circuitry around
  * the NMI input on the main CPU */

@@ -5,7 +5,7 @@
 
 	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
 
-<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
+	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>

@@ -9,13 +9,14 @@
 #include "emu.h"
 #include "covox.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  COVOX DEVICE
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_COVOX = &device_creator<centronics_covox_device>;
+const device_type CENTRONICS_COVOX = device_creator<centronics_covox_device>;
 
 static MACHINE_CONFIG_FRAGMENT( covox )
 	/* sound hardware */
@@ -67,7 +68,7 @@ void centronics_covox_device::update_dac()
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_COVOX_STEREO = &device_creator<centronics_covox_stereo_device>;
+const device_type CENTRONICS_COVOX_STEREO = device_creator<centronics_covox_stereo_device>;
 
 static MACHINE_CONFIG_FRAGMENT( covox_stereo )
 	/* sound hardware */

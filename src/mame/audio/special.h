@@ -9,7 +9,6 @@
 #ifndef SPECIAL_SND_H_
 #define SPECIAL_SND_H_
 
-#include "emu.h"
 
 class specimx_sound_device : public device_t,
 								public device_sound_interface

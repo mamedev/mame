@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mp_fdi.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE = &device_creator<micro_peripherals_floppy_disk_interface_t>;
+const device_type MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE = device_creator<micro_peripherals_floppy_disk_interface_t>;
 
 
 //-------------------------------------------------

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "video64.h"
 
+#include "screen.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -40,7 +42,7 @@ static const gfx_layout iq151_video64_charlayout =
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_VIDEO64 = &device_creator<iq151_video64_device>;
+const device_type IQ151_VIDEO64 = device_creator<iq151_video64_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

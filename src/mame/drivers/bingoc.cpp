@@ -35,6 +35,8 @@ SOUND : YM2151 uPD7759C
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bingoc_state : public driver_device

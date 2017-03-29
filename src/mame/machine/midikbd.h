@@ -3,7 +3,6 @@
 #ifndef MIDIKBD_H_
 #define MIDIKBD_H_
 
-#include "emu.h"
 
 #define MCFG_MIDI_KBD_ADD(_tag, _devcb, _clock) \
 	MCFG_DEVICE_ADD(_tag, MIDI_KBD, _clock) \

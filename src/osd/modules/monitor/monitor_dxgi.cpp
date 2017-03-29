@@ -5,6 +5,7 @@
 *
 */
 
+#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 

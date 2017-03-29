@@ -22,7 +22,6 @@
 #ifndef __MCCS1850__
 #define __MCCS1850__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

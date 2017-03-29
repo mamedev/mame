@@ -9,10 +9,7 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-#include <cstdint>
-
 #include "plib/pconfig.h"
-#include "plib/pchrono.h"
 
 //============================================================
 //  SETUP
@@ -33,7 +30,17 @@
  *
  */
 #define USE_MEMPOOL                 (0)
-#define USE_TRUTHTABLE              (1)
+
+/*
+ * FIXME: Using truthtable is a lot slower than the explicit device
+ *        in breakout. Performance drops by 20%. This can be fixed by
+ *        setting param USE_DEACTIVATE for the device.
+ */
+
+#define USE_TRUTHTABLE_7448 (0)
+
+// How many times do we try to resolve links (connections)
+#define NL_MAX_LINK_RESOLVE_LOOPS   (100)
 
 //============================================================
 //  Solver defines
@@ -67,20 +74,6 @@
 #endif
 
 //============================================================
-//  Performance tracking
-//============================================================
-
-namespace netlist
-{
-#if NL_KEEP_STATISTICS
-using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, true>;
-using nperfcount_t = plib::chrono::counter<true>;
-#else
-using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
-using nperfcount_t = plib::chrono::counter<false>;
-#endif
-}
-//============================================================
 //  General
 //============================================================
 
@@ -108,16 +101,6 @@ using nl_double = double;
  * approach will be automatically selected.
  */
 
-//#define NL_USE_PMF_VIRTUAL         1
-
-#ifndef NL_USE_PMF_VIRTUAL
-	#if PPMF_TYPE == PPMF_TYPE_PMF
-	#define NL_USE_PMF_VIRTUAL     1
-	#else
-	#define NL_USE_PMF_VIRTUAL     0
-	#endif
-#endif
-
 //============================================================
 //  WARNINGS
 //============================================================
@@ -126,11 +109,6 @@ using nl_double = double;
 #if (!(HAS_OPENMP))
 #error To use openmp compile and link with "-fopenmp"
 #endif
-#endif
-
-#ifdef __APPLE__
-#undef  USE_MEMPOOL
-#define USE_MEMPOOL                 (0)
 #endif
 
 #endif /* NLCONFIG_H_ */

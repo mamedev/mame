@@ -58,6 +58,7 @@ TODO:
 - add TTY support
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/kim1.h"
 #include "kim1.lh"
 

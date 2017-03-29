@@ -12,7 +12,6 @@
 #define __C128_COMAL80__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

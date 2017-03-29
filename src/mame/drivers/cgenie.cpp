@@ -22,7 +22,10 @@
 #include "bus/rs232/rs232.h"
 #include "bus/cgenie/expansion/expansion.h"
 #include "bus/cgenie/parallel/parallel.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

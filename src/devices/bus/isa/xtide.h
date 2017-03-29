@@ -5,7 +5,6 @@
 #ifndef __XTIDE_H__
 #define __XTIDE_H__
 
-#include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/eeprompar.h"
 #include "isa.h"

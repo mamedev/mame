@@ -11,7 +11,6 @@
 #ifndef __VCS_LIGHTPEN__
 #define __VCS_LIGHTPEN__
 
-#include "emu.h"
 #include "ctrl.h"
 
 

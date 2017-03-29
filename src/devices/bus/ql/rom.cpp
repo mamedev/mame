@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rom.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_ROM_CARTRIDGE_SLOT = &device_creator<ql_rom_cartridge_slot_t>;
+const device_type QL_ROM_CARTRIDGE_SLOT = device_creator<ql_rom_cartridge_slot_t>;
 
 
 
@@ -81,7 +82,7 @@ image_init_result ql_rom_cartridge_slot_t::call_load()
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 

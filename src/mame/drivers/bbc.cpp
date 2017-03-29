@@ -40,6 +40,7 @@
 
 /* Core includes */
 #include "emu.h"
+#include "includes/bbc.h"
 
 /* Components */
 #include "bus/rs232/rs232.h"
@@ -50,8 +51,6 @@
 #include "bus/econet/econet.h"
 #include "sound/tms5220.h"          /* Speech */
 #include "video/saa5050.h"          /* Teletext */
-#include "bbc.lh"
-#include "bbcm.lh"
 
 /* Devices */
 #include "formats/acorn_dsk.h"
@@ -59,8 +58,12 @@
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
-#include "includes/bbc.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "bbc.lh"
+#include "bbcm.lh"
 
 /******************************************************************************
 A  = BBC Model A

@@ -8,10 +8,9 @@
 #ifndef PEXCEPTION_H_
 #define PEXCEPTION_H_
 
-#include <exception>
-
-#include "pconfig.h"
 #include "pstring.h"
+
+#include <exception>
 
 namespace plib {
 //============================================================
@@ -21,8 +20,8 @@ namespace plib {
 class pexception : public std::exception
 {
 public:
-	explicit pexception(const pstring text);
-	pexception(const pexception &e) : std::exception(e) { m_text = e.m_text; }
+	explicit pexception(const pstring &text);
+	pexception(const pexception &e) : std::exception(e), m_text(e.m_text) { }
 
 	virtual ~pexception() noexcept;
 
@@ -35,7 +34,7 @@ private:
 class file_e : public plib::pexception
 {
 public:
-	explicit file_e(const pstring fmt, const pstring &filename);
+	file_e(const pstring &fmt, const pstring &filename);
 	file_e(const file_e &e) : pexception(e) { }
 	virtual ~file_e() noexcept;
 };
@@ -87,7 +86,7 @@ public:
 class fpexception_e : public pexception
 {
 public:
-	fpexception_e(const pstring &text);
+	explicit fpexception_e(const pstring &text);
 	fpexception_e(const fpexception_e &e) : pexception(e) { }
 	virtual ~fpexception_e() noexcept;
 };
@@ -106,7 +105,7 @@ static const unsigned FP_ALL = 0x0001f;
 class fpsignalenabler
 {
 public:
-	fpsignalenabler(unsigned fpexceptions);
+	explicit fpsignalenabler(unsigned fpexceptions);
 	~fpsignalenabler();
 
 	/* is the functionality supported ? */

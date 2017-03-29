@@ -12,8 +12,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "machine/bankdev.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 16000000
 

@@ -24,7 +24,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type I82371SB = &device_creator<i82371sb_device>;
+const device_type I82371SB = device_creator<i82371sb_device>;
 
 
 i82371sb_device::i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

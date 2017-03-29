@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -1599,7 +1600,7 @@ void tilemap_manager::mark_all_dirty()
 //**************************************************************************
 
 // device type definition
-const device_type TILEMAP = &device_creator<tilemap_device>;
+const device_type TILEMAP = device_creator<tilemap_device>;
 
 //-------------------------------------------------
 //  tilemap_device - constructor

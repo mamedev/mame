@@ -11,7 +11,6 @@
 #ifndef __C1551__
 #define __C1551__
 
-#include "emu.h"
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
 #include "machine/64h156.h"

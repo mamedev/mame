@@ -95,7 +95,7 @@
 #include "scudsp.h"
 
 
-const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
+const device_type SCUDSP = device_creator<scudsp_cpu_device>;
 
 /* FLAGS */
 #define PRF m_flags & 0x04000000

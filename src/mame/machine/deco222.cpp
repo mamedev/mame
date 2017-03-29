@@ -5,7 +5,11 @@
  also sometimes implemented as basic logic outside the CPU on early revs and bootlegs */
 
 
+#include "emu.h"
 #include "deco222.h"
+
+const device_type DECO_222 = device_creator<deco_222_device>;
+const device_type DECO_C10707 = device_creator<deco_c10707_device>;
 
 
 deco_222_device::deco_222_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

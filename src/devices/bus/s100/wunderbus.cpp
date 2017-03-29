@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wunderbus.h"
 #include "bus/rs232/rs232.h"
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
+const device_type S100_WUNDERBUS = device_creator<s100_wunderbus_device>;
 
 
 //-------------------------------------------------

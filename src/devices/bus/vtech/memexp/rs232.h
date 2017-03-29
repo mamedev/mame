@@ -11,7 +11,6 @@
 #ifndef __VTECH_MEMEXP_RS232_H__
 #define __VTECH_MEMEXP_RS232_H__
 
-#include "emu.h"
 #include "memexp.h"
 #include "bus/rs232/rs232.h"
 

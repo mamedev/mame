@@ -48,7 +48,7 @@ ntb_cart_interface::~ntb_cart_interface()
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_NTB_SLOT = &device_creator<nes_ntb_slot_device>;
+const device_type NES_NTB_SLOT = device_creator<nes_ntb_slot_device>;
 
 nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, NES_NTB_SLOT, "NES NTB Cartridge Slot", tag, owner, clock, "nes_ntb_slot", __FILE__),
@@ -85,7 +85,7 @@ image_init_result nes_ntb_slot_device::call_load()
 		if (!ROM)
 			return image_init_result::FAIL;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x4000)
 				return image_init_result::FAIL;
@@ -120,7 +120,7 @@ ROM_START( ntb_rom )
 	ROM_REGION(0x4000, "ntbrom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_NTB_ROM = &device_creator<nes_ntb_rom_device>;
+const device_type NES_NTB_ROM = device_creator<nes_ntb_rom_device>;
 
 nes_ntb_rom_device::nes_ntb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, NES_NTB_ROM, "NES NTB ROM", tag, owner, clock, "nes_ntbrom", __FILE__),
@@ -153,7 +153,7 @@ uint8_t *nes_ntb_rom_device::get_cart_base()
 //
 //------------------------------------------------
 
-const device_type NES_SUNSOFT_DCS = &device_creator<nes_sunsoft_dcs_device>;
+const device_type NES_SUNSOFT_DCS = device_creator<nes_sunsoft_dcs_device>;
 
 
 nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

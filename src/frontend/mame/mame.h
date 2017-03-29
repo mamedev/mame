@@ -52,6 +52,8 @@ public:
 
 	virtual void create_custom(running_machine& machine) override;
 
+	virtual void load_cheatfiles(running_machine& machine) override;
+
 	virtual void ui_initialize(running_machine& machine) override;
 
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */

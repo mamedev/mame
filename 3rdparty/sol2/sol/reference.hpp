@@ -31,7 +31,7 @@ namespace sol {
 		struct push_popper_n {
 			lua_State* L;
 			int t;
-			push_popper_n(lua_State* L, int x) : L(L), t(x) { }
+			push_popper_n(lua_State* luastate, int x) : L(luastate), t(x) { }
 			~push_popper_n() { lua_pop(L, t); }
 		};
 		template <>
@@ -65,76 +65,93 @@ namespace sol {
 
 	class reference {
 	private:
-		lua_State* L = nullptr; // non-owning
+		lua_State* luastate = nullptr; // non-owning
 		int ref = LUA_NOREF;
 
 		int copy() const noexcept {
 			if (ref == LUA_NOREF)
 				return LUA_NOREF;
 			push();
-			return luaL_ref(L, LUA_REGISTRYINDEX);
+			return luaL_ref(lua_state(), LUA_REGISTRYINDEX);
 		}
 
 	protected:
-		reference(lua_State* L, detail::global_tag) noexcept : L(L) {
-			lua_pushglobaltable(L);
-			ref = luaL_ref(L, LUA_REGISTRYINDEX);
+		reference(lua_State* L, detail::global_tag) noexcept : luastate(L) {
+			lua_pushglobaltable(lua_state());
+			ref = luaL_ref(lua_state(), LUA_REGISTRYINDEX);
 		}
 
 		int stack_index() const noexcept {
 			return -1;
 		}
 
-	public:
-		reference() noexcept = default;
-		reference(nil_t) noexcept : reference() {}
-		reference(const stack_reference& r) noexcept : reference(r.lua_state(), r.stack_index()) {}
-		reference(stack_reference&& r) noexcept : reference(r.lua_state(), r.stack_index()) {}
-		reference(lua_State* L, int index = -1) noexcept : L(L) {
-			lua_pushvalue(L, index);
-			ref = luaL_ref(L, LUA_REGISTRYINDEX);
+		void deref() const noexcept {
+			luaL_unref(lua_state(), LUA_REGISTRYINDEX, ref);
 		}
 
-		virtual ~reference() noexcept {
-			luaL_unref(L, LUA_REGISTRYINDEX, ref);
+	public:
+		reference() noexcept = default;
+		reference(lua_nil_t) noexcept : reference() {}
+		reference(const stack_reference& r) noexcept : reference(r.lua_state(), r.stack_index()) {}
+		reference(stack_reference&& r) noexcept : reference(r.lua_state(), r.stack_index()) {}
+		reference(lua_State* L, int index = -1) noexcept : luastate(L) {
+			lua_pushvalue(lua_state(), index);
+			ref = luaL_ref(lua_state(), LUA_REGISTRYINDEX);
+		}
+		reference(lua_State* L, ref_index index) noexcept : luastate(L) {
+			lua_rawgeti(L, LUA_REGISTRYINDEX, index.index);
+			ref = luaL_ref(lua_state(), LUA_REGISTRYINDEX);
+		}
+
+		~reference() noexcept {
+			deref();
 		}
 
 		reference(reference&& o) noexcept {
-			L = o.L;
+			luastate = o.luastate;
 			ref = o.ref;
 
-			o.L = nullptr;
+			o.luastate = nullptr;
 			o.ref = LUA_NOREF;
 		}
 
 		reference& operator=(reference&& o) noexcept {
-			L = o.L;
+			luastate = o.luastate;
 			ref = o.ref;
 
-			o.L = nullptr;
+			o.luastate = nullptr;
 			o.ref = LUA_NOREF;
 
 			return *this;
 		}
 
 		reference(const reference& o) noexcept {
-			L = o.L;
+			luastate = o.luastate;
 			ref = o.copy();
 		}
 
 		reference& operator=(const reference& o) noexcept {
-			L = o.L;
+			luastate = o.luastate;
+			deref();
 			ref = o.copy();
 			return *this;
 		}
 
 		int push() const noexcept {
-			lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+			return push(lua_state());
+		}
+
+		int push(lua_State* Ls) const noexcept {
+			lua_rawgeti(Ls, LUA_REGISTRYINDEX, ref);
 			return 1;
 		}
 
-		void pop(int n = 1) const noexcept {
-			lua_pop(lua_state(), n);
+		void pop() const noexcept {
+			pop(lua_state());
+		}
+
+		void pop(lua_State* Ls, int n = 1) const noexcept {
+			lua_pop(Ls, n);
 		}
 
 		int registry_index() const noexcept {
@@ -151,12 +168,12 @@ namespace sol {
 
 		type get_type() const noexcept {
 			auto pp = stack::push_pop(*this);
-			int result = lua_type(L, -1);
+			int result = lua_type(lua_state(), -1);
 			return static_cast<type>(result);
 		}
 
 		lua_State* lua_state() const noexcept {
-			return L;
+			return luastate;
 		}
 	};
 

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITION
 //**************************************************************************
 
-const device_type COLECOVISION_CONTROL_PORT = &device_creator<colecovision_control_port_device>;
+const device_type COLECOVISION_CONTROL_PORT = device_creator<colecovision_control_port_device>;
 
 
 

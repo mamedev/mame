@@ -11,7 +11,6 @@
 #ifndef __VP595__
 #define __VP595__
 
-#include "emu.h"
 #include "exp.h"
 #include "sound/cdp1863.h"
 

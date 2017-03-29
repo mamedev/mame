@@ -11,7 +11,6 @@
 #ifndef __C2040__
 #define __C2040__
 
-#include "emu.h"
 #include "ieee488.h"
 #include "c2040fdc.h"
 #include "cpu/m6502/m6502.h"

@@ -20,10 +20,12 @@
 
 
 #include "emu.h"
+#include "includes/shuuz.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "includes/shuuz.h"
+#include "speaker.h"
 
 
 void shuuz_state::machine_start()

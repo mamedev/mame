@@ -11,7 +11,6 @@
 #ifndef __PORTFOLIO_RAM_CARD__
 #define __PORTFOLIO_RAM_CARD__
 
-#include "emu.h"
 #include "ccm.h"
 #include "machine/nvram.h"
 

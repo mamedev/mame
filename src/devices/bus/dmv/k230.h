@@ -5,7 +5,6 @@
 #ifndef __DMV_K230_H__
 #define __DMV_K230_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 #include "cpu/i86/i86.h"
 

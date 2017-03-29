@@ -75,10 +75,14 @@ Coin B is not used
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/ashnojoe.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
-#include "includes/ashnojoe.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 {

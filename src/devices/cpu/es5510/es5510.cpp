@@ -54,7 +54,7 @@ static int exec_cc = 0;
 #define LOG_EXEC(x)
 #endif
 
-const device_type ES5510 = &device_creator<es5510_device>;
+const device_type ES5510 = device_creator<es5510_device>;
 
 #define FLAG_N (1 << 7)
 #define FLAG_C (1 << 6)

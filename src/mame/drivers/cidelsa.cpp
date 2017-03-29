@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/cidelsa.h"
 
 /* CDP1802 Interface */

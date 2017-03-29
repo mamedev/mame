@@ -16,12 +16,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "machine/z80pio.h"
 #include "machine/z80dma.h"
-#include "machine/ram.h"
+#include "machine/z80pio.h"
 #include "video/i8275.h"
+#include "screen.h"
 
 
 class rt1715_state : public driver_device

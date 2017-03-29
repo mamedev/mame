@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Robbbert
 
+#include "emu.h"
 #include "includes/gamecom.h"
 
+#include "screen.h"
 
 
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };

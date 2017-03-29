@@ -90,10 +90,13 @@ protected or a snippet should do the aforementioned string copy.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/crgolf.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/hng64.h"
 #include "cpu/z80/kl5c80a12.h"
 

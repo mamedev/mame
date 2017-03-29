@@ -44,7 +44,7 @@ machine_config_constructor neogeo_kf2k2mp2_cart::device_mconfig_additions() cons
  kof2002b
  **************************************************/
 
-const device_type NEOGEO_KOF2002B_CART = &device_creator<neogeo_kof2002b_cart>;
+const device_type NEOGEO_KOF2002B_CART = device_creator<neogeo_kof2002b_cart>;
 
 neogeo_kof2002b_cart::neogeo_kof2002b_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KOF2002B_CART, "Neo Geo KOF 2002 Bootleg Cart", tag, owner, clock, "neocart_kof2002b", __FILE__),
@@ -67,7 +67,7 @@ void neogeo_kof2002b_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  kf2k2mp
  **************************************************/
 
-const device_type NEOGEO_KF2K2MP_CART = &device_creator<neogeo_kf2k2mp_cart>;
+const device_type NEOGEO_KF2K2MP_CART = device_creator<neogeo_kf2k2mp_cart>;
 
 neogeo_kf2k2mp_cart::neogeo_kf2k2mp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K2MP_CART, "Neo Geo KOF 2002 MP Cart", tag, owner, clock, "neocart_kf2k2mp", __FILE__),
@@ -89,7 +89,7 @@ void neogeo_kf2k2mp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  kf2k2mp2
  **************************************************/
 
-const device_type NEOGEO_KF2K2MP2_CART = &device_creator<neogeo_kf2k2mp2_cart>;
+const device_type NEOGEO_KF2K2MP2_CART = device_creator<neogeo_kf2k2mp2_cart>;
 
 neogeo_kf2k2mp2_cart::neogeo_kf2k2mp2_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K2MP2_CART, "Neo Geo KOF 2002 MP2 Cart", tag, owner, clock, "neocart_kf2k2mp2", __FILE__),

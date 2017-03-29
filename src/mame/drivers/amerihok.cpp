@@ -17,6 +17,7 @@ Processor is unknown
 
 #include "emu.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 class amerihok_state : public driver_device

@@ -11,6 +11,7 @@
 * TODO
 *   - too long to list
 */
+#include "emu.h"
 #include "interpro_sga.h"
 
 #define VERBOSE 0
@@ -34,7 +35,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
 	AM_RANGE(0xbc, 0xbf) AM_READWRITE(ddtc1_r, ddtc1_w)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_SGA = &device_creator<interpro_sga_device>;
+const device_type INTERPRO_SGA = device_creator<interpro_sga_device>;
 
 interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_SGA, "InterPro SGA", tag, owner, clock, "sga", __FILE__)

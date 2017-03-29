@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mos6581.h"
 #include "sid.h"
 
@@ -24,8 +25,8 @@
 //**************************************************************************
 
 // device type definition
-const device_type MOS6581 = &device_creator<mos6581_device>;
-const device_type MOS8580 = &device_creator<mos8580_device>;
+const device_type MOS6581 = device_creator<mos6581_device>;
+const device_type MOS8580 = device_creator<mos8580_device>;
 
 
 

@@ -14,11 +14,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/at28c16.h"
 #include "machine/gen_latch.h"
 #include "sound/qs1000.h"
-#include "includes/eolith.h"
+#include "speaker.h"
 
 
 class vegaeo_state : public eolith_state

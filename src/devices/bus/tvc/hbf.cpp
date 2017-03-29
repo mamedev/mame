@@ -48,7 +48,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type TVC_HBF = &device_creator<tvc_hbf_device>;
+const device_type TVC_HBF = device_creator<tvc_hbf_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

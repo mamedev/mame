@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_SCI = &device_creator<sh7604_sci_device>;
+const device_type SH7604_SCI = device_creator<sh7604_sci_device>;
 
 
 //**************************************************************************

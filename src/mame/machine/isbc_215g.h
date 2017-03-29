@@ -4,7 +4,6 @@
 #ifndef ISBC_215G_H_
 #define ISBC_215G_H_
 
-#include "emu.h"
 #include "cpu/i8089/i8089.h"
 #include "bus/isbx/isbx.h"
 #include "imagedev/harddriv.h"

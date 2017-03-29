@@ -3,7 +3,6 @@
 #ifndef __NE2000_H__
 #define __NE2000_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/dp8390.h"
 

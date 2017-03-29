@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "kempston_di.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type KEMPSTON_DISK_INTERFACE = &device_creator<kempston_disk_interface_t>;
+const device_type KEMPSTON_DISK_INTERFACE = device_creator<kempston_disk_interface_t>;
 
 
 //-------------------------------------------------

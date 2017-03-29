@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type TTL74123 = &device_creator<ttl74123_device>;
+const device_type TTL74123 = device_creator<ttl74123_device>;
 
 //-------------------------------------------------
 //  ttl74123_device - constructor

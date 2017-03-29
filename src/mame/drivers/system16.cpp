@@ -89,15 +89,18 @@
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "includes/segaipt.h"
 #include "includes/system16.h"
+#include "includes/segaipt.h"
+
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/2612intf.h"
-#include "sound/rf5c68.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "sound/2612intf.h"
 #include "sound/okim6295.h"
+#include "sound/rf5c68.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 #define SHADOW_COLORS_MULTIPLIER 3
 

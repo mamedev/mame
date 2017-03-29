@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv805.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV805 = &device_creator<sv805_device>;
+const device_type SV805 = device_creator<sv805_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

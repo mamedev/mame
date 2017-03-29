@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
+#include "emu.h"
 #include "machine/octo_kbd.h"
 #include "machine/keyboard.ipp"
 
@@ -259,6 +260,6 @@ void octopus_keyboard_device::device_timer(emu_timer &timer, device_timer_id id,
 }
 
 
-const device_type OCTOPUS_KEYBOARD = &device_creator<octopus_keyboard_device>;
+const device_type OCTOPUS_KEYBOARD = device_creator<octopus_keyboard_device>;
 
 

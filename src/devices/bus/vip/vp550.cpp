@@ -14,7 +14,10 @@
 
 */
 
+#include "emu.h"
 #include "vp550.h"
+
+#include "speaker.h"
 
 
 
@@ -40,7 +43,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP550 = &device_creator<vp550_device>;
+const device_type VP550 = device_creator<vp550_device>;
 
 
 //-------------------------------------------------

@@ -209,27 +209,21 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-#define LOG_INIT    0x08
-#define LOG_READ    0x10
-#define LOG_INT     0x20
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_READ    (1U <<  2)
+#define LOG_INT     (1U <<  3)
+#define LOG_INIT    (1U <<  4)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-#define LOGINIT(...)  LOGMASK(LOG_INIT,   __VA_ARGS__)
-#define LOGR(...)     LOGMASK(LOG_READ,   __VA_ARGS__)
-#define LOGINT(...)   LOGMASK(LOG_INT,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,   __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,    __VA_ARGS__)
+#define LOGINIT(...)  LOGMASKED(LOG_INIT,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -657,7 +651,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu30_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -704,7 +698,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
 
@@ -716,7 +710,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
 

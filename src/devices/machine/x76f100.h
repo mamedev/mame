@@ -12,7 +12,6 @@
 #ifndef __X76F100_H__
 #define __X76F100_H__
 
-#include "emu.h"
 
 #define MCFG_X76F100_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, X76F100, 0 )

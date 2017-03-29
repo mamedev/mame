@@ -44,7 +44,7 @@
 #define SET_BLOCKLOCK(block) (m_blocklock[(block) >> 3] |= 1 << ((block) & 7))
 #define CLEAR_BLOCKLOCK(block) (m_blocklock[(block) >> 3] &= ~(1 << ((block) & 7)))
 
-const device_type STRATAFLASH = &device_creator<strataflash_device>;
+const device_type STRATAFLASH = device_creator<strataflash_device>;
 
 strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock, "strataflash", __FILE__),
@@ -199,16 +199,6 @@ void strataflash_device::device_start(void)
 	m_prot_regs[BYTE_XOR_LE(0)] &= 0xfe;
 	for (int i=2; i<10; i++)
 		m_prot_regs[i] = machine().rand();
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void strataflash_device::device_config_complete()
-{
 }
 
 /*

@@ -51,23 +51,56 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 
 ## Release notes
 
-#### [GLM 0.9.9.0](https://github.com/g-truc/glm/releases/latest) - 2017-XX-XX
-##### Features:
+#### [GLM 0.9.8.5](https://github.com/g-truc/glm/tree/0.9.8) - 2017-0X-XX
+##### Fixes:
+- Fixed Clang version detection from source #608
 
+#### [GLM 0.9.8.4](https://github.com/g-truc/glm/releases/tag/0.9.8.4) - 2017-01-22
+##### Fixes:
+- Fixed GTC_packing test failing on GCC x86 due to denorms #212 #577
+- Fixed POPCNT optimization build in Clang #512
+- Fixed intersectRayPlane returns true in parallel case #578
+- Fixed GCC 6.2 compiler warnings #580
+- Fixed GTX_matrix_decompose decompose #582 #448
+- Fixed GCC 4.5 and older build #566
+- Fixed Visual C++ internal error when declaring a global vec type with siwzzle expression enabled #594
+- Fixed GLM_FORCE_CXX11 with Clang and libstlc++ which wasn't using C++11 STL features. #604
+
+#### [GLM 0.9.8.3](https://github.com/g-truc/glm/releases/tag/0.9.8.3) - 2016-11-12
 ##### Improvements:
+- Broader support of GLM_FORCE_UNRESTRICTED_GENTYPE #378
 
 ##### Fixes:
+- Fixed Android build error with C++11 compiler but C++98 STL #284 #564
+- Fixed GTX_transform2 shear* functions #403
+- Fixed interaction between GLM_FORCE_UNRESTRICTED_GENTYPE and ortho function #568
+- Fixed bitCount with AVX on 32 bit builds #567
+- Fixed CMake find_package with version specification #572 #573
 
-##### Deprecation:
-- Removed GLM_GTX_simd_vec4 extension
-- Removed GLM_GTX_simd_mat4 extension
-- Removed GLM_GTX_simd_quat extension
-- Removed GLM_SWIZZLE, use GLM_FORCE_SWIZZLE instead
-- Removed GLM_MESSAGES, use GLM_FORCE_MESSAGES instead
-- Removed GLM_DEPTH_ZERO_TO_ONE, use GLM_FORCE_DEPTH_ZERO_TO_ONE instead
-- Removed GLM_LEFT_HANDED, use GLM_FORCE_LEFT_HANDED instead
+#### [GLM 0.9.8.2](https://github.com/g-truc/glm/releases/tag/0.9.8.2) - 2016-11-01
+##### Improvements:
+- Added Visual C++ 15 detection
+- Added Clang 4.0 detection
+- Added warning messages when using GLM_FORCE_CXX** but the compiler
+  is known to not fully support the requested C++ version #555
+- Refactored GLM_COMPILER_VC values
+- Made quat, vec, mat type component length() static #565
 
-#### [GLM 0.9.8.0](https://github.com/g-truc/glm/tree/0.9.8) - 2016-XX-XX
+##### Fixes:
+- Fixed Visual C++ constexpr build error #555, #556
+
+#### [GLM 0.9.8.1](https://github.com/g-truc/glm/releases/tag/0.9.8.1) - 2016-09-25
+##### Improvements:
+- Optimized quaternion log function #554
+
+##### Fixes:
+- Fixed GCC warning filtering, replaced -pedantic by -Wpedantic
+- Fixed SIMD faceforward bug. #549
+- Fixed GCC 4.8 with C++11 compilation option #550
+- Fixed Visual Studio aligned type W4 warning #548
+- Fixed packing/unpacking function fixed for 5_6_5 and 5_5_5_1 #552
+
+#### [GLM 0.9.8.0](https://github.com/g-truc/glm/releases/tag/0.9.8.0) - 2016-09-11
 ##### Features:
 - Added right and left handed projection and clip control support #447 #415 #119
 - Added compNormalize and compScale functions to GTX_component_wise
@@ -111,6 +144,7 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 - Fixed missing vec1 overload to length2 and distance2 functions #431
 - Fixed GLM test '/fp:fast' and '/Za' command-line options are incompatible
 - Fixed quaterion to mat3 cast function mat3_cast from GTC_quaternion #542
+- Fixed GLM_GTX_io for Cuda #547 #546
 
 ##### Deprecation:
 - Removed GLM_FORCE_SIZE_FUNC define

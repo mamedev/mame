@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nes_carts.h"
 
 SLOT_INTERFACE_START(nes_cart)
@@ -215,6 +216,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("daou_306",         NES_DAOU306)
 	SLOT_INTERFACE_INTERNAL("subor0",           NES_SUBOR0)
 	SLOT_INTERFACE_INTERNAL("subor1",           NES_SUBOR1)
+	SLOT_INTERFACE_INTERNAL("subor2",           NES_SUBOR2)
 	SLOT_INTERFACE_INTERNAL("cc21",             NES_CC21)
 	SLOT_INTERFACE_INTERNAL("xiaozy",           NES_XIAOZY)
 	SLOT_INTERFACE_INTERNAL("edu2k",            NES_EDU2K)
@@ -224,6 +226,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_43272",        NES_43272)    // used in Gaau Hok Gwong Cheung
 	SLOT_INTERFACE_INTERNAL("tf1201",           NES_TF1201)
 	SLOT_INTERFACE_INTERNAL("unl_cfight",       NES_CITYFIGHT) //  used by City Fighter IV
+	SLOT_INTERFACE_INTERNAL("zemina",           NES_ZEMINA)    // mapper 190 - Magic Kid GooGoo
 // misc bootleg boards
 	SLOT_INTERFACE_INTERNAL("ax5705",           NES_AX5705)
 	SLOT_INTERFACE_INTERNAL("sc127",            NES_SC127)
@@ -344,7 +347,6 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ninjaryu",         NES_NROM)    // mapper 111 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_dance",        NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("onebus",           NES_NROM)    // UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("dance2k",          NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("pec586",           NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("coolboy",          NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("bmc_f15",          NES_NROM)    // UNSUPPORTED

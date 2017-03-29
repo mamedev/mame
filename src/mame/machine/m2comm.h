@@ -7,7 +7,6 @@
 
 #define __M2COMM_SIMULATION__
 
-#include "emu.h"
 
 #define MCFG_M2COMM_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, M2COMM, 0)

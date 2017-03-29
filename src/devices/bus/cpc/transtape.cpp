@@ -8,14 +8,15 @@
  * Further info at - http://cpcwiki.eu/index.php/Transtape
  */
 
+#include "emu.h"
 #include "transtape.h"
-#include "includes/amstrad.h"
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_TRANSTAPE = &device_creator<cpc_transtape_device>;
+const device_type CPC_TRANSTAPE = device_creator<cpc_transtape_device>;
 
 ROM_START( cpc_transtape )
 	ROM_REGION( 0x4000, "tt_rom", 0 )

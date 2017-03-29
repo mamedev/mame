@@ -11,7 +11,6 @@
 #ifndef __NEWBRAIN_EIM__
 #define __NEWBRAIN_EIM__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"

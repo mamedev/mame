@@ -6,7 +6,6 @@
 #define __PC8401A__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
@@ -17,6 +16,8 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
 
 #define SCREEN_TAG      "screen"
 #define CRT_SCREEN_TAG  "screen2"

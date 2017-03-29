@@ -35,19 +35,25 @@
 ************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/sh2/sh2.h"
+#include "includes/stv.h"
+#include "audio/rax.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
+#include "cpu/sh2/sh2.h"
+#include "imagedev/chd_cd.h"
 #include "machine/eepromser.h"
-#include "sound/scsp.h"
-#include "sound/cdda.h"
-#include "audio/rax.h"
 #include "machine/smpc.h"
 #include "machine/stvprot.h"
-#include "includes/stv.h"
-#include "imagedev/chd_cd.h"
-#include "coreutil.h"
+#include "sound/cdda.h"
+#include "sound/scsp.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
@@ -94,7 +100,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 	uint8_t res;
 
 	res = 0xff;
-	if(offset & 0x20 && !space.debugger_access())
+	if(offset & 0x20 && !machine().side_effect_disabled())
 		printf("Reading from mirror %08x?\n",offset);
 
 	offset &= 0x1f; // mirror?
@@ -115,7 +121,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 
 WRITE8_MEMBER(stv_state::stv_ioga_w)
 {
-	if(offset & 0x20 && !space.debugger_access())
+	if(offset & 0x20 && !machine().side_effect_disabled())
 		printf("Writing to mirror %08x %02x?\n",offset,data);
 
 	offset &= 0x1f; // mirror?
@@ -272,7 +278,7 @@ READ32_MEMBER(stv_state::critcrsh_ioga_r32)
 		res |= critcrsh_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -289,7 +295,7 @@ READ32_MEMBER(stv_state::stvmp_ioga_r32)
 		res |= stvmp_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -303,7 +309,7 @@ WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
 		stvmp_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
@@ -318,7 +324,7 @@ READ32_MEMBER(stv_state::magzun_ioga_r32)
 		res |= magzun_ioga_r(space,offset*4+3);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA reads from odd offset %02x %08x!\n",offset*4,mem_mask);
 
 	return res;
@@ -332,7 +338,7 @@ WRITE32_MEMBER(stv_state::magzun_ioga_w32)
 		magzun_ioga_w(space,offset*4+3,data);
 	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
@@ -1130,7 +1136,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 	uint8_t *ROM;
 	uint32_t size = slot->common_get_size("rom");
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		return image_init_result::FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
@@ -2540,7 +2546,25 @@ ROM_START( znpwfv )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD16_BYTE( "epr20398.13",    0x0000001, 0x0100000, CRC(3fb56a0b) SHA1(13c2fa2d94b106d39e46f71d15fbce3607a5965a) ) // bad
+	ROM_LOAD16_BYTE( "epr20398.13",    0x0000001, 0x0100000, CRC(3fb56a0b) SHA1(13c2fa2d94b106d39e46f71d15fbce3607a5965a) ) // good
+	ROM_RELOAD_PLAIN( 0x0200000, 0x0100000)
+	ROM_RELOAD_PLAIN( 0x0300000, 0x0100000)
+	ROM_LOAD16_WORD_SWAP( "mpr20400.2",    0x0400000, 0x0400000, CRC(1edfbe05) SHA1(b0edd3f3d57408101ae6eb0aec742afbb4d289ca) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20401.3",    0x0800000, 0x0400000, CRC(99e98937) SHA1(e1b4d12a0b4d0fe97a62fcc085e19cce77657c99) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20402.4",    0x0c00000, 0x0400000, CRC(4572aa60) SHA1(8b2d76ea8c6e2f472c6ee7c9b6ad6e80e6a1a85a) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20403.5",    0x1000000, 0x0400000, CRC(26a8e13e) SHA1(07f5564b704598e3c3580d3d620ecc4f14549dbd) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20404.6",    0x1400000, 0x0400000, CRC(0b70275d) SHA1(47b8672e19c698dc948760f7091f4c6280e728d0) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20399.1",    0x1800000, 0x0400000, CRC(c178a96e) SHA1(65f4aa05187d48ba8ad4fe75ff6ffe1f8524831d) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20405.8",    0x1c00000, 0x0400000, CRC(f53337b7) SHA1(09a21f81016ee54f10554ae1f790415d7436afe0) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20406.9",    0x2000000, 0x0400000, CRC(b677c175) SHA1(d0de7b5a29928036df0bdfced5a8021c0999eb26) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr20407.10",   0x2400000, 0x0400000, CRC(58356050) SHA1(f8fb5a14f4ec516093c785891b05d55ae345754e) ) // good
+ROM_END
+
+ROM_START( znpwfvt )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_BYTE( "epr20408.13",    0x0000001, 0x0100000, CRC(1d62fcf6) SHA1(3651261aa755da27b11462f2705311b7c639a687) ) // good
 	ROM_RELOAD_PLAIN( 0x0200000, 0x0100000)
 	ROM_RELOAD_PLAIN( 0x0300000, 0x0100000)
 	ROM_LOAD16_WORD_SWAP( "mpr20400.2",    0x0400000, 0x0400000, CRC(1edfbe05) SHA1(b0edd3f3d57408101ae6eb0aec742afbb4d289ca) ) // good
@@ -3424,6 +3448,7 @@ GAME( 1996, vfkids,    stvbios, stv,      stv, stv_state,        stv,        ROT
 GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv, stv_state,        winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, znpwfvt,   znpwfv,  stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer / camera devices */
 // USA sets
@@ -3449,7 +3474,7 @@ GAME( 1997, prc297wia, prc297wi,stv,      stv, stv_state,       stv,        ROT0
 GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
 GAME( 1998, prc298su,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
 GAME( 1998, prc298au,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
-GAME( 2000, prc2ksu,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000) ", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
+GAME( 2000, prc2ksu,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 
 GAME( 1999, pclubor,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )

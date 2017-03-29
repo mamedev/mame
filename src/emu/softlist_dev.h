@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __SOFTLIST_DEV_H_
-#define __SOFTLIST_DEV_H_
+#ifndef MAME_EMU_SOFTLIST_DEV
+#define MAME_EMU_SOFTLIST_DEV
 
 #include "softlist.h"
 
@@ -159,6 +159,7 @@ public:
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);
 	static void display_matches(const machine_config &config, const char *interface, const std::string &name);
+	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool (const device_image_interface &)> filter);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part);
 
 protected:
@@ -189,7 +190,7 @@ private:
 extern const device_type SOFTWARE_LIST;
 
 // device type iterator
-typedef device_type_iterator<&device_creator<software_list_device>, software_list_device> software_list_device_iterator;
+typedef device_type_iterator<software_list_device> software_list_device_iterator;
 
 
-#endif // __SOFTLIST_DEV_H_
+#endif // MAME_EMU_SOFTLIST_DEV

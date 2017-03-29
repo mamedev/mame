@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_EXPANSION_SLOT = &device_creator<ql_expansion_slot_t>;
+const device_type QL_EXPANSION_SLOT = device_creator<ql_expansion_slot_t>;
 
 
 

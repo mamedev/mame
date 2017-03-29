@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "fdc.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_FDC_SLOT = &device_creator<bbc_fdc_slot_device>;
+const device_type BBC_FDC_SLOT = device_creator<bbc_fdc_slot_device>;
 
 
 //**************************************************************************

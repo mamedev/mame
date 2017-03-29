@@ -11,7 +11,6 @@
 #ifndef __WANGPC_WDC__
 #define __WANGPC_WDC__
 
-#include "emu.h"
 #include "wangpc.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"

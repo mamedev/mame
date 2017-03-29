@@ -12,7 +12,6 @@
 #define __NEORAM__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

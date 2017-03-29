@@ -45,7 +45,7 @@
 //****************************************************************************
 
 // device type definition
-const device_type NAMCO_C45_ROAD = &device_creator<namco_c45_road_device>;
+const device_type NAMCO_C45_ROAD = device_creator<namco_c45_road_device>;
 
 
 const gfx_layout namco_c45_road_device::tilelayout =

@@ -760,7 +760,7 @@ uint32_t tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &
 
 ***************************************************************************/
 
-void tmnt_state::screen_eof_blswhstl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tmnt_state::screen_vblank_blswhstl)
 {
 	// on rising edge
 	if (state)

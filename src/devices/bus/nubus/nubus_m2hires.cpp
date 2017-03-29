@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "nubus_m2hires.h"
+#include "screen.h"
 
 #define M2HIRES_SCREEN_NAME "m2hires_screen"
 #define M2HIRES_ROM_REGION  "m2hires_rom"
@@ -35,7 +36,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_M2HIRES = &device_creator<nubus_m2hires_device>;
+const device_type NUBUS_M2HIRES = device_creator<nubus_m2hires_device>;
 
 
 //-------------------------------------------------

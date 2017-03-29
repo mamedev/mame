@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class neptunp2_state : public driver_device

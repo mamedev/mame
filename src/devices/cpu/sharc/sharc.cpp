@@ -52,7 +52,7 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
-const device_type ADSP21062 = &device_creator<adsp21062_device>;
+const device_type ADSP21062 = device_creator<adsp21062_device>;
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)

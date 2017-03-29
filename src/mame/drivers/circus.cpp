@@ -46,9 +46,11 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/samples.h"
 #include "includes/circus.h"
+
+#include "cpu/m6502/m6502.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "circus.lh"
 #include "crash.lh"

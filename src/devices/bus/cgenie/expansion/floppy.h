@@ -11,7 +11,6 @@
 #ifndef __CGENIE_EXPANSION_FLOPPY_H__
 #define __CGENIE_EXPANSION_FLOPPY_H__
 
-#include "emu.h"
 #include "expansion.h"
 #include "machine/wd_fdc.h"
 #include "bus/generic/slot.h"

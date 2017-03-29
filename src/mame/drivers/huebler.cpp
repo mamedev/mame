@@ -20,7 +20,9 @@
 
 */
 
+#include "emu.h"
 #include "includes/huebler.h"
+#include "screen.h"
 
 /* Keyboard */
 

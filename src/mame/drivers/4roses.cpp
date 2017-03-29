@@ -172,15 +172,19 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
 #include "includes/funworld.h"
 
+#include "cpu/m6502/m65c02.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_16MHz
 
 class _4roses_state : public funworld_state
 {

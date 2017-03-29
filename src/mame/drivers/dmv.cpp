@@ -10,15 +10,15 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
-#include "machine/upd765.h"
+#include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
-#include "machine/pit8253.h"
 #include "machine/dmv_keyb.h"
-#include "sound/speaker.h"
+#include "machine/pit8253.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "video/upd7220.h"
-#include "formats/dmv_dsk.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -31,7 +31,11 @@
 #include "bus/dmv/k806.h"
 #include "bus/dmv/ram.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/dmv_dsk.h"
 
 #include "dmv.lh"
 
@@ -311,7 +315,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		for(int xi=0;xi<16;xi++)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[1] : palette[0];
+				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
 		}
 	}
 }
@@ -332,8 +336,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 		else
 		{
 			const rgb_t *palette = m_palette->palette()->entry_list_raw();
-			bg = palette[(attr & 1) ? 1 : 0];
-			fg = palette[(attr & 1) ? 0 : 1];
+			bg = palette[(attr & 1) ? 2 : 0];
+			fg = palette[(attr & 1) ? 0 : 2];
 		}
 
 		for( int yi = 0; yi < lr; yi++)

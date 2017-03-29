@@ -12,7 +12,6 @@
 #define __REX_EP256__
 
 
-#include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "exp.h"

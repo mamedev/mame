@@ -12,7 +12,6 @@
 #define __2JOYSND__
 
 
-#include "emu.h"
 #include "user.h"
 #include "sound/dac.h"
 

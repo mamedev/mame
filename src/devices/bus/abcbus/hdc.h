@@ -11,7 +11,6 @@
 #ifndef __ABC_HDC__
 #define __ABC_HDC__
 
-#include "emu.h"
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"

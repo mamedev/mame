@@ -7,7 +7,7 @@
 
 
 
-extern const device_type PVC_PROT = &device_creator<pvc_prot_device>;
+const device_type PVC_PROT = device_creator<pvc_prot_device>;
 
 
 pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

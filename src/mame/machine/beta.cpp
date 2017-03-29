@@ -24,7 +24,7 @@ BUGS:
 ***************************************************************************/
 
 
-const device_type BETA_DISK = &device_creator<beta_disk_device>;
+const device_type BETA_DISK = device_creator<beta_disk_device>;
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)

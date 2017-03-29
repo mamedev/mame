@@ -12,7 +12,6 @@
 #define __EASY_CALC_RESULT__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

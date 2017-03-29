@@ -9,7 +9,6 @@
 #ifndef CPC_RS232_H_
 #define CPC_RS232_H_
 
-#include "emu.h"
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"

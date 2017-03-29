@@ -59,7 +59,7 @@ static const char *const s_mnemonics[] =
 	"ADDC", "PDTW", "TW", "DTW",
 	"ATS", "EXKSA", "EXKFA",
 	"RMF", "SMF", "COMCN",
-	"TA", "TM", "TG"
+	"TA", "TM", "TG",
 
 	//
 	"LC", "LM", "LE", "LAF", "LAS", "LDF", "BS0", "BS1", "XL", "XM", "XI", "XEI", "XD", "XED", "XE", "BM0", "BM1", "SM1",

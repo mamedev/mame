@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cards.h"
 
 SLOT_INTERFACE_START( nasbus_slot_cards )

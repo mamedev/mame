@@ -31,7 +31,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 #define GF4500_FRAMEBUF_OFFSET 0x20000
 
 
-const device_type GF4500 = &device_creator<gf4500_device>;
+const device_type GF4500 = device_creator<gf4500_device>;
 
 
 gf4500_device::gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -39,16 +39,6 @@ gf4500_device::gf4500_device(const machine_config &mconfig, const char *tag, dev
 			{
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void gf4500_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
