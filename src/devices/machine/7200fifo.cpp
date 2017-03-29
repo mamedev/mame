@@ -59,7 +59,7 @@ void fifo7200_device::device_start()
 void fifo7200_device::device_reset()
 {
 	// master reset
-	m_buffer.clear();
+	std::fill(m_buffer.begin(), m_buffer.end(), 0);
 	m_read_ptr = 0;
 	m_write_ptr = 0;
 
