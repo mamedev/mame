@@ -494,8 +494,8 @@ ROM_END
 
 ROM_START( rastanb ) /* Earlier code base, but uses 2 US region roms and shows Taito Corporation Japan instead of Taito America Corporation */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "b04-14.19", 0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) ) /* These two are from the US rastanub below set */
-	ROM_LOAD16_BYTE( "b04-21.7",  0x00001, 0x10000, CRC(7c8dde9a) SHA1(0cfc3b4f3bc7b940a6c07267ac95e4aae25801ea) ) /* These two are from the US rastanub below set */
+	ROM_LOAD16_BYTE( "b04-14.19", 0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) ) /* These two are from the US rastanub set below */
+	ROM_LOAD16_BYTE( "b04-21.7",  0x00001, 0x10000, CRC(7c8dde9a) SHA1(0cfc3b4f3bc7b940a6c07267ac95e4aae25801ea) ) /* These two are from the US rastanub set below */
 	ROM_LOAD16_BYTE( "b04-27.20", 0x20000, 0x10000, CRC(ce37694b) SHA1(343c35d93f59c0696104e6934063057d117f4d9f) )
 	ROM_LOAD16_BYTE( "b04-26.8",  0x20001, 0x10000, CRC(fbdb98c7) SHA1(717aabf6ce0c7c6107c4bcaae646f7c67b644a54) )
 	ROM_LOAD16_BYTE( "b04-29.21", 0x40000, 0x10000, CRC(90d7c6e8) SHA1(6a36cd6db04fcefbf0487f574fccb0eab94e058f) )
