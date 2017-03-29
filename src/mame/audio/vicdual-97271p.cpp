@@ -33,23 +33,23 @@ const device_type S97271P = device_creator<s97271p_device>;
 static const char *const nsub_sample_names[] =
 {
 	"*nsub",
-	"0_0",
-	"0_1",
-	"1_0",
-	"2_0",
-	"2_1",
-	"3_0",
-	"3_1",
-	"4_0",
-	"4_1",
-	"5_0",
-	"5_1",
-	"6_0",
-	"7_0",
+	"SND_EXPL_L0",
+	"SND_EXPL_L1",
+	"SND_SONAR",
+	"SND_LAUNCH0",
+	"SND_LAUNCH1",
+	"SND_WARNING0",
+	"SND_WARNING1",
+	"SND_EXPL_S0",
+	"SND_EXPL_S1",
+	"SND_BONUS0",
+	"SND_BONUS1",
+	"SND_CODE",
+	"SND_BOAT",
 	nullptr
 };
 
-/* sample IDs - must match sample file name table above */
+/* sample ids - must match sample file name table above */
 enum 
 {
 	SND_EXPL_L0 = 0,
