@@ -5,7 +5,10 @@
 
 #include <bx/allocator.h>
 #include <bx/hash.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
 #include <bx/readerwriter.h>
+#pragma GCC diagnostic pop 
 #include <bx/string.h>
 
 #if !BX_CRT_NONE
