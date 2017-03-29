@@ -58,6 +58,7 @@
 #include "audio/invinco.h"
 #include "audio/pulsar.h"
 #include "audio/vicdual.h"
+#include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
 
 #include "cpu/i8085/i8085.h"
@@ -2247,7 +2248,10 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 WRITE8_MEMBER(vicdual_state::nsub_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
+	if (offset & 0x02)
+	{
+		m_s97271p->port_w(data);
+	}
 	if (offset & 0x04)
 	{
 		palette_bank_w(space, 0, data);
@@ -2411,6 +2415,9 @@ static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 
 	// daughterboard
 	MCFG_S97269PB_ADD("s97269pb")
+
+	/* audio hardware */
+	MCFG_S97271P_ADD("s97271p")
 MACHINE_CONFIG_END
 
 

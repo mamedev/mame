@@ -54,7 +54,6 @@ Notes:
 */
 
 #include "emu.h"
-#include "emuopts.h"
 #include "video/vicdual-97269pb.h"
 
 #define S97269PB_TAG     "s97269pb"
@@ -89,7 +88,7 @@ const tiny_rom_entry *s97269pb_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  m1comm_device - constructor
+//  s97269pb_device - constructor
 //-------------------------------------------------
 
 s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

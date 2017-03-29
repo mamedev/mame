@@ -11,6 +11,7 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "screen.h"
+#include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
 
 class vicdual_state : public driver_device
@@ -27,6 +28,7 @@ public:
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
 		m_s97269pb(*this,"s97269pb"),
+		m_s97271p(*this,"s97271p"),
 		m_proms(*this, "proms"),
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),
@@ -47,6 +49,7 @@ public:
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
 	optional_device<s97269pb_device> m_s97269pb;
+	optional_device<s97271p_device> m_s97271p;
 	optional_memory_region m_proms;
 
 	required_shared_ptr<uint8_t> m_videoram;
