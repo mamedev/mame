@@ -73,19 +73,28 @@ namespace bgfx { namespace glsl
 			optimizedShader = bx::strnl(optimizedShader);
 		}
 
-		if (0 != _version)
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
 
+			strReplace(code, "texture2DLodARB", "texture2DLod");
 			strReplace(code, "texture2DLodEXT", "texture2DLod");
-			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
-			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "texture2DGradARB", "texture2DGrad");
 			strReplace(code, "texture2DGradEXT", "texture2DGrad");
-			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "textureCubeLodARB", "textureCubeLod");
+			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "textureCubeGradARB", "textureCubeGrad");
 			strReplace(code, "textureCubeGradEXT", "textureCubeGrad");
 
+			strReplace(code, "texture2DProjLodARB", "texture2DProjLod");
+			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
+			strReplace(code, "texture2DProjGradARB", "texture2DProjGrad");
+			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "shadow2DARB", "shadow2D");
 			strReplace(code, "shadow2DEXT", "shadow2D");
+			strReplace(code, "shadow2DProjARB", "shadow2DProj");
 			strReplace(code, "shadow2DProjEXT", "shadow2DProj");
 		}
 
@@ -214,8 +223,8 @@ namespace bgfx { namespace glsl
 						bx::strlcpy(uniformName, name, array-name+1);
 
 						char arraySize[32];
-						const char* end = bx::strnstr(array, "]", eol-array);
-						bx::strlcpy(arraySize, array+1, end-array);
+						const char* arrayEnd = bx::strnstr(array, "]", eol-array);
+						bx::strlcpy(arraySize, array+1, arrayEnd-array);
 						num = uint8_t(atoi(arraySize) );
 					}
 					else
@@ -251,7 +260,7 @@ namespace bgfx { namespace glsl
 			uint8_t nameSize = (uint8_t)un.name.size();
 			bx::write(_writer, nameSize);
 			bx::write(_writer, un.name.c_str(), nameSize);
-			uint8_t uniformType = un.type;
+			uint8_t uniformType = uint8_t(un.type);
 			bx::write(_writer, uniformType);
 			bx::write(_writer, un.num);
 			bx::write(_writer, un.regIndex);

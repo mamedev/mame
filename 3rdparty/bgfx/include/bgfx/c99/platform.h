@@ -19,6 +19,7 @@ typedef enum bgfx_render_frame
 {
     BGFX_RENDER_FRAME_NO_CONTEXT,
     BGFX_RENDER_FRAME_RENDER,
+    BGFX_RENDER_FRAME_TIMEOUT,
     BGFX_RENDER_FRAME_EXITING,
 
     BGFX_RENDER_FRAME_COUNT
@@ -150,7 +151,7 @@ typedef struct bgfx_interface_vtbl
     void (*get_uniform_info)(bgfx_uniform_handle_t _handle, bgfx_uniform_info_t* _info);
     void (*destroy_uniform)(bgfx_uniform_handle_t _handle);
     bgfx_occlusion_query_handle_t (*create_occlusion_query)();
-    bgfx_occlusion_query_result_t (*get_result)(bgfx_occlusion_query_handle_t _handle);
+    bgfx_occlusion_query_result_t (*get_result)(bgfx_occlusion_query_handle_t _handle, int32_t* _result);
     void (*destroy_occlusion_query)(bgfx_occlusion_query_handle_t _handle);
     void (*set_palette_color)(uint8_t _index, const float _rgba[4]);
     void (*set_view_name)(uint8_t _id, const char* _name);
@@ -197,7 +198,7 @@ typedef struct bgfx_interface_vtbl
     uint32_t (*dispatch_indirect)(uint8_t _id, bgfx_program_handle_t _handle, bgfx_indirect_buffer_handle_t _indirectHandle, uint16_t _start, uint16_t _num, uint8_t _flags);
     void (*discard)();
     void (*blit)(uint8_t _id, bgfx_texture_handle_t _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx_texture_handle_t _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth);
-    void (*save_screen_shot)(const char* _filePath);
+    void (*request_screen_shot)(bgfx_frame_buffer_handle_t _handle, const char* _filePath);
 
 } bgfx_interface_vtbl_t;
 

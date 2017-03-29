@@ -7,7 +7,12 @@
 #define __TEST_H__
 
 #include <bx/bx.h>
+
+BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' : conversion from 'int' to 'const char *' of greater size
 #include <catch/catch.hpp>
+BX_PRAGMA_DIAGNOSTIC_POP();
+
 #define TEST(_x) TEST_CASE(#_x, "")
 #define CHECK_EQUAL(_x, _y) REQUIRE(_x == _y)
 

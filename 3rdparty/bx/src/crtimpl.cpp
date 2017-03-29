@@ -4,6 +4,7 @@
  */
 
 #include <bx/crtimpl.h>
+#include <stdio.h>
 
 #if BX_CONFIG_ALLOCATOR_CRT
 #	include <malloc.h>

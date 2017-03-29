@@ -193,6 +193,6 @@ namespace bx
 
 } // namespace bx
 
-#include "easing.inl"
+#include "inline/easing.inl"
 
 #endif // BX_EASING_H_HEADER_GUARD

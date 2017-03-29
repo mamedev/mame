@@ -776,16 +776,19 @@ project "bx"
 	}
 
 	files {
+		MAME_DIR .. "3rdparty/bx/src/bx.cpp",
 		MAME_DIR .. "3rdparty/bx/src/commandline.cpp",
-		MAME_DIR .. "3rdparty/bx/src/crt.cpp",
+		MAME_DIR .. "3rdparty/bx/src/crtnone.cpp",
 		MAME_DIR .. "3rdparty/bx/src/crtimpl.cpp",
 		MAME_DIR .. "3rdparty/bx/src/debug.cpp",
 		MAME_DIR .. "3rdparty/bx/src/dtoa.cpp",
 		MAME_DIR .. "3rdparty/bx/src/fpumath.cpp",
 		MAME_DIR .. "3rdparty/bx/src/mutex.cpp",
 		MAME_DIR .. "3rdparty/bx/src/os.cpp",
-		MAME_DIR .. "3rdparty/bx/src/sem.cpp",
+		MAME_DIR .. "3rdparty/bx/src/semaphore.cpp",
+		MAME_DIR .. "3rdparty/bx/src/sort.cpp",
 		MAME_DIR .. "3rdparty/bx/src/string.cpp",
+		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
 		MAME_DIR .. "3rdparty/bx/src/thread.cpp",
 	}
 

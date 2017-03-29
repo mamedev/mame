@@ -9,14 +9,17 @@
 
 #include <bgfx/platform.h>
 
-#include <bx/uint32_t.h>
-#include <bx/thread.h>
 #include <bx/mutex.h>
 #include <bx/handlealloc.h>
+#include <bx/os.h>
+#include <bx/thread.h>
 #include <bx/timer.h>
+#include <bx/uint32_t.h>
+
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 
+#include <windows.h>
 #include <windowsx.h>
 #include <xinput.h>
 
@@ -34,7 +37,7 @@ namespace entry
 	inline void winSetHwnd(::HWND _window)
 	{
 		bgfx::PlatformData pd;
-		memset(&pd, 0, sizeof(pd) );
+		bx::memSet(&pd, 0, sizeof(pd) );
 		pd.nwh = _window;
 		bgfx::setPlatformData(pd);
 	}
@@ -75,8 +78,8 @@ namespace entry
 		XInput()
 			: m_xinputdll(NULL)
 		{
-			memset(m_connected, 0, sizeof(m_connected) );
-			memset(m_state, 0, sizeof(m_state) );
+			bx::memSet(m_connected, 0, sizeof(m_connected) );
+			bx::memSet(m_state, 0, sizeof(m_state) );
 
 			m_deadzone[GamepadAxis::LeftX ] =
 			m_deadzone[GamepadAxis::LeftY ] = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
@@ -85,7 +88,7 @@ namespace entry
 			m_deadzone[GamepadAxis::LeftZ ] =
 			m_deadzone[GamepadAxis::RightZ] = XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
 
-			memset(m_flip, 1, sizeof(m_flip) );
+			bx::memSet(m_flip, 1, sizeof(m_flip) );
 			m_flip[GamepadAxis::LeftY ] =
 			m_flip[GamepadAxis::RightY] = -1;
 		}
@@ -353,7 +356,7 @@ namespace entry
 			, m_init(false)
 			, m_exit(false)
 		{
-			memset(s_translateKey, 0, sizeof(s_translateKey) );
+			bx::memSet(s_translateKey, 0, sizeof(s_translateKey) );
 			s_translateKey[VK_ESCAPE]     = Key::Esc;
 			s_translateKey[VK_RETURN]     = Key::Return;
 			s_translateKey[VK_TAB]        = Key::Tab;
@@ -451,7 +454,7 @@ namespace entry
 			HINSTANCE instance = (HINSTANCE)GetModuleHandle(NULL);
 
 			WNDCLASSEXA wnd;
-			memset(&wnd, 0, sizeof(wnd) );
+			bx::memSet(&wnd, 0, sizeof(wnd) );
 			wnd.cbSize = sizeof(wnd);
 			wnd.style = CS_HREDRAW | CS_VREDRAW;
 			wnd.lpfnWndProc = wndProc;
@@ -829,7 +832,7 @@ namespace entry
 
 		WindowHandle findHandle(HWND _hwnd)
 		{
-			bx::LwMutexScope scope(m_lock);
+			bx::MutexScope scope(m_lock);
 			for (uint16_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
@@ -967,7 +970,7 @@ namespace entry
 		static LRESULT CALLBACK wndProc(HWND _hwnd, UINT _id, WPARAM _wparam, LPARAM _lparam);
 
 		EventQueue m_eventQueue;
-		bx::LwMutex m_lock;
+		bx::Mutex m_lock;
 
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 
@@ -1018,7 +1021,7 @@ namespace entry
 
 	WindowHandle createWindow(int32_t _x, int32_t _y, uint32_t _width, uint32_t _height, uint32_t _flags, const char* _title)
 	{
-		bx::LwMutexScope scope(s_ctx.m_lock);
+		bx::MutexScope scope(s_ctx.m_lock);
 		WindowHandle handle = { s_ctx.m_windowAlloc.alloc() };
 
 		if (UINT16_MAX != handle.idx)
@@ -1042,7 +1045,7 @@ namespace entry
 		{
 			PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_DESTROY, _handle.idx, 0);
 
-			bx::LwMutexScope scope(s_ctx.m_lock);
+			bx::MutexScope scope(s_ctx.m_lock);
 			s_ctx.m_windowAlloc.free(_handle.idx);
 		}
 	}

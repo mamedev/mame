@@ -37,6 +37,8 @@
 #	define _strdup strdup
 #endif // !BX_COMPILER_MSVC
 
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4996) // warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _strdup. See online help for details.
+
 struct complex {
 	complex() {data = 0;}
 	complex(const char* s) { data = strdup(s); }
