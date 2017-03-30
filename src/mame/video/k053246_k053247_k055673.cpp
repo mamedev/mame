@@ -757,7 +757,7 @@ void k053246_055673_device::bitmap_update(bitmap_ind16 *bcolor, bitmap_ind16 *ba
 			noshadow_attr |= mixbri;
 			shadow_attr   |= mixbri;
 
-			//			logerror("tbid %x color %x ns %x s %x atrbk %x [%x %x %x %x]\n", tile_base_id, color, noshadow_attr, shadow_attr, atrbk, m_atrbk[0], m_atrbk[1], m_atrbk[2], m_atrbk[3]);
+			//			logerror("tbid %x color %x ns %x s %x atrbk %x [%x %x %x %x] opset=%d oms=%d s6=%04x\n", tile_base_id, color, noshadow_attr, shadow_attr, atrbk, m_atrbk[0], m_atrbk[1], m_atrbk[2], m_atrbk[3], !!(m_opset & 0x20), !!(m_oms & 0x20), spr[6]);
 
 			//		uint16_t color          = info_ns & 0x1ff;
 			//		uint16_t noshadow_attr  = ((info_ns & 0xc000) >> 6) | ((info_ns >> 8) & 0x3e);

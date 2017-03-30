@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER(konamigx_state::htimerirq_w)
 void konamigx_state::sprites_wiring(uint32_t output, uint16_t &color, uint16_t &attr)
 {
 	color = output & 0xff;
-	attr  = ((output & 0xfc0000) >> 6) | ((output >> 8) & 0x3f);
+	attr  = ((output & 0xfc0000) >> 10) | ((output >> 8) & 0x3f);
 	if(!(m_port2 & 4)) {
 		if(m_port2 & 8)
 			attr |= (output >> 8) & 0xc0;
