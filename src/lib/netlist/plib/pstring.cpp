@@ -104,7 +104,7 @@ void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::substr(const iterator &start, const iterator &end) const
+const pstring_t<F> pstring_t<F>::substr(const const_iterator &start, const const_iterator &end) const
 {
 	pstring_t ret;
 	//FIXME: throw ?
@@ -116,7 +116,7 @@ template<typename F>
 const pstring_t<F> pstring_t<F>::ucase() const
 {
 	pstring_t ret = "";
-	for (auto c : *this)
+	for (code_t c : *this)
 		if (c >= 'a' && c <= 'z')
 			ret += (c - 'a' + 'A');
 		else
@@ -125,12 +125,12 @@ const pstring_t<F> pstring_t<F>::ucase() const
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find_first_not_of(const pstring_t &no) const
+typename pstring_t<F>::const_iterator pstring_t<F>::find_first_not_of(const pstring_t &no) const
 {
 	for (auto it = begin(); it != end(); ++it)
 	{
 		bool f = true;
-		for (auto const jt : no)
+		for (code_t const jt : no)
 		{
 			if (*it == jt)
 			{
@@ -145,14 +145,14 @@ typename pstring_t<F>::iterator pstring_t<F>::find_first_not_of(const pstring_t 
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find_last_not_of(const pstring_t &no) const
+typename pstring_t<F>::const_iterator pstring_t<F>::find_last_not_of(const pstring_t &no) const
 {
-	/* FIXME: reverse iterator */
-	iterator last_found = end();
+	/* FIXME: reverse const_iterator */
+	const_iterator last_found = end();
 	for (auto it = begin(); it != end(); ++it)
 	{
 		bool f = true;
-		for (auto const jt : no)
+		for (code_t const jt : no)
 		{
 			if (*it == jt)
 			{
@@ -167,11 +167,11 @@ typename pstring_t<F>::iterator pstring_t<F>::find_last_not_of(const pstring_t &
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iterator start) const
+typename pstring_t<F>::const_iterator pstring_t<F>::find(const pstring_t &search, const_iterator start) const
 {
 	for (; start != end(); ++start)
 	{
-		iterator itc(start);
+		const_iterator itc(start);
 		auto cmp = search.begin();
 		while (itc != end() && cmp != search.end() && *itc == *cmp)
 		{
@@ -185,7 +185,7 @@ typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iter
 }
 
 template<typename F>
-typename pstring_t<F>::iterator pstring_t<F>::find(const code_t search, iterator start) const
+typename pstring_t<F>::const_iterator pstring_t<F>::find(const code_t search, const_iterator start) const
 {
 	mem_t buf[traits::MAXCODELEN+1] = { 0 };
 	traits::encode(search, buf);
@@ -205,7 +205,7 @@ pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &rep
 	{
 		ret += substr(last_s, s);
 		ret += replace;
-		last_s = s + slen;
+		last_s = std::next(s, slen);
 		s = find(search, last_s);
 	}
 	ret += substr(last_s, end());
@@ -225,7 +225,7 @@ const pstring_t<F> pstring_t<F>::rtrim(const pstring_t &ws) const
 	if (f==end())
 		return pstring_t("");
 	else
-		return substr(begin(), f + 1);
+		return substr(begin(), std::next(f, 1));
 }
 
 template<typename F>

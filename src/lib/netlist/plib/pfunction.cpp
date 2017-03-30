@@ -86,7 +86,7 @@ static int get_prio(pstring v)
 {
 	if (v == "(" || v == ")")
 		return 1;
-	else if (v.left(v.begin()+1) >= "a" && v.left(v.begin()+1) <= "z")
+	else if (v.left(std::next(v.begin(),1)) >= "a" && v.left(std::next(v.begin(),1)) <= "z")
 		return 0;
 	else if (v == "*" || v == "/")
 		return 20;

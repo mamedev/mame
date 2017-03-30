@@ -421,7 +421,7 @@ void tool_app_t::mac_out(const pstring &s, const bool cont)
 	if (cont)
 	{
 		unsigned adj = 0;
-		for (auto x : s)
+		for (auto &x : s)
 			adj += (x == '\t' ? 3 : 0);
 		pout("{1}\\\n", s.rpad(" ", RIGHT-1-adj));
 	}

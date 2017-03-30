@@ -82,25 +82,57 @@ public:
 	// assignment operators
 	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }
 
-	struct iterator final : public std::iterator<std::forward_iterator_tag, mem_t>
+	class const_iterator final
 	{
-		const mem_t * p;
 	public:
-		explicit constexpr iterator(const mem_t *x) noexcept : p(x) {}
-		iterator(const iterator &rhs) noexcept = default;
-		iterator(iterator &&rhs) noexcept { p = rhs.p; }
-		iterator &operator=(const iterator &it) { p = it.p; return *this; }
-		iterator& operator++() noexcept { p += traits::codelen(p); return *this; }
-		iterator operator++(int) noexcept { iterator tmp(*this); operator++(); return tmp; }
-		bool operator==(const iterator& rhs) noexcept { return p==rhs.p; }
-		bool operator!=(const iterator& rhs) noexcept { return p!=rhs.p; }
-		const code_t operator*() noexcept { return traits::code(p); }
-		iterator& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
-		friend iterator operator+(iterator lhs, const size_type &rhs) { return (lhs += rhs); }
+		class value_type final
+		{
+		public:
+			value_type() = delete;
+			value_type(const value_type &) = delete;
+			value_type(value_type &&) = delete;
+			value_type &operator=(const value_type &) = delete;
+			value_type &operator=(value_type &&) = delete;
+			operator code_t() const noexcept { return traits::code(&m); }
+		private:
+			const mem_t m;
+		};
+
+		typedef value_type const *pointer;
+		typedef value_type const &reference;
+		typedef std::ptrdiff_t difference_type;
+		typedef std::forward_iterator_tag iterator_category;
+
+		const_iterator() noexcept : p(nullptr) { }
+		explicit constexpr const_iterator(const mem_t *x) noexcept : p(x) { }
+		const_iterator(const const_iterator &rhs) noexcept = default;
+		const_iterator(const_iterator &&rhs) noexcept = default;
+		const_iterator &operator=(const const_iterator &rhs) noexcept = default;
+		const_iterator &operator=(const_iterator &&rhs) noexcept = default;
+
+		const_iterator& operator++() noexcept { p += traits::codelen(p); return *this; }
+		const_iterator operator++(int) noexcept { const_iterator tmp(*this); operator++(); return tmp; }
+
+		bool operator==(const const_iterator& rhs) const noexcept { return p == rhs.p; }
+		bool operator!=(const const_iterator& rhs) const noexcept { return p != rhs.p; }
+
+		reference operator*() const noexcept { return *reinterpret_cast<pointer>(p); }
+		pointer operator->() const noexcept { return reinterpret_cast<pointer>(p); }
+
+	private:
+		template <typename G> friend struct pstring_t;
+		const mem_t * p;
 	};
 
-	iterator begin() const { return iterator(m_ptr->str()); }
-	iterator end() const { return iterator(m_ptr->str() + blen()); }
+	// no non-const const_iterator for now
+	typedef const_iterator iterator;
+
+	iterator begin() { return iterator(m_ptr->str()); }
+	iterator end() { return iterator(m_ptr->str() + blen()); }
+	const_iterator begin() const { return const_iterator(m_ptr->str()); }
+	const_iterator end() const { return const_iterator(m_ptr->str() + blen()); }
+	const_iterator cbegin() const { return const_iterator(m_ptr->str()); }
+	const_iterator cend() const { return const_iterator(m_ptr->str() + blen()); }
 
 	// C string conversion helpers
 	const mem_t *c_str() const { return m_ptr->str(); }
@@ -141,20 +173,20 @@ public:
 	pstring_t& operator+=(const code_t c) { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(c, buf); pcat(buf); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
-	iterator find(const pstring_t &search, iterator start) const;
-	iterator find(const pstring_t &search) const { return find(search, begin()); }
-	iterator find(const code_t search, iterator start) const;
-	iterator find(const code_t search) const { return find(search, begin()); }
+	const_iterator find(const pstring_t &search, const_iterator start) const;
+	const_iterator find(const pstring_t &search) const { return find(search, begin()); }
+	const_iterator find(const code_t search, const_iterator start) const;
+	const_iterator find(const code_t search) const { return find(search, begin()); }
 
-	const pstring_t substr(const iterator &start, const iterator &end) const ;
-	const pstring_t substr(const iterator &start) const { return substr(start, end()); }
-	const pstring_t substr(size_type start) const { return (start >= len()) ? pstring_t("") : substr(begin() + start, end()); }
+	const pstring_t substr(const const_iterator &start, const const_iterator &end) const;
+	const pstring_t substr(const const_iterator &start) const { return substr(start, end()); }
+	const pstring_t substr(size_type start) const { return (start >= len()) ? pstring_t("") : substr(std::next(begin(), start), end()); }
 
-	const pstring_t left(iterator leftof) const { return substr(begin(), leftof); }
-	const pstring_t right(iterator pos) const  { return substr(pos, end()); }
+	const pstring_t left(const_iterator leftof) const { return substr(begin(), leftof); }
+	const pstring_t right(const_iterator pos) const  { return substr(pos, end()); }
 
-	iterator find_first_not_of(const pstring_t &no) const;
-	iterator find_last_not_of(const pstring_t &no) const;
+	const_iterator find_first_not_of(const pstring_t &no) const;
+	const_iterator find_last_not_of(const pstring_t &no) const;
 
 	const pstring_t ltrim(const pstring_t &ws = pstring_t(" \t\n\r")) const;
 	const pstring_t rtrim(const pstring_t &ws = pstring_t(" \t\n\r")) const;

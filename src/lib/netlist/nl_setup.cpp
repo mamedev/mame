@@ -100,7 +100,7 @@ void setup_t::register_model(const pstring &model_in)
 	if (pos == model_in.end())
 		log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
 	pstring model = model_in.left(pos).trim().ucase();
-	pstring def = model_in.substr(pos + 1).trim();
+	pstring def = model_in.substr(std::next(pos, 1)).trim();
 	if (!m_models.insert({model, def}).second)
 		log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
 }
@@ -818,11 +818,11 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 			log().fatal(MF_1_MODEL_NOT_FOUND, model_in);
 	}
 
-	pstring remainder=model.substr(pos+1).trim();
+	pstring remainder=model.substr(std::next(pos, 1)).trim();
 	if (!remainder.endsWith(")"))
 		log().fatal(MF_1_MODEL_ERROR_1, model);
 	// FIMXE: Not optimal
-	remainder = remainder.left(remainder.begin() + (remainder.len() - 1));
+	remainder = remainder.left(std::next(remainder.begin(), (remainder.len() - 1)));
 
 	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
@@ -830,7 +830,7 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		auto pose = pe.find("=");
 		if (pose == pe.end())
 			log().fatal(MF_1_MODEL_ERROR_ON_PAIR_1, model);
-		map[pe.left(pose).ucase()] = pe.substr(pose+1);
+		map[pe.left(pose).ucase()] = pe.substr(std::next(pose, 1));
 	}
 }
 
@@ -854,7 +854,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	auto p = tmp.begin() + (tmp.len() - 1);
+	auto p = std::next(tmp.begin(), (tmp.len() - 1));
 	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
@@ -870,7 +870,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = tmp.left(tmp.begin() + (tmp.len() - 1));
+		tmp = tmp.left(std::next(tmp.begin(), (tmp.len() - 1)));
 	return tmp.as_double() * factor;
 }
 
@@ -976,7 +976,7 @@ void setup_t::register_define(pstring defstr)
 {
 	auto p = defstr.find("=");
 	if (p != defstr.end())
-		register_define(defstr.left(p), defstr.substr(p+1));
+		register_define(defstr.left(p), defstr.substr(std::next(p, 1)));
 	else
 		register_define(defstr, "1");
 }
