@@ -238,7 +238,7 @@ struct putf8_traits
 {
 	static const unsigned MAXCODELEN = 4; /* in memory units,  RFC 3629 */
 	typedef char mem_t;
-	typedef unsigned code_t;
+	typedef char32_t code_t;
 	static std::size_t len(const std::string &p)
 	{
 		std::size_t ret = 0;
@@ -249,7 +249,7 @@ struct putf8_traits
 		}
 		return ret;
 	}
-	static unsigned codelen(const mem_t *p)
+	static std::size_t codelen(const mem_t *p)
 	{
 		const unsigned char *p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0x80) == 0x00)
@@ -265,7 +265,7 @@ struct putf8_traits
 			return 1; // not correct
 		}
 	}
-	static unsigned codelen(const code_t c)
+	static char32_t codelen(const code_t c)
 	{
 		if (c < 0x0080)
 			return 1;
