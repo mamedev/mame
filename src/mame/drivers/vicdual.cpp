@@ -2234,7 +2234,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::nsub_io_r)
+READ8_MEMBER(nsub_state::nsub_io_r)
 {
 	uint8_t ret = 0;
 
@@ -2245,7 +2245,7 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::nsub_io_w)
+WRITE8_MEMBER(nsub_state::nsub_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)
@@ -2260,7 +2260,7 @@ WRITE8_MEMBER(vicdual_state::nsub_io_w)
 }
 
 
-static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, vicdual_state )
+static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, nsub_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -2269,7 +2269,7 @@ static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, vicdual_state )
+static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, nsub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 
 	/* no decoder, just logic gates, so in theory the
@@ -2280,7 +2280,7 @@ ADDRESS_MAP_END
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
 // IC board "COIN CALCULATOR" (97201-P): two 74191 counters, a 555 timer, coin meters, and lots of other TTL
-TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
+TIMER_DEVICE_CALLBACK_MEMBER(nsub_state::nsub_coin_pulse)
 {
 	if (m_nsub_play_counter > 0)
 	{
@@ -2289,7 +2289,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
 	}
 }
 
-INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
+INPUT_CHANGED_MEMBER(nsub_state::nsub_coin_in)
 {
 	if (newval)
 	{
@@ -2344,14 +2344,14 @@ static INPUT_PORTS_START( nsub )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, read_coin_status, nullptr)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vicdual_state,nsub_coin_in, (void*)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, nsub_state, nsub_coin_in, (void*)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, nsub_state, nsub_coin_in, (void*)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, nsub_state, nsub_coin_in, (void*)2)
 
 	PORT_START("COINAGE") // "OPTION SW." on daughterboard
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW:1,2,3")
@@ -2377,7 +2377,7 @@ static INPUT_PORTS_START( nsub )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(vicdual_state,nsub)
+MACHINE_START_MEMBER(nsub_state, nsub)
 {
 	m_nsub_play_counter = 0;
 	save_item(NAME(m_nsub_coin_counter));
@@ -2390,31 +2390,30 @@ MACHINE_START_MEMBER(vicdual_state,nsub)
 	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
 }
 
-MACHINE_RESET_MEMBER(vicdual_state,nsub)
+MACHINE_RESET_MEMBER(nsub_state, nsub)
 {
 	m_nsub_coin_counter = m_coinage->read() & 7;
 
 	machine_reset();
 }
 
-static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
-
+static MACHINE_CONFIG_START( nsub, nsub_state )
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nsub_map)
 	MCFG_CPU_IO_MAP(nsub_io_map)
 
-	MCFG_TIMER_DRIVER_ADD("nsub_coin", vicdual_state, nsub_coin_pulse)
-
-	MCFG_MACHINE_START_OVERRIDE(vicdual_state,nsub)
-	MCFG_MACHINE_RESET_OVERRIDE(vicdual_state,nsub)
+	MCFG_TIMER_DRIVER_ADD("coinstate", nsub_state, clear_coin_status)
+	MCFG_TIMER_DRIVER_ADD("nsub_coin", nsub_state, nsub_coin_pulse)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
-
-	// daughterboard
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(nsub_state, screen_update_color)
 	MCFG_S97269PB_ADD("s97269pb")
+
+	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
+	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
 	MCFG_S97271P_ADD("s97271p")
