@@ -769,15 +769,17 @@ project "bx"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
-	configuration { "linux*" }
-		buildoptions {
-			"-Wno-strict-overflow",
-		}
-	end	
-	
 	configuration { }
 
+	local version = str_to_version(_OPTIONS["gcc_version"])		
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
+		if version < 60000 then
+			buildoptions {
+				"-Wno-strict-overflow",
+			}
+		end
+	end	
+	
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include",
 	}
