@@ -261,8 +261,6 @@ netlist_t::~netlist_t()
 {
 	m_nets.clear();
 	m_devices.clear();
-
-	pstring::resetmem();
 }
 
 nl_double netlist_t::gmin() const

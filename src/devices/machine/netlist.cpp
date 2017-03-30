@@ -501,7 +501,7 @@ void netlist_mame_analog_output_t::static_set_params(device_t &device, const cha
 void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	const pstring pin(m_in, pstring::UTF8);
-	pstring dname = "OUT_" + pin;
+	pstring dname = pstring("OUT_") + pin;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
 	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(analog_callback)>(setup.netlist(), setup.build_fqn(dname));
@@ -783,7 +783,7 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, devi
 
 netlist_mame_device_t::~netlist_mame_device_t()
 {
-	pstring::resetmem();
+	LOG_DEV_CALLS(("~netlist_mame_device_t\n"));
 }
 
 void netlist_mame_device_t::static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &))
@@ -795,8 +795,14 @@ void netlist_mame_device_t::static_set_constructor(device_t &device, void (*setu
 
 void netlist_mame_device_t::device_config_complete()
 {
-	LOG_DEV_CALLS(("device_config_complete\n"));
+	LOG_DEV_CALLS(("device_config_complete %s %s\n", this->mconfig().gamedrv().name, this->tag()));
 }
+
+void netlist_mame_device_t::device_validity_check(validity_checker &valid) const
+{
+	LOG_DEV_CALLS(("device_validity_check %s\n", this->mconfig().gamedrv().name));
+}
+
 
 void netlist_mame_device_t::device_start()
 {
@@ -969,8 +975,6 @@ netlist_mame_cpu_device_t::netlist_mame_cpu_device_t(const machine_config &mconf
 void netlist_mame_cpu_device_t::device_start()
 {
 	netlist_mame_device_t::device_start();
-
-	LOG_DEV_CALLS(("cpu device_start %s\n", tag()));
 
 	// State support
 
