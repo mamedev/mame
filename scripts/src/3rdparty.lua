@@ -768,7 +768,14 @@ project "bx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
-		
+
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
+	configuration { "linux*" }
+		buildoptions {
+			"-Wno-strict-overflow",
+		}
+	end	
+	
 	configuration { }
 
 	includedirs {

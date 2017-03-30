@@ -5,14 +5,7 @@
 
 #include <bx/allocator.h>
 #include <bx/hash.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
-#endif
 #include <bx/readerwriter.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic pop 
-#endif
 #include <bx/string.h>
 
 #if !BX_CRT_NONE
