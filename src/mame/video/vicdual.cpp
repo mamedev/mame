@@ -113,7 +113,7 @@ uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 
 		}
 
 		if (m_s97269pb != nullptr)
-			back_pen = m_s97269pb->choosePen(x, y, back_pen);
+			back_pen = m_s97269pb->choose_pen(x, y, back_pen);
 		
 		/* plot the current pixel */
 		pen = (video_data & 0x80) ? fore_pen : back_pen;

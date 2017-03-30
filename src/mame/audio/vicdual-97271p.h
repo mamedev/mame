@@ -2,8 +2,8 @@
 // copyright-holders:Ariane Fugmann
 #pragma once
 
-#ifndef __S97271P_H__
-#define __S97271P_H__
+#ifndef MAME_AUDIO_VICDUAL_97271P_H
+#define MAME_AUDIO_VICDUAL_97271P_H
 
 #include "sound/samples.h"
 
@@ -23,8 +23,6 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<samples_device> m_samples;
-
 	// daughterboard logic
 	void port_w(uint8_t data);
 
@@ -34,12 +32,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<samples_device> m_samples;
+
 	uint8_t m_state;
 };
 
 // device type definition
 extern const device_type S97271P;
 
-MACHINE_CONFIG_EXTERN( nsub_audio ); 
-
-#endif  /* __S97271P_H__ */
+#endif  /* MAME_AUDIO_VICDUAL_97271P_H */

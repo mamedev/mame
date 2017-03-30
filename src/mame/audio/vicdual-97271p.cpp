@@ -72,7 +72,7 @@ enum
 //  MACHINE FRAGMENTS
 //**************************************************************************
 
-MACHINE_CONFIG_FRAGMENT( nsub_audio )
+static MACHINE_CONFIG_FRAGMENT( nsub_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* samples */
@@ -112,6 +112,7 @@ machine_config_constructor s97271p_device::device_mconfig_additions() const
 
 void s97271p_device::device_start()
 {
+	save_item(NAME(m_state));
 }
 
 //-------------------------------------------------

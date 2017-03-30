@@ -92,7 +92,8 @@ const tiny_rom_entry *s97269pb_device::device_rom_region() const
 //-------------------------------------------------
 
 s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S97269PB, "N-Sub Daughterboard 97269-P-B", tag, owner, clock, "s97269pb", __FILE__)
+	device_t(mconfig, S97269PB, "N-Sub Daughterboard 97269-P-B", tag, owner, clock, "s97269pb", __FILE__),
+	m_prom_ptr(*this, "s97269pb")
 {
 }
 
@@ -102,6 +103,7 @@ s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag,
 
 void s97269pb_device::device_start()
 {
+	save_item(NAME(m_palette_bank));
 }
 
 //-------------------------------------------------
@@ -118,7 +120,7 @@ void s97269pb_device::palette_bank_w(uint8_t data)
 	m_palette_bank = data & 0x0c;
 }
 
-pen_t s97269pb_device::choosePen(uint8_t x, uint8_t y, pen_t back_pen)
+pen_t s97269pb_device::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
 {
 	if (m_palette_bank & 0x04)
 	{
@@ -131,8 +133,7 @@ pen_t s97269pb_device::choosePen(uint8_t x, uint8_t y, pen_t back_pen)
 		if (m_palette_bank & 0x08)
 			offset |= 0x80;
 
-		uint8_t *prombase = memregion("s97269pb")->base();
-		uint8_t gradient_flags = prombase[offset];
+		uint8_t gradient_flags = m_prom_ptr[offset];
 
 		switch (gradient_flags >> 4)
 		{
