@@ -341,11 +341,11 @@ void k054338_device::bitmap_update(bitmap_rgb32 *bitmap, const rectangle &clipre
 			}
 
 			if(ba & 0x0c) {
-				int code = ((ba >> 0) & 3) - 1;
+				int code = ((ba >> 2) & 3) - 1;
 				uint32_t bri = m_brightness[code] + 1;
-				uint8_t r = (((col0 >> 16) & 0xff) & bri) >> 8;
-				uint8_t g = (((col0 >>  8) & 0xff) & bri) >> 8;
-				uint8_t b = (((col0 >>  0) & 0xff) & bri) >> 8;
+				uint8_t r = (((col0 >> 16) & 0xff) * bri) >> 8;
+				uint8_t g = (((col0 >>  8) & 0xff) * bri) >> 8;
+				uint8_t b = (((col0 >>  0) & 0xff) * bri) >> 8;
 				col0 = (r << 16) | (g << 8) | b;
 			}
 			*dest++ = col0;
