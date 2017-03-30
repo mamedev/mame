@@ -151,7 +151,7 @@ namespace netlist
 
 	struct param_ref_t
 	{
-		param_ref_t(const pstring name, core_device_t &device, param_t &param)
+		param_ref_t(const pstring &name, core_device_t &device, param_t &param)
 		: m_name(name)
 		, m_device(device)
 		, m_param(param)
@@ -211,10 +211,10 @@ namespace netlist
 
 		pstring build_fqn(const pstring &obj_name) const;
 
-		void register_param(pstring name, param_t &param);
-		pstring get_initial_param_val(const pstring name, const pstring def);
-		double get_initial_param_val(const pstring name, const double def);
-		int get_initial_param_val(const pstring name, const int def);
+		void register_param(const pstring &name, param_t &param);
+		pstring get_initial_param_val(const pstring &name, const pstring &def);
+		double get_initial_param_val(const pstring &name, const double def);
+		int get_initial_param_val(const pstring &name, const int def);
 
 		void register_term(detail::core_terminal_t &obj);
 
@@ -235,13 +235,13 @@ namespace netlist
 		void register_param(const pstring &param, const pstring &value);
 		void register_param(const pstring &param, const double value);
 
-		void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
+		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
 
-		void remove_connections(const pstring attach);
+		void remove_connections(const pstring &attach);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
-		bool device_exists(const pstring name) const;
+		bool device_exists(const pstring &name) const;
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
@@ -257,7 +257,7 @@ namespace netlist
 
 		void include(const pstring &netlist_name);
 
-		std::unique_ptr<plib::pistream> get_data_stream(const pstring name);
+		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
 		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
 

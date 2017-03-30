@@ -133,8 +133,8 @@ namespace plib {
 			}
 			else if (arg.startsWith("-"))
 			{
-				auto p = arg.begin() + 1;
-				opt = getopt_short(arg.substr(p,p + 1));
+				auto p = std::next(arg.begin(), 1);
+				opt = getopt_short(arg.substr(p, std::next(p, 1)));
 				++p;
 				if (p != arg.end())
 				{
@@ -226,7 +226,7 @@ namespace plib {
 							{
 								line += v + "|";
 							}
-							line = line.left(line.begin() + (line.len() - 1));
+							line = line.left(std::next(line.begin(), (line.len() - 1)));
 						}
 						else
 							line += "Value";

@@ -415,13 +415,15 @@ each direction to assign the boundries.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/centiped.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/watchdog.h"
 #include "machine/atari_vg.h"
-#include "includes/centiped.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
+#include "speaker.h"
 
 /*************************************
  *

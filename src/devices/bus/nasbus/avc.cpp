@@ -9,12 +9,14 @@
 #include "emu.h"
 #include "avc.h"
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NASCOM_AVC = &device_creator<nascom_avc_device>;
+const device_type NASCOM_AVC = device_creator<nascom_avc_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

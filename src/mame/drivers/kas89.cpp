@@ -189,17 +189,19 @@
 *************************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz
-#define VDP_MEM             0x40000
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "video/v9938.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+#include "speaker.h"
+
 #include "kas89.lh"
+
+
+#define MASTER_CLOCK        XTAL_21_4772MHz
+#define VDP_MEM             0x40000
 
 
 class kas89_state : public driver_device

@@ -79,6 +79,7 @@
 
 #include "emu.h"
 #include "pc_xporter.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -88,7 +89,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PCXPORTER = &device_creator<a2bus_pcxporter_device>;
+const device_type A2BUS_PCXPORTER = device_creator<a2bus_pcxporter_device>;
 
 static ADDRESS_MAP_START( pc_map, AS_PROGRAM, 16, a2bus_pcxporter_device )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -316,7 +317,7 @@ uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
 			case 0x703: // read with increment
 				rv = m_ram[m_offset];
 				// don't increment if the debugger's reading
-				if (!space.debugger_access())
+				if (!machine().side_effect_disabled())
 				{
 					m_offset++;
 				}

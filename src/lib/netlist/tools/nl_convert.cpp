@@ -40,7 +40,7 @@ struct lib_map_entry
 
 using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
-static lib_map_t read_lib_map(const pstring lm)
+static lib_map_t read_lib_map(const pstring &lm)
 {
 	plib::pistringstream istrm(lm);
 	plib::putf8_reader reader(istrm);
@@ -305,7 +305,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED long nval =tt[4].as_long(&cerr);
+				ATTR_UNUSED long nval(tt[4].as_long(&cerr));
 				pstring model;
 				pstring pins ="CBE";
 
@@ -318,7 +318,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					if (m[1].len() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.c_str());
-					pins = m[1].left(m[1].begin() + 3);
+					pins = m[1].left(std::next(m[1].begin(), 3));
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
 				add_term(tt[1], tt[0] + "." + pins.code_at(0));

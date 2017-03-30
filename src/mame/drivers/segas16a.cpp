@@ -149,11 +149,14 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "emu.h"
 #include "includes/segas16a.h"
 #include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS

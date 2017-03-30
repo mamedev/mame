@@ -534,7 +534,9 @@ PCB Layouts missing
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )

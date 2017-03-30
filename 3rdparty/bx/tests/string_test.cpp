@@ -29,7 +29,7 @@ TEST_CASE("strnlen", "")
 
 	REQUIRE(0 == bx::strnlen(test, 0) );
 	REQUIRE(2 == bx::strnlen(test, 2) );
-	REQUIRE(4 == bx::strnlen(test, UINT32_MAX) );
+	REQUIRE(4 == bx::strnlen(test, INT32_MAX) );
 }
 
 TEST_CASE("strlncpy", "")
@@ -41,15 +41,15 @@ TEST_CASE("strlncpy", "")
 	REQUIRE(num == 0);
 
 	num = bx::strlncpy(dst, 3, "blah", 3);
-	REQUIRE(0 == strcmp(dst, "bl") );
+	REQUIRE(0 == bx::strncmp(dst, "bl") );
 	REQUIRE(num == 2);
 
 	num = bx::strlncpy(dst, sizeof(dst), "blah", 3);
-	REQUIRE(0 == strcmp(dst, "bla") );
+	REQUIRE(0 == bx::strncmp(dst, "bla") );
 	REQUIRE(num == 3);
 
 	num = bx::strlncpy(dst, sizeof(dst), "blah");
-	REQUIRE(0 == strcmp(dst, "blah") );
+	REQUIRE(0 == bx::strncmp(dst, "blah") );
 	REQUIRE(num == 4);
 }
 
@@ -135,10 +135,14 @@ static bool testToString(Ty _value, const char* _expected)
 	char tmp[1024];
 	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
 	int32_t len = (int32_t)bx::strnlen(_expected);
-	return true
-		&& 0 == bx::strncmp(tmp, _expected)
-		&& num == len
-		;
+	if (0 == bx::strncmp(tmp, _expected)
+	&&  num == len)
+	{
+		return true;
+	}
+
+	printf("result '%s' (%d), expected '%s' (%d)\n", tmp, num, _expected, len);
+	return false;
 }
 
 TEST_CASE("toString int32_t/uint32_t", "")
@@ -152,7 +156,7 @@ TEST_CASE("toString int32_t/uint32_t", "")
 TEST_CASE("toString double", "")
 {
 	REQUIRE(testToString(0.0,                     "0.0") );
-	REQUIRE(testToString(-0.0,                    "0.0") );
+	REQUIRE(testToString(-0.0,                    "-0.0") );
 	REQUIRE(testToString(1.0,                     "1.0") );
 	REQUIRE(testToString(-1.0,                    "-1.0") );
 	REQUIRE(testToString(1.2345,                  "1.2345") );
@@ -195,7 +199,7 @@ TEST_CASE("StringView", "")
 	st.append("test", 2);
 	REQUIRE(10 == st.getLength() );
 
-	REQUIRE(0 == strcmp(st.getPtr(), "testtestte") );
+	REQUIRE(0 == bx::strncmp(st.getPtr(), "testtestte") );
 
 	st.clear();
 	REQUIRE(0 == st.getLength() );

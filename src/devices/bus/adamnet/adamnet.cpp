@@ -15,8 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ADAMNET = &device_creator<adamnet_device>;
-const device_type ADAMNET_SLOT = &device_creator<adamnet_slot_device>;
+const device_type ADAMNET = device_creator<adamnet_device>;
+const device_type ADAMNET_SLOT = device_creator<adamnet_slot_device>;
 
 
 

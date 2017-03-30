@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_FDC = &device_creator<cgenie_fdc_device>;
+const device_type CGENIE_FDC = device_creator<cgenie_fdc_device>;
 
 DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)

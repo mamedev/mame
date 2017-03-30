@@ -28,10 +28,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/yunsung8.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/3812intf.h"
-#include "includes/yunsung8.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

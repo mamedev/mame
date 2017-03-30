@@ -152,11 +152,13 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaplus.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/namco62.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "includes/gaplus.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
@@ -555,7 +557,7 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gaplus_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)

@@ -124,7 +124,7 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type HD6309 = &device_creator<hd6309_device>;
+const device_type HD6309 = device_creator<hd6309_device>;
 
 
 //-------------------------------------------------

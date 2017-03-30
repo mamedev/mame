@@ -481,7 +481,7 @@ uint32_t taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb3
 
 
 
-void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitob_state::screen_vblank_taitob)
 {
 	// rising edge
 	if (state)
@@ -491,7 +491,7 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 		uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
 		if (~video_control & 0x01)
-			m_framebuffer[framebuffer_page]->fill(0, screen.visible_area());
+			m_framebuffer[framebuffer_page]->fill(0, m_screen->visible_area());
 
 		if (~video_control & 0x80)
 		{
@@ -499,6 +499,6 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 			m_tc0180vcu->set_fb_page(space, 0, framebuffer_page);
 		}
 
-		draw_sprites(*m_framebuffer[framebuffer_page], screen.visible_area());
+		draw_sprites(*m_framebuffer[framebuffer_page], m_screen->visible_area());
 	}
 }

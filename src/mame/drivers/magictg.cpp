@@ -132,11 +132,13 @@ Medium size chip with heat sink on it
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/mips/mips3.h"
+#include "machine/lpci.h"
 #include "sound/dmadac.h"
 #include "video/voodoo.h"
-#include "machine/lpci.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* TODO: Two 3Dfx Voodoo chipsets are used in SLI configuration */

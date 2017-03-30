@@ -74,7 +74,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_asuka(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
 
 	/*----------- defined in machine/bonzeadv.c -----------*/

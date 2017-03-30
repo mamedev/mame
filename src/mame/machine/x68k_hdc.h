@@ -92,13 +92,14 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "hdf"; }
+	virtual const char *custom_instance_name() const override { return "sasihd"; }
+	virtual const char *custom_brief_instance_name() const override { return "sasi"; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
 	DECLARE_WRITE16_MEMBER( hdc_w );
 	DECLARE_READ16_MEMBER( hdc_r );
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:

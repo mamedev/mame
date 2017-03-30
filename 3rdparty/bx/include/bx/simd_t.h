@@ -7,6 +7,7 @@
 #define BX_SIMD_T_H_HEADER_GUARD
 
 #include "bx.h"
+#include "fpumath.h"
 
 #define BX_SIMD_FORCE_INLINE BX_FORCE_INLINE
 #define BX_SIMD_INLINE inline
@@ -52,7 +53,7 @@ namespace bx
 #define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			template<typename Ty> \
 			BX_SIMD_FORCE_INLINE Ty simd_swiz_##_x##_y##_z##_w(Ty _a);
-#include "simd128_swizzle.inl"
+#include "inline/simd128_swizzle.inl"
 
 #undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
@@ -361,19 +362,19 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 } // namespace bx
 
 #if BX_SIMD_AVX
-#	include "simd256_avx.inl"
+#	include "inline/simd256_avx.inl"
 #endif // BX_SIMD_AVX
 
 #if BX_SIMD_LANGEXT
-#	include "simd128_langext.inl"
+#	include "inline/simd128_langext.inl"
 #endif // BX_SIMD_LANGEXT
 
 #if BX_SIMD_NEON
-#	include "simd128_neon.inl"
+#	include "inline/simd128_neon.inl"
 #endif // BX_SIMD_NEON
 
 #if BX_SIMD_SSE
-#	include "simd128_sse.inl"
+#	include "inline/simd128_sse.inl"
 #endif // BX_SIMD_SSE
 
 namespace bx
@@ -422,8 +423,8 @@ namespace bx
 
 } // namespace bx
 
-#include "simd128_ref.inl"
-#include "simd256_ref.inl"
+#include "inline/simd128_ref.inl"
+#include "inline/simd256_ref.inl"
 
 namespace bx
 {

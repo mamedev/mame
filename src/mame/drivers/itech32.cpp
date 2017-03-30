@@ -351,17 +351,20 @@ Notes:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms32031/tms32031.h"
+#include "includes/itech32.h"
+
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/tms32031/tms32031.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "machine/watchdog.h"
-#include "includes/itech32.h"
-#include "sound/es5506.h"
 #include "machine/timekpr.h"
+#include "machine/watchdog.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
 
 
 #define FULL_LOGGING                0

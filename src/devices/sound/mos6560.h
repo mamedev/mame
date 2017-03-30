@@ -29,12 +29,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_SOUND_MOS6560_H
+#define MAME_DEVICES_SOUND_MOS6560_H
+
 #pragma once
 
-#ifndef __MOS6560__
-#define __MOS6560__
-
-
+#include "screen.h"
 
 
 //***************************************************************************
@@ -256,4 +256,4 @@ extern const device_type MOS656X_ATTACK_UFO;
 
 
 
-#endif
+#endif // MAME_DEVICES_SOUND_MOS6560_H

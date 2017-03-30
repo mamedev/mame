@@ -185,7 +185,8 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 
 DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
 {
-	if (image.software_entry() != nullptr){
+	if (image.loaded_through_softlist())
+	{
 		paper_tape_length = image.get_software_region_length("rom");
 		paper_tape_data = image.get_software_region("rom");
 		paper_tape_address = 0;

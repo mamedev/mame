@@ -12,13 +12,16 @@
 
 #include "emu.h"
 #include "playcity.h"
+#include "speaker.h"
+
+
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_PLAYCITY = &device_creator<cpc_playcity_device>;
+const device_type CPC_PLAYCITY = device_creator<cpc_playcity_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_playcity )

@@ -35,9 +35,12 @@ ToDo:
 
 #include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "peyper.lh"
 
 class peyper_state : public genpin_class

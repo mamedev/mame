@@ -185,7 +185,7 @@
 #include "includes/slapstic.h"
 
 
-extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;
+const device_type SLAPSTIC = device_creator<atari_slapstic_device>;
 
 atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),

@@ -51,8 +51,9 @@
 
 #include "emu.h"
 #include "video/kan_pand.h"
+#include "screen.h"
 
-const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
+const device_type KANEKO_PANDORA = device_creator<kaneko_pandora_device>;
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)

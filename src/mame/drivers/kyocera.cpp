@@ -69,6 +69,7 @@
 #include "emu.h"
 #include "includes/kyocera.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -1621,12 +1622,12 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1983, kc85,       0,      0,      kc85,       kc85,       driver_device, 0,      "Kyosei",                    "Kyotronic 85 (Japan)",     0 )
-COMP( 1983, m10,        kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",                  "M-10",                     0 )
-//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",                  "M-10 Modem (US)",          0 )
-COMP( 1983, trsm100,    0,      0,      trsm100,    kc85,       driver_device, 0,      "Tandy Radio Shack",         "TRS-80 Model 100",         0 )
-COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85,       driver_device, 0,      "Tandy Radio Shack",         "Tandy 102",                0 )
-COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201,     driver_device, 0,      "Nippon Electronic Company", "PC-8201 (Japan)",          MACHINE_NOT_WORKING ) // keyboard layout wrong
-COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a,    driver_device, 0,      "Nippon Electronic Company", "PC-8201A",                 0 )
-COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a,    driver_device, 0,      "Nippon Electronic Company", "PC-8300",                  MACHINE_NOT_WORKING )
-COMP( 1984, tandy200,   0,      0,      tandy200,   kc85,       driver_device, 0,      "Tandy Radio Shack",         "Tandy 200",                0 )
+COMP( 1983, kc85,       0,      0,      kc85,       kc85,       driver_device, 0,      "Kyosei",            "Kyotronic 85 (Japan)",     0 )
+COMP( 1983, m10,        kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",          "M-10",                     0 )
+//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",          "M-10 Modem (US)",          0 )
+COMP( 1983, trsm100,    0,      0,      trsm100,    kc85,       driver_device, 0,      "Tandy Radio Shack", "TRS-80 Model 100",         0 )
+COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85,       driver_device, 0,      "Tandy Radio Shack", "Tandy 102",                0 )
+COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201,     driver_device, 0,      "NEC",               "PC-8201 (Japan)",          MACHINE_NOT_WORKING ) // keyboard layout wrong
+COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a,    driver_device, 0,      "NEC",               "PC-8201A",                 0 )
+COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a,    driver_device, 0,      "NEC",               "PC-8300",                  MACHINE_NOT_WORKING )
+COMP( 1984, tandy200,   0,      0,      tandy200,   kc85,       driver_device, 0,      "Tandy Radio Shack", "Tandy 200",                0 )

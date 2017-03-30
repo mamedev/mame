@@ -11,11 +11,13 @@ TODO:
 
 #include "emu.h"
 #include "yamaha.h"
+
 #include "bus/midi/midi.h"
+#include "speaker.h"
 
 
-const device_type MSX_CART_SFG01 = &device_creator<msx_cart_sfg01>;
-const device_type MSX_CART_SFG05 = &device_creator<msx_cart_sfg05>;
+const device_type MSX_CART_SFG01 = device_creator<msx_cart_sfg01>;
+const device_type MSX_CART_SFG05 = device_creator<msx_cart_sfg05>;
 
 
 msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)

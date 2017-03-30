@@ -161,18 +161,18 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1540 = &device_creator<c1540_t>;
-const device_type C1541 = &device_creator<c1541_t>;
-const device_type C1541C = &device_creator<c1541c_t>;
-const device_type C1541II = &device_creator<c1541ii_t>;
-const device_type SX1541 = &device_creator<sx1541_t>;
-const device_type FSD1 = &device_creator<fsd1_t>;
-const device_type FSD2 = &device_creator<fsd2_t>;
-const device_type CSD1 = &device_creator<csd1_t>;
-const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_t>;
-const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_t>;
-const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_t>;
-const device_type INDUS_GT = &device_creator<indus_gt_t>;
+const device_type C1540 = device_creator<c1540_t>;
+const device_type C1541 = device_creator<c1541_t>;
+const device_type C1541C = device_creator<c1541c_t>;
+const device_type C1541II = device_creator<c1541ii_t>;
+const device_type SX1541 = device_creator<sx1541_t>;
+const device_type FSD1 = device_creator<fsd1_t>;
+const device_type FSD2 = device_creator<fsd2_t>;
+const device_type CSD1 = device_creator<csd1_t>;
+const device_type C1541_DOLPHIN_DOS = device_creator<c1541_dolphin_dos_t>;
+const device_type C1541_PROFESSIONAL_DOS_V1 = device_creator<c1541_professional_dos_v1_t>;
+const device_type C1541_PROLOGIC_DOS_CLASSIC = device_creator<c1541_prologic_dos_classic_t>;
+const device_type INDUS_GT = device_creator<indus_gt_t>;
 
 
 //-------------------------------------------------

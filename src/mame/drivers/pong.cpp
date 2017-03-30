@@ -59,6 +59,9 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "machine/nl_pong.h"
 #include "machine/nl_pongd.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 #include "breakout.lh"
 
 #include <cmath>

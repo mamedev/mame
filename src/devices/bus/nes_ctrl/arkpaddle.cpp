@@ -14,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ARKPADDLE = &device_creator<nes_vaus_device>;
-const device_type NES_ARKPADDLE_FC = &device_creator<nes_vausfc_device>;
+const device_type NES_ARKPADDLE = device_creator<nes_vaus_device>;
+const device_type NES_ARKPADDLE_FC = device_creator<nes_vausfc_device>;
 
 
 static INPUT_PORTS_START( arkanoid_paddle )

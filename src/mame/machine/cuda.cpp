@@ -40,9 +40,9 @@
 
 #include "emu.h"
 #include "cuda.h"
+#include "includes/mac.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/asc.h"
-#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -54,7 +54,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CUDA = &device_creator<cuda_device>;
+const device_type CUDA = device_creator<cuda_device>;
 
 ROM_START( cuda )
 	ROM_REGION(0x4400, CUDA_CPU_TAG, 0)

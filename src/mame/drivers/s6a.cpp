@@ -40,12 +40,15 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s6a.lh"
 
 

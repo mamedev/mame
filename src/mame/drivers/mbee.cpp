@@ -126,6 +126,7 @@ from Brett Selwood and Andrew Davies.
 #include "emu.h"
 #include "includes/mbee.h"
 #include "formats/mbee_cas.h"
+#include "speaker.h"
 
 #define XTAL_13_5MHz 13500000
 

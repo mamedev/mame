@@ -9,13 +9,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rocnrope.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "audio/timeplt.h"
-#include "includes/konamipt.h"
-#include "includes/rocnrope.h"
+#include "screen.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1515 = &device_creator<vic1515_t>;
+const device_type VIC1515 = device_creator<vic1515_t>;
 
 
 //-------------------------------------------------

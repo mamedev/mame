@@ -8,7 +8,7 @@
 
 namespace mask
 {
-	template<typename genType>
+	template <typename genType>
 	struct type
 	{
 		genType		Value;
@@ -195,7 +195,7 @@ namespace mask
 
 namespace bitfieldInterleave3
 {
-	template<typename PARAM, typename RET>
+	template <typename PARAM, typename RET>
 	inline RET refBitfieldInterleave(PARAM x, PARAM y, PARAM z)
 	{
 		RET Result = 0; 
@@ -231,7 +231,7 @@ namespace bitfieldInterleave3
 
 namespace bitfieldInterleave4
 {
-	template<typename PARAM, typename RET>
+	template <typename PARAM, typename RET>
 	inline RET loopBitfieldInterleave(PARAM x, PARAM y, PARAM z, PARAM w)
 	{
 		RET const v[4] = {x, y, z, w};

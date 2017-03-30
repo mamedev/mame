@@ -16,7 +16,7 @@
 
 #define LOG 0
 
-const device_type MICROTOUCH = &device_creator<microtouch_device>;
+const device_type MICROTOUCH = device_creator<microtouch_device>;
 
 microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),

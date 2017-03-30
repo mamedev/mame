@@ -30,9 +30,11 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
-#include "machine/rp5c01.h"
 #include "machine/ram.h"
+#include "machine/rp5c01.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 class mstation_state : public driver_device
 {

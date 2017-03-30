@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "includes/galpani2.h"
+#include "screen.h"
 
 /*
 304000:0040 0000 0100 0000-0000 0000 0000 0000      (Sprites regs)

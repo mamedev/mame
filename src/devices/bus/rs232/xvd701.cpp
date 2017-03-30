@@ -150,4 +150,4 @@ void jvc_xvd701_device::rcv_complete()
 	}
 }
 
-const device_type JVC_XVD701 = &device_creator<jvc_xvd701_device>;
+const device_type JVC_XVD701 = device_creator<jvc_xvd701_device>;

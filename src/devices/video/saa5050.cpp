@@ -26,14 +26,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SAA5050 = &device_creator<saa5050_device>;
-const device_type SAA5051 = &device_creator<saa5051_device>;
-const device_type SAA5052 = &device_creator<saa5052_device>;
-const device_type SAA5053 = &device_creator<saa5053_device>;
-const device_type SAA5054 = &device_creator<saa5054_device>;
-const device_type SAA5055 = &device_creator<saa5055_device>;
-const device_type SAA5056 = &device_creator<saa5056_device>;
-const device_type SAA5057 = &device_creator<saa5057_device>;
+const device_type SAA5050 = device_creator<saa5050_device>;
+const device_type SAA5051 = device_creator<saa5051_device>;
+const device_type SAA5052 = device_creator<saa5052_device>;
+const device_type SAA5053 = device_creator<saa5053_device>;
+const device_type SAA5054 = device_creator<saa5054_device>;
+const device_type SAA5055 = device_creator<saa5055_device>;
+const device_type SAA5056 = device_creator<saa5056_device>;
+const device_type SAA5057 = device_creator<saa5057_device>;
 
 
 //-------------------------------------------------
@@ -112,7 +112,7 @@ ROM_END
 
 ROM_START( saa5057 )
 	ROM_REGION( 0x500, "chargen", 0 )
-	ROM_LOAD("saa5057", 0x0140, 0x08c0, BAD_DUMP CRC(d6664fb3) SHA1(5a93445dde03066073e2909a935900e5f8439d81))
+	ROM_LOAD("saa5057", 0x0140, 0x03c0, BAD_DUMP CRC(d6664fb3) SHA1(5a93445dde03066073e2909a935900e5f8439d81))
 ROM_END
 
 

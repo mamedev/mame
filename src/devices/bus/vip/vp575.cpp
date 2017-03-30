@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP575 = &device_creator<vp575_device>;
+const device_type VP575 = device_creator<vp575_device>;
 
 
 //-------------------------------------------------

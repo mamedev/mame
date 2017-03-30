@@ -45,13 +45,14 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "img"; }
+	virtual const char *custom_instance_name() const override { return "disk"; }
+	virtual const char *custom_brief_instance_name() const override { return "disk"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 public:
@@ -62,19 +63,12 @@ public:
 
 
 // device type definition
-extern const device_type MESSIMG_DISK;
-
-const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
+const device_type MESSIMG_DISK = device_creator<messimg_disk_image_device>;
 
 messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
 		device_image_interface(mconfig, *this), m_size(0), m_data(nullptr), m_ejected(false)
 {
-}
-
-void messimg_disk_image_device::device_config_complete()
-{
-	update_names(MESSIMG_DISK, "disk", "disk");
 }
 
 
@@ -141,7 +135,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_IMAGE = &device_creator<nubus_image_device>;
+const device_type NUBUS_IMAGE = device_creator<nubus_image_device>;
 
 
 //-------------------------------------------------

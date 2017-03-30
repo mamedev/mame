@@ -59,9 +59,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type MC68153_CHANNEL   = &device_creator<bim68153_channel>;
-const device_type MC68153           = &device_creator<bim68153_device>;
-const device_type EI68C153          = &device_creator<ei68c153_device>;
+const device_type MC68153_CHANNEL   = device_creator<bim68153_channel>;
+const device_type MC68153           = device_creator<bim68153_device>;
+const device_type EI68C153          = device_creator<ei68c153_device>;
 
 //-------------------------------------------------
 //  device_mconfig_additions -

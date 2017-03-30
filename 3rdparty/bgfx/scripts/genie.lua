@@ -86,10 +86,6 @@ if not os.isdir(BX_DIR) then
 	os.exit()
 end
 
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
-
 dofile (path.join(BX_DIR, "scripts/toolchain.lua"))
 if not toolchain(BGFX_BUILD_DIR, BGFX_THIRD_PARTY_DIR) then
 	return -- no action specified
@@ -139,6 +135,10 @@ function exampleProject(_name)
 
 	removefiles {
 		path.join(BGFX_DIR, "examples", _name, "**.bin.h"),
+	}
+
+	flags {
+		"FatalWarnings",
 	}
 
 	links {

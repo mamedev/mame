@@ -119,9 +119,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/4enraya.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "includes/4enraya.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 

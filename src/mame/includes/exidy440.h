@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "audio/exidy440.h"
+#include "screen.h"
 
 #define EXIDY440_MASTER_CLOCK       (XTAL_12_9792MHz)
 

@@ -4,7 +4,7 @@
 #include "jasmin.h"
 #include "formats/oric_dsk.h"
 
-const device_type JASMIN = &device_creator<jasmin_device>;
+const device_type JASMIN = device_creator<jasmin_device>;
 
 ROM_START( jasmin )
 	ROM_REGION( 0x800, "jasmin", 0 )

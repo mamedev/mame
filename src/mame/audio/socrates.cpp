@@ -16,7 +16,7 @@
 
 
 // device type definition
-const device_type SOCRATES_SOUND = &device_creator<socrates_snd_device>;
+const device_type SOCRATES_SOUND = device_creator<socrates_snd_device>;
 
 
 //-------------------------------------------------

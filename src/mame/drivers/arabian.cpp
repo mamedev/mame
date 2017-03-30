@@ -45,10 +45,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mb88xx/mb88xx.h"
 #include "includes/arabian.h"
+
+#include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* constants */
 #define MAIN_OSC        XTAL_12MHz

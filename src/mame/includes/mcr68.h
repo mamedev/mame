@@ -10,6 +10,7 @@
 #include "audio/midway.h"
 #include "audio/williams.h"
 #include "machine/6840ptm.h"
+#include "screen.h"
 
 class mcr68_state : public driver_device
 {

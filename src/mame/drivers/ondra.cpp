@@ -10,12 +10,16 @@
 
 
 #include "emu.h"
+#include "includes/ondra.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "includes/ondra.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(ondra_mem, AS_PROGRAM, 8, ondra_state )

@@ -18,7 +18,7 @@
 #define TONE1_CLOCK  8000
 
 
-const device_type PLEIADS = &device_creator<pleiads_sound_device>;
+const device_type PLEIADS = device_creator<pleiads_sound_device>;
 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PLEIADS, "Pleiads Audio Custom", tag, owner, clock, "pleiads_sound", __FILE__),
@@ -107,7 +107,7 @@ void pleiads_sound_device::device_start()
 	common_start();
 }
 
-const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
+const device_type NAUGHTYB = device_creator<naughtyb_sound_device>;
 
 naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Audio Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
@@ -175,7 +175,7 @@ void naughtyb_sound_device::device_start()
 	common_start();
 }
 
-const device_type POPFLAME = &device_creator<popflame_sound_device>;
+const device_type POPFLAME = device_creator<popflame_sound_device>;
 
 popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Audio Custom", tag, owner, clock, "popflame_sound", __FILE__)

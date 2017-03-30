@@ -32,6 +32,9 @@ f5
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mosaicf2_state : public driver_device
 {

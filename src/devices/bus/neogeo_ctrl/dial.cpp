@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_DIAL = &device_creator<neogeo_dial_device>;
+const device_type NEOGEO_DIAL = device_creator<neogeo_dial_device>;
 
 
 static INPUT_PORTS_START( neogeo_dial )

@@ -27,14 +27,14 @@
 #include "tms9928a.h"
 
 
-const device_type TMS9928A = &device_creator<tms9928a_device>;
-const device_type TMS9918  = &device_creator<tms9918_device>;
-const device_type TMS9918A = &device_creator<tms9918a_device>;
-const device_type TMS9118  = &device_creator<tms9118_device>;
-const device_type TMS9128  = &device_creator<tms9128_device>;
-const device_type TMS9929  = &device_creator<tms9929_device>;
-const device_type TMS9929A = &device_creator<tms9929a_device>;
-const device_type TMS9129  = &device_creator<tms9129_device>;
+const device_type TMS9928A = device_creator<tms9928a_device>;
+const device_type TMS9918  = device_creator<tms9918_device>;
+const device_type TMS9918A = device_creator<tms9918a_device>;
+const device_type TMS9118  = device_creator<tms9118_device>;
+const device_type TMS9128  = device_creator<tms9128_device>;
+const device_type TMS9929  = device_creator<tms9929_device>;
+const device_type TMS9929A = device_creator<tms9929a_device>;
+const device_type TMS9129  = device_creator<tms9129_device>;
 
 // ======= Debugging =========
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER( tms9928a_device::write )
 READ8_MEMBER( tms9928a_device::vram_read )
 {
 	// prevent debugger from changing the address base
-	if (space.debugger_access()) return 0;
+	if (machine().side_effect_disabled()) return 0;
 
 	uint8_t data = m_ReadAhead;
 
@@ -150,7 +150,7 @@ READ8_MEMBER( tms9928a_device::vram_read )
 WRITE8_MEMBER( tms9928a_device::vram_write )
 {
 	// prevent debugger from changing the address base
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	m_vram_space->write_byte(m_Addr, data);
 	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
@@ -162,7 +162,7 @@ WRITE8_MEMBER( tms9928a_device::vram_write )
 READ8_MEMBER( tms9928a_device::register_read )
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return 0;
+	if (machine().side_effect_disabled()) return 0;
 
 	uint8_t data = m_StatusReg;
 
@@ -290,7 +290,7 @@ void tms9928a_device::change_register(uint8_t reg, uint8_t val)
 WRITE8_MEMBER( tms9928a_device::register_write )
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_latch)
 	{

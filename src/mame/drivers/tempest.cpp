@@ -283,6 +283,8 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "video/vector.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)

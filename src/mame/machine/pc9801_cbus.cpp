@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC9801CBUS_SLOT = &device_creator<pc9801_slot_device>;
+const device_type PC9801CBUS_SLOT = device_creator<pc9801_slot_device>;
 
 
 

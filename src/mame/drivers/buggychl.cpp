@@ -78,11 +78,13 @@ Dip locations and factory settings verified from dip listing
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/buggychl.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/buggychl.h"
+#include "speaker.h"
 
 #include "buggychl.lh"
 

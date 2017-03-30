@@ -12,6 +12,9 @@
 #include "emu.h"
 #include "hd63484.h"
 
+#include "screen.h"
+
+
 #define LOG 0
 #define FIFO_LOG 0
 #define CMD_LOG 0
@@ -328,7 +331,7 @@ enum
 -------------------------------------------------*/
 
 // devices
-const device_type HD63484 = &device_creator<hd63484_device>;
+const device_type HD63484 = device_creator<hd63484_device>;
 
 
 ROM_START( hd63484 )

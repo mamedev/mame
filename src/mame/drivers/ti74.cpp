@@ -70,11 +70,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms7000/tms7000.h"
-#include "video/hd44780.h"
-#include "machine/nvram.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/tms7000/tms7000.h"
+#include "machine/nvram.h"
+#include "video/hd44780.h"
+#include "screen.h"
 #include "softlist.h"
 
 #include "ti74.lh"

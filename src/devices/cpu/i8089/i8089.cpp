@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8089 = &device_creator<i8089_device>;
+const device_type I8089 = device_creator<i8089_device>;
 
 
 //**************************************************************************

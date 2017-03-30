@@ -48,7 +48,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SIO = &device_creator<abc_sio_device>;
+const device_type ABC_SIO = device_creator<abc_sio_device>;
 
 
 //-------------------------------------------------

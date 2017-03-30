@@ -71,10 +71,10 @@ const int gameboy_sound_device::wave_duty_table[4][8] =
 };
 
 // device type definitions
-const device_type DMG_APU = &device_creator<dmg_apu_device>;
-//const device_type CGB02_APU = &device_creator<cgb02_apu_device>;
-const device_type CGB04_APU = &device_creator<cgb04_apu_device>;
-//const device_type CGB05_APU = &device_creator<cgb05_apu_device>;
+const device_type DMG_APU = device_creator<dmg_apu_device>;
+//const device_type CGB02_APU = device_creator<cgb02_apu_device>;
+const device_type CGB04_APU = device_creator<cgb04_apu_device>;
+//const device_type CGB05_APU = device_creator<cgb05_apu_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

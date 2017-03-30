@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "pds30_cb264.h"
+#include "screen.h"
 
 #define CB264SE30_SCREEN_NAME "cb264_screen"
 #define CB264SE30_ROM_REGION  "cb264_rom"
@@ -31,7 +32,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_CB264SE30 = &device_creator<nubus_cb264se30_device>;
+const device_type PDS030_CB264SE30 = device_creator<nubus_cb264se30_device>;
 
 
 //-------------------------------------------------

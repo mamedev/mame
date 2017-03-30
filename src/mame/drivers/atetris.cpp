@@ -57,6 +57,7 @@
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_14_31818MHz

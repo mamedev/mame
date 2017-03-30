@@ -39,8 +39,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type FD2000 = &device_creator<fd2000_device>;
-const device_type FD4000 = &device_creator<fd4000_device>;
+const device_type FD2000 = device_creator<fd2000_device>;
+const device_type FD4000 = device_creator<fd4000_device>;
 
 
 //-------------------------------------------------

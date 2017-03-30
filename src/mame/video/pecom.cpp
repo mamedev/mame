@@ -9,10 +9,11 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
+
+#include "sound/wave.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NASCOM_FDC = &device_creator<nascom_fdc_device>;
+const device_type NASCOM_FDC = device_creator<nascom_fdc_device>;
 
 FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 	FLOPPY_NASCOM_FORMAT

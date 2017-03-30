@@ -939,7 +939,7 @@ mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, cons
 {
 }
 
-const device_type MFMHD_GENERIC = &device_creator<mfm_hd_generic_device>;
+const device_type MFMHD_GENERIC = device_creator<mfm_hd_generic_device>;
 
 /*
     Various models.
@@ -955,7 +955,7 @@ mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 150;
 }
 
-const device_type MFMHD_ST213 = &device_creator<mfm_hd_st213_device>;
+const device_type MFMHD_ST213 = device_creator<mfm_hd_st213_device>;
 
 mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST225, "Seagate ST-225 MFM hard disk", tag, owner, clock, "mfm_hd_st225", __FILE__)
@@ -968,7 +968,7 @@ mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 150;
 }
 
-const device_type MFMHD_ST225 = &device_creator<mfm_hd_st225_device>;
+const device_type MFMHD_ST225 = device_creator<mfm_hd_st225_device>;
 
 mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST251, "Seagate ST-251 MFM hard disk", tag, owner, clock, "mfm_hd_st251", __FILE__)
@@ -981,7 +981,7 @@ mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 70;
 }
 
-const device_type MFMHD_ST251 = &device_creator<mfm_hd_st251_device>;
+const device_type MFMHD_ST251 = device_creator<mfm_hd_st251_device>;
 
 // ===========================================================
 //   Track cache
@@ -1222,4 +1222,4 @@ void mfm_harddisk_connector::device_config_complete()
 	}
 }
 
-const device_type MFM_HD_CONNECTOR = &device_creator<mfm_harddisk_connector>;
+const device_type MFM_HD_CONNECTOR = device_creator<mfm_harddisk_connector>;

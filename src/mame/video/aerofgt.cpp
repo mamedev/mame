@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/aerofgt.h"
+#include "screen.h"
 
 /***************************************************************************
 

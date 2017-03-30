@@ -70,7 +70,7 @@ enum
 };
 
 
-const device_type NAND = &device_creator<nand_device>;
+const device_type NAND = device_creator<nand_device>;
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
@@ -777,15 +777,10 @@ void nand_device::device_reset()
 }
 
 
-const device_type SMARTMEDIA = &device_creator<smartmedia_image_device>;
+const device_type SMARTMEDIA = device_creator<smartmedia_image_device>;
 
 smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock, "smartmedia", __FILE__),
 		device_image_interface(mconfig, *this)
 {
-}
-
-void smartmedia_image_device::device_config_complete()
-{
-	update_names();
 }

@@ -9,8 +9,9 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 
 #include "emu.h"
 #include "fmpac.h"
+#include "speaker.h"
 
-const device_type MSX_CART_FMPAC = &device_creator<msx_cart_fmpac>;
+const device_type MSX_CART_FMPAC = device_creator<msx_cart_fmpac>;
 
 
 msx_cart_fmpac::msx_cart_fmpac(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

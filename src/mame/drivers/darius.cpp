@@ -130,14 +130,18 @@ sounds.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/darius.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "audio/taitosnd.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "sound/flt_vol.h"
-#include "includes/darius.h"
+#include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "darius.lh"
 
 

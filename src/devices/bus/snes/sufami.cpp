@@ -20,8 +20,8 @@
 //  sns_rom_sufami_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUFAMI = &device_creator<sns_rom_sufami_device>;
-const device_type SNS_STROM = &device_creator<sns_rom_strom_device>;
+const device_type SNS_LOROM_SUFAMI = device_creator<sns_rom_sufami_device>;
+const device_type SNS_STROM = device_creator<sns_rom_strom_device>;
 
 
 sns_rom_sufami_device::sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -16,10 +16,6 @@
 #include "../glm.hpp"
 #include "../gtc/integer.hpp"
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#	error "GLM: GLM_GTX_integer is an experimental extension and may change in the future. Use #define GLM_ENABLE_EXPERIMENTAL before including it, if you really want to use it."
-#endif
-
 #if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_integer extension included")
 #endif
@@ -47,7 +43,7 @@ namespace glm
 
 	//! Return the factorial value of a number (!12 max, integer only)
 	//! From GLM_GTX_integer extension.
-	template<typename genType> 
+	template <typename genType> 
 	GLM_FUNC_DECL genType factorial(genType const & x);
 
 	//! 32bit signed integer. 

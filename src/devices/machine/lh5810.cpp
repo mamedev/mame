@@ -17,7 +17,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type LH5810 = &device_creator<lh5810_device>;
+const device_type LH5810 = device_creator<lh5810_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

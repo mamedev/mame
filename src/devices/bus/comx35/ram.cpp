@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_RAM = &device_creator<comx_ram_device>;
+const device_type COMX_RAM = device_creator<comx_ram_device>;
 
 
 //**************************************************************************

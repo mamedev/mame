@@ -131,13 +131,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaiden.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/gaiden.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {

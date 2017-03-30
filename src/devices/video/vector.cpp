@@ -65,7 +65,7 @@ void vector_options::init(emu_options& options)
 }
 
 // device type definition
-const device_type VECTOR = &device_creator<vector_device>;
+const device_type VECTOR = device_creator<vector_device>;
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),

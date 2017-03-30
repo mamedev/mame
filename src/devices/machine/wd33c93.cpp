@@ -804,4 +804,4 @@ int wd33c93_device::get_dma_count()
 	return get_xfer_count();
 }
 
-const device_type WD33C93 = &device_creator<wd33c93_device>;
+const device_type WD33C93 = device_creator<wd33c93_device>;

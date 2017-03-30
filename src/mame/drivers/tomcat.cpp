@@ -37,6 +37,8 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

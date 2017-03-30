@@ -11,16 +11,22 @@
 
 #include "emu.h"
 #include "includes/rmnimbus.h"
+#include "machine/rmnkbd.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/flopdrv.h"
-#include "formats/pc_dsk.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/s1410.h"
-#include "bus/scsi/acb4070.h"
+
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
-#include "machine/rmnkbd.h"
+#include "bus/scsi/acb4070.h"
+#include "bus/scsi/s1410.h"
+#include "bus/scsi/scsihd.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/pc_dsk.h"
+
 
 static SLOT_INTERFACE_START(rmnimbus_floppies)
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )

@@ -33,7 +33,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2031 = &device_creator<c2031_device>;
+const device_type C2031 = device_creator<c2031_device>;
 
 
 //-------------------------------------------------

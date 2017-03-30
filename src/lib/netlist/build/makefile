@@ -10,6 +10,8 @@
 ###########################################################################
 
 SRC = ..
+VSBUILD = $(SRC)/buildVS
+DOC = $(SRC)/documentation
 
 ifeq ($(subst Windows_NT,windows,$(OS)),windows)
 OBJ = obj/mingw
@@ -130,10 +132,32 @@ NLOBJS := \
 	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
+	
+VSBUILDS = \
+	$(VSBUILD/netlistlib.vcxproj) \
+	$(VSBUILD/netlistlib.vcxproj.user \
+	$(VSBUILD/nltool.vcxproj \
+	$(VSBUILD/netlistlib.vcxproj.filters  \
+	$(VSBUILD/nltool.vcxproj.filters \
+	$(VSBUILD/netlist.sln \
+
+DOCS = \
+	doxygen.conf \
+	$(DOC)/doc.css \
+	$(DOC)/mainpage.dox.h \
+	$(DOC)/primer_1.dox.h \
+	$(DOC)/structure.dox.h \
+	$(DOC)/test1-50r.svg \
 
 ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
+
 MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
+
+
+# git archive HEAD --prefix=project-name-version/ \
+#     --format=zip -o project-name-version.zip
 
 #-------------------------------------------------
 # all

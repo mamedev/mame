@@ -16,7 +16,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIOUT = &device_creator<midiout_device>;
+const device_type MIDIOUT = device_creator<midiout_device>;
 
 /*-------------------------------------------------
     ctor
@@ -50,15 +50,6 @@ void midiout_device::device_reset()
 void midiout_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-/*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void midiout_device::device_config_complete(void)
-{
-	update_names();
 }
 
 /*-------------------------------------------------

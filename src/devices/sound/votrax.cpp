@@ -26,7 +26,7 @@ tp1 = phi clock (tied to f2q rom access)
 #include "votrax.h"
 
 
-const device_type VOTRAX_SC01 = &device_creator<votrax_sc01_device>;
+const device_type VOTRAX_SC01 = device_creator<votrax_sc01_device>;
 
 // ROM definition for the Votrax phone ROM
 ROM_START( votrax_sc01 )

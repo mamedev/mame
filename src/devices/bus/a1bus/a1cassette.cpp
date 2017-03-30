@@ -21,7 +21,7 @@
 
 #define CASSETTE_ROM_REGION "casrom"
 
-const device_type A1BUS_CASSETTE = &device_creator<a1bus_cassette_device>;
+const device_type A1BUS_CASSETTE = device_creator<a1bus_cassette_device>;
 
 /* sound output */
 

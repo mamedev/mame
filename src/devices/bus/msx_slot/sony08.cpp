@@ -10,7 +10,7 @@
 #include "sony08.h"
 
 
-const device_type MSX_SLOT_SONY08 = &device_creator<msx_slot_sony08_device>;
+const device_type MSX_SLOT_SONY08 = device_creator<msx_slot_sony08_device>;
 
 
 msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

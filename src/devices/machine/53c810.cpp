@@ -813,4 +813,4 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, uint32_t pc)
 	return result;
 }
 
-const device_type LSI53C810 = &device_creator<lsi53c810_device>;
+const device_type LSI53C810 = device_creator<lsi53c810_device>;

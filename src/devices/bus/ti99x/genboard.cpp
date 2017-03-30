@@ -3,12 +3,11 @@
 /***************************************************************************
     Geneve 9640 mapper and more components
 
-    This file contains 3 classes:
+    This file contains 2 classes:
     - mapper: main function of the Gate Array on the Geneve board. Maps logical
         memory accesses to a wider address space using map registers.
     - keyboard: an implementation of a XT-style keyboard. This should be dropped
         and replaced by a proper XT keyboard implementation.
-    - mouse: an implementation of an Atari-style mouse connected to the v9938.
 
     Onboard SRAM configuration:
     There is an adjustable SRAM configuration on board, representing the
@@ -487,7 +486,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	decdata debug;
 
 	// For the debugger, do the decoding here with no wait states
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		if (m_cpu->is_onchip(offset)) return m_cpu->debug_read_onchip_memory(offset&0xff);
 		dec = &debug;
@@ -504,7 +503,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	switch (dec->function)
 	{
 	case MLGVIDEO:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			value = m_video->read(space, dec->offset>>1);
 			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
@@ -522,7 +521,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 	case MLGKEY:
 		// key
-		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
+		if (!machine().side_effect_disabled()) value = m_keyboard->get_recent_key();
 		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
@@ -542,7 +541,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 	case MLTKEY:
 		// key
-		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
+		if (!machine().side_effect_disabled()) value = m_keyboard->get_recent_key();
 		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
@@ -564,7 +563,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// video
 		// ++++ ++-- ---- ---+
 		// 1000 1000 0000 00x0
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			value = m_video->read(space, dec->offset>>1);
 			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
@@ -587,7 +586,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// grom simulation
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
-		if (!space.debugger_access()) value = read_grom(space, dec->offset, 0xff);
+		if (!machine().side_effect_disabled()) value = read_grom(space, dec->offset, 0xff);
 		if (TRACE_READ) logerror("Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
@@ -674,7 +673,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	decdata debug;
 
 	// For the debugger, do the decoding here with no wait states
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		dec = &debug;
 		m_debug_no_ws = true;
@@ -694,7 +693,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
 
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_video->write(space, dec->offset>>1, data);
 			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
@@ -740,7 +739,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1000 1100 0000 00c0
 		// Initialize waitstate timer
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_video->write(space, dec->offset>>1, data);
 			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
@@ -1508,7 +1507,7 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-const device_type GENEVE_MAPPER = &device_creator<geneve_mapper_device>;
+const device_type GENEVE_MAPPER = device_creator<geneve_mapper_device>;
 
 /****************************************************************************
     Keyboard support
@@ -2009,84 +2008,4 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
-
-/****************************************************************************
-    Mouse support
-****************************************************************************/
-
-geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__), m_v9938(nullptr), m_last_mx(0), m_last_my(0)
-{
-}
-
-line_state geneve_mouse_device::left_button()
-{
-	return ((ioport("MOUSE0")->read() & 0x04)!=0)? ASSERT_LINE : CLEAR_LINE;
-}
-
-void geneve_mouse_device::poll()
-{
-	int new_mx, new_my;
-	int delta_x, delta_y, buttons;
-
-	buttons = ioport("MOUSE0")->read();
-	new_mx = ioport("MOUSEX")->read();
-	new_my = ioport("MOUSEY")->read();
-
-	/* compute x delta */
-	delta_x = new_mx - m_last_mx;
-
-	/* check for wrap */
-	if (delta_x > 0x80)
-		delta_x = 0x100-delta_x;
-	if  (delta_x < -0x80)
-		delta_x = -0x100-delta_x;
-
-	m_last_mx = new_mx;
-
-	/* compute y delta */
-	delta_y = new_my - m_last_my;
-
-	/* check for wrap */
-	if (delta_y > 0x80)
-		delta_y = 0x100-delta_y;
-	if  (delta_y < -0x80)
-		delta_y = -0x100-delta_y;
-
-	m_last_my = new_my;
-
-	// only middle and right button go to V9938
-	m_v9938->update_mouse_state(delta_x, delta_y, buttons & 0x03);
-}
-
-INPUT_PORTS_START( genmouse )
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* mouse buttons */
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button")
-INPUT_PORTS_END
-
-void geneve_mouse_device::device_start()
-{
-	m_v9938 = machine().device<v9938_device>(VDP_TAG);
-}
-
-void geneve_mouse_device::device_reset()
-{
-	m_last_mx = 0;
-	m_last_my = 0;
-}
-
-ioport_constructor geneve_mouse_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( genmouse );
-}
-
-const device_type GENEVE_MOUSE = &device_creator<geneve_mouse_device>;
+const device_type GENEVE_KEYBOARD = device_creator<geneve_keyboard_device>;

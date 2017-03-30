@@ -1158,10 +1158,13 @@
 
 #include "emu.h"
 #include "includes/namcos22.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/namcomcu.h"
 #include "sound/c352.h"
+#include "speaker.h"
+
 
 #define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
 

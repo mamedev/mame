@@ -273,4 +273,4 @@ void igs022_device::IGS022_handle_command()
 }
 
 
-const device_type IGS022 = &device_creator<igs022_device>;
+const device_type IGS022 = device_creator<igs022_device>;

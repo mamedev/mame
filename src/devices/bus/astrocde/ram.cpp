@@ -60,12 +60,12 @@
 //  astrocade_rom_device - constructor
 //-------------------------------------------------
 
-const device_type ASTROCADE_BLUERAM_4K  = &device_creator<astrocade_blueram_4k_device>;
-const device_type ASTROCADE_BLUERAM_16K = &device_creator<astrocade_blueram_16k_device>;
-const device_type ASTROCADE_BLUERAM_32K = &device_creator<astrocade_blueram_32k_device>;
-const device_type ASTROCADE_VIPER_SYS1  = &device_creator<astrocade_viper_sys1_device>;
-const device_type ASTROCADE_WHITERAM    = &device_creator<astrocade_whiteram_device>;
-const device_type ASTROCADE_RL64RAM     = &device_creator<astrocade_rl64ram_device>;
+const device_type ASTROCADE_BLUERAM_4K  = device_creator<astrocade_blueram_4k_device>;
+const device_type ASTROCADE_BLUERAM_16K = device_creator<astrocade_blueram_16k_device>;
+const device_type ASTROCADE_BLUERAM_32K = device_creator<astrocade_blueram_32k_device>;
+const device_type ASTROCADE_VIPER_SYS1  = device_creator<astrocade_viper_sys1_device>;
+const device_type ASTROCADE_WHITERAM    = device_creator<astrocade_whiteram_device>;
+const device_type ASTROCADE_RL64RAM     = device_creator<astrocade_rl64ram_device>;
 
 
 astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

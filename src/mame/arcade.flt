@@ -225,6 +225,7 @@ cliffhgr.cpp
 cloak.cpp
 cloud9.cpp
 clowndwn.cpp
+clpoker.cpp
 clshroad.cpp
 cmmb.cpp
 cninja.cpp
@@ -1105,6 +1106,7 @@ stactics.cpp
 stadhero.cpp
 starcrus.cpp
 starfire.cpp
+stargame.cpp
 starshp1.cpp
 starwars.cpp
 statriv2.cpp

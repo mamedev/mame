@@ -24,14 +24,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/micro3d.h"
+
 #include "cpu/am29000/am29000.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
-#include "sound/ym2151.h"
 #include "machine/nvram.h"
-#include "includes/micro3d.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

@@ -99,6 +99,8 @@ Chips:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+#include "screen.h"
+#include "speaker.h"
 
 /***************************************************************************
 

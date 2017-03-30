@@ -19,6 +19,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -34,23 +35,21 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_AGCI_50282 = &device_creator<nes_agci_device>;
-const device_type NES_DREAMTECH01 = &device_creator<nes_dreamtech_device>;
-const device_type NES_FUKUTAKE = &device_creator<nes_fukutake_device>;
-const device_type NES_FUTUREMEDIA = &device_creator<nes_futuremedia_device>;
-const device_type NES_MAGSERIES = &device_creator<nes_magseries_device>;
-const device_type NES_DAOU306 = &device_creator<nes_daou306_device>;
-const device_type NES_SUBOR0 = &device_creator<nes_subor0_device>;
-const device_type NES_SUBOR1 = &device_creator<nes_subor1_device>;
-const device_type NES_CC21 = &device_creator<nes_cc21_device>;
-const device_type NES_XIAOZY = &device_creator<nes_xiaozy_device>;
-const device_type NES_EDU2K = &device_creator<nes_edu2k_device>;
-const device_type NES_T230 = &device_creator<nes_t230_device>;
-const device_type NES_MK2 = &device_creator<nes_mk2_device>;
-const device_type NES_WHERO = &device_creator<nes_whero_device>;
-const device_type NES_43272 = &device_creator<nes_43272_device>;
-const device_type NES_TF1201 = &device_creator<nes_tf1201_device>;
-const device_type NES_CITYFIGHT = &device_creator<nes_cityfight_device>;
+const device_type NES_AGCI_50282 = device_creator<nes_agci_device>;
+const device_type NES_DREAMTECH01 = device_creator<nes_dreamtech_device>;
+const device_type NES_FUKUTAKE = device_creator<nes_fukutake_device>;
+const device_type NES_FUTUREMEDIA = device_creator<nes_futuremedia_device>;
+const device_type NES_MAGSERIES = device_creator<nes_magseries_device>;
+const device_type NES_DAOU306 = device_creator<nes_daou306_device>;
+const device_type NES_CC21 = device_creator<nes_cc21_device>;
+const device_type NES_XIAOZY = device_creator<nes_xiaozy_device>;
+const device_type NES_EDU2K = device_creator<nes_edu2k_device>;
+const device_type NES_T230 = device_creator<nes_t230_device>;
+const device_type NES_MK2 = device_creator<nes_mk2_device>;
+const device_type NES_WHERO = device_creator<nes_whero_device>;
+const device_type NES_43272 = device_creator<nes_43272_device>;
+const device_type NES_TF1201 = device_creator<nes_tf1201_device>;
+const device_type NES_CITYFIGHT = device_creator<nes_cityfight_device>;
 
 
 nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -80,16 +79,6 @@ nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const 
 
 nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_DAOU306, "NES Cart Daou 306 PCB", tag, owner, clock, "nes_daou306", __FILE__)
-{
-}
-
-nes_subor0_device::nes_subor0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUBOR0, "NES Cart Subor Type 0 PCB", tag, owner, clock, "nes_subor0", __FILE__)
-{
-}
-
-nes_subor1_device::nes_subor1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUBOR1, "NES Cart Subor Type 1 PCB", tag, owner, clock, "nes_subor1", __FILE__)
 {
 }
 
@@ -134,7 +123,7 @@ nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *
 }
 
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+					: nes_nrom_device(mconfig, NES_CITYFIGHT, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 				{
 }
 
@@ -231,38 +220,6 @@ void nes_daou306_device::pcb_reset()
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_LOW);
-
-	memset(m_reg, 0, sizeof(m_reg));
-}
-
-void nes_subor0_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_subor0_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(0x20);
-	chr8(0, m_chr_source);
-
-	memset(m_reg, 0, sizeof(m_reg));
-}
-
-void nes_subor1_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_subor1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(0x07);
-	chr8(0, m_chr_source);
 
 	memset(m_reg, 0, sizeof(m_reg));
 }
@@ -727,82 +684,6 @@ WRITE8_MEMBER(nes_daou306_device::write_h)
 				set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
 	}
-}
-
-/*-------------------------------------------------
-
- Subor bootleg board Type 0
-
- iNES: mapper 167
-
- -------------------------------------------------*/
-
-WRITE8_MEMBER(nes_subor0_device::write_h)
-{
-	uint8_t subor_helper1, subor_helper2;
-	LOG_MMC(("subor0 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_reg[(offset >> 13) & 0x03] = data;
-	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
-	subor_helper2 = ((m_reg[2] ^ m_reg[3]) << 0) & 0x1f;
-
-	if (m_reg[1] & 0x08)
-	{
-		subor_helper1 += subor_helper2 & 0xfe;
-		subor_helper2 = subor_helper1;
-		subor_helper1 += 1;
-	}
-	else if (m_reg[1] & 0x04)
-	{
-		subor_helper2 += subor_helper1;
-		subor_helper1 = 0x1f;
-	}
-	else
-	{
-		subor_helper1 += subor_helper2;
-		subor_helper2 = 0x20;
-	}
-
-	prg16_89ab(subor_helper1);
-	prg16_cdef(subor_helper2);
-}
-
-/*-------------------------------------------------
-
- Subor bootleg board Type 1
-
- iNES: mapper 166
-
- -------------------------------------------------*/
-
-WRITE8_MEMBER(nes_subor1_device::write_h)
-{
-	uint8_t subor_helper1, subor_helper2;
-	LOG_MMC(("subor1 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	m_reg[(offset >> 13) & 0x03] = data;
-	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
-	subor_helper2 = ((m_reg[2] ^ m_reg[3]) << 0) & 0x1f;
-
-	if (m_reg[1] & 0x08)
-	{
-		subor_helper1 += subor_helper2 & 0xfe;
-		subor_helper2 = subor_helper1;
-		subor_helper2 += 1;
-	}
-	else if (m_reg[1] & 0x04)
-	{
-		subor_helper2 += subor_helper1;
-		subor_helper1 = 0x1f;
-	}
-	else
-	{
-		subor_helper1 += subor_helper2;
-		subor_helper2 = 0x07;
-	}
-
-	prg16_89ab(subor_helper1);
-	prg16_cdef(subor_helper2);
 }
 
 /*-------------------------------------------------

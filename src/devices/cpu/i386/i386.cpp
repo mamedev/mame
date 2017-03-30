@@ -27,16 +27,16 @@
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-const device_type I386 = &device_creator<i386_device>;
-const device_type I386SX = &device_creator<i386SX_device>;
-const device_type I486 = &device_creator<i486_device>;
-const device_type PENTIUM = &device_creator<pentium_device>;
-const device_type MEDIAGX = &device_creator<mediagx_device>;
-const device_type PENTIUM_PRO = &device_creator<pentium_pro_device>;
-const device_type PENTIUM_MMX = &device_creator<pentium_mmx_device>;
-const device_type PENTIUM2 = &device_creator<pentium2_device>;
-const device_type PENTIUM3 = &device_creator<pentium3_device>;
-const device_type PENTIUM4 = &device_creator<pentium4_device>;
+const device_type I386 = device_creator<i386_device>;
+const device_type I386SX = device_creator<i386SX_device>;
+const device_type I486 = device_creator<i486_device>;
+const device_type PENTIUM = device_creator<pentium_device>;
+const device_type MEDIAGX = device_creator<mediagx_device>;
+const device_type PENTIUM_PRO = device_creator<pentium_pro_device>;
+const device_type PENTIUM_MMX = device_creator<pentium_mmx_device>;
+const device_type PENTIUM2 = device_creator<pentium2_device>;
+const device_type PENTIUM3 = device_creator<pentium3_device>;
+const device_type PENTIUM4 = device_creator<pentium4_device>;
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -3277,6 +3277,7 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_sreg[GS].d));
 	save_item(NAME(m_eip));
 	save_item(NAME(m_prev_eip));
+
 	save_item(NAME(m_CF));
 	save_item(NAME(m_DF));
 	save_item(NAME(m_SF));
@@ -3286,9 +3287,24 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_AF));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_TF));
+	save_item(NAME(m_IOP1));
+	save_item(NAME(m_IOP2));
+	save_item(NAME(m_NT));
+	save_item(NAME(m_RF));
+	save_item(NAME(m_VM));
+	save_item(NAME(m_AC));
+	save_item(NAME(m_VIF));
+	save_item(NAME(m_VIP));
+	save_item(NAME(m_ID));
+
+	save_item(NAME(m_CPL));
+
+	save_item(NAME(m_performed_intersegment_jump));
+
 	save_item(NAME(m_cr));
 	save_item(NAME(m_dr));
 	save_item(NAME(m_tr));
+
 	save_item(NAME(m_idtr.base));
 	save_item(NAME(m_idtr.limit));
 	save_item(NAME(m_gdtr.base));
@@ -3301,12 +3317,17 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_ldtr.segment));
 	save_item(NAME(m_ldtr.limit));
 	save_item(NAME(m_ldtr.flags));
+
+	save_item(NAME(m_segment_override));
+
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_performed_intersegment_jump));
+	save_item(NAME(m_a20_mask));
+
 	save_item(NAME(m_mxcsr));
+
 	save_item(NAME(m_smm));
-	save_item(NAME(m_smi_latched));
 	save_item(NAME(m_smi));
+	save_item(NAME(m_smi_latched));
 	save_item(NAME(m_nmi_masked));
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));

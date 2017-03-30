@@ -32,10 +32,10 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_SXROM = &device_creator<nes_sxrom_device>;
-const device_type NES_SOROM = &device_creator<nes_sorom_device>;
-const device_type NES_SXROM_A = &device_creator<nes_sxrom_a_device>;
-const device_type NES_SOROM_A = &device_creator<nes_sorom_a_device>;
+const device_type NES_SXROM = device_creator<nes_sxrom_device>;
+const device_type NES_SOROM = device_creator<nes_sorom_device>;
+const device_type NES_SXROM_A = device_creator<nes_sxrom_a_device>;
+const device_type NES_SOROM_A = device_creator<nes_sorom_a_device>;
 
 
 

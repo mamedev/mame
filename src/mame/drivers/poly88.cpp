@@ -27,10 +27,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/poly88.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-#include "includes/poly88.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH

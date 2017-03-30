@@ -184,6 +184,9 @@ below are simply made to the banking address to run on other boards.
 #include "emu.h"
 #include "includes/multfish.h"
 
+#include "speaker.h"
+
+
 TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)
 {
 	int code = m_vid[tile_index*2+0x0000] | (m_vid[tile_index*2+0x0001] << 8);

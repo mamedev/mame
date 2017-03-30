@@ -27,8 +27,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_HORITWIN = &device_creator<nes_horitwin_device>;
-const device_type NES_HORI4P = &device_creator<nes_hori4p_device>;
+const device_type NES_HORITWIN = device_creator<nes_horitwin_device>;
+const device_type NES_HORI4P = device_creator<nes_hori4p_device>;
 
 
 static INPUT_PORTS_START( nes_hori4p )

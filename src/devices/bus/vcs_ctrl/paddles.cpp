@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_PADDLES = &device_creator<vcs_paddles_device>;
+const device_type VCS_PADDLES = device_creator<vcs_paddles_device>;
 
 
 static INPUT_PORTS_START( vcs_paddles )

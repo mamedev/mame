@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#pragma once
+#ifndef MAME_BUS_LPCI_SOUTHBRIDGE_H
+#define MAME_BUS_LPCI_SOUTHBRIDGE_H
 
-#ifndef __SOUTHBRIDGE_H__
-#define __SOUTHBRIDGE_H__
+#pragma once
 
 
 #include "machine/ins8250.h"
@@ -17,7 +17,7 @@
 #include "imagedev/harddriv.h"
 #include "pci.h"
 
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "bus/isa/isa.h"
@@ -126,4 +126,4 @@ protected:
 		void pc_select_dma_channel(int channel, bool state);
 };
 
-#endif  /* __SOUTHBRIDGE_H__ */
+#endif  // MAME_BUS_LPCI_SOUTHBRIDGE_H

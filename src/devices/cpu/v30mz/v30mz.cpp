@@ -94,7 +94,7 @@ enum BREGS {
 
 /***************************************************************************/
 
-const device_type V30MZ = &device_creator<v30mz_cpu_device>;
+const device_type V30MZ = device_creator<v30mz_cpu_device>;
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

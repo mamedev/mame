@@ -7,6 +7,7 @@
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
 #include "sound/x1_010.h"
+#include "screen.h"
 
 class seta2_state : public driver_device
 {
@@ -114,7 +115,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_rgbram(bitmap_ind16 &bitmap);
 

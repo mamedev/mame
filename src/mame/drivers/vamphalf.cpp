@@ -61,13 +61,15 @@ TODO:
 *********************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
 #include "sound/qs1000.h"
 #include "sound/ym2151.h"
-#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vamphalf_state : public driver_device

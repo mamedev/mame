@@ -13,7 +13,7 @@
 
 
 // device type definition
-const device_type PRINTER = &device_creator<printer_image_device>;
+const device_type PRINTER = device_creator<printer_image_device>;
 
 //-------------------------------------------------
 //  printer_image_device - constructor
@@ -24,18 +24,6 @@ printer_image_device::printer_image_device(const machine_config &mconfig, const 
 	device_image_interface(mconfig, *this),
 	m_online_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void printer_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 

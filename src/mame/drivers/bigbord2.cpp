@@ -73,14 +73,16 @@ X - change banks
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/z80ctc.h"
-#include "machine/z80sio.h"
-#include "machine/z80dma.h"
-#include "video/mc6845.h"
-#include "machine/keyboard.h"
-#include "sound/beep.h"
-#include "machine/wd_fdc.h"
 #include "machine/clock.h"
+#include "machine/keyboard.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dma.h"
+#include "machine/z80sio.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bigbord2_state : public driver_device

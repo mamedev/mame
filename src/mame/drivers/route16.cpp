@@ -71,14 +71,14 @@
 
 #include "emu.h"
 #include "includes/route16.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-
-
-
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

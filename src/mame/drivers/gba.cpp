@@ -12,12 +12,15 @@
 
 #include "emu.h"
 #include "includes/gba.h"
+
 #include "bus/gba/rom.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Sound Registers */
 #define SOUNDCNT_L  HWLO(0x080)  /* 0x4000080  2  R/W   Control Stereo/Volume/Enable */
@@ -1141,8 +1144,9 @@ READ32_MEMBER(gba_state::gba_bios_r)
 			return 0;
 	}
 
-	if (m_maincpu->state_int(ARM7_PC) >= 0x4000)
+	if (m_maincpu->pc() >= 0x4000)
 	{
+		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
 		return 0;
 	}
 

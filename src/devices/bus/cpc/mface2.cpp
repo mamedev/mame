@@ -14,7 +14,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_MFACE2 = &device_creator<cpc_multiface2_device>;
+const device_type CPC_MFACE2 = device_creator<cpc_multiface2_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )

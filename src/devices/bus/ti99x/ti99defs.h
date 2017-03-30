@@ -81,7 +81,8 @@
 #define GLIB31_TAG GLIB3_TAG "_1"
 #define GLIB32_TAG GLIB3_TAG "_2"
 
-
+// v9938
+#define COLORBUS_TAG     "colorbus"
 
 // Geneve
 #define GKEYBOARD_TAG   "gkeyboard"
@@ -153,16 +154,12 @@ public:
 ****************************************************************************/
 class ti99_4x_state;
 
-class evpc_clock_connector;
-
-const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
+extern const device_type EVPC_CONN;
 
 class evpc_clock_connector : public device_t
 {
 public:
-	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__),
-		m_vdpint(*this) { };
+	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_vdpint_callback(device_t &device, _Object object)
 	{
@@ -170,7 +167,7 @@ public:
 	}
 
 	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
-	void device_start() override { m_vdpint.resolve();  }
+	void device_start() override;
 
 private:
 	// VDPINT line to the CPU

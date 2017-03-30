@@ -43,7 +43,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK = &device_creator<coco_pak_device>;
+const device_type COCO_PAK = device_creator<coco_pak_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -117,7 +117,7 @@ void coco_pak_device::device_reset()
 			: cococart_slot_device::line_value::CLEAR;
 
 		// normal CoCo PAKs tie their CART line to Q - the system clock
-		m_owner->cart_set_line(cococart_slot_device::line::CART, cart_line);
+		m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
 	}
 }
 
@@ -138,7 +138,7 @@ uint8_t* coco_pak_device::get_cart_base()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
+const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

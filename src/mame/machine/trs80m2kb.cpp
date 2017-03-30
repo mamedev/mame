@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TRS80M2_KEYBOARD = &device_creator<trs80m2_keyboard_device>;
+const device_type TRS80M2_KEYBOARD = device_creator<trs80m2_keyboard_device>;
 
 
 

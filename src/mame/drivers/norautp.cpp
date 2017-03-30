@@ -544,21 +544,25 @@
 
 *******************************************************************************/
 
+#include "emu.h"
+#include "includes/norautp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "noraut11.lh"
+#include "noraut12.lh"
+
 
 #define NORAUT_MASTER_CLOCK     XTAL_18_432MHz
 #define DPHL_MASTER_CLOCK       XTAL_18MHz
 #define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     /* 2.30275 MHz - Measured: 2.305 MHz */
 #define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       /* 2 MHz (from 8224) */
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "includes/norautp.h"
-
-#include "noraut11.lh"
-#include "noraut12.lh"
 
 
 /*************************

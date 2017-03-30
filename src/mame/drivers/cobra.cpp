@@ -327,6 +327,7 @@
 #include "video/rgbutil.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
+#include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0
 #define GFXFIFO_OUT_VERBOSE         0
@@ -508,7 +509,7 @@ private:
 	optional_ioport_array<2> m_player_ports;
 };
 
-const device_type COBRA_JVS = &device_creator<cobra_jvs>;
+const device_type COBRA_JVS = device_creator<cobra_jvs>;
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__),
@@ -599,7 +600,7 @@ private:
 	int m_send_ptr;
 };
 
-const device_type COBRA_JVS_HOST = &device_creator<cobra_jvs_host>;
+const device_type COBRA_JVS_HOST = device_creator<cobra_jvs_host>;
 
 cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, COBRA_JVS_HOST, "JVS-HOST (COBRA)", tag, owner, clock, "cobra_jvs_host", __FILE__)

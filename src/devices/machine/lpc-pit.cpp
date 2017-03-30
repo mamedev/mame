@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "lpc-pit.h"
 
-const device_type LPC_PIT = &device_creator<lpc_pit_device>;
+const device_type LPC_PIT = device_creator<lpc_pit_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(status_r, access_w,  0x00ffffff)

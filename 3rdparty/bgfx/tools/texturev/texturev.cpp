@@ -759,8 +759,8 @@ int _main_(int _argc, char** _argv)
 				| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 				| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				, mouseState.m_mz
-				, width
-				, height
+				, uint16_t(width)
+				, uint16_t(height)
 				);
 
 			static bool help = false;
@@ -856,13 +856,20 @@ int _main_(int _argc, char** _argv)
 						);
 
 				std::string title;
-				bx::stringPrintf(title, "%s (%d x %d%s, %s)"
-					, filePath
-					, view.m_info.width
-					, view.m_info.height
-					, view.m_info.cubeMap ? " CubeMap" : ""
-					, bgfx::getName(view.m_info.format)
-					);
+				if (isValid(texture) )
+				{
+					bx::stringPrintf(title, "%s (%d x %d%s, %s)"
+						, filePath
+						, view.m_info.width
+						, view.m_info.height
+						, view.m_info.cubeMap ? " CubeMap" : ""
+						, bgfx::getName(view.m_info.format)
+						);
+				}
+				else
+				{
+					bx::stringPrintf(title, "Failed to load %s!", filePath);
+				}
 				entry::WindowHandle handle = { 0 };
 				entry::setWindowTitle(handle, title.c_str() );
 			}
@@ -878,7 +885,7 @@ int _main_(int _argc, char** _argv)
 			float ortho[16];
 			bx::mtxOrtho(ortho, 0.0f, (float)width, (float)height, 0.0f, 0.0f, 1000.0f);
 			bgfx::setViewTransform(0, NULL, ortho);
-			bgfx::setViewRect(0, 0, 0, width, height);
+			bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
 			bgfx::touch(0);
 
 			bgfx::dbgTextClear();

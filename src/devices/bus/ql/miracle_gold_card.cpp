@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MIRACLE_GOLD_CARD = &device_creator<miracle_gold_card_t>;
+const device_type MIRACLE_GOLD_CARD = device_creator<miracle_gold_card_t>;
 
 
 //-------------------------------------------------

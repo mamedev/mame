@@ -102,7 +102,7 @@ enum
 };
 
 
-const device_type DSP56156 = &device_creator<dsp56k_device>;
+const device_type DSP56156 = device_creator<dsp56k_device>;
 
 
 /****************************************************************************

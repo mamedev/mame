@@ -16,10 +16,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
-#include "video/mc6845.h"
 #include "machine/i8255.h"
+#include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class multi8_state : public driver_device
@@ -32,7 +34,7 @@ public:
 		, m_ppi(*this, "ppi8255_0")
 		, m_crtc(*this, "crtc")
 		, m_beeper(*this, "beeper")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(multi8_6845_w);
 	DECLARE_READ8_MEMBER(key_input_r);

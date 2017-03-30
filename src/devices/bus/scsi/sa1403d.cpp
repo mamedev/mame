@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SA1403D = &device_creator<sa1403d_device>;
+const device_type SA1403D = device_creator<sa1403d_device>;
 
 
 //-------------------------------------------------

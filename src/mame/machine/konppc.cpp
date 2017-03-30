@@ -14,7 +14,7 @@
 /*****************************************************************************/
 
 
-const device_type KONPPC = &device_creator<konppc_device>;
+const device_type KONPPC = device_creator<konppc_device>;
 
 konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KONPPC, "Konami PowerPC Common Functions", tag, owner, clock, "konppc", __FILE__),

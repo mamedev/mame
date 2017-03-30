@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
+const device_type COCOCART_SLOT = device_creator<cococart_slot_device>;
 
 
 
@@ -86,20 +86,6 @@ void cococart_slot_device::device_start()
 	m_halt_line.callback = &m_halt_callback;
 
 	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
-}
-
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cococart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -253,8 +239,8 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 
 
 //-------------------------------------------------
-//  coco_cartridge_twiddle_q_lines - hack to
-//  support twiddling the Q line
+//  twiddle_q_lines - hack to support twiddling the
+//	Q line
 //-------------------------------------------------
 
 void cococart_slot_device::twiddle_q_lines()
@@ -266,31 +252,61 @@ void cococart_slot_device::twiddle_q_lines()
 
 
 //-------------------------------------------------
-//  coco_cartridge_set_line
+//  set_line_value
 //-------------------------------------------------
 
-void cococart_slot_device::cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
+void cococart_slot_device::set_line_value(cococart_slot_device::line which, cococart_slot_device::line_value value)
 {
 	switch (which)
 	{
-		case line::CART:
-			set_line_timer(m_cart_line, value);
-			break;
+	case cococart_slot_device::line::CART:
+		set_line_timer(m_cart_line, value);
+		break;
 
-		case line::NMI:
-			set_line_timer(m_nmi_line, value);
-			break;
+	case cococart_slot_device::line::NMI:
+		set_line_timer(m_nmi_line, value);
+		break;
 
-		case line::HALT:
-			set_line_timer(m_halt_line, value);
-			break;
+	case cococart_slot_device::line::HALT:
+		set_line_timer(m_halt_line, value);
+		break;
 
-		case line::SOUND_ENABLE:
-			// do nothing for now
-			break;
+	case cococart_slot_device::line::SOUND_ENABLE:
+		if (m_cart)
+			m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
+		break;
 	}
 }
 
+
+
+//-------------------------------------------------
+//  get_line_value
+//-------------------------------------------------
+
+cococart_slot_device::line_value cococart_slot_device::get_line_value(cococart_slot_device::line which) const
+{
+	line_value result;
+	switch (which)
+	{
+	case cococart_slot_device::line::CART:
+		result = m_cart_line.value;
+		break;
+
+	case cococart_slot_device::line::NMI:
+		result = m_nmi_line.value;
+		break;
+
+	case cococart_slot_device::line::HALT:
+		result = m_halt_line.value;
+		break;
+
+	default:
+		result = line_value::CLEAR;
+		break;
+	}
+	return result;
+}
 
 
 //-------------------------------------------------
@@ -327,7 +343,7 @@ image_init_result cococart_slot_device::call_load()
 	if (m_cart)
 	{
 		offs_t read_length;
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);
 		}
@@ -401,6 +417,16 @@ READ8_MEMBER(device_cococart_interface::read)
 //-------------------------------------------------
 
 WRITE8_MEMBER(device_cococart_interface::write)
+{
+}
+
+
+
+//-------------------------------------------------
+//  set_sound_enable
+//-------------------------------------------------
+
+void device_cococart_interface::set_sound_enable(bool sound_enable)
 {
 }
 

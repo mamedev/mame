@@ -6,10 +6,10 @@ This is for common pinball machine coding.
 
 **********************************************************************************/
 
-
-
 #include "emu.h"
 #include "genpin.h"
+#include "speaker.h"
+
 
 MACHINE_CONFIG_FRAGMENT( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mechvol")

@@ -144,11 +144,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
 #include "includes/lsasquad.h"
+
+#include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL_24MHz

@@ -14,7 +14,10 @@
 
 #include "emu.h"
 #include "coco_orch90.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 static MACHINE_CONFIG_FRAGMENT(coco_orch90)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -29,7 +32,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_ORCH90 = &device_creator<coco_orch90_device>;
+const device_type COCO_ORCH90 = device_creator<coco_orch90_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

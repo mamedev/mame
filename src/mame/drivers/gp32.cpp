@@ -18,11 +18,16 @@
 
 #include "emu.h"
 #include "includes/gp32.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/volt_reg.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 

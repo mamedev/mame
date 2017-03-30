@@ -64,6 +64,7 @@
 
 #include "emu.h"
 #include "includes/exterm.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -71,6 +72,8 @@
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

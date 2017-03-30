@@ -21,9 +21,9 @@ enum
 //  ws_rom_device - constructor
 //-------------------------------------------------
 
-const device_type WS_ROM_STD = &device_creator<ws_rom_device>;
-const device_type WS_ROM_SRAM = &device_creator<ws_rom_sram_device>;
-const device_type WS_ROM_EEPROM = &device_creator<ws_rom_eeprom_device>;
+const device_type WS_ROM_STD = device_creator<ws_rom_device>;
+const device_type WS_ROM_SRAM = device_creator<ws_rom_sram_device>;
+const device_type WS_ROM_EEPROM = device_creator<ws_rom_eeprom_device>;
 
 
 ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

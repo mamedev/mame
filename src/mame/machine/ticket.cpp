@@ -26,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
+const device_type TICKET_DISPENSER = device_creator<ticket_dispenser_device>;
 
 
 

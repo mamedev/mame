@@ -24,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SATURN_CONTROL_PORT = &device_creator<saturn_control_port_device>;
+const device_type SATURN_CONTROL_PORT = device_creator<saturn_control_port_device>;
 
 
 //**************************************************************************

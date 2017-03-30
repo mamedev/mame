@@ -354,6 +354,8 @@ Super Missile Attack Board Layout
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class missile_state : public driver_device
 {

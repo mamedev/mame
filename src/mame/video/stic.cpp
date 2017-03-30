@@ -9,9 +9,10 @@
 
 #include "emu.h"
 #include "video/stic.h"
+#include "screen.h"
 
 
-const device_type STIC = &device_creator<stic_device>;
+const device_type STIC = device_creator<stic_device>;
 
 //-------------------------------------------------
 //  stic_device - constructor

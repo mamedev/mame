@@ -122,7 +122,7 @@ protected:
 	virtual void device_reset() override;
 };
 
-static const device_type M68307 = &device_creator<m68307cpu_device>;
+extern const device_type M68307;
 
 
 #endif

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "video/tms9927.h"
 
+#include "screen.h"
+
 
 static const uint8_t chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
 static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
@@ -29,10 +31,10 @@ static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 #define CURSOR_ROW_ADDRESS   (m_reg[8] & 0x3f)
 
 
-const device_type TMS9927 = &device_creator<tms9927_device>;
-const device_type CRT5027 = &device_creator<crt5027_device>;
-const device_type CRT5037 = &device_creator<crt5037_device>;
-const device_type CRT5057 = &device_creator<crt5057_device>;
+const device_type TMS9927 = device_creator<tms9927_device>;
+const device_type CRT5027 = device_creator<crt5027_device>;
+const device_type CRT5037 = device_creator<crt5037_device>;
+const device_type CRT5057 = device_creator<crt5057_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9927_device(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__)

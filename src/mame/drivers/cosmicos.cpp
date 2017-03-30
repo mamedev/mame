@@ -35,7 +35,11 @@
 
 #include "emu.h"
 #include "includes/cosmicos.h"
+
+#include "speaker.h"
+
 #include "cosmicos.lh"
+
 
 enum
 {

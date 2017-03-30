@@ -23,9 +23,12 @@
 
 #include "emu.h"
 #include "includes/cyberbal.h"
+
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "rendlay.h"
 
 

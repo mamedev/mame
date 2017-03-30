@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "epson_lx800.h"
+#include "speaker.h"
 #include "lx800.lh"
 
 
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_LX800 = &device_creator<epson_lx800_t>;
+const device_type EPSON_LX800 = device_creator<epson_lx800_t>;
 
 
 //-------------------------------------------------

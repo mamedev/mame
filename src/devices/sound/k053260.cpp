@@ -62,7 +62,7 @@
 
 
 // device type definition
-const device_type K053260 = &device_creator<k053260_device>;
+const device_type K053260 = device_creator<k053260_device>;
 
 
 //**************************************************************************

@@ -16,11 +16,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/skykid.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
-#include "includes/skykid.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(skykid_state::inputport_select_w)

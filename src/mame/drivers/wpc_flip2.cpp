@@ -5,6 +5,8 @@
 
 #include "emu.h"
 #include "includes/wpc_flip2.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wpc_flip2_map, AS_PROGRAM, 8, wpc_flip2_state )

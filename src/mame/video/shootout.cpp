@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "includes/shootout.h"
+#include "screen.h"
 
 
 PALETTE_INIT_MEMBER(shootout_state, shootout)

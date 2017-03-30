@@ -31,7 +31,7 @@ enum {
 };
 
 
-const device_type I860 = &device_creator<i860_cpu_device>;
+const device_type I860 = device_creator<i860_cpu_device>;
 
 
 i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
-#pragma once
-
 #ifndef MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
 #define MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
+
+#pragma once
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);

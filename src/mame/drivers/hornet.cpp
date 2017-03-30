@@ -325,6 +325,8 @@
 #include "video/voodoo.h"
 #include "video/k037122.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class hornet_state : public driver_device

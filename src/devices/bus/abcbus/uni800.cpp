@@ -40,7 +40,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_UNI800 = &device_creator<abc_uni800_device>;
+const device_type ABC_UNI800 = device_creator<abc_uni800_device>;
 
 
 //-------------------------------------------------

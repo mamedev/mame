@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "includes/simpl156.h"
-
+#include "screen.h"
 
 
 void simpl156_state::video_start()

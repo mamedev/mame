@@ -35,6 +35,7 @@ Some of the parts:
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "screen.h"
 
 
 class p112_state : public driver_device

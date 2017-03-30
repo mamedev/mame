@@ -19,6 +19,8 @@
 #include "emu.h"
 #include "lvc.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -45,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
+const device_type WANGPC_LVC = device_creator<wangpc_lvc_device>;
 
 
 //-------------------------------------------------

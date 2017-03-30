@@ -30,7 +30,7 @@ uint8_t const rp5h01_device::s_initial_data[0x10] =
 //  rp5h01_device - constructor
 //-------------------------------------------------
 
-const device_type RP5H01 = &device_creator<rp5h01_device>;
+const device_type RP5H01 = device_creator<rp5h01_device>;
 
 rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5H01, "RP5H01 6/7-bit Counter", tag, owner, clock, "rp5h01", __FILE__)

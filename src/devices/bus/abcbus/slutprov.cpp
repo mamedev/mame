@@ -9,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SLUTPROV = &device_creator<abc_slutprov_device>;
+const device_type ABC_SLUTPROV = device_creator<abc_slutprov_device>;
 
 
 //-------------------------------------------------

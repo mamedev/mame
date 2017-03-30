@@ -321,18 +321,22 @@
 *****************************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "poker41.lh"
-#include "pulltabs.lh"
-#include "bingo.lh"
 #include "includes/gatron.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "sound/sn76496.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "bingo.lh"
+#include "poker41.lh"
+#include "pulltabs.lh"
+
+
+#define MASTER_CLOCK    XTAL_16MHz
 
 /****************************
 *    Read/Write Handlers    *

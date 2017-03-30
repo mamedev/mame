@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_DESK = &device_creator<c64_magic_desk_cartridge_device>;
+const device_type C64_MAGIC_DESK = device_creator<c64_magic_desk_cartridge_device>;
 
 
 

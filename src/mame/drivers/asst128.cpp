@@ -6,12 +6,14 @@
 #include "machine/pc_fdc.h"
 #include "formats/asst128_dsk.h"
 
+extern const device_type ASST128_MOTHERBOARD;
+
 class asst128_mb_device : public ibm5150_mb_device
 {
 public:
 	// construction/destruction
 	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ibm5150_mb_device(mconfig, tag, owner, clock) { }
+		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, "ASST128_MOTHERBOARD", tag, owner, clock, "asst128_mb", __FILE__) { }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 };
@@ -24,7 +26,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, asst128_mb_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
 
-const device_type ASST128_MOTHERBOARD = &device_creator<asst128_mb_device>;
+const device_type ASST128_MOTHERBOARD = device_creator<asst128_mb_device>;
 
 class asst128_state : public driver_device
 {
@@ -39,7 +41,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_fdc_xt_device> m_fdc;
 
-	DECLARE_FLOPPY_FORMATS( asst128_formats );
+	DECLARE_FLOPPY_FORMATS(asst128_formats);
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 
 	void machine_start() override;
@@ -47,9 +49,9 @@ public:
 
 void asst128_state::machine_start()
 {
-	memory_region* font = memregion(":board0:cga_mc1502:gfx1");
-	memcpy(font->base(), memregion("bios")->base()+0xfa6e, 0x0400);
-	memcpy(font->base()+0x0400, memregion("bios")->base()+0x4000, 0x0400);
+	memory_region *font = memregion(":board0:cga_mc1502:gfx1");
+	memcpy(font->base(), memregion("bios")->base() + 0xfa6e, 0x0400);
+	memcpy(font->base() + 0x0400, memregion("bios")->base() + 0x4000, 0x0400);
 }
 
 WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)

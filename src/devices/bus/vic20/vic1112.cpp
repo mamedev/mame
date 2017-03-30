@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1112 = &device_creator<vic1112_device>;
+const device_type VIC1112 = device_creator<vic1112_device>;
 
 
 WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )

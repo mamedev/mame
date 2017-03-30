@@ -20,15 +20,49 @@
 //  MEDIA IDENTIFIER
 //**************************************************************************
 
+void media_identifier::file_info::match(
+		device_t const &device,
+		rom_entry const &rom,
+		util::hash_collection const &hashes)
+{
+	if (hashes == m_hashes)
+	{
+		m_matches.emplace_back(
+				device.shortname(),
+				device.name(),
+				ROM_GETNAME(&rom),
+				hashes.flag(util::hash_collection::FLAG_BAD_DUMP),
+				device.owner());
+	}
+}
+
+void media_identifier::file_info::match(
+		std::string const &list,
+		software_info const &software,
+		rom_entry const &rom,
+		util::hash_collection const &hashes)
+{
+	if (hashes == m_hashes)
+	{
+		m_matches.emplace_back(
+				util::string_format("%s:%s", list, software.shortname()),
+				std::string(software.longname()),
+				ROM_GETNAME(&rom),
+				hashes.flag(util::hash_collection::FLAG_BAD_DUMP),
+				false);
+	}
+}
+
+
 //-------------------------------------------------
 //  media_identifier - constructor
 //-------------------------------------------------
 
 media_identifier::media_identifier(emu_options &options)
-	: m_drivlist(options),
-		m_total(0),
-		m_matches(0),
-		m_nonroms(0)
+	: m_drivlist(options)
+	, m_total(0)
+	, m_matches(0)
+	, m_nonroms(0)
 {
 }
 
@@ -40,67 +74,10 @@ media_identifier::media_identifier(emu_options &options)
 
 void media_identifier::identify(const char *filename)
 {
-	// first try to open as a directory
-	osd::directory::ptr directory = osd::directory::open(filename);
-	if (directory)
-	{
-		// iterate over all files in the directory
-		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
-			if (entry->type == osd::directory::entry::entry_type::FILE)
-			{
-				std::string curfile = std::string(filename).append(PATH_SEPARATOR).append(entry->name);
-				identify(curfile.c_str());
-			}
-
-		// close the directory and be done
-		directory.reset();
-	}
-
-	// if that failed, and the filename ends with .zip, identify as a ZIP file
-	if (core_filename_ends_with(filename, ".7z") || core_filename_ends_with(filename, ".zip"))
-	{
-		// first attempt to examine it as a valid _7Z file
-		util::archive_file::ptr archive;
-		util::archive_file::error err;
-		if (core_filename_ends_with(filename, ".7z"))
-			err = util::archive_file::open_7z(filename, archive);
-		else
-			err = util::archive_file::open_zip(filename, archive);
-		if ((err == util::archive_file::error::NONE) && archive)
-		{
-			std::vector<std::uint8_t> data;
-
-			// loop over entries in the .7z, skipping empty files and directories
-			for (int i = archive->first_file(); i >= 0; i = archive->next_file())
-			{
-				const std::uint64_t length(archive->current_uncompressed_length());
-				if (!archive->current_is_directory() && (length != 0) && (std::uint32_t(length) == length))
-				{
-					// decompress data into RAM and identify it
-					try
-					{
-						data.resize(std::size_t(length));
-						err = archive->decompress(&data[0], std::uint32_t(length));
-						if (err == util::archive_file::error::NONE)
-							identify_data(archive->current_name().c_str(), &data[0], length);
-					}
-					catch (...)
-					{
-						// resizing the buffer could cause a bad_alloc if archive contains large files
-					}
-					data.clear();
-				}
-			}
-		}
-
-		// clear out any cached files
-		archive.reset();
-		util::archive_file::cache_clear();
-	}
-
-	// otherwise, identify as a raw file
-	else
-		identify_file(filename);
+	std::vector<file_info> info;
+	collect_files(info, filename);
+	match_hashes(info);
+	print_results(info);
 }
 
 
@@ -110,56 +87,10 @@ void media_identifier::identify(const char *filename)
 
 void media_identifier::identify_file(const char *name)
 {
-	// CHD files need to be parsed and their hashes extracted from the header
-	if (core_filename_ends_with(name, ".chd"))
-	{
-		// output the name
-		osd_printf_info("%-20s", core_filename_extract_base(name).c_str());
-		m_total++;
-
-		// attempt to open as a CHD; fail if not
-		chd_file chd;
-		chd_error err = chd.open(name);
-		if (err != CHDERR_NONE)
-		{
-			osd_printf_info("NOT A CHD\n");
-			m_nonroms++;
-			return;
-		}
-
-		// error on writable CHDs
-		if (!chd.compressed())
-		{
-			osd_printf_info("is a writeable CHD\n");
-			return;
-		}
-
-		// otherwise, get the hash collection for this CHD
-		util::hash_collection hashes;
-		if (chd.sha1() != util::sha1_t::null)
-			hashes.add_sha1(chd.sha1());
-
-		// determine whether this file exists
-		int found = find_by_hash(hashes, chd.logical_bytes());
-		if (found == 0)
-			osd_printf_info("NO MATCH\n");
-		else
-			m_matches++;
-	}
-
-	// all other files have their hashes computed directly
-	else
-	{
-		// load the file and process if it opens and has a valid length
-		uint32_t length;
-		void *data;
-		const osd_file::error filerr = util::core_file::load(name, &data, length);
-		if (filerr == osd_file::error::NONE && length > 0)
-		{
-			identify_data(name, reinterpret_cast<uint8_t *>(data), length);
-			free(data);
-		}
-	}
+	std::vector<file_info> info;
+	digest_file(info, name);
+	match_hashes(info);
+	print_results(info);
 }
 
 
@@ -169,78 +100,256 @@ void media_identifier::identify_file(const char *name)
 //  fusemap into raw data first
 //-------------------------------------------------
 
-void media_identifier::identify_data(const char *name, const uint8_t *data, int length)
+void media_identifier::identify_data(const char *name, const uint8_t *data, std::size_t length)
 {
-	// if this is a '.jed' file, process it into raw bits first
-	std::vector<uint8_t> tempjed;
-	jed_data jed;
-	if (core_filename_ends_with(name, ".jed") && jed_parse(data, length, &jed) == JEDERR_NONE)
-	{
-		// now determine the new data length and allocate temporary memory for it
-		length = jedbin_output(&jed, nullptr, 0);
-		tempjed.resize(length);
-		jedbin_output(&jed, &tempjed[0], length);
-		data = &tempjed[0];
-	}
-
-	// compute the hash of the data
-	util::hash_collection hashes;
-	hashes.compute(data, length, util::hash_collection::HASH_TYPES_CRC_SHA1);
-
-	// output the name
-	m_total++;
-	osd_printf_info("%-20s", core_filename_extract_base(name).c_str());
-
-	// see if we can find a match in the ROMs
-	int found = find_by_hash(hashes, length);
-
-	// if we didn't find it, try to guess what it might be
-	if (found == 0)
-		osd_printf_info("NO MATCH\n");
-
-	// if we did find it, count it as a match
-	else
-		m_matches++;
+	std::vector<file_info> info;
+	digest_data(info, name, data, length);
+	match_hashes(info);
+	print_results(info);
 }
 
 
 //-------------------------------------------------
-//  find_by_hash - scan for a file in the list
-//  of drivers by hash
+//  collect_files - pre-process files for
+//  identification
 //-------------------------------------------------
 
-int media_identifier::find_by_hash(const util::hash_collection &hashes, int length)
+void media_identifier::collect_files(std::vector<file_info> &info, char const *path)
 {
-	int found = 0;
+	// first try to open as a directory
+	osd::directory::ptr const directory = osd::directory::open(path);
+	if (directory)
+	{
+		// iterate over all files in the directory
+		for (osd::directory::entry const *entry = directory->read(); entry; entry = directory->read())
+		{
+			if (entry->type == osd::directory::entry::entry_type::FILE)
+			{
+				std::string const curfile = std::string(path).append(PATH_SEPARATOR).append(entry->name);
+				collect_files(info, curfile.c_str());
+			}
+		}
+	}
+	else if (core_filename_ends_with(path, ".7z") || core_filename_ends_with(path, ".zip"))
+	{
+		// first attempt to examine it as a valid zip/7z file
+		util::archive_file::ptr archive;
+		util::archive_file::error err;
+		if (core_filename_ends_with(path, ".7z"))
+			err = util::archive_file::open_7z(path, archive);
+		else
+			err = util::archive_file::open_zip(path, archive);
+
+		if ((util::archive_file::error::NONE == err) && archive)
+		{
+			std::vector<std::uint8_t> data;
+
+			// loop over entries in the .7z, skipping empty files and directories
+			for (int i = archive->first_file(); i >= 0; i = archive->next_file())
+			{
+				std::uint64_t const length(archive->current_uncompressed_length());
+				if (!archive->current_is_directory() && length)
+				{
+					std::string const curfile = std::string(path).append(PATH_SEPARATOR).append(archive->current_name());
+					if (std::uint32_t(length) == length)
+					{
+						// decompress data into RAM and identify it
+						try
+						{
+							data.resize(std::size_t(length));
+							err = archive->decompress(&data[0], std::uint32_t(length));
+							if (util::archive_file::error::NONE == err)
+								digest_data(info, curfile.c_str(), &data[0], length);
+							else
+								osd_printf_error("%s: error decompressing file\n", curfile.c_str());
+						}
+						catch (...)
+						{
+							// resizing the buffer could cause a bad_alloc if archive contains large files
+							osd_printf_error("%s: error decompressing file\n", curfile.c_str());
+						}
+						data.clear();
+					}
+					else
+					{
+						osd_printf_error("%s: file too large to decompress into memory\n", curfile.c_str());
+					}
+				}
+			}
+		}
+		else
+		{
+			osd_printf_error("%s: error opening archive\n", path);
+		}
+
+		// clear out any cached files
+		util::archive_file::cache_clear();
+	}
+	else
+	{
+		// otherwise, identify as a raw file
+		digest_file(info, path);
+	}
+}
+
+
+//-------------------------------------------------
+//  digest_file - calculate hashes for a single
+//  file
+//-------------------------------------------------
+
+void media_identifier::digest_file(std::vector<file_info> &info, char const *path)
+{
+	// CHD files need to be parsed and their hashes extracted from the header
+	if (core_filename_ends_with(path, ".chd"))
+	{
+		// attempt to open as a CHD; fail if not
+		chd_file chd;
+		chd_error const err = chd.open(path);
+		m_total++;
+		if (err != CHDERR_NONE)
+		{
+			osd_printf_info("%-20sNOT A CHD\n", core_filename_extract_base(path).c_str());
+			m_nonroms++;
+		}
+		else if (!chd.compressed())
+		{
+			osd_printf_info("%-20sis a writeable CHD\n", core_filename_extract_base(path).c_str());
+		}
+		else
+		{
+			// otherwise, get the hash collection for this CHD
+			util::hash_collection hashes;
+			if (chd.sha1() != util::sha1_t::null)
+				hashes.add_sha1(chd.sha1());
+			info.emplace_back(path, chd.logical_bytes(), std::move(hashes), file_flavour::CHD);
+		}
+	}
+	else
+	{
+		// if this is a '.jed' file, process it into raw bits first
+		if (core_filename_ends_with(path, ".jed"))
+		{
+			// load the file and process if it opens and has a valid length
+			uint32_t length;
+			void *data;
+			if (osd_file::error::NONE == util::core_file::load(path, &data, length))
+			{
+				jed_data jed;
+				if (JEDERR_NONE == jed_parse(data, length, &jed))
+				{
+					try
+					{
+						// now determine the new data length and allocate temporary memory for it
+						std::vector<uint8_t> tempjed(jedbin_output(&jed, nullptr, 0));
+						jedbin_output(&jed, &tempjed[0], tempjed.size());
+						util::hash_collection hashes;
+						hashes.compute(&tempjed[0], tempjed.size(), util::hash_collection::HASH_TYPES_CRC_SHA1);
+						info.emplace_back(path, tempjed.size(), std::move(hashes), file_flavour::JED);
+						free(data);
+						m_total++;
+						return;
+					}
+					catch (...)
+					{
+					}
+				}
+				free(data);
+			}
+		}
+
+		// load the file and process if it opens and has a valid length
+		util::core_file::ptr file;
+		if ((osd_file::error::NONE == util::core_file::open(path, OPEN_FLAG_READ, file)) && file)
+		{
+			util::hash_collection hashes;
+			hashes.begin(util::hash_collection::HASH_TYPES_CRC_SHA1);
+			std::uint8_t buf[1024];
+			for (std::uint64_t remaining = file->size(); remaining; )
+			{
+				std::uint32_t const block = std::min<std::uint64_t>(remaining, sizeof(buf));
+				if (file->read(buf, block) < block)
+				{
+					osd_printf_error("%s: error reading file\n", path);
+					return;
+				}
+				remaining -= block;
+				hashes.buffer(buf, block);
+			}
+			hashes.end();
+			info.emplace_back(path, file->size(), std::move(hashes), file_flavour::RAW);
+			m_total++;
+		}
+		else
+		{
+			osd_printf_error("%s: error opening file\n", path);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  digest_data - calculate hashes for data in
+//  memory
+//-------------------------------------------------
+
+void media_identifier::digest_data(std::vector<file_info> &info, char const *name, void const *data, std::uint64_t length)
+{
+	util::hash_collection hashes;
+
+	// if this is a '.jed' file, process it into raw bits first
+	if (core_filename_ends_with(name, ".jed"))
+	{
+		jed_data jed;
+		if (JEDERR_NONE == jed_parse(data, length, &jed))
+		{
+			try
+			{
+				// now determine the new data length and allocate temporary memory for it
+				std::vector<uint8_t> tempjed(jedbin_output(&jed, nullptr, 0));
+				jedbin_output(&jed, &tempjed[0], tempjed.size());
+				hashes.compute(&tempjed[0], tempjed.size(), util::hash_collection::HASH_TYPES_CRC_SHA1);
+				info.emplace_back(name, tempjed.size(), std::move(hashes), file_flavour::JED);
+				m_total++;
+				return;
+			}
+			catch (...)
+			{
+			}
+		}
+	}
+
+	hashes.compute(reinterpret_cast<std::uint8_t const *>(data), length, util::hash_collection::HASH_TYPES_CRC_SHA1);
+	info.emplace_back(name, length, std::move(hashes), file_flavour::RAW);
+	m_total++;
+}
+
+
+//-------------------------------------------------
+//  match_hashes - find known dumps that mach
+//  collected hashes
+//-------------------------------------------------
+
+void media_identifier::match_hashes(std::vector<file_info> &info)
+{
 	std::unordered_set<std::string> listnames;
-	std::unordered_set<std::string> shortnames;
 
 	// iterate over drivers
 	m_drivlist.reset();
 	while (m_drivlist.next())
 	{
-		// iterate over devices, regions and files within the region
-		for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
+		// iterate over regions and files within the region
+		device_t &device = m_drivlist.config()->root_device();
+		for (rom_entry const *region = rom_first_region(device); region; region = rom_next_region(region))
 		{
-			if (shortnames.insert(device.shortname()).second)
+			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
-				for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
-					for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
-					{
-						util::hash_collection romhashes(ROM_GETHASHDATA(rom));
-						if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
-						{
-							bool baddump = romhashes.flag(util::hash_collection::FLAG_BAD_DUMP);
-
-							// output information about the match
-							if (found)
-								osd_printf_info("                    ");
-							osd_printf_info("= %s%-20s  %-10s %s%s\n", baddump ? "(BAD) " : "",
-								ROM_GETNAME(rom), device.shortname(), device.name(),
-								device.owner() != nullptr ? " (device)" : "");
-							found++;
-						}
-					}
+				util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				{
+					for (file_info &file : info)
+						file.match(device, *rom, romhashes);
+				}
 			}
 		}
 
@@ -249,27 +358,82 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 		{
 			if (listnames.insert(swlistdev.list_name()).second)
 			{
-				for (const software_info &swinfo : swlistdev.get_info())
-					for (const software_part &part : swinfo.parts())
-						for (const rom_entry *region = part.romdata().data(); region != nullptr; region = rom_next_region(region))
-							for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
+				for (software_info const &swinfo : swlistdev.get_info())
+				{
+					for (software_part const &part : swinfo.parts())
+					{
+						for (rom_entry const *region = part.romdata().data(); region; region = rom_next_region(region))
+						{
+							for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 							{
 								util::hash_collection romhashes(ROM_GETHASHDATA(rom));
-								if (hashes == romhashes)
+								if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
 								{
-									bool baddump = romhashes.flag(util::hash_collection::FLAG_BAD_DUMP);
-
-									// output information about the match
-									if (found)
-										osd_printf_info("                    ");
-									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev.list_name().c_str(), swinfo.shortname().c_str(), swinfo.longname().c_str());
-									found++;
+									for (file_info &file : info)
+										file.match(swlistdev.list_name(), swinfo, *rom, romhashes);
 								}
 							}
+						}
+					}
+				}
 			}
 		}
 	}
 
-	return found;
+	// iterator over devices
+	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	for (device_type type : registered_device_types)
+	{
+		// iterate over regions and files within the region
+		device_t *const device = config.device_add(&config.root_device(), "_tmp", type, 0);
+		for (rom_entry const *region = rom_first_region(*device); region; region = rom_next_region(region))
+		{
+			for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			{
+				util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				{
+					for (file_info &file : info)
+						file.match(*device, *rom, romhashes);
+				}
+			}
+		}
+		config.device_remove(&config.root_device(), "_tmp");
+	}
 }
 
+
+//-------------------------------------------------
+//  print_results - print info on files that were
+//  found to match known dumps
+//-------------------------------------------------
+
+void media_identifier::print_results(std::vector<file_info> const &info)
+{
+	for (file_info const &file : info)
+	{
+		osd_printf_info("%-20s", core_filename_extract_base(file.name()).c_str());
+		if (file.matches().empty())
+		{
+			osd_printf_info("NO MATCH\n");
+		}
+		else
+		{
+			bool first = true;
+			m_matches++;
+			for (match_data const &match : file.matches())
+			{
+				if (!first)
+					osd_printf_info("%-20s", "");
+				first = false;
+				osd_printf_info(
+						"= %s%-20s  %-10s %s%s\n",
+						match.bad() ? "(BAD) " : "",
+						match.romname().c_str(),
+						match.shortname().c_str(),
+						match.fullname().c_str(),
+						match.device() ? " (device)" : "");
+			}
+		}
+	}
+}

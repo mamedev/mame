@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "includes/kaypro.h"
+#include "screen.h"
 
 
 

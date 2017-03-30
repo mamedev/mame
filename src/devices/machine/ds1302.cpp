@@ -66,7 +66,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type DS1302 = &device_creator<ds1302_device>;
+const device_type DS1302 = device_creator<ds1302_device>;
 
 
 //-------------------------------------------------

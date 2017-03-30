@@ -16,7 +16,7 @@
 //  NASBUS SLOT DEVICE
 //**************************************************************************
 
-const device_type NASBUS_SLOT = &device_creator<nasbus_slot_device>;
+const device_type NASBUS_SLOT = device_creator<nasbus_slot_device>;
 
 //-------------------------------------------------
 //  nasbus_slot_device - constructor
@@ -64,14 +64,14 @@ void nasbus_slot_device::device_start()
 //  NASBUS DEVICE
 //**************************************************************************
 
-const device_type NASBUS = &device_creator<nasbus_device>;
+const device_type NASBUS = device_creator<nasbus_device>;
 
 //-------------------------------------------------
 //  nasbus_device - constructor
 //-------------------------------------------------
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NASBUS_SLOT, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
+	device_t(mconfig, NASBUS, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
 	m_program(nullptr),
 	m_io(nullptr),
 	m_ram_disable_handler(*this)

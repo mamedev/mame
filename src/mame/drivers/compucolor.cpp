@@ -19,11 +19,6 @@
 
 */
 
-#define I8080_TAG   "ua2"
-#define TMS5501_TAG "ud2"
-#define CRT5027_TAG "uf9"
-#define RS232_TAG   "rs232"
-
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -31,7 +26,13 @@
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "screen.h"
 #include "softlist.h"
+
+#define I8080_TAG   "ua2"
+#define TMS5501_TAG "ud2"
+#define CRT5027_TAG "uf9"
+#define RS232_TAG   "rs232"
 
 class compucolor2_state : public driver_device
 {

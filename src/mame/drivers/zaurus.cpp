@@ -1403,11 +1403,13 @@ Note:
 
 *****************************************************************************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -1415,9 +1417,9 @@ class zaurus_state : public driver_device
 {
 public:
 	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, "ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
 	{ }
 
 	// devices

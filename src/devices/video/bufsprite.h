@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_DEVICES_VIDEO_BUFSPRITE_H
+#define MAME_DEVICES_VIDEO_BUFSPRITE_H
 
-#ifndef __BUFSPRITE_H__
-#define __BUFSPRITE_H__
+#pragma once
 
 
 
@@ -53,9 +53,15 @@ class buffered_spriteram_device : public device_t
 {
 public:
 	// construction
-	buffered_spriteram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, type, "Buffered Sprite RAM", tag, owner, clock, "buffered_spriteram", __FILE__),
-			m_spriteram(*this, DEVICE_SELF) { }
+	buffered_spriteram_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *name,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			const char *shortname,
+			const char *source);
 
 	// getters
 	_Type *live() const { return m_spriteram; }
@@ -75,24 +81,17 @@ public:
 	void write(address_space &space, offs_t offset, _Type data, _Type mem_mask = ~_Type(0)) { copy(); }
 
 	// VBLANK handlers
-	void vblank_copy_rising(screen_device &screen, bool state) { if (state) copy(); }
-	void vblank_copy_falling(screen_device &screen, bool state) { if (!state) copy(); }
+	DECLARE_WRITE_LINE_MEMBER(vblank_copy_rising) { if (state) copy(); }
+	DECLARE_WRITE_LINE_MEMBER(vblank_copy_falling) { if (!state) copy(); }
 
 protected:
 	// first-time setup
-	virtual void device_start() override
-	{
-		if (m_spriteram != nullptr)
-		{
-			m_buffered.resize(m_spriteram.bytes() / sizeof(_Type));
-			save_item(NAME(m_buffered));
-		}
-	}
+	virtual void device_start() override;
 
 private:
 	// internal state
 	required_shared_ptr<_Type>  m_spriteram;
-	std::vector<_Type>        m_buffered;
+	std::vector<_Type>          m_buffered;
 };
 
 
@@ -102,8 +101,7 @@ class buffered_spriteram8_device : public buffered_spriteram_device<uint8_t>
 {
 public:
 	// construction
-	buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: buffered_spriteram_device<uint8_t>(mconfig, BUFFERED_SPRITERAM8, tag, owner, clock) { }
+	buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -113,8 +111,7 @@ class buffered_spriteram16_device : public buffered_spriteram_device<uint16_t>
 {
 public:
 	// construction
-	buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: buffered_spriteram_device<uint16_t>(mconfig, BUFFERED_SPRITERAM16, tag, owner, clock) { }
+	buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -124,8 +121,7 @@ class buffered_spriteram32_device : public buffered_spriteram_device<uint32_t>
 {
 public:
 	// construction
-	buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: buffered_spriteram_device<uint32_t>(mconfig, BUFFERED_SPRITERAM32, tag, owner, clock) { }
+	buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -135,9 +131,8 @@ class buffered_spriteram64_device : public buffered_spriteram_device<uint64_t>
 {
 public:
 	// construction
-	buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: buffered_spriteram_device<uint64_t>(mconfig, BUFFERED_SPRITERAM64, tag, owner, clock) { }
+	buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-#endif  /* __BUFSPRITE_H__ */
+#endif  // MAME_DEVICES_VIDEO_BUFSPRITE_H

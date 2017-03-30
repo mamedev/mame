@@ -38,6 +38,7 @@ Memo:
 #include "emu.h"
 #include "includes/niyanpai.h"
 #include "includes/nb1413m3.h"
+
 #include "cpu/z80/tmpz84c011.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
@@ -45,6 +46,7 @@ Memo:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(niyanpai_state::soundbank_w)

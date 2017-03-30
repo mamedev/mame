@@ -59,6 +59,8 @@
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK 15974400
 #define LOG 0

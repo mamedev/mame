@@ -11,12 +11,13 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/digitalk.h"
+#include "screen.h"
 
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE         3
 
 /* master clocks */
-#define GALAXIAN_MASTER_CLOCK   (18432000)
+#define GALAXIAN_MASTER_CLOCK   (XTAL_18_432MHz)
 #define GALAXIAN_PIXEL_CLOCK    (GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK/3)
 
 /* H counts from 128->511, HBLANK starts at 130 and ends at 250 */

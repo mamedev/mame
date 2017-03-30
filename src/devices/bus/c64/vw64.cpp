@@ -55,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_VW64 = &device_creator<c64_vizawrite_cartridge_device>;
+const device_type C64_VW64 = device_creator<c64_vizawrite_cartridge_device>;
 
 
 

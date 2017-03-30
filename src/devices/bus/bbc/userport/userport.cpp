@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BBC_USERPORT_SLOT = &device_creator<bbc_userport_device>;
+const device_type BBC_USERPORT_SLOT = device_creator<bbc_userport_device>;
 
 
 

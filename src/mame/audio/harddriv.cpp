@@ -11,6 +11,7 @@
 #include "cpu/tms32010/tms32010.h"
 #include "machine/atarigen.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 #define BIO_FREQUENCY       (1000000 / 50)
@@ -25,7 +26,7 @@
 //  harddriv_sound_board_device - constructor
 //-------------------------------------------------
 
-const device_type HARDDRIV_SOUND_BOARD_DEVICE = &device_creator<harddriv_sound_board_device>;
+const device_type HARDDRIV_SOUND_BOARD_DEVICE = device_creator<harddriv_sound_board_device>;
 
 harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),

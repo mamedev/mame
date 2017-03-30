@@ -80,7 +80,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
+const device_type PCI_BUS_LEGACY = device_creator<pci_bus_legacy_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

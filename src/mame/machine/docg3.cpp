@@ -32,7 +32,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 ***************************************************************************/
 
 // device type definition
-const device_type DISKONCHIP_G3 = &device_creator<diskonchip_g3_device>;
+const device_type DISKONCHIP_G3 = device_creator<diskonchip_g3_device>;
 
 //-------------------------------------------------
 //  diskonchip_g3_device - constructor

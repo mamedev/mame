@@ -72,7 +72,7 @@ const int WAITING_FOR_TRIG  = 0x100;
 //**************************************************************************
 
 // device type definition
-const device_type Z80CTC = &device_creator<z80ctc_device>;
+const device_type Z80CTC = device_creator<z80ctc_device>;
 
 //-------------------------------------------------
 //  z80ctc_device - constructor

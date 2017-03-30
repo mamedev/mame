@@ -5,29 +5,29 @@
 
 #include "debugger.h"
 
-const device_type FD1771 = &device_creator<fd1771_t>;
-const device_type FD1781 = &device_creator<fd1781_t>;
-const device_type FD1791 = &device_creator<fd1791_t>;
-const device_type FD1792 = &device_creator<fd1792_t>;
-const device_type FD1793 = &device_creator<fd1793_t>;
-const device_type KR1818VG93 = &device_creator<kr1818vg93_t>;
-const device_type FD1794 = &device_creator<fd1794_t>;
-const device_type FD1795 = &device_creator<fd1795_t>;
-const device_type FD1797 = &device_creator<fd1797_t>;
-const device_type MB8866 = &device_creator<mb8866_t>;
-const device_type MB8876 = &device_creator<mb8876_t>;
-const device_type MB8877 = &device_creator<mb8877_t>;
-const device_type FD1761 = &device_creator<fd1761_t>;
-const device_type FD1763 = &device_creator<fd1763_t>;
-const device_type FD1765 = &device_creator<fd1765_t>;
-const device_type FD1767 = &device_creator<fd1767_t>;
-const device_type WD2791 = &device_creator<wd2791_t>;
-const device_type WD2793 = &device_creator<wd2793_t>;
-const device_type WD2795 = &device_creator<wd2795_t>;
-const device_type WD2797 = &device_creator<wd2797_t>;
-const device_type WD1770 = &device_creator<wd1770_t>;
-const device_type WD1772 = &device_creator<wd1772_t>;
-const device_type WD1773 = &device_creator<wd1773_t>;
+const device_type FD1771 = device_creator<fd1771_t>;
+const device_type FD1781 = device_creator<fd1781_t>;
+const device_type FD1791 = device_creator<fd1791_t>;
+const device_type FD1792 = device_creator<fd1792_t>;
+const device_type FD1793 = device_creator<fd1793_t>;
+const device_type KR1818VG93 = device_creator<kr1818vg93_t>;
+const device_type FD1794 = device_creator<fd1794_t>;
+const device_type FD1795 = device_creator<fd1795_t>;
+const device_type FD1797 = device_creator<fd1797_t>;
+const device_type MB8866 = device_creator<mb8866_t>;
+const device_type MB8876 = device_creator<mb8876_t>;
+const device_type MB8877 = device_creator<mb8877_t>;
+const device_type FD1761 = device_creator<fd1761_t>;
+const device_type FD1763 = device_creator<fd1763_t>;
+const device_type FD1765 = device_creator<fd1765_t>;
+const device_type FD1767 = device_creator<fd1767_t>;
+const device_type WD2791 = device_creator<wd2791_t>;
+const device_type WD2793 = device_creator<wd2793_t>;
+const device_type WD2795 = device_creator<wd2795_t>;
+const device_type WD2797 = device_creator<wd2797_t>;
+const device_type WD1770 = device_creator<wd1770_t>;
+const device_type WD1772 = device_creator<wd1772_t>;
+const device_type WD1773 = device_creator<wd1773_t>;
 
 /*
     Debugging flags. Set to 0 or 1.

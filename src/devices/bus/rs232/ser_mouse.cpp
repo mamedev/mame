@@ -29,14 +29,14 @@ serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_t
 {
 }
 
-const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
+const device_type MSFT_SERIAL_MOUSE = device_creator<microsoft_mouse_device>;
 
 microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
 {
 }
 
-const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
+const device_type MSYSTEM_SERIAL_MOUSE = device_creator<mouse_systems_mouse_device>;
 
 mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, "Mouse Systems Serial Mouse", tag, owner, clock, "mouse_systems_mouse", __FILE__)

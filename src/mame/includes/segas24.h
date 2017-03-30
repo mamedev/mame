@@ -7,6 +7,7 @@
 
 #include "video/segaic24.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 class segas24_state : public driver_device
 {

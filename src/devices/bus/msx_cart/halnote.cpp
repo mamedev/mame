@@ -4,7 +4,7 @@
 #include "halnote.h"
 
 
-const device_type MSX_CART_HALNOTE = &device_creator<msx_cart_halnote>;
+const device_type MSX_CART_HALNOTE = device_creator<msx_cart_halnote>;
 
 
 msx_cart_halnote::msx_cart_halnote(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

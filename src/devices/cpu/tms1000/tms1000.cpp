@@ -19,13 +19,13 @@
 // - 30-term microinstructions PLA(mpla) at the top half, to the right of the midline, supporting 16 microinstructions
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
-const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage version
-const device_type TMS1040 = &device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
-const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
+const device_type TMS1000 = device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS1070 = device_creator<tms1070_cpu_device>; // high voltage version
+const device_type TMS1040 = device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
+const device_type TMS1200 = device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
-const device_type TMS1700 = &device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
-const device_type TMS1730 = &device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
+const device_type TMS1700 = device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
+const device_type TMS1730 = device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
 
 
 // internal memory maps

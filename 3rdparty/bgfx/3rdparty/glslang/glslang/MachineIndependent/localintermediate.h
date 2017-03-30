@@ -174,6 +174,7 @@ public:
         shiftTextureBinding(0),
         shiftImageBinding(0),
         shiftUboBinding(0),
+        shiftSsboBinding(0),
         autoMapBindings(false),
         flattenUniformArrays(false),
         useUnknownFormat(false)
@@ -207,6 +208,8 @@ public:
     unsigned int getShiftImageBinding() const { return shiftImageBinding; }
     void setShiftUboBinding(unsigned int shift)     { shiftUboBinding = shift; }
     unsigned int getShiftUboBinding()     const { return shiftUboBinding; }
+    void setShiftSsboBinding(unsigned int shift)     { shiftSsboBinding = shift; }
+    unsigned int getShiftSsboBinding()  const { return shiftSsboBinding; }
     void setAutoMapBindings(bool map)               { autoMapBindings = map; }
     bool getAutoMapBindings()             const { return autoMapBindings; }
     void setFlattenUniformArrays(bool flatten)      { flattenUniformArrays = flatten; }
@@ -263,6 +266,7 @@ public:
     TIntermConstantUnion* addConstantUnion(unsigned long long, const TSourceLoc&, bool literal = false) const;
     TIntermConstantUnion* addConstantUnion(bool, const TSourceLoc&, bool literal = false) const;
     TIntermConstantUnion* addConstantUnion(double, TBasicType, const TSourceLoc&, bool literal = false) const;
+    TIntermConstantUnion* addConstantUnion(const TString*, const TSourceLoc&, bool literal = false) const;
     TIntermTyped* promoteConstantUnion(TBasicType, TIntermConstantUnion*) const;
     bool parseConstTree(TIntermNode*, TConstUnionArray, TOperator, const TType&, bool singleConstantParam = false);
     TIntermLoop* addLoop(TIntermNode*, TIntermTyped*, TIntermTyped*, bool testFirst, const TSourceLoc&);
@@ -419,6 +423,13 @@ public:
     bool getGeoPassthroughEXT() const { return geoPassthroughEXT; }
 #endif
 
+    const char* addSemanticName(const TString& name)
+    {
+        return semanticNameSet.insert(name).first->c_str();
+    }
+
+    const char* const implicitThisName = "@this";
+
 protected:
     TIntermSymbol* addSymbol(int Id, const TString&, const TType&, const TConstUnionArray&, TIntermTyped* subtree, const TSourceLoc&);
     void error(TInfoSink& infoSink, const char*);
@@ -440,6 +451,7 @@ protected:
     bool promoteAggregate(TIntermAggregate&);
     void pushSelector(TIntermSequence&, const TVectorSelector&, const TSourceLoc&);
     void pushSelector(TIntermSequence&, const TMatrixSelector&, const TSourceLoc&);
+    bool specConstantPropagates(const TIntermTyped&, const TIntermTyped&);
 
     const EShLanguage language;  // stage, known at construction time
     EShSource source;            // source language, known a bit later
@@ -483,6 +495,7 @@ protected:
     unsigned int shiftTextureBinding;
     unsigned int shiftImageBinding;
     unsigned int shiftUboBinding;
+    unsigned int shiftSsboBinding;
     bool autoMapBindings;
     bool flattenUniformArrays;
     bool useUnknownFormat;
@@ -495,6 +508,7 @@ protected:
     std::vector<TOffsetRange> usedAtomics;  // sets of bindings used by atomic counters
     std::vector<TXfbBuffer> xfbBuffers;     // all the data we need to track per xfb buffer
     std::unordered_set<int> usedConstantId; // specialization constant ids used
+    std::set<TString> semanticNameSet;
 
 private:
     void operator=(TIntermediate&); // prevent assignments

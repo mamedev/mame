@@ -119,6 +119,7 @@ CN4               CN5
 #include "video/tms9928a.h"
 #include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
+#include "speaker.h"
 
 
 class sg1000a_state : public driver_device

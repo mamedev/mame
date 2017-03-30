@@ -53,12 +53,12 @@
 #			define dFdyFine(_y)   ddy_fine(-_y)
 #		endif // BGFX_SHADER_LANGUAGE_HLSL > 4
 
-#	if BGFX_SHADER_LANGUAGE_HLSL
+#		if BGFX_SHADER_LANGUAGE_HLSL
 float intBitsToFloat(int   _x) { return asfloat(_x); }
 vec2  intBitsToFloat(uint2 _x) { return asfloat(_x); }
 vec3  intBitsToFloat(uint3 _x) { return asfloat(_x); }
 vec4  intBitsToFloat(uint4 _x) { return asfloat(_x); }
-#	endif // BGFX_SHADER_LANGUAGE_HLSL
+#		endif // BGFX_SHADER_LANGUAGE_HLSL
 
 float uintBitsToFloat(uint  _x) { return asfloat(_x); }
 vec2  uintBitsToFloat(uint2 _x) { return asfloat(_x); }
@@ -80,7 +80,7 @@ uint2 bitfieldReverse(uint2 _x) { return reversebits(_x); }
 uint3 bitfieldReverse(uint3 _x) { return reversebits(_x); }
 uint4 bitfieldReverse(uint4 _x) { return reversebits(_x); }
 
-#if !BGFX_SHADER_LANGUAGE_SPIRV
+#		if !BGFX_SHADER_LANGUAGE_SPIRV
 uint packHalf2x16(vec2 _x)
 {
 	return (f32tof16(_x.x)<<16) | f32tof16(_x.y);
@@ -90,7 +90,7 @@ vec2 unpackHalf2x16(uint _x)
 {
 	return vec2(f16tof32(_x >> 16), f16tof32(_x) );
 }
-#endif // !BGFX_SHADER_LANGUAGE_SPIRV
+#		endif // !BGFX_SHADER_LANGUAGE_SPIRV
 
 struct BgfxSampler2D
 {
@@ -167,6 +167,11 @@ vec4 bgfxTexture2DProj(BgfxSampler2D _sampler, vec4 _coord)
 {
 	vec2 coord = _coord.xy * rcp(_coord.w);
 	return _sampler.m_texture.Sample(_sampler.m_sampler, coord);
+}
+
+vec4 bgfxTexture2DGrad(BgfxSampler2D _sampler, vec2 _coord, vec2 _dPdx, vec2 _dPdy)
+{
+	return _sampler.m_texture.SampleGrad(_sampler.m_sampler, _coord, _dPdx, _dPdy);
 }
 
 vec4 bgfxTexture2DArray(BgfxSampler2DArray _sampler, vec3 _coord)
@@ -263,6 +268,7 @@ vec4 bgfxTexelFetch(BgfxSampler3D _sampler, ivec3 _coord, int _lod)
 #		define texture2D(_sampler, _coord) bgfxTexture2D(_sampler, _coord)
 #		define texture2DLod(_sampler, _coord, _level) bgfxTexture2DLod(_sampler, _coord, _level)
 #		define texture2DProj(_sampler, _coord) bgfxTexture2DProj(_sampler, _coord)
+#		define texture2DGrad(_sampler, _coord, _dPdx, _dPdy) bgfxTexture2DGrad(_sampler, _coord, _dPdx, _dPdy)
 
 #		define SAMPLER2DARRAY(_name, _reg) \
 			uniform SamplerState _name ## Sampler : REGISTER(s, _reg); \
@@ -360,10 +366,12 @@ float bgfxShadow2DProj(sampler2DShadow _sampler, vec4 _coord)
 
 #		if BGFX_SHADER_LANGUAGE_HLSL == 2
 #			define texture2DLod(_sampler, _coord, _level) tex2D(_sampler, (_coord).xy)
+#			define texture2DGrad(_sampler, _coord, _dPdx, _dPdy) tex2D(_sampler, _coord)
 #			define texture3DLod(_sampler, _coord, _level) tex3D(_sampler, (_coord).xyz)
 #			define textureCubeLod(_sampler, _coord, _level) texCUBE(_sampler, (_coord).xyz)
 #		else
 #			define texture2DLod(_sampler, _coord, _level) tex2Dlod(_sampler, vec4( (_coord).xy, 0.0, _level) )
+#			define texture2DGrad(_sampler, _coord, _dPdx, _dPdy) tex2Dgrad(_sampler, _coord, _dPdx, _dPdy)
 #			define texture3DLod(_sampler, _coord, _level) tex3Dlod(_sampler, vec4( (_coord).xyz, _level) )
 #			define textureCubeLod(_sampler, _coord, _level) texCUBElod(_sampler, vec4( (_coord).xyz, _level) )
 #		endif // BGFX_SHADER_LANGUAGE_HLSL == 2

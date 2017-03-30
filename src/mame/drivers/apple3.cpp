@@ -19,7 +19,6 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "bus/rs232/rs232.h"
 #include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
@@ -28,7 +27,11 @@
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/mouse.h"
 
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)

@@ -158,6 +158,8 @@ DIPSW-2
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sfkick_state : public driver_device

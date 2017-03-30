@@ -44,9 +44,13 @@ PCB Layout
 */
 
 #include "emu.h"
+#include "includes/gumbo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/gumbo.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM

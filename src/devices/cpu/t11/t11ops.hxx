@@ -92,6 +92,15 @@
 #define PUT_DB_IX(v)  GET_DREG; MAKE_EAB_IX(dreg); WBYTE(ea, (v))
 #define PUT_DB_IXD(v) GET_DREG; MAKE_EAB_IXD(dreg); WBYTE(ea, (v))
 
+/* special bus sequence for MOV, CLR, SXT */
+#define PUT_DBT_RGD(v) GET_DREG; MAKE_EAB_RGD(dreg); RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_IN(v)  GET_DREG; MAKE_EAB_IN(dreg); RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_IND(v) GET_DREG; if (dreg == 7) { ea = ROPCODE(); } else { MAKE_EAB_IND(dreg); } RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_DE(v)  GET_DREG; MAKE_EAB_DE(dreg); RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_DED(v) GET_DREG; MAKE_EAB_DED(dreg); RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_IX(v)  GET_DREG; MAKE_EAB_IX(dreg); RBYTE(ea); WBYTE(ea, (v))
+#define PUT_DBT_IXD(v) GET_DREG; MAKE_EAB_IXD(dreg); RBYTE(ea); WBYTE(ea, (v))
+
 /* for a word-sized destination operand: extracts 'dreg', computes 'ea', and writes 'v' to it */
 #define PUT_DW_RG(v)  GET_DREG; REGW(dreg) = (v)
 #define PUT_DW_RGD(v) GET_DREG; MAKE_EAW_RGD(dreg); WWORD(ea, (v))
@@ -101,6 +110,16 @@
 #define PUT_DW_DED(v) GET_DREG; MAKE_EAW_DED(dreg); WWORD(ea, (v))
 #define PUT_DW_IX(v)  GET_DREG; MAKE_EAW_IX(dreg); WWORD(ea, (v))
 #define PUT_DW_IXD(v) GET_DREG; MAKE_EAW_IXD(dreg); WWORD(ea, (v))
+
+/* special bus sequence for MOV, CLR, SXT */
+#define PUT_DWT_RG(v)  PUT_DW_RG(v)
+#define PUT_DWT_RGD(v) GET_DREG; MAKE_EAW_RGD(dreg); RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_IN(v)  GET_DREG; MAKE_EAW_IN(dreg); RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_IND(v) GET_DREG; if (dreg == 7) { ea = ROPCODE(); } else { MAKE_EAW_IND(dreg); } RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_DE(v)  GET_DREG; MAKE_EAW_DE(dreg); RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_DED(v) GET_DREG; MAKE_EAW_DED(dreg); RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_IX(v)  GET_DREG; MAKE_EAW_IX(dreg); RWORD(ea); WWORD(ea, (v))
+#define PUT_DWT_IXD(v) GET_DREG; MAKE_EAW_IXD(dreg); RWORD(ea); WWORD(ea, (v))
 
 /* flag clearing; must be done before setting */
 #define CLR_ZV   (PSW &= ~(ZFLAG | VFLAG))
@@ -168,9 +187,9 @@
 #define BR(c)       if (c) { PC += 2 * (signed char)(op & 0xff); }
 /* CLR: dst = 0 */
 #define CLR_R(d)    int dreg;     PUT_DW_##d(0); CLR_NZVC; SET_Z
-#define CLR_M(d)    int dreg, ea; PUT_DW_##d(0); CLR_NZVC; SET_Z
+#define CLR_M(d)    int dreg, ea; PUT_DWT_##d(0); CLR_NZVC; SET_Z
 #define CLRB_R(d)   int dreg;     PUT_DB_##d(0); CLR_NZVC; SET_Z
-#define CLRB_M(d)   int dreg, ea; PUT_DB_##d(0); CLR_NZVC; SET_Z
+#define CLRB_M(d)   int dreg, ea; PUT_DBT_##d(0); CLR_NZVC; SET_Z
 /* CMP: flags = src - dst */
 #define CMP_R(s,d)  int sreg, dreg, source, dest, result;     GET_SW_##s; GET_DW_##d; CLR_NZVC; result = source - dest; SETW_NZVC;
 #define CMP_M(s,d)  int sreg, dreg, source, dest, result, ea; GET_SW_##s; GET_DW_##d; CLR_NZVC; result = source - dest; SETW_NZVC;
@@ -200,10 +219,10 @@
 #define MFPS_M(d)   int dreg, result, ea; result = PSW; CLR_NZV; SETB_NZ; PUT_DB_##d(result)
 /* MOV: dst = src */
 #define MOV_R(s,d)  int sreg, dreg, source, result;     GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DW_##d(result)
-#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DW_##d(result)
+#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DWT_##d(result)
 #define MOVB_R(s,d) int sreg, dreg, source, result;     GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
 #define MOVB_X(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
-#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DB_##d(result)
+#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DBT_##d(result)
 /* MTPS: flags = src */
 #define MTPS_R(d)   int dreg, dest;     GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
 #define MTPS_M(d)   int dreg, dest, ea; GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
@@ -239,7 +258,7 @@
 #define SWAB_M(d)   int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = ((dest >> 8) & 0xff) + (dest << 8); SETB_NZ; PUT_DW_EA(result)
 /* SXT: dst = sign-extend dst */
 #define SXT_R(d)    int dreg, result;     CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } PUT_DW_##d(result)
-#define SXT_M(d)    int dreg, result, ea; CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } PUT_DW_##d(result)
+#define SXT_M(d)    int dreg, result, ea; CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } PUT_DWT_##d(result)
 /* TST: dst = ~dst */
 #define TST_R(d)    int dreg, dest, result;     GET_DW_##d; CLR_NZVC; result = dest; SETW_NZ;
 #define TST_M(d)    int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = dest; SETW_NZ;
@@ -262,6 +281,8 @@ void t11_device::op_0000(uint16_t op)
 		case 0x04:  /* IOT   */ m_icount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x10); PSW = RWORD(0x12); t11_check_irqs(); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
 		case 0x06:  /* RTT   */ m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); break;
+		case 0x07:  /* MFPT  */ REGB(0) = 4; break;
+
 		default:    illegal(op); break;
 	}
 }

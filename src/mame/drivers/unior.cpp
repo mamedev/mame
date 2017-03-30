@@ -43,7 +43,9 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class unior_state : public driver_device
@@ -255,7 +257,7 @@ WRITE8_MEMBER( unior_state::vram_w )
 WRITE8_MEMBER( unior_state::scroll_w )
 {
 	if (data)
-		memcpy(m_p_vram, m_p_vram+80, 24*80);
+		memmove(m_p_vram, m_p_vram+80, 24*80);
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)

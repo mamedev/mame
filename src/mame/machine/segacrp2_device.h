@@ -16,7 +16,7 @@
 class segacrp2_z80_device : public z80_device
 {
 public:
-	segacrp2_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void set_decrypted_tag(device_t &device, const char* decrypted_tag);
 	const char*         m_decrypted_tag;
@@ -105,7 +105,6 @@ protected:
 };
 
 
-extern const device_type SEGACRP2_Z80;
 extern const device_type SEGA_315_5179;
 extern const device_type SEGA_315_5178;
 extern const device_type SEGA_315_5177;

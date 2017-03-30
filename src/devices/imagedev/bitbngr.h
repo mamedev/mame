@@ -32,6 +32,8 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return ""; }
+	virtual const char *custom_instance_name() const override { return "bitbanger"; }
+	virtual const char *custom_brief_instance_name() const override { return "bitb"; }
 
 	void output(uint8_t data);
 	uint32_t input(void *buffer, uint32_t length);
@@ -39,7 +41,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 private:
 	char const *m_interface;

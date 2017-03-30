@@ -162,7 +162,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMVCART_SLOT = &device_creator<dmvcart_slot_device>;
+const device_type DMVCART_SLOT = device_creator<dmvcart_slot_device>;
 
 //**************************************************************************
 //    DMV cartridge interface

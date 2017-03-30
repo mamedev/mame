@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "zx8301.h"
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -51,7 +52,7 @@ static const rgb_t PALETTE_ZX8301[] =
 //**************************************************************************
 
 // devices
-const device_type ZX8301 = &device_creator<zx8301_device>;
+const device_type ZX8301 = device_creator<zx8301_device>;
 
 
 // default address map

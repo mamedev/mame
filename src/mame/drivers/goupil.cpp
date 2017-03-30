@@ -22,15 +22,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6522via.h"
+#include "machine/6850acia.h"
 #include "machine/i8279.h"
+#include "machine/wd_fdc.h"
 #include "video/ef9364.h"
 #include "video/mc6845.h"
-#include "machine/6850acia.h"
-#include "machine/wd_fdc.h"
 
+#include "screen.h"
 #include "softlist.h"
+
 
 #define MAIN_CLOCK           XTAL_4MHz
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */

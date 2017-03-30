@@ -9,6 +9,7 @@
 #define MIDZEUS_VIDEO_CLOCK     XTAL_66_6667MHz
 
 #include "machine/timekpr.h"
+#include "screen.h"
 
 class midzeus_state : public driver_device
 {

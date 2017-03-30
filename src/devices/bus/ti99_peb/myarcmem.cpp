@@ -211,4 +211,4 @@ ioport_constructor myarc_memory_expansion_device::device_input_ports() const
 	return INPUT_PORTS_NAME(myarc_exp);
 }
 
-const device_type TI99_MYARCMEM = &device_creator<myarc_memory_expansion_device>;
+const device_type TI99_MYARCMEM = device_creator<myarc_memory_expansion_device>;

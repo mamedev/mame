@@ -45,6 +45,7 @@ Notes:
 ************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
@@ -54,6 +55,10 @@ Notes:
 #include "machine/igs022.h"
 #include "machine/ticket.h"
 #include "video/igs017_igs031.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class igs017_state : public driver_device
 {

@@ -12,7 +12,7 @@
 
 
 // MCU types
-const device_type SM500 = &device_creator<sm500_device>;
+const device_type SM500 = device_creator<sm500_device>;
 
 
 // internal memory maps

@@ -30,6 +30,9 @@
 #include "eminline.h"
 #include "profiler.h"
 
+// http interface helpers
+#include "http.h"
+
 // commonly-referenced utilities imported from lib/util
 #include "palette.h"
 #include "unicode.h"
@@ -101,12 +104,10 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "drawgfx.h"
 #include "emupal.h"
 #include "tilemap.h"
-#include "screen.h"
 #include "video.h"
 
 // sound-related
 #include "sound.h"
-#include "speaker.h"
 
 // generic helpers
 #include "devcb.h"

@@ -50,10 +50,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/m57.h"
+#include "includes/iremipt.h"
+
 #include "cpu/z80/z80.h"
 #include "audio/irem.h"
-#include "includes/iremipt.h"
-#include "includes/m57.h"
+
+#include "screen.h"
 
 
 #define MASTER_CLOCK        XTAL_18_432MHz

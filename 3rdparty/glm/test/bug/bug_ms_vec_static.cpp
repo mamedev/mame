@@ -1,29 +1,12 @@
-#include <glm/glm.hpp>
+#define GLM_FORCE_SWIZZLE
+#include <glm/vec2.hpp>
 
-#if GLM_HAS_ALIGNED_TYPE
-struct vec2;
-
-struct _swizzle
+struct Foo
 {
-	char _buffer[1];
+	static glm::vec2 Bar;
 };
 
-struct vec2
-{
-	GLM_CONSTEXPR_CTOR vec2() :
-		x(0), y(0)
-	{}
-
-	union
-	{
-		struct { float x, y; };
-		struct { _swizzle xx; };
-	};
-};
-#endif
-
-// Visual C++ has a bug generating the error: fatal error C1001: An internal error has occurred in the compiler.
-// vec2 Bar;
+glm::vec2 Foo::Bar = glm::vec2(1.f, 1.f);
 
 int main()
 {

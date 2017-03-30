@@ -758,6 +758,20 @@
 
 *****************************************************************************************/
 
+#include "emu.h"
+#include "includes/lucky74.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
+#include "sound/sn76496.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "lucky74.lh"
+
 
 #define MASTER_CLOCK        XTAL_12MHz      /* confirmed */
 
@@ -782,16 +796,6 @@
 #define C_06B49P_CLKOUT_18  (MASTER_CLOCK/256/3)    /* 15625 Hz. (H-Sync) */
 #define C_06B49P_CLKOUT_19  (MASTER_CLOCK/200000)   /* 60 Hz. (V-Sync) */
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "sound/sn76496.h"
-#include "sound/msm5205.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "lucky74.lh"
-#include "includes/lucky74.h"
 
 void lucky74_state::machine_reset()
 {

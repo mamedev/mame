@@ -2,6 +2,7 @@
 // copyright-holders:David Graves, R. Belmont
 #include "emu.h"
 #include "includes/gcpinbal.h"
+#include "screen.h"
 
 
 /*******************************************************************/

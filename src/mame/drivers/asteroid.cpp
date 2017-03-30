@@ -186,20 +186,22 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/watchdog.h"
-#include "video/vector.h"
-#include "video/avgdvg.h"
-#include "machine/atari_vg.h"
 #include "includes/asteroid.h"
+#include "audio/llander.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/atari_vg.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
-#include "audio/llander.h"
+#include "video/avgdvg.h"
+#include "video/vector.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "astdelux.lh"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define CLOCK_3KHZ   (double(MASTER_CLOCK) / 4096)
 
 /*************************************
  *

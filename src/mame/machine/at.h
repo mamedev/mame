@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Miodrag Milanovic, Carl
-#ifndef _AT_H_
-#define _AT_H_
+#ifndef MAME_MACHINE_AT_H
+#define MAME_MACHINE_AT_H
 
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
@@ -9,7 +9,7 @@
 #include "machine/am9517a.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/isa/isa.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "softlist.h"
 
 class at_mb_device : public device_t
@@ -91,4 +91,4 @@ extern const device_type AT_MB;
 
 MACHINE_CONFIG_EXTERN(at_softlists);
 
-#endif
+#endif // MAME_MACHINE_AT_H

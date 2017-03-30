@@ -15,10 +15,10 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A800_ROM_OSS8K = &device_creator<a800_rom_oss8k_device>;
-const device_type A800_ROM_OSS34 = &device_creator<a800_rom_oss34_device>;
-const device_type A800_ROM_OSS43 = &device_creator<a800_rom_oss43_device>;
-const device_type A800_ROM_OSS91 = &device_creator<a800_rom_oss91_device>;
+const device_type A800_ROM_OSS8K = device_creator<a800_rom_oss8k_device>;
+const device_type A800_ROM_OSS34 = device_creator<a800_rom_oss34_device>;
+const device_type A800_ROM_OSS43 = device_creator<a800_rom_oss43_device>;
+const device_type A800_ROM_OSS91 = device_creator<a800_rom_oss91_device>;
 
 
 a800_rom_oss8k_device::a800_rom_oss8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

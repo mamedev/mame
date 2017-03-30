@@ -23,7 +23,7 @@ ALLOW_SAVE_TYPE(rtc9701_state_t);
 //**************************************************************************
 
 // device type definition
-const device_type rtc9701 = &device_creator<rtc9701_device>;
+const device_type rtc9701 = device_creator<rtc9701_device>;
 
 
 //**************************************************************************

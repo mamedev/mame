@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PRINTER_INTERFACE = &device_creator<printer_interface_device>;
+const device_type PRINTER_INTERFACE = device_creator<printer_interface_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

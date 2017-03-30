@@ -99,6 +99,8 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dreamwld_state : public driver_device
@@ -149,7 +151,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_dreamwld(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -279,7 +281,7 @@ void dreamwld_state::video_start()
 
 }
 
-void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
 {
 	// rising edge
 	if (state)
@@ -804,7 +806,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dreamwld_state, screen_vblank_dreamwld))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)

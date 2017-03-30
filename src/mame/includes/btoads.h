@@ -13,6 +13,7 @@
 #include "video/tlc34076.h"
 #include "sound/bsmt2000.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 class btoads_state : public driver_device
 {

@@ -83,7 +83,7 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const device_type A2BUS_MOUSE = &device_creator<a2bus_mouse_device>;
+const device_type A2BUS_MOUSE = device_creator<a2bus_mouse_device>;
 
 static MACHINE_CONFIG_FRAGMENT( mouse )
 	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)

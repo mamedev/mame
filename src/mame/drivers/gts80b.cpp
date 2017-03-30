@@ -16,8 +16,12 @@
 #include "emu.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
+
 #include "cpu/i86/i86.h"
+#include "speaker.h"
+
 #include "gts80b.lh"
+
 
 class gts80b_state : public genpin_class
 {

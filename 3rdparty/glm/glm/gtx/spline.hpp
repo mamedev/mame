@@ -16,10 +16,6 @@
 #include "../glm.hpp"
 #include "../gtx/optimum_pow.hpp"
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#	error "GLM: GLM_GTX_spline is an experimental extension and may change in the future. Use #define GLM_ENABLE_EXPERIMENTAL before including it, if you really want to use it."
-#endif
-
 #if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_spline extension included")
 #endif
@@ -31,7 +27,7 @@ namespace glm
 
 	/// Return a point from a catmull rom curve.
 	/// @see gtx_spline extension.
-	template<typename genType> 
+	template <typename genType> 
 	GLM_FUNC_DECL genType catmullRom(
 		genType const & v1, 
 		genType const & v2, 
@@ -41,7 +37,7 @@ namespace glm
 		
 	/// Return a point from a hermite curve.
 	/// @see gtx_spline extension.
-	template<typename genType> 
+	template <typename genType> 
 	GLM_FUNC_DECL genType hermite(
 		genType const & v1, 
 		genType const & t1, 
@@ -51,7 +47,7 @@ namespace glm
 		
 	/// Return a point from a cubic curve. 
 	/// @see gtx_spline extension.
-	template<typename genType> 
+	template <typename genType> 
 	GLM_FUNC_DECL genType cubic(
 		genType const & v1, 
 		genType const & v2, 

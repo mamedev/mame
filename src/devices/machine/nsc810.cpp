@@ -21,7 +21,7 @@
 
 #define LOG (1)
 
-const device_type NSC810 = &device_creator<nsc810_device>;
+const device_type NSC810 = device_creator<nsc810_device>;
 
 nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSC810, "National Semiconductor NSC810", tag, owner, clock, "nsc810", __FILE__), m_portA_latch(0), m_portB_latch(0), m_portC_latch(0),

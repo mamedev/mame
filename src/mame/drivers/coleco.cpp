@@ -65,7 +65,9 @@
 
 #include "emu.h"
 #include "includes/coleco.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 

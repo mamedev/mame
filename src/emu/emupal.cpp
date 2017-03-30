@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 
 #define VERBOSE 0
 
@@ -17,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PALETTE = &device_creator<palette_device>;
+const device_type PALETTE = device_creator<palette_device>;
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),

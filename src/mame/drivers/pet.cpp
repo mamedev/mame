@@ -150,7 +150,9 @@ ROM sockets:  UA3   2K or 4K character
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/ieee488/c2040.h"
@@ -166,7 +168,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/cbm_snqk.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
 #define M6502_TAG       "f3"

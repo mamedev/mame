@@ -147,4 +147,4 @@ offs_t ti990_10_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms9900)(this, stream, pc, oprom, opram, options);
 }
 
-const device_type TI990_10 = &device_creator<ti990_10_device>;
+const device_type TI990_10 = device_creator<ti990_10_device>;

@@ -11,8 +11,12 @@
 
 #include "emu.h"
 #include "includes/special.h"
+
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )

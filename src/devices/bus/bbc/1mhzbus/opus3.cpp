@@ -45,7 +45,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS3 = &device_creator<bbc_opus3_device>;
+const device_type BBC_OPUS3 = device_creator<bbc_opus3_device>;
 
 
 //-------------------------------------------------

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "pci-ide.h"
 
-const device_type IDE_PCI = &device_creator<ide_pci_device>;
+const device_type IDE_PCI = device_creator<ide_pci_device>;
 
 ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, IDE_PCI, "IDE PCI interface", tag, owner, clock, "ide_pci", __FILE__),
@@ -103,6 +103,8 @@ void ide_pci_device::device_reset()
 	// PCI0646U allow BAR
 	if (main_id == 0x10950646)
 		m_config_data[0x10 / 4] |= 0x0C40;
+	m_ide->reset();
+	m_ide2->reset();
 }
 
 READ32_MEMBER(ide_pci_device::ide_read_cs1)

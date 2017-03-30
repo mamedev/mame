@@ -66,10 +66,13 @@ Stephh's notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pbaction.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/segacrpt_device.h"
-#include "includes/pbaction.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)

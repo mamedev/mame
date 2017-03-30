@@ -89,6 +89,8 @@
 
 #include "emu.h"
 #include "includes/imds2.h"
+#include "screen.h"
+#include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     XTAL_8MHz

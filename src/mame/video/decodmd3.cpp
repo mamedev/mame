@@ -11,8 +11,9 @@
 #include "emu.h"
 #include "decodmd3.h"
 #include "rendlay.h"
+#include "screen.h"
 
-const device_type DECODMD3 = &device_creator<decodmd_type3_device>;
+const device_type DECODMD3 = device_creator<decodmd_type3_device>;
 
 WRITE8_MEMBER( decodmd_type3_device::data_w )
 {

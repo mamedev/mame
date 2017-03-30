@@ -150,6 +150,8 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100

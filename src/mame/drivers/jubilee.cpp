@@ -193,14 +193,15 @@
 
 ****************************************************************************************/
 
+#include "emu.h"
+#include "cpu/tms9900/tms9980a.h"
+#include "machine/nvram.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 #define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
 #define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
-
-#include "emu.h"
-#include "cpu/tms9900/tms9980a.h"
-#include "video/mc6845.h"
-#include "machine/nvram.h"
 
 
 class jubilee_state : public driver_device

@@ -44,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CS4031 = &device_creator<cs4031_device>;
+const device_type CS4031 = device_creator<cs4031_device>;
 
 const char* cs4031_device::m_register_names[] =
 {
@@ -250,6 +250,7 @@ void cs4031_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
+	save_item(NAME(m_emu_gatea20));
 	save_item(NAME(m_address));
 	save_item(NAME(m_address_valid));
 	save_item(NAME(m_registers));

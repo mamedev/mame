@@ -194,7 +194,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_MICROSOFT_NATURAL      = &device_creator<pc_kbd_microsoft_natural_device>;
+const device_type PC_KBD_MICROSOFT_NATURAL      = device_creator<pc_kbd_microsoft_natural_device>;
 
 /*****************************************************************************
     ADDRESS MAPS

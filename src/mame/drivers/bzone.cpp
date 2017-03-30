@@ -207,13 +207,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bzone.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
-#include "includes/bzone.h"
 #include "sound/pokey.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "bzone.lh"
 #include "redbaron.lh"

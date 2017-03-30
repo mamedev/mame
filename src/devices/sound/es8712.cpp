@@ -33,7 +33,7 @@ static int diff_lookup[49*16];
 
 
 // device type definition
-const device_type ES8712 = &device_creator<es8712_device>;
+const device_type ES8712 = device_creator<es8712_device>;
 
 
 //**************************************************************************

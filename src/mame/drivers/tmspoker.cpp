@@ -207,13 +207,14 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
-
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
-#include "video/mc6845.h"
 #include "sound/sn76477.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
 
 
 class tmspoker_state : public driver_device

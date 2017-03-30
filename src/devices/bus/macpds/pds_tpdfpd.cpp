@@ -31,7 +31,10 @@
 
 #include "emu.h"
 #include "pds_tpdfpd.h"
+
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
+
 
 #define SEDISPLAY_SCREEN_NAME "fpd_screen"
 #define SEDISPLAY_ROM_REGION  "fpd_rom"
@@ -56,7 +59,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS_SEDISPLAY = &device_creator<macpds_sedisplay_device>;
+const device_type PDS_SEDISPLAY = device_creator<macpds_sedisplay_device>;
 
 
 //-------------------------------------------------

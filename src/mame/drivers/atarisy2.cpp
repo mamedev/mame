@@ -127,6 +127,7 @@
 
 #include "emu.h"
 #include "includes/atarisy2.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_20MHz

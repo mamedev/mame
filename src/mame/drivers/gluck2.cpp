@@ -189,16 +189,18 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-#define SND_CLOCK       XTAL_3_579545MHz
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "video/mc6845.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
+#define SND_CLOCK       XTAL_3_579545MHz
 
 
 class gluck2_state : public driver_device

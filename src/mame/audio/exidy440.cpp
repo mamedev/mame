@@ -10,8 +10,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "audio/exidy440.h"
+
+#include "cpu/m6809/m6809.h"
+#include "speaker.h"
 
 
 #define SOUND_LOG       0
@@ -46,7 +48,7 @@ static const int channel_bits[4] =
 };
 
 
-const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
+const device_type EXIDY440 = device_creator<exidy440_sound_device>;
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),

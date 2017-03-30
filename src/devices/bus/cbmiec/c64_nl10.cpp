@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_NL10_INTERFACE = &device_creator<c64_nl10_interface_device>;
+const device_type C64_NL10_INTERFACE = device_creator<c64_nl10_interface_device>;
 
 
 //-------------------------------------------------

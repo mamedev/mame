@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "pci-smbus.h"
 
-const device_type SMBUS = &device_creator<smbus_device>;
+const device_type SMBUS = device_creator<smbus_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, smbus_device)
 	AM_RANGE(0x00, 0x03) AM_READWRITE8 (hst_sts_r,        hst_sts_w,        0x000000ff)

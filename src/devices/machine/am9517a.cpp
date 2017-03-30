@@ -48,9 +48,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AM9517A = &device_creator<am9517a_device>;
-const device_type V53_DMAU = &device_creator<upd71071_v53_device>;
-const device_type PCXPORT_DMAC = &device_creator<pcxport_dmac_device>;
+const device_type AM9517A = device_creator<am9517a_device>;
+const device_type V53_DMAU = device_creator<upd71071_v53_device>;
+const device_type PCXPORT_DMAC = device_creator<pcxport_dmac_device>;
 
 
 //**************************************************************************

@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "pci-usb.h"
 
-const device_type USB_UHCI = &device_creator<usb_uhci_device>;
-const device_type USB_EHCI = &device_creator<usb_ehci_device>;
+const device_type USB_UHCI = device_creator<usb_uhci_device>;
+const device_type USB_EHCI = device_creator<usb_ehci_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, usb_uhci_device)
 ADDRESS_MAP_END

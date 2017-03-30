@@ -36,14 +36,15 @@
 *************************************************************************/
 
 #include "emu.h"
-
+#include "includes/rungun.h"
+#include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/rungun.h"
+#include "speaker.h"
+
 #include "rungun_dual.lh"
 
 

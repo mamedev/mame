@@ -23,8 +23,11 @@
 
 #include "emu.h"
 #include "spchsyn.h"
-#include "sound/wave.h"
+
 #include "machine/spchrom.h"
+#include "sound/wave.h"
+#include "speaker.h"
+
 
 #define TRACE_MEM 0
 #define TRACE_ADDR 0
@@ -44,7 +47,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
 
 READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_sbe)
 	{
@@ -63,7 +66,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 */
 WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_sbe)
 	{
@@ -171,4 +174,4 @@ const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }
-const device_type TI99_SPEECH = &device_creator<ti_speech_synthesizer_device>;
+const device_type TI99_SPEECH = device_creator<ti_speech_synthesizer_device>;

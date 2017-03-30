@@ -10,14 +10,17 @@
 
 #include "emu.h"
 #include "cpc_ssa1.h"
+#include "speaker.h"
+
+
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_SSA1 = &device_creator<cpc_ssa1_device>;
-const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
+const device_type CPC_SSA1 = device_creator<cpc_ssa1_device>;
+const device_type CPC_DKSPEECH = device_creator<cpc_dkspeech_device>;
 
 //-------------------------------------------------
 //  device I/O handlers

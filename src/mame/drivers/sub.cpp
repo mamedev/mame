@@ -112,6 +112,8 @@ PCB2  (Top board, CPU board)
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK            XTAL_18_432MHz
 

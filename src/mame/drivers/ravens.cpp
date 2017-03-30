@@ -70,12 +70,16 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/terminal.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "ravens.lh"
+
 
 #define TERMINAL_TAG "terminal"
 

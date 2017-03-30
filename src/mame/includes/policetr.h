@@ -6,6 +6,8 @@
 
 **************************************************************************/
 #include "machine/eepromser.h"
+#include "screen.h"
+
 class policetr_state : public driver_device
 {
 public:

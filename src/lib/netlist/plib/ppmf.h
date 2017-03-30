@@ -208,7 +208,7 @@ namespace plib {
 	#endif
 		}
 		template<typename O>
-		inline R call(O *obj, Targs... args) const
+		R call(O *obj, Targs... args) const
 		{
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);

@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
+const device_type A2BUS_SSC = device_creator<a2bus_ssc_device>;
 
 #define SSC_ROM_REGION  "ssc_rom"
 #define SSC_ACIA_TAG    "ssc_acia"

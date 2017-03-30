@@ -260,8 +260,8 @@ cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode)
 //**************************************************************************
 
 // device type definition
-const device_type CDP1801 = &device_creator<cdp1801_device>;
-const device_type CDP1802 = &device_creator<cdp1802_device>;
+const device_type CDP1801 = device_creator<cdp1801_device>;
+const device_type CDP1802 = device_creator<cdp1802_device>;
 
 
 //-------------------------------------------------

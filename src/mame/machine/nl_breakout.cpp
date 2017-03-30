@@ -91,6 +91,7 @@ CIRCUIT_LAYOUT( breakout )
 #if (SLOW_BUT_ACCURATE)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
+	PARAM(Solver.METHOD, "MAT_CR")
 #else
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
@@ -128,7 +129,7 @@ CIRCUIT_LAYOUT( breakout )
 	//----------------------------------------------------------------
 	// Clock circuit
 	//----------------------------------------------------------------
-#if 0 || (SLOW_BUT_ACCURATE)
+#if (SLOW_BUT_ACCURATE)
 	MAINCLOCK(Y1, 14318000.0)
 	CHIP("F1", 9316)
 	NET_C(Y1.Q, F1.2)

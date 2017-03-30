@@ -227,6 +227,28 @@ Envelope shapes:
 The envelope counter on the AY-3-8910 has 16 steps. On the YM2149 it
 has twice the steps, happening twice as fast.
 
+****************************************************************************
+
+    The bus control and chip selection signals of the AY PSGs and their
+    pin-compatible clones such as YM2149 are somewhat unconventional and
+    redundant, having been designed for compatibility with GI's CP1610
+    series of microprocessors. Much of the redundancy can be finessed by
+    tying BC2 to Vcc; AY-3-8913 and AY8930 do this internally.
+
+                            /A9   A8    /CS   BDIR  BC2   BC1
+                AY-3-8910   24    25    n/a   27    28    29
+                AY-3-8912   n/a   17    n/a   18    19    20
+                AY-3-8913   22    23    24    2     n/a   3
+                            ------------------------------------
+                Inactive            NACT      0     0     0
+                Latch address       ADAR      0     0     1
+                Inactive            IAB       0     1     0
+                Read from PSG       DTB       0     1     1
+                Latch address       BAR       1     0     0
+                Inactive            DW        1     0     1
+                Write to PSG        DWS       1     1     0
+                Latch address       INTAK     1     1     1
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -969,6 +991,11 @@ void ay8910_device::ay_set_clock(int clock)
 	m_channel->set_sample_rate( clock / 8 );
 }
 
+void ay8910_device::device_clock_changed()
+{
+	ay_set_clock(clock());
+}
+
 void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
 {
 	if (addr & 1)
@@ -1119,6 +1146,25 @@ WRITE8_MEMBER( ay8910_device::data_w )
 #endif
 }
 
+// here, BC1 is hooked up to A0 on the host and BC2 is hooked up to A1
+WRITE8_MEMBER( ay8910_device::write_bc1_bc2 )
+{
+	switch (offset & 3)
+	{
+	case 0: // latch address
+		address_w(space, 0, data);
+		break;
+	case 1: // inactive
+		break;
+	case 2: // write to psg
+		data_w(space, 0, data);
+		break;
+	case 3: // latch address
+		address_w(space, 0, data);
+		break;
+	}
+}
+
 WRITE8_MEMBER( ay8910_device::reset_w )
 {
 	ay8910_reset_ym();
@@ -1142,7 +1188,7 @@ WRITE8_MEMBER( ay8914_device::write )
 
 
 
-const device_type AY8910 = &device_creator<ay8910_device>;
+const device_type AY8910 = device_creator<ay8910_device>;
 
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
@@ -1252,7 +1298,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 	}
 }
 
-const device_type AY8912 = &device_creator<ay8912_device>;
+const device_type AY8912 = device_creator<ay8912_device>;
 
 ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, PSG_TYPE_AY, 3, 1, "ay8912", __FILE__)
@@ -1260,7 +1306,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8913 = &device_creator<ay8913_device>;
+const device_type AY8913 = device_creator<ay8913_device>;
 
 ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8913, "AY-3-8913A", tag, owner, clock, PSG_TYPE_AY, 3, 0, "ay8913", __FILE__)
@@ -1268,7 +1314,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8914 = &device_creator<ay8914_device>;
+const device_type AY8914 = device_creator<ay8914_device>;
 
 ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8914, "AY-3-8914", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8914", __FILE__)
@@ -1276,7 +1322,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type AY8930 = &device_creator<ay8930_device>;
+const device_type AY8930 = device_creator<ay8930_device>;
 
 ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8930, "AY8930", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8930", __FILE__)
@@ -1284,7 +1330,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YM2149 = &device_creator<ym2149_device>;
+const device_type YM2149 = device_creator<ym2149_device>;
 
 ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2149, "YM2149", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2149", __FILE__)
@@ -1292,7 +1338,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YM3439 = &device_creator<ym3439_device>;
+const device_type YM3439 = device_creator<ym3439_device>;
 
 ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM3439, "YM3439", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym3429", __FILE__)
@@ -1300,7 +1346,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YMZ284 = &device_creator<ymz284_device>;
+const device_type YMZ284 = device_creator<ymz284_device>;
 
 ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ284, "YMZ284", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz284", __FILE__)
@@ -1308,7 +1354,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-const device_type YMZ294 = &device_creator<ymz294_device>;
+const device_type YMZ294 = device_creator<ymz294_device>;
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ294, "YMZ294", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz294", __FILE__)

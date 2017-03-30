@@ -170,11 +170,13 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/8950intf.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cybertnk_state : public driver_device

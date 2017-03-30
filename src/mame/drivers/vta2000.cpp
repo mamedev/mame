@@ -20,6 +20,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class vta2000_state : public driver_device

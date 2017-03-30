@@ -49,29 +49,35 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "formats/vg5k_cas.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "sound/volt_reg.h"
+#include "sound/wave.h"
 #include "video/ef9345.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/vg5k_cas.h"
+
 
 class vg5k_state : public driver_device
 {
 public:
 	vg5k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ef9345(*this, "ef9345"),
-			m_dac(*this, "dac"),
-			m_printer(*this, "printer"),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_printer(*this, "printer")
+		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
@@ -196,7 +202,7 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)                                                               PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)                                                              PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)                                                               PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)	PORT_NAME("CTRL ACCENT")    PORT_CHAR(UCHAR_SHIFT_2)
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)   PORT_NAME("CTRL ACCENT")    PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT)                                 PORT_NAME("INSC INSL")      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_START("ROW2")
 		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)                                     PORT_NAME("RUN STOP")       PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))

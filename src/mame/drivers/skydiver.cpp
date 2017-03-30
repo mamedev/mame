@@ -89,9 +89,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/skydiver.h"
+
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "skydiver.lh"
 

@@ -18,11 +18,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/csd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/watchdog.h"
-#include "audio/csd.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************

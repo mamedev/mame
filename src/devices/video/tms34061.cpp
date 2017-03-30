@@ -15,6 +15,8 @@
 #include "emu.h"
 #include "tms34061.h"
 
+#include "screen.h"
+
 
 #define VERBOSE     (0)
 
@@ -27,7 +29,7 @@
 //  tms34061_device - constructor
 //-------------------------------------------------
 
-const device_type TMS34061 = &device_creator<tms34061_device>;
+const device_type TMS34061 = device_creator<tms34061_device>;
 
 tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS34061, "TMS34061 VSC", tag, owner, clock, "tms34061", __FILE__),

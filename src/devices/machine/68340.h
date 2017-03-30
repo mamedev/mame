@@ -15,10 +15,8 @@
 #include "68340tmu.h"
 
 
-
-
-
-class m68340cpu_device : public fscpu32_device {
+class m68340cpu_device : public fscpu32_device
+{
 public:
 	m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -58,17 +56,13 @@ public:
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 	void start_68340_sim(void);
 	void do_timer_irq(void);
-protected:
 
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 };
 
-static const device_type M68340 = &device_creator<m68340cpu_device>;
-
-
-
-
+extern const device_type M68340;
 
 #endif

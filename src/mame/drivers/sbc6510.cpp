@@ -51,11 +51,12 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6510.h"
 #include "cpu/avr8/avr8.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/mos6526.h"
-#include "sound/ay8910.h"
 #include "machine/terminal.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 #define TERMINAL_TAG "terminal"
 

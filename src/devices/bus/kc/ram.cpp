@@ -27,12 +27,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_M011 = &device_creator<kc_m011_device>;
-const device_type KC_M022 = &device_creator<kc_m022_device>;
-const device_type KC_M032 = &device_creator<kc_m032_device>;
-const device_type KC_M034 = &device_creator<kc_m034_device>;
-const device_type KC_M035 = &device_creator<kc_m035_device>;
-const device_type KC_M036 = &device_creator<kc_m036_device>;
+const device_type KC_M011 = device_creator<kc_m011_device>;
+const device_type KC_M022 = device_creator<kc_m022_device>;
+const device_type KC_M032 = device_creator<kc_m032_device>;
+const device_type KC_M034 = device_creator<kc_m034_device>;
+const device_type KC_M035 = device_creator<kc_m035_device>;
+const device_type KC_M036 = device_creator<kc_m036_device>;
 
 //**************************************************************************
 //  M011 64KB RAM

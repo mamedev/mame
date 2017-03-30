@@ -89,11 +89,15 @@ TO DO :
 */
 
 #include "emu.h"
+#include "includes/tehkanwc.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "gridiron.lh"
-#include "includes/tehkanwc.h"
 
 
 void tehkanwc_state::machine_start()

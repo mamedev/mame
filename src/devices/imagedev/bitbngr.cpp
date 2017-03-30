@@ -15,7 +15,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type BITBANGER = &device_creator<bitbanger_device>;
+const device_type BITBANGER = device_creator<bitbanger_device>;
 
 /*-------------------------------------------------
     ctor
@@ -64,17 +64,6 @@ uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 
 void bitbanger_device::device_start(void)
 {
-}
-
-
-
-/*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void bitbanger_device::device_config_complete(void)
-{
-	update_names(BITBANGER, "bitbngr", "bitb");
 }
 
 

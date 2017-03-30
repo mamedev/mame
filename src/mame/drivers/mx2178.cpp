@@ -22,10 +22,12 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 class mx2178_state : public driver_device
 {

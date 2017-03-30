@@ -316,14 +316,18 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/taito_x.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "includes/taito_x.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/cchip.h"
 #include "sound/2610intf.h"
 #include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {

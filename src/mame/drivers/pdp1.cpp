@@ -56,9 +56,12 @@ To load and play a game:
 */
 
 #include "emu.h"
-#include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
+
+#include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
+#include "screen.h"
+
 
 /*
  *
@@ -683,11 +686,10 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_READTAPE = &device_creator<pdp1_readtape_image_device>;
+const device_type PDP1_READTAPE = device_creator<pdp1_readtape_image_device>;
 
 pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock, "pdp1_readtape_image", __FILE__),
@@ -716,11 +718,10 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_PUNCHTAPE = &device_creator<pdp1_punchtape_image_device>;
+const device_type PDP1_PUNCHTAPE = device_creator<pdp1_punchtape_image_device>;
 
 pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock, "pdp1_punchtape_image", __FILE__),
@@ -750,11 +751,10 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_PRINTER = &device_creator<pdp1_printer_image_device>;
+const device_type PDP1_PRINTER = device_creator<pdp1_printer_image_device>;
 
 pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock, "pdp1_printer_image", __FILE__),
@@ -783,11 +783,10 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type PDP1_CYLINDER = &device_creator<pdp1_cylinder_image_device>;
+const device_type PDP1_CYLINDER = device_creator<pdp1_cylinder_image_device>;
 
 pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock, "pdp1_cylinder_image", __FILE__),
@@ -1934,7 +1933,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_DRIVER(pdp1_state, screen_eof_pdp1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pdp1_state, screen_vblank_pdp1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)

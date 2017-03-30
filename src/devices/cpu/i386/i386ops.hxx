@@ -2559,7 +2559,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 	m_sreg[ES].limit = READ32(ea + 0xc8);
 	m_CPL = (m_sreg[SS].flags >> 5) & 3; // cpl == dpl of ss
 
-	for(int i = 0; i < GS; i++)
+	for(int i = 0; i <= GS; i++)
 	{
 		m_sreg[i].valid = (m_sreg[i].flags & 0x80) ? true : false;
 		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;

@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "includes/vector06.h"
+#include "screen.h"
 
 
 READ8_MEMBER( vector06_state::vector06_8255_portb_r )

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_STD = &device_creator<vic20_standard_cartridge_device>;
+const device_type VIC20_STD = device_creator<vic20_standard_cartridge_device>;
 
 
 

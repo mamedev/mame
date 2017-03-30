@@ -42,12 +42,14 @@
  ***********************************************************************/
 
 #include "emu.h"
+#include "includes/decocass.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
-#include "includes/decocass.h"
+#include "machine/deco222.h"
 #include "machine/decocass_tape.h"
 #include "sound/ay8910.h"
-#include "machine/deco222.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_12MHz
 #define HCLK            (MASTER_CLOCK/2)

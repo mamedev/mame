@@ -646,7 +646,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_end_update_cb)
 }
 
 // device type definition
-const device_type RTC65271 = &device_creator<rtc65271_device>;
+const device_type RTC65271 = device_creator<rtc65271_device>;
 
 //-------------------------------------------------
 //  rtc65271_device - constructor

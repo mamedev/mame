@@ -361,28 +361,37 @@ public:
 	*  Inlines for texel accesses
 	*************************************/
 	// 4x2 block size
-	static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
+	static inline uint8_t get_texel_4bit_4x2(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
 
-	static inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
+	static inline uint8_t get_texel_8bit_4x2(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 		return WAVERAM_READ8(base, byteoffs);
 	}
 
-	// 2x2 block size
-	static inline uint8_t get_texel_alt_4bit(const void *base, int y, int x, int width)
+	// 2x2 block size within 32 bits, 2 2x2 blocks stacked in y in 64 bits
+	static inline uint8_t get_texel_4bit_2x2(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
 
-	static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int width)
+	static inline uint8_t get_texel_8bit_2x2(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
+		return WAVERAM_READ8(base, byteoffs);
+	}
+	// 2x2 block size of texel, alpha in 64 bits
+	// 8 Bit texel, 8 bit alpha
+	static inline uint8_t get_texel_8bit_2x2_alpha(const void *base, int y, int x, int width)
+	{
+		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 2) << 2) + ((y & 1) << 1) + (x & 1);
+		// Only grab RGB value for now
+		byteoffs <<= 1;
 		return WAVERAM_READ8(base, byteoffs);
 	}
 

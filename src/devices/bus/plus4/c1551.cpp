@@ -27,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1551 = &device_creator<c1551_t>;
+const device_type C1551 = device_creator<c1551_t>;
 
 
 //-------------------------------------------------

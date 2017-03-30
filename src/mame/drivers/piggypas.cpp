@@ -14,8 +14,11 @@ game details unknown
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "video/hd44780.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "piggypas.lh"
+
 
 class piggypas_state : public driver_device
 {

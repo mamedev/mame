@@ -974,7 +974,7 @@ static MACHINE_CONFIG_FRAGMENT( ti990_hdc )
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 MACHINE_CONFIG_END
 
-const device_type TI990_HDC = &device_creator<ti990_hdc_device>;
+const device_type TI990_HDC = device_creator<ti990_hdc_device>;
 
 ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),

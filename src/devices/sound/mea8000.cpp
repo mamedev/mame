@@ -111,7 +111,7 @@ static const int pi_table[32] =
 
 
 
-const device_type MEA8000 = &device_creator<mea8000_device>;
+const device_type MEA8000 = device_creator<mea8000_device>;
 
 
 mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

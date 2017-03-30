@@ -219,6 +219,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bwidow.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
@@ -227,7 +229,7 @@
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 
-#include "includes/bwidow.h"
+#include "screen.h"
 
 
 

@@ -25,7 +25,7 @@
 
 
 // device type definition
-const device_type MC146818 = &device_creator<mc146818_device>;
+const device_type MC146818 = device_creator<mc146818_device>;
 
 //-------------------------------------------------
 //  mc146818_device - constructor

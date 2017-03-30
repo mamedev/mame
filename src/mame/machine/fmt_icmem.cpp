@@ -14,7 +14,7 @@
 #include "fmt_icmem.h"
 
 // device type definition
-const device_type FMT_ICMEM = &device_creator<fmt_icmem_device>;
+const device_type FMT_ICMEM = device_creator<fmt_icmem_device>;
 
 //-------------------------------------------------
 //  fmt_icmem_device - constructor
@@ -38,19 +38,6 @@ static INPUT_PORTS_START( fmt_icmem )
 	PORT_CONFSETTING(0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(0x01, DEF_STR( On ))
 INPUT_PORTS_END
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void fmt_icmem_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
 
 
 //-------------------------------------------------

@@ -18,11 +18,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lemmings.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/lemmings.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 {
@@ -250,7 +254,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
-	MCFG_SCREEN_VBLANK_DRIVER(lemmings_state, screen_eof_lemmings)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lemmings_state, screen_vblank_lemmings))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)

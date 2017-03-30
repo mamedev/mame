@@ -20,10 +20,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/goindol.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/goindol.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)

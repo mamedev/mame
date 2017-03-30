@@ -33,9 +33,14 @@
 
 #include "emu.h"
 #include "includes/jpmsys5.h"
+
 #include "machine/clock.h"
 #include "sound/saa1099.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "jpmsys5.lh"
+
 
 enum state { IDLE, START, DATA, STOP1, STOP2 };
 

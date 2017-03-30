@@ -28,6 +28,8 @@
 #include "konami.h"
 
 #include "cpu/m6502/m6502.h"
+#include "speaker.h"
+
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -37,18 +39,16 @@
 
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define N2A03_DEFAULTCLOCK (21477272.724 / 12)
-
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_VRC1 = &device_creator<nes_konami_vrc1_device>;
-const device_type NES_VRC2 = &device_creator<nes_konami_vrc2_device>;
-const device_type NES_VRC3 = &device_creator<nes_konami_vrc3_device>;
-const device_type NES_VRC4 = &device_creator<nes_konami_vrc4_device>;
-const device_type NES_VRC6 = &device_creator<nes_konami_vrc6_device>;
-const device_type NES_VRC7 = &device_creator<nes_konami_vrc7_device>;
+const device_type NES_VRC1 = device_creator<nes_konami_vrc1_device>;
+const device_type NES_VRC2 = device_creator<nes_konami_vrc2_device>;
+const device_type NES_VRC3 = device_creator<nes_konami_vrc3_device>;
+const device_type NES_VRC4 = device_creator<nes_konami_vrc4_device>;
+const device_type NES_VRC6 = device_creator<nes_konami_vrc6_device>;
+const device_type NES_VRC7 = device_creator<nes_konami_vrc7_device>;
 
 
 nes_konami_vrc1_device::nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -640,7 +640,9 @@ static MACHINE_CONFIG_FRAGMENT( vrc6 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("vrc6snd", VRC6, N2A03_DEFAULTCLOCK)
+	// TODO: this is not how VRC6 clock signaling works!
+	// The board uses the CLK pin in reality, not hardcoded NTSC values!
+	MCFG_SOUND_ADD("vrc6snd", VRC6, XTAL_21_4772MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
 
@@ -772,7 +774,9 @@ static MACHINE_CONFIG_FRAGMENT( vrc7 )
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("ym", YM2413, N2A03_DEFAULTCLOCK)
+	// TODO: this is not how VRC7 clock signaling works!
+	// The board uses the CLK pin in reality, not hardcoded NTSC values!
+	MCFG_SOUND_ADD("ym", YM2413, XTAL_21_4772MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
 

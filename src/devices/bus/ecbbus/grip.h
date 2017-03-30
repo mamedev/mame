@@ -6,19 +6,20 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ECBBUS_GRIP_H
+#define MAME_BUS_ECBBUS_GRIP_H
+
 #pragma once
 
-#ifndef __GRIP__
-#define __GRIP__
-
 #include "ecbbus.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/z80sti.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
 
@@ -110,7 +111,6 @@ private:
 
 	// timers
 	emu_timer *m_kb_timer;
-};
 
 
 	/*
@@ -122,9 +122,10 @@ private:
 	int m_dpage;            // displayed video page
 	*/
 
+};
 
 
 // device type definition
 extern const device_type ECB_GRIP21;
 
-#endif
+#endif // MAME_BUS_ECBBUS_GRIP_H

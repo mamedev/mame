@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_EXPANSION_SLOT = &device_creator<cbm2_expansion_slot_device>;
+const device_type CBM2_EXPANSION_SLOT = device_creator<cbm2_expansion_slot_device>;
 
 
 
@@ -108,7 +108,7 @@ image_init_result cbm2_expansion_slot_device::call_load()
 
 	if (m_card)
 	{
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 

@@ -11,6 +11,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/upd7220.h"
+#include "screen.h"
 
 
 class if800_state : public driver_device

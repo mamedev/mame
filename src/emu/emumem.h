@@ -290,8 +290,6 @@ public:
 
 	// debug helpers
 	const char *get_handler_string(read_or_write readorwrite, offs_t byteaddress);
-	bool debugger_access() const { return m_debugger_access; }
-	void set_debugger_access(bool debugger) { m_debugger_access = debugger; }
 	bool log_unmap() const { return m_log_unmap; }
 	void set_log_unmap(bool log) { m_log_unmap = log; }
 	void dump_map(FILE *file, read_or_write readorwrite);
@@ -462,7 +460,6 @@ protected:
 	offs_t                  m_logbytemask;      // byte-converted logical address mask
 	u64                     m_unmap;            // unmapped value
 	address_spacenum        m_spacenum;         // address space index
-	bool                    m_debugger_access;  // treat accesses as coming from the debugger
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
 	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
@@ -472,33 +469,6 @@ protected:
 private:
 	memory_manager &        m_manager;          // reference to the owning manager
 	running_machine &       m_machine;          // reference to the owning machine
-};
-
-
-// ======================> address_space_debug_wrapper
-
-// wrapper for temporarily setting the debug flag on a memory space (especially one being accessed through another space)
-class address_space_debug_wrapper
-{
-public:
-	// construction
-	address_space_debug_wrapper(address_space &space, bool debugger_access)
-		: m_target(space)
-		, m_prev_debugger_access(space.debugger_access())
-	{
-		space.set_debugger_access(debugger_access);
-	}
-
-	// destruction
-	~address_space_debug_wrapper() { m_target.set_debugger_access(m_prev_debugger_access); }
-
-	// getter
-	address_space &space() const { return m_target; }
-
-private:
-	// internal state
-	address_space &m_target;
-	const bool m_prev_debugger_access;
 };
 
 

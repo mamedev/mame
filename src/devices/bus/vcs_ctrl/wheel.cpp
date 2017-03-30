@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_WHEEL = &device_creator<vcs_wheel_device>;
+const device_type VCS_WHEEL = device_creator<vcs_wheel_device>;
 
 
 static INPUT_PORTS_START( vcs_wheel )

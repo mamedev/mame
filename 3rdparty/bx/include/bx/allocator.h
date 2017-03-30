@@ -8,7 +8,6 @@
 
 #include "bx.h"
 
-#include <string.h> //::memmove
 #include <new>
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
@@ -41,11 +40,14 @@
 
 namespace bx
 {
+	/// Abstract allocator interface.
+	///
 	struct BX_NO_VTABLE AllocatorI
 	{
+		///
 		virtual ~AllocatorI() = 0;
 
-		/// Allocated, resizes memory block or frees memory.
+		/// Allocates, resizes memory block, or frees memory.
 		///
 		/// @param[in] _ptr If _ptr is NULL new block will be allocated.
 		/// @param[in] _size If _ptr is set, and _size is 0, memory will be freed.
@@ -65,7 +67,7 @@ namespace bx
 		, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
 		);
 
-	///
+	/// Allocate memory.
 	void* alloc(
 		  AllocatorI* _allocator
 		, size_t _size
@@ -74,7 +76,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Free memory.
 	void free(
 		  AllocatorI* _allocator
 		, void* _ptr
@@ -83,7 +85,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Resize memory block.
 	void* realloc(
 		  AllocatorI* _allocator
 		, void* _ptr
@@ -93,7 +95,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Allocate memory with specific alignment.
 	void* alignedAlloc(
 		  AllocatorI* _allocator
 		, size_t _size
@@ -102,7 +104,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Free memory that was allocated with aligned allocator.
 	void alignedFree(
 		  AllocatorI* _allocator
 		, void* _ptr
@@ -111,7 +113,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Resize memory block that was allocated with aligned allocator.
 	void* alignedRealloc(
 		  AllocatorI* _allocator
 		, void* _ptr
@@ -121,7 +123,7 @@ namespace bx
 		, uint32_t _line = 0
 		);
 
-	///
+	/// Delete object with specific allocator.
 	template <typename ObjectT>
 	void deleteObject(
 		  AllocatorI* _allocator
@@ -133,6 +135,6 @@ namespace bx
 
 } // namespace bx
 
-#include "allocator.inl"
+#include "inline/allocator.inl"
 
 #endif // BX_ALLOCATOR_H_HEADER_GUARD

@@ -33,13 +33,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/thunderx.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/thunderx.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(thunderx_state::vblank_interrupt)

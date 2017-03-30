@@ -14,7 +14,7 @@
 //  SLOT BUS DEVICE
 //**************************************************************************
 
-const device_type SVI_SLOT_BUS = &device_creator<svi_slot_bus_device>;
+const device_type SVI_SLOT_BUS = device_creator<svi_slot_bus_device>;
 
 //-------------------------------------------------
 //  svi_slot_bus_device - constructor
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk32_w )
 //  SVI SLOT DEVICE
 //**************************************************************************
 
-const device_type SVI_SLOT = &device_creator<svi_slot_device>;
+const device_type SVI_SLOT = device_creator<svi_slot_device>;
 
 //-------------------------------------------------
 //  svi_slot_device - constructor

@@ -24,11 +24,13 @@ Memo:
 
 #include "emu.h"
 #include "includes/pastelg.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 void pastelg_state::machine_start()

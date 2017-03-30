@@ -44,10 +44,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1570 = &device_creator<c1570_t>;
-const device_type C1571 = &device_creator<c1571_t>;
-const device_type C1571CR = &device_creator<c1571cr_t>;
-const device_type MINI_CHIEF = &device_creator<mini_chief_t>;
+const device_type C1570 = device_creator<c1570_t>;
+const device_type C1571 = device_creator<c1571_t>;
+const device_type C1571CR = device_creator<c1571cr_t>;
+const device_type MINI_CHIEF = device_creator<mini_chief_t>;
 
 
 //-------------------------------------------------

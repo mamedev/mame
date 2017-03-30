@@ -19,11 +19,16 @@ The cassette uses 2 bits for input, plus a D flipflop and a 74LS221 oneshot, wit
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+
+#include "speaker.h"
+
 #include "pro80.lh"
+
 
 class pro80_state : public driver_device
 {

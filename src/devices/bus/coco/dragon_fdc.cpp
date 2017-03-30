@@ -297,7 +297,7 @@ namespace
 	};
 };
 
-const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
+const device_type DRAGON_FDC = device_creator<dragon_fdc_device>;
 
 
 //**************************************************************************
@@ -329,4 +329,4 @@ namespace
 	};
 };
 
-const device_type SDTANDY_FDC = &device_creator<sdtandy_fdc_device>;
+const device_type SDTANDY_FDC = device_creator<sdtandy_fdc_device>;

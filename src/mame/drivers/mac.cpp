@@ -82,6 +82,7 @@
 
 #include "machine/macadb.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "mac.lh"
 
 #define C7M (7833600)

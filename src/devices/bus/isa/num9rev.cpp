@@ -5,12 +5,14 @@
 
 #include "emu.h"
 #include "num9rev.h"
+#include "screen.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_NUM_9_REV = &device_creator<isa8_number_9_rev_device>;
+const device_type ISA8_NUM_9_REV = device_creator<isa8_number_9_rev_device>;
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, isa8_number_9_rev_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP

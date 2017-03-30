@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "screen.h"
 
 
 class univac_state : public driver_device

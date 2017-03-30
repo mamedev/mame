@@ -4,7 +4,7 @@
 #include "msx_systemflags.h"
 
 
-const device_type MSX_SYSTEMFLAGS = &device_creator<msx_systemflags_device>;
+const device_type MSX_SYSTEMFLAGS = device_creator<msx_systemflags_device>;
 
 
 msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -50,9 +50,12 @@ Usage:
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/mos6530.h"
+
 #include "cpu/m6502/m6504.h"
-#include "sound/speaker.h"
+#include "machine/mos6530.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "mk2.lh"
 
 
@@ -60,10 +63,10 @@ class mk2_state : public driver_device
 {
 public:
 	mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker"),
-	m_miot(*this, "miot")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_miot(*this, "miot")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -221,5 +224,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS            INIT    COMPANY               FULLNAME */
-CONS( 1979, ccmk2,    0,      0,      mk2,    mk2, driver_device,    0, "Quelle International", "Chess Champion MK II", 0)
+CONS( 1979, ccmk2,    0,      0,      mk2,    mk2, driver_device,    0, "Novag", "Chess Champion MK II", 0)
 // second design sold (same computer/program?)

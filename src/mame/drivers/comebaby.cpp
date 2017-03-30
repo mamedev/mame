@@ -182,6 +182,7 @@ Nearly everything.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "screen.h"
 
 
 class comebaby_state : public driver_device

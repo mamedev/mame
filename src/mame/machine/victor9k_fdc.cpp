@@ -86,7 +86,7 @@ const int victor_9000_fdc_t::rpm[] = { 252, 252, 252, 252, 252, 252, 252, 252, 2
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VICTOR_9000_FDC = &device_creator<victor_9000_fdc_t>;
+const device_type VICTOR_9000_FDC = device_creator<victor_9000_fdc_t>;
 
 
 //-------------------------------------------------

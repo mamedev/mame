@@ -23,7 +23,6 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
@@ -40,6 +39,9 @@
 #include "machine/z80dart.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
 
 #define I8088_TAG       "8l"
 #define I8253_TAG       "13h"

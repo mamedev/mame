@@ -184,7 +184,7 @@ WRITE8_MEMBER( ym2608_device::write )
 	ym2608_write(m_chip, offset & 3, data);
 }
 
-const device_type YM2608 = &device_creator<ym2608_device>;
+const device_type YM2608 = device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),

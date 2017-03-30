@@ -163,11 +163,13 @@ const char* binaryFileName = nullptr;
 const char* entryPointName = nullptr;
 const char* sourceEntryPointName = nullptr;
 const char* shaderStageName = nullptr;
+const char* variableName = nullptr;
 
 std::array<unsigned int, EShLangCount> baseSamplerBinding;
 std::array<unsigned int, EShLangCount> baseTextureBinding;
 std::array<unsigned int, EShLangCount> baseImageBinding;
 std::array<unsigned int, EShLangCount> baseUboBinding;
+std::array<unsigned int, EShLangCount> baseSsboBinding;
 
 //
 // Create the default name for saving a binary if -o is not provided.
@@ -257,6 +259,7 @@ void ProcessArguments(int argc, char* argv[])
     baseTextureBinding.fill(0);
     baseImageBinding.fill(0);
     baseUboBinding.fill(0);
+    baseSsboBinding.fill(0);
 
     ExecutableName = argv[0];
     NumWorkItems = argc;  // will include some empties where the '-' options were, but it doesn't matter, they'll be 0
@@ -291,6 +294,10 @@ void ProcessArguments(int argc, char* argv[])
                                lowerword == "shift-ubo-binding"  ||
                                lowerword == "sub") {
                         ProcessBindingBase(argc, argv, baseUboBinding);
+                    } else if (lowerword == "shift-ssbo-bindings" ||  // synonyms
+                               lowerword == "shift-ssbo-binding"  ||
+                               lowerword == "sbb") {
+                        ProcessBindingBase(argc, argv, baseSsboBinding);
                     } else if (lowerword == "auto-map-bindings" ||  // synonyms
                                lowerword == "auto-map-binding"  ||
                                lowerword == "amb") {
@@ -302,7 +309,18 @@ void ProcessArguments(int argc, char* argv[])
                     } else if (lowerword == "no-storage-format" || // synonyms
                                lowerword == "nsf") {
                         Options |= EOptionNoStorageFormat;
-                    } else if (lowerword == "source-entrypoint" || // synonyms
+                    } else if (lowerword == "variable-name" || // synonyms
+                        lowerword == "vn") {
+                        Options |= EOptionOutputHexadecimal;
+                        variableName = argv[1];
+                        if (argc > 0) {
+                            argc--;
+                            argv++;
+                        } else
+                            Error("no <C-variable-name> provided for --variable-name");
+                        break;
+                    }
+                    else if (lowerword == "source-entrypoint" || // synonyms
                                lowerword == "sep") {
                         sourceEntryPointName = argv[1];
                         if (argc > 0) {
@@ -338,8 +356,7 @@ void ProcessArguments(int argc, char* argv[])
                 if (argc > 0) {
                     argc--;
                     argv++;
-                }
-                else
+                } else
                     Error("no <stage> specified for -S");
                 break;
             case 'G':
@@ -515,14 +532,14 @@ struct ShaderCompUnit {
     EShLanguage stage;
     std::string fileName;
     char** text;             // memory owned/managed externally
-    const char*  fileNameList[1];
+    const char* fileNameList[1];
 
     // Need to have a special constructors to adjust the fileNameList, since back end needs a list of ptrs
     ShaderCompUnit(EShLanguage istage, std::string &ifileName, char** itext)
     {
         stage = istage;
         fileName = ifileName;
-        text    = itext;
+        text = itext;
         fileNameList[0] = fileName.c_str();
     }
 
@@ -570,6 +587,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
         shader->setShiftTextureBinding(baseTextureBinding[compUnit.stage]);
         shader->setShiftImageBinding(baseImageBinding[compUnit.stage]);
         shader->setShiftUboBinding(baseUboBinding[compUnit.stage]);
+        shader->setShiftSsboBinding(baseSsboBinding[compUnit.stage]);
         shader->setFlattenUniformArrays((Options & EOptionFlattenUniformArrays) != 0);
         shader->setNoStorageFormat((Options & EOptionNoStorageFormat) != 0);
 
@@ -650,7 +668,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
                     if (! (Options & EOptionMemoryLeakMode)) {
                         printf("%s", logger.getAllMessages().c_str());
                         if (Options & EOptionOutputHexadecimal) {
-                            glslang::OutputSpvHex(spirv, GetBinaryName((EShLanguage)stage));
+                            glslang::OutputSpvHex(spirv, GetBinaryName((EShLanguage)stage), variableName);
                         } else {
                             glslang::OutputSpvBin(spirv, GetBinaryName((EShLanguage)stage));
                         }
@@ -829,21 +847,23 @@ int C_DECL main(int argc, char* argv[])
 EShLanguage FindLanguage(const std::string& name, bool parseSuffix)
 {
     size_t ext = 0;
+    std::string suffix;
 
-    // Search for a suffix on a filename: e.g, "myfile.frag".  If given
-    // the suffix directly, we skip looking the '.'
-    if (parseSuffix) {
-        ext = name.rfind('.');
-        if (ext == std::string::npos) {
-            usage();
-            return EShLangVertex;
-        }
-        ++ext;
-    }
-
-    std::string suffix = name.substr(ext, std::string::npos);
     if (shaderStageName)
         suffix = shaderStageName;
+    else {
+        // Search for a suffix on a filename: e.g, "myfile.frag".  If given
+        // the suffix directly, we skip looking for the '.'
+        if (parseSuffix) {
+            ext = name.rfind('.');
+            if (ext == std::string::npos) {
+                usage();
+                return EShLangVertex;
+            }
+            ++ext;
+        }
+        suffix = name.substr(ext, std::string::npos);
+    }
 
     if (suffix == "vert")
         return EShLangVertex;
@@ -938,8 +958,8 @@ void usage()
            "  -H          print human readable form of SPIR-V; turns on -V\n"
            "  -E          print pre-processed GLSL; cannot be used with -l;\n"
            "              errors will appear on stderr.\n"
-           "  -S <stage>  uses explicit stage specified, rather then the file extension.\n"
-           "              valid choices are vert, tesc, tese, geom, frag, or comp\n"
+           "  -S <stage>  uses specified stage rather than parsing the file extension\n"
+           "              valid choices for <stage> are vert, tesc, tese, geom, frag, or comp\n"
            "  -c          configuration dump;\n"
            "              creates the default configuration file (redirect to a .conf file)\n"
            "  -C          cascading errors; risks crashes from accumulation of error recoveries\n"
@@ -972,6 +992,9 @@ void usage()
            "  --shift-UBO-binding [stage] num         set base binding number for UBOs\n"
            "  --sub [stage] num                       synonym for --shift-UBO-binding\n"
            "\n"
+           "  --shift-ssbo-binding [stage] num        set base binding number for SSBOs\n"
+           "  --sbb [stage] num                       synonym for --shift-ssbo-binding\n"
+           "\n"
            "  --auto-map-bindings                     automatically bind uniform variables without\n"
            "                                          explicit bindings.\n"
            "  --amb                                   synonym for --auto-map-bindings\n"
@@ -987,6 +1010,8 @@ void usage()
            "\n"
            "  --keep-uncalled                         don't eliminate uncalled functions when linking\n"
            "  --ku                                    synonym for --keep-uncalled\n"
+           "  --variable-name <name>                  Creates a C header file that contains a uint32_t array named <name> initialized with the shader binary code.\n"
+           "  --vn <name>                             synonym for --variable-name <name>.\n"
            );
 
     exit(EFailUsage);

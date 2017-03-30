@@ -93,4 +93,4 @@ void serial_terminal_device::received_byte(uint8_t byte)
 	term_write(byte);
 }
 
-const device_type SERIAL_TERMINAL = &device_creator<serial_terminal_device>;
+const device_type SERIAL_TERMINAL = device_creator<serial_terminal_device>;

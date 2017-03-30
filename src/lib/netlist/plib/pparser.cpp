@@ -80,7 +80,7 @@ void ptokenizer::require_token(const token_id_t &token_num)
 	require_token(get_token(), token_num);
 }
 
-void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
+void ptokenizer::require_token(const token_t &tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
@@ -385,7 +385,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	std::vector<pstring> elems(psplit(line, m_expr_sep));
-	pstringbuffer ret = "";
+	pstringbuffer ret("");
 	for (auto & elem : elems)
 	{
 		define_t *def = get_define(elem);
@@ -399,7 +399,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 
 static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
-	pstringbuffer ret = "";
+	pstringbuffer ret("");
 	for (auto & elem : elems)
 	{
 		ret.cat(elem);

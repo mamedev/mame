@@ -16,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type huc6271 = &device_creator<huc6271_device>;
+const device_type huc6271 = device_creator<huc6271_device>;
 
 
 //**************************************************************************

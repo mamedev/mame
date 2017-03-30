@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "includes/opwolf.h"
+#include "screen.h"
 
 
 WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)

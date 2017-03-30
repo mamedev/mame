@@ -66,13 +66,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/vtech2.h"
-#include "imagedev/cassette.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/vt_cas.h"
+
 
 static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
 	ADDRESS_MAP_UNMAP_HIGH

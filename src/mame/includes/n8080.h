@@ -3,6 +3,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
+#include "screen.h"
 
 class n8080_state : public driver_device
 {
@@ -96,7 +97,7 @@ public:
 	uint32_t screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_helifire(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_helifire);
 	TIMER_CALLBACK_MEMBER(spacefev_stop_red_cannon);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);

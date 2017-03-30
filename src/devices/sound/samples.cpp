@@ -33,7 +33,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SAMPLES = &device_creator<samples_device>;
+const device_type SAMPLES = device_creator<samples_device>;
 
 
 

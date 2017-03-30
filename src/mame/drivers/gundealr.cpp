@@ -59,9 +59,13 @@ Z80 CPU - 12MHz/2
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gundealr.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/gundealr.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
 {

@@ -158,13 +158,16 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
+#include "includes/namcofl.h"
 #include "includes/namcoic.h"
+
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
 #include "machine/namcomcu.h"
 #include "machine/nvram.h"
+#include "speaker.h"
+
 #include "namcofl.lh"
-#include "includes/namcofl.h"
 
 
 READ32_MEMBER(namcofl_state::fl_unk1_r)

@@ -6,8 +6,8 @@
 #define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
 #define LOOPBACK (!(m_regs.dcr & 8) && (m_regs.tcr & 6))
 
-const device_type DP8390D = &device_creator<dp8390d_device>;
-const device_type RTL8019A = &device_creator<rtl8019a_device>;
+const device_type DP8390D = device_creator<dp8390d_device>;
+const device_type RTL8019A = device_creator<rtl8019a_device>;
 
 dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: dp8390_device(mconfig, DP8390D, "DP8390D", tag, owner, clock, 10.0f, "dp8390d", __FILE__) {

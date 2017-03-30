@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "lpc-acpi.h"
 
-const device_type LPC_ACPI = &device_creator<lpc_acpi_device>;
+const device_type LPC_ACPI = device_creator<lpc_acpi_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 32, lpc_acpi_device)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(pm1_sts_r,        pm1_sts_w,        0x0000ffff)

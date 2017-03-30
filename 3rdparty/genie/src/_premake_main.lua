@@ -49,7 +49,6 @@
 		-- if running off the disk (in debug mode), load everything
 		-- listed in _manifest.lua; the list divisions make sure
 		-- everything gets initialized in the proper order.
-
 		if (scriptpath) then
 			local scripts  = dofile(scriptpath .. "/_manifest.lua")
 			for _,v in ipairs(scripts) do
@@ -57,28 +56,24 @@
 			end
 		end
 
+		local profiler = newProfiler()
+		if (nil ~= _OPTIONS["debug-profiler"]) then
+			profiler:start()
+		end
 
 		-- Now that the scripts are loaded, I can use path.getabsolute() to properly
 		-- canonicalize the executable path.
-
 		_PREMAKE_COMMAND = path.getabsolute(_PREMAKE_COMMAND)
-
 
 		-- Set up the environment for the chosen action early, so side-effects
 		-- can be picked up by the scripts.
-
 		premake.action.set(_ACTION)
 
-
 		-- Seed the random number generator so actions don't have to do it themselves
-
 		math.randomseed(os.time())
-
 
 		-- If there is a project script available, run it to get the
 		-- project information, available options and actions, etc.
-
-
 		if (nil ~= _OPTIONS["file"]) then
 			local fname = _OPTIONS["file"]
 			if (os.isfile(fname)) then
@@ -95,7 +90,6 @@
 		end
 
 		-- Process special options
-
 		if (_OPTIONS["version"] or _OPTIONS["help"] or not _ACTION) then
 			printf("GENie - Project generator tool %s", _GENIE_VERSION_STR)
 			printf("https://github.com/bkaradzic/GENie")
@@ -107,7 +101,6 @@
 
 		-- Validate the command-line arguments. This has to happen after the
 		-- script has run to allow for project-specific options
-
 		action = premake.action.current()
 		if (not action) then
 			error("Error: no such action '" .. _ACTION .. "'", 0)
@@ -116,37 +109,17 @@
 		ok, err = premake.option.validate(_OPTIONS)
 		if (not ok) then error("Error: " .. err, 0) end
 
-
 		-- Sanity check the current project setup
-
 		ok, err = premake.checktools()
 		if (not ok) then error("Error: " .. err, 0) end
 
-
 		-- If a platform was specified on the command line, inject it now
-
 		ok, err = injectplatform(_OPTIONS["platform"])
 		if (not ok) then error("Error: " .. err, 0) end
-
-		local profiler = newProfiler()
-		if (nil ~= _OPTIONS["debug-profiler"]) then
-			profiler:start()
-		end
 
 		-- work-in-progress: build the configurations
 		print("Building configurations...")
 		premake.bake.buildconfigs()
-
-		if (nil ~= _OPTIONS["debug-profiler"]) then
-			profiler:stop()
-
-			local filePath = path.getabsolute("GENie-profiler-bake.txt")
-			print("Writing debug-profiler report " .. filePath .. ".")
-
-			local outfile = io.open(filePath, "w+")
-			profiler:report(outfile)
-			outfile:close()
-		end
 
 		ok, err = premake.checkprojects()
 		if (not ok) then error("Error: " .. err, 0) end
@@ -159,6 +132,17 @@
 		-- Hand over control to the action
 		printf("Running action '%s'...", action.trigger)
 		premake.action.call(action.trigger)
+
+		if (nil ~= _OPTIONS["debug-profiler"]) then
+			profiler:stop()
+
+			local filePath = path.getabsolute("GENie-profile.txt")
+			print("Writing debug-profile report to ''" .. filePath .. "'.")
+
+			local outfile = io.open(filePath, "w+")
+			profiler:report(outfile, true)
+			outfile:close()
+		end
 
 		printf("Done. Generated %d/%d projects."
 			, premake.stats.num_generated

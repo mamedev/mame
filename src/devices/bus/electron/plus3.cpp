@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_PLUS3 = &device_creator<electron_plus3_device>;
+const device_type ELECTRON_PLUS3 = device_creator<electron_plus3_device>;
 
 
 //-------------------------------------------------

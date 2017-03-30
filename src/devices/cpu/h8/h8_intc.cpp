@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "h8_intc.h"
 
-const device_type H8_INTC  = &device_creator<h8_intc_device>;
-const device_type H8H_INTC = &device_creator<h8h_intc_device>;
-const device_type H8S_INTC = &device_creator<h8s_intc_device>;
+const device_type H8_INTC  = device_creator<h8_intc_device>;
+const device_type H8H_INTC = device_creator<h8h_intc_device>;
+const device_type H8S_INTC = device_creator<h8s_intc_device>;
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_INTC, "H8 INTC", tag, owner, clock, "h8_intc", __FILE__),

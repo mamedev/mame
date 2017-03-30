@@ -91,4 +91,4 @@ const tiny_rom_entry *k573npu_device::device_rom_region() const
 	return ROM_NAME( k573npu );
 }
 
-const device_type KONAMI_573_NETWORK_PCB_UNIT = &device_creator<k573npu_device>;
+const device_type KONAMI_573_NETWORK_PCB_UNIT = device_creator<k573npu_device>;

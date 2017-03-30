@@ -82,6 +82,14 @@ void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 //-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+void ymf262_device::device_post_load()
+{
+	ymf262_post_load(m_chip);
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -135,7 +143,7 @@ WRITE8_MEMBER( ymf262_device::write )
 	ymf262_write(m_chip, offset & 3, data);
 }
 
-const device_type YMF262 = &device_creator<ymf262_device>;
+const device_type YMF262 = device_creator<ymf262_device>;
 
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMF262, "YMF262", tag, owner, clock, "ymf262", __FILE__),

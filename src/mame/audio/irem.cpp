@@ -7,13 +7,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "sound/discrete.h"
 #include "audio/irem.h"
 
-const device_type IREM_M62_AUDIO = &device_creator<m62_audio_device>;
-const device_type IREM_M52_SOUNDC_AUDIO = &device_creator<m52_soundc_audio_device>;
-const device_type IREM_M52_LARGE_AUDIO = &device_creator<m52_large_audio_device>;
+#include "cpu/m6800/m6800.h"
+#include "sound/discrete.h"
+#include "speaker.h"
+
+
+const device_type IREM_M62_AUDIO = device_creator<m62_audio_device>;
+const device_type IREM_M52_SOUNDC_AUDIO = device_creator<m52_soundc_audio_device>;
+const device_type IREM_M52_LARGE_AUDIO = device_creator<m52_large_audio_device>;
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),

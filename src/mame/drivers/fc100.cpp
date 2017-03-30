@@ -32,18 +32,22 @@ TODO:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6847.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
-#include "sound/ay8910.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "formats/fc100_cas.h"
-#include "machine/buffer.h"
+
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/buffer.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "video/mc6847.h"
+
+#include "speaker.h"
+
+#include "formats/fc100_cas.h"
 
 
 class fc100_state : public driver_device

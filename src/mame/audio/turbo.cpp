@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "includes/turbo.h"
 #include "sound/samples.h"
+#include "speaker.h"
 
 
 #define DISCRETE_TEST (0)

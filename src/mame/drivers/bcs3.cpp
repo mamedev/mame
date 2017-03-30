@@ -53,6 +53,8 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bcs3_state : public driver_device

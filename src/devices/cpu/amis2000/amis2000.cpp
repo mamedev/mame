@@ -26,11 +26,11 @@
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM
 // S2150 increased RAM to 80 nibbles and ROM to 1.5KB
 // high-voltage output versions of these chips (S2000A and S2150A) are identical overall
-const device_type AMI_S2000 = &device_creator<amis2000_cpu_device>;
-const device_type AMI_S2150 = &device_creator<amis2150_cpu_device>;
+const device_type AMI_S2000 = device_creator<amis2000_cpu_device>;
+const device_type AMI_S2150 = device_creator<amis2150_cpu_device>;
 
 // S2152 is an extension to S2150, removing the K pins and adding a better timer
-const device_type AMI_S2152 = &device_creator<amis2152_cpu_device>;
+const device_type AMI_S2152 = device_creator<amis2152_cpu_device>;
 
 
 // internal memory maps

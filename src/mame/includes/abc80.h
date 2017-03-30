@@ -69,7 +69,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_pio(*this, Z80PIO_TAG),
-		m_psg(*this, SN76477_TAG),
+		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
 		m_bus(*this, ABCBUS_TAG),
 		m_kb(*this, ABC80_KEYBOARD_TAG),
@@ -92,7 +92,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<sn76477_device> m_psg;
+	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_t> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
@@ -146,6 +146,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
+	DECLARE_WRITE8_MEMBER( csg_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 

@@ -158,7 +158,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MVME350 = &device_creator<vme_mvme350_card_device>;
+const device_type VME_MVME350 = device_creator<vme_mvme350_card_device>;
 
 #define MVME350_CPU_TAG "mvme350_cpu"
 #define MVME350_ROM "mvme350_rom"

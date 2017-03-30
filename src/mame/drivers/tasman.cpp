@@ -28,6 +28,8 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "speaker.h"
+
 
 #define CUSTOM_DRAW 1
 

@@ -80,7 +80,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_l
 #define XMAP1_MODETBLIDX    m_XMAP1.nRegister[0x07]
 
 
-const device_type NEWPORT_VIDEO = &device_creator<newport_video_device>;
+const device_type NEWPORT_VIDEO = device_creator<newport_video_device>;
 
 
 newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

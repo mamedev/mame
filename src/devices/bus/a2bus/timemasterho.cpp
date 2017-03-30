@@ -46,7 +46,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_TIMEMASTERHO = &device_creator<a2bus_timemasterho_device>;
+const device_type A2BUS_TIMEMASTERHO = device_creator<a2bus_timemasterho_device>;
 
 #define TIMEMASTER_ROM_REGION   "timemst_rom"
 #define TIMEMASTER_PIA_TAG      "timemst_pia"

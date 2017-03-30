@@ -244,14 +244,14 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/ym2413.h"
-#include "video/315_5124.h"
 #include "includes/sms.h"
+
+#include "cpu/z80/z80.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "sms1.lh"
+
 
 #define MASTER_CLOCK_GG     32215905
 #define MASTER_CLOCK_PALN   10746168
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_DERIVED( sms1_paln, sms_paln_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_DERIVED( sms1_br, sms_br_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 

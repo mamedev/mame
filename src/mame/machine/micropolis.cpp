@@ -63,7 +63,7 @@ static const uint8_t track_SD[][2] = {
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
-const device_type MICROPOLIS = &device_creator<micropolis_device>;
+const device_type MICROPOLIS = device_creator<micropolis_device>;
 
 micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),

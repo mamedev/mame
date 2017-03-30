@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h8s2245.h"
 
-const device_type H8S2241 = &device_creator<h8s2241_device>;
-const device_type H8S2242 = &device_creator<h8s2242_device>;
-const device_type H8S2245 = &device_creator<h8s2245_device>;
-const device_type H8S2246 = &device_creator<h8s2246_device>;
+const device_type H8S2241 = device_creator<h8s2241_device>;
+const device_type H8S2242 = device_creator<h8s2242_device>;
+const device_type H8S2245 = device_creator<h8s2245_device>;
+const device_type H8S2246 = device_creator<h8s2246_device>;
 
 
 h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :

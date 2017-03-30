@@ -8,6 +8,7 @@
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "machine/pic8259.h"
+#include "screen.h"
 
 #define M81_B_B_JUMPER_J3_S \
 	PORT_START("JumperJ3") \

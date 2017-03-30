@@ -80,11 +80,14 @@ with the following code:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fromance.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
-#include "includes/fromance.h"
+#include "sound/ym2413.h"
+#include "video/vsystem_gga.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -305,8 +308,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -319,8 +321,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -333,8 +334,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -902,8 +902,6 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 
 MACHINE_RESET_MEMBER(fromance_state,fromance)
 {
-	int i;
-
 	m_directionflag = 0;
 	m_commanddata = 0;
 	m_portselect = 0;
@@ -923,10 +921,6 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_scrolly[1] = 0;
 	m_gfxreg = 0;
 	m_flipscreen = 0;
-	m_crtc_register = 0;
-
-	for (i = 0; i < 0x10; i++)
-		m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( nekkyoku, fromance_state )
@@ -953,6 +947,9 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
@@ -994,6 +991,9 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
@@ -1033,6 +1033,9 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 

@@ -13,7 +13,7 @@
 // TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
 // - RAM, ROM, microinstructions is the same as TMS1000
 // - 10-term inverted output PLA and segment PLA on the top-left
-const device_type TMS0950 = &device_creator<tms0950_cpu_device>; // 28-pin DIP, 8 O pins, 11? R pins
+const device_type TMS0950 = device_creator<tms0950_cpu_device>; // 28-pin DIP, 8 O pins, 11? R pins
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is the same as TMS1000
@@ -22,8 +22,8 @@ const device_type TMS0950 = &device_creator<tms0950_cpu_device>; // 28-pin DIP, 
 //     RETN, SETR, RBIT, SBIT, LDX, COMX, TDO, ..., redir(----0-00), LDP
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
-const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
+const device_type TMS0970 = device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
+const device_type TMS1990 = device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
 
 
 // internal memory maps

@@ -17,7 +17,7 @@
 
 
 
-const device_type NMK112 = &device_creator<nmk112_device>;
+const device_type NMK112 = device_creator<nmk112_device>;
 
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK112, "NMK112", tag, owner, clock, "nmk112", __FILE__),

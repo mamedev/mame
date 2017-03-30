@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GG_EXT_PORT = &device_creator<gg_ext_port_device>;
+const device_type GG_EXT_PORT = device_creator<gg_ext_port_device>;
 
 
 

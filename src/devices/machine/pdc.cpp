@@ -113,7 +113,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PDC = &device_creator<pdc_device>;
+const device_type PDC = device_creator<pdc_device>;
 
 //-------------------------------------------------
 //  ROM( PDC )

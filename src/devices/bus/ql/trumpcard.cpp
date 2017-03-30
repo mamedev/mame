@@ -23,10 +23,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_TRUMP_CARD = &device_creator<ql_trump_card_t>;
-const device_type QL_TRUMP_CARD_256K = &device_creator<ql_trump_card_256k_t>;
-const device_type QL_TRUMP_CARD_512K = &device_creator<ql_trump_card_512k_t>;
-const device_type QL_TRUMP_CARD_768K = &device_creator<ql_trump_card_768k_t>;
+const device_type QL_TRUMP_CARD = device_creator<ql_trump_card_t>;
+const device_type QL_TRUMP_CARD_256K = device_creator<ql_trump_card_256k_t>;
+const device_type QL_TRUMP_CARD_512K = device_creator<ql_trump_card_512k_t>;
+const device_type QL_TRUMP_CARD_768K = device_creator<ql_trump_card_768k_t>;
 
 
 //-------------------------------------------------

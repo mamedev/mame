@@ -775,7 +775,7 @@
 	</software>
 	<software name="interceptor">
 		<description>Interceptor</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Blair Rideout</publisher>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">

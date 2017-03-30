@@ -27,6 +27,7 @@
 
 #include "emu.h"
 #include "733_asr.h"
+#include "screen.h"
 
 enum
 {
@@ -78,7 +79,7 @@ PALETTE_INIT_MEMBER(asr733_device, asr733)
 }
 
 
-const device_type ASR733 = &device_creator<asr733_device>;
+const device_type ASR733 = device_creator<asr733_device>;
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),

@@ -209,8 +209,8 @@ static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM_IEC = &device_creator<cbm_iec_device>;
-const device_type CBM_IEC_SLOT = &device_creator<cbm_iec_slot_device>;
+const device_type CBM_IEC = device_creator<cbm_iec_device>;
+const device_type CBM_IEC_SLOT = device_creator<cbm_iec_slot_device>;
 
 
 

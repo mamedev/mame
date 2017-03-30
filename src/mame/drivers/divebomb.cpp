@@ -92,6 +92,8 @@ To verify against original HW:
 
 #include "emu.h"
 #include "includes/divebomb.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

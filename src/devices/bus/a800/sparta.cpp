@@ -15,7 +15,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A800_ROM_SPARTADOS = &device_creator<a800_rom_spartados_device>;
+const device_type A800_ROM_SPARTADOS = device_creator<a800_rom_spartados_device>;
 
 
 a800_rom_spartados_device::a800_rom_spartados_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

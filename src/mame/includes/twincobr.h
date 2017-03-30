@@ -8,6 +8,7 @@
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
+#include "screen.h"
 
 class twincobr_state : public driver_device
 {

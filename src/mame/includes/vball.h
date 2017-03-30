@@ -2,6 +2,7 @@
 // copyright-holders:Paul Hampson
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class vball_state : public driver_device
 {

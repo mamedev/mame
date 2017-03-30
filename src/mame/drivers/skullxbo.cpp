@@ -20,9 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/skullxbo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "includes/skullxbo.h"
+#include "speaker.h"
 
 
 

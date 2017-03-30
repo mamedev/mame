@@ -24,9 +24,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mjkjidai.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/mjkjidai.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(mjkjidai_state::adpcm_w)

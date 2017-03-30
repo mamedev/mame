@@ -222,12 +222,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class nmg5_state : public driver_device
 {

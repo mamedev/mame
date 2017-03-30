@@ -38,11 +38,12 @@
 
 #include "machine/clock.h"
 #include "machine/input_merger.h"
+#include "speaker.h"
 
 
-extern const device_type EFO_ZSU = &device_creator<efo_zsu_device>;
-extern const device_type EFO_ZSU1 = &device_creator<efo_zsu1_device>;
-extern const device_type CEDAR_MAGNET_SOUND = &device_creator<cedar_magnet_sound_device>;
+const device_type EFO_ZSU = device_creator<efo_zsu_device>;
+const device_type EFO_ZSU1 = device_creator<efo_zsu1_device>;
+const device_type CEDAR_MAGNET_SOUND = device_creator<cedar_magnet_sound_device>;
 
 
 efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)

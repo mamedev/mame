@@ -338,12 +338,15 @@ Notes:
 #include "emu.h"
 #include "includes/segas24.h"
 #include "includes/segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "video/segaic24.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK        XTAL_20MHz
 #define VIDEO_CLOCK         XTAL_32MHz

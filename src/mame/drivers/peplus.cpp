@@ -197,11 +197,14 @@ A Note about Best Bet Products.
 ***********************************************************************************/
 
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "peplus.lh"
 #include "pe_schip.lh"
@@ -792,7 +795,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	}
 
 	if (m_bv_pulse == 1) {
-		return (0x70 || m_in0->read()); // Add Bill Validator Credit Pulse
+		return (0x70 | m_in0->read()); // Add Bill Validator Credit Pulse
 	} else {
 		return m_in0->read();
 	}

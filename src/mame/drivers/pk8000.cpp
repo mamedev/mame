@@ -10,14 +10,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/pk8000.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
-#include "formats/fmsx_cas.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "includes/pk8000.h"
 #include "machine/ram.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/fmsx_cas.h"
 
 
 class pk8000_state : public pk8000_base_state

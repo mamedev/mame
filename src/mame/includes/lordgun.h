@@ -8,6 +8,7 @@
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 struct lordgun_gun_data
 {

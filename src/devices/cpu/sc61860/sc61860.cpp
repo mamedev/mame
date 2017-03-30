@@ -46,7 +46,7 @@
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type SC61860 = &device_creator<sc61860_device>;
+const device_type SC61860 = device_creator<sc61860_device>;
 
 
 sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

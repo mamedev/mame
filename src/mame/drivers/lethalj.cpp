@@ -140,9 +140,10 @@ Pin #11(+) | | R               |
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
 #include "includes/lethalj.h"
+
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK            XTAL_40MHz

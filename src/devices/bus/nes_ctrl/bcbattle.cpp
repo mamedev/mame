@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_BARCODE_BATTLER = &device_creator<nes_bcbattle_device>;
+const device_type NES_BARCODE_BATTLER = device_creator<nes_bcbattle_device>;
 
 
 MACHINE_CONFIG_FRAGMENT( nes_battler )

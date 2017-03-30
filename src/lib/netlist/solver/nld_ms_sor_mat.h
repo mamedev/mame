@@ -39,7 +39,7 @@ public:
 		{
 		}
 
-	virtual ~matrix_solver_SOR_mat_t() {}
+	virtual ~matrix_solver_SOR_mat_t() override {}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 

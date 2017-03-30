@@ -169,15 +169,20 @@ Protection Notes:
 ********************************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "includes/raiden2.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/3812intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/raiden2.h"
+#include "sound/ym2151.h"
 #include "machine/r2crypt.h"
+
+#include "debugger.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void raiden2_state::machine_start()
 {
@@ -401,15 +406,17 @@ WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
 
 WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 {
-	COMBINE_DATA(scrollvals + offset);
-	data = scrollvals[offset];
-
 	tilemap_t *tm = nullptr;
 	switch(offset/2) {
 	case 0: tm = background_layer; break;
 	case 1: tm = midground_layer; break;
 	case 2: tm = foreground_layer; break;
+	default: assert(0); break;
 	}
+
+	COMBINE_DATA(scrollvals + offset);
+	data = scrollvals[offset];
+
 	if(offset & 1)
 		tm->set_scrolly(0, data);
 	else

@@ -22,6 +22,8 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
 
 class zrt80_state : public driver_device
 {

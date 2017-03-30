@@ -36,11 +36,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/exzisus.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
-#include "includes/exzisus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************

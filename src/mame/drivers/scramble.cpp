@@ -29,14 +29,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/s2650/s2650.h"
-#include "sound/ay8910.h"
-#include "machine/i8255.h"
-#include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "includes/scramble.h"
 
+#include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/i8255.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )

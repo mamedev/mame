@@ -38,20 +38,28 @@
 ************************************************************************************************/
 
 #include "emu.h"
+#include "includes/fm7.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
+
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
 
-#include "imagedev/cassette.h"
-#include "formats/fm7_cas.h"
-#include "imagedev/flopdrv.h"
 #include "bus/centronics/dsjoy.h"
-#include "includes/fm7.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+
+#include "formats/fm7_cas.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -366,7 +374,7 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		uint8_t* RAM = memregion("maincpu")->base();
 

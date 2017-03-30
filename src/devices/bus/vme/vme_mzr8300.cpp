@@ -113,7 +113,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MZR8300 = &device_creator<vme_mzr8300_card_device>;
+const device_type VME_MZR8300 = device_creator<vme_mzr8300_card_device>;
 
 /* These values are borrowed just to get the terminal going and should be replaced
  * once a proper serial board hardware (ie MZ 8300) is found and emulated. */

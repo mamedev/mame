@@ -27,8 +27,8 @@ static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IEEE488 = &device_creator<ieee488_device>;
-const device_type IEEE488_SLOT = &device_creator<ieee488_slot_device>;
+const device_type IEEE488 = device_creator<ieee488_device>;
+const device_type IEEE488_SLOT = device_creator<ieee488_slot_device>;
 
 template class device_finder<ieee488_device, false>;
 template class device_finder<ieee488_device, true>;

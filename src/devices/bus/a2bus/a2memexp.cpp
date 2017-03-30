@@ -20,8 +20,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MEMEXP = &device_creator<a2bus_memexpapple_device>;
-const device_type A2BUS_RAMFACTOR = &device_creator<a2bus_ramfactor_device>;
+const device_type A2BUS_MEMEXP = device_creator<a2bus_memexpapple_device>;
+const device_type A2BUS_RAMFACTOR = device_creator<a2bus_ramfactor_device>;
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
 

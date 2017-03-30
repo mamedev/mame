@@ -28,16 +28,17 @@
 
 #include "emu.h"
 #include "cpuwiz.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_ROM_VERSABOARD = &device_creator<a78_versaboard_device>;
-const device_type A78_ROM_MEGACART = &device_creator<a78_megacart_device>;
+const device_type A78_ROM_VERSABOARD = device_creator<a78_versaboard_device>;
+const device_type A78_ROM_MEGACART = device_creator<a78_megacart_device>;
 
-const device_type A78_ROM_P450_VB = &device_creator<a78_rom_p450_vb_device>;
+const device_type A78_ROM_P450_VB = device_creator<a78_rom_p450_vb_device>;
 
 
 a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

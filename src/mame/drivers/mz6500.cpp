@@ -12,6 +12,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+#include "screen.h"
 
 class mz6500_state : public driver_device
 {

@@ -33,7 +33,7 @@ gladiatr and Great Swordsman set.
 #define CMD_08 1
 #define CMD_4a 2
 
-const device_type TAITO8741_4PACK = &device_creator<taito8741_4pack_device>;
+const device_type TAITO8741_4PACK = device_creator<taito8741_4pack_device>;
 
 taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO8741_4PACK, "I8741 MCU Simulation (Taito 4Pack)", tag, owner, clock, "taito8741_4pack", __FILE__),

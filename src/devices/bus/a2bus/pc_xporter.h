@@ -21,7 +21,7 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

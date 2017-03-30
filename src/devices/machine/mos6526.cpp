@@ -112,10 +112,10 @@ enum
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6526 = &device_creator<mos6526_device>;
-const device_type MOS6526A = &device_creator<mos6526a_device>;
-const device_type MOS8520 = &device_creator<mos8520_device>;
-const device_type MOS5710 = &device_creator<mos5710_device>;
+const device_type MOS6526 = device_creator<mos6526_device>;
+const device_type MOS6526A = device_creator<mos6526a_device>;
+const device_type MOS8520 = device_creator<mos8520_device>;
+const device_type MOS5710 = device_creator<mos5710_device>;
 
 
 
@@ -802,7 +802,7 @@ void mos6526_device::execute_run()
 
 READ8_MEMBER( mos6526_device::read )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0xff;
 
 	uint8_t data = 0;

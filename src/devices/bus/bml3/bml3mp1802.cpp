@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_MP1802 = &device_creator<bml3bus_mp1802_device>;
+const device_type BML3BUS_MP1802 = device_creator<bml3bus_mp1802_device>;
 
 static SLOT_INTERFACE_START( mp1802_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)

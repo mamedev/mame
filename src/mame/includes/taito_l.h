@@ -73,7 +73,7 @@ public:
 	DECLARE_VIDEO_START(taito_l);
 	DECLARE_MACHINE_RESET(taito_l);
 	u32 screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_taitol(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void taitol_chardef14_m(int offset);

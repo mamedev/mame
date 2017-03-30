@@ -15,7 +15,7 @@
 #define K001604_NUM_TILES_LAYER0        16384
 #define K001604_NUM_TILES_LAYER1        4096
 
-const device_type K001604 = &device_creator<k001604_device>;
+const device_type K001604 = device_creator<k001604_device>;
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001604, "K001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),

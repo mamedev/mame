@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "kaneko_hit.h"
 
-const device_type KANEKO_HIT = &device_creator<kaneko_hit_device>;
+const device_type KANEKO_HIT = device_creator<kaneko_hit_device>;
 
 kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_HIT, "Kaneko CALC Hitbox", tag, owner, clock, "kaneko_hit", __FILE__),

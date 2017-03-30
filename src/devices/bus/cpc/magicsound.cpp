@@ -10,13 +10,16 @@
 #include "emu.h"
 #include "magicsound.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
+
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AL_MAGICSOUND = &device_creator<al_magicsound_device>;
+const device_type AL_MAGICSOUND = device_creator<al_magicsound_device>;
 
 
 static MACHINE_CONFIG_FRAGMENT( al_magicsound )

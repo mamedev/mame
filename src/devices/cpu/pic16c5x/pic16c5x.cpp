@@ -76,14 +76,14 @@
 #include "pic16c5x.h"
 
 
-const device_type PIC16C54 = &device_creator<pic16c54_device>;
-const device_type PIC16C55 = &device_creator<pic16c55_device>;
-const device_type PIC16C56 = &device_creator<pic16c56_device>;
-const device_type PIC16C57 = &device_creator<pic16c57_device>;
-const device_type PIC16C58 = &device_creator<pic16c58_device>;
+const device_type PIC16C54 = device_creator<pic16c54_device>;
+const device_type PIC16C55 = device_creator<pic16c55_device>;
+const device_type PIC16C56 = device_creator<pic16c56_device>;
+const device_type PIC16C57 = device_creator<pic16c57_device>;
+const device_type PIC16C58 = device_creator<pic16c58_device>;
 
-const device_type PIC1650 = &device_creator<pic1650_device>;
-const device_type PIC1655 = &device_creator<pic1655_device>;
+const device_type PIC1650 = device_creator<pic1650_device>;
+const device_type PIC1655 = device_creator<pic1655_device>;
 
 
 /****************************************************************************

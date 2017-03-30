@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "includes/dassault.h"
+#include "screen.h"
 
 /******************************************************************************/
 

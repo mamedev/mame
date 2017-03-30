@@ -101,10 +101,7 @@ public:
 		DESCENDING
 	};
 
-	matrix_solver_t(netlist_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params);
-
-	virtual ~matrix_solver_t();
+	virtual ~matrix_solver_t() override;
 
 	void setup(analog_net_t::list_t &nets)
 	{
@@ -143,6 +140,9 @@ public:
 	}
 
 protected:
+
+	matrix_solver_t(netlist_t &anetlist, const pstring &name,
+			const eSortType sort, const solver_parameters_t *params);
 
 	void setup_base(analog_net_t::list_t &nets);
 	void update_dynamic();

@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "avgdvg.h"
+#include "screen.h"
 
 /*************************************
  *
@@ -1567,11 +1568,11 @@ avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *
 {
 }
 
-const device_type DVG = &device_creator<dvg_device>;
-const device_type AVG = &device_creator<avg_device>;
-const device_type AVG_TEMPEST = &device_creator<avg_tempest_device>;
-const device_type AVG_MHAVOC = &device_creator<avg_mhavoc_device>;
-const device_type AVG_STARWARS = &device_creator<avg_starwars_device>;
-const device_type AVG_QUANTUM = &device_creator<avg_quantum_device>;
-const device_type AVG_BZONE = &device_creator<avg_bzone_device>;
-const device_type AVG_TOMCAT = &device_creator<avg_tomcat_device>;
+const device_type DVG = device_creator<dvg_device>;
+const device_type AVG = device_creator<avg_device>;
+const device_type AVG_TEMPEST = device_creator<avg_tempest_device>;
+const device_type AVG_MHAVOC = device_creator<avg_mhavoc_device>;
+const device_type AVG_STARWARS = device_creator<avg_starwars_device>;
+const device_type AVG_QUANTUM = device_creator<avg_quantum_device>;
+const device_type AVG_BZONE = device_creator<avg_bzone_device>;
+const device_type AVG_TOMCAT = device_creator<avg_tomcat_device>;

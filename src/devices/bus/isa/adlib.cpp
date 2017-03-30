@@ -8,7 +8,10 @@
 
 #include "emu.h"
 #include "adlib.h"
-#include "sound/speaker.h"
+
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 
 #define ym3812_StdClock 3579545
 
@@ -41,7 +44,7 @@ WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_ADLIB = &device_creator<isa8_adlib_device>;
+const device_type ISA8_ADLIB = device_creator<isa8_adlib_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

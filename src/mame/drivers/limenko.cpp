@@ -28,8 +28,10 @@
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "sound/qs1000.h"
 #include "sound/okim6295.h"
+#include "sound/qs1000.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class limenko_state : public driver_device

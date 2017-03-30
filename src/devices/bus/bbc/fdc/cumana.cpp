@@ -17,8 +17,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_CUMANA1 = &device_creator<bbc_cumana1_device>;
-const device_type BBC_CUMANA2 = &device_creator<bbc_cumana2_device>;
+const device_type BBC_CUMANA1 = device_creator<bbc_cumana1_device>;
+const device_type BBC_CUMANA2 = device_creator<bbc_cumana2_device>;
 
 
 //-------------------------------------------------

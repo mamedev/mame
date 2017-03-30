@@ -45,20 +45,24 @@
  ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h" // For mp68a, md6802 and e100
 #include "cpu/m6809/m6809.h" // For candela
 #include "machine/6821pia.h" // For all boards
 #include "machine/6840ptm.h" // For candela
 #include "machine/6850acia.h"// For candela
-#include "video/mc6845.h"    // For candela
-#include "machine/wd_fdc.h"  // For candela
+#include "machine/74145.h"   // For the md6802 and e100
 #include "machine/clock.h"   // For candela
 #include "machine/ram.h"     // For candela
+#include "machine/wd_fdc.h"  // For candela
 #include "video/dm9368.h"    // For the mp68a
-#include "machine/74145.h"   // For the md6802 and e100
+#include "video/mc6845.h"    // For candela
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+
+#include "screen.h"
+
 // Generated artwork includes
 #include "mp68a.lh"
 #include "md6802.lh"

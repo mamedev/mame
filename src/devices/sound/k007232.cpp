@@ -145,7 +145,7 @@ static const float kdaca_fn[][2] = {
 /*************************************************************/
 
 
-const device_type K007232 = &device_creator<k007232_device>;
+const device_type K007232 = device_creator<k007232_device>;
 
 k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007232, "K007232 PCM Controller", tag, owner, clock, "k007232", __FILE__),

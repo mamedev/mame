@@ -16,7 +16,7 @@
  svcboot
  **************************************************/
 
-const device_type NEOGEO_SVCBOOT_CART = &device_creator<neogeo_svcboot_cart>;
+const device_type NEOGEO_SVCBOOT_CART = device_creator<neogeo_svcboot_cart>;
 
 neogeo_svcboot_cart::neogeo_svcboot_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_SVCBOOT_CART, "Neo Geo SVC Bootleg Cart", tag, owner, clock, "neocart_svcboot", __FILE__),
@@ -44,7 +44,7 @@ machine_config_constructor neogeo_svcboot_cart::device_mconfig_additions() const
  svcplus
 **************************************************/
 
-const device_type NEOGEO_SVCPLUS_CART = &device_creator<neogeo_svcplus_cart>;
+const device_type NEOGEO_SVCPLUS_CART = device_creator<neogeo_svcplus_cart>;
 
 neogeo_svcplus_cart::neogeo_svcplus_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_SVCPLUS_CART, "Neo Geo SVC Plus Bootleg Cart", tag, owner, clock, "neocart_svcplus", __FILE__)
@@ -63,7 +63,7 @@ void neogeo_svcplus_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  svcplusa
 **************************************************/
 
-const device_type NEOGEO_SVCPLUSA_CART = &device_creator<neogeo_svcplusa_cart>;
+const device_type NEOGEO_SVCPLUSA_CART = device_creator<neogeo_svcplusa_cart>;
 
 neogeo_svcplusa_cart::neogeo_svcplusa_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_SVCPLUSA_CART, "Neo Geo SVC Plus Alt Bootleg Cart", tag, owner, clock, "neocart_svcplusa", __FILE__)
@@ -80,7 +80,7 @@ void neogeo_svcplusa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  svcsplus
  **************************************************/
 
-const device_type NEOGEO_SVCSPLUS_CART = &device_creator<neogeo_svcsplus_cart>;
+const device_type NEOGEO_SVCSPLUS_CART = device_creator<neogeo_svcsplus_cart>;
 
 neogeo_svcsplus_cart::neogeo_svcsplus_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_SVCSPLUS_CART, "Neo Geo SVC S.Plus Bootleg Cart", tag, owner, clock, "neocart_svcsplus", __FILE__),

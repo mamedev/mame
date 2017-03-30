@@ -19,6 +19,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "screen.h"
+
 
 class modellot_state : public driver_device
 {

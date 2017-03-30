@@ -26,7 +26,9 @@ TODO:
 #include "emu.h"
 #include "includes/vector06.h"
 #include "formats/vector06_dsk.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)

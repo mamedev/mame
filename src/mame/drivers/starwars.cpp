@@ -25,6 +25,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/starwars.h"
+#include "includes/slapstic.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
@@ -32,8 +35,8 @@
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "machine/x2212.h"
-#include "includes/starwars.h"
-#include "includes/slapstic.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)

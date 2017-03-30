@@ -17,6 +17,8 @@
       can be removed together with this note when we implement it across MAME.
     - verify cpu speed and rom labels where unknown
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
+    - granits gives error beeps at start, need to press clear to play
+    - finish fphantom emulation
 
 ******************************************************************************
 
@@ -350,34 +352,51 @@ Designer 2000 (model 6102)
 ----------------
 8KB RAM(KM6264AL-10), 32KB ROM(AMI 101.1077A01)
 Ricoh RP65C02G CPU, 3MHz XTAL
-PCB label 510-1129A01
-basically same as Excellence hardware, reskinned board
+PCB label 510.1129A01
+basically same as (Par) Excellence hardware, reskinned board
 
-Designer 2100 (model 6103): same hardware, XTAL 5MHz?, ROMs unknown
+Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 Designer 2100 Display (model 6106)
 ----------------
 8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
 WDC W65C02P-6 CPU, 6MHz XTAL
 4-digit LCD panel
-PCB label 510-1130A01
+PCB label 510.1130A01
 
-Designer 2000 Display (model 6105): same hardware, XTAL and ROMs unknown
+Designer 2000 Display (model 6105): same hardware, no bookrom, 3MHz
 
 Designer 1500 is on 80C50 hardware
 
 
 ******************************************************************************
 
+Phantom (model 6100)
+----------------
+R65C02P4, XTAL marked 4.91?200
+2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
+LCD driver, display panel for digits
+magnetized x/y motor under chessboard, chesspieces have magnet underneath
+piezo speaker, LEDs, 8*8 chessboard buttons
+PCB label 510.1128A01
+
+Fidelity licensed the design of the Milton/Phantom motorized chessboard and released
+their own version. It has a small LCD panel added, the rest looks nearly the same from
+the outside. After Fidelity was taken over by H&G, it was rereleased in 1990 as the
+Mephisto Phantom. This is assumed to be identical.
+
+
+******************************************************************************
+
 Chesster (model 6120)
-There is also a German version titled Kishon Chesster
+There is also a German version titled Kishon Chesster (model 6120G, or 6127)
 ----------------
 
 8*(8+1) buttons, 8+8+1 LEDs
 8KB RAM(UM6264-12), 32KB ROM(M27C256B)
 Ricoh RP65C02G CPU, 5MHz XTAL
 8-bit DAC speech timed via IRQ, 128KB ROM(AMI custom label)
-PCB label 510-1141C01
+PCB label 510.1141C01
 
 I/O is via TTL, very similar to Designer Display
 
@@ -385,6 +404,7 @@ I/O is via TTL, very similar to Designer Display
 
 #include "emu.h"
 #include "includes/fidelbase.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
@@ -392,6 +412,7 @@ I/O is via TTL, very similar to Designer Display
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "fidel_chesster.lh" // clickable
@@ -473,8 +494,13 @@ public:
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
 	DECLARE_DRIVER_INIT(fdesdis);
 
+	// Phantom
+	DECLARE_MACHINE_RESET(fphantom);
+	DECLARE_DRIVER_INIT(fphantom);
+
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
+	DECLARE_WRITE8_MEMBER(kishon_control_w);
 	DECLARE_DRIVER_INIT(chesster);
 };
 
@@ -935,6 +961,25 @@ DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
 
 
 /******************************************************************************
+    Phantom
+******************************************************************************/
+
+// TTL/generic
+
+MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
+{
+	fidelbase_state::machine_reset();
+	membank("bank1")->set_entry(0);
+}
+
+DRIVER_INIT_MEMBER(fidel6502_state, fphantom)
+{
+	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
+}
+
+
+
+/******************************************************************************
     Chesster
 ******************************************************************************/
 
@@ -960,9 +1005,17 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
+WRITE8_MEMBER(fidel6502_state::kishon_control_w)
+{
+	chesster_control_w(space, offset, data);
+
+	// 2 more bankswitch bits: 74259(2) Q2 to A17, Q0 to A18
+	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4) | (m_speech_bank << 1 & 8) | (m_speech_bank << 4 & 0x10));
+}
+
 DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, memregion("user1")->bytes() / 0x4000, memregion("user1")->base(), 0x4000);
 }
 
 
@@ -1081,7 +1134,7 @@ static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// Designer Display, Chesster
+// Designer Display, Phantom, Chesster
 
 static ADDRESS_MAP_START( fdesdis_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -1091,12 +1144,23 @@ static ADDRESS_MAP_START( fdesdis_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( fphantom_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, chesster_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac8", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kishon_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
+	AM_IMPORT_FROM( chesster_map )
 ADDRESS_MAP_END
 
 
@@ -1317,8 +1381,8 @@ static INPUT_PORTS_START( csc )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
 	PORT_START("IN.9") // hardwired
-	PORT_CONFNAME( 0x01, 0x00, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -1329,8 +1393,8 @@ static INPUT_PORTS_START( cscg )
 	PORT_INCLUDE( csc )
 
 	PORT_MODIFY("IN.9")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 
@@ -1351,8 +1415,8 @@ static INPUT_PORTS_START( su9g )
 	PORT_INCLUDE( su9 )
 
 	PORT_MODIFY("IN.9")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 
@@ -1380,8 +1444,8 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
 
 	PORT_START("IN.9") // hardwired
-	PORT_CONFNAME( 0x01, 0x00, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -1392,8 +1456,8 @@ static INPUT_PORTS_START( easg )
 	PORT_INCLUDE( eas )
 
 	PORT_MODIFY("IN.9")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 
@@ -1421,8 +1485,8 @@ static INPUT_PORTS_START( eag )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
 	PORT_START("IN.9") // hardwired
-	PORT_CONFNAME( 0x01, 0x00, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -1433,8 +1497,8 @@ static INPUT_PORTS_START( eagg )
 	PORT_INCLUDE( eag )
 
 	PORT_MODIFY("IN.9")
-	PORT_CONFNAME( 0x01, 0x01, "Language" )
-	PORT_CONFSETTING(    0x00, "English" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
 	PORT_CONFSETTING(    0x01, "Other" )
 INPUT_PORTS_END
 
@@ -1480,11 +1544,11 @@ static INPUT_PORTS_START( fexcelv )
 	PORT_INCLUDE( fexcelb )
 
 	PORT_START("IN.9")
-	PORT_CONFNAME( 0x03, 0x00, "Language" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fexcelv_bankswitch, 0)
-	PORT_CONFSETTING(    0x00, "English" )
-	PORT_CONFSETTING(    0x01, "German" )
-	PORT_CONFSETTING(    0x02, "French" )
-	PORT_CONFSETTING(    0x03, "Spanish" )
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, fexcelv_bankswitch, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( German ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( French ) )
+	PORT_CONFSETTING(    0x03, DEF_STR( Spanish ) )
 	PORT_BIT(0x7c, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("speech", s14001a_device, busy_r)
 INPUT_PORTS_END
@@ -1531,6 +1595,11 @@ static INPUT_PORTS_START( chesster )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fphantom )
+	PORT_INCLUDE( cb_buttons )
+INPUT_PORTS_END
+
+
 
 /******************************************************************************
     Machine Drivers
@@ -1567,7 +1636,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( csc, fidel6502_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3900000/2) // from 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
 
@@ -1738,6 +1807,13 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fexcel4, fexcel )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_4MHz) // R65C02P4
+	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( fexcelb, fexcel )
 
 	/* basic machine hardware */
@@ -1750,6 +1826,13 @@ static MACHINE_CONFIG_DERIVED( fexcelp, fexcel )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( granits, fexcelp )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_8MHz) // overclocked
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
@@ -1766,6 +1849,13 @@ static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fdes2100, fdes2000 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_5MHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
@@ -1808,6 +1898,25 @@ static MACHINE_CONFIG_DERIVED( fdes2000d, fdes2100d )
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( fphantom, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4_9152MHz) // R65C02P4
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_CPU_PROGRAM_MAP(fphantom_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, fphantom)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_fidel_phantom)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( chesster, fidel6502_state )
 
 	/* basic machine hardware */
@@ -1826,6 +1935,14 @@ static MACHINE_CONFIG_START( chesster, fidel6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kishon, chesster )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(kishon_map)
 MACHINE_CONFIG_END
 
 
@@ -2128,7 +2245,7 @@ ROM_START( fscc9ps )
 ROM_END
 
 
-ROM_START( fscc12 )
+ROM_START( fscc12 ) // model 6086, PCB label 510-1084B01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1068a01",   0x8000, 0x2000, CRC(63c76cdd) SHA1(e0771c98d4483a6b1620791cb99a7e46b0db95c4) ) // SSS SCM23C65E4
 	ROM_LOAD("tms2732ajl-45", 0xc000, 0x1000, CRC(45070a71) SHA1(8aeecff828f26fb7081902c757559903be272649) ) // TI TMS2732AJL-45
@@ -2138,37 +2255,61 @@ ROM_END
 
 ROM_START( fexcel ) // model 6080(B), PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) )
 ROM_END
 
-#define rom_fexceld rom_fexcel /* model 6093, PCB label 510.1117A02 */
+ROM_START( fexceld ) // model 6093, PCB label 510.1117A02
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same rom as fexcel
+ROM_END
 
 ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
+	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256, same rom as fexcel
 
 	ROM_REGION( 0x8000, "speech", 0 )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
-ROM_START( fexcela ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
+ROM_START( fexcel12 ) // model EP12, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072a01.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
 ROM_END
 
-ROM_START( fexcelb ) // model EP12, PCB label 510-1099A01
+ROM_START( fexcel124 ) // model EP12, PCB label 510-1099A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1073a01.ic5", 0xc000, 0x4000, CRC(3e221534) SHA1(7516bc6a8aab9d8ac30ac1a9317630a6aa9ac1a0) )
+ROM_END
+
+ROM_START( fexcela ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
 
-ROM_START( fexcelp ) // model 6083, PCB label 510-1099B01
+
+ROM_START( fexcelp ) // model 6083, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) )
+ROM_END
+
+ROM_START( fexcelpb ) // model 6083, PCB label 510-1099B01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label, only 1 byte difference, assume bugfix in bookrom
+ROM_END
+
+ROM_START( granits ) // modified SC12 board, overclocked Par Excellence program
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("granit_s-4", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
 ROM_END
 
 ROM_START( fdes2000 ) // model 6102, PCB label 510.1129A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI, same label as fexcelp
+ROM_END
+
+ROM_START( fdes2100 ) // model 6103, PCB label 510.1129A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // same as fdes2000
 ROM_END
 
 
@@ -2188,6 +2329,15 @@ ROM_START( fdes2000d ) // model 6105, PCB label 510.1130A01
 ROM_END
 
 
+ROM_START( fphantom ) // model 6100, PCB label 510.1128A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u_3c_yellow.u3", 0x8000, 0x8000, CRC(fb7c38ae) SHA1(a1aa7637705052cb4eec92644dc79aee7ba4d77c) ) // 27C256
+
+	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_LOAD("u_4_white.u4",  0x0000, 0x8000, CRC(e4181ba2) SHA1(1f77d1867c6f566be98645fc252a01108f412c96) ) // 27C256
+ROM_END
+
+
 ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("ch_1.3.ic9", 0x8000, 0x8000, CRC(8b42d1ad) SHA1(2161fc5ab2476fe7ca4ffc226e3cb329b8a57a01) ) // 27256, CH 1.3 on sticker
@@ -2202,6 +2352,14 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 
 	ROM_REGION( 0x20000, "user1", 0 )
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
+ROM_END
+
+ROM_START( kishon ) // model 6120G, PCB label 510.1141C01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256
+
+	ROM_REGION( 0x80000, "user1", 0 )
+	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
 ROM_END
 
 
@@ -2239,21 +2397,28 @@ CONS( 1986, feag2100fr, feag2100, 0,      eag,       eagg,      driver_device, 0
 
 CONS( 1982, fscc9,      0,        0,      sc9,       sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, fscc9b,     fscc9,    0,      sc9b,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
 CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, fexcel,     0,        0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
-CONS( 1985, fexcelb,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcel12,   fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
+CONS( 1985, fexcel124,  fexcel,   0,      fexcel4,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelpb,   fexcelp,  0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, granits,    fexcelp,  0,      granits,   fexcel,    driver_device, 0, "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2000,   fexcelp,  0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1988, fdes2100,   fexcelp,  0,      fdes2100,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
 CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d,  fdes2100d,0,      fdes2000d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
+CONS( 1988, fphantom,   0,        0,      fphantom,  fphantom,  fidel6502_state, fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, chesstera,  chesster, 0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,     chesster, 0,      kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

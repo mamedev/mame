@@ -37,7 +37,7 @@ enum
 };
 
 // device type definition
-const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
+const device_type PCE220SERIAL = device_creator<pce220_serial_device>;
 
 //-------------------------------------------------
 //  pce220_serial_device - constructor
@@ -81,19 +81,6 @@ void pce220_serial_device::device_reset()
 	m_bytes_count = 0;
 	m_dout = m_busy = m_xout = 0;
 	m_din = m_xin = m_ack = 0;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce220_serial_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 

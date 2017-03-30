@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "volt_reg.h"
 
-const device_type VOLTAGE_REGULATOR = &device_creator<voltage_regulator_device>;
+const device_type VOLTAGE_REGULATOR = device_creator<voltage_regulator_device>;
 
 voltage_regulator_device::voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VOLTAGE_REGULATOR, "Voltage Regulator", tag, owner, clock, "volt_reg", __FILE__),

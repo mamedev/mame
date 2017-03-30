@@ -908,23 +908,17 @@ public:
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 private:
 	int tape_get_id();
 };
 
-const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
+const device_type TI990_TAPE = device_creator<ti990_tape_image_device>;
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI990_TAPE, "TI-990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
-}
-
-void ti990_tape_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void ti990_tape_image_device::device_start()
@@ -974,21 +968,11 @@ static MACHINE_CONFIG_FRAGMENT( tap_990 )
 	MCFG_TI990_TAPE_ADD("tape3")
 MACHINE_CONFIG_END
 
-const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
+const device_type TI990_TAPE_CTRL = device_creator<tap_990_device>;
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI-990 Tape Controller", tag, owner, clock, "tap_990", __FILE__),
 	m_int_line(*this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tap_990_device::device_config_complete()
 {
 }
 

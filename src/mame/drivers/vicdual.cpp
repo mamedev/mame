@@ -52,14 +52,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/vicdual.h"
 #include "audio/carnival.h"
 #include "audio/depthch.h"
 #include "audio/invinco.h"
 #include "audio/pulsar.h"
 #include "audio/vicdual.h"
+
+#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 #include "depthch.lh"
 
@@ -2245,7 +2247,11 @@ WRITE8_MEMBER(vicdual_state::nsub_io_w)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
-	if (offset & 0x04)  palette_bank_w(space, 0, data);
+	if (offset & 0x04)
+	{
+		palette_bank_w(space, 0, data);
+		m_gradient = data & 4;
+	}
 }
 
 

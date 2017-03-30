@@ -35,10 +35,10 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_74X161X161X32 = &device_creator<nes_74x161x161x32_device>;
-const device_type NES_74X139X74 = &device_creator<nes_74x139x74_device>;
-const device_type NES_74X377 = &device_creator<nes_74x377_device>;
-const device_type NES_74X161X138 = &device_creator<nes_74x161x138_device>;
+const device_type NES_74X161X161X32 = device_creator<nes_74x161x161x32_device>;
+const device_type NES_74X139X74 = device_creator<nes_74x139x74_device>;
+const device_type NES_74X377 = device_creator<nes_74x377_device>;
+const device_type NES_74X161X138 = device_creator<nes_74x161x138_device>;
 
 
 nes_74x161x161x32_device::nes_74x161x161x32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

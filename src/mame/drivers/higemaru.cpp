@@ -13,9 +13,12 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/higemaru.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/higemaru.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)

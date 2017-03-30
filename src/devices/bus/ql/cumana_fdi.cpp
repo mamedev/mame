@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CUMANA_FLOPPY_DISK_INTERFACE = &device_creator<cumana_floppy_disk_interface_t>;
+const device_type CUMANA_FLOPPY_DISK_INTERFACE = device_creator<cumana_floppy_disk_interface_t>;
 
 
 //-------------------------------------------------

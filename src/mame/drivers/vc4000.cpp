@@ -134,6 +134,8 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 #include "emu.h"
 #include "includes/vc4000.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 READ8_MEMBER( vc4000_state::vc4000_key_r )
 {

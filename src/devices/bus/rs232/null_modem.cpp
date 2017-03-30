@@ -138,4 +138,4 @@ void null_modem_device::rcv_complete()
 	m_stream->output(get_received_char());
 }
 
-const device_type NULL_MODEM = &device_creator<null_modem_device>;
+const device_type NULL_MODEM = device_creator<null_modem_device>;

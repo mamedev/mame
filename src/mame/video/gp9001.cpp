@@ -125,6 +125,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 
 #include "emu.h"
 #include "gp9001.h"
+#include "screen.h"
 
 /*
  Single VDP mixing priority note:
@@ -211,7 +212,7 @@ GFXDECODE_MEMBER( gp9001vdp_device::gfxinfo )
 GFXDECODE_END
 
 
-const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
+const device_type GP9001_VDP = device_creator<gp9001vdp_device>;
 
 gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GP9001_VDP, "GP9001 VDP", tag, owner, clock, "gp9001vdp", __FILE__),

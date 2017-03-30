@@ -1105,6 +1105,25 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ikaria" cloneof="ikari" supported="no">
+		<description>Ikari Warriors (alt)</description>
+		<year>1987</year>
+		<publisher>Data East</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, 1 bad or protected sector on final track -->
+			<dataarea name="flop" size = "409600">
+				<rom name="[PC] Ikari Warriors.img" size="409600" crc="1cd6ff6e" sha1="904a355dd55895a7b9dd9c943054f474cbb84852" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, shows as good and unmodified -->
+			<feature name="part_id" value="EGA Disk" />
+			<dataarea name="flop" size = "409600">
+				<rom name="[PC] Ikari Warriors EGA [5.25].img" size="409600" crc="763f1962" sha1="d9224132cde74fbacfdbcb8d9d5034fd62c2f611" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="inca" supported="no">
 		<description>Inca</description>
 		<year>1985</year>
@@ -2863,6 +2882,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="editexte">
+		<description>EDITEXTE</description>
+		<year>1992</year>
+		<publisher>Gérard Lyannaz</publisher>
+		<info name="version" value="2º" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] EDITEXTE [5.25].img" size="368640" crc="bbf2d707" sha1="e3a2e08005b6beb097e3db74ce894007b6cebfb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jingdisk">
 		<description>Jingle Disk</description>
 		<year>1986</year>
@@ -2870,6 +2901,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
 				<rom name="Disk01.img" size="184320" crc="55dd837c" sha1="fab48e2f3153d8529406e1c0e0428dd32e069618" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labelmag">
+		<description>Label Magic (Shareware)</description>
+		<year>1989</year>
+		<publisher>Neocom</publisher>
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Label Magic [5.25].img" size="368640" crc="e1475b1d" sha1="abd775ca1022d17bfb00bc6ea6a847b7340e7ce7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multtext">
+		<description>Multitexte</description>
+		<year>1992</year>
+		<publisher>François Burckel</publisher>
+		<info name="version" value="1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] MultiTexte [5.25].img" size="368640" crc="a38bd8d8" sha1="2a88e879c9ee89da687eebacf07037a85422a0d6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2884,6 +2939,22 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="norton utilities 310.img" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" offset="0x00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmasterp">
+		<description>PrintMaster Plus</description>
+		<year>1988</year>
+		<publisher>Unison World</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size = "368640">
+				<rom name="[PC] Print Master Plus D1.2 [5.25].img" size="368640" crc="5c1d27fe" sha1="300f4e6b999cad025aa5e8e14c6dc2baaa8e0112" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop2" size = "368640">
+				<rom name="[PC] Print Master Plus D2.2 [5.25].img" size="368640" crc="bc646f11" sha1="27872f48eb22bd7851921feb31d1becc71d51f2c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4668,6 +4739,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="bivouac">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>Bivouac</description>
+		<year>1987</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "377856">
+				<rom name="[PC] Bivouac [5.25].img" size="377856" crc="d2ec2072" sha1="997e1a26d0f8207f91a839ce0e63a88a7976a73e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1989</year>
@@ -4838,6 +4921,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- copied disks with copy utility watermark on final track -->
+	<software name="cyeagaft">
+		<description>Chuck Yeager's Advanced Flight Trainer (French)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "387072">
+				<rom name="[PC] Chuck Yeager's AFT D1.2 [5.25].img" size="387072" crc="66b5ed52" sha1="9d99f5ef5ee1aefbd65729e77e0c2f474443597d" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "387072">
+				<rom name="[PC] Chuck Yeager's AFT D2.2 [5.25].img" size="387072" crc="3d2fecd4" sha1="6224ba3cca920cab74ada05304e7e4767c2c687e" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dmnstomb">
 		<description>Demon's Tomb - The Awakening</description>
 		<year>1989</year>
@@ -4882,6 +4983,22 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="ddragona" cloneof="ddragon">
+		<description>Double Dragon (5.25", older)</description>
+		<year>1988</year>
+		<publisher>Arcadia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Double Dragon D1.2 [5.25].img" size="368640" crc="1ff27d27" sha1="4276093a6c49ca2a44c0b6d104ae8b506f27165f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Double Dragon D2.2 [5.25].img" size="368640" crc="bef457ee" sha1="93314e374a7ff907fbd57d69076b94d0c3c09944" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddragon2">
 		<description>Double Dragon II - The Revenge</description>
 		<year>1989</year>
@@ -4917,6 +5034,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Double Dragon III - The Rosetta Stone (World) (5.25'') (Disk 2).img" size="368640" crc="fb5a97a4" sha1="a46b44548145024479a5889482e88446d4b25f9e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1samurai" supported="no">
+		<description>First Samurai</description>
+		<year>1992</year>
+		<publisher>Vivid Image</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] First Samurai.img" size="737280" crc="49264976" sha1="3178d690ad32a3565e4fa6c68a84b4232acea251" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5011,6 +5139,19 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="indy500_35" cloneof="indy500">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>Indianapolis 500: The Simulation (3.5", newer)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="ZC/35/93 P/N : 0400000310" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Indianapolis 500 The Simulation.img" size="737280" crc="76e41cc3" sha1="aa21e32da1c091a9302de80f1c4285fc085e353d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indy500_35a" cloneof="indy500">
 		<description>Indianapolis 500: The Simulation (3.5")</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
@@ -5050,6 +5191,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
 				<rom name="Shogun [1987] [Mastertronic Group] [5.25] [1 of 1] [a1].img" size="184320" crc="4a4daf48" sha1="337c9934218a351bce352996c84ae14f45435485" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetfight" supported="no">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>JetFighter I: The Adventure</description>
+		<year>1991</year>
+		<publisher>Velocity</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="24LB-JFT02" />
+			<dataarea name="flop" size = "737280">
+				<rom name="[PC] Jetfighter I [3.5].img" size="737280" crc="907b4d46" sha1="259a15e7aa6b45aa0328566c86ceffe36c97db24" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5175,6 +5329,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Leather Goddesses of Phobos [1988] [5.25] [1 of 1].img" size="368640" crc="8e586c8d" sha1="865cf5dc0de66b0ef06e7bd710eee8a6b0351154" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lic2kill">
+		<description>Licence to Kill</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Licence To Kill [5.25].img" size="368640" crc="725f268e" sha1="7e908d1cd8c10109859638113f99a5c0655b08ac" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5310,6 +5475,33 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pickpile">
+		<description>Pick'n Pile</description>
+		<year>1991</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prehist">
+		<description>Prehistorik</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Prehistorik D1.2 [5.25].img" size="368640" crc="f60f5fe5" sha1="5b7d07f5c43c00e78b9821ae74c1565d8e13acf5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Prehistorik D2.2 [5.25].img" size="368640" crc="83e839da" sha1="4f8906e08e912eb957ba2eacf5be959aee001f6e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersia">
 		<description>Prince of Persia (5.25", v1.3)</description>
 		<year>1990</year>
@@ -5395,6 +5587,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="rockford">
+		<description>Rockford</description>
+		<year>1987</year>
+		<publisher>Mastertronic</publisher>
+		<info name="developer" value="Synergistic Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Rockford D1.2 [5.25].img" size="368640" crc="fef39278" sha1="9b60e3c2397412507116000279798aefb4e38371" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Rockford D2.2 [5.25].img" size="368640" crc="28fc4d51" sha1="baa9482064b253add90e830597a370186897daa3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="agidemos">
 		<description>Sierra Demo</description>
 		<year>1987</year>
@@ -5429,6 +5638,22 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Skate or Die [1988] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="ad1fb4e3" sha1="60a315b8f744258d66c221538830808ae7184f47" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skweek">
+		<description>Skweek</description>
+		<year>1989</year>
+		<publisher>Loriciels</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Skweek D1.2 [5.25].img" size="368640" crc="2a66e086" sha1="51139705882ab153c06ad844c6cd1030ccb3961a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Skweek D2.2 [5.25].img" size="368640" crc="29fb059e" sha1="c93d3411ec866b6c489bfad5b7825c89d79b6f90" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5516,6 +5741,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "242382">
 				<rom name="Tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbdriv" supported="no">
+		<description>Turbo Driver</description>
+		<year>1987</year>
+		<publisher>France Image Logiciel</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<!-- modified with high scores, user-created circuits, etc. -->
+				<rom name="[PC] Turbo Driver [5.25].img" size="368640" crc="cac778cc" sha1="e2d725c8dc3d530231489cab827bc1b938af4bdc" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

@@ -85,8 +85,8 @@ AUD_A_RIGHT EQU %00000001
 
 
 // device type definition
-const device_type LYNX_SND = &device_creator<lynx_sound_device>;
-const device_type LYNX2_SND = &device_creator<lynx2_sound_device>;
+const device_type LYNX_SND = device_creator<lynx_sound_device>;
+const device_type LYNX2_SND = device_creator<lynx2_sound_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

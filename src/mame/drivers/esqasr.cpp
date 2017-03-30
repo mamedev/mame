@@ -38,12 +38,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/68340.h"
-#include "sound/es5506.h"
-#include "cpu/es5510/es5510.h"
-#include "machine/upd765.h"
 
+#include "cpu/es5510/es5510.h"
+#include "machine/68340.h"
 #include "machine/esqvfd.h"
+#include "machine/upd765.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
+
 
 class esqasr_state : public driver_device
 {

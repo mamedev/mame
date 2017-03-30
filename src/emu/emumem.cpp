@@ -714,7 +714,7 @@ private:
 	template<typename _UintType>
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.debugger_access())
+		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
@@ -785,7 +785,7 @@ private:
 	template<typename _UintType>
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.debugger_access())
+		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
 			m_space.device().logerror(
 					m_space.is_octal()
@@ -1739,7 +1739,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_logbytemask(address_to_byte_end(m_logaddrmask)),
 		m_unmap(0),
 		m_spacenum(spacenum),
-		m_debugger_access(false),
 		m_log_unmap(true),
 		m_direct(std::make_unique<direct_read_data>(*this)),
 		m_name(memory.space_config(spacenum)->name()),
@@ -1854,10 +1853,7 @@ void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_
 inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror)
 {
 	// adjust start/end/mask values
-	if (mask == 0)
-		mask = m_addrmask & ~mirror;
-	else
-		mask &= m_addrmask;
+	mask &= m_addrmask;
 	start &= ~mirror & m_addrmask;
 	end &= ~mirror & m_addrmask;
 
@@ -2028,7 +2024,7 @@ void address_space::prepare_map()
 		entry.m_bytestart = entry.m_addrstart;
 		entry.m_byteend = entry.m_addrend;
 		entry.m_bytemirror = entry.m_addrmirror;
-		entry.m_bytemask = entry.m_addrmask;
+		entry.m_bytemask = entry.m_addrmask ? entry.m_addrmask : ~entry.m_addrmirror;
 		adjust_addresses(entry.m_bytestart, entry.m_byteend, entry.m_bytemask, entry.m_bytemirror);
 
 		// if we have a share entry, add it to our map
@@ -2858,7 +2854,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	// adjust the addresses, handling mirrors and such
 	offs_t bytemirror = addrmirror;
 	offs_t bytestart = addrstart;
-	offs_t bytemask = 0;
+	offs_t bytemask = ~addrmirror;
 	offs_t byteend = addrend;
 	adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
@@ -4381,6 +4377,8 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
+	assert(count != 0);
+	assert(maxunits % count == 0);
 
 	// fill in the shifts
 	int cur_offset = 0;
@@ -4390,7 +4388,7 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		u32 shift = (unitnum^shift_xor_mask) * handlerbits;
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
-			m_subunit_infos[m_subunits].m_bytemask = m_bytemask;
+			m_subunit_infos[m_subunits].m_bytemask = m_bytemask / (maxunits / count);
 			m_subunit_infos[m_subunits].m_mask = unitmask;
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;

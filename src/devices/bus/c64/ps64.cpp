@@ -57,7 +57,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_PS64 = &device_creator<c64_ps64_cartridge_device>;
+const device_type C64_PS64 = device_creator<c64_ps64_cartridge_device>;
 
 
 //-------------------------------------------------

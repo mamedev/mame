@@ -22,6 +22,7 @@ be found!
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "screen.h"
 
 
 class pv9234_state : public driver_device

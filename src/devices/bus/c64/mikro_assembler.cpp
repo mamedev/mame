@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIKRO_ASSEMBLER = &device_creator<c64_mikro_assembler_cartridge_device>;
+const device_type C64_MIKRO_ASSEMBLER = device_creator<c64_mikro_assembler_cartridge_device>;
 
 
 

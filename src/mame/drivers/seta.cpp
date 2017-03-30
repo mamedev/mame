@@ -1360,21 +1360,26 @@ Note: on screen copyright is (c)1998 Coinmaster.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m65c02.h"
 #include "includes/seta.h"
+
+#include "cpu/m6502/m65c02.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #if __uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
@@ -1596,7 +1601,7 @@ READ8_MEMBER(seta_state::dsw2_r)
  Sprites Buffering
 
 */
-void seta_state::screen_eof_seta_buffer_sprites(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
 {
 	// rising edge
 	if (state)
@@ -8075,7 +8080,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
@@ -8112,7 +8117,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
@@ -8303,7 +8308,7 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
@@ -8339,7 +8344,7 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qzkklgy2)
@@ -8391,7 +8396,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_setaroul)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_setaroul)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_setaroul))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", setaroul)
@@ -8938,7 +8943,7 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)

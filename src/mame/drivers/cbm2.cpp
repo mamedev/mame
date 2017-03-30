@@ -11,7 +11,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/cbm2/exp.h"
 #include "bus/cbm2/user.h"
 #include "bus/ieee488/ieee488.h"

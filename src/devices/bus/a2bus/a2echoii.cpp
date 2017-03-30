@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "a2echoii.h"
 #include "sound/tms5220.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -20,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ECHOII = &device_creator<a2bus_echoii_device>;
+const device_type A2BUS_ECHOII = device_creator<a2bus_echoii_device>;
 
 #define TMS_TAG         "tms5220"
 

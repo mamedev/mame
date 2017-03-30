@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_FTRAINER = &device_creator<nes_ftrainer_device>;
+const device_type NES_FTRAINER = device_creator<nes_ftrainer_device>;
 
 
 static INPUT_PORTS_START( nes_joypad )

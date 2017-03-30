@@ -6,16 +6,21 @@
  *
  ****************************************************************************/
 
-#ifndef ZX_H_
-#define ZX_H_
+#ifndef MAME_INCLUDES_ZX_H
+#define MAME_INCLUDES_ZX_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
-#include "formats/zx81_p.h"
-#include "formats/tzx_cas.h"
 #include "machine/ram.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+
+#include "formats/tzx_cas.h"
+#include "formats/zx81_p.h"
 
 
 class zx_state : public driver_device
@@ -105,4 +110,4 @@ protected:
 	void recalc_hsync();
 };
 
-#endif /* ZX_H_ */
+#endif // MAME_INCLUDES_ZX_H

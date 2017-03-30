@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 
 class segapm_state : public driver_device

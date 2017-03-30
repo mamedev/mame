@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "sbp.h"
 
-extern const device_type NEOGEO_SBP_CART = &device_creator<neogeo_sbp_cart>;
+const device_type NEOGEO_SBP_CART = device_creator<neogeo_sbp_cart>;
 
 neogeo_sbp_cart::neogeo_sbp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_SBP_CART, "Neo Geo Super Bubble Pop Cart", tag, owner, clock, "neocart_sbp", __FILE__)

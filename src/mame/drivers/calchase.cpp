@@ -138,6 +138,8 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class calchase_state : public pcat_base_state

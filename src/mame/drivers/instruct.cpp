@@ -43,11 +43,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "instruct.lh"
+
 
 class instruct_state : public driver_device
 {

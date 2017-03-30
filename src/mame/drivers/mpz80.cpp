@@ -165,6 +165,9 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 
 READ8_MEMBER( mpz80_state::mmu_r )
 {
+	if (m_trap && offset >= m_trap_start && offset <= m_trap_start + 0xf)
+		return m_rom->base()[0x3f0 | (m_trap_reset << 10) | (offset - m_trap_start)];
+
 	m_addr = get_address(offset);
 	uint8_t data = 0;
 
@@ -545,7 +548,6 @@ static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
 */
 ADDRESS_MAP_END
 
-
 //-------------------------------------------------
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
@@ -772,37 +774,9 @@ ROM_START( mpz80 )
 ROM_END
 
 
-
-//**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( mpz80 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
-{
-	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
-	{
-		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, m_rom->base() + ((m_trap_reset << 10) | 0x3f0));
-		return ~0;
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(mpz80_state,mpz80)
-{
-	address_space &program = machine().device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(&mpz80_state::mpz80_direct_update_handler, this));
-}
-
-
-
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, driver_device,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

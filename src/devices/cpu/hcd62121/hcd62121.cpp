@@ -30,7 +30,7 @@ constexpr u8 FLAG_CL = 0x01;
 constexpr u8 FLAG_ZH = 0x10;
 
 
-const device_type HCD62121 = &device_creator<hcd62121_cpu_device>;
+const device_type HCD62121 = device_creator<hcd62121_cpu_device>;
 
 
 hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

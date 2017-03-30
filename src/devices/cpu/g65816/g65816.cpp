@@ -93,8 +93,8 @@ TODO general:
 #include "g65816.h"
 
 
-const device_type G65816 = &device_creator<g65816_device>;
-const device_type _5A22 = &device_creator<_5a22_device>;
+const device_type G65816 = device_creator<g65816_device>;
+const device_type _5A22 = device_creator<_5a22_device>;
 
 
 g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

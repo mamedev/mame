@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_JOYSTICK_BOOSTER = &device_creator<vcs_joystick_booster_device>;
+const device_type VCS_JOYSTICK_BOOSTER = device_creator<vcs_joystick_booster_device>;
 
 
 static INPUT_PORTS_START( vcs_joystick_booster )

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_COMAL80 = &device_creator<c64_comal80_cartridge_device>;
+const device_type C64_COMAL80 = device_creator<c64_comal80_cartridge_device>;
 
 
 

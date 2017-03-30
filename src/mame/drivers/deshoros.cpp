@@ -33,6 +33,8 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class destiny_state : public driver_device
 {

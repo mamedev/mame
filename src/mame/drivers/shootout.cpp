@@ -43,10 +43,13 @@
 */
 
 #include "emu.h"
+#include "includes/shootout.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-#include "includes/shootout.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*******************************************************************************/
 

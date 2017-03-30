@@ -11,6 +11,8 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
+#include "speaker.h"
+
 
 class joctronic_state : public driver_device
 {
@@ -22,7 +24,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_soundbank(*this, "soundbank")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(csin_r);
 	DECLARE_WRITE8_MEMBER(control_port_w);

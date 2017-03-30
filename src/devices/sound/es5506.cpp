@@ -163,7 +163,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	}
 }
 
-const device_type ES5506 = &device_creator<es5506_device>;
+const device_type ES5506 = device_creator<es5506_device>;
 
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: es550x_device(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__)
@@ -337,7 +337,7 @@ void es550x_device::device_stop()
 	#endif
 }
 
-const device_type ES5505 = &device_creator<es5505_device>;
+const device_type ES5505 = device_creator<es5505_device>;
 
 es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: es550x_device(mconfig, ES5505, "ES5505", tag, owner, clock, "es5505", __FILE__)

@@ -9,15 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
+
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
+
 #include "debugger.h"
+#include "screen.h"
+
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -314,7 +315,7 @@ void apple2_state::apple2_update_memory_postload()
 
 READ8_MEMBER(apple2_state::apple2_c0xx_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		read8_delegate handlers[] =
 		{
@@ -367,7 +368,7 @@ WRITE8_MEMBER(apple2_state::apple2_c0xx_w)
 
 READ8_MEMBER(apple2_state::apple2_c080_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		device_a2bus_card_interface *slotdevice;
 		int slot;
@@ -424,7 +425,7 @@ int8_t apple2_state::apple2_slotram_r(address_space &space, int slotnum, int off
 {
 	if (m_slot_ram)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 //          printf("slotram_r: taking cnxx_slot to -1\n");
 			m_a2_cnxx_slot = -1;
@@ -448,7 +449,7 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!space.debugger_access()))
+		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
 		{
 //          printf("c1xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -498,7 +499,7 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!space.debugger_access()))
+		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
 		{
 //          printf("c3xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -526,7 +527,7 @@ WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!space.debugger_access()))
+		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
 		{
 //          printf("c3xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -552,7 +553,7 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != nullptr)
 	{
-		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum) && (!space.debugger_access()))
+		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum) && (!machine().side_effect_disabled()))
 		{
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory();
@@ -579,7 +580,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 
 	if (slotdevice != nullptr)
 	{
-		if ((slotdevice->take_c800()) && (!space.debugger_access()))
+		if ((slotdevice->take_c800()) && (!machine().side_effect_disabled()))
 		{
 //          printf("c4xx_w: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
@@ -597,7 +598,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 READ8_MEMBER(apple2_state::apple2_cfff_r)
 {
 	// debugger guard
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 //      printf("cfff_r: taking cnxx_slot to -1\n");
 		m_a2_cnxx_slot = -1;
@@ -609,7 +610,7 @@ READ8_MEMBER(apple2_state::apple2_cfff_r)
 
 WRITE8_MEMBER(apple2_state::apple2_cfff_w)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 //      printf("cfff_w: taking cnxx_slot to -1\n");
 		m_a2_cnxx_slot = -1;
@@ -1652,7 +1653,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
 {
 	uint8_t result = 0;
 
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		/* Read the keyboard data and strobe */
 		g_profiler.start(PROFILER_C00X);
@@ -1706,7 +1707,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 {
 	uint8_t result = apple2_getfloatingbusvalue() & 0x7F;
 
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		g_profiler.start(PROFILER_C01X);
 
@@ -1759,7 +1760,7 @@ WRITE8_MEMBER( apple2_state::apple2_c01x_w )
 
 READ8_MEMBER( apple2_state::apple2_c02x_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		apple2_c02x_w(space, offset, 0, 0);
 	}
@@ -1790,7 +1791,7 @@ WRITE8_MEMBER( apple2_state::apple2_c02x_w )
 
 READ8_MEMBER ( apple2_state::apple2_c03x_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		if (!offset)
 		{
@@ -1822,7 +1823,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c03x_w )
 
 READ8_MEMBER ( apple2_state::apple2_c05x_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		uint32_t mask;
 
@@ -1870,7 +1871,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
 READ8_MEMBER ( apple2_state::apple2_c06x_r )
 {
 	int result = 0;
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		switch (offset & 0x0F)
 		{
@@ -1933,7 +1934,7 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 
 READ8_MEMBER ( apple2_state::apple2_c07x_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		double x_calibration = attotime::from_usec(12).as_double();
 		double y_calibration = attotime::from_usec(13).as_double();

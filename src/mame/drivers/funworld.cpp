@@ -991,17 +991,21 @@
 #define CRTC_CLOCK     (MASTER_CLOCK/8)
 
 #include "emu.h"
-#include "cpu/m6502/r65c02.h"
+#include "includes/funworld.h"
+
 #include "cpu/m6502/m65sc02.h"
-#include "video/mc6845.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "jollycrd.lh"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "bonuscrd.lh"
+#include "jollycrd.lh"
 #include "novoplay.lh"
 #include "royalcrd.lh"
-#include "includes/funworld.h"
 
 
 /**********************

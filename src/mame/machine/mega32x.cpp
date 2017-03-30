@@ -202,8 +202,8 @@ GFX check (these don't explicitly fails):
 #include "sound/volt_reg.h"
 
 
-const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
-const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
+const device_type SEGA_32X_NTSC = device_creator<sega_32x_ntsc_device>;
+const device_type SEGA_32X_PAL = device_creator<sega_32x_pal_device>;
 
 sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)

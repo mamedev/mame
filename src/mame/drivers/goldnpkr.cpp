@@ -1071,24 +1071,26 @@
 
 ************************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-#define CPU_CLOCK       (MASTER_CLOCK/16)
-
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "machine/6821pia.h"
-#include "sound/discrete.h"
-#include "machine/nvram.h"
 
-/* Extra CPUs, MCUs, devices, etc... */
+#include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
+#include "machine/6821pia.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "sound/discrete.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
 #include "upndown.lh"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
+#define CPU_CLOCK       (MASTER_CLOCK/16)
 
 
 class goldnpkr_state : public driver_device

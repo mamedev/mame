@@ -4,7 +4,7 @@
 
     NEC uPD1771-017 as used in the Epoch Super Cassette Vision (SCV)
 
-    Made using recording/analysis on a Yeno (PAL Super Cassete Vision)
+    Made using recording/analysis on a Yeno (PAL Super Cassette Vision)
     by plgDavid
 
     Full markings on my 2 specimens are
@@ -95,7 +95,7 @@
     uPD1771C-006: used in NEC APC for sound as the "MPU"
             -011: used on Firefox F-4/Astro Thunder handheld
             -015: unknown, known to exist from part scalper sites only.
-            -017: used on Epoch Super Cassete Vision for sound; This audio driver HLEs that part only.
+            -017: used on Epoch Super Cassette Vision for sound; This audio driver HLEs that part only.
 
      Used pinout in the SCV:
 
@@ -230,7 +230,7 @@ static unsigned char noise_tbl[]=
 #define STATE_ADPCM   3
 
 
-const device_type UPD1771C = &device_creator<upd1771c_device>;
+const device_type UPD1771C = device_creator<upd1771c_device>;
 
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

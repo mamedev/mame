@@ -25,8 +25,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6530n = &device_creator<mos6530_t>;
-const device_type MOS6532n = &device_creator<mos6532_t>;
+const device_type MOS6530n = device_creator<mos6530_t>;
+const device_type MOS6532n = device_creator<mos6532_t>;
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 8, mos6530_t )
@@ -634,7 +634,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 
 READ8_MEMBER( mos6530_base_t::timer_off_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	return timer_r(false);
@@ -642,7 +642,7 @@ READ8_MEMBER( mos6530_base_t::timer_off_r )
 
 READ8_MEMBER( mos6530_base_t::timer_on_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	return timer_r(true);
@@ -679,7 +679,7 @@ READ8_MEMBER( mos6530_base_t::irq_r )
 {
 	uint8_t data = get_irq_flags();
 
-	if (!space.debugger_access()) {
+	if (!machine().side_effect_disabled()) {
 		if (m_irq_edge) {
 			m_irq_edge = false;
 			update_irq();

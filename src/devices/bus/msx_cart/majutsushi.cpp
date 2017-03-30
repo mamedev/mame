@@ -2,9 +2,12 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "majutsushi.h"
-#include "sound/volt_reg.h"
 
-const device_type MSX_CART_MAJUTSUSHI = &device_creator<msx_cart_majutsushi>;
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
+
+const device_type MSX_CART_MAJUTSUSHI = device_creator<msx_cart_majutsushi>;
 
 
 msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -69,11 +69,15 @@ Notes:
  *************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/h8/h83002.h"
 #include "includes/namcond1.h"
-#include "sound/c352.h"
+
+#include "cpu/h8/h83002.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/at28c16.h"
+#include "sound/c352.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************************************/
 

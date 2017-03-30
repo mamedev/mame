@@ -102,7 +102,10 @@
 
 #include "emu.h"
 #include "includes/tdv2324.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
 {

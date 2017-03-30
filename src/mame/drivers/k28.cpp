@@ -23,6 +23,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/tms6100.h"
 #include "sound/votrax.h"
+#include "speaker.h"
 
 #include "k28.lh"
 

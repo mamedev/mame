@@ -139,7 +139,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_10828 = &device_creator<luxor_55_10828_device>;
+const device_type LUXOR_55_10828 = device_creator<luxor_55_10828_device>;
 
 
 //-------------------------------------------------

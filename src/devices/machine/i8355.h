@@ -67,8 +67,7 @@
 
 // ======================> i8355_device
 
-class i8355_device :    public device_t,
-						public device_memory_interface
+class i8355_device : public device_t
 {
 public:
 	// construction/destruction
@@ -89,9 +88,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);
 
@@ -106,7 +102,8 @@ private:
 	uint8_t m_output[2];          // output latches
 	uint8_t m_ddr[2];             // DDR latches
 
-	const address_space_config      m_space_config;
+	// internal ROM
+	required_region_ptr<uint8_t> m_rom;
 };
 
 

@@ -7,20 +7,23 @@
  *
  */
 
-#define DEBUG_VIEWER ( 0 )
-
 #include "emu.h"
+
+#define DEBUG_VIEWER ( 0 )
 #include "video/psx.h"
+
+#include "screen.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
 // device type definition
-const device_type CXD8514Q = &device_creator<cxd8514q_device>;
-const device_type CXD8538Q = &device_creator<cxd8538q_device>;
-const device_type CXD8561Q = &device_creator<cxd8561q_device>;
-const device_type CXD8561BQ = &device_creator<cxd8561bq_device>;
-const device_type CXD8561CQ = &device_creator<cxd8561cq_device>;
-const device_type CXD8654Q = &device_creator<cxd8654q_device>;
+const device_type CXD8514Q = device_creator<cxd8514q_device>;
+const device_type CXD8538Q = device_creator<cxd8538q_device>;
+const device_type CXD8561Q = device_creator<cxd8561q_device>;
+const device_type CXD8561BQ = device_creator<cxd8561bq_device>;
+const device_type CXD8561CQ = device_creator<cxd8561cq_device>;
+const device_type CXD8654Q = device_creator<cxd8654q_device>;
 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),

@@ -194,12 +194,14 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/8080bw.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
-#include "includes/8080bw.h"
+
+#include "speaker.h"
 
 #include "attackfc.lh"
 #include "cosmicm.lh"

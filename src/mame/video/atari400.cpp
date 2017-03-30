@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/atari400.h"
+#include "screen.h"
 
 #define VERBOSE 0
 

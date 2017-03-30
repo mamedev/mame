@@ -19,10 +19,6 @@
 #include "../gtc/quaternion.hpp"
 #include "../gtx/norm.hpp"
 
-#ifndef GLM_ENABLE_EXPERIMENTAL
-#	error "GLM: GLM_GTX_quaternion is an experimental extension and may change in the future. Use #define GLM_ENABLE_EXPERIMENTAL before including it, if you really want to use it."
-#endif
-
 #if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_quaternion extension included")
 #endif
@@ -36,16 +32,16 @@ namespace glm
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL vec<3, T, P> cross(
+	GLM_FUNC_DECL tvec3<T, P> cross(
 		tquat<T, P> const & q,
-		vec<3, T, P> const & v);
+		tvec3<T, P> const & v);
 
 	//! Compute a cross product between a vector and a quaternion.
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL vec<3, T, P> cross(
-		vec<3, T, P> const & v,
+	GLM_FUNC_DECL tvec3<T, P> cross(
+		tvec3<T, P> const & v,
 		tquat<T, P> const & q);
 
 	//! Compute a point on a path according squad equation. 
@@ -102,17 +98,17 @@ namespace glm
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL vec<3, T, P> rotate(
+	GLM_FUNC_DECL tvec3<T, P> rotate(
 		tquat<T, P> const & q,
-		vec<3, T, P> const & v);
+		tvec3<T, P> const & v);
 
 	/// Rotates a 4 components vector by a quaternion.
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL vec<4, T, P> rotate(
+	GLM_FUNC_DECL tvec4<T, P> rotate(
 		tquat<T, P> const & q,
-		vec<4, T, P> const & v);
+		tvec4<T, P> const & v);
 
 	/// Extract the real component of a quaternion.
 	///
@@ -125,14 +121,14 @@ namespace glm
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL mat<3, 3, T, P> toMat3(
+	GLM_FUNC_DECL tmat3x3<T, P> toMat3(
 		tquat<T, P> const & x){return mat3_cast(x);}
 
 	/// Converts a quaternion to a 4 * 4 matrix.
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
-	GLM_FUNC_DECL mat<4, 4, T, P> toMat4(
+	GLM_FUNC_DECL tmat4x4<T, P> toMat4(
 		tquat<T, P> const & x){return mat4_cast(x);}
 
 	/// Converts a 3 * 3 matrix to a quaternion.
@@ -140,14 +136,14 @@ namespace glm
 	/// @see gtx_quaternion
 	template<typename T, precision P>
 	GLM_FUNC_DECL tquat<T, P> toQuat(
-		mat<3, 3, T, P> const& x){return quat_cast(x);}
+		tmat3x3<T, P> const & x){return quat_cast(x);}
 
 	/// Converts a 4 * 4 matrix to a quaternion.
 	///
 	/// @see gtx_quaternion
 	template<typename T, precision P>
 	GLM_FUNC_DECL tquat<T, P> toQuat(
-		mat<4, 4, T, P> const& x){return quat_cast(x);}
+		tmat4x4<T, P> const & x){return quat_cast(x);}
 
 	/// Quaternion interpolation using the rotation short path.
 	///
@@ -174,8 +170,8 @@ namespace glm
 	/// @see gtx_quaternion
 	template<typename T, precision P>
 	GLM_FUNC_DECL tquat<T, P> rotation(
-		vec<3, T, P> const & orig, 
-		vec<3, T, P> const & dest);
+		tvec3<T, P> const & orig, 
+		tvec3<T, P> const & dest);
 
 	/// Returns the squared length of x.
 	/// 

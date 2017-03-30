@@ -23,7 +23,7 @@ rom 5 and 6 are prg roms
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-
+#include "screen.h"
 
 
 

@@ -162,11 +162,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ssv.h"
+
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/ssv.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 

@@ -87,10 +87,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-device_type const M68705P3 = &device_creator<m68705p3_device>;
-device_type const M68705P5 = &device_creator<m68705p5_device>;
-device_type const M68705R3 = &device_creator<m68705r3_device>;
-device_type const M68705U3 = &device_creator<m68705u3_device>;
+device_type const M68705P3 = device_creator<m68705p3_device>;
+device_type const M68705P5 = device_creator<m68705p5_device>;
+device_type const M68705R3 = device_creator<m68705r3_device>;
+device_type const M68705U3 = device_creator<m68705u3_device>;
 
 
 /****************************************************************************
@@ -888,7 +888,7 @@ u8 m68705p3_device::get_mask_options() const
  ****************************************************************************/
 
 m68705p5_device::m68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705p_device(mconfig, tag, owner, clock, M68705P3, "MC68705P5", "m68705p5", __FILE__)
+	: m68705p_device(mconfig, tag, owner, clock, M68705P5, "MC68705P5", "m68705p5", __FILE__)
 {
 }
 

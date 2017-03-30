@@ -29,7 +29,7 @@ typedef std::unordered_map<std::string, const software_info *> softlist_map;
 //**************************************************************************
 
 // device type definition
-const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
+const device_type SOFTWARE_LIST = device_creator<software_list_device>;
 false_software_list_loader false_software_list_loader::s_instance;
 rom_software_list_loader rom_software_list_loader::s_instance;
 image_software_list_loader image_software_list_loader::s_instance;
@@ -365,7 +365,7 @@ software_compatibility software_list_device::is_compatible(const software_part &
 //  that can automatically mount this software part
 //-------------------------------------------------
 
-device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool(const device_image_interface &)> filter)
 {
 	// if automount="no", don't bother
 	const char *mount = part.feature("automount");
@@ -375,15 +375,32 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
 	{
 		const char *interface = image.image_interface();
-		if (interface != nullptr && part.matches_interface(interface))
-		{
-			// mount only if not already mounted
-			const char *option = mconfig.options().value(image.brief_instance_name());
-			if (*option == '\0' && !image.filename())
-				return &image;
-		}
+		if (interface != nullptr && part.matches_interface(interface) && filter(image))
+			return &image;
 	}
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  find_mountable_image - find an image interface
+//  that can automatically mount this software part
+//-------------------------------------------------
+
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+{
+	// Multi-part softlists will distribute individual images serially (e.g. - first floppy to flop1, next one to flop2
+	// etc).  Pre MAME 0.183 relied on the core doing this distribution between calls to find_mountable_image() so it
+	// could check to see if the slot was empty.
+	//
+	// When softlists were refactored in MAME 0.183, this was changed to build a "plan" for what needs to be loaded, so
+	// it was incorrect to check the image slot.  This is why an overload for find_mountable_image() was created that
+	// takes an std::function.  This overload is being preserved for compatibility with existing code, but I regard the
+	// continued existance of this overload is a red flag.
+	return find_mountable_image(
+		mconfig,
+		part,
+		[](const device_image_interface &image) { return !image.exists(); });
 }
 
 

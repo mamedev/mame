@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BW2_RAMCARD = &device_creator<bw2_ramcard_device>;
+const device_type BW2_RAMCARD = device_creator<bw2_ramcard_device>;
 
 
 //-------------------------------------------------

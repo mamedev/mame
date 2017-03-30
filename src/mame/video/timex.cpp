@@ -32,7 +32,7 @@ VIDEO_START_MEMBER(spectrum_state,ts2068)
 	m_frame_invert_count = 30;
 }
 
-void spectrum_state::screen_eof_timex(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(spectrum_state::screen_vblank_timex)
 {
 	// rising edge
 	if (state)

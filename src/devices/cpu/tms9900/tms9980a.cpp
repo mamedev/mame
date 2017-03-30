@@ -298,4 +298,4 @@ offs_t tms9980a_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms9980)(this, stream, pc, oprom, opram, options);
 }
 
-const device_type TMS9980A = &device_creator<tms9980a_device>;
+const device_type TMS9980A = device_creator<tms9980a_device>;

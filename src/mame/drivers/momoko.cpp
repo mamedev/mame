@@ -46,11 +46,14 @@ Stephh's notes (based on the game Z80 code and some tests) :
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/momoko.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/momoko.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)

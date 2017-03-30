@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_TAOTAIDO_H
+#define MAME_INCLUDES_TAOTAIDO_H
 
+#include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 
 class taotaido_state : public driver_device
@@ -53,6 +56,8 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t tile_callback( uint32_t code );
 };
+
+#endif // MAME_INCLUDES_TAOTAIDO_H

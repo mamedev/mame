@@ -11,6 +11,7 @@
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "video/deco_zoomspr.h"
+#include "screen.h"
 
 class deco32_state : public driver_device
 {

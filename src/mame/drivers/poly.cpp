@@ -36,10 +36,13 @@
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "machine/mc6854.h"
-#include "video/saa5050.h"
 #include "machine/keyboard.h"
-#include "sound/speaker.h"
+#include "machine/mc6854.h"
+#include "sound/spkrdev.h"
+#include "video/saa5050.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class poly_state : public driver_device
 {

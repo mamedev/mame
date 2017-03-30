@@ -329,16 +329,19 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dec0.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68705.h"
-#include "includes/dec0.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/

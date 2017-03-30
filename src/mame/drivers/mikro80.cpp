@@ -15,7 +15,9 @@
 #include "includes/mikro80.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )

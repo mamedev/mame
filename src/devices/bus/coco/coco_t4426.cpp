@@ -124,7 +124,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_T4426 = &device_creator<coco_t4426_device>;
+const device_type COCO_T4426 = device_creator<coco_t4426_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -208,7 +208,7 @@ void coco_t4426_device::device_reset()
 {
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = cococart_slot_device::line_value::Q;
-	m_owner->cart_set_line(cococart_slot_device::line::CART, cart_line);
+	m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
 }
 
 /*-------------------------------------------------

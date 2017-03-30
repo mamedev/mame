@@ -59,6 +59,8 @@ Notes:
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cham24_state : public driver_device
@@ -309,9 +311,8 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( cham24, cham24_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

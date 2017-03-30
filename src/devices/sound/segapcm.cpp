@@ -9,7 +9,7 @@
 
 
 // device type definition
-const device_type SEGAPCM = &device_creator<segapcm_device>;
+const device_type SEGAPCM = device_creator<segapcm_device>;
 
 
 //-------------------------------------------------

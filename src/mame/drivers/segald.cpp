@@ -22,6 +22,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "speaker.h"
 
 #define SCHEMATIC_CLOCK (20000000)
 

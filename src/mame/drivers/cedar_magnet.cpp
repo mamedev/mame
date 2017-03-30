@@ -115,6 +115,9 @@ I suspect the additional memory was an afterthought.
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
 
+#include "screen.h"
+
+
 #define LOG_IC49_PIO_PB 0
 #define LOG_IC48_PIO_PB 0
 #define LOG_IC48_PIO_PA 0

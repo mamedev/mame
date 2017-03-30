@@ -29,7 +29,7 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_ROM_GAMEGENIE = &device_creator<md_rom_ggenie_device>;
+const device_type MD_ROM_GAMEGENIE = device_creator<md_rom_ggenie_device>;
 
 
 md_rom_ggenie_device::md_rom_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SIMONS_BASIC = &device_creator<c64_simons_basic_cartridge_device>;
+const device_type C64_SIMONS_BASIC = device_creator<c64_simons_basic_cartridge_device>;
 
 
 

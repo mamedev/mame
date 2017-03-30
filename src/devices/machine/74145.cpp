@@ -50,7 +50,7 @@
 #include "coreutil.h"
 
 
-const device_type TTL74145 = &device_creator<ttl74145_device>;
+const device_type TTL74145 = device_creator<ttl74145_device>;
 
 /***************************************************************************
     DEVICE INTERFACE

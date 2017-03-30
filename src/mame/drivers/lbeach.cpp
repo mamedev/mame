@@ -26,6 +26,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 #include "lbeach.lh"
 

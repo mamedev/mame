@@ -2,9 +2,12 @@
 // copyright-holders:Carl
 #include "emu.h"
 #include "dectalk.h"
-#include "sound/volt_reg.h"
 
-const device_type ISA8_DECTALK = &device_creator<dectalk_isa_device>;
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
+
+const device_type ISA8_DECTALK = device_creator<dectalk_isa_device>;
 
 dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	device_t(mconfig, ISA8_DECTALK, "DECTalk-PC", tag, owner, clock, "dectalk_isa", __FILE__),

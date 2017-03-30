@@ -11,7 +11,7 @@
 #include "vc4000.h"
 
 
-const device_type VC4000_SND = &device_creator<vc4000_sound_device>;
+const device_type VC4000_SND = device_creator<vc4000_sound_device>;
 
 vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VC4000_SND, "Intertion Electronic VC 4000 Audio Custom", tag, owner, clock, "vc4000_sound", __FILE__),

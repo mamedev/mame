@@ -25,11 +25,13 @@ Memo:
 
 #include "emu.h"
 #include "includes/hyhoo.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8, hyhoo_state )

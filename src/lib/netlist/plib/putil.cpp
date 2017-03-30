@@ -52,7 +52,7 @@ namespace plib
 			pstring t = str.substr(p, pn);
 			if (!ignore_empty || t.len() != 0)
 				ret.push_back(t);
-			p = pn + onstr.len();
+			p = std::next(pn, onstr.len());
 			pn = str.find(onstr, p);
 		}
 		if (p != str.end())

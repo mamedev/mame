@@ -2,6 +2,7 @@
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
 #include "emu.h"
 #include "includes/osi.h"
+#include "screen.h"
 
 /* Palette Initialization */
 

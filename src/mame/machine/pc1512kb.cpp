@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC1512_KEYBOARD = &device_creator<pc1512_keyboard_t>;
+const device_type PC1512_KEYBOARD = device_creator<pc1512_keyboard_t>;
 
 
 //-------------------------------------------------

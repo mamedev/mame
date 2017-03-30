@@ -14,6 +14,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -29,7 +30,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_HOSENKAN = &device_creator<nes_hosenkan_device>;
+const device_type NES_HOSENKAN = device_creator<nes_hosenkan_device>;
 
 
 nes_hosenkan_device::nes_hosenkan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

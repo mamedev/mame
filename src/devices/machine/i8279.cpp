@@ -84,7 +84,7 @@ that uses this feature.
 //**************************************************************************
 
 // device type definition
-const device_type I8279 = &device_creator<i8279_device>;
+const device_type I8279 = device_creator<i8279_device>;
 
 //-------------------------------------------------
 //  i8279_device - constructor

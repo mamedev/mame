@@ -10,6 +10,7 @@
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class vicdual_state : public driver_device
 {
@@ -57,6 +58,7 @@ public:
 
 	uint8_t m_coin_status;
 	uint8_t m_palette_bank;
+	uint8_t m_gradient;
 	uint8_t m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;

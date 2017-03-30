@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DMV_KEYBOARD = &device_creator<dmv_keyboard_device>;
+const device_type DMV_KEYBOARD = device_creator<dmv_keyboard_device>;
 
 
 //***************************************************************************

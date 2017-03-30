@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "nubus_vikbw.h"
+#include "screen.h"
 
 #define VIKBW_SCREEN_NAME   "vikbw_screen"
 #define VIKBW_ROM_REGION    "vikbw_rom"
@@ -35,7 +36,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_VIKBW = &device_creator<nubus_vikbw_device>;
+const device_type NUBUS_VIKBW = device_creator<nubus_vikbw_device>;
 
 
 //-------------------------------------------------

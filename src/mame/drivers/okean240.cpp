@@ -53,6 +53,8 @@ Usage of terminal:
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
+#include "screen.h"
+
 
 class okean240_state : public driver_device
 {

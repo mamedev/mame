@@ -2,7 +2,7 @@
 #include "sun_kbd.h"
 
 
-device_type const SUN_KBD_ADAPTOR = &device_creator<sun_keyboard_adaptor_device>;
+device_type const SUN_KBD_ADAPTOR = device_creator<sun_keyboard_adaptor_device>;
 
 
 namespace {

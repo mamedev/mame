@@ -377,12 +377,16 @@
 #define MASTER_CLOCK    XTAL_6MHz
 
 #include "emu.h"
+#include "includes/ampoker2.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
-#include "includes/ampoker2.h"
 
 /**********************
 * Read/Write Handlers *

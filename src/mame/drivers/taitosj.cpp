@@ -167,8 +167,10 @@ TODO:
 
 #include "emu.h"
 #include "includes/taitosj.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)

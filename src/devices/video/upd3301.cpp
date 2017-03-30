@@ -22,6 +22,8 @@
 #include "emu.h"
 #include "upd3301.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -63,7 +65,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type UPD3301 = &device_creator<upd3301_device>;
+const device_type UPD3301 = device_creator<upd3301_device>;
 
 
 

@@ -55,11 +55,13 @@ f80b      ????
 
 ***************************************************************************/
 #include "emu.h"
+#include "includes/tecmo.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
-#include "includes/tecmo.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(tecmo_state::bankswitch_w)

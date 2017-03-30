@@ -215,7 +215,11 @@ public:
 	}
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8, uint64_t unitmask = 0xffffffffffffffffU)
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8)
+	{
+		m_iospace->install_device(addrstart, addrend, device, map, bits, 0xffffffffffffffffU >> (64 - m_iospace->data_width()));
+	}
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits, uint64_t unitmask)
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
 	}
@@ -261,7 +265,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
 
 	// internal state
 	cpu_device   *m_maincpu;
@@ -399,7 +402,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 private:
 	// internal state

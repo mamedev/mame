@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "am2847.h"
 
-const device_type AM2847 = &device_creator<am2847_device>;
-const device_type AM2849 = &device_creator<am2849_device>;
-const device_type TMS3409 = &device_creator<tms3409_device>;
+const device_type AM2847 = device_creator<am2847_device>;
+const device_type AM2849 = device_creator<am2849_device>;
+const device_type TMS3409 = device_creator<tms3409_device>;
 
 am2847_base_device::am2847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)

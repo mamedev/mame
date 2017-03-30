@@ -25,10 +25,14 @@
 
 
 #include "emu.h"
+#include "includes/pc4.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
+
 #include "rendlay.h"
-#include "includes/pc4.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER( pc4_state::kb_r )

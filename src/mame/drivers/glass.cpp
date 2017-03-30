@@ -12,9 +12,13 @@ except for the Promat licensed Korean version which is unprotected.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/glass.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/glass.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(glass_state::clr_int_w)
 {

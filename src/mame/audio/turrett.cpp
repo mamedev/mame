@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
+const device_type TURRETT = device_creator<turrett_device>;
 
 
 //-------------------------------------------------

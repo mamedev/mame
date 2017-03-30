@@ -492,7 +492,7 @@ void palette_t::group_set_contrast(uint32_t group, float contrast)
 void palette_t::normalize_range(uint32_t start, uint32_t end, int lum_min, int lum_max)
 {
 	// clamp within range
-	start = std::max(start, 0U);
+	// start = std::max(start, 0U); ==> reduces to start = start
 	end = std::min(end, m_numcolors - 1);
 
 	// find the minimum and maximum brightness of all the colors in the range

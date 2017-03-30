@@ -118,8 +118,8 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-const device_type I80186 = &device_creator<i80186_cpu_device>;
-const device_type I80188 = &device_creator<i80188_cpu_device>;
+const device_type I80186 = device_creator<i80186_cpu_device>;
+const device_type I80188 = device_creator<i80188_cpu_device>;
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, "I80188", tag, owner, clock, "i80188", __FILE__, 8)

@@ -21,7 +21,7 @@
 *****************************************************************************/
 
 // device type definition
-const device_type RAM = &device_creator<ram_device>;
+const device_type RAM = device_creator<ram_device>;
 
 template class device_finder<ram_device, false>;
 template class device_finder<ram_device, true>;

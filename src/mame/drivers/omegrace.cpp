@@ -223,6 +223,8 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "omegrace.lh"
 
