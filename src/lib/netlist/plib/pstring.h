@@ -110,7 +110,7 @@ public:
 		const_iterator &operator=(const const_iterator &rhs) noexcept = default;
 		const_iterator &operator=(const_iterator &&rhs) noexcept = default;
 
-		const_iterator& operator++() noexcept { p += traits_type::codelen(&(*p)); return *this; }
+		const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
 		const_iterator operator++(int) noexcept { const_iterator tmp(*this); operator++(); return tmp; }
 
 		bool operator==(const const_iterator& rhs) const noexcept { return p == rhs.p; }

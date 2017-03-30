@@ -317,8 +317,8 @@ public:
 		char b[4];
 		if (m_strm.read(&b[0], 1) != 1)
 			return false;
-		const unsigned l = pstring::traits_type::codelen(b);
-		for (unsigned i = 1; i < l; i++)
+		const std::size_t l = pstring::traits_type::codelen(b);
+		for (std::size_t i = 1; i < l; i++)
 			if (m_strm.read(&b[i], 1) != 1)
 				return false;
 		c = pstring::traits_type::code(b);
