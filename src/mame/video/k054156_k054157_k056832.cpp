@@ -202,7 +202,6 @@ cad[hml]: address for rom readback (only cadl is actually used)
 vrc: 4-bits bank values, indexed on the bits chosen with sb
 off[vh]: offset added to the layer scrolls when flipped
 
-
 Scrolling is done independently per-layer.  Vertical scrolling is
 controlled by the m?v registers.  Horizontal scolling uses one of
 three modes: standard full-layer scrolling, linescroll and scroll by
@@ -210,10 +209,11 @@ three modes: standard full-layer scrolling, linescroll and scroll by
 position is controller by m?h.  Linescroll and 8-line block scroll
 uses either a page or external dedicated ram to store the positions.
 There are 4x512 (0x800) positions, 512 for each layer, using exactly
-one page.  The positions are indexed by the tilemap line numbers and
-the layer number, the vertical scroll position has no influence.  Or not.
-In 8-line mode, holes are left between each position (e.g. the IC zeroes
-the three bottom address bits when reading the offset).
+one page.  The positions are indexed by the tilemap line numbers
+(taking vertical scroll and global offset into account) and the layer
+number, the vertical scroll position has no influence.  In 8-line
+mode, holes are left between each position (e.g. the IC zeroes the
+three bottom address bits when reading the offset).
 
 
 The 054156 can generate the sync signals for fixed video configurations,
@@ -327,18 +327,15 @@ Verification:
                   at bottom:   (~(ee+1) + 0 + 700) & (ff/1ff) = 10
 
 So, that works for the vertical position.
-'
-*/
 
-/*
 Orig | Width | Visible | Hsync | Hoff | Scroll | TilePos | TWidth  | Game
 ext  |   120 |      30 |    20 |  d55 |   ffe6 |       0 |    200  | gokuparo
 ext  |       |         |       |      |        |         |         | xexex
 int  |       |         |       |      |        |         |         | gijoe
 
-
-
 */
+
+
 #include "k054156_k054157_k056832.h"
 #include "screen.h"
 
@@ -1414,41 +1411,34 @@ void k054156_056832_device::bitmap_update(bitmap_ind16 *bitmap, const rectangle 
 	if(0)
 	logerror("draw layer %d scroll = %03x %03x\n", layer, m_mh[layer] & 0xfff, m_mv[layer] & 0x7ff);
 
-	switch((m_rzs >> (2*layer)) & 3) {
-	case 0: {
-		const uint32_t *sbase = m_cur_linescroll_page + 512 * layer;
-		switch(m_reg1l & 0x30) {
-		case 0x00:
-			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
-				draw_line_block<false, false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[(y + m_mv[layer]+1) & 511] - xdelta[layer]);
-			break;
-		case 0x10:
-			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
-				draw_line_block<true , false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[y & 511] - xdelta[layer] + m_offh);
-			break;
-		case 0x20:
-			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
-				draw_line_block<false, true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[y & 511] - xdelta[layer]);
-			break;
-		case 0x30:
-			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
-				draw_line_block<true , true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[y & 511] - xdelta[layer] + m_offh);
-			break;
-		}
-		break;
-	}
-	case 2:
-		logerror("blockscroll on %d\n", layer);
-		break;
-	case 1:
-	case 3:
+	if((m_rzs >> (2*layer)) & 1) {
 		switch(m_reg1l & 0x30) {
 		case 0x00: draw_line_block<false, false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer]); break;
 		case 0x10: draw_line_block<true , false>(bitmap, layer, cliprect, m_mv[layer],          m_mh[layer] - xdelta[layer] + m_offh); break;
 		case 0x20: draw_line_block<false, true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer]); break;
 		case 0x30: draw_line_block<true , true >(bitmap, layer, cliprect, m_mv[layer] + m_offv, m_mh[layer] - xdelta[layer] + m_offh); break;
 		}
-		break;
+	} else {
+		uint32_t mask = ((m_rzs >> (2*layer)) & 2) ? 0x1f8 : 0x1ff;
+		const uint32_t *sbase = m_cur_linescroll_page + 0x200 * layer;
+		switch(m_reg1l & 0x30) {
+		case 0x00:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<false, false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[(y + 1 + m_mv[layer]) & mask] - xdelta[layer]);
+			break;
+		case 0x10:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<true , false>(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer],          sbase[(y + 1 + m_mv[layer]) & mask] - xdelta[layer] + m_offh);
+			break;
+		case 0x20:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<false, true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[(~(y + 1) + m_mv[layer] + m_offv) & mask] - xdelta[layer]);
+			break;
+		case 0x30:
+			for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+				draw_line_block<true , true >(bitmap, layer, rectangle(cliprect.left(), cliprect.right(), y, y), m_mv[layer] + m_offv, sbase[(~(y + 1) + m_mv[layer] + m_offv) & mask] - xdelta[layer] + m_offh);
+			break;
+		}
 	}
 }
 
