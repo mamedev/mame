@@ -323,10 +323,9 @@
         ITV4400 = IT custom blitter
 
 
-    ---------------------
-    Slick Shot/Poker Dice
-    ---------------------
-    (Likely Dyno Bop as well)
+    ------------------------------
+    Slick Shot/Poker Dice/Dyno Bop
+    ------------------------------
 
         +------------------------------------+-+
         |   Z80PGM   4Mhz      itvs5         | |
