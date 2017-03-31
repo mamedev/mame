@@ -421,7 +421,7 @@ void tool_app_t::mac_out(const pstring &s, const bool cont)
 	if (cont)
 	{
 		unsigned adj = 0;
-		for (auto x : s)
+		for (const auto &x : s)
 			adj += (x == '\t' ? 3 : 0);
 		pout("{1}\\\n", s.rpad(" ", RIGHT-1-adj));
 	}
@@ -434,13 +434,13 @@ void tool_app_t::cmac(const netlist::factory::element_t *e)
 	auto v = plib::psplit(e->param_desc(), ",");
 	pstring vs;
 	for (auto s : v)
-		vs += ", p" + s.replace("+","").replace(".","_");
+		vs += ", p" + s.replace_all("+", "").replace_all(".", "_");
 	mac_out("#define " + e->name() + "(name" + vs + ")");
 	mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");
 
 	for (auto s : v)
 	{
-		pstring r(s.replace("+","").replace(".","_"));
+		pstring r(s.replace_all("+", "").replace_all(".", "_"));
 		if (s.startsWith("+"))
 			mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
 		else
@@ -455,7 +455,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 	pstring vs;
 	for (auto s : v)
 	{
-		vs += ", " + s.replace("+","").replace(".","_");
+		vs += ", " + s.replace_all("+", "").replace_all(".", "_");
 	}
 	pout("{1}(name{2})\n", e->name(), vs);
 	if (v.size() > 0)
@@ -463,7 +463,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 		pout("/*\n");
 		for (auto s : v)
 		{
-			pstring r(s.replace("+","").replace(".","_"));
+			pstring r(s.replace_all("+", "").replace_all(".", "_"));
 			if (s.startsWith("+"))
 				pout("{1:10}: Terminal\n",r);
 			else
@@ -507,7 +507,7 @@ void tool_app_t::create_header()
 		{
 			last_source = e->sourcefile();
 			pout("{1}\n", pstring("// ").rpad("-", 72));
-			pout("{1}\n", pstring("// Source: ").cat(e->sourcefile().replace("../","")));
+			pout("{1}{2}\n", pstring("// Source: "), e->sourcefile().replace_all("../", ""));
 			pout("{1}\n", pstring("// ").rpad("-", 72));
 		}
 		cmac(e.get());
@@ -603,7 +603,7 @@ void tool_app_t::listdevices()
 			if (t.second->name().startsWith(d->name()))
 			{
 				pstring tn(t.second->name().substr(d->name().len()+1));
-				if (tn.find(".") == tn.end())
+				if (tn.find(".") == pstring::npos)
 					terms.push_back(tn);
 			}
 		}
@@ -614,7 +614,7 @@ void tool_app_t::listdevices()
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
 				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
-				if (tn.find(".") == tn.end())
+				if (tn.find(".") == pstring::npos)
 				{
 					terms.push_back(tn);
 					pstring resolved = nt.setup().resolve_alias(t.first);
@@ -770,8 +770,6 @@ int tool_app_t::execute()
 	{
 		perr("plib exception caught: {}\n", e.text());
 	}
-
-	pstring::resetmem();
 	return 0;
 }
 

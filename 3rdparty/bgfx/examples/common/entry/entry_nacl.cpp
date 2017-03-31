@@ -9,8 +9,6 @@
 
 #include <bgfx/platform.h>
 
-#include <stdio.h>
-#include <string.h>
 #include <pthread.h>
 #include <string>
 
@@ -190,7 +188,7 @@ using namespace entry;
 
 PP_EXPORT const void* PPP_GetInterface(const char* _name)
 {
-	if (0 == strcmp(_name, PPP_INSTANCE_INTERFACE) )
+	if (0 == bx::strncmp(_name, PPP_INSTANCE_INTERFACE) )
 	{
 		static PPP_Instance instanceInterface =
 		{

@@ -4821,6 +4821,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 				((*dmaput == 0x0574d000) && (*dmaget == 0x07f4d000)) || // only for mj2c
 				((*dmaput == 0x07ca3000) && (*dmaget == 0x07f4d000)) || // only for hotd3
 				((*dmaput == 0x063cd000) && (*dmaget == 0x07f4d000)) || // only for vcop3
+				((*dmaput == 0x07f4f000) && (*dmaget == 0x07f4d000)) || // only for ccfboxa
 				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
 			{
 				*dmaget = *dmaput;

@@ -7,7 +7,6 @@
 #define BX_DEBUG_H_HEADER_GUARD
 
 #include "bx.h"
-#include <stdarg.h> // va_list
 
 namespace bx
 {

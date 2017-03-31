@@ -881,7 +881,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 			parse_memory_operator(token, buffer.c_str(), disable_se);
 			string += 1;
 			return;
-		} catch(const expression_error &e) {
+		} catch(const expression_error &) {
 			// Try some other operator instead
 		}
 	}

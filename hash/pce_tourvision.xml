@@ -336,6 +336,20 @@
 	</software>
 
 
+	<!--Dragon Egg! -->
+	<software name="dragnegg" supported="no">
+		<description>Dragon Egg! (Tourvision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (Tourvision) / Masaya</publisher>
+		<part name="cart" interface="tourvision_cart">
+			<dataarea name="rom" size="1048576">
+		<!-- 0x80000 matches PCE dragnegg -->
+				<rom name="dragon_egg.tv" size="1048576" crc="fa24bc20" sha1="d6da2f5c95bb25d15918e01de951bbf35de9de7b" offset="000000" /> 
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!--Dragon Spirit -->
 	<software name="dspirit">
 		<description>Dragon Spirit (Tourvision PCE bootleg)</description>

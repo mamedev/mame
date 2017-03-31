@@ -367,7 +367,7 @@ pstream::pos_type pomemstream::vtell()
 bool putf8_reader::readline(pstring &line)
 {
 	pstring::code_t c = 0;
-	m_linebuf.clear();
+	m_linebuf = "";
 	if (!this->readcode(c))
 	{
 		line = "";

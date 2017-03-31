@@ -45,6 +45,6 @@ namespace bx
 
 } // namespace bx
 
-#include "endian.inl"
+#include "inline/endian.inl"
 
 #endif // BX_ENDIAN_H_HEADER_GUARD

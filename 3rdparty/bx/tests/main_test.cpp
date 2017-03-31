@@ -3,16 +3,11 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#define CATCH_CONFIG_RUNNER
 #include "test.h"
 
 static const char* s_argv[] = { "bx.test" };
 
-int runAllTests(int _argc, const char* _argv[])
-{
-	DBG(BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME);
-	return Catch::Session().run(_argc, _argv);
-}
+int runAllTests(int _argc, const char* _argv[]);
 
 #if BX_PLATFORM_ANDROID
 #	include <android/native_activity.h>

@@ -209,8 +209,8 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 
 double nl_convert_base_t::get_sp_val(const pstring &sin)
 {
-	auto p = sin.begin();
-	while (p != sin.end() && (m_numberchars.find(*p) != m_numberchars.end()))
+	std::size_t p = 0;
+	while (p < sin.len() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
 		++p;
 	pstring val = sin.left(p);
 	pstring unit = sin.substr(p);
@@ -318,7 +318,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					if (m[1].len() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.c_str());
-					pins = m[1].left(m[1].begin() + 3);
+					pins = m[1].left(3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
 				add_term(tt[1], tt[0] + "." + pins.code_at(0));
@@ -381,7 +381,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				//        last element is component type
 				// FIXME: Parameter
 
-				pstring xname = tt[0].replace(".", "_");
+				pstring xname = tt[0].replace_all(".", "_");
 				pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)

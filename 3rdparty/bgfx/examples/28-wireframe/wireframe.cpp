@@ -162,8 +162,8 @@ struct Camera
 
 	static inline void latLongFromVec(float& _u, float& _v, const float _vec[3])
 	{
-		const float phi = atan2f(_vec[0], _vec[2]);
-		const float theta = acosf(_vec[1]);
+		const float phi   = bx::fatan2(_vec[0], _vec[2]);
+		const float theta = bx::facos(_vec[1]);
 
 		_u = (bx::pi + phi)*bx::invPi*0.5f;
 		_v = theta*bx::invPi;
@@ -394,8 +394,8 @@ class ExampleWireframe : public entry::AppI
 					| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 					,  m_mouseState.m_mz
-					, m_width
-					, m_height
+					, uint16_t(m_width)
+					, uint16_t(m_height)
 					);
 
 			imguiBeginScrollArea("Settings"
@@ -495,9 +495,9 @@ class ExampleWireframe : public entry::AppI
 			float view[16];
 			float proj[16];
 			m_camera.update(deltaTimeSec);
-			memcpy(m_uniforms.m_camPos, m_camera.m_pos.curr, 3*sizeof(float));
+			bx::memCopy(m_uniforms.m_camPos, m_camera.m_pos.curr, 3*sizeof(float));
 			m_camera.mtxLookAt(view);
-			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 			bgfx::setViewTransform(0, view, proj);
 
 			m_uniforms.m_drawEdges = (DrawMode::WireframeShaded == m_drawMode) ? 1.0f : 0.0f;
