@@ -202,7 +202,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
 
 void destroyr_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
+	m_frame_timer->adjust(m_screen->time_until_pos(0));
 
 	m_cursor = 0;
 	m_wavemod = 0;
