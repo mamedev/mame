@@ -426,7 +426,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 			text = "(" + text + ")";
 
 		/* if we're polling this item, use some spaces with left/right arrows */
-		if (pollingref == item->ref)
+		if (pollingref == item->ref && pollingseq == item->seqtype)
 		{
 			subtext.assign("   ");
 			flags |= FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
