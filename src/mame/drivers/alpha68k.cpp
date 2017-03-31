@@ -87,14 +87,14 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
   - The "Unused" Dip Switch is sort of "Debug Mode" Dip Switch and has an
     effect ONLY if 0x008fff.b is writable (as Bryan mentioned it).
-    Its role seems only to be limited to display some coordonates.
+    Its role seems only to be limited to display some coordinates.
 
  5)  'skysoldr'
 
   - As in "Time Soldiers / Battle Field" there is a something that is sort
     of "Debug Mode" Dip Switch : this is the "Manufacturer" Dip Switch when
     it is set to "Romstar". Again, it has an effect only if 0x000074.w is
-    writable and its role seems only to be limited to display some coordonates.
+    writable and its role seems only to be limited to display some coordinates.
 
  7)  'skyadvnt', 'skyadvntu' and 'skyadvntj'
 
@@ -103,7 +103,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
       * bit 4 (when "Unused" Dip Switch is set to "On") determines invulnerability
       * bit 6 (when "Difficulty" Dip Switch is set to DEF_STR( Hard ) or DEF_STR( Hardest ))
-        determines if some coordonates are displayed.
+        determines if some coordinates are displayed.
 
  8)  'gangwars'
 
@@ -124,7 +124,7 @@ Stephh's log (2002.06.19) :
   - Add READ16_HANDLER( *_cycle_r ) for the following games :
       * timesold1  (based on the one from 'timesold')
       * btlfield  (based on the one from 'timesold')
-      * gangwars  (I splitted the one from 'gangwarsu')
+      * gangwars  (I split the one from 'gangwarsu')
       * skyadvnt, skyadvntu and skyadvntj
   - Change manufacturer for the following games :
       * timesold
@@ -1861,6 +1861,8 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
+	save_item(NAME(m_sound_nmi_mask));
+	save_item(NAME(m_sound_pa_latch));
 }
 
 MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
@@ -1895,7 +1897,8 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 	save_item(NAME(m_buffer_28));
 	save_item(NAME(m_buffer_60));
 	save_item(NAME(m_buffer_68));
-
+	save_item(NAME(m_sound_nmi_mask));
+	save_item(NAME(m_sound_pa_latch));
 }
 
 
