@@ -348,10 +348,57 @@ ROM_START( gensitou )
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
+// world bootleg using 64k*8 UVEPROMs, program and sound unchanged, sprites and background tilemaps altered
+ROM_START( prehisleb )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u_h1.bin", 0x00000, 0x10000, CRC(04c1703b) SHA1(36aa9b8cd11621faa094af4dd2fb5a0e59318a5e) )
+	ROM_LOAD16_BYTE( "u_h3.bin", 0x00001, 0x10000, CRC(62f04cd1) SHA1(9506e18a7847362128e06781e783fdb1f562e502) )
+	ROM_LOAD16_BYTE( "u_j2.bin", 0x20000, 0x10000, CRC(7b12501d) SHA1(678d32f70d86807449ffe617c7c6e257d308d8af) )
+	ROM_LOAD16_BYTE( "u_j3.bin", 0x20001, 0x10000, CRC(2a86f7c4) SHA1(5bca393f6edfcd41e1803ea1062497752fd400a9) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "u_e12.bin", 0x00000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+
+	ROM_REGION( 0x008000, "chars", 0 )
+	ROM_LOAD( "l_a17.bin", 0x00000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
+
+	ROM_REGION( 0x040000, "bgtiles", 0 )
+	ROM_LOAD( "l_b17.bin", 0x00000, 0x10000, CRC(65a22ffc) SHA1(0122c15f9c948bd6a12d44f71178d0a8b7f38c2e) )
+	ROM_LOAD( "l_b16.bin", 0x10000, 0x10000, CRC(b1e1f527) SHA1(07d88d4a1f198bd5e37dcb1521904c5f8d851f4d) )
+	ROM_LOAD( "l_b14.bin", 0x20000, 0x10000, CRC(28e94d40) SHA1(e77187040b5c5c7354088aa1173b23493cf26b78) )
+	ROM_LOAD( "l_b13.bin", 0x30000, 0x10000, CRC(4dbb557a) SHA1(af07074dae121264018f2f6f3489cce243bfd3c0) )
+
+	ROM_REGION( 0x040000, "fgtiles", 0 )
+	ROM_LOAD( "l_h17.bin", 0x00000, 0x10000, CRC(79c42316) SHA1(7a1c72c9146ce50d9c24ec4f3ae210103a95c2eb) )
+	ROM_LOAD( "l_h15.bin", 0x10000, 0x10000, CRC(50e31fb0) SHA1(043181041354e3af07b6b32fc6192aae9e49d869) )
+	ROM_LOAD( "l_f17.bin", 0x20000, 0x10000, CRC(2af1739d) SHA1(e17b88ee525247100b038f2200ad5a1ce4e71cb2) )
+	ROM_LOAD( "l_f15.bin", 0x30000, 0x10000, CRC(cac11327) SHA1(c0feb6f3d9b8bba1dab66142fa44269bda579443) )
+
+	ROM_REGION( 0x0a0000, "sprites", 0 )
+	ROM_LOAD( "u_k12.bin", 0x00000, 0x10000, CRC(4b0215f0) SHA1(340e68e9b9603829a200ad1ff7c0b373d39ca4dc) )
+	ROM_LOAD( "u_k13.bin", 0x10000, 0x10000, CRC(68b8a698) SHA1(ff87c47cb600bacdb50b2e8ad87090a0e0146d12) )
+	ROM_LOAD( "u_j4.bin",  0x20000, 0x10000, CRC(06ce7b57) SHA1(d19f35405b34bb43a2ca341c020c14de4c8474d6) )
+	ROM_LOAD( "u_j5.bin",  0x30000, 0x10000, CRC(2ee8b401) SHA1(6f4a3ff75daae790872477a600c9e61332f74a46) )
+	ROM_LOAD( "u_j7.bin",  0x40000, 0x10000, CRC(35656cbc) SHA1(bed0b2bfb9bd8487718a14d5388c61740d0e0e3a) )
+	ROM_LOAD( "u_j8.bin",  0x50000, 0x10000, CRC(1e7e9336) SHA1(28b13ab7e9a0bb806af8fe3dbc2b100b93b29c5c) )
+	ROM_LOAD( "u_j10.bin", 0x60000, 0x10000, CRC(785bf046) SHA1(5ab3f883643de6c59e764775b11b275989437fa2) )
+	ROM_LOAD( "u_j11.bin", 0x70000, 0x10000, CRC(c306b9fa) SHA1(58c8d64dd7ae80b5d21d289757de442ac8e9264c) )
+	ROM_LOAD( "u_j12.bin" ,0x80000, 0x10000, CRC(5ba5bbed) SHA1(6af3503e0277a926815afb973d67c4ad7a0427d1) )
+	ROM_LOAD( "u_j13.bin", 0x90000, 0x10000, CRC(007dee47) SHA1(e45ce52a471783864cc2704b3b0462c32ddf7e52) ) // modified by bootleggers
+
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
+	ROM_LOAD( "l_a6.bin",  0x00000, 0x10000, CRC(e2b9a44b) SHA1(4a1be44c19a724727218bbdc120bafbbe095747a) ) // modified by bootleggers
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
+	ROM_LOAD( "u_f14.bin", 0x00000, 0x10000, CRC(2fb32933) SHA1(2cea86dfe9a6a0b2de34c3c952c625ad30a7ebea) )
+	ROM_LOAD( "u_j14.bin", 0x10000, 0x10000, CRC(32d5f7c9) SHA1(23abc82f83296c62320a047b9f63032a7f07bf6d) )
+ROM_END
+
 /******************************************************************************/
 
 
-GAME( 1989, prehisle, 0,        prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehisleu,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehislek,prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gensitou, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK", "Genshi-Tou 1930's", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisle,  0,        prehisle, prehisle, driver_device, 0, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisleu, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK",                  "Prehistoric Isle in 1930 (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehislek, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gensitou,  prehisle, prehisle, prehisle, driver_device, 0, ROT0, "SNK",                  "Genshi-Tou 1930's",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisleb, prehisle, prehisle, prehisle, driver_device, 0, ROT0, "bootleg",              "Prehistoric Isle in 1930 (World, bootleg)", MACHINE_SUPPORTS_SAVE )
