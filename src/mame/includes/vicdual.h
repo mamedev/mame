@@ -177,5 +177,5 @@ public:
 	DECLARE_MACHINE_START(nsub);
 	DECLARE_MACHINE_RESET(nsub);
 
-	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen);
+	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
 };
