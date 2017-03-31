@@ -136,7 +136,7 @@ namespace plib {
 				std::size_t p = 1;
 				opt = getopt_short(arg.substr(p, 1));
 				++p;
-				if (p < arg.len())
+				if (p < arg.length())
 				{
 					has_equal_arg = true;
 					opt_arg = arg.substr(p);
@@ -184,7 +184,7 @@ namespace plib {
 			pstring line = pstring("").rpad(" ", firstline_indent);
 			for (auto &s : psplit(p, " "))
 			{
-				if (line.len() + s.len() > width)
+				if (line.length() + s.length() > width)
 				{
 					ret += line + "\n";
 					line = pstring("").rpad(" ", indent);
@@ -228,14 +228,14 @@ namespace plib {
 							{
 								line += v + "|";
 							}
-							line = line.left(line.len() - 1);
+							line = line.left(line.length() - 1);
 						}
 						else
 							line += "Value";
 					}
 				}
 				line = line.rpad(" ", indent - 2) + "  ";
-				if (line.len() > indent)
+				if (line.length() > indent)
 				{
 					//ret += "TestGroup abc\n  def gef\nxyz\n\n" ;
 					ret += line + "\n";
@@ -259,7 +259,7 @@ namespace plib {
 				ex += split_paragraphs(example->help(), width, 4, 4) + "\n";
 			}
 		}
-		if (ex.len() > 0)
+		if (ex.length() > 0)
 		{
 			ret += "\n\nExamples:\n\n" + ex;
 		}

@@ -210,7 +210,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 double nl_convert_base_t::get_sp_val(const pstring &sin)
 {
 	std::size_t p = 0;
-	while (p < sin.len() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
+	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
 		++p;
 	pstring val = sin.left(p);
 	pstring unit = sin.substr(p);
@@ -276,7 +276,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 	{
 		std::vector<pstring> tt(plib::psplit(line, " ", true));
 		double val = 0.0;
-		switch (tt[0].code_at(0))
+		switch (tt[0].at(0))
 		{
 			case ';':
 				out("// {}\n", line.substr(1));
@@ -316,14 +316,14 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				std::vector<pstring> m(plib::psplit(model,"{"));
 				if (m.size() == 2)
 				{
-					if (m[1].len() != 4)
+					if (m[1].length() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.c_str());
 					pins = m[1].left(3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
-				add_term(tt[1], tt[0] + "." + pins.code_at(0));
-				add_term(tt[2], tt[0] + "." + pins.code_at(1));
-				add_term(tt[3], tt[0] + "." + pins.code_at(2));
+				add_term(tt[1], tt[0] + "." + pins.at(0));
+				add_term(tt[2], tt[0] + "." + pins.at(1));
+				add_term(tt[3], tt[0] + "." + pins.at(2));
 			}
 				break;
 			case 'R':
@@ -467,7 +467,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 				tok.require_token(tok.m_tok_SEMICOLON);
 				token = tok.get_token();
 			}
-			switch (name.code_at(0))
+			switch (name.at(0))
 			{
 				case 'Q':
 				{

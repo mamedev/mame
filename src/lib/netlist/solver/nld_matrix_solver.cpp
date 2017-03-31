@@ -328,9 +328,9 @@ void matrix_solver_t::setup_matrix()
 	if ((0))
 		for (unsigned k = 0; k < iN; k++)
 		{
-			pstring line = plib::pfmt("{1}")(k, "3");
+			pstring line = plib::pfmt("{1:3}")(k);
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
 			log().verbose("{1}", line);
 		}
 

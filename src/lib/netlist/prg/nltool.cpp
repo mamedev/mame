@@ -591,7 +591,7 @@ void tool_app_t::listdevices()
 
 	for (auto & f : list)
 	{
-		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
+		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 		std::vector<pstring> terms;
 
 		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
@@ -602,7 +602,7 @@ void tool_app_t::listdevices()
 		{
 			if (t.second->name().startsWith(d->name()))
 			{
-				pstring tn(t.second->name().substr(d->name().len()+1));
+				pstring tn(t.second->name().substr(d->name().length()+1));
 				if (tn.find(".") == pstring::npos)
 					terms.push_back(tn);
 			}
@@ -612,7 +612,7 @@ void tool_app_t::listdevices()
 		{
 			if (t.first.startsWith(d->name()))
 			{
-				pstring tn(t.first.substr(d->name().len()+1));
+				pstring tn(t.first.substr(d->name().length()+1));
 				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
 				if (tn.find(".") == pstring::npos)
 				{
@@ -621,7 +621,7 @@ void tool_app_t::listdevices()
 					//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), resolved.c_str());
 					if (resolved != t.first)
 					{
-						auto found = std::find(terms.begin(), terms.end(), resolved.substr(d->name().len()+1));
+						auto found = std::find(terms.begin(), terms.end(), resolved.substr(d->name().length()+1));
 						if (found!=terms.end())
 							terms.erase(found);
 					}
