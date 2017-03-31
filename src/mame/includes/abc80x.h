@@ -177,7 +177,6 @@ public:
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc800m_update_row );
 };
 
@@ -206,7 +205,6 @@ public:
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc800c );
 };
 
@@ -242,7 +240,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -304,7 +301,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc806 );
 	MC6845_UPDATE_ROW( abc806_update_row );
 
