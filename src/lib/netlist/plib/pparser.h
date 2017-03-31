@@ -127,7 +127,7 @@ private:
 
 	int m_lineno;
 	pstring m_cur_line;
-	pstring::iterator m_px;
+	pstring::const_iterator m_px;
 	pstring::code_t m_unget;
 
 	/* tokenizer stuff follows ... */

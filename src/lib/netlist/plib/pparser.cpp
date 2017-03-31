@@ -183,7 +183,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
 	pstring::code_t c = getc();
-	while (m_whitespace.find(c) != m_whitespace.end())
+	while (m_whitespace.find(c) != pstring::npos)
 	{
 		c = getc();
 		if (eof())
@@ -191,7 +191,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(ENDOFFILE);
 		}
 	}
-	if (m_number_chars_start.find(c) != m_number_chars_start.end())
+	if (m_number_chars_start.find(c) != pstring::npos)
 	{
 		/* read number while we receive number or identifier chars
 		 * treat it as an identifier when there are identifier chars in it
@@ -200,9 +200,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		token_type ret = NUMBER;
 		pstring tokstr = "";
 		while (true) {
-			if (m_identifier_chars.find(c) != m_identifier_chars.end() && m_number_chars.find(c) == m_number_chars.end())
+			if (m_identifier_chars.find(c) != pstring::npos && m_number_chars.find(c) == pstring::npos)
 				ret = IDENTIFIER;
-			else if (m_number_chars.find(c) == m_number_chars.end())
+			else if (m_number_chars.find(c) == pstring::npos)
 				break;
 			tokstr += c;
 			c = getc();
@@ -210,11 +210,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		ungetc(c);
 		return token_t(ret, tokstr);
 	}
-	else if (m_identifier_chars.find(c) != m_identifier_chars.end())
+	else if (m_identifier_chars.find(c) != pstring::npos)
 	{
 		/* read identifier till non identifier char */
 		pstring tokstr = "";
-		while (m_identifier_chars.find(c) != m_identifier_chars.end())
+		while (m_identifier_chars.find(c) != pstring::npos)
 		{
 			tokstr += c;
 			c = getc();
@@ -241,7 +241,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	{
 		/* read identifier till first identifier char or ws */
 		pstring tokstr = "";
-		while ((m_identifier_chars.find(c) == m_identifier_chars.end()) && (m_whitespace.find(c) == m_whitespace.end()))
+		while ((m_identifier_chars.find(c) == pstring::npos) && (m_whitespace.find(c) == pstring::npos))
 		{
 			tokstr += c;
 			/* expensive, check for single char tokens */
@@ -385,33 +385,33 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	std::vector<pstring> elems(psplit(line, m_expr_sep));
-	pstringbuffer ret("");
+	pstring ret("");
 	for (auto & elem : elems)
 	{
 		define_t *def = get_define(elem);
 		if (def != nullptr)
-			ret.cat(def->m_replace);
+			ret += def->m_replace;
 		else
-			ret.cat(elem);
+			ret += elem;
 	}
 	return ret;
 }
 
 static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
-	pstringbuffer ret("");
+	pstring ret("");
 	for (auto & elem : elems)
 	{
-		ret.cat(elem);
-		ret.cat(sep);
+		ret += elem;
+		ret += sep;
 	}
 	return ret;
 }
 
 pstring  ppreprocessor::process_line(const pstring &line)
 {
-	pstring lt = line.replace("\t"," ").trim();
-	pstringbuffer ret;
+	pstring lt = line.replace_all("\t"," ").trim();
+	pstring ret;
 	m_lineno++;
 	// FIXME ... revise and extend macro handling
 	if (lt.startsWith("#"))
@@ -422,7 +422,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			std::vector<pstring> t(psplit(lt.substr(3).replace(" ",""), m_expr_sep));
+			std::vector<pstring> t(psplit(lt.substr(3).replace_all(" ",""), m_expr_sep));
 			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
@@ -477,7 +477,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 		lt = replace_macros(lt);
 		if (m_ifflag == 0)
 		{
-			ret.cat(lt);
+			ret += lt;
 		}
 	}
 	return ret;

@@ -34,7 +34,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_CASSETTE,  "cassette",     "cass" }, /*  4 */
 		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  5 */
 		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  6 */
-		{ IO_PRINTER,   "printer",      "prin" }, /*  7 */
+		{ IO_PRINTER,   "printout",     "prin" }, /*  7 */
 		{ IO_SERIAL,    "serial",       "serl" }, /*  8 */
 		{ IO_PARALLEL,  "parallel",     "parl" }, /*  9 */
 		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 10 */

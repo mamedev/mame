@@ -148,19 +148,19 @@ public:
 	postringstream() : postream(0) { }
 	virtual ~postringstream() override;
 
-	const pstringbuffer &str() { return m_buf; }
+	const pstring &str() { return m_buf; }
 
 protected:
 	/* write n bytes to stream */
 	virtual void vwrite(const void *buf, const pos_type n) override
 	{
-		m_buf.cat(buf, n);
+		m_buf += pstring(static_cast<const pstring::mem_t *>(buf), n, pstring::UTF8);
 	}
 	virtual void vseek(const pos_type n) override { }
 	virtual pos_type vtell() override { return m_buf.len(); }
 
 private:
-	pstringbuffer m_buf;
+	pstring m_buf;
 };
 
 // -----------------------------------------------------------------------------
@@ -317,17 +317,17 @@ public:
 		char b[4];
 		if (m_strm.read(&b[0], 1) != 1)
 			return false;
-		const unsigned l = pstring::traits::codelen(b);
-		for (unsigned i = 1; i < l; i++)
+		const std::size_t l = pstring::traits_type::codelen(b);
+		for (std::size_t i = 1; i < l; i++)
 			if (m_strm.read(&b[i], 1) != 1)
 				return false;
-		c = pstring::traits::code(b);
+		c = pstring::traits_type::code(b);
 		return true;
 	}
 
 private:
 	pistream &m_strm;
-	pstringbuffer m_linebuf;
+	pstring m_linebuf;
 };
 
 // -----------------------------------------------------------------------------
@@ -348,7 +348,7 @@ public:
 
 	void write(const pstring &text) const
 	{
-		m_strm.write(text.c_str(), text.blen());
+		m_strm.write(text.c_str(), text.size());
 	}
 
 	void write(const pstring::code_t c) const
@@ -391,8 +391,8 @@ public:
 
 	void write(const pstring &s)
 	{
-		write(s.blen());
-		m_strm.write(s.c_str(), s.blen());
+		write(s.size());
+		m_strm.write(s.c_str(), s.size());
 	}
 
 	template <typename T>
