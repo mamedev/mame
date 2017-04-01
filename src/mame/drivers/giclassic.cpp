@@ -52,8 +52,7 @@ private:
 
 K056832_CB_MEMBER(giclassic_state::tile_callback)
 {
-	*color = 0;
-	*code = (*code & 0x3fff);
+	*color = (*color & 0xf);
 }
 
 void giclassic_state::video_start()
@@ -65,10 +64,10 @@ uint32_t giclassic_state::screen_update_giclassic(screen_device &screen, bitmap_
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
 
 	return 0;
 }
@@ -90,6 +89,7 @@ static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
 	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
 	AM_RANGE(0xb00000, 0xb01fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(control_w)
+	AM_RANGE(0xd00000, 0xd0003f) AM_RAM	// these must read/write or 26S (LCD controller) fails
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP AM_WRITENOP	// watchdog reset
 ADDRESS_MAP_END
 
@@ -113,16 +113,16 @@ static MACHINE_CONFIG_START( giclassic, giclassic_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
+	MCFG_SCREEN_REFRESH_RATE(59.62)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
+	MCFG_SCREEN_SIZE(600, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(giclassic_state, screen_update_giclassic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(giclassic_state, tile_callback)
