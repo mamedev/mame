@@ -960,6 +960,16 @@ void k055673_device::device_start()
 			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 		16*16*6
 	};
+	static const gfx_layout spritelayout5 = /* Pirate Ship layout */
+	{
+		16,16,
+		0,
+		4,
+		{ 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7, 32, 33, 34, 35, 36, 37, 38, 39 },
+		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
+		16*16*4
+	};
 	uint8_t *s1, *s2, *d;
 	long i;
 	uint16_t *alt_k055673_rom;
@@ -995,6 +1005,11 @@ void k055673_device::device_start()
 		case K055673_LAYOUT_RNG:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
+			break;
+
+		case K055673_LAYOUT_PS:
+			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout5, 4);
 			break;
 
 		case K055673_LAYOUT_LE2:

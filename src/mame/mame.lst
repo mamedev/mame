@@ -30881,6 +30881,9 @@ genix                           // (c) 199? NIX
 pirates                         // (c) 1994 NIX
 piratesb                        // bootleg?
 
+@source:piratesh.cpp
+piratesh						// (c) 1995 Konami
+
 @source:pitagjr.cpp
 pitagjr                         // Pitagorin Junior
 

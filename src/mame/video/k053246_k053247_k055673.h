@@ -34,7 +34,7 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define K055673_LAYOUT_RNG 4
 #define K055673_LAYOUT_LE2 8
 #define K055673_LAYOUT_GX6 6
-
+#define K055673_LAYOUT_PS  7
 
 /*
 Callback procedures for non-standard shadows:
