@@ -174,10 +174,6 @@ public:
 	void force_update() { m_byteend = 0; m_bytestart = 1; }
 	void force_update(u16 if_match) { if (m_entry == if_match) force_update(); }
 
-	// custom update callbacks and configuration
-	direct_update_delegate set_direct_update(direct_update_delegate function);
-	void explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *raw);
-
 	// accessor methods
 	void *read_ptr(offs_t byteaddress, offs_t directxor = 0);
 	u8 read_byte(offs_t byteaddress, offs_t directxor = 0);
@@ -341,9 +337,6 @@ public:
 	offs_t address_to_byte_end(offs_t address) const { return m_config.addr2byte_end(address); }
 	offs_t byte_to_address(offs_t address) const { return m_config.byte2addr(address); }
 	offs_t byte_to_address_end(offs_t address) const { return m_config.byte2addr_end(address); }
-
-	// direct access
-	direct_update_delegate set_direct_update_handler(direct_update_delegate function) { return m_direct->set_direct_update(function); }
 
 	// umap ranges (short form)
 	void unmap_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0) { unmap_generic(addrstart, addrend, addrmirror, ROW_READ, false); }
@@ -728,12 +721,6 @@ private:
 //**************************************************************************
 //  MACROS
 //**************************************************************************
-
-// opcode base adjustment handler function macro
-#define DIRECT_UPDATE_MEMBER(name)          offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
-#define DECLARE_DIRECT_UPDATE_MEMBER(name)  offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
-
-
 
 // space read/write handler function macros
 #define READ8_MEMBER(name)              u8     name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)

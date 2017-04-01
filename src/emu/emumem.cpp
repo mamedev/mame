@@ -4000,35 +4000,6 @@ void direct_read_data::remove_intersecting_ranges(offs_t bytestart, offs_t bytee
 }
 
 
-//-------------------------------------------------
-//  set_direct_update - set a custom direct range
-//  update callback
-//-------------------------------------------------
-
-direct_update_delegate direct_read_data::set_direct_update(direct_update_delegate function)
-{
-	direct_update_delegate old = m_directupdate;
-	m_directupdate = function;
-	return old;
-}
-
-
-//-------------------------------------------------
-//  explicit_configure - explicitly configure
-//  the start/end/mask and the pointers from
-//  within a custom callback
-//-------------------------------------------------
-
-void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *ptr)
-{
-	m_bytestart = bytestart;
-	m_byteend = byteend;
-	m_bytemask = bytemask;
-	m_ptr = reinterpret_cast<u8 *>(ptr) - (bytestart & bytemask);
-}
-
-
-
 //**************************************************************************
 //  MEMORY BLOCK
 //**************************************************************************
