@@ -106,12 +106,6 @@ struct data_accessors
 };
 
 
-// ======================> direct_update_delegate
-
-// direct region update handler
-typedef delegate<offs_t (direct_read_data &, offs_t)> direct_update_delegate;
-
-
 // ======================> read_delegate
 
 // declare delegates for each width
@@ -183,7 +177,7 @@ public:
 
 private:
 	// internal helpers
-	bool set_direct_region(offs_t &byteaddress);
+	bool set_direct_region(offs_t byteaddress);
 	direct_range *find_range(offs_t byteaddress, u16 &entry);
 	void remove_intersecting_ranges(offs_t bytestart, offs_t byteend);
 
@@ -195,7 +189,6 @@ private:
 	offs_t                      m_byteend;              // maximum valid byte address
 	u16                         m_entry;                // live entry
 	std::list<direct_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
-	direct_update_delegate      m_directupdate;         // fast direct-access update callback
 };
 
 

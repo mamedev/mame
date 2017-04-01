@@ -3915,21 +3915,10 @@ direct_read_data::~direct_read_data()
 //  update the opcode base for the given address
 //-------------------------------------------------
 
-bool direct_read_data::set_direct_region(offs_t &byteaddress)
+bool direct_read_data::set_direct_region(offs_t byteaddress)
 {
-	// allow overrides
-	offs_t overrideaddress = byteaddress;
-	if (!m_directupdate.isnull())
-	{
-		overrideaddress = m_directupdate(*this, overrideaddress);
-		if (overrideaddress == ~0)
-			return true;
-
-		byteaddress = overrideaddress;
-	}
-
 	// find or allocate a matching range
-	direct_range *range = find_range(overrideaddress, m_entry);
+	direct_range *range = find_range(byteaddress, m_entry);
 
 	// if we don't map to a bank, return false
 	if (m_entry < STATIC_BANK1 || m_entry > STATIC_BANKMAX)
@@ -3943,7 +3932,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	u8 *base = *m_space.manager().bank_pointer_addr(m_entry);
 
 	// compute the adjusted base
-	offs_t maskedbits = overrideaddress & ~m_space.bytemask();
+	offs_t maskedbits = byteaddress & ~m_space.bytemask();
 	const handler_entry_read &handler = m_space.read().handler_read(m_entry);
 	m_bytemask = handler.bytemask();
 	m_ptr = base - (handler.bytestart() & m_bytemask);
