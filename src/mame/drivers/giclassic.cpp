@@ -3,14 +3,41 @@
 /***************************************************************************
 
  GI Classic / GI Classic EX
- (c) 1995 Konami
+ (c) 1995, 1998 Konami
  Preliminary driver by R. Belmont
 
- Satellite PCB:
+ GI Classic EX Main PCB:
+ Main CPU: 68020
+ Photo too unclear to identify Konami customs.
+
+ GI Classic EX Satellite PCB:
  Main CPU: 68000-12
  Video: 056832 / 058143 (GX tilemaps)
  Video: 000907 LCD Controller
-
+ 
+ WANTED: main PCB and any other PCBs for GI Classic EX, plus any and all 
+ PCBs for other games also believed to be on this h/w:
+ - GI-Classic (1995)
+ - GI-Classic Special (1996)
+ - GI-Classic WINDS (1996)
+ - GI-Classic WINDS EX (1998)
+ 
+ Other "GI" games, list from http://www.konami.jp/am/g1/
+ - GI-LEADING SIRE (1999)
+ - GI-LEADING SIRE Ver. 2 (2000)
+ - GI-LEADING SIRE Ver. 3 (2001)
+ - GI-WINNING SIRE (2002)
+ - GI-TURFWILD (2003)
+ - GI-WINNING SIRE Ver. 2 (2003)
+ - GI-TURFWILD 2 (2004)
+ - GI-TURFWILD 3 (2005)
+ - GI-HORSEPARK (2005)
+ - GI-HORSEPARK EX (2006)
+ - GI-HORSEPARK EX STD (2006)
+ - GI-HORSEPARK GX STD (2009)
+ - GI-HORSEPARK GX (2009)
+ - GI-Turf TV (2010)
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -45,7 +72,8 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	
 	DECLARE_WRITE16_MEMBER(control_w);
-	
+	DECLARE_READ16_MEMBER(vrom_r);
+
 private:
 	uint8_t m_control;
 };
@@ -74,11 +102,33 @@ uint32_t giclassic_state::screen_update_giclassic(screen_device &screen, bitmap_
 
 INTERRUPT_GEN_MEMBER(giclassic_state::giclassic_interrupt)
 {
+	if (m_control & 2)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE);
+	}
 }
 
 WRITE16_MEMBER(giclassic_state::control_w)
 {
-	m_control = data & 0xff;	// oscillates between 0x14 and 0x1c during VROM readback - IRQ disable?
+	// bits:
+	// 0 = ?
+	// 1 = IRQ enable
+	// 2 = ?
+	// 3 = extra VROM readback bank
+	// 4 = screen on?
+
+	m_control = data & 0xff;
+}
+
+READ16_MEMBER(giclassic_state::vrom_r)
+{
+	if (m_control & 8)
+	{
+		return m_k056832->piratesh_rom_r(space, offset + 0x1000);
+	}
+	
+	return m_k056832->piratesh_rom_r(space, offset);
 }
 
 static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
@@ -87,9 +137,10 @@ static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM	AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0xb00000, 0xb01fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)
+	AM_RANGE(0xb00000, 0xb01fff) AM_READ(vrom_r)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(control_w)
 	AM_RANGE(0xd00000, 0xd0003f) AM_RAM	// these must read/write or 26S (LCD controller) fails
+	AM_RANGE(0xe00000, 0xe0001f) AM_DEVWRITE8("k056832", k056832_device, b_w, 0xff00)
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP AM_WRITENOP	// watchdog reset
 ADDRESS_MAP_END
 
@@ -139,4 +190,4 @@ ROM_START( giclasex )
 	ROM_LOAD( "gsgu760ae02.14e", 0x080000, 0x080000, CRC(2b9fe163) SHA1(f60190a9689a70d6c5bb14fb46b7ac2267cf0969) ) 
 ROM_END
 
-GAME( 1995, giclasex, 0, giclassic, giclassic,  driver_device, 0, 0, "Konami", "GI-Classic EX", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex, 0, giclassic, giclassic,  driver_device, 0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
