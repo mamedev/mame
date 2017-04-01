@@ -2227,6 +2227,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gberet.cpp",
 	MAME_DIR .. "src/mame/includes/gberet.h",
 	MAME_DIR .. "src/mame/video/gberet.cpp",
+	MAME_DIR .. "src/mame/drivers/giclassic.cpp",
 	MAME_DIR .. "src/mame/drivers/gijoe.cpp",
 	MAME_DIR .. "src/mame/includes/gijoe.h",
 	MAME_DIR .. "src/mame/video/gijoe.cpp",
