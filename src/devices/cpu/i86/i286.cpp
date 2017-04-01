@@ -281,6 +281,17 @@ void i80286_cpu_device::device_start()
 	m_out_shutdown_func.resolve_safe();
 }
 
+const address_space_config *i80286_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return &m_io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_opcodes_config : nullptr;
+	default:                   return nullptr;
+	}
+}
+
 
 //-------------------------------------------------
 //  state_import - import state into the device,
@@ -1010,7 +1021,7 @@ uint8_t i80286_cpu_device::fetch_op()
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }
@@ -1021,7 +1032,7 @@ uint8_t i80286_cpu_device::fetch()
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }
