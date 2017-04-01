@@ -3672,6 +3672,35 @@ ROM_END
 
 ROM_START( sbm )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c69-20-2.ic10", 0x00000, 0x20000, CRC(225952a3) SHA1(d95ef971929d4a8c19193e80499052f57d205001) )
+	ROM_LOAD16_BYTE( "c69-22-2.ic12", 0x00001, 0x20000, CRC(d900ce83) SHA1(b86c3e7c2f9f2dbd415b7a355e5978de46fc3564) )
+	ROM_LOAD16_BYTE( "c69-19-2.ic9" , 0x40000, 0x20000, CRC(d6cfacfb) SHA1(0f910e92a81e0d7ac35d0ffc799dd723f64d47d1) )
+	ROM_LOAD16_BYTE( "c69-25-2.ic11", 0x40001, 0x20000, CRC(70903898) SHA1(879412e3c385533fd0bf1e47956e3e9bea78378d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "c69-31.ic28",0x00000, 0x10000, CRC(c999f753) SHA1(5d944b492893a0bb605743e2928c802427a85fbf) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD       ( "c69-01.ic5", 0x000000, 0x100000, CRC(521fabe3) SHA1(f81303688ac014145a7e9325affc4a0f86755ba9) )
+	ROM_LOAD16_BYTE( "c69-13.ic2", 0x100000, 0x020000, CRC(d1550884) SHA1(f3a65827c45959fe5ac4bfc92831a8bed76bf287) )
+	ROM_LOAD16_BYTE( "c69-12.ic1", 0x100001, 0x020000, CRC(eb56582c) SHA1(41b77704aeaecf3eaa3f87e97c0b59fd00e5349e) )
+	/* 140000-1fffff empty */
+	ROM_LOAD       ( "c69-02.ic6", 0x200000, 0x100000, CRC(f0e20d35) SHA1(af67f39498f68523ece4cd91045456092038e0a4) )
+	ROM_LOAD16_BYTE( "c69-15.ic4", 0x300000, 0x020000, CRC(9761d316) SHA1(f03216bbade96948ff433a925e8bffb8760b4101) )
+	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
+	/* 340000-3fffff empty */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c69-26.ic36", 0x00000, 0x80000, CRC(8784058b) SHA1(c3d9c620704fb5e80719e996e97f6191a5bd9f8c) )
+
+	ROM_REGION( 0x1800, "plds", 0 )
+	ROM_LOAD( "c69-04.ic6",  0x000, 0x104, CRC(80498715) SHA1(076c26f365b74f3b6adb2c4c1a3add5a46a257ea) ) // 16l8
+	ROM_LOAD( "c69-05.ic25", 0x200, 0x104, CRC(35e345b4) SHA1(befbea944c645dafb143d8dba83fcc16f1edd3e6) ) // 16l8
+	ROM_LOAD( "c69-06.ic17", 0x400, 0x144, CRC(3988e5d1) SHA1(24e03455fd9e653e3fc901bef2c3f3ea59f04ea5) ) // 20l8
+ROM_END
+
+ROM_START( sbmj )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c69-20-1.10", 0x00000, 0x20000, CRC(b40e4910) SHA1(1436990b8c3c1d0763283133b2ce9d47cd65f825) )
 	ROM_LOAD16_BYTE( "c69-22-1.12", 0x00001, 0x20000, CRC(ecbcf830) SHA1(49f04a198d327866b26b978a302ddc7aea5ac6de) )
 	ROM_LOAD16_BYTE( "c69-19-1.9" , 0x40000, 0x20000, CRC(5719c158) SHA1(e1cdf89695e1dba75f92e449d08fa6df57e9b388) )
@@ -3770,5 +3799,6 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,
     in that it has a punching pad that player needs to punch to hit
     the enemy.
 */
-GAME( 1990, sbm,      0,       sbm,      sbm,      taitob_state, taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1994, realpunc, 0,       realpunc, realpunc, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",       MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbm,      0,       sbm,      sbm,      taitob_state, taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (US)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,   sbm,       sbm,      sbm,      taitob_state, taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpunc, 0,       realpunc, realpunc, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",      MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
