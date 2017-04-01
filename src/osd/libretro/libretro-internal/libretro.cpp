@@ -464,7 +464,7 @@ void retro_init (void)
    }
 
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "SYSTEM_DIRECTORY: %s", retro_system_directory);
+      log_cb(RETRO_LOG_INFO, "SYSTEM_DIRECTORY: %s\n", retro_system_directory);
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_CONTENT_DIRECTORY, &content_dir) && content_dir)
    {
@@ -473,7 +473,7 @@ void retro_init (void)
    }
 
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "CONTENT_DIRECTORY: %s", retro_content_directory);
+      log_cb(RETRO_LOG_INFO, "CONTENT_DIRECTORY: %s\n", retro_content_directory);
 
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
@@ -491,12 +491,12 @@ void retro_init (void)
       retro_save_directory=retro_system_directory;
    }
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "SAVE_DIRECTORY: %s", retro_save_directory);
+      log_cb(RETRO_LOG_INFO, "SAVE_DIRECTORY: %s\n", retro_save_directory);
 
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
       if (log_cb)
-         log_cb(RETRO_LOG_ERROR, "pixel format not supported");
+         log_cb(RETRO_LOG_ERROR, "pixel format not supported\n");
       exit(0);
    }
 }
@@ -549,7 +549,7 @@ void retro_run (void)
    }
    else if (NEWGAME_FROM_OSD == 2){
       update_geometry();
-printf("w:%d h:%d a:%f\n",fb_width,fb_height,retro_aspect);
+      printf("w:%d h:%d a:%f\n",fb_width,fb_height,retro_aspect);
       NEWGAME_FROM_OSD=0;
    }
 
