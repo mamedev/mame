@@ -606,9 +606,9 @@ static int num_lock = 0;
 
 
 static inline void OPL3_SLOT_CONNECT(OPL3 *chip, OPL3_SLOT *slot) {
-	if ((slot->conn_enum == CONN_NULL)) {
+	if (slot->conn_enum == CONN_NULL) {
 		slot->connect = nullptr;
-	} else if ((slot->conn_enum >= CONN_CHAN0) && (slot->conn_enum < CONN_PHASEMOD)) {
+	} else if (slot->conn_enum >= CONN_CHAN0 && slot->conn_enum < CONN_PHASEMOD) {
 		slot->connect = &chip->chanout[slot->conn_enum];
 	} else if (slot->conn_enum == CONN_PHASEMOD) {
 		slot->connect = &chip->phase_modulation;

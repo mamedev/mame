@@ -112,22 +112,8 @@ uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 
 			fore_pen = pens_from_color_prom[(color_prom[offs] >> 5) & 0x07];
 		}
 
-		if (m_gradient == 0x04)
-		{
-			// used by nsub and starrkr (maybe others)
-			// bit 4 on palette_bank_w seems to enable/disable the starfield/gradient
-			// how exactly those work is unclear right now
-			if (x >= 24 && x < 105)
-			{
-				// nsub - black to blue gradient
-				back_pen = rgb_t(0x00, 0x00, (x - 24) * 3);
-			}
-			if (x >= 105 && x < 233)
-			{
-				// nsub - blue to cyan gradient
-				back_pen = rgb_t(0x00, 0x80 + (x - 105), 0xff);
-			}
-		}
+		// this does nothing by default, but is used to enable overrides
+		back_pen = choose_pen(x, y, back_pen);
 
 		/* plot the current pixel */
 		pen = (video_data & 0x80) ? fore_pen : back_pen;
@@ -163,4 +149,16 @@ uint32_t vicdual_state::screen_update_bw_or_color(screen_device &screen, bitmap_
 		screen_update_bw(screen, bitmap, cliprect);
 
 	return 0;
+}
+
+
+pen_t vicdual_state::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
+{
+	return back_pen;
+}
+
+
+pen_t nsub_state::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
+{
+	return m_s97269pb->choose_pen(x, y, back_pen);
 }

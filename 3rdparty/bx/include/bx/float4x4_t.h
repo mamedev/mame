@@ -44,7 +44,7 @@ namespace bx
 		return result;
 	}
 
-	BX_SIMD_INLINE void float4x4_mul(float4x4_t* __restrict _result, const float4x4_t* __restrict _a, const float4x4_t* __restrict _b)
+	BX_SIMD_INLINE void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
 		_result->col[0] = simd_mul(_a->col[0], _b);
 		_result->col[1] = simd_mul(_a->col[1], _b);
@@ -52,7 +52,7 @@ namespace bx
 		_result->col[3] = simd_mul(_a->col[3], _b);
 	}
 
-	BX_SIMD_FORCE_INLINE void float4x4_transpose(float4x4_t* __restrict _result, const float4x4_t* __restrict _mtx)
+	BX_SIMD_FORCE_INLINE void float4x4_transpose(float4x4_t* _result, const float4x4_t* _mtx)
 	{
 		const simd128_t aibj = simd_shuf_xAyB(_mtx->col[0], _mtx->col[2]); // aibj
 		const simd128_t emfn = simd_shuf_xAyB(_mtx->col[1], _mtx->col[3]); // emfn
@@ -64,7 +64,7 @@ namespace bx
 		_result->col[3] = simd_shuf_zCwD(ckdl, gohp); // dhlp
 	}
 
-	BX_SIMD_INLINE void float4x4_inverse(float4x4_t* __restrict _result, const float4x4_t* __restrict _a)
+	BX_SIMD_INLINE void float4x4_inverse(float4x4_t* _result, const float4x4_t* _a)
 	{
 		const simd128_t tmp0 = simd_shuf_xAzC(_a->col[0], _a->col[1]);
 		const simd128_t tmp1 = simd_shuf_xAzC(_a->col[2], _a->col[3]);

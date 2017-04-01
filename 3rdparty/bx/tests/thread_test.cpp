@@ -16,23 +16,23 @@ int32_t threadExit1(void*)
 	return 1;
 }
 
-TEST(thread)
+TEST_CASE("thread", "")
 {
 	bx::Thread th;
 
-	CHECK_EQUAL(th.isRunning(), false);
+	REQUIRE(!th.isRunning() );
 
 	th.init(threadExit0);
-	CHECK_EQUAL(th.isRunning(), true);
+	REQUIRE(th.isRunning() );
 	th.shutdown();
 
-	CHECK_EQUAL(th.isRunning(), false);
-	CHECK_EQUAL(th.getExitCode(), 0);
+	REQUIRE(!th.isRunning() );
+	REQUIRE(th.getExitCode() == 0);
 
 	th.init(threadExit1);
-	CHECK_EQUAL(th.isRunning(), true);
+	REQUIRE(th.isRunning() );
 	th.shutdown();
 
-	CHECK_EQUAL(th.isRunning(), false);
-	CHECK_EQUAL(th.getExitCode(), 1);
+	REQUIRE(!th.isRunning() );
+	REQUIRE(th.getExitCode() == 1);
 }

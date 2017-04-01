@@ -24,7 +24,7 @@ plog_dispatch_intf::~plog_dispatch_intf()
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {
-	std::size_t l = fmt.blen() + 1;
+	std::size_t l = fmt.size() + 1;
 	if (l>sizeof(m_str_buf))
 	{
 		m_allocated = 2 * l;

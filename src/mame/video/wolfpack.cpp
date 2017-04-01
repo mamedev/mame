@@ -44,51 +44,51 @@ PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_size_w)
+WRITE8_MEMBER(wolfpack_state::ship_size_w)
 {
 	m_ship_size = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_video_invert_w)
+WRITE8_MEMBER(wolfpack_state::video_invert_w)
 {
 	m_video_invert = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_reflect_w)
+WRITE8_MEMBER(wolfpack_state::ship_reflect_w)
 {
 	m_ship_reflect = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pos_select_w)
+WRITE8_MEMBER(wolfpack_state::pt_pos_select_w)
 {
 	m_pt_pos_select = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_horz_w)
+WRITE8_MEMBER(wolfpack_state::pt_horz_w)
 {
 	m_pt_horz = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pic_w)
+WRITE8_MEMBER(wolfpack_state::pt_pic_w)
 {
 	m_pt_pic = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_w)
+WRITE8_MEMBER(wolfpack_state::ship_h_w)
 {
 	m_ship_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_pic_w)
+WRITE8_MEMBER(wolfpack_state::torpedo_pic_w)
 {
 	m_torpedo_pic = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_precess_w)
+WRITE8_MEMBER(wolfpack_state::ship_h_precess_w)
 {
 	m_ship_h_precess = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_pic_w)
+WRITE8_MEMBER(wolfpack_state::ship_pic_w)
 {
 	m_ship_pic = data & 0x0f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_h_w)
+WRITE8_MEMBER(wolfpack_state::torpedo_h_w)
 {
 	m_torpedo_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
+WRITE8_MEMBER(wolfpack_state::torpedo_v_w)
 {
 	m_torpedo_v = data;
 }
@@ -96,16 +96,14 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
 
 void wolfpack_state::video_start()
 {
-	uint16_t val = 0;
-
-	int i;
-
 	m_LFSR = std::make_unique<uint8_t[]>(0x8000);
 
 	m_screen->register_screen_bitmap(m_helper);
 
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
+		uint16_t val = 0;
+		
 		int bit = (val >> 0x0) ^ (val >> 0xe) ^ 1;
 
 		val = (val << 1) | (bit & 1);
@@ -114,6 +112,21 @@ void wolfpack_state::video_start()
 	}
 
 	m_current_index = 0x80;
+
+	save_item(NAME(m_collision));
+	save_item(NAME(m_current_index));
+	save_item(NAME(m_video_invert));
+	save_item(NAME(m_ship_reflect));
+	save_item(NAME(m_pt_pos_select));
+	save_item(NAME(m_pt_horz));
+	save_item(NAME(m_pt_pic));
+	save_item(NAME(m_ship_h));
+	save_item(NAME(m_torpedo_pic));
+	save_item(NAME(m_ship_size));
+	save_item(NAME(m_ship_h_precess));
+	save_item(NAME(m_ship_pic));
+	save_item(NAME(m_torpedo_h));
+	save_item(NAME(m_torpedo_v));
 }
 
 
@@ -233,7 +246,7 @@ void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, c
 }
 
 
-uint32_t wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wolfpack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int j;
@@ -273,7 +286,7 @@ uint32_t wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_in
 }
 
 
-WRITE_LINE_MEMBER(wolfpack_state::screen_vblank_wolfpack)
+WRITE_LINE_MEMBER(wolfpack_state::screen_vblank)
 {
 	// rising edge
 	if (state)

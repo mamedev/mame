@@ -1235,9 +1235,12 @@ void screen_device::update_now()
 		// if the line before us was incomplete, we must do it in two pieces
 		if (m_partial_scan_hpos > 0)
 		{
-			s32 save_scan = m_partial_scan_hpos;
-			update_partial(current_vpos - 2);
-			m_partial_scan_hpos = save_scan;
+			if (current_vpos > 1)
+			{
+				s32 save_scan = m_partial_scan_hpos;
+				update_partial(current_vpos - 2);
+				m_partial_scan_hpos = save_scan;
+			}
 
 			// now finish the previous partial scanline
 			int scanline = current_vpos - 1;

@@ -148,48 +148,49 @@
 -- for generating the solution.
 --
 
-    function premake.vstudio.bakeimports(sln)
-        for _,iprj in ipairs(sln.importedprojects) do
-            if string.find(iprj.location, ".csproj") ~= nil then
-                iprj.language = "C#"
-            else
-                iprj.language = "C++"
-            end
+	function premake.vstudio.bakeimports(sln)
+		for _,iprj in ipairs(sln.importedprojects) do
+			if string.find(iprj.location, ".csproj") ~= nil then
+				iprj.language = "C#"
+			else
+				iprj.language = "C++"
+			end
 
+			local f, err = io.open(iprj.location, "r")
+			if (not f) then
+				error(err, 1)
+			end
 
-            local f, err = io.open(iprj.location, "r")
-            if (not f) then
-                error(err, 1)
-            end
-            local projcontents = f:read("*all")
-            f:close()
+			local projcontents = f:read("*all")
+			f:close()
 
-            local found, _, uuid = string.find(projcontents, "<ProjectGuid>{([%w%-]+)}</ProjectGuid>")
-            if not found then
-                error("Could not find ProjectGuid element in project " .. iprj.location, 1)
-            end
-            iprj.uuid = uuid
+			local found, _, uuid = string.find(projcontents, "<ProjectGuid>{([%w%-]+)}</ProjectGuid>")
+			if not found then
+				error("Could not find ProjectGuid element in project " .. iprj.location, 1)
+			end
+
+			iprj.uuid = uuid
 
 			if iprj.language == "C++" and string.find(projcontents, "<CLRSupport>true</CLRSupport>") then
 				iprj.flags.Managed = true
 			end
 
-            iprj.relpath = path.getrelative(sln.location, iprj.location)
-        end
-    end
+			iprj.relpath = path.getrelative(sln.location, iprj.location)
+		end
+	end
 
 --
 -- Look up a imported project by project path
 --
-    function premake.vstudio.getimportprj(prjpath, sln)
-        for _,iprj in ipairs(sln.importedprojects) do
-            if prjpath == iprj.relpath then
-                return iprj
-            end
-        end
+	function premake.vstudio.getimportprj(prjpath, sln)
+		for _,iprj in ipairs(sln.importedprojects) do
+			if prjpath == iprj.relpath then
+				return iprj
+			end
+		end
 
-        error("Could not find reference import project " .. prjpath, 1)
-    end
+		error("Could not find reference import project " .. prjpath, 1)
+	end
 
 --
 -- Clean Visual Studio files
@@ -259,97 +260,3 @@
 			return "8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942"
 		end
 	end
-
---
--- Register Visual Studio 2008
---
-
-	newaction {
-		trigger         = "vs2008",
-		shortname       = "Visual Studio 2008",
-		description     = "Generate Microsoft Visual Studio 2008 project files",
-		os              = "windows",
-
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
-
-		valid_languages = { "C", "C++", "C#" },
-
-		valid_tools     = {
-			cc     = { "msc"   },
-			dotnet = { "msnet" },
-		},
-
-		onsolution = function(sln)
-			premake.generate(sln, "%%.sln", vstudio.sln2005.generate)
-		end,
-
-		onproject = function(prj)
-			if premake.isdotnetproject(prj) then
-				premake.generate(prj, "%%.csproj", vstudio.cs2005.generate)
-				premake.generate(prj, "%%.csproj.user", vstudio.cs2005.generate_user)
-			else
-				premake.generate(prj, "%%.vcproj", vstudio.vc200x.generate)
-				premake.generate(prj, "%%.vcproj.user", vstudio.vc200x.generate_user)
-			end
-		end,
-
-		oncleansolution = vstudio.cleansolution,
-		oncleanproject  = vstudio.cleanproject,
-		oncleantarget   = vstudio.cleantarget,
-
-		vstudio = {
-			productVersion  = "9.0.21022",
-			solutionVersion = "10",
-			toolsVersion    = "3.5",
-			supports64bitEditContinue = false,
-		}
-	}
-
-
---
--- Register Visual Studio 2010
---
-
-	newaction
-	{
-		trigger         = "vs2010",
-		shortname       = "Visual Studio 2010",
-		description     = "Generate Microsoft Visual Studio 2010 project files",
-		os              = "windows",
-
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
-
-		valid_languages = { "C", "C++", "C#"},
-
-		valid_tools     = {
-			cc     = { "msc"   },
-			dotnet = { "msnet" },
-		},
-
-		onsolution = function(sln)
-			premake.generate(sln, "%%.sln", vstudio.sln2005.generate)
-		end,
-
-		onproject = function(prj)
-			if premake.isdotnetproject(prj) then
-				premake.generate(prj, "%%.csproj", vstudio.cs2005.generate)
-				premake.generate(prj, "%%.csproj.user", vstudio.cs2005.generate_user)
-			else
-			premake.generate(prj, "%%.vcxproj", premake.vs2010_vcxproj)
-			premake.generate(prj, "%%.vcxproj.user", premake.vs2010_vcxproj_user)
-			premake.generate(prj, "%%.vcxproj.filters", vstudio.vc2010.generate_filters)
-			end
-		end,
-
-		oncleansolution = premake.vstudio.cleansolution,
-		oncleanproject  = premake.vstudio.cleanproject,
-		oncleantarget   = premake.vstudio.cleantarget,
-
-		vstudio = {
-			productVersion  = "8.0.30703",
-			solutionVersion = "11",
-			targetFramework = "4.0",
-			toolsVersion    = "4.0",
-			supports64bitEditContinue = false,
-		}
-	}

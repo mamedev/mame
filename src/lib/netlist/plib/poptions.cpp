@@ -133,17 +133,19 @@ namespace plib {
 			}
 			else if (arg.startsWith("-"))
 			{
-				auto p = arg.begin() + 1;
-				opt = getopt_short(arg.substr(p,p + 1));
+				std::size_t p = 1;
+				opt = getopt_short(arg.substr(p, 1));
 				++p;
-				if (p != arg.end())
+				if (p < arg.len())
 				{
 					has_equal_arg = true;
 					opt_arg = arg.substr(p);
 				}
 			}
 			else
+			{
 				return i;
+			}
 			if (opt == nullptr)
 				return i;
 			if (opt->has_argument())
@@ -226,7 +228,7 @@ namespace plib {
 							{
 								line += v + "|";
 							}
-							line = line.left(line.begin() + (line.len() - 1));
+							line = line.left(line.len() - 1);
 						}
 						else
 							line += "Value";
