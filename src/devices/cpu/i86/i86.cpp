@@ -1267,7 +1267,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0x6d:
 		case 0x7d: // i_jnl
-			JMP((ZF)||(SF==OF));
+			JMP(SF==OF);
 			break;
 
 		case 0x6e:
