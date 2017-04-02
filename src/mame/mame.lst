@@ -29581,6 +29581,9 @@ othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
 othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
+@source:otomedius.cpp
+otomedius						// (c) 2007 Konami
+
 @source:overdriv.cpp
 overdriv                        // GX789 (c) 1990
 overdriva                       // GX789 (c) 1990
