@@ -25,8 +25,8 @@
         10      fedc ba-- ---- ----
                 ---- --9- ---- ----       Pen Replacement Mode
                 ---- ---8 ---- ----
-                ---- ---- 7--- ----       Layer
-                ---- ---- -6-- ----       Buffer
+                ---- ---- 7--- ----       Layer To Draw To
+                ---- ---- -6-- ----       Draw To Not Displayed Buffer
                 ---- ---- --5- ----       Solid Fill
                 ---- ---- ---4 ----       Enable VBlank IRQ           (e.g. level 3) (0 clears the IRQ line too)
                 ---- ---- ---- 3---       Enable Blitter Finished IRQ (e.g. level 2) ""
@@ -98,8 +98,23 @@ void cesblit_device::device_start()
 	{
 		for (int buffer = 0; buffer < 2; ++buffer)
 		{
-			m_screen->register_screen_bitmap(m_bitmap[layer][buffer]);
+			m_bitmap[layer][buffer].allocate(512, 512);
 			m_bitmap[layer][buffer].fill(0xff);
+		}
+	}
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void cesblit_device::device_stop()
+{
+	for (int layer = 0; layer < 2; ++layer)
+	{
+		for (int buffer = 0; buffer < 2; ++buffer)
+		{
+			m_bitmap[layer][buffer].reset();
 		}
 	}
 }
@@ -156,7 +171,7 @@ void cesblit_device::do_blit()
 	int mode    =    m_regs[0x10/2];
 
 	int layer   =   (mode >> 7) & 1;    // layer to draw to
-	buffer  =   ((mode >> 6) & 1) ^ ((buffer >> layer) & 1);    // bit 6 selects whether to use the opposite buffer to that displayed
+	buffer      =   ((mode >> 6) & 1) ^ ((buffer >> layer) & 1);    // bit 6 selects whether to use the opposite buffer to that displayed
 
 	addr <<= 1;
 
@@ -168,6 +183,12 @@ void cesblit_device::do_blit()
 #endif
 #endif
 
+	sx &= 0x1ff;
+	sw &= 0x1ff;	// can be 0: draw nothing (see e.g. fade-in effect in galgame3/diamond derby)
+
+	sy &= 0x1ff;
+	sh &= 0x1ff;
+
 	int flipx = mode & 1;
 	int flipy = mode & 2;
 
@@ -178,9 +199,6 @@ void cesblit_device::do_blit()
 
 	if (flipy)  { y0 = sh-1;    y1 = -1;    dy = -1;    sy -= sh-1; }
 	else        { y0 = 0;       y1 = sh;    dy = +1;    }
-
-	sx = (sx & 0x7fff) - (sx & 0x8000);
-	sy = (sy & 0x7fff) - (sy & 0x8000);
 
 	int color = (m_color & 0x0f) << 8;
 
@@ -205,20 +223,16 @@ void cesblit_device::do_blit()
 				{
 					for (x = x0; x != x1; x += dx)
 					{
-						if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						{
-							pen = m_space->read_byte(addr);
+						pen = m_space->read_byte(addr);
 
-							if (pen == src_pen)
-								pen = dst_pen;
+						if (pen == src_pen)
+							pen = dst_pen;
 
-							if (pen != 0xff)
-								bitmap.pix16(sy + y, sx + x) = pen + color;
-						}
+						if (pen != 0xff)
+							bitmap.pix16((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen + color;
+
 						++addr;
 					}
-					if ( (dy > 0 && (sy + y >= 256-1)) || (dy < 0 && (sy + y <= 0)) )
-						break;
 				}
 			}
 			else
@@ -229,17 +243,13 @@ void cesblit_device::do_blit()
 				{
 					for (x = x0; x != x1; x += dx)
 					{
-						if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						{
-							pen = m_space->read_byte(addr);
+						pen = m_space->read_byte(addr);
 
-							if (pen != 0xff)
-								bitmap.pix16(sy + y, sx + x) = pen + color;
-						}
+						if (pen != 0xff)
+							bitmap.pix16((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen + color;
+
 						++addr;
 					}
-					if ( (dy > 0 && (sy + y >= 256-1)) || (dy < 0 && (sy + y <= 0)) )
-						break;
 				}
 			}
 			break;
@@ -254,11 +264,8 @@ void cesblit_device::do_blit()
 			{
 				for (x = x0; x != x1; x += dx)
 				{
-					if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						bitmap.pix16(sy + y, sx + x) = pen;
+						bitmap.pix16((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen;
 				}
-				if ( (dy > 0 && (sy + y >= 256-1)) || (dy < 0 && (sy + y <= 0)) )
-					break;
 			}
 			break;
 	}
