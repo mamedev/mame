@@ -32,26 +32,37 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	// construct the config
 	(*gamedrv.machine_config)(*this, nullptr, nullptr);
 
-	bool is_selected_driver = core_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
-
 	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
 	{
 		device_t &owner = slot.device();
-		std::string selval;
-		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
-		if (is_selected_driver && options.exists(owner.tag()+1))
-			selval = options.main_value(owner.tag()+1);
-		else if (slot.default_option() != nullptr)
-			selval.assign(slot.default_option());
+		const char *slot_option_name = owner.tag() + 1;
 
-		if (!selval.empty())
+		// figure out which device goes into this slot
+		bool has_option = options.slot_options().count(slot_option_name);
+		const char *selval;
+		bool is_default;
+		if (!has_option)
 		{
-			const device_slot_option *option = slot.option(selval.c_str());
+			selval = slot.default_option();
+			is_default = true;
+		}
+		else
+		{
+			const slot_option &opt = options.slot_options()[slot_option_name];
+			selval = opt.value().c_str();
+			is_default = opt.is_default();
+		}
 
-			if (option && (isdefault || option->selectable()))
+		if (selval && *selval)
+		{
+			const device_slot_option *option = slot.option(selval);
+
+			if (option && (is_default || option->selectable()))
 			{
+				// create the device
 				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
+				slot.set_card_device(new_dev);
 
 				const char *default_bios = option->default_bios();
 				if (default_bios != nullptr)
@@ -66,7 +77,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
 			}
 			else
-				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval.c_str(), owner.tag()+1);
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
 		}
 	}
 

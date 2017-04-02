@@ -158,7 +158,6 @@ void menu_control_device_image::load_software_part()
 
 void menu_control_device_image::hook_load(const std::string &name)
 {
-	if (m_image.is_reset_on_load()) m_image.set_init_phase();
 	m_image.load(name);
 	stack_pop();
 }

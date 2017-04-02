@@ -93,7 +93,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_supported(0),
 		m_readonly(false),
 		m_created(false),
-		m_init_phase(false),
 		m_create_format(0),
 		m_create_args(nullptr),
 		m_user_loadable(true),
@@ -1030,7 +1029,7 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	m_create_format = create_format;
 	m_create_args = create_args;
 
-	if (m_init_phase==false) {
+	if (init_phase()==false) {
 		m_err = (finish_load() == image_init_result::PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
@@ -1043,7 +1042,7 @@ done:
 		return m_err ? image_init_result::FAIL : image_init_result::PASS;
 	}
 	if (m_err!=0) {
-		if (!m_init_phase)
+		if (!init_phase())
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
@@ -1052,33 +1051,7 @@ done:
 		}
 		clear();
 	}
-	else {
-		// do we need to reset the CPU? only schedule it if load/create is successful
-		if (!schedule_postload_hard_reset_if_needed())
-		{
-			if (!m_init_phase)
-			{
-				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-					device().popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
-				else
-					osd_printf_info("Image '%s' was successfully %s.\n", path.c_str(), is_create ? "created" : "loaded");
-			}
-		}
-	}
 	return m_err ? image_init_result::FAIL : image_init_result::PASS;
-}
-
-
-//-------------------------------------------------
-//  schedule_postload_hard_reset_if_needed
-//-------------------------------------------------
-
-bool device_image_interface::schedule_postload_hard_reset_if_needed()
-{
-	bool postload_hard_reset_needed = device().machine().time() > attotime::zero && is_reset_on_load();
-	if (postload_hard_reset_needed)
-		device().machine().schedule_hard_reset();
-	return postload_hard_reset_needed;
 }
 
 
@@ -1088,6 +1061,13 @@ bool device_image_interface::schedule_postload_hard_reset_if_needed()
 
 image_init_result device_image_interface::load(const std::string &path)
 {
+	// is this a reset on load item?
+	if (is_reset_on_load() && !init_phase())
+	{
+		reset_and_load(path);
+		return image_init_result::PASS;
+	}
+
 	return load_internal(path, false, 0, nullptr, false);
 }
 
@@ -1146,20 +1126,8 @@ image_init_result device_image_interface::load_software(const std::string &softw
 	}
 
 	// call finish_load if necessary
-	if (m_init_phase == false && (finish_load() != image_init_result::PASS))
+	if (init_phase() == false && (finish_load() != image_init_result::PASS))
 		return image_init_result::FAIL;
-
-	// do we need to reset the CPU? only schedule it if load is successful
-	if (!schedule_postload_hard_reset_if_needed())
-	{
-		if (!m_init_phase)
-		{
-			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				device().popmessage("Image '%s' was successfully loaded.", software_identifier);
-			else
-				osd_printf_info("Image '%s' was successfully loaded.\n", software_identifier.c_str());
-		}
-	}
 
 	return image_init_result::PASS;
 }
@@ -1167,18 +1135,28 @@ image_init_result device_image_interface::load_software(const std::string &softw
 
 //-------------------------------------------------
 //  open_image_file - opening plain image file
+//
+//  This is called by implementations of get_default_card_software() so that they can
+//	interogate the file.  Implementations of get_default_card_software() are then
+//	responsible for closing out the resulting image file
+//
+//	If this sounds gross, its because it is gross.  get_default_card_software() needs to die
 //-------------------------------------------------
 
 bool device_image_interface::open_image_file(emu_options &options)
 {
-	const char* path = options.value(instance_name().c_str());
-	if (*path != 0)
+	if (options.image_options().count(instance_name()) > 0)
 	{
-		set_init_phase();
+		const std::string &path = options.image_options()[instance_name()];
+
+		// try loading through softlist
+		if (software_name_parse(path) && load_software(path) == image_init_result::PASS)
+			return false;
+
+		// otherwise just try loading normally; of course we need to use load_internal() and
+		// we ignore the result
 		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
-		{
-			if (!loaded_through_softlist()) return true;
-		}
+			return true;
 	}
 	return false;
 }
@@ -1220,7 +1198,6 @@ image_init_result device_image_interface::finish_load()
 	m_is_loading = false;
 	m_create_format = 0;
 	m_create_args = nullptr;
-	m_init_phase = false;
 	return err;
 }
 
@@ -1252,6 +1229,22 @@ image_init_result device_image_interface::create(const std::string &path, const 
 		cnt++;
 	}
 	return load_internal(path, true, format_index, create_args, false);
+}
+
+
+//-------------------------------------------------
+//	reset_and_load - called internally when we try
+//	to load an is_reset_on_load() item; will reset
+//	the emulation and record this image to be loaded
+//-------------------------------------------------
+
+void device_image_interface::reset_and_load(const std::string &path)
+{
+	// first make sure the reset is scheduled
+	device().machine().schedule_hard_reset();
+
+	// and record the new load
+	device().machine().options().image_options()[instance_name()] = path;
 }
 
 
@@ -1442,20 +1435,18 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		return false;
 	}
 
-	// I'm not sure what m_init_phase is all about; but for now I'm preserving this behavior
+	// Is this a software part that forces a reset?  If so, get this loaded through reset_and_load
 	if (is_reset_on_load())
-		set_init_phase();
+	{
+		reset_and_load(identifier);
+		return true;
+	}
 
 	// Load the software part
 	const char *swname = m_software_part_ptr->info().shortname().c_str();
 	const rom_entry *start_entry = m_software_part_ptr->romdata().data();
 	const software_list_loader &loader = get_software_list_loader();
 	bool result = loader.load_software(*this, *swlist, swname, start_entry);
-
-#ifdef UNUSED_VARIABLE
-	// Tell the world which part we actually loaded
-	std::string full_sw_name = string_format("%s:%s:%s", swlist->list_name(), m_software_part_ptr->info().shortname(), m_software_part_ptr->name());
-#endif
 
 	// check compatibility
 	switch (swlist->is_compatible(*m_software_part_ptr))
@@ -1481,10 +1472,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		{
 			device_image_interface *req_image = software_list_device::find_mountable_image(device().mconfig(), *req_swpart);
 			if (req_image != nullptr)
-			{
-				req_image->set_init_phase();
-				req_image->load(requirement);
-			}
+				req_image->load_software(requirement);
 		}
 	}
 
@@ -1513,6 +1501,21 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 	}
 	return result;
 }
+
+
+//-------------------------------------------------
+//  init_phase
+//-------------------------------------------------
+
+bool device_image_interface::init_phase() const
+{
+	// diimage.cpp has quite a bit of logic that randomly decides to behave
+	// differently at startup; this is an enc[r]apsulation of the "logic"
+	// that switches these behaviors
+	return !device().has_running_machine()
+		|| device().machine().phase() == MACHINE_PHASE_INIT;
+}
+
 
 //----------------------------------------------------------------------------
 
