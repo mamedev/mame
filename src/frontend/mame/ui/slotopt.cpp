@@ -25,14 +25,17 @@ namespace ui {
 device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_interface &slot)
 {
 	std::string current;
-	if (slot.fixed())
+
+	const char *slot_option_name = slot.device().tag() + 1;
+	if (!slot.fixed() && machine().options().slot_options().count(slot_option_name) > 0)
 	{
-		if (slot.default_option() == nullptr) return nullptr;
-		current.assign(slot.default_option());
+		current = machine().options().slot_options()[slot_option_name].value();
 	}
 	else
 	{
-		current = machine().options().main_value(slot.device().tag() + 1);
+		if (slot.default_option() == nullptr)
+			return nullptr;
+		current.assign(slot.default_option());
 	}
 
 	return slot.option(current.c_str());

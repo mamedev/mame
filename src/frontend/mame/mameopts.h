@@ -53,6 +53,8 @@ class mame_options
 	static const uint32_t OPTION_FLAG_DEVICE = 0x80000000;
 
 public:
+	typedef std::function<std::string (const std::string &)> value_specifier_func;
+
 	// parsing wrappers
 	static bool parse_command_line(emu_options &options, std::vector<std::string> &args, std::string &error_string);
 	static void parse_standard_inis(emu_options &options, std::string &error_string, const game_driver *driver = nullptr);
@@ -61,21 +63,26 @@ public:
 
 	static const game_driver *system(const emu_options &options);
 	static void set_system_name(emu_options &options, const char *name);
-	static bool add_slot_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier = nullptr);
+	static bool add_slot_options(emu_options &options, value_specifier_func value_specifier = nullptr);
+	static bool reevaluate_slot_options(emu_options &options);
 
 private:
 	// device-specific option handling
-	static void add_device_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier = nullptr);
+	static void add_device_options(emu_options &options, value_specifier_func value_specifier = nullptr);
 	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
-	static void parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier);
+	static void parse_slot_devices(emu_options &options, value_specifier_func value_specifier);
 	static std::string get_full_option_name(const device_image_interface &image);
-	static bool reevaluate_slot_options(emu_options &options);
+	static slot_option parse_slot_option(std::string &&text);
 
 	// INI parsing helper
 	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);
 
 	// softlist handling
 	static std::map<std::string, std::string> evaluate_initial_softlist_options(emu_options &options);
+
+	// represents an "invalid" value (an empty string is valid so we can't use that; what I
+	// really want to return is std::optional<std::string> but C++17 isn't here yet)
+	static std::string value_specifier_invalid_value() { return std::string("\x01\x02\x03"); }
 
 	static int m_slot_options;
 	static int m_device_options;

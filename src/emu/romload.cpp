@@ -1467,9 +1467,13 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 				specbios.assign(machine.options().bios());
 			else
 			{
-				specbios = machine.options().sub_value(device.owner()->tag()+1,"bios");
-				if (specbios.empty())
-					specbios = device.default_bios_tag();
+				const char *slot_option_name = device.owner()->tag() + 1;
+				const slot_option *opt = machine.options().slot_options().count(slot_option_name)
+					? &machine.options().slot_options()[slot_option_name]
+					: nullptr;
+				specbios = opt && !opt->bios().empty()
+					? opt->bios().c_str()
+					: device.default_bios_tag();
 			}
 			determine_bios_rom(device, specbios.c_str());
 		}

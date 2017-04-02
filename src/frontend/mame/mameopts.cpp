@@ -27,7 +27,7 @@ int mame_options::m_device_options = 0;
 //  options for the configured system
 //-------------------------------------------------
 
-bool mame_options::add_slot_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
+bool mame_options::add_slot_options(emu_options &options, value_specifier_func value_specifier)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -58,7 +58,11 @@ bool mame_options::add_slot_options(emu_options &options, std::function<void(emu
 
 			// allow opportunity to specify this value
 			if (value_specifier)
-				value_specifier(options, name);
+			{
+				std::string value = value_specifier(name);
+				if (value != value_specifier_invalid_value())
+					options.slot_options()[name] = parse_slot_option(std::move(value));
+			}
 		}
 	}
 	return (options.options_count() != starting_count);
@@ -112,7 +116,7 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 //  options for the configured system
 //-------------------------------------------------
 
-void mame_options::add_device_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
+void mame_options::add_device_options(emu_options &options, value_specifier_func value_specifier)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -121,7 +125,7 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 	machine_config config(*cursystem, options);
 
 	// iterate through all image devices
-	for (const device_image_interface &image : image_interface_iterator(config.root_device()))
+	for (device_image_interface &image : image_interface_iterator(config.root_device()))
 	{
 		if (!image.user_loadable())
 			continue;
@@ -139,7 +143,11 @@ void mame_options::add_device_options(emu_options &options, std::function<void(e
 
 			// allow opportunity to specify this value
 			if (value_specifier)
-				value_specifier(options, image.instance_name());
+			{
+				std::string value = value_specifier(image.instance_name());
+				if (value != value_specifier_invalid_value())
+					options.image_options()[image.instance_name()] = std::move(value);
+			}
 		}
 	}
 }
@@ -191,7 +199,7 @@ void mame_options::remove_device_options(emu_options &options)
 //  and update slot and image devices
 //-------------------------------------------------
 
-void mame_options::parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
+void mame_options::parse_slot_devices(emu_options &options, value_specifier_func value_specifier)
 {
 	bool still_adding = true;
 	while (still_adding)
@@ -248,12 +256,12 @@ bool mame_options::reevaluate_slot_options(emu_options &options)
 			std::string default_card_software = slot.get_default_card_software();
 			if (!default_card_software.empty())
 			{
-				std::string old_value = options.value(name);
-
-				options.set_default_value(name, default_card_software.c_str());
-
-				if (strcmp(old_value.c_str(), options.value(name)))
+				// we have default card software - is this resulting in the slot option being mutated?
+				if (options.slot_options()[name].default_card_software() != default_card_software)
+				{
+					options.slot_options()[name].set_default_card_software(std::move(default_card_software));
 					result = true;
+				}
 			}
 		}
 	}
@@ -277,7 +285,7 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 
 	// assemble a "value specifier" that will be used to specify options set up as a consequence
 	// of slot and device setup
-	auto value_specifier = [&softlist_opts, &args, &error_string](emu_options &options, const std::string &arg)
+	auto value_specifier = [&options, &softlist_opts, &args, &error_string](const std::string &arg)
 	{
 		// first find within the command line
 		std::string arg_value;
@@ -295,8 +303,9 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 		}
 
 		// did we find something?
-		if (success)
-			options.set_value(arg.c_str(), arg_value.c_str(), OPTION_PRIORITY_MAXIMUM, error_string);
+		return success
+			? arg_value
+			: value_specifier_invalid_value();
 	};
 
 	// parse the slot devices
@@ -512,9 +521,6 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 	if (parent != -1)
 		parse_one_ini(options,driver_list::driver(parent).name, OPTION_PRIORITY_PARENT_INI, &error_string);
 	parse_one_ini(options,cursystem->name, OPTION_PRIORITY_DRIVER_INI, &error_string);
-
-	// Re-evaluate slot options after loading ini files
-	update_slot_options(options);
 }
 
 
@@ -641,4 +647,21 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 		error_string->append(string_format("While parsing %s:\n%s\n", file.fullpath(), error));
 
 	return result;
+}
+
+
+//-------------------------------------------------
+//  parse_slot_option - parses a slot option (the
+//	',bios=XYZ' syntax)
+//-------------------------------------------------
+
+slot_option mame_options::parse_slot_option(std::string &&text)
+{
+	slot_option result;
+	const char *bios_arg = ",bios=";
+
+	size_t pos = text.find(bios_arg);
+	return pos != std::string::npos
+		? slot_option(text.substr(0, pos), text.substr(pos + strlen(bios_arg)))
+		: slot_option(std::move(text));
 }

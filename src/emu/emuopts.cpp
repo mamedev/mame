@@ -231,33 +231,6 @@ emu_options::emu_options()
 }
 
 
-std::string emu_options::main_value(const char *name) const
-{
-	std::string buffer = value(name);
-	int pos = buffer.find_first_of(',');
-	if (pos != -1)
-		buffer = buffer.substr(0, pos);
-	return buffer;
-}
-
-std::string emu_options::sub_value(const char *name, const char *subname) const
-{
-	std::string tmp = std::string(",").append(subname).append("=");
-	std::string buffer = value(name);
-	int pos = buffer.find(tmp);
-	if (pos != -1)
-	{
-		int endpos = buffer.find_first_of(',', pos + 1);
-		if (endpos == -1)
-			endpos = buffer.length();
-		buffer = buffer.substr(pos + tmp.length(), endpos - pos - tmp.length());
-	}
-	else
-		buffer.clear();
-	return buffer;
-}
-
-
 //-------------------------------------------------
 //  value_changed - to prevent tagmap
 //    lookups keep copies of frequently requested
