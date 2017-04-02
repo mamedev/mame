@@ -3915,6 +3915,57 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="btbas1g">
+		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
+		<description>Borland Turbo Basic 1.0 (German)</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.0" />
+		<info name="serial" value="5141124" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="9c44f003" sha1="ba37e292571e7f73b1a45d08a6708eff24d4d1c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="503b568f" sha1="373df232d6538efebc1930a1db45db5bd770d233" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="8737aed8" sha1="65da51e627b37c01d2d4edeb591f07c1a5249b16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btpascl40">
+		<!-- dumped via KryoFlux from original floppies, multiple tracks are modified though -->
+		<description>Borland Turbo Pascal 4.0</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="4.0" />
+		<info name="serial" value="A4C0500544" />
+		<part name="flop1_compiler" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk1_compiler.img" size="368640" crc="c87ab989" sha1="d5a65adc300a310fcbe3497f3fd153ca65db5c69" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2_examples" interface="floppy_5_25">
+			<feature name="part_id" value="Examples" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk2_examples.img" size="368640" crc="5ad8ca41" sha1="191fd4517ba208e5615c52269f12a251fdfffc57" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3_graphics" interface="floppy_5_25">
+			<feature name="part_id" value="Graphics" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk3_graphics.img" size="368640" crc="286bd4e6" sha1="95aff9eea8ac0ef3e9356ef322751e8ba764bf23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btpscl55">
 		<description>Borland Turbo Pascal 5.5</description>
 		<year>1989</year>
@@ -3927,6 +3978,98 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk2 - oop demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btp601g">
+		<!-- dumped via KryoFlux from original floppies. Disks 2 and 3 partially modified -->
+		<description>Borland Turbo Pascal 6.01 (German)</description>
+		<year>1991</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="6.01" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="c09c7f23" sha1="630cde83828053de14f622fab89e3e6e1602b6dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_%">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="94ea897b" sha1="ce9e331ebfb1aac40ae1e422cbbd68ce341f48db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bqpro3g">
+		<!-- dumped via KryoFlux from original floppies -->
+		<!-- Disks 1, 3, 5, 6 and 8 show up as modified, all others are unmodified -->
+		<description>Borland Quattro Pro 3.0 (German)</description>
+		<year>1991</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="3.0" />
+		<info name="serial" value="GS246A10075408" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="906d8656" sha1="674710ea98aea152ea064484599ce463f66470f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="63c74e76" sha1="ce6da37c7a28d647269484c596db2da1c7d9a327" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="3891f951" sha1="525b40f0e59efc740938726943d11641f11b2a4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="db0ac862" sha1="8132792047b87c17bfc2be8f418313c7f942e6ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="2296194c" sha1="d76251f57eb3c2d2d93e10aedc158f884224dd96" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk6.img" size="368640" crc="d1632f0c" sha1="90f8533a4df6de936b4973ef537c11dc5864d9cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk7.img" size="368640" crc="b0b1f6ba" sha1="d1a7ad90665f73d6d1ebad7600a626fed450d055" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk8.img" size="368640" crc="9b20182f" sha1="e994aa19a0d96edf3df3c851520923938d129747" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bqpro5g">
+		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
+		<description>Borland Quattro Pro 5.0 (German)</description>
+		<year>1993</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="5.0" />
+		<info name="serial" value="IC935A10106185" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="bcaa0dbd" sha1="e555d5526b51383e5826254ed1e5f06b28af32b4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="7f476a84" sha1="c5a5935edcffbda38697081d1347304be81597f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
