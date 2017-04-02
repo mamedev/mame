@@ -10,7 +10,7 @@
 		- Intel 82865 northbridge, unknown which sub-model
 		- Intel 82801EB southbridge and "ICH5" Super I/O
 		- 512MB of system RAM
-		- ATI-branded Radeon 9600XT AGP video card with 128 MB of VRAM (VBIOS not dumped)
+		- ATI-branded Radeon 9600XT AGP video card with 128 MB of VRAM
 		- Konami protection dongle marked "GEGGG JA-B"
 */
 
@@ -82,11 +82,12 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-// Type X
-
 ROM_START( otomedius )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sst49fl004b.u18", 0x000000, 0x080000, CRC(bb9f4e3e) SHA1(95b393a38a5eded3204debfe7a88cc7ea15adf9a) ) 
+
+	ROM_REGION( 0x10000, "vbios", 0 )	// video card BIOS
+	ROM_LOAD( "ati.9600xt.128.samsung.031113.rom", 0x000000, 0x00d000, CRC(020ec211) SHA1(3860c980106f00e5259ecd8d4cd2f9b3fca2428a) ) 
 
 	DISK_REGION( "ide:0:hdd:image" ) // Seagate ST340015A 40GB PATA drive
 	DISK_IMAGE( "otomedius", 0, SHA1(9283f8b7cd747be7b8e7321953adbf6cbe926f25) )
