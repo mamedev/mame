@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 /* */
 
+#include "emu.h"
 #include "k053936.h"
 
 #define VERBOSE 0

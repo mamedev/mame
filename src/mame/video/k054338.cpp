@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Olivier Galibert
 
+#include "emu.h"
 #include "k054338.h"
 
 /***************************************************************************/

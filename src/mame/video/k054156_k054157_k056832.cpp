@@ -335,7 +335,7 @@ int  |       |         |       |      |        |         |         | gijoe
 
 */
 
-
+#include "emu.h"
 #include "k054156_k054157_k056832.h"
 #include "screen.h"
 

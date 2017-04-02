@@ -87,6 +87,7 @@ The sprite RAM format is very similar to the 053245.
 
 */
 
+#include "emu.h"
 #include "k053246_k053247_k055673.h"
 
 const device_type K053246_053247 = device_creator<k053246_053247_device>;

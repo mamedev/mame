@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Olivier Galibert
 
+#include "emu.h"
 #include "k055555.h"
 #include "k054338.h" // For the bitmap indexes in input
 
