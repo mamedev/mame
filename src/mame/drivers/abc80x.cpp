@@ -141,6 +141,7 @@ Notes:
 
     TODO:
 
+	- option ROM/HR video RAM access needs refactor of memory banking
     - cassette
     - abc806 RTC
     - abc806 disks except ufd631 won't boot
@@ -1577,34 +1578,11 @@ ROM_END
 
 
 //**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-
-DRIVER_INIT_MEMBER(abc800c_state,driver_init)
-{
-}
-
-DRIVER_INIT_MEMBER(abc800m_state,driver_init)
-{
-}
-
-DRIVER_INIT_MEMBER(abc802_state,driver_init)
-{
-}
-
-DRIVER_INIT_MEMBER(abc806_state,driver_init)
-{
-}
-
-
-
-//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  driver_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  driver_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   driver_init, "Luxor Datorer AB", "ABC 802",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   driver_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, driver_device,  0, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, driver_device,  0, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, driver_device,  0, "Luxor Datorer AB", "ABC 802",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, driver_device,  0, "Luxor Datorer AB", "ABC 806",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
