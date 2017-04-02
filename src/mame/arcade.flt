@@ -433,6 +433,7 @@ gcpinbal.cpp
 gei.cpp
 ggconnie.cpp
 ghosteo.cpp
+giclassic.cpp
 gijoe.cpp
 ginganin.cpp
 gkigt.cpp
@@ -830,6 +831,7 @@ opwolf.cpp
 orbit.cpp
 othello.cpp
 othunder.cpp
+otomedius.cpp
 overdriv.cpp
 pachifev.cpp
 pacland.cpp
@@ -866,6 +868,7 @@ pinkiri8.cpp
 pipedrm.cpp
 pipeline.cpp
 pirates.cpp
+piratesh.cpp
 pitnrun.cpp
 pkscram.cpp
 pktgaldx.cpp
