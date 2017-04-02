@@ -278,7 +278,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	
 	uint8_t *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
-	uint32_t src_clipmask, src_wrapmask, dst_wrapmask;
+	uint32_t src_clipmask, src_wrapmask; //, dst_wrapmask;
 	int linedata_offs, line_pos, line_start, line_end, scroll_corr;
 	int color, offset, zoom, scroll, passes, i;
 	bool wrap500 = false;
@@ -371,7 +371,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 			linedata_offs += bitmap.height() - 1;   // and get info for the first line from the bottom
 		}
 
-		dst_wrapmask = ~0;  // scanlines don't seem to wrap horizontally in normal orientation
+//		dst_wrapmask = ~0;  // scanlines don't seem to wrap horizontally in normal orientation
 		passes = 1;         // draw scanline in a single pass
 	}
 	else  // orientaion with X and Y parameters switched
@@ -401,13 +401,13 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		if (src_clipmask)
 		{
 			// determine target wrap boundary and draw scanline in two passes if the source is clipped
-			dst_wrapmask = dst_height - 1;
+//			dst_wrapmask = dst_height - 1;
 			passes = 2;
 		}
 		else
 		{
 			// otherwise disable target wraparound and draw scanline in a single pass
-			dst_wrapmask = ~0;
+//			dst_wrapmask = ~0;
 			passes = 1;
 		}
 	}
