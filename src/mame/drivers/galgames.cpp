@@ -1217,4 +1217,4 @@ ROM_END
 GAME( 1998, galgbios, 0,        galgbios, galgames, driver_device, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
 GAME( 1998, galgame2, galgbios, galgame2, galgames, driver_device, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
 GAME( 1998, galgame3, galgbios, galgame3, galgames, driver_device, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
-GAME( 1998, galgame4, galgbios, galgame3, galgames, driver_device, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, galgame4, galgbios, galgame3, galgames, driver_device, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
