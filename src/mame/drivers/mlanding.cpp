@@ -765,7 +765,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM
+	AM_RANGE(0x200800, 0x203fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 
@@ -781,7 +782,7 @@ static ADDRESS_MAP_START( dsp_map_prog, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 /*************************************
