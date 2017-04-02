@@ -186,6 +186,20 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	return ROM[romofs + (offset & 0x3)];
 }
 
+READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
+{
+	uint8_t *ROM = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
+	int romofs;
+	int magic = (offset & 1);
+
+	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
+	offset = ((offset & 4) >> 1);
+		
+	int finoffs = (romofs * 2) + (offset * 2) + magic;
+
+	return ROM[finoffs+2] | (ROM[finoffs]<<8);
+}
+
 READ8_MEMBER( k053247_device::k053246_r )
 {
 	if (m_objcha_line == ASSERT_LINE)

@@ -83,6 +83,7 @@ public:
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );
+	DECLARE_READ16_MEMBER( k055673_ps_rom_word_r );
 	DECLARE_READ16_MEMBER( k055673_5bpp_rom_word_r );
 
 	DECLARE_READ8_MEMBER( k053247_r );
