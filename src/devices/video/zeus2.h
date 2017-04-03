@@ -46,6 +46,7 @@ struct zeus2_poly_extra_data
 	uint32_t		  dstAlpha;
 	uint32_t          ctrl_word;
 	bool			texture_alpha;
+	bool			texture_rgb555;
 	bool            blend_enable;
 	bool            depth_min_enable;
 	bool            depth_test_enable;

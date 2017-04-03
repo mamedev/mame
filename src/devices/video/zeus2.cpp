@@ -1284,7 +1284,6 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 		{
 			int countneeded = 2;
 			uint8_t cmd;
-//			uint8_t subCmd;
 
 			/* accumulate 2 words of data */
 			databuffer[databufcount++] = WAVERAM_READ32(base, curoffs * 2 + 0);
@@ -1292,7 +1291,6 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 
 			/* if this is enough, process the command */
 			cmd = databuffer[0] >> 24;
-//			subCmd = (databuffer[1] >> 24) & 0xfc;
 
 			if ((cmd == 0x38) || (cmd == 0x2d)) {
 				countneeded = zeus_quad_size;
@@ -1643,6 +1641,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.transcolor = 0; // (texmode & 0x100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
+	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
 	extra.depth_write_enable = true; // (m_state->m_renderRegs[0x14] & 0x004000);
 	extra.depth_clear_enable = false; // (m_state->m_renderRegs[0x14] & 0x001000);
 	// 021e0e = blend with texture alpha, 020202 blend src / dst alpha
@@ -1650,6 +1649,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.srcAlpha = m_state->m_renderRegs[0x0c];
 	extra.dstAlpha = m_state->m_renderRegs[0x0d];
 	extra.texture_alpha = false;
+	extra.texture_rgb555 = false;
 	switch (texmode & 0x3) {
 	case 0:
 		extra.get_texel = m_state->get_texel_4bit_2x2;
@@ -1660,13 +1660,16 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		break;
 	case 2:
 		// Seems to select texture with embedded alpha
-		if (1) {
+		if (texmode & 0x80) {
 			// Texel , Alpha
 			extra.get_texel = m_state->get_texel_8bit_2x2_alpha;
 			extra.texture_alpha = true;
 			extra.get_alpha = m_state->get_alpha_8bit_2x2_alpha;
 			extra.depth_test_enable = false;
 			extra.depth_write_enable = false;
+		}
+		else {
+			extra.texture_rgb555 = true;
 		}
 		break;
 	default:
@@ -1734,8 +1737,13 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			int v0 = (curv >> 8);// &255;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
-			// Rendering for textures with embedded alpha
-			if (object.texture_alpha) {
+			if (object.texture_rgb555) {
+				// Rendering for textures with direct color
+				rgb_t srcColor = m_state->get_rgb555(texbase, v0, u0, texwidth);
+				colorptr[x] = srcColor;
+			}
+			else if (object.texture_alpha) {
+				// Rendering for textures with embedded alpha
 				// To bilinear filter or not to bilinear filter
 				if (0) {
 					// Add rounding
