@@ -6,9 +6,10 @@
 	Skeleton by R. Belmont
 	
 	Hardware for Otomedius:
-		- Intel Socket 478 Celeron CPU, speed unknown
-		- Intel 82865 northbridge, unknown which sub-model
-		- Intel 82801EB southbridge and "ICH5" Super I/O
+		- Intel Socket 478 Celeron CPU, 2.5 GHz, S-Spec "SL6ZY"
+		  More info: http://www.cpu-world.com/sspec/SL/SL6ZY.html
+		- Intel 82865G northbridge
+		- Intel 82801EB southbridge / "ICH5" Super I/O
 		- 512MB of system RAM
 		- ATI-branded Radeon 9600XT AGP video card with 128 MB of VRAM
 		- Konami protection dongle marked "GEGGG JA-B"
