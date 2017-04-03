@@ -1284,7 +1284,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 		{
 			int countneeded = 2;
 			uint8_t cmd;
-			uint8_t subCmd;
+//			uint8_t subCmd;
 
 			/* accumulate 2 words of data */
 			databuffer[databufcount++] = WAVERAM_READ32(base, curoffs * 2 + 0);
@@ -1292,7 +1292,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 
 			/* if this is enough, process the command */
 			cmd = databuffer[0] >> 24;
-			subCmd = (databuffer[1] >> 24) & 0xfc;
+//			subCmd = (databuffer[1] >> 24) & 0xfc;
 
 			if ((cmd == 0x38) || (cmd == 0x2d)) {
 				countneeded = zeus_quad_size;
