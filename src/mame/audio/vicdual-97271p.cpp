@@ -159,14 +159,14 @@ void s97271p_device::port_w(uint8_t data)
 		m_samples->stop(SND_LAUNCH0);
 	}
 
-	if (bitsGoneLow & S97271P_WARNING)
+	if (bitsGoneLow & S97271P_EXPL_L)
 	{
-		m_samples->start(SND_WARNING0, SND_WARNING0, 1);
-		m_samples->stop(SND_WARNING1);
-	} else if (bitsGoneHigh & S97271P_WARNING)
+		m_samples->start(SND_EXPL_L0, SND_EXPL_L0, 1);
+		m_samples->stop(SND_EXPL_L1);
+	} else if (bitsGoneHigh & S97271P_EXPL_L)
 	{
-		m_samples->start(SND_WARNING1, SND_WARNING1, 0);
-		m_samples->stop(SND_WARNING0);
+		m_samples->start(SND_EXPL_L1, SND_EXPL_L1, 0);
+		m_samples->stop(SND_EXPL_L0);
 	}
 
 	if (bitsGoneLow & S97271P_EXPL_S)
