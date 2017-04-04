@@ -141,6 +141,7 @@ void zeus2_device::device_reset()
 	m_fill_color = 0;
 	m_fill_depth = 0;
 	m_texmodeReg = 0;
+	zeus_trans[3] = 0.0f;
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -628,10 +629,11 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					int size = m_zeusbase[0x40] & 0xff;
 					logerror("\n Setup size=%d [40]=%08X [41]=%08X [4e]=%08X\n", zeus_quad_size, m_zeusbase[0x40], m_zeusbase[0x41], m_zeusbase[0x4e]);
 					for (int i = 0; i <= size; ++i) {
-						waveData = *wavePtr++;
+						waveData = wavePtr[1];
 						logerror(" %08X", waveData);
-						waveData = *wavePtr++;
-						logerror(" %08X", waveData);
+						waveData = wavePtr[0];
+						logerror("%08X", waveData);
+						wavePtr += 2;
 						//logerror(" %08X", waveData);
 						if (0 && (i + 1) % 16 == 0)
 							logerror("\n");
@@ -1215,7 +1217,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x32:
 			poly->wait("REND_WAIT");
 			if (log_fifo)
-				log_fifo_command(data, numwords, " sync? \n");
+				log_fifo_command(data, numwords, " wait for renderer idle \n");
 			break;
 
 		/* 0x38: direct render quad (crusnexo) */
@@ -1317,16 +1319,13 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 					case 0x21:  /* thegrid */
 					case 0x22:  /* crusnexo */
 					{
-						int regSel = (databuffer[0] >> 16) & 0xff;
-						if ((regSel >= 0x98) && (regSel <= 0x9b))
-						{
-							texdata = databuffer[1];
-							m_texmodeReg = regSel;
-							if (logit)
-								logerror("texdata @%02X\n", regSel);
-						}
-						else if (logit)
-							logerror("unknown offset %08X %08X\n", databuffer[0], databuffer[1]);
+						// Sets 0x68 (uv float offset) and texture line and mode
+						// In reality this sets internal registers that are used in the
+						// zeus2 microcode to set these registers
+						m_zeusbase[0x68] = (databuffer[0] >> 16) & 0xff;
+						texdata = databuffer[1];
+						if (logit)
+								logerror("(0x68)uvFloat=%02X\n", m_zeusbase[0x68]);
 					}
 						break;
 
@@ -1478,26 +1477,26 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[0].x = (int16_t)databuffer[2];
 		vert[0].y = (int16_t)databuffer[3];
 		vert[0].p[0] = (int16_t)databuffer[6];
-		vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
-		vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
+		vert[0].p[1] = (databuffer[1] >> 0) & 0x3ff;
+		vert[0].p[2] = (databuffer[1] >> 16) & 0x3ff;
 
 		vert[1].x = (int16_t)(databuffer[2] >> 16);
 		vert[1].y = (int16_t)(databuffer[3] >> 16);
 		vert[1].p[0] = (int16_t)(databuffer[6] >> 16);
-		vert[1].p[1] = (databuffer[4] >> 2) & 0xff;
-		vert[1].p[2] = (databuffer[4] >> 12) & 0xff;
+		vert[1].p[1] = (databuffer[4] >> 0) & 0x3ff;
+		vert[1].p[2] = (databuffer[4] >> 10) & 0x3ff;
 
 		vert[2].x = (int16_t)databuffer[8];
 		vert[2].y = (int16_t)databuffer[9];
 		vert[2].p[0] = (int16_t)databuffer[7];
-		vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
-		vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
+		vert[2].p[1] = (databuffer[4] >> 20) & 0x3ff;
+		vert[2].p[2] = (databuffer[5] >> 0) & 0x3ff;
 
 		vert[3].x = (int16_t)(databuffer[8] >> 16);
 		vert[3].y = (int16_t)(databuffer[9] >> 16);
 		vert[3].p[0] = (int16_t)(databuffer[7] >> 16);
-		vert[3].p[1] = (databuffer[5] >> 12) & 0xff;
-		vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
+		vert[3].p[1] = (databuffer[5] >> 10) & 0x3ff;
+		vert[3].p[2] = (databuffer[5] >> 20) & 0x3ff;
 	}
 	int unknown[8];
 	float unknownFloat[4];
@@ -1522,7 +1521,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
 	float fScale = pow(2.0f, intScale);
-
+	int intUVScale = m_state->m_zeusbase[0x68] - 0x9d;
+	float uvScale = pow(2.0f, intUVScale);
 	for (i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
@@ -1551,6 +1551,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].p[0] = 0.0f;
 
 		//vert[i].p[1] += ((texdata >> 8) & 0x1) ? 1.0f : 0.0f;
+		vert[i].p[1] *= uvScale;
+		vert[i].p[2] *= uvScale;
 		vert[i].p[2] += (texdata >> 16);
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
@@ -1638,7 +1640,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
 	extra.zbufmin = m_state->m_zbufmin;
-	extra.transcolor = 0; // (texmode & 0x100) ? 0 : 0x100;
+	extra.transcolor = (texmode & 0x100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
@@ -1904,7 +1906,7 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 		//infoStream << "pal=0x" << std::setw(4) << std::setfill('0') << (m_curPalTableSrc >> 16) << ", 0x" << std::setw(4) << (m_curPalTableSrc & 0xffff) << " ";
 		infoStream << "pal=0x" << std::setw(8) << std::setfill('0') << m_curPalTableSrc << " ";
 		infoStream << "texdata=" << std::setw(8) << std::hex << texmode << " ";
-		infoStream << "texReg=" << std::setw(2) << std::hex << m_texmodeReg << " ";
+		infoStream << "68(uvFloat)=" << std::setw(2) << std::hex << m_zeusbase[0x68] << " ";
 		infoStream << "(6c)=" << m_zeusbase[0x6c] << " ";
 		infoStream << "(63)=" << std::setw(6) << std::dec << reinterpret_cast<float&>(m_zeusbase[0x63]) << " ";
 		//infoStream << "zObj=" << std::setw(6) << std::dec << zObj << " ";
