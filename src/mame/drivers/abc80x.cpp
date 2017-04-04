@@ -141,6 +141,7 @@ Notes:
 
     TODO:
 
+	- option ROM/HR video RAM access needs refactor of memory banking
     - cassette
     - abc806 RTC
     - abc806 disks except ufd631 won't boot
@@ -1577,142 +1578,11 @@ ROM_END
 
 
 //**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc800c )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
-{
-	if (address >= 0x7c00 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, m_rom->base() + 0x7c00);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc800c_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&abc800c_state::direct_update_handler, this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc800m )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
-{
-	if (address >= 0x7800 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc800m_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&abc800m_state::direct_update_handler, this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc802 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
-{
-	if (m_lrs)
-	{
-		if (address >= 0x7800 && address < 0x8000)
-		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-			return ~0;
-		}
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc802_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&abc802_state::direct_update_handler, this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc806 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
-{
-	if (address >= 0x7800 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc806_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&abc806_state::direct_update_handler, this));
-}
-
-
-
-//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  driver_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  driver_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   driver_init, "Luxor Datorer AB", "ABC 802",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   driver_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, driver_device,  0, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, driver_device,  0, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, driver_device,  0, "Luxor Datorer AB", "ABC 802",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, driver_device,  0, "Luxor Datorer AB", "ABC 806",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

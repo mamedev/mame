@@ -347,8 +347,8 @@ void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != m_outs.mask() &&  m_outs[nstate] != val)
-				nl_exception(plib::pfmt("Error in truthtable: State {1} already set, {2} != {3}\n")
-						.x(nstate.as_uint(),"04")(m_outs[nstate])(val) );
+				nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
+						.x(nstate.as_uint())(m_outs[nstate])(val) );
 			m_outs.set(nstate, val);
 			for (std::size_t j=0; j<m_NO; j++)
 				m_timing[nstate * m_NO + j] = timing_index[j];

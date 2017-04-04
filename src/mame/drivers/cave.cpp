@@ -28,8 +28,9 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
 96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
-96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
+96 Pac-Slot           Namco         N-44 EM     038 9444WX010   013 9345E7006
 96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
+97 Tekken Card World  Namco         EMG4        038 9701WX001   013 9651EX001
 97 Dodonpachi         Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
@@ -38,7 +39,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 99 Gaia Crusaders     Noise Factory ?           038 9838WX003   013 9918EX008
 99 Koro Koro Quest    Takumi        TUG-01B     038 9838WX004   013 9838EX004
 99 Crusher Makochan   Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Tobikose! Jumpman  Namco         TJ0476      038 9919WX007   013 9934WX002
+99 Tobikose! Jumpman  Namco         EMG4        038 9919WX007   013 9934WX002
 01 Thunder Heroes     Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
@@ -1004,6 +1005,29 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                            Tekken Card World
+***************************************************************************/
+
+static ADDRESS_MAP_START( tekkencw_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                               // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")                                            // Inputs + EEPROM + Hopper
+	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")                                            // Inputs
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                               // Layer 0 Control
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram.0")                                // Palette
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                      // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)      // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                           // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                      // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                                // EEPROM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
@@ -1049,7 +1073,7 @@ CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)                                                // Layer 0 - 16x16 tiles mapped here
@@ -1089,7 +1113,7 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 
 static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -1596,38 +1620,13 @@ static INPUT_PORTS_START( korokoro )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( tjumpman )
+static INPUT_PORTS_START( tekkencw )
 	PORT_START("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
-	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Go" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   )                                                    // medal
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "3 Bet" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( pacslot )
-	PORT_START("IN0")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) // credits
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
@@ -1639,9 +1638,59 @@ static INPUT_PORTS_START( pacslot )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Action" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tjumpman )
+	PORT_START("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Go" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "3 Bet" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pacslot )
+	PORT_START("IN0")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) // must stay on during service mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) // medal
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2599,8 +2648,6 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 MACHINE_CONFIG_END
 
 
-
-
 /***************************************************************************
                         Sailor Moon / Air Gallet
 ***************************************************************************/
@@ -2671,6 +2718,55 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
 
 
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
+                            Tekken Card World
+***************************************************************************/
+
+static MACHINE_CONFIG_START( tekkencw, cave_state )
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(tekkencw_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tjumpman)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
 
@@ -3897,8 +3993,6 @@ U55
 
 ***************************************************************************/
 
-
-
 #define ROMS_MAZINGER \
 	ROM_REGION( 0x80000, "maincpu", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "mzp-0.u24", 0x00000, 0x80000, CRC(43a4279f) SHA1(2c17eb31040bb7f1554bc1c9a968eec5e72af097) ) \
@@ -3921,6 +4015,7 @@ U55
 	\
 	ROM_REGION( 0x080000, "oki", 0 ) \
 	ROM_LOAD( "bp943a-4.u64", 0x000000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) )
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
 	ROMS_MAZINGER
@@ -4630,6 +4725,46 @@ ROM_END
 
 /***************************************************************************
 
+  Tekken Card World by Namco, 1997
+  Namco EMG4 platform, PCB D0049
+
+  TMP 68HC000P-16
+
+  013 9651EX001
+  038 9701WX001
+
+  OKI M6295 (the second OKI location is unpopulated)
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( tekkencw )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "mpr0.u41", 0x00000, 0x80000, CRC(5b8919f3) SHA1(580298b6dc36527ab69889c848acab97726a6cc6) ) // 27c240
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "obj0.u52", 0x00000, 0x80000, CRC(6d3c0c76) SHA1(92f9c9beae222a2c2a3242f812030e08036c9963) ) // 27c040
+	ROM_LOAD16_BYTE( "obj1.u53", 0x00001, 0x80000, CRC(8069b731) SHA1(9f0409c28466503092b74f635602962d9f127de8) ) // ""
+
+	ROM_REGION( 0x80000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "cha0.u60", 0x00000, 0x40000, CRC(2a245ade) SHA1(7217017975c88c3edea613152ee6f2158f8777d7) ) // 27c020
+	ROM_LOAD( "cha1.u61", 0x40000, 0x40000, CRC(43f62cce) SHA1(aa12ed0ccb94115ff8f9acf17850e1186c68bcf9) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "voi0.u27", 0x00000, 0x40000, CRC(3bcd9b7d) SHA1(7ecb47127733187f385a75b9db655e35c249de18) ) // 27c020
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1d.u1", 0x117*0, 0x117, NO_DUMP )   // GAL16V8D-15LP
+	ROM_LOAD( "n44u3a.u3", 0x117*1, 0x117, NO_DUMP )   // GAL16V8D-15LP
+ROM_END
+
+
+/***************************************************************************
+
   Tobikose! Jumpman by Namco, 1999
   Namco EMG4 platform, PCB TJ0476
 
@@ -5115,18 +5250,18 @@ GAME( 1996, agalletak,   agallet,  sailormn, cave, cave_state,     agallet,  ROT
 GAME( 1996, agalletat,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, agalletah,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
-
 GAME( 1996, hotdogst,   0,        hotdogst, cave, cave_state,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, pacslot,    0,        pacslot,  pacslot, cave_state,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan, cave_state,  ppsatan,  ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
+GAME( 1997, tekkencw,   0,        tekkencw, tekkencw, cave_state, tjumpman, ROT0,   "Namco",                                  "Tekken Card World", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1997, ddonpach,   0,        ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
 // NOT an official CAVE release, but several PCBs have been converted to it and used on location.
 GAME( 2012, ddonpacha,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",     MACHINE_SUPPORTS_SAVE )
-
 
 GAME( 1998, dfeveron,   feversos, dfeveron, cave, cave_state,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1998, feversos,   0,        dfeveron, cave, cave_state,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )

@@ -9240,6 +9240,7 @@ sailormnot                      // (c) 1995 Banpresto (country is in EEPROM)
 sailormnou                      // (c) 1995 Banpresto (country is in EEPROM)
 sailormnt                       // (c) 1995 Banpresto (country is in EEPROM)
 sailormnu                       // (c) 1995 Banpresto (country is in EEPROM)
+tekkencw                        // (c) 1997 Namco
 theroes                         // (c) 2001 Primetek Investments
 tjumpman                        // (c) 1999 Namco
 uopoko                          // (c) 1998 Cave + Jaleco license
@@ -9958,6 +9959,7 @@ sf2ceea                         // 13/03/1992 (c) 1992 (World)
 sf2ceja                         // 22/03/1992 (c) 1992 (Japan)
 sf2cejb                         // 13/05/1992 (c) 1992 (Japan)
 sf2cejc                         // 03/08/1992 (c) 1992 (Japan)
+sf2ceupl                       // 03/08/1992 (c) 1992 (Japan)
 sf2ceua                         // 13/03/1992 (c) 1992 (USA)
 sf2ceub                         // 13/05/1992 (c) 1992 (USA)
 sf2ceuc                         // 03/08/1992 (c) 1992 (USA)
@@ -13052,7 +13054,7 @@ galgame                         // (c) 1971 Computer Recreations, Inc
 @source:galgames.cpp
 galgame2                        // (c) 1998 Creative Electronics & Software (CES) / Namco
 galgame3                        // (c) 1998 Creative Electronics & Software (CES) / Atari
-galgame4                        // (c) 1998 Creative Electronics & Software (CES) / Atari
+galgame4                        // (c) 1998 Creative Electronics & Software (CES)
 galgbios                        // (c) 1998 Creative Electronics & Software (CES)
 
 @source:galivan.cpp
@@ -13461,6 +13463,9 @@ ggconnie                        // (c) ???? Capcom
 bballoon                        // (c) 2003 Eolith
 hapytour                        // (c) 2005 GAV Company (on Eolith's Ghost hardware)
 touryuu                         // (c) 200? Yuki Enterprise
+
+@source:giclassic.cpp
+giclasex	
 
 @source:gijoe.cpp
 gijoe                           // GX069 (c) 1991 (World)
@@ -29576,6 +29581,9 @@ othundero                       // B67 (c) 1988 Taito Corporation Japan (World)
 othunderu                       // B67 (c) 1988 Taito America Corporation (US, rev 1)
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
+@source:otomedius.cpp
+otomedius						// (c) 2007 Konami
+
 @source:overdriv.cpp
 overdriv                        // GX789 (c) 1990
 overdriva                       // GX789 (c) 1990
@@ -30689,6 +30697,7 @@ killbld104                      //
 killbldp                        // (c) 2004 Killing Blade Plus
 kov                             // (c) 1999 Knights of Valor
 kov100                          //
+kov100hk                        //
 kov115                          //
 kov2                            // (c) 2000 Knights of Valor 2
 kov2100                         //
@@ -30875,6 +30884,9 @@ pipeline                        // (c) 1990 Daehyun Electronics
 genix                           // (c) 199? NIX
 pirates                         // (c) 1994 NIX
 piratesb                        // bootleg?
+
+@source:piratesh.cpp
+piratesh						// (c) 1995 Konami
 
 @source:pitagjr.cpp
 pitagjr                         // Pitagorin Junior
@@ -31283,6 +31295,7 @@ ppmast93                        // (c) 1993 Electronic Devices S.R.L.
 @source:prehisle.cpp
 gensitou                        // A8003 'GT' (c) 1989
 prehisle                        // A8003 'GT' (c) 1989
+prehisleb                       //
 prehislek                       // A8003 'GT' (c) 1989
 prehisleu                       // A8003 'GT' (c) 1989
 
@@ -32830,6 +32843,7 @@ sblazerp                        // (c) 1983
 
 @source:segam1.cpp
 bingpty                         // ?
+unkm1                           // ?
 
 @source:segaorun.cpp
 outrun                          // Revision B
@@ -35123,7 +35137,8 @@ rambo3u                         // B93 (c) 1989 Taito America Corporation (US)
 rastsag2                        // B81 (c) 1988 Taito Corporation (Japan)
 realpunc                        // D76 (c) 1994 Taito Corporation (Japan)
 ryujin                          // ??? (c) 1993 Taito Corporation (Japan)
-sbm                             // C69 (c) 1990 Taito Corporation (Japan)
+sbm                             // C69 (c) 1990 Taito America Corporation (US)
+sbmj                            // C69 (c) 1990 Taito Corporation (Japan)
 selfeena                        // ??? (c) 1991 East Technology
 silentd                         // ??? (c) 1992 Taito Corporation Japan (World)
 silentdj                        // ??? (c) 1992 Taito Corporation (Japan)

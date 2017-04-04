@@ -28,15 +28,31 @@ public:
 	typedef typename traits_type::code_t code_t;
 	typedef std::size_t 	size_type;
     typedef std::ptrdiff_t difference_type;
+    typedef typename traits_type::string_type string_type;
+
+	class ref_value_type final
+	{
+	public:
+    	ref_value_type() = delete;
+    	ref_value_type(const ref_value_type &) = delete;
+    	ref_value_type(ref_value_type &&) = delete;
+    	ref_value_type &operator=(const ref_value_type &) = delete;
+    	ref_value_type &operator=(ref_value_type &&) = delete;
+		operator code_t() const noexcept { return traits_type::code(&m); }
+	private:
+		const mem_t m;
+	};
+	typedef const ref_value_type& const_reference ;
+	typedef const_reference reference;
 
 	enum enc_t
 	{
-		UTF8
+		UTF8,
+		UTF16
 	};
 
 	// simple construction/destruction
 	pstring_t()
-	: m_str("")
 	{
 	}
 	~pstring_t()
@@ -54,10 +70,10 @@ public:
 	{
 	}
 
-	template<typename C, std::size_t N>
+	template<typename C, std::size_t N,
+		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
 	pstring_t(C (&string)[N])
 	{
-		static_assert(std::is_same<C, const mem_t>::value, "pstring constructor only accepts const mem_t");
 		static_assert(N > 0,"pstring from array of length 0");
 		if (string[N-1] != 0)
 			throw std::exception();
@@ -68,35 +84,45 @@ public:
 	: m_str(string.m_str)
 	{ }
 
+	explicit pstring_t(const string_type &string, const enc_t enc)
+		: m_str(string)
+	{ }
+
 	pstring_t(pstring_t &&string)
 	: m_str(string.m_str)
 	{  }
 
 	explicit pstring_t(code_t code)
 	{
-		pstring_t t;
-		t+= code;
-		m_str.assign(t.m_str);
+		*this += code;
 	}
 
-	// assignment operators
+	template <typename T,
+		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+	explicit pstring_t(const pstring_t<T> &string)
+	{
+		m_str.clear();
+		for (auto &c : string)
+			*this += static_cast<code_t>(c); // FIXME: codepage conversion for u8
+	}
+
 	pstring_t &operator=(const pstring_t &string) { m_str = string.m_str; return *this; }
+
+	template <typename T,
+		class = typename std::enable_if<!std::is_same<T, pstring_t::traits_type>::value>::type>
+	pstring_t &operator=(const pstring_t<T> &string)
+	{
+		m_str.clear();
+		for (auto &c : string)
+			*this += c;
+		return *this;
+	}
 
 	class const_iterator final
 	{
 	public:
-		class value_type final
-		{
-		public:
-			value_type() = delete;
-			value_type(const value_type &) = delete;
-			value_type(value_type &&) = delete;
-			value_type &operator=(const value_type &) = delete;
-			value_type &operator=(value_type &&) = delete;
-			operator code_t() const noexcept { return traits_type::code(&m); }
-		private:
-			const mem_t m;
-		};
+
+		typedef ref_value_type value_type;
 
 		typedef value_type const *pointer;
 		typedef value_type const &reference;
@@ -104,7 +130,7 @@ public:
 		typedef std::forward_iterator_tag iterator_category;
 
 		const_iterator() noexcept : p() { }
-		explicit constexpr const_iterator(const std::string::const_iterator &x) noexcept : p(x) { }
+		explicit constexpr const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
 		const_iterator(const const_iterator &rhs) noexcept = default;
 		const_iterator(const_iterator &&rhs) noexcept = default;
 		const_iterator &operator=(const const_iterator &rhs) noexcept = default;
@@ -121,7 +147,7 @@ public:
 
 	private:
 		template <typename G> friend struct pstring_t;
-		std::string::const_iterator p;
+		typename string_type::const_iterator p;
 	};
 
 	// no non-const const_iterator for now
@@ -136,10 +162,14 @@ public:
 
 	// C string conversion helpers
 	const mem_t *c_str() const  { 	return static_cast<const mem_t *>(m_str.c_str()); }
+	const mem_t *data() const  { 	return c_str(); }
 
-	size_type size() const { return m_str.size(); }
+	size_type length() const { return traits_type::len(m_str); }
+	size_type size() const { return traits_type::len(m_str); }
+	bool empty() const { return m_str.size() == 0; }
 
 	pstring_t substr(size_type start, size_type nlen = npos) const;
+	int compare(const pstring_t &right) const;
 
 	size_type find(const pstring_t &search, size_type start = 0) const;
 	size_type find(code_t search, size_type start = 0) const;
@@ -149,25 +179,27 @@ public:
 
 	// concatenation operators
 	pstring_t& operator+=(const pstring_t &string) { m_str.append(string.m_str); return *this; }
-	pstring_t& operator+=(const code_t c) { mem_t buf[traits_type::MAXCODELEN+1] = { 0 }; traits_type::encode(c, buf); m_str.append(buf); return *this; }
+	pstring_t& operator+=(const code_t c) { traits_type::encode(c, m_str); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
 	// comparison operators
-	bool operator==(const pstring_t &string) const { return (pcmp(string) == 0); }
-	bool operator!=(const pstring_t &string) const { return (pcmp(string) != 0); }
+	bool operator==(const pstring_t &string) const { return (compare(string) == 0); }
+	bool operator!=(const pstring_t &string) const { return (compare(string) != 0); }
 
-	bool operator<(const pstring_t &string) const { return (pcmp(string) < 0); }
-	bool operator<=(const pstring_t &string) const { return (pcmp(string) <= 0); }
-	bool operator>(const pstring_t &string) const { return (pcmp(string) > 0); }
-	bool operator>=(const pstring_t &string) const { return (pcmp(string) >= 0); }
+	bool operator<(const pstring_t &string) const { return (compare(string) < 0); }
+	bool operator<=(const pstring_t &string) const { return (compare(string) <= 0); }
+	bool operator>(const pstring_t &string) const { return (compare(string) > 0); }
+	bool operator>=(const pstring_t &string) const { return (compare(string) >= 0); }
+
+	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
 
 	/* The following is not compatible to std::string */
 
-	bool equals(const pstring_t &string) const { return (pcmp(string) == 0); }
+	bool equals(const pstring_t &string) const { return (compare(string) == 0); }
 
-	bool startsWith(const pstring_t &arg) const { return arg.size() > size() ? false : m_str.compare(0, arg.size(), arg.m_str) == 0; }
-	bool endsWith(const pstring_t &arg) const { return arg.size() > size() ? false : m_str.compare(size()-arg.size(), arg.size(), arg.m_str) == 0; }
+	bool startsWith(const pstring_t &arg) const { return arg.mem_t_size() > mem_t_size() ? false : m_str.compare(0, arg.mem_t_size(), arg.m_str) == 0; }
+	bool endsWith(const pstring_t &arg) const { return arg.mem_t_size() > mem_t_size() ? false : m_str.compare(mem_t_size()-arg.mem_t_size(), arg.mem_t_size(), arg.m_str) == 0; }
 
 	pstring_t replace_all(const pstring_t &search, const pstring_t &replace) const;
 	pstring_t cat(const pstring_t &s) const { return *this + s; }
@@ -178,14 +210,14 @@ public:
 	double as_double(bool *error = nullptr) const;
 	long as_long(bool *error = nullptr) const;
 
-	size_type len() const { return traits_type::len(m_str); }
-
 	/* the following are extensions to <string> */
+
+	size_type mem_t_size() const { return m_str.size(); }
 
 	pstring_t left(size_type len) const { return substr(0, len); }
 	pstring_t right(size_type nlen) const
 	{
-		return nlen >= len() ? pstring_t(*this) : substr(len() - nlen, nlen);
+		return nlen >= length() ? *this : substr(length() - nlen, nlen);
 	}
 
 	pstring_t ltrim(const pstring_t &ws = pstring_t(" \t\n\r")) const
@@ -196,50 +228,45 @@ public:
 	pstring_t rtrim(const pstring_t &ws = pstring_t(" \t\n\r")) const
 	{
 		auto f = find_last_not_of(ws);
-		if (f==npos)
-			return pstring_t("");
-		else
-			return substr(0, f + 1);
+		return f == npos ? pstring_t() : substr(0, f + 1);
 	}
 
 	pstring_t trim(const pstring_t &ws = pstring_t(" \t\n\r")) const { return this->ltrim(ws).rtrim(ws); }
 
 	pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
 
-	code_t code_at(const size_type pos) const {return F::code(F::nthcode(m_str.c_str(),pos)); }
-
 	pstring_t ucase() const;
+
+	const string_type &cpp_string() const { return m_str; }
 
 	static const size_type npos = static_cast<size_type>(-1);
 
 protected:
-	std::string m_str;
+	string_type m_str;
 
 private:
-
-	int pcmp(const pstring_t &right) const;
 };
 
 struct pu8_traits
 {
-	static const unsigned MAXCODELEN = 1; /* in memory units */
 	typedef char mem_t;
 	typedef char code_t;
-	static std::size_t len(const std::string &p) { return p.size(); }
-	static unsigned codelen(const mem_t *p) { return 1; }
-	static unsigned codelen(const code_t c) { return 1; }
+	typedef std::string string_type;
+	static std::size_t len(const string_type &p) { return p.size(); }
+	static std::size_t codelen(const mem_t *p) { return 1; }
+	static std::size_t codelen(const code_t c) { return 1; }
 	static code_t code(const mem_t *p) { return *p; }
-	static void encode(const code_t c, mem_t *p) { *p = c; }
+	static void encode(const code_t c, string_type &s) { s += static_cast<mem_t>(c); }
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n) { return &(p[n]); }
 };
 
 /* No checking, this may deliver invalid codes */
 struct putf8_traits
 {
-	static const unsigned MAXCODELEN = 4; /* in memory units,  RFC 3629 */
 	typedef char mem_t;
 	typedef char32_t code_t;
-	static std::size_t len(const std::string &p)
+	typedef std::string string_type;
+	static std::size_t len(const string_type &p)
 	{
 		std::size_t ret = 0;
 		for (const auto &c : p)
@@ -265,7 +292,7 @@ struct putf8_traits
 			return 1; // not correct
 		}
 	}
-	static char32_t codelen(const code_t c)
+	static std::size_t codelen(const code_t c)
 	{
 		if (c < 0x0080)
 			return 1;
@@ -290,30 +317,29 @@ struct putf8_traits
 		else
 			return *p1; // not correct
 	}
-	static void encode(const code_t c, mem_t *p)
+	static void encode(const code_t c, string_type &s)
 	{
-		unsigned char *m = reinterpret_cast<unsigned char *>(p);
 		if (c < 0x0080)
 		{
-			m[0] = static_cast<unsigned char>(c);
+			s += static_cast<mem_t>(c);
 		}
 		else if (c < 0x800)
 		{
-			m[0] = static_cast<unsigned char>(0xC0 | (c >> 6));
-			m[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xC0 | (c >> 6));
+			s += static_cast<mem_t>(0x80 | (c & 0x3f));
 		}
 		else if (c < 0x10000)
 		{
-			m[0] = static_cast<unsigned char>(0xE0 | (c >> 12));
-			m[1] = static_cast<unsigned char>(0x80 | ((c>>6) & 0x3f));
-			m[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xE0 | (c >> 12));
+			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f));
+			s += static_cast<mem_t>(0x80 | (c & 0x3f));
 		}
 		else /* U+10000 U+1FFFFF */
 		{
-			m[0] = static_cast<unsigned char>(0xF0 | (c >> 18));
-			m[1] = static_cast<unsigned char>(0x80 | ((c>>12) & 0x3f));
-			m[2] = static_cast<unsigned char>(0x80 | ((c>>6) & 0x3f));
-			m[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
+			s += static_cast<mem_t>(0xF0 | (c >> 18));
+			s += static_cast<mem_t>(0x80 | ((c>>12) & 0x3f));
+			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f));
+			s += static_cast<mem_t>(0x80 | (c & 0x3f));
 		}
 	}
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n)
@@ -326,17 +352,191 @@ struct putf8_traits
 	}
 };
 
+struct putf16_traits
+{
+	typedef char16_t mem_t;
+	typedef char32_t code_t;
+	typedef std::u16string string_type;
+	static std::size_t len(const string_type &p)
+	{
+		std::size_t ret = 0;
+		auto i = p.begin();
+		while (i != p.end())
+		{
+			// FIXME: check that size is equal
+	        uint16_t c = static_cast<uint16_t>(*i++);
+			if (!((c & 0xd800) == 0xd800))
+				ret++;
+		}
+		return ret;
+	}
+	static std::size_t codelen(const mem_t *p)
+	{
+        uint16_t c = static_cast<uint16_t>(*p);
+        return ((c & 0xd800) == 0xd800) ? 2 : 1;
+	}
+	static std::size_t codelen(const code_t c)
+	{
+		if (c < 0x10000)
+			return 1;
+		else /* U+10000 U+1FFFFF */
+			return 2;
+	}
+	static code_t code(const mem_t *p)
+	{
+        uint32_t c = static_cast<uint32_t>(*p++);
+        if ((c & 0xd800) == 0xd800)
+        {
+        	c = (c - 0xd800) << 10;
+            c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+        }
+        return static_cast<code_t>(c);
+	}
+	static void encode(code_t c, string_type &s)
+	{
+		uint32_t cu = static_cast<uint32_t>(c);
+        if (c > 0xffff)
+        { //make a surrogate pair
+        	uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
+        	cu = (cu & 0x3ff) + 0xdc00;
+        	s += static_cast<mem_t>(t);
+            s += static_cast<mem_t>(cu);
+        }
+        else
+        {
+            s += static_cast<mem_t>(cu);
+        }
+	}
+	static const mem_t *nthcode(const mem_t *p, const std::size_t n)
+	{
+		std::size_t i = n;
+		while (i-- > 0)
+			p += codelen(p);
+		return p;
+	}
+};
+
+struct pwchar_traits
+{
+	typedef wchar_t mem_t;
+	typedef char32_t code_t;
+	typedef std::wstring string_type;
+	static std::size_t len(const string_type &p)
+	{
+		if (sizeof(wchar_t) == 2)
+		{
+			std::size_t ret = 0;
+			auto i = p.begin();
+			while (i != p.end())
+			{
+				// FIXME: check that size is equal
+		        uint32_t c = static_cast<uint32_t>(*i++);
+				if (!((c & 0xd800) == 0xd800))
+					ret++;
+			}
+			return ret;
+		}
+		else
+			return p.size();
+	}
+
+	static std::size_t codelen(const mem_t *p)
+	{
+		if (sizeof(wchar_t) == 2)
+		{
+	        uint16_t c = static_cast<uint16_t>(*p);
+	        return ((c & 0xd800) == 0xd800) ? 2 : 1;
+		}
+		else
+			return 1;
+	}
+
+	static std::size_t codelen(const code_t c)
+	{
+		if (sizeof(wchar_t) == 2)
+			return ((c & 0xd800) == 0xd800) ? 2 : 1;
+		else
+			return 1;
+	}
+
+	static code_t code(const mem_t *p)
+	{
+		if (sizeof(wchar_t) == 2)
+		{
+	        uint32_t c = static_cast<uint32_t>(*p++);
+	        if ((c & 0xd800) == 0xd800)
+	        {
+	        	c = (c - 0xd800) << 10;
+	            c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+	        }
+	        return static_cast<code_t>(c);
+		}
+		else
+			return static_cast<code_t>(*p);
+	}
+
+	static void encode(code_t c, string_type &s)
+	{
+		if (sizeof(wchar_t) == 2)
+		{
+			uint32_t cu = static_cast<uint32_t>(c);
+			if (c > 0xffff)
+			{ //make a surrogate pair
+				uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
+				cu = (cu & 0x3ff) + 0xdc00;
+				s += static_cast<mem_t>(t);
+				s += static_cast<mem_t>(cu);
+			}
+			else
+				s += static_cast<mem_t>(cu);
+		}
+		else
+			s += static_cast<wchar_t>(c);
+	}
+	static const mem_t *nthcode(const mem_t *p, const std::size_t n)
+	{
+		if (sizeof(wchar_t) == 2)
+		{
+			std::size_t i = n;
+			while (i-- > 0)
+				p += codelen(p);
+			return p;
+		}
+		else
+			return p + n;
+	}
+};
+
 extern template struct pstring_t<pu8_traits>;
 extern template struct pstring_t<putf8_traits>;
+extern template struct pstring_t<putf16_traits>;
+extern template struct pstring_t<pwchar_traits>;
 
 typedef pstring_t<putf8_traits> pstring;
+typedef pstring_t<putf16_traits> pu16string;
+typedef pstring_t<pwchar_traits> pwstring;
+
+namespace plib
+{
+	template<typename T>
+	pstring to_string(const T &v)
+	{
+		return pstring(std::to_string(v), pstring::UTF8);
+	}
+
+	template<typename T>
+	pwstring to_wstring(const T &v)
+	{
+		return pwstring(std::to_wstring(v), pwstring::UTF16);
+	}
+}
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std
 {
-	template<> struct hash<pstring>
+	template<typename T> struct hash<pstring_t<T>>
 	{
-		typedef pstring argument_type;
+		typedef pstring_t<T> argument_type;
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& s) const
 		{

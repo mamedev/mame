@@ -1167,7 +1167,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	{
 		if (m_basic_ptr)
 		{
-			membank("fbasic_bank_r")->set_base(m_rom_ptr);
+			membank("fbasic_bank_r")->set_base(m_basic_ptr);
 		}
 	}
 	else
