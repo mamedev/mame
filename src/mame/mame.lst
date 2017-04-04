@@ -12752,6 +12752,10 @@ speedup10                       // (c) 1996 - Ref ???
 surfplnt                        // (c) 1997 - Ref 971223
 surfplnt40                      // (c) 1997 - Ref 970514
 
+@source:gaelcopc.cpp
+tokyocop                        // (c) 2003 (Arcade TV Game List - P.168, Right, 19 from bottom)
+tuningrc                        //
+
 @source:gaiden.cpp
 drgnbowl                        // (c) 1992 Nics
 drgnbowla                       // (c) 1992 Nics
@@ -36214,9 +36218,6 @@ tokib                           // bootleg
 tokiu                           // (c) 1989 Tad + Fabtek license (US)
 tokiua                          // (c) 1989 Tad + Fabtek license (US)
 tokip
-
-@source:tokyocop.cpp
-tokyocop                        // (c) 2003 (Arcade TV Game List - P.168, Right, 19 from bottom)
 
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985

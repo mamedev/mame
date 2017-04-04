@@ -1,0 +1,105 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
+/* Gaelco PC based hardware
+
+TODO:
+- tokyocop can't be emulated without proper mb bios
+
+Custom motherboard with
+82815
+82801
+82562 (LAN)
+RTM 560-25R (Audio)
+TI4200 128Mb AGP
+256 Mb PC133
+Pentium 4 (??? XXXXMhz)
+
+I/O Board with Altera Flex EPF15K50EQC240-3
+
+The graphics cards are swappable between nVidia cards from
+the era. There is no protection on the games, you can just swap out
+hard drives to change games, though they do seem to have their own
+motherboard bioses.
+
+*/
+
+
+#include "emu.h"
+#include "cpu/i386/i386.h"
+#include "screen.h"
+
+
+class gaelcopc_state : public driver_device
+{
+public:
+	gaelcopc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu")
+	{ }
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+
+	// driver_device overrides
+	virtual void video_start() override;
+};
+
+
+void gaelcopc_state::video_start()
+{
+}
+
+uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+static ADDRESS_MAP_START( gaelcopc_map, AS_PROGRAM, 32, gaelcopc_state )
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( gaelcopc )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( gaelcopc, gaelcopc_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
+	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelcopc_state, screen_update)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+MACHINE_CONFIG_END
+
+
+ROM_START(tokyocop)
+	ROM_REGION32_LE(0x20000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("tokyocop.pcbios", 0x000000, 0x10000, NO_DUMP )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE( "tokyocop", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
+ROM_END
+
+ROM_START(tuningrc)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )
+
+	DISK_REGION( "disks" ) // Hitachi HDS728080PLAT20 ATA/IDE
+	DISK_IMAGE( "tuningrc", 0, SHA1(4055cdc0b0c0e99252b90fbfafc48b693b144d67) )
+ROM_END
+
+
+GAME( 2003, tokyocop,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
+GAME( 2005, tuningrc,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )
