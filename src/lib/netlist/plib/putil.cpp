@@ -50,15 +50,15 @@ namespace plib
 		while (pn != pstring::npos)
 		{
 			pstring t = str.substr(p, pn - p);
-			if (!ignore_empty || t.len() != 0)
+			if (!ignore_empty || t.length() != 0)
 				ret.push_back(t);
-			p = pn + onstr.len();
+			p = pn + onstr.length();
 			pn = str.find(onstr, p);
 		}
-		if (p < str.len())
+		if (p < str.length())
 		{
 			pstring t = str.substr(p);
-			if (!ignore_empty || t.len() != 0)
+			if (!ignore_empty || t.length() != 0)
 				ret.push_back(t);
 		}
 		return ret;
@@ -75,7 +75,7 @@ namespace plib
 			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
-				if (std::equal(onstrl[j].c_str(), onstrl[j].c_str() + onstrl[j].size(), i))
+				if (std::equal(onstrl[j].begin(), onstrl[j].end(), i))
 				{
 					p = j;
 					break;
@@ -88,7 +88,7 @@ namespace plib
 
 				col = "";
 				ret.push_back(onstrl[p]);
-				i = std::next(i, static_cast<pstring::difference_type>(onstrl[p].len()));
+				i = std::next(i, static_cast<pstring::difference_type>(onstrl[p].length()));
 			}
 			else
 			{

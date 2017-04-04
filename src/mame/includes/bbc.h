@@ -139,8 +139,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcm_wd1772l_write);
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
 	DECLARE_DRIVER_INIT(bbc);
 	DECLARE_VIDEO_START(bbc);

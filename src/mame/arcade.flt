@@ -405,6 +405,7 @@ g627.cpp
 gaelco.cpp
 gaelco2.cpp
 gaelco3d.cpp
+gaelcopc.cpp
 gaiden.cpp
 gal3.cpp
 galaga.cpp
@@ -433,6 +434,7 @@ gcpinbal.cpp
 gei.cpp
 ggconnie.cpp
 ghosteo.cpp
+giclassic.cpp
 gijoe.cpp
 ginganin.cpp
 gkigt.cpp
@@ -830,6 +832,7 @@ opwolf.cpp
 orbit.cpp
 othello.cpp
 othunder.cpp
+otomedius.cpp
 overdriv.cpp
 pachifev.cpp
 pacland.cpp
@@ -866,6 +869,7 @@ pinkiri8.cpp
 pipedrm.cpp
 pipeline.cpp
 pirates.cpp
+piratesh.cpp
 pitnrun.cpp
 pkscram.cpp
 pktgaldx.cpp
@@ -1207,7 +1211,6 @@ tnzs.cpp
 toaplan1.cpp
 toaplan2.cpp
 toki.cpp
-tokyocop.cpp
 tomcat.cpp
 tonton.cpp
 toobin.cpp

@@ -100,6 +100,7 @@ i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *ta
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I8086, "I8086", tag, owner, clock, "i8086", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
@@ -109,14 +110,26 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *ta
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
 {
+}
+
+const address_space_config *i8086_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return &m_io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_opcodes_config : nullptr;
+	default:                   return nullptr;
+	}
 }
 
 uint8_t i8086_cpu_device::fetch_op()
 {
 	uint8_t data;
-	data = m_direct->read_byte(pc(), m_fetch_xor);
+	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -124,7 +137,7 @@ uint8_t i8086_cpu_device::fetch_op()
 uint8_t i8086_cpu_device::fetch()
 {
 	uint8_t data;
-	data = m_direct->read_byte(pc(), m_fetch_xor);
+	data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -382,7 +395,9 @@ void i8086_common_cpu_device::state_string_export(const device_state_entry &entr
 void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
+	m_opcodes = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
 	m_direct = &m_program->direct();
+	m_direct_opcodes = &m_opcodes->direct();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -1252,7 +1267,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0x6d:
 		case 0x7d: // i_jnl
-			JMP((ZF)||(SF==OF));
+			JMP(SF==OF);
 			break;
 
 		case 0x6e:

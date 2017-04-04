@@ -10,12 +10,12 @@ used for redemption / gambling style machines in a satellite setup
 
 based on Caribbean Boule the following hardware setup is used
 
-One X-Board (segaxbd.c) drives a large rear-projection monitor which all players view to see the main game progress.
+One X-Board (segaxbd.cpp) drives a large rear-projection monitor which all players view to see the main game progress.
 
 Multiple M1 boards ("satellite" board) for each player for them to view information privately.
 
 One 'link' board which connects everything together.  The link board has audio hardware, a 68K, and a Z80 as
-well as a huge bank of UARTS and toslink connectors, but no video.  it's possible the main game logic runs
+well as a huge bank of UARTS and toslink connectors, but no video. It's possible the main game logic runs
 on the 'link' board.
 
 
@@ -23,7 +23,7 @@ Unfortunately we don't have any dumps of anything other than an M1 board right n
 
 ---
 
-is this related to (or a component of?) bingoc.c, the EPR numbers are much lower there tho
+is this related to (or a component of?) bingoc.cpp, the EPR numbers are much lower there tho
 so it's probably an earlier version of the same thing or one of the 'link' boards?
 
 uses s24 style tilemaps (ram based?)
@@ -93,6 +93,7 @@ static MACHINE_CONFIG_START( segam1, segam1_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	// YM3438
 MACHINE_CONFIG_END
 
 
@@ -110,4 +111,20 @@ ROM_START( bingpty )
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
+ROM_START( unkm1 ) // 1992.01.31 string
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "epr-14427.ic8", 0x00000, 0x40000, CRC(2d904fc6) SHA1(7062f47d77d09906420118c85e1cb565bec345a7) )
+	ROM_LOAD16_BYTE( "epr-14428.ic7", 0x00001, 0x40000, CRC(97a317f4) SHA1(19bc4cf6b6c580caa44f36c929b445ed94b2d9eb) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "epr-14429.ic104", 0x00000, 0x20000, CRC(1ff8262d) SHA1(fb90bd877b2dc65eb3e5495d6e21dee1f871fb44) )
+
+	// ROM_REGION( 0x8000, "m1comm", 0 ) // not present?
+	
+	ROM_REGION( 0x100, "plds", 0 )
+	ROM_LOAD( "315-5472-01.ic22", 0x000, 0x0eb, CRC(828ee6e2) SHA1(f32dd0f6297cc8bd3049be4bca502c0f8ec738cf) )
+	// dumps of the X-Board part, and the LINK PCB are missing.
+ROM_END
+
 GAME( 199?, bingpty,    0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, unkm1,      0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

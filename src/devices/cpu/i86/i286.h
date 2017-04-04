@@ -67,7 +67,7 @@ public:
 	i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	typedef delegate<uint32_t (bool)> a20_cb;
 	static void static_set_a20_callback(device_t &device, a20_cb object) { downcast<i80286_cpu_device &>(device).m_a20_callback = object; }
@@ -134,6 +134,7 @@ private:
 	uint32_t TRAP(uint16_t fault, uint16_t code)  { return ((((uint32_t)fault&0xffff)<<16)|(code&0xffff)); }
 
 	address_space_config m_program_config;
+	address_space_config m_opcodes_config;
 	address_space_config m_io_config;
 	static const uint8_t m_i80286_timing[200];
 

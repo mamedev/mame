@@ -8,6 +8,7 @@
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/6821pia.h"
@@ -23,7 +24,10 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  23961600
+#define MAIN_CLOCK  XTAL_23_9616MHz
+
+#define MODEM_PORT_TAG "modem"
+#define PRINTER_PORT_TAG "printer"
 
 
 class osbexec_state : public driver_device
@@ -117,8 +121,11 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_pia0_b_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_irq);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia1_irq);
+	DECLARE_WRITE_LINE_MEMBER(modem_txclk_w);
+	DECLARE_WRITE_LINE_MEMBER(modem_rxclk_w);
+	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
+	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
+	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
 };
 
 
@@ -212,7 +219,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)               /* 6821 PIA @ UD12 */
-	/* 0x04 - 0x07 - 8253 @UD1 */
+	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)  /* 8253 @UD1 */
 	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_t, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w ) /* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)               /* 6821 PIA @ UD8 */
@@ -354,7 +361,7 @@ READ8_MEMBER(osbexec_state::osbexec_pia0_a_r)
 
 WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 {
-	logerror("osbexec_pia0_a_w: %02x\n", data );
+	//logerror("osbexec_pia0_a_w: %02x\n", data );
 
 	m_pia0_porta = data;
 
@@ -370,7 +377,7 @@ READ8_MEMBER(osbexec_state::osbexec_pia0_b_r)
 
 WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 {
-	m_pia0_portb = data;
+	m_pia0_portb = (m_pia0_portb & 0xc0) | (data & 0x3f);
 
 	m_speaker->level_w(!BIT(data, 3));
 
@@ -402,6 +409,46 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_ca2_w)
 WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
 {
 	m_pia0_cb2 = state;
+}
+
+
+WRITE_LINE_MEMBER(osbexec_state::modem_txclk_w)
+{
+	if (BIT(m_pia0_portb, 5))
+		m_sio->txca_w(!state);
+}
+
+
+WRITE_LINE_MEMBER(osbexec_state::modem_rxclk_w)
+{
+	if (BIT(m_pia0_portb, 4))
+		m_sio->rxca_w(!state);
+}
+
+
+WRITE_LINE_MEMBER(osbexec_state::modem_dsr_w)
+{
+	m_pia0_portb &= 0xbf;
+	if (!state)
+		m_pia0_portb |= 0x40;
+}
+
+
+WRITE_LINE_MEMBER(osbexec_state::modem_ri_w)
+{
+	m_pia0_portb &= 0x7f;
+	if (!state)
+		m_pia0_portb |= 0x80;
+}
+
+
+WRITE_LINE_MEMBER(osbexec_state::comm_clk_a_w)
+{
+	//if (!BIT(m_pia0_portb, 5))
+		m_sio->txca_w(state);
+	//if (!BIT(m_pia0_portb, 4))
+		m_sio->rxca_w(state);
+	//m_modem->txclk_w(!state);
 }
 
 
@@ -498,7 +545,7 @@ void osbexec_state::machine_reset()
 
 	m_rtc = 0;
 
-	// D0 cleared on interrupt acknowledge cycle by a few TTL gates
+	// D0 cleared on interrupt acknowledge cycle by TTL gates at UC21 and UA18
 	m_maincpu->set_input_line_vector(0, 0xfe);
 }
 
@@ -526,8 +573,6 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-//  MCFG_PIT8253_ADD("pit", osbexec_pit_config)
-
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(osbexec_state, osbexec_pia0_a_r))
 	MCFG_PIA_READPB_HANDLER(READ8(osbexec_state, osbexec_pia0_b_r))
@@ -546,6 +591,33 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in2_w))
+
+	MCFG_DEVICE_ADD("ctc", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
+	MCFG_PIT8253_CLK1(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
+	MCFG_PIT8253_CLK2(MAIN_CLOCK / 12)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(osbexec_state, comm_clk_a_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxtxcb_w))
+	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(osbexec_state, spindle_clk_w))
+
+	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxa_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio2_device, dcda_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DSR_HANDLER(WRITELINE(osbexec_state, modem_dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(osbexec_state, modem_ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
+
+	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio2_device, dcdb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))

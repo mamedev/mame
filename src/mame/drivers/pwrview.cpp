@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE16_MEMBER(nmimem_w);
 	DECLARE_READ8_MEMBER(rotary_r);
 	DECLARE_READ8_MEMBER(err_r);
+	MC6845_UPDATE_ROW(update_row);
 
 protected:
 	virtual void device_start() override;
@@ -74,6 +75,11 @@ void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	m_maincpu->drq0_w(1);
 	m_maincpu->drq1_w(1); // TODO: this is unfortunate
+}
+
+MC6845_UPDATE_ROW(pwrview_state::update_row)
+{
+
 }
 
 READ8_MEMBER(pwrview_state::rotary_r)
@@ -199,7 +205,11 @@ WRITE8_MEMBER(pwrview_state::led_w)
 	};
 	m_leds[offset] = data;
 	if(offset == 1)
+	{
 		logerror("%c%c%c%c\n", m_leds[1] & 0x80 ? ' ' : '.', xlate(m_leds[1]), m_leds[0] & 0x80 ? ' ' : '.', xlate(m_leds[0]));
+		m_c009 &= ~2;
+		m_c009 |= (data & 0x80) ? 0 : 2; // TODO: what this means
+	}
 }
 
 static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
@@ -217,6 +227,7 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc008, 0xc009) AM_READWRITE8(unk2_r, unk2_w, 0xff00)
 	AM_RANGE(0xc00a, 0xc00b) AM_READ8(err_r, 0xff00)
 	AM_RANGE(0xc00c, 0xc00d) AM_RAM
+	AM_RANGE(0xc080, 0xc081) AM_UNMAP
 	AM_RANGE(0xc088, 0xc089) AM_DEVWRITE8("crtc", hd6845_device, address_w, 0x00ff)
 	AM_RANGE(0xc08a, 0xc08b) AM_DEVREADWRITE8("crtc", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xc280, 0xc287) AM_READWRITE8(unk3_r, unk3_w, 0x00ff)
@@ -258,6 +269,7 @@ static MACHINE_CONFIG_START( pwrview, pwrview_state )
 	MCFG_Z80SIO2_ADD("sio", 4000000, 0, 0, 0, 0)
 	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
+	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
 MACHINE_CONFIG_END
 
 ROM_START(pwrview)

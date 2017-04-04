@@ -245,7 +245,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		{
 			tokstr += c;
 			/* expensive, check for single char tokens */
-			if (tokstr.len() == 1)
+			if (tokstr.length() == 1)
 			{
 				auto id = m_tokens.find(tokstr);
 				if (id != m_tokens.end())

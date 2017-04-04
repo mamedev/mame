@@ -6,6 +6,7 @@
 
   TODO:
   - fix debugger disasm view
+  - INIT pin
 
 
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
