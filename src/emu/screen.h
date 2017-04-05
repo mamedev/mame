@@ -213,8 +213,8 @@ public:
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-	palette_device &palette() const { assert(m_palette.found()); return *m_palette; }
-	bool has_palette() const { return m_palette.found(); }
+	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
+	bool has_palette() const { return m_palette != nullptr; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -247,6 +247,7 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
+	void resolve_palette();
 
 	// internal to the video system
 	bool update_quads();
@@ -292,7 +293,8 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
-	optional_device<palette_device> m_palette;      // our palette
+	device_palette_interface *m_palette;            // our palette
+	const char *        m_palette_tag;              // configured tag for palette device
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
 
@@ -496,9 +498,9 @@ extern template class device_finder<screen_device, true>;
 #define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
 	devcb = &screen_device::static_set_screen_vblank(*device, DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
-	screen_device::static_set_palette(*device, "^" _palette_tag);
+	screen_device::static_set_palette(*device, _palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \
-	screen_device::static_set_palette(*device, finder_base::DUMMY_TAG);
+	screen_device::static_set_palette(*device, nullptr);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	screen_device::static_set_video_attributes(*device, _flags);
 #define MCFG_SCREEN_COLOR(_color) \
