@@ -122,7 +122,7 @@ namespace netlist
 			}
 		}
 
-		uint_least64_t mask() const { return (static_cast<uint_least64_t>(1) << m_size) - 1; }
+		uint_least64_t mask() const { return static_cast<uint_least64_t>(-1); }
 
 	private:
 		void *m_data;
@@ -140,7 +140,7 @@ namespace netlist
 		{
 		}
 
-		void parse(const std::vector<pstring> &desc, uint_least64_t disabled_ignore);
+		void parse(const std::vector<pstring> &desc);
 
 	private:
 		void parseline(unsigned cur, std::vector<pstring> list,
@@ -209,11 +209,12 @@ namespace netlist
 
 		m_ign = 0;
 
-		truthtable_parser desc_s(m_NO, m_NI, &m_ttp->m_initialized,
-				packed_int(m_ttp->m_outs, sizeof(m_ttp->m_outs[0]) * 8),
-				m_ttp->m_timing, m_ttp->m_timing_nt);
-
-		desc_s.parse(desc, disabled_ignore * 0);
+#if 0
+		for (size_t i=0; i<m_size; i++)
+		{
+			m_ttp.m_outs[i] &= ~(disabled_ignore << m_NO);
+		}
+#endif
 #if 0
 		printf("%s\n", name().c_str());
 		for (int j=0; j < m_size; j++)
@@ -240,7 +241,12 @@ namespace netlist
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
 			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
-			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, &m_ttbl, m_desc);
+			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
+					packed_int(m_ttbl.m_outs, sizeof(m_ttbl.m_outs[0]) * 8),
+					m_ttbl.m_timing, m_ttbl.m_timing_nt);
+
+			desc_s.parse(m_desc);
+			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);
 		}
 	private:
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
@@ -356,7 +362,7 @@ void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
 	}
 }
 
-void truthtable_parser::parse(const std::vector<pstring> &truthtable, uint_least64_t disabled_ignore)
+void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 {
 	unsigned line = 0;
 
@@ -446,7 +452,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable, uint_least
 	{
 		if (m_outs[i] == m_outs.mask())
 			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
-		m_outs.set(i, m_outs[i] | ((ign[i] & ~disabled_ignore)  << m_NO));;
+		m_outs.set(i, m_outs[i] | (ign[i] << m_NO));;
 	}
 	*m_initialized = true;
 

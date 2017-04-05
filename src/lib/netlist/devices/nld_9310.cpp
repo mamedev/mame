@@ -180,8 +180,8 @@ namespace netlist
 		else
 		{
 			m_cnt = m_ABCD->read_ABCD();
-			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 			m_RC.push(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		}
 	}
 

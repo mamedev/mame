@@ -5,8 +5,6 @@
  *
  */
 
-#define MAXCNT 9
-
 #include "nld_74192.h"
 #include "../nl_base.h"
 
@@ -14,6 +12,9 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	static constexpr const unsigned MAXCNT = 9;
+
 	NETLIB_OBJECT(74192_subABCD)
 	{
 		NETLIB_CONSTRUCTOR(74192_subABCD)
@@ -109,7 +110,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static const netlist_time delay[4] =
+	static constexpr netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),
@@ -133,8 +134,7 @@ namespace netlist
 		{
 			if (m_CD() && !m_last_CU && m_CU())
 			{
-				++m_cnt;
-				if (m_cnt > MAXCNT)
+				if (++m_cnt > MAXCNT)
 					m_cnt = 0;
 			}
 			if (m_CU() && !m_last_CD && m_CD())

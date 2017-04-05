@@ -417,7 +417,7 @@ void tool_app_t::static_compile()
 
 void tool_app_t::mac_out(const pstring &s, const bool cont)
 {
-	static const unsigned RIGHT = 72;
+	static constexpr unsigned RIGHT = 72;
 	if (cont)
 	{
 		unsigned adj = 0;

@@ -213,8 +213,8 @@ namespace plib {
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
-		bool is_set() { return m_func != nullptr; }
-		generic_function get_function() const { return m_func; }
+		bool is_set() noexcept { return m_func != nullptr; }
+		generic_function get_function() const noexcept { return m_func; }
 	private:
 		generic_function m_func;
 	};
@@ -246,8 +246,8 @@ namespace plib {
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}
 
-		generic_class *object() const { return m_obj; }
-		bool has_object() const { return m_obj != nullptr; }
+		generic_class *object() const noexcept { return m_obj; }
+		bool has_object() const noexcept { return m_obj != nullptr; }
 	private:
 		generic_class *m_obj;
 	};
