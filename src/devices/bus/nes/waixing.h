@@ -276,7 +276,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	uint8_t m_latch;
+	uint8_t m_reg[4];
 };
 
 
