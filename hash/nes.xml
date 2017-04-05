@@ -47108,9 +47108,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="ds-f301 prg.u3" size="131072" crc="710e3cf9" sha1="45e82bec4a0d4685be20feaacb4c57b4bea09575" offset="00000" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -52930,13 +52929,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<!-- Alt. Title: Adan y Eva (on the cart label) -->
-	<!--software name="adanyeva">
+	<software name="adanyeva">
 	    <description>Adam &amp; Eve (Spa)</description>
 	    <year>1991</year>
 	    <publisher>Gluk Video</publisher>
 	    <info name="serial" value="CN-11"/>
 	    <info name="release" value="19910101"/>
 	    <part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
 	        <feature name="pcb" value="NTDEC-N715062" />
 	        <feature name="mirroring" value="vertical" />
 	        <dataarea name="prg" size="32768">
@@ -52946,7 +52946,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	            <rom name="0.chr" size="32768" crc="0a7307d9" sha1="de1ef6c5c390947aab477afe7d61e37b6c4d2e32" offset="00000" />
 	        </dataarea>
 	    </part>
-	</software-->
+	</software>
 
 	<software name="destroyr">
 		<description>Destroyer (Spa)</description>
@@ -58153,6 +58153,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Frank Cifaldi's dump -->
+	<software name="avsrpchi">
+		<description>AV Super Real Pachinko (Jpn)</description>
+		<year>1991</year>
+		<publisher>Hacker International</publisher>
+		<info name="serial" value="HKI-07"/>
+		<info name="alt_title" value="AVスーパーリアルパチンコ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="gxrom" />
+			<feature name="pcb" value="2209-A" />
+			<dataarea name="chr" size="65536">
+				<rom name="0.chr" size="65536" crc="be68914b" sha1="c77697cfc97464cec7517f72d0824aba2e1e43e7" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="0.prg" size="65536" crc="b66ff0f1" sha1="c11d158465475bfe8fdd950fb39180df2ef597f0" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- nointro -->
 	<software name="hanafuda">
 		<description>Hanafuda Yuukyou Den - Nagarebana Oryuu (Jpn)</description>
@@ -61360,6 +61379,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Dance 2000 - 12 in 1 (Chi)</description>
 		<year>2000?</year>
 		<publisher>Benli</publisher>
+		<info name="alt_title" value="奔力跳舞天使动感2000 12 IN 1"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="subor2" />
 			<feature name="pcb" value="UNL-DANCE2000" />
@@ -69137,11 +69157,13 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 <!-- Russian & Chinese pirate educational computers / famiclones
 
-Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
+Take note that some of these carts require a mouse, which is why some carts that have software that do
+not work without a mouse of some sort are marked as partial due to the lack of mouse emulation.
 
-<!-- TODO: waixing_sgzlz based carts either need a new board, or they are not being handled right!
-The wrong PRG/CHR can be selected on some carts (Karaoke returns to Solitaire on edu2k48), or some games
-simply will not work at all! (Most selections in magistr2 just crash!) -->
+However, some carts that do have mouse support like edu2k48 are fully navigatable without a mouse... Hence
+they are marked as fully working.
+
+Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
 
 	<software name="liko3in1">
 		<description>LIKO Study Cartridge 3 in 1 (Rus)</description>
@@ -69225,7 +69247,7 @@ simply will not work at all! (Most selections in magistr2 just crash!) -->
 		</part>
 	</software>
 
-	<software name="edu2k48" supported="partial">
+	<software name="edu2k48">
 		<description>Education Computer 2000 48 in 1 (Asia?, Fixed)</description>
 		<!-- 'Shenzhen Brave' references and a copyright from 2004 are in the ROM -->
 		<!-- However, the cart itself probably had many different publishers -->
@@ -69286,6 +69308,7 @@ simply will not work at all! (Most selections in magistr2 just crash!) -->
 		</part>
 	</software>
 
+	<!-- Does battery-backed WRAM actually work here? Trying to save files on WORD does nothing -->
 	<software name="glk48" supported="partial">
 		<description>GLK Book 48 in 1 (Asia?)</description>
 		<year>19??</year>
@@ -69351,6 +69374,7 @@ simply will not work at all! (Most selections in magistr2 just crash!) -->
 	</software>
 
 <!-- This has an additional (and currently unemulated) sound chip, possibly an ADPCM! -->
+<!-- TODO: New board -->
 	<software name="magistr2" supported="partial">
 		<description>Magistr-Genie 2 (Rus)</description>
 		<year>19??</year>
