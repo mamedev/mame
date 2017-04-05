@@ -92,6 +92,14 @@ ROM_START(tokyocop)
 	DISK_IMAGE( "tokyocop", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
 ROM_END
 
+ROM_START(rriders)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
+
+	DISK_REGION( "disks" ) // 250 MB compact flash card
+	DISK_IMAGE( "rriders", 0, SHA1(46e10517ee1b383e03c88cac67a54318c227e3e1) )
+ROM_END
+
 ROM_START(tuningrc)
 	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
 	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )
@@ -102,4 +110,5 @@ ROM_END
 
 
 GAME( 2003, tokyocop,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
+GAME( 2004, rriders,   0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
 GAME( 2005, tuningrc,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )
