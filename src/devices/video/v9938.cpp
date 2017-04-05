@@ -91,6 +91,7 @@ const device_type V9958 = device_creator<v9958_device>;
 v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock)
 :   device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_memory_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
 	m_model(0),
@@ -116,7 +117,6 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_button_state(0),
 	m_vdp_ops_count(0),
 	m_vdp_engine(nullptr),
-	m_palette(*this, "palette"),
 	m_pal_ntsc(0)
 {
 	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
@@ -301,13 +301,13 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 */
 
-PALETTE_INIT_MEMBER(v9938_device, v9938)
+void v9938_device::palette_init()
 {
 	int i;
 
 	// create the full 512 colour palette
 	for (i=0;i<512;i++)
-		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -323,17 +323,16 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 uint16_t v99x8_device::s_pal_indYJK[0x20000];
 
-PALETTE_INIT_MEMBER(v9958_device, v9958)
+void v9958_device::palette_init()
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
 	uint8_t pal[19268*3];
 
 	// init v9938 512-color palette
 	for (i=0;i<512;i++)
-		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 
-
-	if(palette.entries() != 19780)
+	if (entries() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");
 
 	// set up YJK table
@@ -372,7 +371,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette.set_pen_color(i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
+			set_pen_color(i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}
@@ -638,6 +637,8 @@ void v99x8_device::device_start()
 	}
 
 	m_line_timer = timer_alloc(TIMER_LINE);
+
+	palette_init();
 
 	save_item(NAME(m_offset_x));
 	save_item(NAME(m_offset_y));
@@ -1853,7 +1854,6 @@ void v99x8_device::set_mode()
 
 void v99x8_device::refresh_16(int line)
 {
-	const pen_t *pens = m_palette->pens();
 	bool double_lines = false;
 	uint8_t col[256];
 	uint16_t *ln, *ln2 = nullptr;
@@ -1871,15 +1871,15 @@ void v99x8_device::refresh_16(int line)
 
 	if ( !(m_cont_reg[1] & 0x40) || (m_stat_reg[2] & 0x40) )
 	{
-		(this->*s_modes[m_mode].border_16)(pens, ln);
+		(this->*s_modes[m_mode].border_16)(pens(), ln);
 	}
 	else
 	{
-		(this->*s_modes[m_mode].visible_16)(pens, ln, line);
+		(this->*s_modes[m_mode].visible_16)(pens(), ln, line);
 		if (s_modes[m_mode].sprites)
 		{
 			(this->*s_modes[m_mode].sprites)(line, col);
-			(this->*s_modes[m_mode].draw_sprite_16)(pens, ln, col);
+			(this->*s_modes[m_mode].draw_sprite_16)(pens(), ln, col);
 		}
 	}
 
@@ -3049,34 +3049,4 @@ void v99x8_device::update_command()
 		m_vdp_ops_count=13662;
 		if(m_vdp_engine) (this->*m_vdp_engine)();
 	}
-}
-
-static MACHINE_CONFIG_FRAGMENT( v9938 )
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(v9938_device, v9938)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor v9938_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v9938 );
-}
-
-static MACHINE_CONFIG_FRAGMENT( v9958 )
-	MCFG_PALETTE_ADD("palette", 19780)
-	MCFG_PALETTE_INIT_OWNER(v9958_device, v9958)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor v9958_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v9958 );
 }

@@ -37,7 +37,7 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -49,7 +49,7 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
 	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
@@ -73,6 +73,7 @@ extern const device_type V9958;
 
 class v99x8_device :    public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
 protected:
@@ -132,6 +133,8 @@ protected:
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
+
+	virtual void palette_init() = 0;
 
 	void configure_pal_ntsc();
 	void set_screen_parameters();
@@ -263,7 +266,6 @@ private:
 		void (v99x8_device::*draw_sprite_16)(const pen_t *, uint16_t*, uint8_t*);
 	} ;
 	static const v99x8_mode s_modes[];
-	required_device<palette_device> m_palette;
 	emu_timer *m_line_timer;
 	uint8_t m_pal_ntsc;
 	int m_scanline_start;
@@ -280,9 +282,9 @@ class v9938_device : public v99x8_device
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9938);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual int palette_entries() const override { return 512; }
 };
 
 class v9958_device : public v99x8_device
@@ -290,10 +292,9 @@ class v9958_device : public v99x8_device
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9958);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual int palette_entries() const override { return 19780; }
 };
 
 
