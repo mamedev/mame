@@ -83,13 +83,20 @@ static MACHINE_CONFIG_START( gaelcopc, gaelcopc_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
-
 ROM_START(tokyocop)
-	ROM_REGION32_LE(0x20000, "maincpu", 0)  /* motherboard bios */
-	ROM_LOAD("tokyocop.pcbios", 0x000000, 0x10000, NO_DUMP )
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+
+	DISK_REGION( "disks" ) // Maxtor 2F040J0310613 VAM051JJ0
+	DISK_IMAGE( "tokyocop", 0, SHA1(3805e41903719d8ed163f9879db65e71aba2e3e7) )
+ROM_END
+
+ROM_START(tokyocopi)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("tokyocopi.pcbios", 0x000000, 0x80000, NO_DUMP )
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "tokyocop", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
+	DISK_IMAGE( "tokyocopi", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
 ROM_END
 
 ROM_START(rriders)
@@ -109,6 +116,7 @@ ROM_START(tuningrc)
 ROM_END
 
 
-GAME( 2003, tokyocop,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
-GAME( 2004, rriders,   0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
-GAME( 2005, tuningrc,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )
+GAME( 2003, tokyocop,  0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (US, kit version)", MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopi, tokyocop,  gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
+GAME( 2004, rriders,   0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
+GAME( 2005, tuningrc,  0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )
