@@ -33,6 +33,9 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 
 void k037122_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	static const gfx_layout k037122_char_layout =
 	{
 	8, 8,

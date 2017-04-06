@@ -52,6 +52,9 @@ static const gfx_layout layout_16x8x8_2 =
 
 void st0020_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	memory_region* rgn = memregion(tag());
 
 	if (rgn)

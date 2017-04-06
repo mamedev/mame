@@ -118,6 +118,9 @@ void k05324x_device::set_bpp(device_t &device, int bpp)
 
 void k05324x_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	/* decode the graphics */
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
