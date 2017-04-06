@@ -148,24 +148,24 @@ private:
 	void check_int();
 	void register_write(int reg, int data);
 
-	void default_border(const pen_t *pens, uint16_t *ln);
-	void graphic7_border(const pen_t *pens, uint16_t *ln);
-	void graphic5_border(const pen_t *pens, uint16_t *ln);
-	void mode_text1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_text2(const pen_t *pens, uint16_t *ln, int line);
-	void mode_multi(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic23(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic4(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic5(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic6(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic7(const pen_t *pens, uint16_t *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
-	void mode_unknown(const pen_t *pens, uint16_t *ln, int line);
-	void default_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic5_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic7_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
+	void default_border(uint16_t *ln);
+	void graphic7_border(uint16_t *ln);
+	void graphic5_border(uint16_t *ln);
+	void mode_text1(uint16_t *ln, int line);
+	void mode_text2(uint16_t *ln, int line);
+	void mode_multi(uint16_t *ln, int line);
+	void mode_graphic1(uint16_t *ln, int line);
+	void mode_graphic23(uint16_t *ln, int line);
+	void mode_graphic4(uint16_t *ln, int line);
+	void mode_graphic5(uint16_t *ln, int line);
+	void mode_graphic6(uint16_t *ln, int line);
+	void mode_graphic7(uint16_t *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yae(_PixelType *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yjk(_PixelType *ln, int line);
+	void mode_unknown(uint16_t *ln, int line);
+	void default_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic5_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic7_draw_sprite(uint16_t *ln, uint8_t *col);
 
 	void sprite_mode1(int line, uint8_t *col);
 	void sprite_mode2(int line, uint8_t *col);
@@ -260,10 +260,10 @@ private:
 	struct v99x8_mode
 	{
 		uint8_t m;
-		void (v99x8_device::*visible_16)(const pen_t *, uint16_t*, int);
-		void (v99x8_device::*border_16)(const pen_t *, uint16_t*);
+		void (v99x8_device::*visible_16)(uint16_t*, int);
+		void (v99x8_device::*border_16)(uint16_t*);
 		void (v99x8_device::*sprites)(int, uint8_t*);
-		void (v99x8_device::*draw_sprite_16)(const pen_t *, uint16_t*, uint8_t*);
+		void (v99x8_device::*draw_sprite_16)(uint16_t*, uint8_t*);
 	} ;
 	static const v99x8_mode s_modes[];
 	emu_timer *m_line_timer;
