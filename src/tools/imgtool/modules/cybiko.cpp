@@ -65,9 +65,9 @@ static cybiko_file_system *get_cfs(imgtool::image &image)
 
 // 2208988800 is the number of seconds between 1900/01/01 and 1970/01/01
 
-static time_t time_crack( uint32_t cfs_time)
+static imgtool::datetime time_crack( uint32_t cfs_time)
 {
-	return (time_t)(cfs_time - 2208988800UL);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, (time_t)(cfs_time - 2208988800UL));
 }
 
 static uint32_t time_setup( time_t ansi_time)
@@ -389,7 +389,7 @@ static imgtoolerr_t cybiko_image_begin_enum(imgtool::directory &enumeration, con
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtool::image &image(enumeration.image());
 	cybiko_file_system *cfs = get_cfs(image);
@@ -410,7 +410,7 @@ static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgt
 	// get file information
 	if ((file_id != INVALID_FILE_ID) && cfs_file_info(cfs, file_id, &file))
 	{
-		strcpy(ent.filename, file.name);
+		ent.filename = file.name;
 		ent.filesize = file.size;
 		ent.lastmodified_time = time_crack(file.date);
 		ent.filesize = file.size;

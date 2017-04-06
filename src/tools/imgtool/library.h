@@ -19,6 +19,7 @@
 
 #include <time.h>
 #include <list>
+#include <chrono>
 
 #include "corestr.h"
 #include "opresolv.h"
@@ -55,24 +56,80 @@ union filterinfo
 
 typedef void (*filter_getinfoproc)(uint32_t state, union filterinfo *info);
 
-struct imgtool_dirent
+namespace imgtool
 {
-	char filename[1024];
-	char attr[64];
-	uint64_t filesize;
+	class datetime
+	{
+	public:
+		enum datetime_type
+		{
+			NONE,
+			LOCAL,
+			GMT
+		};
 
-	time_t creation_time;
-	time_t lastmodified_time;
-	time_t lastaccess_time;
+		datetime()
+			: m_type(datetime_type::NONE)
+		{
+		}
 
-	char softlink[1024];
-	char comment[256];
+		datetime(datetime_type type, time_t t)
+			: m_type(type)
+			, m_clock(std::chrono::system_clock::from_time_t(t))
+		{
+		}
 
-	/* flags */
-	unsigned int eof : 1;
-	unsigned int corrupt : 1;
-	unsigned int directory : 1;
-	unsigned int hardlink : 1;
+		datetime(datetime_type type, tm *t)
+			: datetime(type, mktime(t))
+		{
+		}
+
+		datetime(const datetime &that) = default;
+		datetime(datetime &&that) = default;
+
+		// accessors
+		datetime_type type() const { return m_type; }
+		bool empty() const { return type() == datetime_type::NONE; }
+		time_t to_time_t() const { return std::chrono::system_clock::to_time_t(m_clock); }
+
+		// operators
+		datetime &operator =(const datetime &that)
+		{
+			m_type = that.m_type;
+			m_clock = that.m_clock;
+			return *this;
+		}
+
+	private:
+		typedef std::chrono::system_clock imgtool_clock;
+
+		datetime_type							m_type;
+		std::chrono::time_point<imgtool_clock>	m_clock;
+	};
+
+	struct dirent
+	{
+		dirent() = default;
+		dirent(const dirent &that) = default;
+		dirent(dirent &&that) = default;
+
+		std::string filename;
+		std::string attr;
+		uint64_t filesize;
+
+		datetime creation_time;
+		datetime lastmodified_time;
+		datetime lastaccess_time;
+
+		std::string softlink;
+		std::string comment;
+
+		// flags
+		bool eof;
+		bool corrupt;
+		bool directory;
+		bool hardlink;
+	};
 };
 
 struct imgtool_chainent
@@ -135,7 +192,7 @@ enum
 union imgtool_attribute
 {
 	int64_t   i;
-	time_t  t;
+	time_t t;
 };
 
 struct imgtool_iconinfo
@@ -283,7 +340,7 @@ union imgtoolinfo
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, uint64_t first_block, uint64_t block_count);
 	void            (*info)             (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
-	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool_dirent &ent);
+	imgtoolerr_t    (*next_enum)        (imgtool::directory &enumeration, imgtool::dirent &ent);
 	void            (*close_enum)       (imgtool::directory &enumeration);
 	imgtoolerr_t    (*open_partition)   (imgtool::partition &partition, uint64_t first_block, uint64_t block_count);
 	imgtoolerr_t    (*free_space)       (imgtool::partition &partition, uint64_t *size);

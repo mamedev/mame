@@ -470,7 +470,7 @@ static imgtoolerr_t datapack_begin_enum(imgtool::directory &enumeration, const c
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtool::image &image(enumeration.image());
 	psion_pack *pack = get_psion_pack(image);
@@ -482,8 +482,8 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_
 		ent.eof = 1;
 		return IMGTOOLERR_SUCCESS;
 	}
-	memcpy(ent.filename, pack->pack_index[iter->index].filename, 8);
-	sprintf(ent.attr, "Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
+	ent.filename = std::string(pack->pack_index[iter->index].filename, 8);
+	ent.attr = util::string_format("Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
 
 	if (pack->pack_index[iter->index].data_rec)
 	{

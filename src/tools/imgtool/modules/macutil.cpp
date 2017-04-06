@@ -12,18 +12,28 @@
 #include "macutil.h"
 
 
-time_t mac_crack_time(uint32_t t)
+imgtool::datetime mac_crack_time(uint32_t t)
 {
-	/* not sure if this is correct... */
-	return t - (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
+	// not sure if this is correct...
+	// NPW 15-Jan-2017 - This is not correct; time_t is not necessarily POSIX time 
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, t - (((1970 - 1904) * 365) + 17) * 24 * 60 * 60);
+}
+
+
+
+uint32_t mac_setup_time(const imgtool::datetime &t)
+{
+	// not sure if this is correct...
+	// NPW 15-Jan-2017 - This is not correct; time_t is not necessarily POSIX time 
+	return t.to_time_t() + (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
 }
 
 
 
 uint32_t mac_setup_time(time_t t)
 {
-	/* not sure if this is correct... */
-	return t + (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
+	imgtool::datetime dt = imgtool::datetime(imgtool::datetime::LOCAL, t);
+	return mac_setup_time(dt);
 }
 
 
@@ -32,7 +42,7 @@ uint32_t mac_time_now(void)
 {
 	time_t now;
 	time(&now);
-	return mac_setup_time(now);
+	return mac_setup_time(imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, now));
 }
 
 

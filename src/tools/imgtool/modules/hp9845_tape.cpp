@@ -237,7 +237,7 @@ public:
 	static void tape_word_to_bytes(tape_word_t w , uint8_t& bh , uint8_t& bl);
 	static void bytes_to_tape_word(uint8_t bh , uint8_t bl , tape_word_t& w);
 
-	static void get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , char *out , bool& qmark);
+	static void get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , std::string& out , bool& qmark);
 	static void split_filename_and_ext(const char *filename , char *fname , char *ext);
 
 private:
@@ -645,12 +645,12 @@ bool tape_image_t::find_file(const char *filename , bool ignore_ext , unsigned& 
 	}
 
 	for (auto i = dir.cbegin(); i < dir.cend(); i++) {
-		char full_fname[ CHARS_PER_FNAME_EXT + 1 ];
+		std::string full_fname;
 		bool qmark;
 
 		get_filename_and_ext(*i, has_ext, full_fname, qmark);
 
-		if (strcmp(fname , full_fname) == 0) {
+		if (full_fname == fname) {
 			idx = i - dir.cbegin();
 			return true;
 		}
@@ -890,7 +890,7 @@ static const char *const filetype_attrs[] = {
 	OPRM_ATTR_STR   // 7
 };
 
-void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , char *out , bool& qmark)
+void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , std::string& out , bool& qmark)
 {
 	strncpy(&out[ 0 ] , (const char*)&ent.filename[ 0 ] , CHARS_PER_FNAME);
 	out[ CHARS_PER_FNAME ] = '\0';
@@ -906,8 +906,8 @@ void tape_image_t::get_filename_and_ext(const dir_entry_t& ent , bool inc_ext , 
 				  (type_low != DATA_FILETYPE && type_hi != 2);
 
 	if (inc_ext) {
-		strcat(out , ".");
-		strcat(out , filetype_str);
+		out += ".";
+		out += filetype_str;
 	}
 }
 
@@ -1095,7 +1095,7 @@ static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory &enumeration, con
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	tape_state_t& state = get_tape_state(enumeration.image());
 	tape_image_t& tape_image = get_tape_image(state);
@@ -1113,7 +1113,7 @@ static imgtoolerr_t hp9845_tape_next_enum (imgtool::directory &enumeration, imgt
 		tape_image_t::get_filename_and_ext(*entry, true, ent.filename, qmark);
 
 		// "filename" and "attr" fields try to look like the output of the "CAT" command
-		snprintf(ent.attr , sizeof(ent.attr) , "%c %02x%c %4u %4u %3u" , entry->protection ? '*' : ' ' , entry->filetype , qmark ? '?' : ' ' , entry->n_recs , entry->wpr * 2 , entry->filepos);
+		ent.attr = util::string_format("%c %02x%c %4u %4u %3u" , entry->protection ? '*' : ' ' , entry->filetype , qmark ? '?' : ' ' , entry->n_recs , entry->wpr * 2 , entry->filepos);
 
 		ent.filesize = entry->n_sects * SECTOR_LEN;
 	}

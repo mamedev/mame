@@ -872,7 +872,7 @@ done:
 
 
 
-static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	struct os9_direnum *os9enum;
 	uint32_t lsn, index;
@@ -951,9 +951,9 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory &enumeration, imgt
 	if (err)
 		return err;
 
-	/* fill out imgtool_dirent structure */
-	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", filename);
-	snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c%c%c%c%c%c%c%c",
+	/* fill out imgtool::dirent structure */
+	ent.filename = filename;
+	ent.attr = util::string_format("%c%c%c%c%c%c%c%c",
 		file_info.directory      ? 'd' : '-',
 		file_info.non_sharable   ? 's' : '-',
 		file_info.public_execute ? 'x' : '-',

@@ -186,7 +186,7 @@ enum creation_policy_t
 
 
 
-static time_t prodos_crack_time(uint32_t prodos_time)
+static imgtool::datetime prodos_crack_time(uint32_t prodos_time)
 {
 	struct tm t;
 	time_t now;
@@ -203,7 +203,7 @@ static time_t prodos_crack_time(uint32_t prodos_time)
 
 	if (t.tm_year <= 49)
 		t.tm_year += 100;
-	return mktime(&t);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, &t);
 }
 
 
@@ -1520,7 +1520,7 @@ static imgtoolerr_t prodos_diskimage_beginenum(imgtool::directory &enumeration, 
 
 
 
-static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
+static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, imgtool::dirent &ent)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(enumeration.image());
@@ -1547,10 +1547,10 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool::directory &enumeration, i
 		return IMGTOOLERR_SUCCESS;
 	}
 
-	strcpy(ent.filename, pd_ent.filename);
-	ent.directory          = is_dir_storagetype(pd_ent.storage_type);
-	ent.creation_time      = prodos_crack_time(pd_ent.creation_time);
-	ent.lastmodified_time  = prodos_crack_time(pd_ent.lastmodified_time);
+	ent.filename			= pd_ent.filename;
+	ent.directory			= is_dir_storagetype(pd_ent.storage_type);
+	ent.creation_time		= prodos_crack_time(pd_ent.creation_time);
+	ent.lastmodified_time	= prodos_crack_time(pd_ent.lastmodified_time);
 
 	if (!ent.directory)
 	{
@@ -2047,10 +2047,10 @@ static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition &partition, con
 				break;
 
 			case IMGTOOLATTR_TIME_CREATED:
-				values[i].t = prodos_crack_time(ent.creation_time);
+				values[i].t = prodos_crack_time(ent.creation_time).to_time_t();
 				break;
 			case IMGTOOLATTR_TIME_LASTMODIFIED:
-				values[i].t = prodos_crack_time(ent.lastmodified_time);
+				values[i].t = prodos_crack_time(ent.lastmodified_time).to_time_t();
 				break;
 		}
 	}
