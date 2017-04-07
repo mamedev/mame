@@ -1222,9 +1222,11 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				zeus_light[1] = convert_float(data[1]);
 				zeus_light[2] = convert_float(data[2]);
 				if (log_fifo)
+				{
 					log_fifo_command(data, numwords, " -- Set static fade\n");
 					logerror("\t\tlight_vector %8.2f %8.2f %8.2f\n",
 						(double)zeus_light[0], (double)zeus_light[1], (double)zeus_light[2]);
+				}
 				break;
 			}
 		// 0x1b: thegrid
