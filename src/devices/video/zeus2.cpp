@@ -292,10 +292,22 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 	switch (offset)
 	{
 		case 0x00:
+			// STATUS0
+			// 0x20 IFIFO Empty
+			// 0x80 IFIFO Full
 			result = 0x20;
 			break;
 
 		case 0x01:
+			// STATUS1
+			// 0x00000004 VBLANK
+			// 0x40000000 Slave Error
+			// 0x80000000 Master Error
+			// 0x00000010 DP_ACTIVE
+			// 0x00000020 TP_ACTIVE
+			// 0x00000040 RP_ACTIVE
+			// 0x00040000 EXPY_ACTIVE0
+			// 0x00080000 EXPY_ACTIVE1
 			/* bit  $000C0070 are tested in a loop until 0 */
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
@@ -309,9 +321,20 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 			result = 0x10451998;
 			break;
 
+		case 0x18:
+			// IFIFO Read Counter
+			result = 0x0;
+			break;
+
+		case 0x19:
+			// MFIFO Read Counter
+			result = 0x0;
+			break;
+
 		case 0x54:
-			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (m_screen->vpos() << 16) | m_screen->vpos();
+			// VCOUNT upper 16 bits
+			//result = (m_screen->vpos() << 16) | m_screen->vpos();
+			result = (m_screen->vpos() << 16);
 			break;
 	}
 
@@ -407,7 +430,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			zeus_fifo_words = 0;
 
 		/* set the interrupt signal to indicate we can handle more */
-		int_timer->adjust(attotime::from_nsec(500));
+		// Not sure how much to time to put here
+		int_timer->adjust(attotime::from_nsec(10000));
 		break;
 
 	case 0x10:
@@ -597,30 +621,75 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				else {
 					m_curUCodeSrc = m_zeusbase[0x41];
 					// Zeus Quad Size
-					switch (m_zeusbase[0x40]) {
-					case 0x38550083: case 0x2D550083: case 0x3885007B:
-						zeus_quad_size = 14;
-						break;
-					case 0x3855006F: case 0x38550088: case 0x388500A9:
-						zeus_quad_size = 12;
-						break;
-					case 0x38550075:
-						if (m_zeusbase[0x41] == 0x00000324)
+					if (m_system == THEGRID) {
+						switch (m_curUCodeSrc) {
+						case 0x000000037:
+							// pm4dl: mfifo quads dynamic light
+							zeus_quad_size = 14;
+							logerror(" pm4dl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000000b3:
+							// pm4sl: mfifo quads static light
 							zeus_quad_size = 12;
-						else
+							logerror(" pm4sl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x00000015d:
+							// pm4nl: mfifo quads no light
 							zeus_quad_size = 10;
-						break;
-					case 0x38850077:
-						zeus_quad_size = 10;
-						break;
-					case 0x388500be:
-						// The Grid direct rendering
-						zeus_quad_size = 512;
-						break;
-					default:
-						logerror(" default quad size 10\n");
-						zeus_quad_size = 10;
-						break;
+							logerror(" pm4nl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000001d5:
+							// pm4nluv: mfifo quads no light (tga and uv variants)
+							zeus_quad_size = 10;
+							logerror(" pm4nluv pm4nl_tga quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000266:
+							// pm3dli: mfifo trimesh dynamic light interpolation
+							zeus_quad_size = 14;
+							logerror(" pm3dli quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000002e9:
+							// px3sl: xfifo trimesh static light
+							zeus_quad_size = 10;
+							logerror(" px3sl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000343:
+							// blit24: The Grid direct rendering
+							// Really should be 128 but this works
+							zeus_quad_size = 512;
+							logerror(" blit24 quad size %d\n", zeus_quad_size);
+							break;
+						default:
+							zeus_quad_size = 10;
+							logerror(" unknown quad size 10\n");
+							break;
+						}
+					}
+					//else if (m_system == CRUSNEXO) {
+
+					//}
+					else {
+						switch (m_zeusbase[0x40]) {
+						case 0x38550083: case 0x2D550083: case 0x3885007B:
+							zeus_quad_size = 14;
+							break;
+						case 0x3855006F: case 0x38550088: case 0x388500A9:
+							zeus_quad_size = 12;
+							break;
+						case 0x38550075:
+							if (m_zeusbase[0x41] == 0x00000324)
+								zeus_quad_size = 12;
+							else
+								zeus_quad_size = 10;
+							break;
+						case 0x38850077:
+							zeus_quad_size = 10;
+							break;
+						default:
+							logerror(" default quad size 10\n");
+							zeus_quad_size = 10;
+							break;
+						}
 					}
 				}
 				if (1 && logit) {
@@ -1150,8 +1219,12 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			if (m_system == THEGRID) {
 				if (numwords < 3)
 					return false;
+				zeus_light[1] = convert_float(data[1]);
+				zeus_light[2] = convert_float(data[2]);
 				if (log_fifo)
-					log_fifo_command(data, numwords, " -- Init light source\n");
+					log_fifo_command(data, numwords, " -- Set static fade\n");
+					logerror("\t\tlight_vector %8.2f %8.2f %8.2f\n",
+						(double)zeus_light[0], (double)zeus_light[1], (double)zeus_light[2]);
 				break;
 			}
 		// 0x1b: thegrid
@@ -1159,12 +1232,12 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x1b:
 			if (numwords < 4)
 				return false;
+			/* extract the translation point from the raw data */
+			zeus_light[0] = convert_float(data[1]);
+			zeus_light[1] = convert_float(data[2]);
+			zeus_light[2] = convert_float(data[3]);
 			if (log_fifo)
 			{
-				/* extract the translation point from the raw data */
-				zeus_light[0] = convert_float(data[1]);
-				zeus_light[1] = convert_float(data[2]);
-				zeus_light[2] = convert_float(data[3]);
 				log_fifo_command(data, numwords, " -- Set light vector\n");
 				logerror("\t\tlight_vector %8.2f %8.2f %8.2f\n",
 					(double)zeus_light[0], (double)zeus_light[1], (double)zeus_light[2]);
@@ -1172,15 +1245,15 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			}
 			break;
 
-		// thegrid ???
+		// thegrid
 		case 0x1d:
 			if (numwords < 2)
 				return false;
+			zeus_light[2] = convert_float(data[1]);
 			if (log_fifo)
 			{
-				log_fifo_command(data, numwords, " -- unknown\n");
-				logerror("\t\tdata %8.5f\n",
-					(double)convert_float(data[1]));
+				log_fifo_command(data, numwords, " -- Set zoffset\n");
+				logerror("\t\tdata %8.5f\n", (double)convert_float(data[1]));
 			}
 			break;
 
@@ -1244,6 +1317,17 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			}
 			break;
 
+			// thegrid
+		case 0xb7:
+			if (numwords < 2)
+				return false;
+			if (log_fifo)
+			{
+				log_fifo_command(data, numwords, " -- Set interp factor\n");
+				logerror("\t\tdata %8.5f\n", (double)convert_float(data[1]));
+			}
+			break;
+
 		default:
 			if (1 || data[0] != 0x2c0)
 			{
@@ -1304,7 +1388,8 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 				{
 					if (cmd != 0x00 || (cmd == 0x00 && curoffs == count)) {
 						logerror("\t");
-						for (int offs = 0; offs < databufcount; offs++)
+						// Limit logging to 16 words
+						for (int offs = 0; offs < databufcount && offs < 16; offs++)
 							logerror("%08X ", databuffer[offs]);
 						logerror("-- ");
 					}
