@@ -22,8 +22,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-constexpr float PALETTE_DEFAULT_SHADOW_FACTOR = 0.6;
-constexpr float PALETTE_DEFAULT_HIGHLIGHT_FACTOR = 1/PALETTE_DEFAULT_SHADOW_FACTOR;
+constexpr float PALETTE_DEFAULT_SHADOW_FACTOR = 0.6f;
+constexpr float PALETTE_DEFAULT_HIGHLIGHT_FACTOR = 1.0f/PALETTE_DEFAULT_SHADOW_FACTOR;
 
 
 //**************************************************************************
