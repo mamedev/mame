@@ -456,13 +456,11 @@ const software_info *device_image_interface::software_entry() const
 
 u8 *device_image_interface::get_software_region(const char *tag)
 {
-	char full_tag[256];
-
 	if (!loaded_through_softlist())
 		return nullptr;
 
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	memory_region *region = device().machine().root_device().memregion(full_tag);
+	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
+	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
 	return region != nullptr ? region->base() : nullptr;
 }
 
@@ -473,11 +471,8 @@ u8 *device_image_interface::get_software_region(const char *tag)
 
 u32 device_image_interface::get_software_region_length(const char *tag)
 {
-	char full_tag[256];
-
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
-
-	memory_region *region = device().machine().root_device().memregion(full_tag);
+	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
+	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
 	return region != nullptr ? region->bytes() : 0;
 }
 
@@ -1149,12 +1144,13 @@ bool device_image_interface::open_image_file(emu_options &options)
 	{
 		const std::string &path = options.image_options()[instance_name()];
 
-		// try loading through softlist
-		if (software_name_parse(path) && load_software(path) == image_init_result::PASS)
-			return false;
-
-		// otherwise just try loading normally; of course we need to use load_internal() and
-		// we ignore the result
+		// Try to load with load_internal()
+		//
+		// Take note that this code path is executed when an image is loaded by a
+		// software list.  Under such circumstances, load_internal() is expected
+		// to fail.  This is by "design"; implementations of get_default_card_software()
+		// typically invoke open_image_file() and if the result is false, branch on a
+		// code path oriented for software lists
 		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
 			return true;
 	}
@@ -1435,8 +1431,8 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		return false;
 	}
 
-	// Is this a software part that forces a reset?  If so, get this loaded through reset_and_load
-	if (is_reset_on_load())
+	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
+	if (is_reset_on_load() && !init_phase())
 	{
 		reset_and_load(identifier);
 		return true;
@@ -1486,12 +1482,13 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 
 std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
-	const char *path = device().mconfig().options().value(instance_name().c_str());
 	std::string result;
-	if (*path != '\0')
+
+	auto iter = device().mconfig().options().image_options().find(instance_name());
+	if (iter != device().mconfig().options().image_options().end() && !iter->second.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(path, true);
+		const software_part *swpart = find_software_item(iter->second, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");
