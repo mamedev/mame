@@ -141,6 +141,7 @@ void zeus2_device::device_reset()
 	m_fill_color = 0;
 	m_fill_depth = 0;
 	m_texmodeReg = 0;
+	zeus_trans[3] = 0.0f;
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -291,10 +292,22 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 	switch (offset)
 	{
 		case 0x00:
+			// STATUS0
+			// 0x20 IFIFO Empty
+			// 0x80 IFIFO Full
 			result = 0x20;
 			break;
 
 		case 0x01:
+			// STATUS1
+			// 0x00000004 VBLANK
+			// 0x40000000 Slave Error
+			// 0x80000000 Master Error
+			// 0x00000010 DP_ACTIVE
+			// 0x00000020 TP_ACTIVE
+			// 0x00000040 RP_ACTIVE
+			// 0x00040000 EXPY_ACTIVE0
+			// 0x00080000 EXPY_ACTIVE1
 			/* bit  $000C0070 are tested in a loop until 0 */
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
@@ -308,9 +321,20 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 			result = 0x10451998;
 			break;
 
+		case 0x18:
+			// IFIFO Read Counter
+			result = 0x0;
+			break;
+
+		case 0x19:
+			// MFIFO Read Counter
+			result = 0x0;
+			break;
+
 		case 0x54:
-			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (m_screen->vpos() << 16) | m_screen->vpos();
+			// VCOUNT upper 16 bits
+			//result = (m_screen->vpos() << 16) | m_screen->vpos();
+			result = (m_screen->vpos() << 16);
 			break;
 	}
 
@@ -406,7 +430,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			zeus_fifo_words = 0;
 
 		/* set the interrupt signal to indicate we can handle more */
-		int_timer->adjust(attotime::from_nsec(500));
+		// Not sure how much to time to put here
+		int_timer->adjust(attotime::from_nsec(10000));
 		break;
 
 	case 0x10:
@@ -596,30 +621,75 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				else {
 					m_curUCodeSrc = m_zeusbase[0x41];
 					// Zeus Quad Size
-					switch (m_zeusbase[0x40]) {
-					case 0x38550083: case 0x2D550083: case 0x3885007B:
-						zeus_quad_size = 14;
-						break;
-					case 0x3855006F: case 0x38550088: case 0x388500A9:
-						zeus_quad_size = 12;
-						break;
-					case 0x38550075:
-						if (m_zeusbase[0x41] == 0x00000324)
+					if (m_system == THEGRID) {
+						switch (m_curUCodeSrc) {
+						case 0x000000037:
+							// pm4dl: mfifo quads dynamic light
+							zeus_quad_size = 14;
+							logerror(" pm4dl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000000b3:
+							// pm4sl: mfifo quads static light
 							zeus_quad_size = 12;
-						else
+							logerror(" pm4sl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x00000015d:
+							// pm4nl: mfifo quads no light
 							zeus_quad_size = 10;
-						break;
-					case 0x38850077:
-						zeus_quad_size = 10;
-						break;
-					case 0x388500be:
-						// The Grid direct rendering
-						zeus_quad_size = 512;
-						break;
-					default:
-						logerror(" default quad size 10\n");
-						zeus_quad_size = 10;
-						break;
+							logerror(" pm4nl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000001d5:
+							// pm4nluv: mfifo quads no light (tga and uv variants)
+							zeus_quad_size = 10;
+							logerror(" pm4nluv pm4nl_tga quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000266:
+							// pm3dli: mfifo trimesh dynamic light interpolation
+							zeus_quad_size = 14;
+							logerror(" pm3dli quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000002e9:
+							// px3sl: xfifo trimesh static light
+							zeus_quad_size = 10;
+							logerror(" px3sl quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000343:
+							// blit24: The Grid direct rendering
+							// Really should be 128 but this works
+							zeus_quad_size = 512;
+							logerror(" blit24 quad size %d\n", zeus_quad_size);
+							break;
+						default:
+							zeus_quad_size = 10;
+							logerror(" unknown quad size 10\n");
+							break;
+						}
+					}
+					//else if (m_system == CRUSNEXO) {
+
+					//}
+					else {
+						switch (m_zeusbase[0x40]) {
+						case 0x38550083: case 0x2D550083: case 0x3885007B:
+							zeus_quad_size = 14;
+							break;
+						case 0x3855006F: case 0x38550088: case 0x388500A9:
+							zeus_quad_size = 12;
+							break;
+						case 0x38550075:
+							if (m_zeusbase[0x41] == 0x00000324)
+								zeus_quad_size = 12;
+							else
+								zeus_quad_size = 10;
+							break;
+						case 0x38850077:
+							zeus_quad_size = 10;
+							break;
+						default:
+							logerror(" default quad size 10\n");
+							zeus_quad_size = 10;
+							break;
+						}
 					}
 				}
 				if (1 && logit) {
@@ -628,10 +698,11 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					int size = m_zeusbase[0x40] & 0xff;
 					logerror("\n Setup size=%d [40]=%08X [41]=%08X [4e]=%08X\n", zeus_quad_size, m_zeusbase[0x40], m_zeusbase[0x41], m_zeusbase[0x4e]);
 					for (int i = 0; i <= size; ++i) {
-						waveData = *wavePtr++;
+						waveData = wavePtr[1];
 						logerror(" %08X", waveData);
-						waveData = *wavePtr++;
-						logerror(" %08X", waveData);
+						waveData = wavePtr[0];
+						logerror("%08X", waveData);
+						wavePtr += 2;
 						//logerror(" %08X", waveData);
 						if (0 && (i + 1) % 16 == 0)
 							logerror("\n");
@@ -1148,8 +1219,14 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			if (m_system == THEGRID) {
 				if (numwords < 3)
 					return false;
+				zeus_light[1] = convert_float(data[1]);
+				zeus_light[2] = convert_float(data[2]);
 				if (log_fifo)
-					log_fifo_command(data, numwords, " -- Init light source\n");
+				{
+					log_fifo_command(data, numwords, " -- Set static fade\n");
+					logerror("\t\tlight_vector %8.2f %8.2f %8.2f\n",
+						(double)zeus_light[0], (double)zeus_light[1], (double)zeus_light[2]);
+				}
 				break;
 			}
 		// 0x1b: thegrid
@@ -1157,12 +1234,12 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x1b:
 			if (numwords < 4)
 				return false;
+			/* extract the translation point from the raw data */
+			zeus_light[0] = convert_float(data[1]);
+			zeus_light[1] = convert_float(data[2]);
+			zeus_light[2] = convert_float(data[3]);
 			if (log_fifo)
 			{
-				/* extract the translation point from the raw data */
-				zeus_light[0] = convert_float(data[1]);
-				zeus_light[1] = convert_float(data[2]);
-				zeus_light[2] = convert_float(data[3]);
 				log_fifo_command(data, numwords, " -- Set light vector\n");
 				logerror("\t\tlight_vector %8.2f %8.2f %8.2f\n",
 					(double)zeus_light[0], (double)zeus_light[1], (double)zeus_light[2]);
@@ -1170,15 +1247,15 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			}
 			break;
 
-		// thegrid ???
+		// thegrid
 		case 0x1d:
 			if (numwords < 2)
 				return false;
+			zeus_light[2] = convert_float(data[1]);
 			if (log_fifo)
 			{
-				log_fifo_command(data, numwords, " -- unknown\n");
-				logerror("\t\tdata %8.5f\n",
-					(double)convert_float(data[1]));
+				log_fifo_command(data, numwords, " -- Set zoffset\n");
+				logerror("\t\tdata %8.5f\n", (double)convert_float(data[1]));
 			}
 			break;
 
@@ -1215,7 +1292,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x32:
 			poly->wait("REND_WAIT");
 			if (log_fifo)
-				log_fifo_command(data, numwords, " sync? \n");
+				log_fifo_command(data, numwords, " wait for renderer idle \n");
 			break;
 
 		/* 0x38: direct render quad (crusnexo) */
@@ -1239,6 +1316,17 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				//print_fifo_command(data, numwords, "\n");
 				if (log_fifo)
 					log_fifo_command(data, numwords, "\n");
+			}
+			break;
+
+			// thegrid
+		case 0xb7:
+			if (numwords < 2)
+				return false;
+			if (log_fifo)
+			{
+				log_fifo_command(data, numwords, " -- Set interp factor\n");
+				logerror("\t\tdata %8.5f\n", (double)convert_float(data[1]));
 			}
 			break;
 
@@ -1302,7 +1390,8 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 				{
 					if (cmd != 0x00 || (cmd == 0x00 && curoffs == count)) {
 						logerror("\t");
-						for (int offs = 0; offs < databufcount; offs++)
+						// Limit logging to 16 words
+						for (int offs = 0; offs < databufcount && offs < 16; offs++)
 							logerror("%08X ", databuffer[offs]);
 						logerror("-- ");
 					}
@@ -1317,16 +1406,13 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 					case 0x21:  /* thegrid */
 					case 0x22:  /* crusnexo */
 					{
-						int regSel = (databuffer[0] >> 16) & 0xff;
-						if ((regSel >= 0x98) && (regSel <= 0x9b))
-						{
-							texdata = databuffer[1];
-							m_texmodeReg = regSel;
-							if (logit)
-								logerror("texdata @%02X\n", regSel);
-						}
-						else if (logit)
-							logerror("unknown offset %08X %08X\n", databuffer[0], databuffer[1]);
+						// Sets 0x68 (uv float offset) and texture line and mode
+						// In reality this sets internal registers that are used in the
+						// zeus2 microcode to set these registers
+						m_zeusbase[0x68] = (databuffer[0] >> 16) & 0xff;
+						texdata = databuffer[1];
+						if (logit)
+								logerror("(0x68)uvFloat=%02X\n", m_zeusbase[0x68]);
 					}
 						break;
 
@@ -1478,26 +1564,26 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[0].x = (int16_t)databuffer[2];
 		vert[0].y = (int16_t)databuffer[3];
 		vert[0].p[0] = (int16_t)databuffer[6];
-		vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
-		vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
+		vert[0].p[1] = (databuffer[1] >> 0) & 0x3ff;
+		vert[0].p[2] = (databuffer[1] >> 16) & 0x3ff;
 
 		vert[1].x = (int16_t)(databuffer[2] >> 16);
 		vert[1].y = (int16_t)(databuffer[3] >> 16);
 		vert[1].p[0] = (int16_t)(databuffer[6] >> 16);
-		vert[1].p[1] = (databuffer[4] >> 2) & 0xff;
-		vert[1].p[2] = (databuffer[4] >> 12) & 0xff;
+		vert[1].p[1] = (databuffer[4] >> 0) & 0x3ff;
+		vert[1].p[2] = (databuffer[4] >> 10) & 0x3ff;
 
 		vert[2].x = (int16_t)databuffer[8];
 		vert[2].y = (int16_t)databuffer[9];
 		vert[2].p[0] = (int16_t)databuffer[7];
-		vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
-		vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
+		vert[2].p[1] = (databuffer[4] >> 20) & 0x3ff;
+		vert[2].p[2] = (databuffer[5] >> 0) & 0x3ff;
 
 		vert[3].x = (int16_t)(databuffer[8] >> 16);
 		vert[3].y = (int16_t)(databuffer[9] >> 16);
 		vert[3].p[0] = (int16_t)(databuffer[7] >> 16);
-		vert[3].p[1] = (databuffer[5] >> 12) & 0xff;
-		vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
+		vert[3].p[1] = (databuffer[5] >> 10) & 0x3ff;
+		vert[3].p[2] = (databuffer[5] >> 20) & 0x3ff;
 	}
 	int unknown[8];
 	float unknownFloat[4];
@@ -1522,7 +1608,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
 	float fScale = pow(2.0f, intScale);
-
+	int intUVScale = m_state->m_zeusbase[0x68] - 0x9d;
+	float uvScale = pow(2.0f, intUVScale);
 	for (i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
@@ -1551,6 +1638,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].p[0] = 0.0f;
 
 		//vert[i].p[1] += ((texdata >> 8) & 0x1) ? 1.0f : 0.0f;
+		vert[i].p[1] *= uvScale;
+		vert[i].p[2] *= uvScale;
 		vert[i].p[2] += (texdata >> 16);
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
@@ -1638,7 +1727,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
 	extra.zbufmin = m_state->m_zbufmin;
-	extra.transcolor = 0; // (texmode & 0x100) ? 0 : 0x100;
+	extra.transcolor = (texmode & 0x100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
@@ -1904,7 +1993,7 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 		//infoStream << "pal=0x" << std::setw(4) << std::setfill('0') << (m_curPalTableSrc >> 16) << ", 0x" << std::setw(4) << (m_curPalTableSrc & 0xffff) << " ";
 		infoStream << "pal=0x" << std::setw(8) << std::setfill('0') << m_curPalTableSrc << " ";
 		infoStream << "texdata=" << std::setw(8) << std::hex << texmode << " ";
-		infoStream << "texReg=" << std::setw(2) << std::hex << m_texmodeReg << " ";
+		infoStream << "68(uvFloat)=" << std::setw(2) << std::hex << m_zeusbase[0x68] << " ";
 		infoStream << "(6c)=" << m_zeusbase[0x6c] << " ";
 		infoStream << "(63)=" << std::setw(6) << std::dec << reinterpret_cast<float&>(m_zeusbase[0x63]) << " ";
 		//infoStream << "zObj=" << std::setw(6) << std::dec << zObj << " ";

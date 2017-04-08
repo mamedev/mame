@@ -215,7 +215,7 @@ void bfm_adder2_device::device_reset()
 
 void bfm_adder2_device::device_start()
 {
-	if (!palette().started())
+	if (!palette().device().started())
 		throw device_missing_dependencies();
 
 	adder2_decode_char_roms();

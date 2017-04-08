@@ -558,7 +558,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_xscale(1.0f),
 		m_yscale(1.0f),
 		m_screen_vblank(*this),
-		m_palette(*this, finder_base::DUMMY_TAG),
+		m_palette(nullptr),
+		m_palette_tag(nullptr),
 		m_video_attributes(0),
 		m_svg_region(nullptr),
 		m_container(nullptr),
@@ -727,7 +728,7 @@ void screen_device::static_set_screen_update(device_t &device, screen_update_rgb
 
 void screen_device::static_set_palette(device_t &device, const char *tag)
 {
-	downcast<screen_device &>(device).m_palette.set_tag(tag);
+	downcast<screen_device &>(device).m_palette_tag = tag;
 }
 
 
@@ -785,10 +786,23 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_palette == nullptr && texformat == TEXFORMAT_PALETTE16)
+	if (m_palette_tag != nullptr)
+	{
+		if (texformat == TEXFORMAT_RGB32)
+			osd_printf_warning("Screen does not need palette defined\n");
+
+		device_t *paldev = owner()->subdevice(m_palette_tag);
+		if (paldev == nullptr)
+			osd_printf_error("Nonexistent device '%s' specified as palette\n", m_palette_tag);
+		else
+		{
+			device_palette_interface *palintf;
+			if (!paldev->interface(palintf))
+				osd_printf_error("Device '%s' specified as palette, but it has no palette interface\n", m_palette_tag);
+		}
+	}
+	else if (texformat == TEXFORMAT_PALETTE16)
 		osd_printf_error("Screen does not have palette defined\n");
-	if (m_palette != nullptr && texformat == TEXFORMAT_RGB32)
-		osd_printf_warning("Screen does not need palette defined\n");
 }
 
 
@@ -821,7 +835,8 @@ void screen_device::device_start()
 	m_screen_vblank.resolve_safe();
 
 	// if we have a palette and it's not started, wait for it
-	if (m_palette != nullptr && !m_palette->started())
+	resolve_palette();
+	if (m_palette != nullptr && !m_palette->device().started())
 		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
@@ -1466,6 +1481,28 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 	bitmap.allocate(width(), height());
 	if (m_palette != nullptr)
 		bitmap.set_palette(m_palette->palette());
+}
+
+
+//-------------------------------------------------
+//  resolve_palette - find the specified palette
+//-------------------------------------------------
+
+void screen_device::resolve_palette()
+{
+	if (m_palette_tag != nullptr && m_palette == nullptr)
+	{
+		// find our palette as a sibling device
+		device_t *palette = owner()->subdevice(m_palette_tag);
+		if (palette == nullptr)
+			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
+									tag(),
+									m_palette_tag);
+		if (!palette->interface(m_palette))
+			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
+									tag(),
+									m_palette_tag);
+	}
 }
 
 

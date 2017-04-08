@@ -37,6 +37,9 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 
 void k001604_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	static const gfx_layout k001604_char_layout_layer_8x8 =
 	{
 		8, 8,

@@ -273,7 +273,7 @@ void setup_t::register_frontier(const pstring &attach, const double r_IN, const 
 
 void setup_t::register_param(const pstring &param, const double value)
 {
-	register_param(param, plib::pfmt("{1}").e(value,".9"));
+	register_param(param, plib::pfmt("{1:.9}").e(value));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -820,7 +820,7 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 	if (!remainder.endsWith(")"))
 		log().fatal(MF_1_MODEL_ERROR_1, model);
 	// FIMXE: Not optimal
-	remainder = remainder.left(remainder.len() - 1);
+	remainder = remainder.left(remainder.length() - 1);
 
 	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
@@ -852,7 +852,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.len() - 1));
+	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.length() - 1));
 	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
@@ -868,7 +868,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = tmp.left(tmp.len() - 1);
+		tmp = tmp.left(tmp.length() - 1);
 	return tmp.as_double() * factor;
 }
 
@@ -997,12 +997,12 @@ bool source_t::parse(const pstring &name)
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)

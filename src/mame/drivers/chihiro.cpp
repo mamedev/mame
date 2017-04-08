@@ -1592,8 +1592,8 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 		break;
 	case 0x0101:
 		// third word fourth word
-		word_write_le(read_buffer + 4, 0xca); // ?
-		word_write_le(read_buffer + 6, 0xcb); // ?
+		word_write_le(read_buffer + 4, 0x1234); // dimm board firmware version (1234 -> 12.34)
+		word_write_le(read_buffer + 6, 0x4567); // ?
 		break;
 	case 0x0102:
 		// second dword
@@ -1601,8 +1601,10 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 		break;
 	case 0x0103:
 		// dwords 1 3 4
-		memcpy(read_buffer + 4, "-abc-abc12345678", 16); // ?
+		memcpy(read_buffer + 4, "-abc-abc12345678", 16); // dimm board serial number
 		break;
+	default:
+		logerror("Unknown baseboard sector command %04X\n", c);
 	}
 	// clear
 	write_buffer[0] = write_buffer[1] = write_buffer[2] = write_buffer[3] = 0;

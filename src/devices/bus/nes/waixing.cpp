@@ -142,7 +142,7 @@ nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, co
 }
 
 nes_waixing_sgzlz_device::nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, "NES Cart Waixing San Guo Zhong Lie Zhuan PCB", tag, owner, clock, "nes_waixing_sgzlz", __FILE__), m_latch(0)
+					: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, "NES Cart Waixing San Guo Zhong Lie Zhuan PCB", tag, owner, clock, "nes_waixing_sgzlz", __FILE__), m_reg{}
 				{
 }
 
@@ -183,7 +183,7 @@ void nes_waixing_a_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 }
 
 void nes_waixing_f_device::pcb_reset()
@@ -191,7 +191,7 @@ void nes_waixing_f_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 	m_mmc_prg_bank[0] = 0x00;
 	m_mmc_prg_bank[1] = 0x01;
 	m_mmc_prg_bank[2] = 0x4e;
@@ -204,7 +204,7 @@ void nes_waixing_g_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
-	memset(mapper_ram, 0, sizeof(mapper_ram));
+	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 	m_mmc_prg_bank[0] = 0x00;
 	m_mmc_prg_bank[1] = 0x01;
 	m_mmc_prg_bank[2] = 0x3e;
@@ -289,13 +289,13 @@ void nes_waixing_sgz_device::pcb_reset()
 	m_irq_count = 0;
 	m_irq_count_latch = 0;
 
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
+	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
 }
 
 void nes_waixing_sgzlz_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
 }
 
 void nes_waixing_sgzlz_device::pcb_reset()
@@ -304,7 +304,7 @@ void nes_waixing_sgzlz_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 
-	m_latch = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 void nes_waixing_ffv_device::device_start()
@@ -372,7 +372,7 @@ void nes_waixing_fs304_device::pcb_reset()
 	prg32(0);
 	chr8(0, m_chr_source);
 
-	memset(m_reg, 0x00, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 
@@ -1035,30 +1035,69 @@ WRITE8_MEMBER(nes_waixing_sgz_device::write_h)
  Waixing San Guo Zhong Lie Zhuan Board
 
  Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing
- Ji Zheng Ba
+ Ji Zheng Ba, Chong Wu Da Jia Zu Bu Luo Fen Zheng
 
  iNES: mapper 178
 
  In MESS: Supported.
+ 
+ Implementations wildly vary between emulators, but
+ Cah4e3's implementation boots up both the games and
+ the educational carts that assumedly use this board.
+
+ TODO: Is this even correct compared to real hardware?
 
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_waixing_sgzlz_device::write_l)
 {
 	LOG_MMC(("waixing_sgzlz write_l, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset)
+	if (offset >= 0x700 && offset <= 0xEFF)
 	{
-		case 0x700:
-			set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x701:
-			m_latch = (m_latch & 0x0c) | ((data >> 1) & 0x03);
-			prg32(m_latch);
-			break;
-		case 0x702:
-			m_latch = (m_latch & 0x03) | ((data << 2) & 0x0c);
-			break;
+		m_reg[offset & 0x03] = data;
+		const uint8_t hbank = m_reg[1] & 0x7;
+		const uint8_t lbank = m_reg[2];
+		const uint8_t bank = (lbank << 3) | hbank;
+
+		// NESDev docs do it like this:
+		// case 0x700:
+		//  set_nt_mirroring(data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		// case 0x701:
+		//  reg1 = (value >> 1);
+		//  bank = reg1 + (reg2 << 2);
+		//  prg32(bank);
+		//  break;
+		// case 0x702:
+		//  reg2 = value;
+		//  break;
+
+		if (BIT(m_reg[0], 1))
+		{
+			// UNROM-ish mode
+			prg16_89ab(bank);
+			if (BIT(m_reg[0], 3))
+			{
+				prg16_cdef((lbank << 3) | 6 | BIT(m_reg[1], 0));
+			}
+			else
+			{
+				prg16_cdef((lbank << 3) | 7);
+			}
+		}
+		else
+		{	// NROM mode
+			if (BIT(m_reg[0], 3))
+			{
+				prg16_89ab(bank);
+				prg16_cdef(bank);
+			}
+			else
+			{
+				prg32(bank >> 1);
+			}
+		}
+
+		set_nt_mirroring(BIT(m_reg[0], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 }
 

@@ -219,7 +219,7 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
  *
  */
 
-void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device &palette,
+void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, device_palette_interface &palette,
 							const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck )
 {
 	//  gfx_element *gfx = gfxs[chip];

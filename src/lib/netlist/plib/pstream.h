@@ -157,7 +157,7 @@ protected:
 		m_buf += pstring(static_cast<const pstring::mem_t *>(buf), n, pstring::UTF8);
 	}
 	virtual void vseek(const pos_type n) override { }
-	virtual pos_type vtell() override { return m_buf.len(); }
+	virtual pos_type vtell() override { return m_buf.mem_t_size(); }
 
 private:
 	pstring m_buf;
@@ -284,7 +284,7 @@ private:
 class pistringstream : public pimemstream
 {
 public:
-	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
+	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.mem_t_size()), m_str(str) { }
 	virtual ~pistringstream() override;
 
 private:
@@ -348,7 +348,7 @@ public:
 
 	void write(const pstring &text) const
 	{
-		m_strm.write(text.c_str(), text.size());
+		m_strm.write(text.c_str(), text.mem_t_size());
 	}
 
 	void write(const pstring::code_t c) const
@@ -391,8 +391,8 @@ public:
 
 	void write(const pstring &s)
 	{
-		write(s.size());
-		m_strm.write(s.c_str(), s.size());
+		write(s.mem_t_size());
+		m_strm.write(s.c_str(), s.mem_t_size());
 	}
 
 	template <typename T>
