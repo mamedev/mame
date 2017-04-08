@@ -147,13 +147,13 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 int image_manager::write_config(emu_options &options, const char *filename, const game_driver *gamedrv)
 {
-	char buffer[128];
+	std::string buffer;
 	int retval = 1;
 
 	if (gamedrv != nullptr)
 	{
-		sprintf(buffer, "%s.ini", gamedrv->name);
-		filename = buffer;
+		buffer = util::string_format("%s.ini", gamedrv->name);
+		filename = buffer.c_str();
 	}
 
 	emu_file file(options.ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
