@@ -171,7 +171,7 @@ public:
 protected:
 	optional_memory_region m_bios_rom;
 	required_ioport m_io_p1;
-	required_ioport m_io_p2;
+	optional_ioport m_io_p2;
 
 	memory_region *m_cart_rom;
 
