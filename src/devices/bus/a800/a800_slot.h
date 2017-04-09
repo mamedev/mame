@@ -100,7 +100,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(uint8_t *header);
+	int identify_cart_type(const uint8_t *header) const;
 	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }

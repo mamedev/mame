@@ -296,7 +296,7 @@ void a800_cart_slot_device::call_unload()
  fullpath
  -------------------------------------------------*/
 
-int a800_cart_slot_device::identify_cart_type(uint8_t *header)
+int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 {
 	int type = A800_8K;
 

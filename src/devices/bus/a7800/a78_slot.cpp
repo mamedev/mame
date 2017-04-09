@@ -143,7 +143,7 @@ void a78_cart_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-int a78_cart_slot_device::validate_header(int head, bool log)
+int a78_cart_slot_device::validate_header(int head, bool log) const
 {
 	switch (head & 0x3d)
 	{
