@@ -111,7 +111,7 @@ DRIVER_INIT_MEMBER(mt6k_state,at)
 }
 
 static MACHINE_CONFIG_START( at486, mt6k_state )
-	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
+	MCFG_CPU_ADD("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
