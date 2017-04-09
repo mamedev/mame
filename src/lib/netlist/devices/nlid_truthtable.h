@@ -160,7 +160,7 @@ namespace netlist
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
 						m_I[i].activate();
-						nstate |= (m_I[i]() << i);
+						nstate |= (m_I[i]() ? (1 << i) : 0);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
@@ -168,7 +168,7 @@ namespace netlist
 					{
 						if ((ign & 1))
 							m_I[i].activate();
-						nstate |= (m_I[i]() << i);
+						nstate |= (m_I[i]() ? (1 << i) : 0);
 						ign >>= 1;
 					}
 			}
@@ -177,12 +177,12 @@ namespace netlist
 				if (!doOUT)
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
-						nstate |= (m_I[i]() << i);
+						nstate |= (m_I[i]() ? (1 << i) : 0);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
 					for (std::size_t i = 0; i < m_NI; i++)
-						nstate |= (m_I[i]() << i);
+						nstate |= (m_I[i]() ? (1 << i) : 0);
 			}
 
 			const type_t outstate(m_ttp.m_outs[nstate]);
