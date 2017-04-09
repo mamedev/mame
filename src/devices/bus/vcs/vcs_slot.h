@@ -97,7 +97,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(uint8_t *ROM, uint32_t len);
+	static int identify_cart_type(const uint8_t *ROM, uint32_t len);
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -121,21 +121,21 @@ private:
 	device_vcs_cart_interface*       m_cart;
 	int m_type;
 
-	int detect_snowhite(uint8_t *cart, uint32_t len);
-	int detect_modeDC(uint8_t *cart, uint32_t len);
-	int detect_modeF6(uint8_t *cart, uint32_t len);
-	int detect_mode3E(uint8_t *cart, uint32_t len);
-	int detect_modeSS(uint8_t *cart, uint32_t len);
-	int detect_modeFE(uint8_t *cart, uint32_t len);
-	int detect_modeE0(uint8_t *cart, uint32_t len);
-	int detect_modeCV(uint8_t *cart, uint32_t len);
-	int detect_modeFV(uint8_t *cart, uint32_t len);
-	int detect_modeJVP(uint8_t *cart, uint32_t len);
-	int detect_modeE7(uint8_t *cart, uint32_t len);
-	int detect_modeUA(uint8_t *cart, uint32_t len);
-	int detect_8K_mode3F(uint8_t *cart, uint32_t len);
-	int detect_32K_mode3F(uint8_t *cart, uint32_t len);
-	int detect_super_chip(uint8_t *cart, uint32_t len);
+	static bool detect_snowhite(const uint8_t *cart, uint32_t len);
+	static bool detect_modeDC(const uint8_t *cart, uint32_t len);
+	static bool detect_modeF6(const uint8_t *cart, uint32_t len);
+	static bool detect_mode3E(const uint8_t *cart, uint32_t len);
+	static bool detect_modeSS(const uint8_t *cart, uint32_t len);
+	static bool detect_modeFE(const uint8_t *cart, uint32_t len);
+	static bool detect_modeE0(const uint8_t *cart, uint32_t len);
+	static bool detect_modeCV(const uint8_t *cart, uint32_t len);
+	static bool detect_modeFV(const uint8_t *cart, uint32_t len);
+	static bool detect_modeJVP(const uint8_t *cart, uint32_t len);
+	static bool detect_modeE7(const uint8_t *cart, uint32_t len);
+	static bool detect_modeUA(const uint8_t *cart, uint32_t len);
+	static bool detect_8K_mode3F(const uint8_t *cart, uint32_t len);
+	static bool detect_32K_mode3F(const uint8_t *cart, uint32_t len);
+	static bool detect_super_chip(const uint8_t *cart, uint32_t len);
 };
 
 

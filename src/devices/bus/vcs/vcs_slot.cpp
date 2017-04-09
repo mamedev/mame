@@ -319,7 +319,7 @@ void vcs_cart_slot_device::call_unload()
   detection helper routines
  -------------------------------------------------*/
 
-int vcs_cart_slot_device::detect_modeDC(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeDC(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
@@ -340,7 +340,7 @@ int vcs_cart_slot_device::detect_modeDC(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeF6(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeF6(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
@@ -360,7 +360,7 @@ int vcs_cart_slot_device::detect_modeF6(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_snowhite(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_snowhite(const uint8_t *cart, uint32_t len)
 {
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
@@ -369,7 +369,7 @@ int vcs_cart_slot_device::detect_snowhite(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_mode3E(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_mode3E(const uint8_t *cart, uint32_t len)
 {
 	// this one is a little hacky... looks for STY $3e, which is unique to
 	// 'not boulderdash', but is the only example I have (cow)
@@ -392,7 +392,7 @@ int vcs_cart_slot_device::detect_mode3E(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeSS(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeSS(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
@@ -412,7 +412,7 @@ int vcs_cart_slot_device::detect_modeSS(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeFE(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeFE(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][5] =  {
@@ -440,7 +440,7 @@ int vcs_cart_slot_device::detect_modeFE(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeE0(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeE0(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][3] =  {
@@ -470,7 +470,7 @@ int vcs_cart_slot_device::detect_modeE0(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeCV(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeCV(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][3] = {
@@ -496,7 +496,7 @@ int vcs_cart_slot_device::detect_modeCV(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeFV(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeFV(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][3] = { { 0x2c, 0xd0, 0xff } };
@@ -519,7 +519,7 @@ int vcs_cart_slot_device::detect_modeFV(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeJVP(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeJVP(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][4] = {
@@ -545,7 +545,7 @@ int vcs_cart_slot_device::detect_modeJVP(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeE7(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeE7(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signatures[][3] = {
@@ -571,7 +571,7 @@ int vcs_cart_slot_device::detect_modeE7(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_modeUA(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_modeUA(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
@@ -591,7 +591,7 @@ int vcs_cart_slot_device::detect_modeUA(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_8K_mode3F(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_8K_mode3F(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
@@ -617,7 +617,7 @@ int vcs_cart_slot_device::detect_8K_mode3F(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_32K_mode3F(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_32K_mode3F(const uint8_t *cart, uint32_t len)
 {
 	int numfound = 0;
 	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
@@ -637,7 +637,7 @@ int vcs_cart_slot_device::detect_32K_mode3F(uint8_t *cart, uint32_t len)
 	return 0;
 }
 
-int vcs_cart_slot_device::detect_super_chip(uint8_t *cart, uint32_t len)
+bool vcs_cart_slot_device::detect_super_chip(const uint8_t *cart, uint32_t len)
 {
 	static const unsigned char signatures[][5] = {
 									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
@@ -679,7 +679,7 @@ int vcs_cart_slot_device::detect_super_chip(uint8_t *cart, uint32_t len)
  -------------------------------------------------*/
 
 // 4in1 & 8in1 are not currently detected from fullpath...
-int vcs_cart_slot_device::identify_cart_type(uint8_t *ROM, uint32_t len)
+int vcs_cart_slot_device::identify_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = 0xff;
 

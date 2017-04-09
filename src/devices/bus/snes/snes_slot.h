@@ -163,8 +163,8 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	void get_cart_type_addon(uint8_t *ROM, uint32_t len, int &type, int &addon);
-	uint32_t snes_skip_header(uint8_t *ROM, uint32_t snes_rom_size);
+	void get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const;
+	uint32_t snes_skip_header(const uint8_t *ROM, uint32_t snes_rom_size) const;
 	int get_type() { return m_type; }
 
 	void setup_nvram();

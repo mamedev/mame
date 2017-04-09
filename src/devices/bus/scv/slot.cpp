@@ -203,7 +203,7 @@ image_init_result scv_cart_slot_device::call_load()
  fullpath
  -------------------------------------------------*/
 
-int scv_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int scv_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = SCV_8K;
 
