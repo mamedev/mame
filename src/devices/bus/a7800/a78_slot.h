@@ -131,7 +131,7 @@ private:
 	int m_type;
 
 	image_verify_result verify_header(char *header);
-	int validate_header(int head, bool log);
+	int validate_header(int head, bool log) const;
 	void internal_header_logging(uint8_t *header, uint32_t len);
 };
 
