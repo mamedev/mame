@@ -68,7 +68,7 @@ protected:
 	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
 
-	int get_cart_type(uint8_t *rom, uint32_t length);
+	static int get_cart_type(const uint8_t *rom, uint32_t length);
 };
 
 

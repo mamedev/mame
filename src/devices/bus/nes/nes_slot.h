@@ -367,8 +367,8 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
 	const char * get_default_card_ines(uint8_t *ROM, uint32_t len);
-	const char * get_default_card_unif(uint8_t *ROM, uint32_t len);
-	const char * nes_get_slot(int pcb_id);
+	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
+	static const char * nes_get_slot(int pcb_id);
 	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing

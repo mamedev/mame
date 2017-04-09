@@ -671,7 +671,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 
 
-int base_md_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = SEGA_STD;
 

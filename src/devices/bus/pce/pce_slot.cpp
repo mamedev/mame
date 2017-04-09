@@ -287,7 +287,7 @@ void pce_cart_slot_device::call_unload()
  fullpath
  -------------------------------------------------*/
 
-int pce_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int pce_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = PCE_STD;
 

@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(msx_slot_cartridge_device::irq_out)
 }
 
 
-int msx_slot_cartridge_device::get_cart_type(uint8_t *rom, uint32_t length)
+int msx_slot_cartridge_device::get_cart_type(const uint8_t *rom, uint32_t length)
 {
 	if (length < 0x2000)
 	{

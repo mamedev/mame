@@ -170,7 +170,7 @@ public:
 
 	image_init_result load_list();
 	image_init_result load_nonlist();
-	int get_cart_type(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	void setup_custom_mappers();
 	void setup_nvram();
