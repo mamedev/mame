@@ -197,7 +197,7 @@ static INPUT_PORTS_START( powerbal )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) /* Manual shows this as "Weapon"  Off for Yes and On for No - Meaning is unknown */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )

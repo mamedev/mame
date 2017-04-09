@@ -1292,22 +1292,7 @@ void sb8_device::device_start()
 		m_isa->install_device(0x0228, 0x0229, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
-	m_timer = timer_alloc(0, nullptr);
-
-	save_item(NAME(m_dack_out));
-	save_item(NAME(m_onebyte_midi));
-	save_item(NAME(m_uart_midi));
-	save_item(NAME(m_uart_irq));
-	save_item(NAME(m_mpu_midi));
-	save_item(NAME(m_rx_waiting));
-	save_item(NAME(m_tx_waiting));
-	save_item(NAME(m_recvring));
-	save_item(NAME(m_xmitring));
-	save_item(NAME(m_xmit_read));
-	save_item(NAME(m_xmit_write));
-	save_item(NAME(m_recv_read));
-	save_item(NAME(m_recv_write));
-	save_item(NAME(m_tx_busy));
+	sb_device::device_start();
 }
 
 void isa8_sblaster1_0_device::device_start()
@@ -1333,19 +1318,16 @@ void isa8_sblaster1_5_device::device_start()
 void sb16_device::device_start()
 {
 	ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
-
 	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
 	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
 	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
+	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
 	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-
-	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));
@@ -1363,6 +1345,8 @@ void sb16_device::device_start()
 	save_item(NAME(m_mixer.agc));
 	save_item(NAME(m_mixer.treble));
 	save_item(NAME(m_mixer.bass));
+
+	sb_device::device_start();
 }
 
 void isa16_sblaster16_device::device_start()
@@ -1372,6 +1356,59 @@ void isa16_sblaster16_device::device_start()
 	m_isa->set_dma_channel(5, this, false);
 	m_dsp.version = 0x0405; // diagnose.exe rejects anything lower than 0x0402
 	sb16_device::device_start();
+}
+
+void sb_device::device_start()
+{
+	m_timer = timer_alloc(0, nullptr);
+
+	save_item(NAME(m_dack_out));
+	save_item(NAME(m_onebyte_midi));
+	save_item(NAME(m_uart_midi));
+	save_item(NAME(m_uart_irq));
+	save_item(NAME(m_mpu_midi));
+	save_item(NAME(m_rx_waiting));
+	save_item(NAME(m_tx_waiting));
+	save_item(NAME(m_recvring));
+	save_item(NAME(m_xmitring));
+	save_item(NAME(m_xmit_read));
+	save_item(NAME(m_xmit_write));
+	save_item(NAME(m_recv_read));
+	save_item(NAME(m_recv_write));
+	save_item(NAME(m_tx_busy));
+
+	save_item(NAME(m_dsp.reset_latch));
+	save_item(NAME(m_dsp.rbuf_status));
+	save_item(NAME(m_dsp.wbuf_status));
+	save_item(NAME(m_dsp.fifo));
+	save_item(NAME(m_dsp.fifo_ptr));
+	save_item(NAME(m_dsp.fifo_r));
+	save_item(NAME(m_dsp.fifo_r_ptr));
+
+	save_item(NAME(m_dsp.test_reg));
+	save_item(NAME(m_dsp.speaker_on));
+	save_item(NAME(m_dsp.dma_no_irq));
+	save_item(NAME(m_dsp.prot_count));
+	save_item(NAME(m_dsp.prot_value));
+	save_item(NAME(m_dsp.frequency));
+	save_item(NAME(m_dsp.adc_freq));
+	save_item(NAME(m_dsp.dma_length));
+	save_item(NAME(m_dsp.dma_transferred));
+	save_item(NAME(m_dsp.adc_length));
+	save_item(NAME(m_dsp.adc_transferred));
+	save_item(NAME(m_dsp.dma_autoinit));
+	save_item(NAME(m_dsp.data));
+	save_item(NAME(m_dsp.d_wptr));
+	save_item(NAME(m_dsp.d_rptr));
+	save_item(NAME(m_dsp.dma_timer_started));
+	save_item(NAME(m_dsp.dma_throttled));
+	save_item(NAME(m_dsp.flags));
+	save_item(NAME(m_dsp.irq_active));
+	save_item(NAME(m_dsp.adpcm_new_ref));
+	save_item(NAME(m_dsp.adpcm_ref));
+	save_item(NAME(m_dsp.adpcm_step));
+	save_item(NAME(m_dsp.adpcm_count));
+
 }
 
 //-------------------------------------------------
@@ -1388,9 +1425,13 @@ void sb_device::device_reset()
 	m_dsp.wbuf_status = 0;
 	m_dsp.rbuf_status = 0;
 	m_dsp.frequency = 8000; // per stereo-fx
+	m_dsp.flags = 0;
 	m_dsp.irq_active = 0;
 	m_dsp.dma_no_irq = false;
 	mixer_reset();
+
+	m_ldac->write(0x8000);
+	m_rdac->write(0x8000);
 
 	m_onebyte_midi = false;
 	m_uart_midi = false;

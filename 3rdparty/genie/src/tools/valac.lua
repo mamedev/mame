@@ -91,3 +91,15 @@
 		end
 		return result
 	end
+
+--
+-- Decorate vapidirs for the Vala command line.
+--
+
+	function premake.valac.getvapidirs(vapidirs)
+		local result = { }
+		for _, def in ipairs(vapidirs) do
+			table.insert(result, '--vapidir=' .. def)
+		end
+		return result
+	end

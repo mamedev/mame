@@ -36,7 +36,7 @@ namespace netlist
 
 #if TEST_PARALLEL
 #define MAXTHR 10
-static const int num_thr = 3;
+static constexpr int num_thr = 3;
 
 struct thr_intf
 {
@@ -165,7 +165,7 @@ protected:
 
 private:
 	//static const std::size_t m_pitch = (((storage_N + 1) + 0) / 1) * 1;
-	static const std::size_t m_pitch = (((storage_N + 1) + 7) / 8) * 8;
+	static constexpr std::size_t m_pitch = (((storage_N + 1) + 7) / 8) * 8;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 15) / 16) * 16;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 31) / 32) * 32;
 #if (NL_USE_DYNAMIC_ALLOCATION)

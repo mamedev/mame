@@ -37,27 +37,24 @@ image_manager::image_manager(running_machine &machine)
 		if (!image.user_loadable())
 			continue;
 
-		// is an image specified for this image
-		const char *image_name_ptr = machine.options().value(image.instance_name().c_str());
-		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
+		// is an image specified for this image?
+		if (machine.options().image_options().count(image.instance_name()) > 0)
 		{
+			// we do have a startup image specified - load it
+			const std::string &startup_image = machine.options().image_options()[image.instance_name()];
 			image_init_result result = image_init_result::FAIL;
-			std::string image_name(image_name_ptr);
-
-			// mark init state
-			image.set_init_phase();
 
 			// try as a softlist
-			if (software_name_parse(image_name))
-				result = image.load_software(image_name);
+			if (software_name_parse(startup_image))
+				result = image.load_software(startup_image);
 
 			// failing that, try as an image
 			if (result != image_init_result::PASS)
-				result = image.load(image_name);
+				result = image.load(startup_image);
 
 			// failing that, try creating it (if appropriate)
 			if (result != image_init_result::PASS && image.support_command_line_image_creation())
-				result = image.create(image_name);
+				result = image.create(startup_image);
 
 			// did the image load fail?
 			if (result != image_init_result::PASS)
@@ -70,7 +67,7 @@ image_manager::image_manager(running_machine &machine)
 
 				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (%s) failed: %s",
 					image.device().name(),
-					image_name.c_str(),
+					startup_image.c_str(),
 					image_err.c_str());
 			}
 		}

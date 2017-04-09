@@ -2,15 +2,15 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/iskr103x.c
+    drivers/iskr103x.c
 
-	Driver file for Iskra-1030, 1031
+    Driver file for Iskra-1030, 1031
 
-	TODO
-	- fix cyrillic chargen upload for CGA and MDA
-	- replace DIP switch definition
-	- keyboard test is not passing (code 301)
-	- hard disk is connected but untested
+    TODO
+    - fix cyrillic chargen upload for CGA and MDA
+    - replace DIP switch definition
+    - keyboard test is not passing (code 301)
+    - hard disk is connected but untested
 
 ***************************************************************************/
 

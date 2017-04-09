@@ -96,6 +96,6 @@ namespace bx
 
 } // namespace bx
 
-#include "rng.inl"
+#include "inline/rng.inl"
 
 #endif // BX_RNG_H_HEADER_GUARD

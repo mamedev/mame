@@ -2,7 +2,7 @@
 // copyright-holders:Raphael Nabet
 /****************************************************************************
 
-    macutil.c
+    macutil.cpp
 
     Imgtool Utility code for manipulating certain Apple/Mac data structures
     and conventions
@@ -10,20 +10,25 @@
 *****************************************************************************/
 
 #include "macutil.h"
+#include "timeconv.h"
 
+
+typedef util::arbitrary_clock<std::uint32_t, 1904, 1, 1, 0, 0, 0, std::ratio<1, 1> > classic_mac_clock;
 
 time_t mac_crack_time(uint32_t t)
 {
-	/* not sure if this is correct... */
-	return t - (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
+	classic_mac_clock::duration d(t);
+	std::chrono::time_point<std::chrono::system_clock> tp = classic_mac_clock::to_system_clock(std::chrono::time_point<classic_mac_clock>(d));
+	return std::chrono::system_clock::to_time_t(tp);
 }
 
 
 
 uint32_t mac_setup_time(time_t t)
 {
-	/* not sure if this is correct... */
-	return t + (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
+	auto system_time_point = std::chrono::system_clock::from_time_t(t);
+	auto mac_time_point = classic_mac_clock::from_system_clock(system_time_point);
+	return mac_time_point.time_since_epoch().count();
 }
 
 

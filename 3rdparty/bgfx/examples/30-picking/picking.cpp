@@ -207,7 +207,7 @@ class ExamplePicking : public entry::AppI
 			bx::mtxLookAt(view, eye, at);
 
 			float proj[16];
-			bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 100.0f);
+			bx::mtxProj(proj, 60.0f, float(m_width) / float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			// Set up view rect and transform for the shaded pass
 			bgfx::setViewRect(RENDER_PASS_SHADING, 0, 0, uint16_t(m_width), uint16_t(m_height) );
@@ -238,7 +238,7 @@ class ExamplePicking : public entry::AppI
 
 			// Tight FOV is best for picking
 			float pickProj[16];
-			bx::mtxProj(pickProj, m_fov, 1, 0.1f, 100.0f);
+			bx::mtxProj(pickProj, m_fov, 1, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			// View rect and transforms for picking pass
 			bgfx::setViewRect(RENDER_PASS_ID, 0, 0, ID_DIM, ID_DIM);
@@ -363,8 +363,8 @@ class ExamplePicking : public entry::AppI
 				| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
 				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				, m_mouseState.m_mz
-				, m_width
-				, m_height
+				, uint16_t(m_width)
+				, uint16_t(m_height)
 				);
 
 			imguiBeginArea("Picking Render Target:", 10, 100, 300, 400);

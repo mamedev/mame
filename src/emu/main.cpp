@@ -14,8 +14,8 @@ Controls execution of the core MAME system.
 machine_manager::machine_manager(emu_options& options, osd_interface& osd)
   : m_osd(osd),
 	m_options(options),
-	m_machine(nullptr)	
-{	
+	m_machine(nullptr)
+{
 }
 
 void machine_manager::start_http_server()

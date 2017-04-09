@@ -148,7 +148,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 						if (net_proxy_output == nullptr)
 						{
-							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, this->name() + "." + plib::pfmt("m{1}")(m_inps.size()));
+							pstring nname = this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size()));
+							auto net_proxy_output_u = plib::make_unique<proxied_analog_output_t>(*this, nname);
 							net_proxy_output = net_proxy_output_u.get();
 							m_inps.push_back(std::move(net_proxy_output_u));
 							nl_assert(p->net().is_analog());
@@ -327,9 +328,9 @@ void matrix_solver_t::setup_matrix()
 	if ((0))
 		for (unsigned k = 0; k < iN; k++)
 		{
-			pstring line = plib::pfmt("{1}")(k, "3");
+			pstring line = plib::pfmt("{1:3}")(k);
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				line += plib::pfmt(" {1}")(m_terms[k]->m_nzrd[j], "3");
+				line += plib::pfmt(" {1:3}")(m_terms[k]->m_nzrd[j]);
 			log().verbose("{1}", line);
 		}
 

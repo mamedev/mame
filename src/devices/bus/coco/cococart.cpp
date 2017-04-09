@@ -239,8 +239,8 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 
 
 //-------------------------------------------------
-//  coco_cartridge_twiddle_q_lines - hack to
-//  support twiddling the Q line
+//  twiddle_q_lines - hack to support twiddling the
+//	Q line
 //-------------------------------------------------
 
 void cococart_slot_device::twiddle_q_lines()
@@ -252,32 +252,61 @@ void cococart_slot_device::twiddle_q_lines()
 
 
 //-------------------------------------------------
-//  coco_cartridge_set_line
+//  set_line_value
 //-------------------------------------------------
 
-void cococart_slot_device::cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
+void cococart_slot_device::set_line_value(cococart_slot_device::line which, cococart_slot_device::line_value value)
 {
 	switch (which)
 	{
-		case line::CART:
-			set_line_timer(m_cart_line, value);
-			break;
+	case cococart_slot_device::line::CART:
+		set_line_timer(m_cart_line, value);
+		break;
 
-		case line::NMI:
-			set_line_timer(m_nmi_line, value);
-			break;
+	case cococart_slot_device::line::NMI:
+		set_line_timer(m_nmi_line, value);
+		break;
 
-		case line::HALT:
-			set_line_timer(m_halt_line, value);
-			break;
+	case cococart_slot_device::line::HALT:
+		set_line_timer(m_halt_line, value);
+		break;
 
-		case line::SOUND_ENABLE:
-			if (m_cart)
-				m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
-			break;
+	case cococart_slot_device::line::SOUND_ENABLE:
+		if (m_cart)
+			m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
+		break;
 	}
 }
 
+
+
+//-------------------------------------------------
+//  get_line_value
+//-------------------------------------------------
+
+cococart_slot_device::line_value cococart_slot_device::get_line_value(cococart_slot_device::line which) const
+{
+	line_value result;
+	switch (which)
+	{
+	case cococart_slot_device::line::CART:
+		result = m_cart_line.value;
+		break;
+
+	case cococart_slot_device::line::NMI:
+		result = m_nmi_line.value;
+		break;
+
+	case cococart_slot_device::line::HALT:
+		result = m_halt_line.value;
+		break;
+
+	default:
+		result = line_value::CLEAR;
+		break;
+	}
+	return result;
+}
 
 
 //-------------------------------------------------

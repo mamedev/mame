@@ -5,9 +5,8 @@
   Volfied C-Chip Protection
   =========================
 
-  The C-Chip (Taito TC0030CMD) is an unidentified mask programmed
-  microcontroller of some sort with 64 pins.  It probably has
-  about 2k of ROM and 8k of RAM.
+  The C-Chip (Taito TC0030CMD) contains a NEC D78C11 (with 4k internal ROM) +
+  8k EPROM + 8k DRAM + logic.
 
   Cheat:
     volfied:0:100191:00:001:Complete level with 99.9% Now!
@@ -284,14 +283,14 @@ void volfied_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_VOLFIED:
-		volfied_timer_callback(ptr, param);
+		timer_callback(ptr, param);
 		break;
 	default:
 		assert_always(false, "Unknown id in volfied_state::device_timer");
 	}
 }
 
-TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
+TIMER_CALLBACK_MEMBER(volfied_state::timer_callback)
 {
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
@@ -339,17 +338,17 @@ TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
  *
  *************************************/
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ctrl_w)
+WRITE16_MEMBER(volfied_state::cchip_ctrl_w)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_bank_w)
+WRITE16_MEMBER(volfied_state::cchip_bank_w)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
+WRITE16_MEMBER(volfied_state::cchip_ram_w)
 {
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data;
 
@@ -400,12 +399,12 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 			{
-				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), TIMER_VOLFIED);
+				m_cchip_timer->adjust(m_maincpu->cycles_to_attotime(122242));
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (m_current_cmd >= 0x81 && m_current_cmd < 0x92)
 			{
-				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), TIMER_VOLFIED);
+				m_cchip_timer->adjust(m_maincpu->cycles_to_attotime(105500));
 			}
 			else
 			{
@@ -429,7 +428,7 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
  *
  *************************************/
 
-READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
+READ16_MEMBER(volfied_state::cchip_ctrl_r)
 {
 	/*
 	    Bit 2 = Error signal
@@ -438,7 +437,7 @@ READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
+READ16_MEMBER(volfied_state::cchip_ram_r)
 {
 	/* Check for input ports */
 	if (m_current_bank == 0)
@@ -491,8 +490,10 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
  *
  *************************************/
 
-void volfied_state::volfied_cchip_init(  )
+void volfied_state::cchip_init()
 {
+	m_cchip_timer = timer_alloc(TIMER_VOLFIED);
+
 	m_cchip_ram = make_unique_clear<uint8_t[]>(0x400 * 8);
 
 	save_item(NAME(m_current_bank));
@@ -502,7 +503,7 @@ void volfied_state::volfied_cchip_init(  )
 	save_pointer(NAME(m_cchip_ram.get()), 0x400 * 8);
 }
 
-void volfied_state::volfied_cchip_reset(  )
+void volfied_state::cchip_reset()
 {
 	m_current_bank = 0;
 	m_current_flag = 0;

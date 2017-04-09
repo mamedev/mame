@@ -304,7 +304,7 @@ READ8_MEMBER(cc40_state::bankswitch_r)
 WRITE8_MEMBER(cc40_state::bankswitch_w)
 {
 	data &= 0x0f;
-	
+
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
 
@@ -330,7 +330,7 @@ void cc40_state::update_clock_divider()
 WRITE8_MEMBER(cc40_state::clock_control_w)
 {
 	data &= 0x0f;
-	
+
 	// d0-d2: clock divider
 	// d3: enable clock divider always
 	// other bits: unused?

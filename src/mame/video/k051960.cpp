@@ -184,6 +184,8 @@ void k051960_device::device_start()
 	// make sure our screen is started
 	if (!m_screen->started())
 		throw device_missing_dependencies();
+	if (!palette().device().started())
+		throw device_missing_dependencies();
 
 	// allocate scanline timer and start at first scanline
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));

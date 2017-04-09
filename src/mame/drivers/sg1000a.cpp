@@ -113,6 +113,162 @@ CN4               CN5
 
 ******************************************************/
 
+/* Super Derby II notes from Charles MacDonald
+
+================================================================================
+Notes
+================================================================================
+
+Z80 memory map
+
+0000-3FFF : IC10 (EPROM, 16Kx8)
+4000-7FFF : IC11 (EPROM, 16Kx8)
+8000-BFFF : (Unused)
+C000-FFFF : IC8 (Work RAM, 2Kx8)
+
+Z80 port map
+
+00-3F : (Unused)
+40-7F : 315-5066 (SN76489 part)
+80-BF : 315-5066 (TMS9918 part)
+C0-FF : KBSEL#
+
+Detail of KBSEL# area
+
+C0-C7 : 8251 UART
+C8-CF : 8255 PPI
+D0-D7 : (Unused)
+D8-DF : (Unused)
+E0-E7 : (Unused)
+E8-EF : Output port load strobe (IC25 P9)
+F0-F7 : Output port load strobe (IC21 P9)
+F8-FF : Pulse generator trigger (IC17 P1)
+
+Z80 signals
+
+ INT# from 315-5066 (same as TMS9918 INT#)
+ NMI# source is unclear (from unlabeled IC3 nearby)
+WAIT# is unused (pulled up)
+  CLK is 3.579543 MHz (from 315-5066 which divides 10.73863 XTAL by 3)
+
+The PCB is configured to connect the PSG output of the 315-5066 to an amplifier,
+but none of the locations are populated so there is no audio output.
+
+================================================================================
+Board markings
+================================================================================
+
+On top copper layer:
+"(C) SEGA 1984  834-5529"
+
+On bottom copper layer:
+"171-5200"
+
+On a sticker: 
+"REV C"
+
+On a sticker:
+"94.05.27"
+
+================================================================================
+Parts list
+================================================================================
+
+All ICs have a date code of either 1983 or 1984.
+
+ IC1 - LA4460 (unpopulated)
+ IC2 - NEC D74HC138C
+ IC3 - (Unreadable)
+ IC4 - D780C-1 (Z80)
+ IC5 - TI SN74LS245N
+ IC6 - SN74LS244N
+ IC7 - SN73LS244N
+ IC8 - Toshiba TC5517APL (backed by a super capacitor)
+ IC9 - NEC D8255AC-2 
+IC10 - 28-pin socket (silkscreen is "27128") for "EPR-6450D" (Fujitsu MB27128-30)
+IC11 - 28-pin socket (silkscreen is "27128") for "EPR-6504D" (Fujitsu MB27128-30)
+IC12 - Toshiba TC4053BP
+IC13 - Toshiba TC74HC4040P
+IC14 - NEC D74HC138C
+IC15 - Mitsubishi M74LS02P
+IC16 - Sharp IR2339
+IC17 - TI SN74LS123N
+IC18 - National DM74175N
+IC19 - Sega 315-5066
+IC20 - NEC D8251AC
+IC21 - National DM74175N
+IC22 - National DM74175N
+IC23 - NEC D41416C-15
+IC24 - NEC D41416C-15
+IC25 - National DM74175N
+IC26 - Motorola NE592N
+IC27 - Motorola NE592N
+IC28 - Motorola NE592N
+IC29 - NEC 7808
+
+PC1  - GI B 5102 321J "TLP521-1" 
+PC2  - GI D 5102 423J
+PC3  - GI D 5102 423J
+PC4  - GI D 5102 423J
+PC5  - GI D 5102 423J
+PC6  - GI D 5102 423J
+PC7  - GI D 5102 423J
+PC8  - GI D 5102 423J
+PC9  - GI D 5102 423J
+
+PST1 - "F" (Unreadable)
+PST2 - T516A
+
+TA1  - TD62003P
+TA2  - TD62003P
+TA3  - TD62003P
+TA4  - TD62003P
+TA5  - TD62003P
+
+TR1  - C945
+TR2  - C1B15
+TR3  - C458
+
+SW1  - DIP switch, eight switches, all OFF
+SW2  - DIP switch, eight switches, all OFF
+
+XTAL - 10.73863
+
+CN1  - 2x20 latching header
+CN2  - 2x17 latching header
+CN3  - 2x13 latching header
+CN4  - 2x5  latching header
+
+LED-1  - Red LED
+LED   - ??? (in optical housing)
+PTr   - ??? (in optical housing)
+
+================================================================================
+Source code and text in EPR-6450D
+================================================================================
+
+"KYOKO SAEKI & HIROMITSU MARUYAMA"
+
+POWER DOWN CHANGE
+TSEL:
+	LD	A,(BETFLG)	; READ CREDIT
+	RRCA			; CREDIT IN ?
+	JR	C,BETSELZ
+
+	LD	A,(SELOLD)
+	OR	A
+	LD	C,A
+	CALL	NZ,OLDCLCG
+	LD	HL,0
+	LD	(SELOLD),HL
+	LD	(DBLSWCT),HL
+	LD	(LMPCNT),1
+
+================================================================================
+End
+================================================================================
+*/
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -159,6 +315,15 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sderby2_io_map, AS_IO, 8, sg1000a_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489a_device, write)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	// AM_RANGE(0xc0, 0xc1) NEC D8251AC UART
+	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // NEC D8255AC-2
 ADDRESS_MAP_END
 
 /*************************************
@@ -247,6 +412,36 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sderby2 )
+	PORT_INCLUDE( sg1000 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 {
@@ -294,6 +489,14 @@ static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sderby2, sg1000a )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_10_738635MHz / 3)
+	MCFG_CPU_IO_MAP(sderby2_io_map)
+
+	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output
+MACHINE_CONFIG_END
+
 /*************************************
  *
  *  ROM definitions
@@ -321,6 +524,12 @@ ROM_START( dokidoki )
 	ROM_LOAD( "epr-7358.ic3",   0x8000, 0x4000, CRC(c6f26b0b) SHA1(3753e05b6e77159832dbe88562ba7a818120d1a3) )
 ROM_END
 
+ROM_START( sderby2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-6450d.ic10",   0x0000, 0x4000, CRC(e56986d3) SHA1(a2dbdc95128cc94a1492e080aeea402f2d4b89fe) )
+	ROM_LOAD( "epr-6504d.ic11",   0x4000, 0x4000, CRC(7bb364b9) SHA1(9f93572b6d999422d93ad5f7a251b4695565651f) )
+ROM_END
+
 /*************************************
  *
  *  Driver initialization
@@ -340,5 +549,6 @@ DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
  *************************************/
 
 GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
-GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, sg1000a, ROT0, "Sega", "Champion Pro Wrestling", 0 )
+GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Pro Wrestling", 0 )
 GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )
+GAME( 1985, sderby2,  0, sderby2,  sderby2,  sg1000a_state, sg1000a,  ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway

@@ -55,9 +55,6 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	DIRECT_UPDATE_MEMBER( amstrad_default );
-	DIRECT_UPDATE_MEMBER( amstrad_multiface_directoverride );
-
 	std::unique_ptr<uint8_t[]> m_multiface_ram;
 	unsigned long m_multiface_flags;
 

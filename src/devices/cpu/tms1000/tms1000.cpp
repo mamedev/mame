@@ -2,7 +2,12 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
+  and second source Motorola MC141000, MC141200.
+  
+  TODO:
+  - add TMS1270 (10 O pins, how does that work?)
+  - add TMS1000C, TMS1200C (CMOS, and 3-level stack)
 
 */
 
@@ -23,9 +28,11 @@ const device_type TMS1000 = device_creator<tms1000_cpu_device>; // 28-pin DIP, 1
 const device_type TMS1070 = device_creator<tms1070_cpu_device>; // high voltage version
 const device_type TMS1040 = device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
 const device_type TMS1200 = device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
-// TMS1270 has 10 O pins, how does that work?
 const device_type TMS1700 = device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
 const device_type TMS1730 = device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
+
+const device_type MC141000 = device_creator<mc141000_cpu_device>; // CMOS, pin-compatible with TMS1000(reverse polarity)
+const device_type MC141200 = device_creator<mc141200_cpu_device>; // CMOS, 40-pin DIP, 16 R pins
 
 
 // internal memory maps
@@ -74,6 +81,14 @@ tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char
 
 tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1730, "TMS1730", tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4), "tms1730", __FILE__)
+{ }
+
+mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tms1000_cpu_device(mconfig, MC141000, "MC141000", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "mc141000", __FILE__)
+{ }
+
+mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tms1000_cpu_device(mconfig, MC141200, "MC141200", tag, owner, clock, 8, 16, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "mc141200", __FILE__)
 { }
 
 

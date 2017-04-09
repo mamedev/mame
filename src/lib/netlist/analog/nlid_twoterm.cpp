@@ -38,7 +38,7 @@ generic_diode::generic_diode(device_t &dev, pstring name)
 
 void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
-	static const double csqrt2 = std::sqrt(2.0);
+	static constexpr double csqrt2 = 1.414213562373095048801688724209; //std::sqrt(2.0);
 	m_Is = Is;
 	m_logIs = std::log(Is);
 	m_n = n;

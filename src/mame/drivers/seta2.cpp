@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")               // DSW 2
 	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)       // Samples Banks
 ADDRESS_MAP_END
-	
+
 static ADDRESS_MAP_START( penbrosk_map, AS_PROGRAM, 16, seta2_state )
 	AM_IMPORT_FROM(penbros_base_map)
 	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")               // DSW 1

@@ -216,6 +216,11 @@ int mame_machine_manager::execute()
 			valid.check_shared_source(*system);
 		}
 
+		// reevaluate slot options until nothing changes
+		while (mame_options::reevaluate_slot_options(m_options))
+		{
+		}
+
 		// create the machine configuration
 		machine_config config(*system, m_options);
 

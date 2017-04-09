@@ -3009,7 +3009,7 @@ void TParseContext::declareArray(const TSourceLoc& loc, TString& identifier, con
             symbol = new TVariable(&identifier, type);
             symbolTable.insert(*symbol);
             if (symbolTable.atGlobalLevel())
-                trackLinkageDeferred(*symbol);
+                trackLinkage(*symbol);
 
             if (! symbolTable.atBuiltInLevel()) {
                 if (isIoResizeArray(type)) {
@@ -3476,7 +3476,7 @@ void TParseContext::redeclareBuiltinBlock(const TSourceLoc& loc, TTypeList& newT
         fixIoArraySize(loc, block->getWritableType());
 
     // Save it in the AST for linker use.
-    trackLinkageDeferred(*block);
+    trackLinkage(*block);
 }
 
 void TParseContext::paramCheckFix(const TSourceLoc& loc, const TStorageQualifier& qualifier, TType& type)
@@ -4008,16 +4008,20 @@ void TParseContext::setLayoutQualifier(const TSourceLoc& loc, TPublicType& publi
         //  - uniform offsets
         //  - atomic_uint offsets
         const char* feature = "offset";
-        requireProfile(loc, EEsProfile | ECoreProfile | ECompatibilityProfile, feature);
-        const char* exts[2] = { E_GL_ARB_enhanced_layouts, E_GL_ARB_shader_atomic_counters };
-        profileRequires(loc, ECoreProfile | ECompatibilityProfile, 420, 2, exts, feature);
-        profileRequires(loc, EEsProfile, 310, nullptr, feature);
+        if (spvVersion.spv == 0) {
+            requireProfile(loc, EEsProfile | ECoreProfile | ECompatibilityProfile, feature);
+            const char* exts[2] = { E_GL_ARB_enhanced_layouts, E_GL_ARB_shader_atomic_counters };
+            profileRequires(loc, ECoreProfile | ECompatibilityProfile, 420, 2, exts, feature);
+            profileRequires(loc, EEsProfile, 310, nullptr, feature);
+        }
         publicType.qualifier.layoutOffset = value;
         return;
     } else if (id == "align") {
         const char* feature = "uniform buffer-member align";
-        requireProfile(loc, ECoreProfile | ECompatibilityProfile, feature);
-        profileRequires(loc, ECoreProfile | ECompatibilityProfile, 440, E_GL_ARB_enhanced_layouts, feature);
+        if (spvVersion.spv == 0) {
+            requireProfile(loc, ECoreProfile | ECompatibilityProfile, feature);
+            profileRequires(loc, ECoreProfile | ECompatibilityProfile, 440, E_GL_ARB_enhanced_layouts, feature);
+        }
         // "The specified alignment must be a power of 2, or a compile-time error results."
         if (! IsPow2(value))
             error(loc, "must be a power of 2", "align", "");
@@ -4495,8 +4499,11 @@ void TParseContext::layoutTypeCheck(const TSourceLoc& loc, const TType& type)
                 }
             }
         }
-    } else if (type.isImage() && ! qualifier.writeonly)
-        error(loc, "image variables not declared 'writeonly' must have a format layout qualifier", "", "");
+    } else if (type.isImage() && ! qualifier.writeonly) {
+        const char *explanation = "image variables declared 'writeonly' without a format layout qualifier";
+        requireProfile(loc, ECoreProfile | ECompatibilityProfile, explanation);
+        profileRequires(loc, ECoreProfile | ECompatibilityProfile, 0, E_GL_EXT_shader_image_load_formatted, explanation);
+    }
 
     if (qualifier.layoutPushConstant && type.getBasicType() != EbtBlock)
         error(loc, "can only be used with a block", "push_constant", "");
@@ -5056,7 +5063,7 @@ TVariable* TParseContext::declareNonArray(const TSourceLoc& loc, TString& identi
     // add variable to symbol table
     if (symbolTable.insert(*variable)) {
         if (symbolTable.atGlobalLevel())
-            trackLinkageDeferred(*variable);
+            trackLinkage(*variable);
         return variable;
     }
 
@@ -5546,8 +5553,10 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
         if (memberType.isArray())
             arrayUnsizedCheck(memberLoc, currentBlockQualifier, &memberType.getArraySizes(), false, member == typeList.size() - 1);
         if (memberQualifier.hasOffset()) {
-            requireProfile(memberLoc, ~EEsProfile, "offset on block member");
-            profileRequires(memberLoc, ~EEsProfile, 440, E_GL_ARB_enhanced_layouts, "offset on block member");
+            if (spvVersion.spv == 0) {
+                requireProfile(memberLoc, ~EEsProfile, "offset on block member");
+                profileRequires(memberLoc, ~EEsProfile, 440, E_GL_ARB_enhanced_layouts, "offset on block member");
+            }
         }
 
         if (memberType.containsOpaque())
@@ -5588,11 +5597,10 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
 
     mergeObjectLayoutQualifiers(defaultQualification, currentBlockQualifier, true);
 
-    // "The offset qualifier can only be used on block members of blocks declared with std140 or std430 layouts."
     // "The align qualifier can only be used on blocks or block members, and only for blocks declared with std140 or std430 layouts."
-    if (currentBlockQualifier.hasAlign() || currentBlockQualifier.hasAlign()) {
+    if (currentBlockQualifier.hasAlign()) {
         if (defaultQualification.layoutPacking != ElpStd140 && defaultQualification.layoutPacking != ElpStd430) {
-            error(loc, "can only be used with std140 or std430 layout packing", "offset/align", "");
+            error(loc, "can only be used with std140 or std430 layout packing", "align", "");
             defaultQualification.layoutAlign = -1;
         }
     }
@@ -5634,9 +5642,12 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
             }
         } else
             memberWithoutLocation = true;
-        if (memberQualifier.hasAlign()) {
+
+        // "The offset qualifier can only be used on block members of blocks declared with std140 or std430 layouts."
+        // "The align qualifier can only be used on blocks or block members, and only for blocks declared with std140 or std430 layouts."
+        if (memberQualifier.hasAlign() || memberQualifier.hasOffset()) {
             if (defaultQualification.layoutPacking != ElpStd140 && defaultQualification.layoutPacking != ElpStd430)
-                error(memberLoc, "can only be used with std140 or std430 layout packing", "align", "");
+                error(memberLoc, "can only be used with std140 or std430 layout packing", "offset/align", "");
         }
 
         TQualifier newMemberQualification = defaultQualification;
@@ -5718,7 +5729,7 @@ void TParseContext::declareBlock(const TSourceLoc& loc, TTypeList& typeList, con
         fixIoArraySize(loc, variable.getWritableType());
 
     // Save it in the AST for linker use.
-    trackLinkageDeferred(variable);
+    trackLinkage(variable);
 }
 
 // Do all block-declaration checking regarding the combination of in/out/uniform/buffer
@@ -5786,11 +5797,8 @@ void TParseContext::blockQualifierCheck(const TSourceLoc& loc, const TQualifier&
         error(loc, "cannot use sample qualifier on an interface block", "sample", "");
     if (qualifier.invariant)
         error(loc, "cannot use invariant qualifier on an interface block", "invariant", "");
-    if (qualifier.layoutPushConstant) {
+    if (qualifier.layoutPushConstant)
         intermediate.addPushConstantCount();
-        if (! instanceName)
-            error(loc, "requires an instance name", "push_constant", "");
-    }
 }
 
 //

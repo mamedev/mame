@@ -3,6 +3,16 @@
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
+newoption {
+	trigger = "with-amalgamated",
+	description = "Enable amalgamated build.",
+}
+
+newoption {
+	trigger = "with-crtnone",
+	description = "Enable build without CRT.",
+}
+
 solution "bx"
 	configurations {
 		"Debug",
@@ -20,10 +30,6 @@ solution "bx"
 BX_DIR = path.getabsolute("..")
 local BX_BUILD_DIR = path.join(BX_DIR, ".build")
 local BX_THIRD_PARTY_DIR = path.join(BX_DIR, "3rdparty")
-
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
 
 dofile "toolchain.lua"
 toolchain(BX_BUILD_DIR, BX_THIRD_PARTY_DIR)
@@ -50,7 +56,7 @@ project "bx.test"
 
 	files {
 		path.join(BX_DIR, "tests/*_test.cpp"),
-		path.join(BX_DIR, "tests/*_test.H"),
+		path.join(BX_DIR, "tests/*.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
 	}
 

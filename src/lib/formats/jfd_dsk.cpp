@@ -339,7 +339,7 @@ bool jfd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				}
 			}
 		}
-		
+
 		if (discop3)
 		{
 			generate_track_from_levels(track / 2, track % 2, track_data, 0, image);

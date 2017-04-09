@@ -77,6 +77,9 @@ TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
 
 void segas24_tile::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	char_ram = std::make_unique<uint16_t[]>(0x80000/2);
 	tile_ram = std::make_unique<uint16_t[]>(0x10000/2);
 

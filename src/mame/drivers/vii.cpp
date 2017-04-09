@@ -36,7 +36,7 @@
          D - SPG243 - Wall-E
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - V-Tech V-Smile
-        ND - unknown - Wireless 60
+         D - SPG243 - Wireless 60
         ND - unknown - Wireless Air 60
         ND - Likely many more
 
@@ -44,7 +44,7 @@
 Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
 - V.Smile by Vtech, a system designed for children under the age of 10
 - V.Smile Pocket (2 versions)
-- V.SMile Cyber Pocket
+- V.Smile Cyber Pocket
 - V.Smile PC Pal
 - V-Motion Active Learning System
 - Leapster
@@ -109,7 +109,8 @@ public:
 		m_p_spriteram(*this, "p_spriteram"),
 		m_bank(*this, "cart"),
 		m_bios_rom(*this, "bios"),
-		m_io_p1(*this, "P1")
+		m_io_p1(*this, "P1"),
+		m_io_p2(*this, "P2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -142,6 +143,7 @@ public:
 	uint16_t m_io_regs[0x200];
 	uint16_t m_uart_rx_count;
 	uint8_t m_controller_input[8];
+	uint8_t m_w60_controller_input;
 	uint32_t m_spg243_mode;
 
 	emu_timer *m_tmb1;
@@ -155,6 +157,7 @@ public:
 	DECLARE_DRIVER_INIT(walle);
 	DECLARE_DRIVER_INIT(vii);
 	DECLARE_DRIVER_INIT(batman);
+	DECLARE_DRIVER_INIT(wirels60);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -168,6 +171,7 @@ public:
 protected:
 	optional_memory_region m_bios_rom;
 	required_ioport m_io_p1;
+	optional_ioport m_io_p2;
 
 	memory_region *m_cart_rom;
 
@@ -187,6 +191,7 @@ enum
 	SPG243_VII = 0,
 	SPG243_BATMAN,
 	SPG243_VSMILE,
+	SPG243_WIRELESS60,
 
 	SPG243_MODEL_COUNT
 };
@@ -640,6 +645,36 @@ void vii_state::do_gpio(uint32_t offset)
 	{
 		// TODO: find out how vsmile accesses these GPIO regs!
 	}
+	else if (m_spg243_mode == SPG243_WIRELESS60)
+	{
+		if(index == 0)
+		{
+			switch(what & 0x300)
+			{
+				case 0x300:
+					m_w60_controller_input = -1;
+					break;
+
+				case 0x200:
+					m_w60_controller_input++;
+					break;
+
+				default:
+					uint16_t temp1 = m_io_p1->read();
+					uint16_t temp2 = m_io_p2->read();
+					uint16_t temp3 = 1 << m_w60_controller_input;
+					if (temp1 & temp3) what ^= 0x400;
+					if (temp2 & temp3) what ^= 0x800;
+					break;
+			}
+		}
+
+		if(index == 1)
+		{
+			uint32_t bank = (what & 7);
+			switch_bank(bank);
+		}
+	}
 
 	m_io_regs[5*index + 1] = what;
 }
@@ -952,6 +987,27 @@ static INPUT_PORTS_START( walle )
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wirels60 )
+	PORT_START("P1")
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Menu")
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Start")
+	PORT_START("P2")
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_NAME("Joypad Up")
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_NAME("Joypad Down")
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_NAME("Joypad Left")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Joypad Right")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("A Button")
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(2) PORT_NAME("B Button")
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(2) PORT_NAME("Menu")
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(2) PORT_NAME("Start")
+INPUT_PORTS_END
+
 
 void vii_state::test_centered(uint8_t *ROM)
 {
@@ -1017,6 +1073,7 @@ void vii_state::machine_start()
 	m_controller_input[4] = 0;
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
+	m_w60_controller_input = -1;
 
 	if (m_cart && m_cart->exists())
 	{
@@ -1025,7 +1082,7 @@ void vii_state::machine_start()
 		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes()/0x800000), m_cart_rom->base(), 0x800000 );
 		m_bank->set_entry(0);
 	}
-	else if (m_spg243_mode == SPG243_VII)   // Vii bios is banked
+	else if (m_spg243_mode == SPG243_VII || m_spg243_mode == SPG243_WIRELESS60)   // Vii bios is banked
 	{
 		m_bank->configure_entries(0, ceilf((float)m_bios_rom->bytes()/0x800000), m_bios_rom->base(), 0x800000 );
 		m_bank->set_entry(0);
@@ -1177,6 +1234,21 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( wirels60, vii_state )
+
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_PROGRAM_MAP( vii_mem )
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
+
+
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
+	MCFG_PALETTE_ADD("palette", 32768)
+MACHINE_CONFIG_END
+
 DRIVER_INIT_MEMBER(vii_state,vii)
 {
 	m_spg243_mode = SPG243_VII;
@@ -1199,6 +1271,12 @@ DRIVER_INIT_MEMBER(vii_state,walle)
 {
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 0;
+}
+
+DRIVER_INIT_MEMBER(vii_state,wirels60)
+{
+	m_spg243_mode = SPG243_WIRELESS60;
+	m_centered_coordinates = 1;
 }
 
 ROM_START( vii )
@@ -1230,9 +1308,17 @@ ROM_START( walle )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
-CONS( 2004, batmantv, vii,      0,        batman,   batman, vii_state,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", MACHINE_NO_SOUND )
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile (Germany)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile (France)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2007, vii,      0,        0,        vii,      vii, vii_state,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        MACHINE_NO_SOUND )
-CONS( 2008, walle,    vii,      0,        batman,   walle, vii_state,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     MACHINE_NO_SOUND )
+ROM_START( wirels60 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+
+	ROM_REGION( 0x4000000, "bios", 0 )
+	ROM_LOAD( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
+ROM_END
+
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT                INIT      COMPANY                                              FULLNAME             FLAGS */
+CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
+CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND )

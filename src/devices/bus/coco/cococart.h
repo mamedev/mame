@@ -90,8 +90,9 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	// sets a cartridge line
-	void cart_set_line(line line, line_value value);
+	// manipulation of cartridge lines
+	void set_line_value(line line, line_value value);
+	line_value get_line_value(line line) const;
 
 	// hack to support twiddling the Q line
 	void twiddle_q_lines();

@@ -2,10 +2,10 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Poisk-1 sound card
+    Poisk-1 sound card
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
