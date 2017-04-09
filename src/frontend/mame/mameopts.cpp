@@ -14,6 +14,8 @@
 #include "drivenum.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "zippath.h"
+#include "hashfile.h"
 
 #include <ctype.h>
 #include <stack>
@@ -89,7 +91,7 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 		const char *name = slot.device().tag() + 1;
 		if (options.exists(name) && !slot.option_list().empty())
 		{
-			std::string defvalue = slot.get_default_card_software();
+			std::string defvalue = get_default_card_software(slot, options);
 			if (defvalue.empty())
 			{
 				// keep any non-default setting
@@ -108,6 +110,43 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 		}
 	}
 	add_device_options(options);
+}
+
+
+//-------------------------------------------------
+//	get_default_card_software
+//-------------------------------------------------
+
+std::string mame_options::get_default_card_software(device_slot_interface &slot, const emu_options &options)
+{
+	std::string image_path;
+	std::function<bool(util::core_file &, std::string&)> get_hashfile_extrainfo;
+
+	// figure out if an image option has been specified, and if so, get the image path out of the options
+	device_image_interface *image = dynamic_cast<device_image_interface *>(&slot);
+	if (image)
+	{
+		auto iter = options.image_options().find(image->instance_name());
+		if (iter != options.image_options().end())
+			image_path = iter->second;
+		
+		get_hashfile_extrainfo = [image, &options](util::core_file &file, std::string &extrainfo)
+		{
+			util::hash_collection hashes = image->calculate_hash_on_file(file);
+
+			return hashfile_extrainfo(
+				options.hash_path(),
+				image->device().mconfig().gamedrv(),
+				hashes,
+				extrainfo);
+		};
+	}
+
+	// create the hook
+	get_default_card_software_hook hook(image_path, std::move(get_hashfile_extrainfo));
+
+	// and invoke the slot's implementation of get_default_card_software()
+	return slot.get_default_card_software(hook);
 }
 
 
@@ -253,7 +292,7 @@ bool mame_options::reevaluate_slot_options(emu_options &options)
 			// In reality, having some sort of hook into the pipeline of slot/device evaluation
 			// makes sense, but the fact that it is joined at the hip to device_image_interface
 			// and device_slot_interface is unfortunate
-			std::string default_card_software = slot.get_default_card_software();
+			std::string default_card_software = get_default_card_software(slot, options);
 			if (!default_card_software.empty())
 			{
 				// we have default card software - is this resulting in the slot option being mutated?

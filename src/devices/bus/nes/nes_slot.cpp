@@ -890,23 +890,21 @@ void nes_cart_slot_device::call_unload()
  get default card software
  -------------------------------------------------*/
 
-std::string nes_cart_slot_device::get_default_card_software()
+std::string nes_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string = "nrom";
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
-			slot_string = get_default_card_ines(&rom[0], len);
+			slot_string = get_default_card_ines(hook, &rom[0], len);
 
 		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
 			slot_string = get_default_card_unif(&rom[0], len);
-
-		clear();
 
 		return std::string(slot_string);
 	}

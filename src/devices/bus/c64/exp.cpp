@@ -206,14 +206,12 @@ image_init_result c64_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string c64_expansion_slot_device::get_default_card_software()
+std::string c64_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
-		if (is_filetype("crt"))
-			return cbm_crt_get_card(*m_file);
-
-		clear();
+		if (hook.is_filetype("crt"))
+			return cbm_crt_get_card(*hook.image_file());
 	}
 
 	return software_get_default_slot("standard");

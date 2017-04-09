@@ -122,7 +122,7 @@ void hp_optrom_slot_device::call_unload()
 		}
 }
 
-std::string hp_optrom_slot_device::get_default_card_software()
+std::string hp_optrom_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 		return software_get_default_slot("rom");
 }

@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "zippath.h"
+
 
 // -------------------------------------------------
 // ctor
@@ -131,4 +133,30 @@ device_slot_card_interface::device_slot_card_interface(const machine_config &mco
 
 device_slot_card_interface::~device_slot_card_interface()
 {
+}
+
+get_default_card_software_hook::get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo)
+	: m_get_hashfile_extrainfo(std::move(get_hashfile_extrainfo))
+	, m_called_get_hashfile_extrainfo(false)
+	, m_has_hash_extrainfo(false)
+{
+	if (!path.empty())
+	{
+		std::string revised_path;
+		util::zippath_fopen(path, OPEN_FLAG_READ, m_image_file, revised_path);
+		if (m_image_file)
+			m_file_type = core_filename_extract_extension(revised_path, true);
+	}
+}
+
+bool get_default_card_software_hook::hashfile_extrainfo(std::string &extrainfo)
+{
+	if (!m_called_get_hashfile_extrainfo)
+	{
+		if (m_get_hashfile_extrainfo)
+			m_has_hash_extrainfo = m_get_hashfile_extrainfo(*image_file(), m_hash_extrainfo);
+		m_called_get_hashfile_extrainfo = true;
+	}
+	extrainfo = m_hash_extrainfo;
+	return m_has_hash_extrainfo;
 }

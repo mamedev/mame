@@ -107,7 +107,7 @@ protected:
 	virtual const char *file_extensions() const override { return "rom,bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_ql_rom_cartridge_card_interface *m_card;
 };

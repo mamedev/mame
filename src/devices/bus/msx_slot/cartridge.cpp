@@ -271,9 +271,9 @@ int msx_slot_cartridge_device::get_cart_type(const uint8_t *rom, uint32_t length
 }
 
 
-std::string msx_slot_cartridge_device::get_default_card_software()
+std::string msx_slot_cartridge_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string = "nomapper";
 		uint32_t length = m_file->size();
@@ -282,7 +282,7 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 
 		// Check if there's some mapper related information in the hashfiles
 		std::string extrainfo;
-		if (hashfile_extrainfo(*this, extrainfo))
+		if (hook.hashfile_extrainfo(extrainfo))
 		{
 			int extrainfo_type = -1;
 			if (1 == sscanf(extrainfo.c_str(), "%d", &extrainfo_type))

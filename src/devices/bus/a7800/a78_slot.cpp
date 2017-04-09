@@ -511,9 +511,9 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
  get default card software
  -------------------------------------------------*/
 
-std::string a78_cart_slot_device::get_default_card_software()
+std::string a78_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
 		std::vector<uint8_t> head(128);
@@ -568,8 +568,6 @@ std::string a78_cart_slot_device::get_default_card_software()
 
 		logerror("Cart type: %x\n", type);
 		slot_string = a78_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}
