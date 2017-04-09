@@ -835,8 +835,9 @@ namespace netlist
 		devices::matrix_solver_t *solver() const NL_NOEXCEPT { return m_solver; }
 		void set_solver(devices::matrix_solver_t *solver) NL_NOEXCEPT { m_solver = solver; }
 
-	private:
 		state_var<nl_double>     m_cur_Analog;
+
+	private:
 		devices::matrix_solver_t *m_solver;
 	};
 
