@@ -602,7 +602,7 @@ static const floppy_interface thomson_floppy_interface =
 	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
 	"thom_flop"
 };
-
+/*
 FLOPPY_FORMATS_MEMBER( thomson_state::cd90_640_formats )
 	FLOPPY_CD90_640_FORMAT
 FLOPPY_FORMATS_END
@@ -613,7 +613,7 @@ static SLOT_INTERFACE_START( cd90_640_floppies )
 	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
 	SLOT_INTERFACE("dd",   FLOPPY_525_DD)
 SLOT_INTERFACE_END
-
+*/
 
 /* ------------ driver ------------ */
 
@@ -669,10 +669,10 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 
-	MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
+        MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
 
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+//MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
+//MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
