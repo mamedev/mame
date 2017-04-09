@@ -40,6 +40,11 @@
  *   C++14:     __cplusplus is 201402L.
  *   c++17/c++1z__cplusplus is 201703L.
  *
+ *   VS2015 returns 199711L here. This is the bug filed in
+ *   2012 which obviously never was picked up by MS:
+ *   https://connect.microsoft.com/VisualStudio/feedback/details/763051/a-value-of-predefined-macro-cplusplus-is-still-199711l
+ *
+ *
  *============================================================*/
 
 #if __cplusplus == 201103L
@@ -48,6 +53,8 @@
 #define C14CONSTEXPR constexpr
 #elif __cplusplus == 201703L
 #define C14CONSTEXPR constexpr
+#elif defined(_MSC_VER)
+#define C14CONSTEXPR
 #else
 #error "C++ version not supported"
 #endif
