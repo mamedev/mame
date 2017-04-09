@@ -388,7 +388,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	if (m_proc.resolved())
 	{
 		//static_solver(m_A, RHS);
-		m_proc(mat.A, RHS, new_V);
+		m_proc((double *) mat.A, (double *)RHS, (double *)new_V);
 	}
 	else
 	{

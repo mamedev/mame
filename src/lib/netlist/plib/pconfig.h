@@ -48,6 +48,8 @@
 #define C14CONSTEXPR constexpr
 #elif __cplusplus == 201703L
 #define C14CONSTEXPR constexpr
+#elif defined(_MSC_VER)
+#define C14CONSTEXPR
 #else
 #error "C++ version not supported"
 #endif
