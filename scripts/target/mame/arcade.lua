@@ -2505,6 +2505,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mgames.cpp",
 	MAME_DIR .. "src/mame/drivers/merit.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
+	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")
