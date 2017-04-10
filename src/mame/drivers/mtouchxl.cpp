@@ -40,8 +40,8 @@ public:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_rombank;
-	void machine_start();
-	void machine_reset();
+	void machine_start() override;
+	void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(bank_w);
 };
 
