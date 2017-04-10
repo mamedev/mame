@@ -24,6 +24,7 @@
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
+#include "machine/atapicdr.h"
 #include "speaker.h"
 
 class mt6k_state : public driver_device
@@ -102,11 +103,13 @@ void mt6k_state::machine_reset()
 	m_rombank->set_entry(0);
 }
 
+static SLOT_INTERFACE_START(mt6k_ata_devices)
+	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(cdrom)
 	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_DEFAULT_OPTION("cdrom")
-	MCFG_SLOT_FIXED(true)
+	MCFG_DEVICE_SLOT_INTERFACE(mt6k_ata_devices, "cdrom", true)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_SLOT_DEFAULT_OPTION("")
 	MCFG_SLOT_FIXED(true)
@@ -153,7 +156,7 @@ ROM_START( mtchxl6k )
 	ROM_REGION(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
 	
-	DISK_REGION("board1:ide:ide:0:cdrom:image")
+	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
 ROM_END
 
