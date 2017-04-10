@@ -1432,9 +1432,20 @@ class i486_device : public i386_device
 public:
 	// construction/destruction
 	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i486_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+class i486dx4_device : public i486_device
+{
+public:
+	// construction/destruction
+	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void device_reset() override;
 };
 
@@ -1528,6 +1539,7 @@ protected:
 extern const device_type I386;
 extern const device_type I386SX;
 extern const device_type I486;
+extern const device_type I486DX4;
 extern const device_type PENTIUM;
 extern const device_type MEDIAGX;
 extern const device_type PENTIUM_PRO;
