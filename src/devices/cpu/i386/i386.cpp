@@ -3569,6 +3569,7 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
+	float_exception_flags = 0; // kill any float exceptions that occur here
 }
 
 void i386_device::build_opcode_table(uint32_t features)
