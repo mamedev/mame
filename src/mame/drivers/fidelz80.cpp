@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger
+// thanks-to:Berger,yovan
 /******************************************************************************
 
     Fidelity Electronics Z80 based board driver
@@ -506,6 +506,7 @@ expect that the software reads these once on startup only.
 #include "fidel_cc.lh" // clickable
 #include "fidel_bcc.lh" // clickable
 #include "fidel_dsc.lh" // clickable
+#include "fidel_sc8.lh" // clickable
 #include "fidel_vcc.lh" // clickable
 #include "fidel_vbrc.lh"
 #include "fidel_vsc.lh" // clickable
@@ -556,7 +557,6 @@ public:
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
-	DECLARE_WRITE8_MEMBER(scc_leds_w);
 
 	// VSC
 	void vsc_prepare_display();
@@ -922,22 +922,23 @@ READ8_MEMBER(fidelz80_state::bcc_input_r)
 
 // TTL
 
-WRITE8_MEMBER(fidelz80_state::scc_leds_w)
-{
-}
-
 WRITE8_MEMBER(fidelz80_state::scc_control_w)
 {
-	// d0-d3: input mux, speaker out
+	// a0-a2,d7: led data
+	u8 mask = 1 << (offset & 7);
+	m_led_data = (m_led_data & ~mask) | ((data & 0x80) ? mask : 0);
+
+	// d0-d3: led select, input mux (row 9 is speaker out)
+	// d4: corner led(direct)
 	m_inp_mux = 1 << (data & 0xf);
 	m_dac->write(BIT(m_inp_mux, 9));
+	display_matrix(8, 9, m_led_data, (m_inp_mux & 0xff) | (data << 4 & 0x100));
 }
 
 READ8_MEMBER(fidelz80_state::scc_input_r)
 {
-	// d0-d7: multiplexed inputs
-	//return rand();
-	return read_inputs(9);
+	// d0-d7: multiplexed inputs (active low)
+	return ~read_inputs(9);
 }
 
 
@@ -1172,9 +1173,8 @@ static ADDRESS_MAP_START( scc_map, AS_PROGRAM, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scc_io, AS_IO, 8, fidelz80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE(scc_control_w)
-	AM_RANGE(0xf6, 0xf6) AM_READ(scc_input_r)
+	ADDRESS_MAP_GLOBAL_MASK(0x07)
+	AM_RANGE(0x00, 0x07) AM_READWRITE(scc_input_r, scc_control_w)
 ADDRESS_MAP_END
 
 
@@ -1616,8 +1616,7 @@ static MACHINE_CONFIG_START( scc, fidelz80_state )
 	MCFG_CPU_IO_MAP(scc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_fidel_scc)
-	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_sc8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1758,7 +1757,7 @@ ROM_START( cc10 )
 ROM_END
 
 
-ROM_START( cc7 )
+ROM_START( cc7 ) // model BCC
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
 ROM_END
@@ -1766,7 +1765,7 @@ ROM_END
 
 ROM_START( fscc8 ) // model SCC, PCB label 510-1011 REV.2
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "101-32017", 0x0000, 0x1000, CRC(5340820d) SHA1(e3494c7624b3cacbbb9a0a8cc9e1ed3e00326dfd) ) // MOS 2332
+	ROM_LOAD( "101-32017", 0x0000, 0x1000, CRC(5340820d) SHA1(e3494c7624b3cacbbb9a0a8cc9e1ed3e00326dfd) ) // 2732
 ROM_END
 
 
@@ -1936,7 +1935,7 @@ ROM_END
 CONS( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, cc7,      0,      0,      bcc,     bcc,    driver_device, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, fscc8,    0,      0,      scc,     scc,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1980, fscc8,    0,      0,      scc,     scc,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
