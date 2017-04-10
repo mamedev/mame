@@ -553,6 +553,11 @@ public:
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
 
+	// SCC
+	DECLARE_READ8_MEMBER(scc_input_r);
+	DECLARE_WRITE8_MEMBER(scc_control_w);
+	DECLARE_WRITE8_MEMBER(scc_leds_w);
+
 	// VSC
 	void vsc_prepare_display();
 	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
@@ -912,6 +917,32 @@ READ8_MEMBER(fidelz80_state::bcc_input_r)
 
 
 /******************************************************************************
+    SCC
+******************************************************************************/
+
+// TTL
+
+WRITE8_MEMBER(fidelz80_state::scc_leds_w)
+{
+}
+
+WRITE8_MEMBER(fidelz80_state::scc_control_w)
+{
+	// d0-d3: input mux, speaker out
+	m_inp_mux = 1 << (data & 0xf);
+	m_dac->write(BIT(m_inp_mux, 9));
+}
+
+READ8_MEMBER(fidelz80_state::scc_input_r)
+{
+	// d0-d7: multiplexed inputs
+	//return rand();
+	return read_inputs(9);
+}
+
+
+
+/******************************************************************************
     VSC
 ******************************************************************************/
 
@@ -1130,6 +1161,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bcc_io, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(bcc_input_r, bcc_control_w)
+ADDRESS_MAP_END
+
+
+// SCC
+
+static ADDRESS_MAP_START( scc_map, AS_PROGRAM, 8, fidelz80_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x5000, 0x50ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( scc_io, AS_IO, 8, fidelz80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(scc_control_w)
+	AM_RANGE(0xf6, 0xf6) AM_READ(scc_input_r)
 ADDRESS_MAP_END
 
 
@@ -1463,6 +1508,22 @@ static INPUT_PORTS_START( cb_buttons )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( scc )
+	PORT_INCLUDE( cb_buttons )
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( vsc )
 	PORT_INCLUDE( cb_buttons )
 
@@ -1539,6 +1600,24 @@ static MACHINE_CONFIG_START( bcc, fidelz80_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( scc, fidelz80_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz)
+	MCFG_CPU_PROGRAM_MAP(scc_map)
+	MCFG_CPU_IO_MAP(scc_io)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	//MCFG_DEFAULT_LAYOUT(layout_fidel_scc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1678,9 +1757,16 @@ ROM_START( cc10 )
 	ROM_LOAD( "cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
 ROM_END
 
+
 ROM_START( cc7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
+ROM_END
+
+
+ROM_START( fscc8 ) // model SCC, PCB label 510-1011 REV.2
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "101-32017", 0x0000, 0x1000, CRC(5340820d) SHA1(e3494c7624b3cacbbb9a0a8cc9e1ed3e00326dfd) ) // MOS 2332
 ROM_END
 
 
@@ -1849,6 +1935,8 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, cc7,      0,      0,      bcc,     bcc,    driver_device, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1980, fscc8,    0,      0,      scc,     scc,    driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 8", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
 CONS( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
