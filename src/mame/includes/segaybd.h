@@ -33,36 +33,36 @@ public:
 		, m_ysprites(*this, "ysprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_soundlatch(*this, "soundlatch")
-		, m_digital_ports(*this, { { "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" } })
 		, m_adc_ports(*this, "ADC.%u", 0)
 		, m_pdrift_bank(0)
 		, m_scanline_timer(nullptr)
 		, m_irq2_scanline(0)
 		, m_timer_irq_state(0)
 		, m_vblank_irq_state(0)
+		, m_misc_io_data(0)
 		, m_tmp_bitmap(512, 512)
 	{
 		memset(m_analog_data, 0, sizeof(m_analog_data));
-		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 	}
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( analog_r );
-	DECLARE_WRITE16_MEMBER( analog_w );
-	DECLARE_READ16_MEMBER( io_chip_r );
-	DECLARE_WRITE16_MEMBER( io_chip_w );
-	DECLARE_WRITE16_MEMBER( sound_data_w );
+	DECLARE_READ16_MEMBER(analog_r);
+	DECLARE_WRITE16_MEMBER(analog_w);
+	DECLARE_WRITE8_MEMBER(output1_w);
+	DECLARE_WRITE8_MEMBER(misc_output_w);
+	DECLARE_WRITE8_MEMBER(output2_w);
+	DECLARE_WRITE16_MEMBER(sound_data_w);
 
 	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	DECLARE_READ8_MEMBER(sound_data_r);
 
 	// linked cabinet specific handlers
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intl );
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intr );
-	DECLARE_READ16_MEMBER( link_r );
-	DECLARE_READ16_MEMBER( link2_r );
-	DECLARE_WRITE16_MEMBER( link2_w );
-//  DECLARE_READ8_MEMBER( link_portc0_r );
+	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
+	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
+	DECLARE_READ16_MEMBER(link_r);
+	DECLARE_READ16_MEMBER(link2_r);
+	DECLARE_WRITE16_MEMBER(link2_w);
+//  DECLARE_READ8_MEMBER(link_portc0_r);
 
 	// game-specific output handlers
 	void gforce2_output_cb1(uint16_t data);
@@ -117,7 +117,6 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// input ports
-	required_ioport_array<8> m_digital_ports;
 	optional_ioport_array<6> m_adc_ports;
 
 	// configuration
@@ -131,6 +130,6 @@ protected:
 	int             m_irq2_scanline;
 	uint8_t           m_timer_irq_state;
 	uint8_t           m_vblank_irq_state;
-	uint8_t           m_misc_io_data[0x10];
+	uint8_t           m_misc_io_data;
 	bitmap_ind16    m_tmp_bitmap;
 };
