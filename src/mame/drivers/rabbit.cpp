@@ -135,6 +135,7 @@ public:
 	int m_banking;
 	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
 	tilemap_t *m_tilemap[4];
+	emu_timer *m_blit_done_timer;
 
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
 	DECLARE_WRITE32_MEMBER(tilemap1_w);
@@ -439,6 +440,8 @@ void rabbit_state::video_start()
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 
+	m_blit_done_timer = timer_alloc(TIMER_BLIT_DONE);
+
 	save_pointer(NAME(m_tilemap_ram[0].get()), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[1].get()), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[2].get()), 0x20000/4);
@@ -631,7 +634,7 @@ void rabbit_state::do_blit()
 				if (!blt_amount)
 				{
 					if(BLITLOG) osd_printf_debug("end of blit list\n");
-					timer_set(attotime::from_usec(500), TIMER_BLIT_DONE);
+					m_blit_done_timer->adjust(attotime::from_usec(500));
 					return;
 				}
 
