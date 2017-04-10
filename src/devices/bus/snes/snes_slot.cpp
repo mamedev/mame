@@ -308,7 +308,7 @@ static const char *sns_get_slot(int type)
 
 
 /* Here we add a couple of cart utilities, to avoid duplicating the code in each DEVICE_IMAGE_LOAD */
-uint32_t base_sns_cart_slot_device::snes_skip_header( uint8_t *ROM, uint32_t rom_size )
+uint32_t base_sns_cart_slot_device::snes_skip_header(const uint8_t *ROM, uint32_t rom_size) const
 {
 	uint8_t header[512];
 	uint32_t offset = 512;
@@ -345,7 +345,7 @@ uint32_t base_sns_cart_slot_device::snes_skip_header( uint8_t *ROM, uint32_t rom
 /* This function assign a 'score' to data immediately after 'offset' to measure how valid they are
  as information block (to decide if the image is HiRom, LoRom, ExLoRom or ExHiRom) */
 /* Code from bsnes, courtesy of byuu - http://byuu.org/ , based on previous code by Cowering */
-static int snes_validate_infoblock( uint8_t *infoblock, uint32_t offset )
+static int snes_validate_infoblock(const uint8_t *infoblock, uint32_t offset)
 {
 	int score = 0;
 	uint16_t reset_vector = infoblock[offset + 0x3c] | (infoblock[offset + 0x3d] << 8);
@@ -454,7 +454,7 @@ static int snes_validate_infoblock( uint8_t *infoblock, uint32_t offset )
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
  state->m_cart[0].sram accordingly; and returns the offset of the internal header (needed to
  detect BSX and ST carts) */
-static uint32_t snes_find_hilo_mode(device_t *device, uint8_t *buffer, uint32_t buf_len )
+static uint32_t snes_find_hilo_mode(const device_t *device, const uint8_t *buffer, uint32_t buf_len)
 {
 	uint8_t valid_mode20 = 0;
 	uint8_t valid_mode21 = 0;
@@ -490,7 +490,7 @@ static uint32_t snes_find_hilo_mode(device_t *device, uint8_t *buffer, uint32_t 
 }
 
 
-static int snes_find_addon_chip( uint8_t *buffer, uint32_t start_offs )
+static int snes_find_addon_chip( const uint8_t *buffer, uint32_t start_offs )
 {
 	/* Info mostly taken from http://snesemu.black-ship.net/misc/hardware/-from%20nsrt.edgeemu.com-chipinfo.htm */
 	switch (buffer[start_offs + 0x16])
@@ -868,10 +868,10 @@ void base_sns_cart_slot_device::setup_nvram()
 
 
 
-void base_sns_cart_slot_device::get_cart_type_addon(uint8_t *ROM, uint32_t len, int &type, int &addon)
+void base_sns_cart_slot_device::get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const
 {
 	// First, look if the cart is HiROM or LoROM (and set snes_cart accordingly)
-	int hilo_mode = snes_find_hilo_mode(this,ROM, len);
+	int hilo_mode = snes_find_hilo_mode(this, ROM, len);
 
 	switch (hilo_mode)
 	{

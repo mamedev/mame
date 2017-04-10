@@ -473,7 +473,7 @@ int sms_state::detect_korean_mapper( uint8_t *rom )
 }
 #endif
 
-int sega8_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) const
 {
 	int type = SEGA8_BASE_ROM;
 
