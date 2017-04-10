@@ -124,6 +124,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -2505,7 +2506,12 @@ static MACHINE_CONFIG_DERIVED( model2a_0229, model2a )
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(model2_state::driveio_port_r)
+READ8_MEMBER(model2_state::driveio_portg_r)
+{
+	return m_driveio_comm_data;
+}
+
+READ8_MEMBER(model2_state::driveio_porth_r)
 {
 	return m_driveio_comm_data;
 }
@@ -2516,13 +2522,6 @@ WRITE8_MEMBER(model2_state::driveio_port_w)
 //  popmessage("%02x",data);
 }
 
-READ8_MEMBER(model2_state::driveio_port_str_r)
-{
-	static const char sega_str[4] = { 'S', 'E', 'G', 'A' };
-
-	return sega_str[offset];
-}
-
 static ADDRESS_MAP_START( drive_map, AS_PROGRAM, 8, model2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -2531,11 +2530,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
-	AM_RANGE(0x23, 0x23) AM_WRITE(driveio_port_w)
-	AM_RANGE(0x26, 0x27) AM_READ(driveio_port_r)
-	AM_RANGE(0x28, 0x2b) AM_READ(driveio_port_str_r)
-	AM_RANGE(0x40, 0x4f) AM_WRITENOP //Oki M6253
-	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("driveio2", sega_315_5296_device, read, write)
+	AM_RANGE(0x80, 0x83) AM_NOP //Oki M6253
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( srallyc, model2a )
@@ -2544,6 +2541,13 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_CPU_PROGRAM_MAP(drive_map)
 	MCFG_CPU_IO_MAP(drive_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 16000000/4) //???
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(model2_state, driveio_port_w))
+	MCFG_315_5296_IN_PORTG_CB(READ8(model2_state, driveio_portg_r))
+	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
+
+	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 16000000/4) //???
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
