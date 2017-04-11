@@ -122,6 +122,7 @@
 #include "cpu/mb86235/mb86235.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -2615,6 +2616,25 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( model2b_0229, model2b )
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
+
+static ADDRESS_MAP_START( rchase2_iocpu_map, AS_PROGRAM, 8, model2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rchase2_ioport_map, AS_IO, 8, model2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_DERIVED( rchase2, model2b )
+	MCFG_CPU_ADD("iocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
+	MCFG_CPU_IO_MAP(rchase2_ioport_map)
+
+	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
@@ -6151,7 +6171,7 @@ GAME( 1997, zerogunj,  zerogun, model2b_5881, model2,  model2_state,  zerogun, R
 GAME( 1998, dynamcopb,dynamcop, model2b_5881, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2b,dynamcop, model2b_5881, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,         0, model2b_5881, model2,  model2_state,  pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, rchase2,         0, model2b,      rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, rchase2,         0, rchase2,      rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
