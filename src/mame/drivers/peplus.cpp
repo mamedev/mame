@@ -4980,7 +4980,7 @@ PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF* 
   % Range: 95.5-97.5%  Optimum: 99.5%  Hit Frequency: 51.4%
      Programs Available: PP0232
 
-* Custom or Flag suit.   A Sequential Royal with the Flag suit pays 10,000 per coin in!
+* Custom or Flag suit.   A Sequential, left to right (10 --> A), Royal Flush with the Flag suit pays 10,000 per coin in!
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
