@@ -3,6 +3,7 @@
 
 #include "sound/okim6295.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 
 class tatsumi_state : public driver_device
@@ -18,6 +19,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_io(*this, {"io1", "io2"}),
 		m_videoram(*this, "videoram"),
 		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
 		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),
@@ -45,6 +47,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<cxd1095_device, 2> m_io;
 
 	optional_shared_ptr<uint16_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_cyclwarr_cpua_ram;
@@ -72,9 +75,9 @@ public:
 	uint8_t *m_rom_sprite_lookup2;
 	uint8_t *m_rom_clut0;
 	uint8_t *m_rom_clut1;
-	uint16_t m_control_word;
+	uint8_t m_control_word;
 	uint16_t m_apache3_rotate_ctrl[12];
-	uint16_t m_last_control;
+	uint8_t m_last_control;
 	uint8_t m_apache3_adc;
 	int m_apache3_rot_idx;
 	tilemap_t *m_tx_layer;
@@ -96,6 +99,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
+	DECLARE_WRITE16_MEMBER(io1_byte_smear_w);
+	DECLARE_WRITE16_MEMBER(io2_byte_smear_w);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sound_w);
 	DECLARE_READ16_MEMBER(apache3_bank_r);
 	DECLARE_WRITE16_MEMBER(apache3_bank_w);
@@ -112,8 +117,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_control_w);
 	DECLARE_WRITE16_MEMBER(roundup5_d0000_w);
 	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
-	DECLARE_READ16_MEMBER(cyclwarr_control_r);
-	DECLARE_WRITE16_MEMBER(cyclwarr_control_w);
+	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_READ16_MEMBER(tatsumi_v30_68000_r);
 	DECLARE_WRITE16_MEMBER(tatsumi_v30_68000_w);
 	DECLARE_WRITE16_MEMBER(tatsumi_sprite_control_w);
