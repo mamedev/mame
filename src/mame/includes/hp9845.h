@@ -76,9 +76,6 @@ protected:
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
 
-	// Optional character generator
-	required_region_ptr<uint8_t> m_optional_chargen;
-
 	// Text mode video I/F
 	typedef struct {
 		uint8_t chars[ 80 ];
