@@ -72,6 +72,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 */
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "sound/sn76496.h"
 #include "rendlay.h"
 
@@ -105,8 +106,10 @@ public:
 
 	DECLARE_READ8_MEMBER(cart_select_r);
 	DECLARE_WRITE8_MEMBER(cart_select_w);
-	DECLARE_READ8_MEMBER(bios_ctrl_r);
-	DECLARE_WRITE8_MEMBER(bios_ctrl_w);
+	DECLARE_READ8_MEMBER(bios_portc_r);
+	DECLARE_READ8_MEMBER(bios_porte_r);
+	DECLARE_WRITE8_MEMBER(bios_portd_w);
+	DECLARE_WRITE8_MEMBER(bios_porte_w);
 	DECLARE_READ8_MEMBER(read_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
 	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
@@ -302,10 +305,6 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 INPUT_PORTS_END
 
 /* MEGATECH specific */
-READ8_MEMBER(mtech_state::cart_select_r )
-{
-	return m_mt_cart_select_reg;
-}
 
 READ8_MEMBER(mtech_state::sms_count_r)
 {
@@ -453,7 +452,7 @@ void mtech_state::switch_cart(int gameno)
 	}
 }
 
-WRITE8_MEMBER(mtech_state::cart_select_w )
+WRITE8_MEMBER(mtech_state::cart_select_w)
 {
 	/* seems to write the slot number..
 	  but it stores something in (banked?) ram
@@ -464,27 +463,25 @@ WRITE8_MEMBER(mtech_state::cart_select_w )
 }
 
 
-READ8_MEMBER(mtech_state::bios_ctrl_r )
+READ8_MEMBER(mtech_state::bios_portc_r)
 {
-	if (offset == 0)
-		return 0;
-	if (offset == 2)
-		return m_bios_ctrl[offset] & 0xfe;
-
-	return m_bios_ctrl[offset];
+	return 0;
 }
 
-WRITE8_MEMBER(mtech_state::bios_ctrl_w )
+READ8_MEMBER(mtech_state::bios_porte_r)
 {
-	if (offset == 1)
-	{
-		output().set_value("Alarm_sound", BIT(data, 7));
-		m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
-	}
-	else if (offset == 2)
-		output().set_value("Flash_screen", BIT(data, 1));
+	return 0;
+}
 
-	m_bios_ctrl[offset] = data;
+WRITE8_MEMBER(mtech_state::bios_portd_w)
+{
+	output().set_value("Alarm_sound", BIT(data, 7));
+	m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
+}
+
+WRITE8_MEMBER(mtech_state::bios_porte_w)
+{
+	output().set_value("Flash_screen", BIT(data, 1));
 }
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
@@ -525,13 +522,8 @@ static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(banked_ram_r, banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(mt_z80_bank_w )
-	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("BIOS_DSW0")
-	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("BIOS_DSW1")
-	AM_RANGE(0x6404, 0x6404) AM_READWRITE(cart_select_r, cart_select_w) // cart select & ram bank
-	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("BIOS_IN0")
-	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("BIOS_IN1")
-	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
-//  AM_RANGE(0x6805, 0x6805) AM_READ_PORT("???")
+	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
+	AM_RANGE(0x6800, 0x6807) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
 	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(read_68k_banked_data, write_68k_banked_data) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
@@ -684,6 +676,19 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MCFG_CPU_PROGRAM_MAP(megatech_bios_map)
 	MCFG_CPU_IO_MAP(megatech_bios_portmap)
+
+	MCFG_DEVICE_ADD("io1", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_DSW0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_DSW0"))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mtech_state, cart_select_w))
+
+	MCFG_DEVICE_ADD("io2", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_IN0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_IN1"))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(mtech_state, bios_portc_r))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mtech_state, bios_portd_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(mtech_state, bios_porte_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mtech_state, bios_porte_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
