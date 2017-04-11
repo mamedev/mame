@@ -53,11 +53,19 @@ void cxd1095_device::device_start()
 		cb.resolve();
 
 	std::fill(std::begin(m_data_latch), std::end(m_data_latch), 0);
-	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
 
 	// save state
 	save_item(NAME(m_data_latch));
 	save_item(NAME(m_data_dir));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void cxd1095_device::device_reset()
+{
+	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
 }
 
 //-------------------------------------------------

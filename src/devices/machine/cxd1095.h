@@ -103,6 +103,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// input/output callbacks
