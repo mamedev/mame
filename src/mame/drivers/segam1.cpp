@@ -34,6 +34,7 @@ uses s24 style tilemaps (ram based?)
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/315_5296.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,6 +66,17 @@ uint32_t segam1_state::screen_update_segam1(screen_device &screen, bitmap_ind16 
 
 static ADDRESS_MAP_START( segam1_map, AS_PROGRAM, 16, segam1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0xb00000, 0xb01fff) AM_RAM // ???
+	AM_RANGE(0xb02000, 0xb03fff) AM_RAM // ???
+	AM_RANGE(0xb04000, 0xb05fff) AM_RAM // ???
+	AM_RANGE(0xb06000, 0xb07fff) AM_RAM // ???
+	AM_RANGE(0xb0c000, 0xb0dfff) AM_RAM // ???
+	AM_RANGE(0xb80000, 0xbfffff) AM_RAM // ???
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM // ???
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM // ???
+	AM_RANGE(0xe00000, 0xe0001f) AM_DEVREADWRITE8("io1", sega_315_5296_device, read, write, 0x00ff)
+	AM_RANGE(0xe80000, 0xe8001f) AM_DEVREADWRITE8("io2", sega_315_5296_device, read, write, 0x00ff)
+	AM_RANGE(0xf00000, 0xf03fff) AM_RAM // NVRAM?
 ADDRESS_MAP_END
 
 
@@ -80,6 +92,8 @@ static MACHINE_CONFIG_START( segam1, segam1_state )
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state,  irq1_line_hold)
 
+	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 10000000) // ???
+	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 10000000) // ???
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
