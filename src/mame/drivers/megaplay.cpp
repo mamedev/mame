@@ -77,7 +77,6 @@ public:
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
 	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_READ8_MEMBER(bios_gamesel_r);
 	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
 	DECLARE_WRITE16_MEMBER(mp_io_write);
 	DECLARE_READ16_MEMBER(mp_io_read);
@@ -400,11 +399,6 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 	m_bios_bank = data;
 	m_bios_mode = MP_ROM;
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
-}
-
-READ8_MEMBER(mplay_state::bios_gamesel_r)
-{
-	return m_bios_6403;
 }
 
 WRITE8_MEMBER(mplay_state::bios_gamesel_w)
