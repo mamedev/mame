@@ -1077,6 +1077,7 @@ pstlpkr1                        //
 punchy                          //
 punchy3                         //
 usafootb                        //
+usafootba                       //
 wrldtour                        //
 wrldtour2                       //
 wrldtour3                       //
@@ -17785,7 +17786,7 @@ unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
 @source:macp.cpp
-//glxplay                       //
+glxplay                       //
 glxplay2                        //
 kidnap                          //
 mac_1808                        //
