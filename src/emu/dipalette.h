@@ -46,8 +46,8 @@ public:
 	device_palette_interface(const machine_config &mconfig, device_t &device);
 
 	// getters
-	int entries() const { return (m_palette != nullptr) ? m_palette->num_colors() : 0; }
-	int indirect_entries() const { return m_indirect_colors.size(); }
+	int entries() const { return palette_entries(); }
+	int indirect_entries() const { return palette_indirect_entries(); }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -56,8 +56,8 @@ public:
 	double pen_contrast(pen_t pen) const { return m_palette->entry_contrast(pen); }
 	pen_t black_pen() const { return m_black_pen; }
 	pen_t white_pen() const { return m_white_pen; }
-	bool shadows_enabled() const { return m_shadow_group != 0; }
-	bool hilights_enabled() const { return m_hilight_group != 0; }
+	bool shadows_enabled() const { return palette_shadows_enabled(); }
+	bool hilights_enabled() const { return palette_hilights_enabled(); }
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
@@ -83,6 +83,7 @@ public:
 
 protected:
 	// interface-level overrides
+	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
 	virtual void interface_pre_save() override;
