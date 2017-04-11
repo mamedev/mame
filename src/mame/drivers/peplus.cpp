@@ -4986,10 +4986,10 @@ MAX Bet of 5 coins      Bonus    Payout
 ---------------------------------------
 Royal Flush............  1300     6500
 Flag Royal Flush.......  3000    15000
-Sequentail Royal Flush.  5000    25000
+Sequential Royal Flush.  5000    25000
 Flag Seq Royal Flush... 10000    50000
 
-Sequentail Royal is left to right 10, J, Q, K, A
+Sequential Royal is left to right 10, J, Q, K, A
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
