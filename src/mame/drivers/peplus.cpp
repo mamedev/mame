@@ -4974,13 +4974,22 @@ ROM_START( pepp0232 ) /* Normal board : Patriot Poker (PP0232) */
 /*
 Has 5 additional cards, 10 through Ace, with a US Flag for a Suit.
 
-PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*  (Bonus)
-----------------------------------------------------------------------------------------
-  P118U     1    2   2   3    5   6  15 100  800   1000  2000    3000    5000     10000
+PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*    (Bonus)
+------------------------------------------------------------------------------------------
+  P118U     1    2   2   3    5   6  15 100  800   1000  2000    3000    5000    See Below
   % Range: 95.5-97.5%  Optimum: 99.5%  Hit Frequency: 51.4%
      Programs Available: PP0232
 
-* Custom or Flag suit.   A Sequential, left to right (10 --> A), Royal Flush with the Flag suit pays 10,000 per coin in!
+* Custom under this CG set is the Flag suit.
+
+MAX Bet of 5 coins      Bonus    Payout
+---------------------------------------
+Royal Flush............  1300     6500
+Flag Royal Flush.......  3000    15000
+Sequentail Royal Flush.  5000    25000
+Flag Seq Royal Flush... 10000    50000
+
+Sequentail Royal is left to right 10, J, Q, K, A
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
