@@ -4,14 +4,14 @@
 
   mtouchxl.cpp: Merit Industries MegaTouch XL
   
-  Hardware includes a base 486? PC with VGA and a customized ISA I/O
+  Hardware includes a base 486 PC with VGA and a customized ISA I/O
   card.  The I/O card includes audio and an option ROM which patches int 19h
   (POST Completed) to instead jump back to the option ROM which loads
   "ROM-DOS", installs drivers for the Microtouch screen, and then boots 
   from the CD-ROM drive.
   
-  Currently: ROM-DOS loads and installs virtual drive C:, but things go wrong
-  in a hurry after that :)
+  Audio is a CS4231 combination CODEC/Mixer also found in Gravis Ultraound MAX
+  and some SPARCstations.
   
 ***************************************************************************/
 
@@ -25,42 +25,44 @@
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/atapicdr.h"
+#include "machine/bankdev.h"
+#include "machine/intelfsh.h"
 #include "speaker.h"
 
-class mt6k_state : public driver_device
+class mtxl_state : public driver_device
 {
 public:
-	mt6k_state(const machine_config &mconfig, device_type type, const char *tag)
+	mtxl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG),
-		m_rombank(*this, "rombank")
+		m_iocard(*this, "dbank")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	required_memory_bank m_rombank;
+	required_device<address_map_bank_device> m_iocard;
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(bank_w);
 };
 
-WRITE8_MEMBER(mt6k_state::bank_w)
+WRITE8_MEMBER(mtxl_state::bank_w)
 {
-	m_rombank->set_entry(data & 0xf);
+	m_iocard->set_bank(data & 0x1f);
 }
 
-static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mt6k_state )
+static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0x000d0000, 0x000dffff) AM_ROMBANK("rombank")
+	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x000d0000, 0x000dffff) AM_DEVICE("dbank", address_map_bank_device, amap32)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_io, AS_IO, 32, mt6k_state )
+static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
@@ -75,13 +77,18 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mt6k_state )
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
+ADDRESS_MAP_END
+
 /**********************************************************
  *
  * Init functions
  *
  *********************************************************/
 
-void mt6k_state::machine_start()
+void mtxl_state::machine_start()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
@@ -95,12 +102,11 @@ void mt6k_state::machine_start()
 		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
 		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
 	}
-	m_rombank->configure_entries(0, 16, memregion("ioboard")->base(), 0x10000);
 }
 
-void mt6k_state::machine_reset()
+void mtxl_state::machine_reset()
 {
-	m_rombank->set_entry(0);
+	m_iocard->set_bank(0);
 }
 
 static SLOT_INTERFACE_START(mt6k_ata_devices)
@@ -115,7 +121,7 @@ static MACHINE_CONFIG_FRAGMENT(cdrom)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at486, mt6k_state )
+static MACHINE_CONFIG_START( at486, mtxl_state )
 	MCFG_CPU_ADD("maincpu", I486DX4, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -147,6 +153,16 @@ static MACHINE_CONFIG_START( at486, mt6k_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")	// Early XL games had 8 MB RAM, later ones require 32MB
 	MCFG_RAM_EXTRA_OPTIONS("32M")
+	
+	/* bankdev for dxxxx */
+	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	
+	/* Flash ROM */
+	MCFG_AMD_29F040_ADD("flash")
 MACHINE_CONFIG_END
 
 ROM_START( mtchxl6k )
@@ -155,7 +171,9 @@ ROM_START( mtchxl6k )
 	
 	ROM_REGION(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
-	
+		
+	ROM_REGION(0x8000, "dallas", ROMREGION_ERASE00)
+		
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
 ROM_END
