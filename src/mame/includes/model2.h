@@ -186,9 +186,9 @@ public:
 	DECLARE_READ32_MEMBER(copro_status_r);
 	DECLARE_READ32_MEMBER(polygon_count_r);
 
-	DECLARE_READ8_MEMBER(driveio_port_r);
+	DECLARE_READ8_MEMBER(driveio_portg_r);
+	DECLARE_READ8_MEMBER(driveio_porth_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
-	DECLARE_READ8_MEMBER(driveio_port_str_r);
 	void push_geo_data(uint32_t data);
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);

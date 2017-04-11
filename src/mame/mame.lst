@@ -1077,6 +1077,7 @@ pstlpkr1                        //
 punchy                          //
 punchy3                         //
 usafootb                        //
+usafootba                       //
 wrldtour                        //
 wrldtour2                       //
 wrldtour3                       //
@@ -12411,6 +12412,7 @@ bridgec3                        //
 cc10                            //
 cc7                             //
 damesc                          //
+fscc8                           //
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German
@@ -14417,7 +14419,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
-gnwmndon                        // Nintendo
+gnw_dm53                        // Nintendo
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
@@ -17784,7 +17786,7 @@ unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
 @source:macp.cpp
-//glxplay                       //
+glxplay                       //
 glxplay2                        //
 kidnap                          //
 mac_1808                        //

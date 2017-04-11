@@ -92,6 +92,18 @@
 		</part>
 	</software>
 
+	<software name="keychip">
+		<description>KeyChip</description>
+		<year>1981</year>
+		<publisher>WIRT Microsystems</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="keychip-9000.bin" size="0x1000" crc="e7b9d8d2" sha1="5825d25206eb82febc9fb2c8fb669e4301cd1101" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcterm095" cloneof="mcterm">
 		<description>McTerm 0.95</description>
 		<year>1980</year>
