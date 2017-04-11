@@ -100,7 +100,7 @@ public:
 		, m_stack_levels(stack_levels)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
-		, m_melody_rom(*this, "music")
+		, m_melody_rom(*this, "melody")
 		, m_read_k(*this)
 		, m_read_ba(*this), m_read_b(*this)
 		, m_write_s(*this)

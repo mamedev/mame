@@ -197,7 +197,7 @@
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="&#x265e;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
-	<element name="text_pion">
+	<element name="text_pawn">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="&#x265f;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
@@ -393,7 +393,7 @@
 		<bezel element="text_rook"><bounds x="21" y="98" width="10" height="4" /></bezel>
 		<bezel element="text_bishop"><bounds x="55" y="98" width="10" height="4" /></bezel>
 		<bezel element="text_knight"><bounds x="64" y="98" width="10" height="4" /></bezel>
-		<bezel element="text_pion"><bounds x="73" y="98" width="10" height="4" /></bezel>
+		<bezel element="text_pawn"><bounds x="73" y="98" width="10" height="4" /></bezel>
 
 		<bezel element="disk_black"><bounds x="6" y="92" width="4" height="4" /></bezel>
 		<bezel element="disk_black"><bounds x="15" y="92" width="4" height="4" /></bezel>
