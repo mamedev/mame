@@ -27,6 +27,7 @@
 #include "machine/atapicdr.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
+#include "machine/ds128x.h"
 #include "speaker.h"
 
 class mtxl_state : public driver_device
@@ -148,6 +149,10 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
 	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
+	MCFG_DEVICE_REMOVE("mb:rtc")
+	MCFG_DS12885_ADD("mb:rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -176,6 +181,9 @@ ROM_START( mtchxl6k )
 		
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
+
+	ROM_REGION(0x80, "mb:rtc", 0)
+	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(1647ff1d) SHA1(038e040d4be1ac3ca0eb36cbfd9435ab3147f076))
 ROM_END
 
 /***************************************************************************
