@@ -28,6 +28,7 @@
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
+#include "machine/ds2401.h"
 #include "speaker.h"
 
 class mtxl_state : public driver_device
@@ -38,20 +39,34 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG),
-		m_iocard(*this, "dbank")
+		m_iocard(*this, "dbank"),
+		m_ibutton(*this, "ibutton")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_iocard;
+	required_device<ds2401_device> m_ibutton;
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_WRITE8_MEMBER(key_w);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
 {
 	m_iocard->set_bank(data & 0x1f);
+}
+
+READ8_MEMBER(mtxl_state::key_r)
+{
+	return m_ibutton->read() ? 0x20 : 0;
+}
+
+WRITE8_MEMBER(mtxl_state::key_w)
+{
+	m_ibutton->write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
@@ -75,6 +90,7 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
+	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -168,6 +184,9 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	
 	/* Flash ROM */
 	MCFG_AMD_29F040_ADD("flash")
+	
+	/* Security iButton */
+	MCFG_DS2401_ADD("ibutton")
 MACHINE_CONFIG_END
 
 ROM_START( mtchxl6k )
