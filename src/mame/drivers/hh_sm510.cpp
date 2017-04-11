@@ -555,6 +555,65 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Boxing (model BX-301)
+  * Sharp SM511 label BX-301 287C (die label KMS 73B, KMS 744)
+
+***************************************************************************/
+
+class bx301_state : public hh_sm510_state
+{
+public:
+	bx301_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 1;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( bx301 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bx301, bx301_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+
+	/* video hardware */
+	/*
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920, 529)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 529-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+	*/
+
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   IM-02 Nu, Pogodi!
   * KB1013VK1-2, die label V2-2 VK1-2
 
@@ -665,6 +724,18 @@ ROM_START( gnw_dm53 )
 ROM_END
 
 
+ROM_START( gnw_bx301 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bx301_kms73b_kms744.program", 0x0000, 0x1000, CRC(dee4e7ea) SHA1(177b8ab779bbafee18c4f00b521d5e94aa069fb6) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bx301_kms73b_kms744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
+
+	ROM_REGION( 258646, "svg", 0)
+	ROM_LOAD( "gnw_bx301.svg", 0, 258646, BAD_DUMP CRC(5b2c94d2) SHA1(2c9b58df3a973b81e38ba0bf0e4686a00ab1578b) ) // by sean, ver. 11 apr 2017
+ROM_END
+
+
 ROM_START( nupogodi )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
@@ -680,5 +751,6 @@ CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  driver_device, 0, "Kon
 CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  driver_device, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     driver_device, 0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  driver_device, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
