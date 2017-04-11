@@ -304,6 +304,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 			m_palette_entries(0),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
+			m_io0_porta(*this, "IO0PORTA"),
 			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
 			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
 {
@@ -736,7 +737,7 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 
 READ8_MEMBER(segaxbd_state::aburner2_motor_r)
 {
-	uint8_t data = ioport("IO0PORTA")->read() & 0xc0;
+	uint8_t data = m_io0_porta->read() & 0xc0;
 
 	// TODO
 	return data | 0x3f;
@@ -761,7 +762,7 @@ WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
 
 READ8_MEMBER(segaxbd_state::smgp_motor_r)
 {
-	uint8_t data = ioport("IO0PORTA")->read() & 0xc0;
+	uint8_t data = m_io0_porta->read() & 0xc0;
 
 	// TODO
 	return data | 0x0;
