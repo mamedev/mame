@@ -199,7 +199,7 @@ enum
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    | EXLTFG   | EXSYFG   |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | EVEN     |
+       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | PAL      |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 /* 180006 - r/w - VRSIZE - VRAM Size
@@ -6001,14 +6001,20 @@ uint8_t saturn_state::get_vblank( void )
 }
 
 // TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition, assume following disp bit.
+//       this is actually wrong for finlarch/sasissu/magzun so it needs to be tested on real HW.
 uint8_t saturn_state::get_odd_bit( void )
 {
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
-		return STV_VDP2_DISP;
+		return 1;
 
 	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
-		return STV_VDP2_DISP;
-
+	{
+		if((STV_VDP2_HRES & 1) == 0)
+			return STV_VDP2_DISP;
+		
+		return 1;
+	}
+	
 	return machine().first_screen()->frame_number() & 1;
 }
 
