@@ -7,159 +7,6 @@
 
 #include <limits.h>
 
-enum clipper_registers
-{
-	CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
-	CLIPPER_R8, CLIPPER_R9, CLIPPER_R10, CLIPPER_R11, CLIPPER_R12, CLIPPER_R13, CLIPPER_R14, CLIPPER_R15,
-
-	CLIPPER_F0, CLIPPER_F1, CLIPPER_F2, CLIPPER_F3, CLIPPER_F4, CLIPPER_F5, CLIPPER_F6, CLIPPER_F7,
-	CLIPPER_F8, CLIPPER_F9, CLIPPER_F10, CLIPPER_F11, CLIPPER_F12, CLIPPER_F13, CLIPPER_F14, CLIPPER_F15,
-
-	CLIPPER_PSW,
-	CLIPPER_SSW,
-	CLIPPER_PC,
-};
-
-enum clipper_addressing_modes
-{
-	ADDR_MODE_PC32  = 0x10,
-	ADDR_MODE_ABS32 = 0x30,
-	ADDR_MODE_REL32 = 0x60,
-	ADDR_MODE_PC16  = 0x90,
-	ADDR_MODE_REL12 = 0xa0,
-	ADDR_MODE_ABS16 = 0xb0,
-	ADDR_MODE_PCX   = 0xd0,
-	ADDR_MODE_RELX  = 0xe0,
-};
-
-// branch conditions
-enum clipper_branch_conditions
-{
-	BRANCH_T   = 0x0,
-	BRANCH_LT  = 0x1,
-	BRANCH_LE  = 0x2,
-	BRANCH_EQ  = 0x3,
-	BRANCH_GT  = 0x4,
-	BRANCH_GE  = 0x5,
-	BRANCH_NE  = 0x6,
-	BRANCH_LTU = 0x7,
-	BRANCH_LEU = 0x8,
-	BRANCH_GTU = 0x9,
-	BRANCH_GEU = 0xa,
-	BRANCH_V   = 0xb,
-	BRANCH_NV  = 0xc,
-	BRANCH_N   = 0xd,
-	BRANCH_NN  = 0xe,
-	BRANCH_FN  = 0xf,
-};
-
-enum clipper_psw
-{
-	PSW_N   = 0x00000001, // negative
-	PSW_Z   = 0x00000002, // zero
-	PSW_V   = 0x00000004, // overflow
-	PSW_C   = 0x00000008, // carry out or borrow in
-	PSW_FX  = 0x00000010, // floating inexact
-	PSW_FU  = 0x00000020, // floating underflow
-	PSW_FD  = 0x00000040, // floating divide by zero
-	PSW_FV  = 0x00000080, // floating overflow
-	PSW_FI  = 0x00000100, // floating invalid operation
-	PSW_EFX = 0x00000200, // enable floating inexact trap
-	PSW_EFU = 0x00000400, // enable floating underflow trap
-	PSW_EFD = 0x00000800, // enable floating divide by zero trap
-	PSW_EFV = 0x00001000, // enable floating overflow trap
-	PSW_EFI = 0x00002000, // enable floating invalid operation trap
-	PSW_EFT = 0x00004000, // enable floating trap
-	PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
-						  // unused (3 bits)
-	PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
-	PSW_BIG = 0x00400000, // c400 - big endian (hardware)
-	PSW_T   = 0x00800000, // trace trap
-	PSW_CTS = 0x0f000000, // cpu trap status (4 bits)
-	PSW_MTS = 0xf0000000, // memory trap status (4 bits)
-};
-
-enum clipper_ssw
-{
-	SSW_IN  = 0x0000000f, // interrupt number (4 bits)
-	SSW_IL  = 0x000000f0, // interrupt level (4 bits)
-	SSW_EI  = 0x00000100, // enable interrupts
-	SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
-						  // unused (5 bits)
-	SSW_FRD = 0x00400000, // floating registers dirty
-	SSW_TP  = 0x00800000, // trace trap pending
-	SSW_ECM = 0x01000000, // enabled corrected memory error
-	SSW_DF  = 0x02000000, // fpu disabled
-	SSW_M   = 0x04000000, // mapped mode
-	SSW_KU  = 0x08000000, // user protect key
-	SSW_UU  = 0x10000000, // user data mode
-	SSW_K   = 0x20000000, // protect key
-	SSW_U   = 0x40000000, // user mode
-	SSW_P   = 0x80000000, // previous mode
-};
-
-enum clipper_exception_vectors
-{
-	// data memory trap group
-	EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
-	EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
-	EXCEPTION_D_ALIGNMENT_FAULT            = 0x120,
-	EXCEPTION_D_PAGE_FAULT                 = 0x128,
-	EXCEPTION_D_READ_PROTECT_FAULT         = 0x130,
-	EXCEPTION_D_WRITE_PROTECT_FAULT        = 0x138,
-
-	// floating-point arithmetic trap group
-	EXCEPTION_FLOATING_INEXACT             = 0x180,
-	EXCEPTION_FLOATING_UNDERFLOW           = 0x188,
-	EXCEPTION_FLOATING_DIVIDE_BY_ZERO      = 0x190,
-	EXCEPTION_FLOATING_OVERFLOW            = 0x1a0,
-	EXCEPTION_FLOATING_INVALID_OPERATION   = 0x1c0,
-
-	// integer arithmetic trap group
-	EXCEPTION_INTEGER_DIVIDE_BY_ZERO       = 0x208,
-
-	// instruction memory trap group
-	EXCEPTION_I_CORRECTED_MEMORY_ERROR     = 0x288,
-	EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
-	EXCEPTION_I_ALIGNMENT_FAULT            = 0x2a0,
-	EXCEPTION_I_PAGE_FAULT                 = 0x2a8,
-	EXCEPTION_I_EXECUTE_PROTECT_FAULT      = 0x2b0,
-
-	// illegal operation trap group
-	EXCEPTION_ILLEGAL_OPERATION            = 0x300,
-	EXCEPTION_PRIVILEGED_INSTRUCTION       = 0x308,
-
-	// diagnostic trap group
-	EXCEPTION_TRACE                        = 0x380,
-
-	// supervisor calls (0x400-0x7f8)
-	EXCEPTION_SUPERVISOR_CALL_BASE         = 0x400,
-
-	// prioritized interrupts (0x800-0xff8)
-	EXCEPTION_INTERRUPT_BASE               = 0x800,
-};
-
-// trap source values are shifted into the correct field in the psw
-enum clipper_cpu_trap_sources
-{
-	CTS_NO_CPU_TRAP            = 0 << 24,
-	CTS_DIVIDE_BY_ZERO         = 2 << 24,
-	CTS_ILLEGAL_OPERATION      = 4 << 24,
-	CTS_PRIVILEGED_INSTRUCTION = 5 << 24,
-	CTS_TRACE_TRAP             = 7 << 24,
-};
-
-enum clipper_memory_trap_sources
-{
-	MTS_NO_MEMORY_TRAP                = 0 << 28,
-	MTS_CORRECTED_MEMORY_ERROR        = 1 << 28,
-	MTS_UNCORRECTABLE_MEMORY_ERROR    = 2 << 28,
-	MTS_ALIGNMENT_FAULT               = 4 << 28,
-	MTS_PAGE_FAULT                    = 5 << 28,
-	MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6 << 28,
-	MTS_WRITE_PROTECT_FAULT           = 7 << 28,
-};
-
 // convenience macros for frequently used instruction fields
 #define R1 (m_info.r1)
 #define R2 (m_info.r2)
@@ -190,6 +37,159 @@ enum clipper_memory_trap_sources
 
 class clipper_device : public cpu_device
 {
+	enum registers
+	{
+		CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
+		CLIPPER_R8, CLIPPER_R9, CLIPPER_R10, CLIPPER_R11, CLIPPER_R12, CLIPPER_R13, CLIPPER_R14, CLIPPER_R15,
+
+		CLIPPER_F0, CLIPPER_F1, CLIPPER_F2, CLIPPER_F3, CLIPPER_F4, CLIPPER_F5, CLIPPER_F6, CLIPPER_F7,
+		CLIPPER_F8, CLIPPER_F9, CLIPPER_F10, CLIPPER_F11, CLIPPER_F12, CLIPPER_F13, CLIPPER_F14, CLIPPER_F15,
+
+		CLIPPER_PSW,
+		CLIPPER_SSW,
+		CLIPPER_PC,
+	};
+
+	enum addressing_modes
+	{
+		ADDR_MODE_PC32  = 0x10,
+		ADDR_MODE_ABS32 = 0x30,
+		ADDR_MODE_REL32 = 0x60,
+		ADDR_MODE_PC16  = 0x90,
+		ADDR_MODE_REL12 = 0xa0,
+		ADDR_MODE_ABS16 = 0xb0,
+		ADDR_MODE_PCX   = 0xd0,
+		ADDR_MODE_RELX  = 0xe0,
+	};
+
+	// branch conditions
+	enum branch_conditions
+	{
+		BRANCH_T   = 0x0,
+		BRANCH_LT  = 0x1,
+		BRANCH_LE  = 0x2,
+		BRANCH_EQ  = 0x3,
+		BRANCH_GT  = 0x4,
+		BRANCH_GE  = 0x5,
+		BRANCH_NE  = 0x6,
+		BRANCH_LTU = 0x7,
+		BRANCH_LEU = 0x8,
+		BRANCH_GTU = 0x9,
+		BRANCH_GEU = 0xa,
+		BRANCH_V   = 0xb,
+		BRANCH_NV  = 0xc,
+		BRANCH_N   = 0xd,
+		BRANCH_NN  = 0xe,
+		BRANCH_FN  = 0xf,
+	};
+
+	enum psw
+	{
+		PSW_N   = 0x00000001, // negative
+		PSW_Z   = 0x00000002, // zero
+		PSW_V   = 0x00000004, // overflow
+		PSW_C   = 0x00000008, // carry out or borrow in
+		PSW_FX  = 0x00000010, // floating inexact
+		PSW_FU  = 0x00000020, // floating underflow
+		PSW_FD  = 0x00000040, // floating divide by zero
+		PSW_FV  = 0x00000080, // floating overflow
+		PSW_FI  = 0x00000100, // floating invalid operation
+		PSW_EFX = 0x00000200, // enable floating inexact trap
+		PSW_EFU = 0x00000400, // enable floating underflow trap
+		PSW_EFD = 0x00000800, // enable floating divide by zero trap
+		PSW_EFV = 0x00001000, // enable floating overflow trap
+		PSW_EFI = 0x00002000, // enable floating invalid operation trap
+		PSW_EFT = 0x00004000, // enable floating trap
+		PSW_FR  = 0x00018000, // floating rounding mode (2 bits)
+							  // unused (3 bits)
+		PSW_DSP = 0x00300000, // c400 - delay slot pointer (2 bits)
+		PSW_BIG = 0x00400000, // c400 - big endian (hardware)
+		PSW_T   = 0x00800000, // trace trap
+		PSW_CTS = 0x0f000000, // cpu trap status (4 bits)
+		PSW_MTS = 0xf0000000, // memory trap status (4 bits)
+	};
+
+	enum clipper_ssw
+	{
+		SSW_IN  = 0x0000000f, // interrupt number (4 bits)
+		SSW_IL  = 0x000000f0, // interrupt level (4 bits)
+		SSW_EI  = 0x00000100, // enable interrupts
+		SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
+						  // unused (5 bits)
+		SSW_FRD = 0x00400000, // floating registers dirty
+		SSW_TP  = 0x00800000, // trace trap pending
+		SSW_ECM = 0x01000000, // enabled corrected memory error
+		SSW_DF  = 0x02000000, // fpu disabled
+		SSW_M   = 0x04000000, // mapped mode
+		SSW_KU  = 0x08000000, // user protect key
+		SSW_UU  = 0x10000000, // user data mode
+		SSW_K   = 0x20000000, // protect key
+		SSW_U   = 0x40000000, // user mode
+		SSW_P   = 0x80000000, // previous mode
+	};
+
+	enum exception_vectors
+	{
+		// data memory trap group
+		EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
+		EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
+		EXCEPTION_D_ALIGNMENT_FAULT            = 0x120,
+		EXCEPTION_D_PAGE_FAULT                 = 0x128,
+		EXCEPTION_D_READ_PROTECT_FAULT         = 0x130,
+		EXCEPTION_D_WRITE_PROTECT_FAULT        = 0x138,
+
+		// floating-point arithmetic trap group
+		EXCEPTION_FLOATING_INEXACT             = 0x180,
+		EXCEPTION_FLOATING_UNDERFLOW           = 0x188,
+		EXCEPTION_FLOATING_DIVIDE_BY_ZERO      = 0x190,
+		EXCEPTION_FLOATING_OVERFLOW            = 0x1a0,
+		EXCEPTION_FLOATING_INVALID_OPERATION   = 0x1c0,
+
+		// integer arithmetic trap group
+		EXCEPTION_INTEGER_DIVIDE_BY_ZERO       = 0x208,
+
+		// instruction memory trap group
+		EXCEPTION_I_CORRECTED_MEMORY_ERROR     = 0x288,
+		EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
+		EXCEPTION_I_ALIGNMENT_FAULT            = 0x2a0,
+		EXCEPTION_I_PAGE_FAULT                 = 0x2a8,
+		EXCEPTION_I_EXECUTE_PROTECT_FAULT      = 0x2b0,
+
+		// illegal operation trap group
+		EXCEPTION_ILLEGAL_OPERATION            = 0x300,
+		EXCEPTION_PRIVILEGED_INSTRUCTION       = 0x308,
+
+		// diagnostic trap group
+		EXCEPTION_TRACE                        = 0x380,
+
+		// supervisor calls (0x400-0x7f8)
+		EXCEPTION_SUPERVISOR_CALL_BASE         = 0x400,
+
+		// prioritized interrupts (0x800-0xff8)
+		EXCEPTION_INTERRUPT_BASE               = 0x800,
+	};
+
+	// trap source values are shifted into the correct field in the psw
+	enum cpu_trap_sources
+	{
+		CTS_NO_CPU_TRAP            = 0 << 24,
+		CTS_DIVIDE_BY_ZERO         = 2 << 24,
+		CTS_ILLEGAL_OPERATION      = 4 << 24,
+		CTS_PRIVILEGED_INSTRUCTION = 5 << 24,
+		CTS_TRACE_TRAP             = 7 << 24,
+	};
+
+	enum memory_trap_sources
+	{
+		MTS_NO_MEMORY_TRAP                = 0 << 28,
+		MTS_CORRECTED_MEMORY_ERROR        = 1 << 28,
+		MTS_UNCORRECTABLE_MEMORY_ERROR    = 2 << 28,
+		MTS_ALIGNMENT_FAULT               = 4 << 28,
+		MTS_PAGE_FAULT                    = 5 << 28,
+		MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6 << 28,
+		MTS_WRITE_PROTECT_FAULT           = 7 << 28,
+	};
+
 public:
 	clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
