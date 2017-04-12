@@ -94,7 +94,6 @@ enum
 	NAMCOFL_FINAL_LAP_R
 };
 
-
 // fix me -- most of this should be devices eventually
 class namcos2_shared_state : public driver_device
 {
@@ -158,7 +157,36 @@ public:
 	TILE_GET_INFO_MEMBER( get_tile_info3 );
 	TILE_GET_INFO_MEMBER( get_tile_info4 );
 	TILE_GET_INFO_MEMBER( get_tile_info5 );
-	void namco_tilemap_init(int gfxbank, void *pMaskROM, void (*cb)( running_machine &machine, uint16_t code, int *gfx, int *mask) );
+	typedef delegate<void (uint16_t, int*, int*)> c123_tilemap_delegate;
+	void c123_tilemap_init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
+	void c123_tilemap_invalidate(void);
+	void c123_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void c123_SetTilemapVideoram(int offset, uint16_t newword);
+	void c123_SetTilemapControl(int offset, uint16_t newword);
+
+	struct c123_mTilemapInfo
+	{
+		uint16_t control[0x40/2];
+		/**
+		 * [0x1] 0x02/2 tilemap#0.scrollx
+		 * [0x3] 0x06/2 tilemap#0.scrolly
+		 * [0x5] 0x0a/2 tilemap#1.scrollx
+		 * [0x7] 0x0e/2 tilemap#1.scrolly
+		 * [0x9] 0x12/2 tilemap#2.scrollx
+		 * [0xb] 0x16/2 tilemap#2.scrolly
+		 * [0xd] 0x1a/2 tilemap#3.scrollx
+		 * [0xf] 0x1e/2 tilemap#3.scrolly
+		 * 0x20/2 priority
+		 * 0x30/2 color
+		 */
+		tilemap_t *tmap[6];
+		std::unique_ptr<uint16_t[]> videoram;
+		int gfxbank;
+		uint8_t *maskBaseAddr;
+		c123_tilemap_delegate cb;
+	};
+	
+	c123_mTilemapInfo m_c123_TilemapInfo;
 
 	// C169 ROZ Layer Emulation
 public:
@@ -357,6 +385,7 @@ public:
 	void GollyGhostUpdateLED_c8( int data );
 	void GollyGhostUpdateLED_ca( int data );
 	void GollyGhostUpdateDiorama_c0( int data );
+	void TilemapCB(uint16_t code, int *tile, int *mask);
 
 };
 
