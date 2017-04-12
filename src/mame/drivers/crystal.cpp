@@ -1819,7 +1819,7 @@ GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, donghaer, ROT
 GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, trivrus,  0,        trivrus,  trivrus,  driver_device, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 ) // has a CF card instead of flash roms
-GAME( 2009, crospuzl, 0,        crospuzl, crospuzl, driver_device, 0,        ROT0, "<unknown>",           "Cross Puzzle",                  MACHINE_NOT_WORKING )
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, driver_device, 0,        ROT0, "<unknown>",           "Cross Puzzle",                  MACHINE_NOT_WORKING )
 
 GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
