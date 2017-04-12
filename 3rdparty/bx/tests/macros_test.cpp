@@ -4,8 +4,18 @@
  */
 
 #include "test.h"
-#include <string.h>
 #include <bx/bx.h>
+#include <bx/string.h>
+
+BX_STATIC_ASSERT(false
+	|| BX_CRT_BIONIC
+	|| BX_CRT_GLIBC
+	|| BX_CRT_LIBCXX
+	|| BX_CRT_MINGW
+	|| BX_CRT_MSVC
+	|| BX_CRT_MUSL
+	|| BX_CRT_NEWLIB
+	);
 
 BX_STATIC_ASSERT(1 == BX_VA_ARGS_COUNT(1) );
 BX_STATIC_ASSERT(2 == BX_VA_ARGS_COUNT(1, 2) );
@@ -51,5 +61,5 @@ TEST(macros)
 	CHECK_EQUAL(5, BX_VA_ARGS_COUNT(1, 2, 3, 4, 5) );
 	CHECK_EQUAL(6, BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
 
-	CHECK_EQUAL(0, strcmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
+	CHECK_EQUAL(0, bx::strncmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
 }

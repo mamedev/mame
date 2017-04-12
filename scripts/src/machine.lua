@@ -744,6 +744,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cxd1095.h,MACHINES["CXD1095"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1095"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1095.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1095.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/dm9334.h,MACHINES["DM9334"] = true
 ---------------------------------------------------
 
@@ -1134,6 +1146,28 @@ if (MACHINES["IDE"]~=null) then
 		MAME_DIR .. "src/devices/machine/idehd.h",
 		MAME_DIR .. "src/devices/machine/vt83c461.cpp",
 		MAME_DIR .. "src/devices/machine/vt83c461.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ie15.h,MACHINES["IE15"] = true
+---------------------------------------------------
+
+if (MACHINES["IE15"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ie15.cpp",
+		MAME_DIR .. "src/devices/machine/ie15.h",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.cpp",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/ie15.cpp", GEN_DIR .. "emu/layout/ie15.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "ie15"),
 	}
 end
 

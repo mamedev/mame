@@ -13,8 +13,8 @@ namespace netlist
 	namespace devices
 	{
 
-	static const netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
-	static const netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
+	static constexpr netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
+	static constexpr netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
 
 	NETLIB_OBJECT(74107A)
 	{

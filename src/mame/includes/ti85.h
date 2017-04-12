@@ -219,7 +219,6 @@ public:
 	void ti85_setup_snapshot(uint8_t *data);
 	void ti86_setup_snapshot(uint8_t *data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
-	DECLARE_DIRECT_UPDATE_MEMBER(ti83p_direct_update_handler);
 
 	ti83pse_timer m_ctimer[3];
 

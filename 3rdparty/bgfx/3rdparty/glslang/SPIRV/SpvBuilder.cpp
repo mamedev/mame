@@ -1125,7 +1125,8 @@ Id Builder::createAccessChain(StorageClass storageClass, Id base, const std::vec
 
 Id Builder::createArrayLength(Id base, unsigned int member)
 {
-    Instruction* length = new Instruction(getUniqueId(), makeIntType(32), OpArrayLength);
+    spv::Id intType = makeIntType(32);
+    Instruction* length = new Instruction(getUniqueId(), intType, OpArrayLength);
     length->addIdOperand(base);
     length->addImmediateOperand(member);
     buildPoint->addInstruction(std::unique_ptr<Instruction>(length));
@@ -1661,7 +1662,7 @@ Id Builder::createTextureCall(Decoration precision, Id resultType, bool sparse, 
 }
 
 // Comments in header
-Id Builder::createTextureQueryCall(Op opCode, const TextureParameters& parameters)
+Id Builder::createTextureQueryCall(Op opCode, const TextureParameters& parameters, bool isUnsignedResult)
 {
     // All these need a capability
     addCapability(CapabilityImageQuery);
@@ -1694,10 +1695,12 @@ Id Builder::createTextureQueryCall(Op opCode, const TextureParameters& parameter
         }
         if (isArrayedImageType(getImageType(parameters.sampler)))
             ++numComponents;
+
+        Id intType = isUnsignedResult ? makeUintType(32) : makeIntType(32);
         if (numComponents == 1)
-            resultType = makeIntType(32);
+            resultType = intType;
         else
-            resultType = makeVectorType(makeIntType(32), numComponents);
+            resultType = makeVectorType(intType, numComponents);
 
         break;
     }
@@ -1706,7 +1709,7 @@ Id Builder::createTextureQueryCall(Op opCode, const TextureParameters& parameter
         break;
     case OpImageQueryLevels:
     case OpImageQuerySamples:
-        resultType = makeIntType(32);
+        resultType = isUnsignedResult ? makeUintType(32) : makeIntType(32);
         break;
     default:
         assert(0);
@@ -1832,34 +1835,72 @@ Id Builder::createConstructor(Decoration precision, const std::vector<Id>& sourc
     if (sources.size() == 1 && isScalar(sources[0]) && numTargetComponents > 1)
         return smearScalar(precision, sources[0], resultTypeId);
 
+    // accumulate the arguments for OpCompositeConstruct
+    std::vector<Id> constituents;
     Id scalarTypeId = getScalarTypeId(resultTypeId);
-    std::vector<Id> constituents;  // accumulate the arguments for OpCompositeConstruct
-    for (unsigned int i = 0; i < sources.size(); ++i) {
-        assert(! isAggregate(sources[i]));
-        unsigned int sourceSize = getNumComponents(sources[i]);
+
+    // lambda to store the result of visiting an argument component
+    const auto latchResult = [&](Id comp) {
+        if (numTargetComponents > 1)
+            constituents.push_back(comp);
+        else
+            result = comp;
+        ++targetComponent;
+    };
+
+    // lambda to visit a vector argument's components
+    const auto accumulateVectorConstituents = [&](Id sourceArg) {
+        unsigned int sourceSize = getNumComponents(sourceArg);
         unsigned int sourcesToUse = sourceSize;
         if (sourcesToUse + targetComponent > numTargetComponents)
             sourcesToUse = numTargetComponents - targetComponent;
 
         for (unsigned int s = 0; s < sourcesToUse; ++s) {
-            Id arg = sources[i];
-            if (sourceSize > 1) {
-                std::vector<unsigned> swiz;
-                swiz.push_back(s);
-                arg = createRvalueSwizzle(precision, scalarTypeId, arg, swiz);
-            }
-
-            if (numTargetComponents > 1)
-                constituents.push_back(arg);
-            else
-                result = arg;
-            ++targetComponent;
+            std::vector<unsigned> swiz;
+            swiz.push_back(s);
+            latchResult(createRvalueSwizzle(precision, scalarTypeId, sourceArg, swiz));
         }
+    };
+
+    // lambda to visit a matrix argument's components
+    const auto accumulateMatrixConstituents = [&](Id sourceArg) {
+        unsigned int sourceSize = getNumColumns(sourceArg) * getNumRows(sourceArg);
+        unsigned int sourcesToUse = sourceSize;
+        if (sourcesToUse + targetComponent > numTargetComponents)
+            sourcesToUse = numTargetComponents - targetComponent;
+
+        int col = 0;
+        int row = 0;
+        for (unsigned int s = 0; s < sourcesToUse; ++s) {
+            if (row >= getNumRows(sourceArg)) {
+                row = 0;
+                col++;
+            }
+            std::vector<Id> indexes;
+            indexes.push_back(col);
+            indexes.push_back(row);
+            latchResult(createCompositeExtract(sourceArg, scalarTypeId, indexes));
+            row++;
+        }
+    };
+
+    // Go through the source arguments, each one could have either
+    // a single or multiple components to contribute.
+    for (unsigned int i = 0; i < sources.size(); ++i) {
+        if (isScalar(sources[i]))
+            latchResult(sources[i]);
+        else if (isVector(sources[i]))
+            accumulateVectorConstituents(sources[i]);
+        else if (isMatrix(sources[i]))
+            accumulateMatrixConstituents(sources[i]);
+        else
+            assert(0);
 
         if (targetComponent >= numTargetComponents)
             break;
     }
 
+    // If the result is a vector, make it from the gathered constituents.
     if (constituents.size() > 0)
         result = createCompositeConstruct(resultTypeId, constituents);
 

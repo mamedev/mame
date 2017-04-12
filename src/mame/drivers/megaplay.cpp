@@ -53,6 +53,7 @@ Bugs:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "sound/sn76496.h"
 
 #include "includes/megadriv.h"
@@ -75,9 +76,7 @@ public:
 
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_READ8_MEMBER(bios_banksel_r);
 	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_READ8_MEMBER(bios_gamesel_r);
 	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
 	DECLARE_WRITE16_MEMBER(mp_io_write);
 	DECLARE_READ16_MEMBER(mp_io_read);
@@ -390,11 +389,6 @@ INPUT_PORTS_END
 
 /*MEGAPLAY specific*/
 
-READ8_MEMBER(mplay_state::bios_banksel_r)
-{
-	return m_bios_bank;
-}
-
 WRITE8_MEMBER(mplay_state::bios_banksel_w)
 {
 /*  Multi-slot note:
@@ -405,11 +399,6 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 	m_bios_bank = data;
 	m_bios_mode = MP_ROM;
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
-}
-
-READ8_MEMBER(mplay_state::bios_gamesel_r)
-{
-	return m_bios_6403;
 }
 
 WRITE8_MEMBER(mplay_state::bios_gamesel_w)
@@ -524,7 +513,7 @@ WRITE8_MEMBER(mplay_state::bios_width_w)
 READ8_MEMBER(mplay_state::bios_6404_r)
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
-	return (m_bios_6404 & 0xfe) | ((m_bios_6403 & 0x10) >> 4);
+	return ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
@@ -578,15 +567,8 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(game_w)
-	AM_RANGE(0x6200, 0x6200) AM_READ_PORT("DSW0")
-	AM_RANGE(0x6201, 0x6201) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6203, 0x6203) AM_READWRITE(bios_banksel_r, bios_banksel_w)
-	AM_RANGE(0x6204, 0x6204) AM_READWRITE(bios_6204_r, bios_width_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("TEST")
-	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("COIN")
-	AM_RANGE(0x6402, 0x6402) AM_READWRITE(bios_6402_r, bios_6402_w)
-	AM_RANGE(0x6403, 0x6403) AM_READWRITE(bios_gamesel_r, bios_gamesel_w)
-	AM_RANGE(0x6404, 0x6404) AM_READWRITE(bios_6404_r, bios_6404_w)
+	AM_RANGE(0x6200, 0x6207) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
+	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
 	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
 	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
 	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
@@ -664,6 +646,22 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("io1", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_banksel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6204_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_width_w))
+
+	MCFG_DEVICE_ADD("io2", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("TEST"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("COIN"))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(mplay_state, bios_6402_r))
+	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(mplay_state, bios_6402_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_gamesel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6404_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_6404_w))
 
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */

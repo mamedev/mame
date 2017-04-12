@@ -175,13 +175,13 @@ namespace bx
 
 	bool CommandLine::hasArg(const char _short, const char* _long) const
 	{
-		const char* arg = findOption(_short, _long, 0);
+		const char* arg = findOption(_short, _long, int32_t(0) );
 		return NULL != arg;
 	}
 
 	bool CommandLine::hasArg(const char* _long) const
 	{
-		const char* arg = findOption('\0', _long, 0);
+		const char* arg = findOption('\0', _long, int32_t(0) );
 		return NULL != arg;
 	}
 

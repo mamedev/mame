@@ -562,7 +562,7 @@ uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 
 
 
 
-void galaga_state::screen_eof_galaga(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(galaga_state::screen_vblank_galaga)
 {
 	// falling edge
 	if (!state)

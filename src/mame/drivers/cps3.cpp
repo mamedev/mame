@@ -324,7 +324,7 @@ Notes:
                            DL-2829 CCU SD07-1514  (QFP208) - Probably a companion CPU or co-processor. Decapping
                                                              reveals it is manufactured by Toshiba. The 'Work RAM' is
                                                              connected to it.
-                           DL-2929 IOU SD08-1513  (QFP208) - I/O controller.
+                           DL-2929 IOU SD08-1513  (QFP208) - I/O controller, next to 3.6864MHz XTAL.
                            DL-3329 SSU SD04-1536  (QFP144) - Sound chip, clocked at 21.47725MHz (42.9545/2). It has 32k
                                                              SRAM connected to it.
                            DL-3429 GLL1 SD06-1537 (QFP144) - DMA memory/bus controller.

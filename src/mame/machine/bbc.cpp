@@ -145,41 +145,6 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 }
 
 
-/* the next two function handle reads and write to the shadow video ram area
-   between 0x3000 and 0x7fff
-
-   when vdusel is set high the video display uses the shadow ram memory
-   the processor only reads and write to the shadow ram when vdusel is set
-   and when the instruction being executed is stored in a set range of memory
-   addresses known as the VDU driver instructions.
-*/
-
-
-DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
-{
-	uint8_t *RAM = m_region_maincpu->base();
-	if (m_vdusel == 0)
-	{
-		// not in shadow ram mode so just read normal ram
-		m_bank2->set_base(RAM + 0x3000);
-	}
-	else
-	{
-		if (vdudriverset())
-		{
-			// if VDUDriver set then read from shadow ram
-			m_bank2->set_base(RAM + 0xb000);
-		}
-		else
-		{
-			// else read from normal ram
-			m_bank2->set_base(RAM + 0x3000);
-		}
-	}
-	return address;
-}
-
-
 WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 {
 	uint8_t *RAM = m_region_maincpu->base();
@@ -398,28 +363,6 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
 {
 	m_region_maincpu->base()[offset] = data;
-}
-
-
-DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
-{
-	if (m_ACCCON_X)
-	{
-		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
-	}
-	else
-	{
-		if (m_ACCCON_E && bbcm_vdudriverset())
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
-		}
-		else
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
-		}
-	}
-
-	return address;
 }
 
 
@@ -1788,8 +1731,6 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcbp_direct_handler, this));
-
 	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);   // additional bank for paged ram
 	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
@@ -1815,8 +1756,6 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 {
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcm_direct_handler, this));
 
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram

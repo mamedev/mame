@@ -505,7 +505,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megaaton, play_3 )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_2_95MHz)
 	MCFG_CPU_IO_MAP(megaaton_io)
+
+	MCFG_DEVICE_MODIFY("tpb_clock")
+	MCFG_DEVICE_CLOCK(XTAL_2_95MHz / 8) // TPB line from CPU
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sklflite, play_3 )

@@ -868,11 +868,7 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			// First step: Search the next IDAM, and if found, read the
 			// ID values into the registers
 
-			// Depending on the implied seek flag, continue with read_id,
-			// else switch to verify.
-			// The 9224 always assumes implied seek
-			m_substate = (implied_seek || !m_is_hdc9234)? READ_ID1 : VERIFY;
-
+			m_substate = READ_ID1;
 			m_live_state.bit_count_total = 0;
 			live_start(SEARCH_IDAM);
 			cont = WAIT;
@@ -903,12 +899,19 @@ void hdc92x4_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 				break;
 			}
 
+			// Depending on the implied seek flag, continue with read_id,
+			// else switch to verify.
+			// The 9224 always assumes implied seek
+			m_substate = (implied_seek || !m_is_hdc9234)? READ_ID_STEPON : VERIFY;
+
 			// Calculate the direction and number of step pulses
 			// positive -> towards inner cylinders
 			// negative -> towards outer cylinders
 			// zero -> we're already there
-			m_track_delta = desired_cylinder() - current_cylinder();
-			m_substate = READ_ID_STEPON;
+
+			if (m_substate == VERIFY) cont = NEXT;
+			else m_track_delta = desired_cylinder() - current_cylinder();
+
 			break;
 
 		case READ_ID_STEPON:
@@ -2341,6 +2344,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 			// [1,2]: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
+				if (TRACE_LIVE) logerror("[%s live] Sector not found within 33,792 byte times\n", tts(m_live_state.time).c_str());
 				// Desired sector not found within time
 				if (m_substate == VERIFY3)
 					wait_for_realtime(VERIFY_FAILED);
@@ -2367,7 +2371,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 				// FM case
 				if (m_live_state.shift_reg == 0xf57e)
 				{
-					if (TRACE_LIVE) logerror("SEARCH_IDAM: IDAM found\n");
+					if (TRACE_LIVE) logerror("[%s live] SEARCH_IDAM: IDAM found [byte count %d]\n", tts(m_live_state.time).c_str(), m_live_state.bit_count_total/16);
 					preset_crc(m_live_state, 0xfe);
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;

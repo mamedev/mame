@@ -3817,7 +3817,7 @@ ROM_START( pepp0120 ) /* Normal board : Wild Sevens Poker (PP0120) */
                                         w/7 Four w/o7
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  7s   RF  (Bonus)
 -------------------------------------------------------------
-  ????      1    2    3   4   4   9  12  20 200  250    800
+  P55A      1    2    3   4   4   9  12  20 200  250    800
   % Range: 93.1-95.1%  Optimum: 97.1%  Hit Frequency: 44.1%
      Programs Available: PP0120
 
@@ -3867,7 +3867,7 @@ ROM_START( pepp0126 ) /* Normal board : Deuces Wild Poker (PP0126) - PSR Verifie
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
   P63A      1    2    2   3   5   9  12  20 200 250    800
-  % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 45.4%
+  % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 44.5%
      Programs Available: PP0126, X000126P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3889,7 +3889,7 @@ ROM_START( pepp0126a ) /* Normal board : Deuces Wild Poker (PP0126) - PSR Verifi
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
   P63A      1    2    2   3   5   9  12  20 200 250    800
-  % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 45.4%
+  % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 44.5%
      Programs Available: PP0126, X000126P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3911,7 +3911,7 @@ ROM_START( pepp0126b ) /* Normal board : Deuces Wild Poker (PP0126) */
 PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
   P63A      1    2    2   3   5   9  12  20 200 250    800
-  % Range: 94.9-96.9%  Optimum: 98.9%  Hit Frequency: 45.4%
+  % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 44.5%
      Programs Available: PP0126, X000126P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4974,13 +4974,22 @@ ROM_START( pepp0232 ) /* Normal board : Patriot Poker (PP0232) */
 /*
 Has 5 additional cards, 10 through Ace, with a US Flag for a Suit.
 
-PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*  (Bonus)
-----------------------------------------------------------------------------------------
-   ????     1    2   2   3    5   6  15 100  1000  1300  3000    5000    10000     800
-  % Range: ???-???%  Optimum: ???%  Hit Frequency: ???%
+PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*    (Bonus)
+------------------------------------------------------------------------------------------
+  P118U     1    2   2   3    5   6  15 100  800   1000  2000    3000    5000    See Below
+  % Range: 95.5-97.5%  Optimum: 99.5%  Hit Frequency: 51.4%
      Programs Available: PP0232
 
-* Custom or Flag suit.   A Sequential Royal with the Flag suit pays 10,000 per coin in!
+* Custom under this CG set is the Flag suit.
+
+MAX Bet of 5 coins      Bonus    Payout
+---------------------------------------
+Royal Flush............  1300     6500
+Flag Royal Flush.......  3000    15000
+Sequential Royal Flush.  5000    25000
+Flag Seq Royal Flush... 10000    50000
+
+Sequential Royal is left to right 10, J, Q, K, A
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7972,7 +7981,7 @@ ROM_START( pebe0014a ) /* Normal board : Blackjack (BE0014) English / Spanish - 
 	ROM_LOAD( "cap707.u50", 0x0000, 0x0100, CRC(9851ba36) SHA1(5a0a43c1e212ae8c173102ede9c57a3d95752f99) )
 ROM_END
 
-ROM_START( peke0004 ) /* Normal board : Keno 1-10 Spot (KE0004) */
+ROM_START( peke0004 ) /* Normal board : Keno 1-10 Spot (KE0004) - Payout 92.552%, Paytable 92A */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke0004_566-a17.u68",  0x00000, 0x10000, CRC(dd3b8a70) SHA1(8e402fea9f2e055be309ba24f518b3b513d39ce8) ) /* Game Version: 566, Library Version: A17 */
 
@@ -7986,7 +7995,7 @@ ROM_START( peke0004 ) /* Normal board : Keno 1-10 Spot (KE0004) */
 	ROM_LOAD( "cap797.u50", 0x0000, 0x0100, CRC(1ab81779) SHA1(17e037235bb8c3f4a420d84841bac734373bf6b8) )
 ROM_END
 
-ROM_START( peke0017 ) /* Normal board : Keno 1-10 Spot (KE0017) */
+ROM_START( peke0017 ) /* Normal board : Keno 2-10 Spot (KE0017) - Payout 85.02%, Paytable 85-H */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke0017_560-a07.u68",  0x00000, 0x08000, CRC(a0f70116) SHA1(15808cd3245e2e5934f3365f95590da0be552e8b) ) /* Game Version: 560, Library Version: A07 - 02/11/94   @ IGT  L94-0689 */
 	ROM_RELOAD(                      0x08000, 0x8000) /* 32K version built using earlier gaming libraries */

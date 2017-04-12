@@ -33,43 +33,42 @@ public:
 	void sound_data_w(uint8_t data);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( adc_r );
-	DECLARE_WRITE16_MEMBER( adc_w );
-	uint16_t iochip_r(int which, int port, int inputval);
-	DECLARE_READ16_MEMBER( iochip_0_r );
-	DECLARE_WRITE16_MEMBER( iochip_0_w );
-	DECLARE_READ16_MEMBER( iochip_1_r );
-	DECLARE_WRITE16_MEMBER( iochip_1_w );
-	DECLARE_WRITE16_MEMBER( iocontrol_w );
+	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_WRITE16_MEMBER(adc_w);
+	DECLARE_WRITE8_MEMBER(pc_0_w);
+	DECLARE_WRITE8_MEMBER(pd_0_w);
+	DECLARE_WRITE16_MEMBER(iocontrol_w);
 
 	// game-specific main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER( loffire_sync0_w );
-	DECLARE_READ16_MEMBER( rascot_excs_r );
-	DECLARE_WRITE16_MEMBER( rascot_excs_w );
-	DECLARE_READ16_MEMBER( smgp_excs_r );
-	DECLARE_WRITE16_MEMBER( smgp_excs_w );
+	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
+	DECLARE_READ16_MEMBER(rascot_excs_r);
+	DECLARE_WRITE16_MEMBER(rascot_excs_w);
+	DECLARE_READ16_MEMBER(smgp_excs_r);
+	DECLARE_WRITE16_MEMBER(smgp_excs_w);
+
+	// custom I/O
+	DECLARE_READ8_MEMBER(aburner2_motor_r);
+	DECLARE_WRITE8_MEMBER(aburner2_motor_w);
+	DECLARE_READ8_MEMBER(smgp_motor_r);
+	DECLARE_WRITE8_MEMBER(smgp_motor_w);
+	DECLARE_READ8_MEMBER(lastsurv_port_r);
+	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
 
 	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-
+	DECLARE_READ8_MEMBER(sound_data_r);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// palette helpers
-	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER(paletteram_w);
 
 	void install_aburner2(void);
-	void install_lastsurv(void);
 	void install_loffire(void);
 	void install_smgp(void);
 	void install_gprider(void);
 
 protected:
-	// internal types
-	typedef delegate<uint8_t (uint8_t)> ioread_delegate;
-	typedef delegate<void (uint8_t)> iowrite_delegate;
-
 	// timer IDs
 	enum
 	{
@@ -86,15 +85,7 @@ protected:
 	// internal helpers
 	void update_main_irqs();
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-
-	// custom I/O
 	void generic_iochip0_lamps_w(uint8_t data);
-	uint8_t aburner2_iochip0_motor_r(uint8_t data);
-	void aburner2_iochip0_motor_w(uint8_t data);
-	uint8_t smgp_iochip0_motor_r(uint8_t data);
-	void smgp_iochip0_motor_w(uint8_t data);
-	uint8_t lastsurv_iochip1_port_r(uint8_t data);
-	void lastsurv_iochip0_muxer_w(uint8_t data);
 
 	// devices
 public:
@@ -114,15 +105,13 @@ protected:
 
 	// configuration
 	bool            m_adc_reverse[8];
-	ioread_delegate m_iochip_custom_io_r[2][8];
-	iowrite_delegate m_iochip_custom_io_w[2][8];
 	uint8_t           m_road_priority;
 
 	// internal state
 	emu_timer *     m_scanline_timer;
 	uint8_t           m_timer_irq_state;
 	uint8_t           m_vblank_irq_state;
-	uint8_t           m_iochip_regs[2][8];
+	uint8_t           m_pc_0;
 
 	// game-specific state
 	uint16_t *        m_loffire_sync;
@@ -140,6 +129,7 @@ protected:
 	uint8_t       m_palette_hilight[32];      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport m_io0_porta;
 	optional_ioport_array<8> m_adc_ports;
 	optional_ioport_array<4> m_mux_ports;
 
@@ -166,6 +156,17 @@ class segaxbd_fd1094_state :  public segaxbd_state
 {
 public:
 	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual void device_start();
+//  virtual void device_reset();
+};
+
+class segaxbd_aburner2_state :  public segaxbd_state
+{
+public:
+	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

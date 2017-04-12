@@ -28,7 +28,7 @@ Games on this system include....
 | | 2003 | F-Zero AX (Rev A)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004A      | 317-0362-COM | 253-5508-0362 |
 | | 2003 | F-Zero AX (Rev B)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004B      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev C)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004C      | 317-0362-COM | 253-5508-0362 |
-|*| 2003 | F-Zero AX (Rev D)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004D      | 317-0362-COM | 253-5508-0362 |
+| | 2003 | F-Zero AX (Rev D)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004D      | 317-0362-COM | 253-5508-0362 |
 |*| 2003 | F-Zero AX (Rev E)                                               | Sega / Amusement Vision / Nintendo  | GDROM | GDT-0004E      | 317-0362-COM | 253-5508-0362 |
 | | 2003 | The Key Of Avalon: The Wizard Master (server)                   | Sega / Hitmaker                     | GDROM | GDT-0005       | 317-0355-JPN | 253-5508-0355J|
 | | 2003 | The Key Of Avalon: The Wizard Master (server) (Rev A)           | Sega / Hitmaker                     | GDROM | GDT-0005A      | 317-0355-JPN | 253-5508-0355J|
@@ -76,7 +76,7 @@ Games on this system include....
 |*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B)        | Sega / Hitmaker                     | GDROM | GDT-0017B      | 317-0403-JPN | 253-5508-0403J|
 | | 2004 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | GDROM |                |              |               |
 | | 2005 | Donkey Kong Jungle Fever                                        | Namco / Nintendo                    | Cart  |                |              |               |
-|*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  |!317-5109-COM | 253-5509-5109 |
+|*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0018       | 317-0403-JPN | 253-5508-0403J|
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev B)          | Sega / Hitmaker                     | GDROM | GDT-0018B      | 317-0403-JPN | 253-5508-0403J|
@@ -833,7 +833,7 @@ ROM_START( tfupdate )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0011", 0, BAD_DUMP SHA1(71bfa8f53d211085c020d54f55eeeabf85212a0b) )
+	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(834e261f2752883ceac0220a0305f9b09c3b5a9b) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0371-jpn.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
@@ -914,7 +914,7 @@ ROM_START( avalon20 )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0017b", 0, BAD_DUMP SHA1(e2dd32c322ffcaf38b82275d2721b71bb3dfc1f2) )
+	DISK_IMAGE_READONLY( "gdt-0017b", 0, SHA1(22827a78415c967c9b6abff5aa1037e01785a7b3) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0403-jpn.data", 0x00, 0x50, CRC(c5071ada) SHA1(70018180b917beec1b2c272f9125fa43fd1a7b00) )
@@ -1006,6 +1006,9 @@ ROM_START( mkartagp )
 	ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) )
 	ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) )
 	ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-5109-com.pic", 0x00, 0x4000, CRC(b7159fe3) SHA1(886c026ae62651bb5f700dfd6f9ebb2c415c1ae8) )
 ROM_END
 
 /*

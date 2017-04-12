@@ -161,8 +161,8 @@ public:
 
 	// callback functions for memory reads/writes
 	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
-	typedef std::function<u64(void *cbparam, const char *name, expression_space space, u32 offset, int size, bool with_se)> read_func;
-	typedef std::function<void(void *cbparam, const char *name, expression_space space, u32 offset, int size, u64 value, bool with_se)> write_func;
+	typedef std::function<u64(void *cbparam, const char *name, expression_space space, u32 offset, int size, bool disable_se)> read_func;
+	typedef std::function<void(void *cbparam, const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se)> write_func;
 
 	enum read_write
 	{
@@ -195,8 +195,8 @@ public:
 
 	// memory accessors
 	expression_error::error_code memory_valid(const char *name, expression_space space);
-	u64 memory_value(const char *name, expression_space space, u32 offset, int size, bool with_se);
-	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool with_se);
+	u64 memory_value(const char *name, expression_space space, u32 offset, int size, bool disable_se);
+	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se);
 
 private:
 	// internal state
@@ -314,7 +314,7 @@ private:
 		parse_token &set_right_to_left() { assert(m_type == OPERATOR); m_flags |= TIN_RIGHT_TO_LEFT_MASK; return *this; }
 		parse_token &set_memory_space(expression_space space) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SPACE_MASK) | ((space << TIN_MEMORY_SPACE_SHIFT) & TIN_MEMORY_SPACE_MASK); return *this; }
 		parse_token &set_memory_size(int log2ofbits) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SIZE_MASK) | ((log2ofbits << TIN_MEMORY_SIZE_SHIFT) & TIN_MEMORY_SIZE_MASK); return *this; }
-		parse_token &set_memory_side_effect(bool with_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = with_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
+		parse_token &set_memory_side_effect(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
 
 		// access
@@ -363,7 +363,7 @@ private:
 	void parse_number(parse_token &token, const char *string, int base, expression_error::error_code errcode);
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
-	void parse_memory_operator(parse_token &token, const char *string, bool with_se);
+	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
 	void normalize_operator(parse_token *prevtoken, parse_token &thistoken);
 	void infix_to_postfix();
 

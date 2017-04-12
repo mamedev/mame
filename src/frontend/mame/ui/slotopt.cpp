@@ -25,14 +25,17 @@ namespace ui {
 device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_interface &slot)
 {
 	std::string current;
-	if (slot.fixed())
+
+	const char *slot_option_name = slot.device().tag() + 1;
+	if (!slot.fixed() && machine().options().slot_options().count(slot_option_name) > 0)
 	{
-		if (slot.default_option() == nullptr) return nullptr;
-		current.assign(slot.default_option());
+		current = machine().options().slot_options()[slot_option_name].value();
 	}
 	else
 	{
-		current = machine().options().main_value(slot.device().tag() + 1);
+		if (slot.default_option() == nullptr)
+			return nullptr;
+		current.assign(slot.default_option());
 	}
 
 	return slot.option(current.c_str());
@@ -159,7 +162,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		// does this slot have any selectable options?
 		bool has_selectable_options = slot.has_selectable_options();
 
-		// name this option		
+		// name this option
 		std::string opt_name("------");
 		const device_slot_option *option = slot_get_current_option(slot);
 		if (option)

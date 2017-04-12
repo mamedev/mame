@@ -114,6 +114,7 @@ void n64_periphs::device_start()
 	pi_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::pi_dma_callback),this));
 	si_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::si_dma_callback),this));
 	vi_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::vi_scanline_callback),this));
+	dp_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::dp_delay_callback),this));
 	reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n64_periphs::reset_timer_callback),this));
 	m_n64 = machine().driver_data<n64_state>();
 }
@@ -217,6 +218,8 @@ void n64_periphs::device_reset()
 	si_dma_timer->adjust(attotime::never);
 
 	dp_clock = 0;
+
+	dp_delay_timer->adjust(attotime::never);
 
 	cic_status = 0;
 
@@ -417,11 +420,6 @@ WRITE32_MEMBER( n64_periphs::mi_reg_w )
 	}
 }
 
-void signal_rcp_interrupt(running_machine &machine, int interrupt)
-{
-	machine.device<n64_periphs>("rcp")->signal_rcp_interrupt(interrupt);
-}
-
 void n64_periphs::check_interrupts()
 {
 	if (mi_intr_mask & mi_interrupt)
@@ -571,6 +569,10 @@ void n64_periphs::sp_dma(int direction)
 	uint32_t *sp_mem[2] = { m_rsp_dmem, m_rsp_imem };
 
 	int sp_mem_page = (sp_mem_addr >> 12) & 1;
+
+	if(sp_mem_page == 1)
+		m_rsp->rspdrc_flush_drc_cache();
+
 	if(direction == 0)// RDRAM -> I/DMEM
 	{
 		for(int c = 0; c <= sp_dma_count; c++)
@@ -881,9 +883,15 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 
 // RDP Interface
 
-void dp_full_sync(running_machine &machine)
+void n64_periphs::dp_full_sync()
 {
-	signal_rcp_interrupt(machine, DP_INTERRUPT);
+	dp_delay_timer->adjust(attotime::from_hz(62500000 / 100));
+}
+
+TIMER_CALLBACK_MEMBER(n64_periphs::dp_delay_callback)
+{
+	dp_delay_timer->adjust(attotime::never);
+	signal_rcp_interrupt(DP_INTERRUPT);
 }
 
 READ32_MEMBER( n64_periphs::dp_reg_r )

@@ -4486,7 +4486,7 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 	combiner.function_Aop3 = std::max(std::min((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
-void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 {
 #ifdef LOG_NV2A
 	printf("vblank_callback\n\r");
@@ -4821,6 +4821,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 				((*dmaput == 0x0574d000) && (*dmaget == 0x07f4d000)) || // only for mj2c
 				((*dmaput == 0x07ca3000) && (*dmaget == 0x07f4d000)) || // only for hotd3
 				((*dmaput == 0x063cd000) && (*dmaget == 0x07f4d000)) || // only for vcop3
+				((*dmaput == 0x07f4f000) && (*dmaget == 0x07f4d000)) || // only for ccfboxa
 				((*dmaput == 0x07dca000) && (*dmaget == 0x07f4d000))) // only for crtaxihr
 			{
 				*dmaget = *dmaput;

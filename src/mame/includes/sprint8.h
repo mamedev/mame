@@ -45,7 +45,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint8);
 	uint32_t screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_sprint8(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sprint8);
 	TIMER_CALLBACK_MEMBER(sprint8_collision_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(input_callback);
 	DECLARE_WRITE8_MEMBER(sprint8_crash_w);

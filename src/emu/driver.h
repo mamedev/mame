@@ -89,8 +89,6 @@
 //**************************************************************************
 
 // forward declarations
-class gfxdecode_device;
-class palette_device;
 typedef delegate<void ()> driver_callback_delegate;
 
 

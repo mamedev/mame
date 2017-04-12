@@ -72,7 +72,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
 	required_device<cpu_device> m_maincpu;
 
 	void pgm_create_dummy_internal_arm_region();
@@ -95,7 +95,7 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void pgm2_state::screen_eof_pgm2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
 }
 
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_DRIVER(pgm2_state, screen_eof_pgm2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm2)

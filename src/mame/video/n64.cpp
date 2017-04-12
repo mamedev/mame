@@ -95,6 +95,7 @@ void n64_state::video_start()
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
+	m_rdp->set_n64_periphs(machine().device<n64_periphs>("rcp"));
 
 	m_rdp->m_blender.set_machine(machine());
 	m_rdp->m_blender.set_processor(m_rdp);
@@ -164,7 +165,7 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-void n64_state::screen_eof_n64(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
 {
 }
 
@@ -1663,7 +1664,7 @@ void n64_rdp::disassemble(char* buffer)
 		case 0x2f:  sprintf(buffer, "Set_Other_Modes        %08X %08X", uint32_t(cmd[0] >> 32), (uint32_t)cmd[0]); break;
 		case 0x30:  sprintf(buffer, "Load_TLUT              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
 		case 0x32:  sprintf(buffer, "Set_Tile_Size          %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
-		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, uint32_t(cmd[0] >> 44) & 0xfff, uint32_t(cmd[0] >> 32) & 0xfff, uint32_t(cmd[0] >> 12) & 0xfff, uint32_t(cmd[1]) & 0xfff); break;
+		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, uint32_t(cmd[0] >> 44) & 0xfff, uint32_t(cmd[0] >> 32) & 0xfff, uint32_t(cmd[0] >> 12) & 0xfff, uint32_t(cmd[0]) & 0xfff); break;
 		case 0x34:  sprintf(buffer, "Load_Tile              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
 		case 0x35:  sprintf(buffer, "Set_Tile               %d, %s, %s, %d, %04X", tile, format, size, (uint32_t(cmd[0] >> 41) & 0x1ff) * 8, (uint32_t(cmd[0] >> 32) & 0x1ff) * 8); break;
 		case 0x36:  sprintf(buffer, "Fill_Rectangle         %s, %s, %s, %s", sh, th, sl, tl); break;
@@ -2356,7 +2357,7 @@ void n64_rdp::cmd_sync_tile(uint64_t w1)
 void n64_rdp::cmd_sync_full(uint64_t w1)
 {
 	//wait("SyncFull");
-	dp_full_sync(*m_machine);
+	m_n64_periphs->dp_full_sync();
 }
 
 void n64_rdp::cmd_set_key_gb(uint64_t w1)
@@ -3169,6 +3170,7 @@ n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manag
 	m_tmem = nullptr;
 
 	m_machine = nullptr;
+	m_n64_periphs = nullptr;
 
 	//memset(m_hidden_bits, 3, 8388608);
 

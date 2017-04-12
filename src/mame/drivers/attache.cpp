@@ -136,7 +136,6 @@ public:
 
 	// overrides
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_int(screen_device &screen, bool state);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -342,11 +341,6 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 	}
 	return 0;
-}
-
-void attache_state::vblank_int(screen_device &screen, bool state)
-{
-	m_ctc->trg2(state);
 }
 
 READ8_MEMBER(attache_state::rom_r)
@@ -932,7 +926,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 

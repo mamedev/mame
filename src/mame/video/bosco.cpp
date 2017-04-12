@@ -301,7 +301,7 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void bosco_state::screen_eof_bosco(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(bosco_state::screen_vblank_bosco)
 {
 	// falling edge
 	if (!state)

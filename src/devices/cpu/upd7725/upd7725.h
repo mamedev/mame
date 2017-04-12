@@ -181,6 +181,8 @@ private:
 		uint16_t si;
 		uint16_t so;
 		uint16_t idb;
+		bool siack;         // Serial in ACK
+		bool soack;         // Serial out ACK
 	} regs;
 
 	void exec_op(uint32_t opcode);
@@ -189,8 +191,11 @@ private:
 	void exec_ld(uint32_t opcode);
 
 	int m_icount;
-	int m_irq; // old irq line state, for detecting rising edges.
-
+	bool m_irq; // old irq line state, for detecting rising edges.
+	// m_irq_firing: if an irq has fired; 0 = not fired or has already finished firing
+	// 1 = next opcode is the first half of int firing 'NOP+push pc'
+	// 2 = next opcode is the second half of int firing 'JMP 0100'
+	int m_irq_firing;
 	address_space *m_program, *m_data;
 	direct_read_data *m_direct;
 
@@ -255,7 +260,9 @@ enum
 	UPD7725_TRB,
 	UPD7725_SI,
 	UPD7725_SO,
-	UPD7725_IDB
+	UPD7725_IDB,
+	UPD7725_SIACK,
+	UPD7725_SOACK
 };
 
 #endif /* __UPD7725_H__ */

@@ -24,6 +24,8 @@
 
   serial  device   etc.
 ----------------------------------------------------------------
+ *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
  @043     uPD552C  1979, Bambino Kick The Goal Soccer (ET-10)
@@ -50,6 +52,7 @@
 
  @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
+ *513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808

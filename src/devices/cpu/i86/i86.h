@@ -297,8 +297,8 @@ protected:
 	uint8_t   m_fire_trap;
 	uint8_t   m_test_state;
 
-	address_space *m_program;
-	direct_read_data *m_direct;
+	address_space *m_program, *m_opcodes;
+	direct_read_data *m_direct, *m_direct_opcodes;
 	address_space *m_io;
 	offs_t m_fetch_xor;
 	int m_icount;
@@ -345,7 +345,7 @@ public:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 protected:
 	virtual void execute_run() override;
@@ -356,6 +356,7 @@ protected:
 	uint32_t pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	address_space_config m_program_config;
+	address_space_config m_opcodes_config;
 	address_space_config m_io_config;
 	static const uint8_t m_i8086_timing[200];
 };

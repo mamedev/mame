@@ -59,7 +59,6 @@ differences between OPL2 and OPL3 shown in datasheets:
 #include "ymf262.h"
 
 
-
 /* output final shift */
 #if (OPL3_SAMPLE_BITS==16)
 	#define FINAL_SH    (0)
@@ -108,6 +107,11 @@ differences between OPL2 and OPL3 shown in datasheets:
 #define EG_REL          1
 #define EG_OFF          0
 
+/* Routing connections between slots */
+#define CONN_NULL       0
+#define CONN_CHAN0      1
+#define CONN_PHASEMOD   19
+#define CONN_PHASEMOD2  20
 
 /* save output as raw 16-bit sample */
 
@@ -151,6 +155,7 @@ struct OPL3_SLOT
 	uint32_t  Cnt;        /* frequency counter            */
 	uint32_t  Incr;       /* frequency counter step       */
 	uint8_t   FB;         /* feedback shift value         */
+	uint8_t	  conn_enum;  /* slot output route            */
 	int32_t   *connect;   /* slot output pointer          */
 	int32_t   op1_out[2]; /* slot1 output for feedback    */
 	uint8_t   CON;        /* connection (algorithm) type  */
@@ -600,8 +605,17 @@ static int num_lock = 0;
 #define SLOT8_2 (&chip->P_CH[8].SLOT[SLOT2])
 
 
-
-
+static inline void OPL3_SLOT_CONNECT(OPL3 *chip, OPL3_SLOT *slot) {
+	if (slot->conn_enum == CONN_NULL) {
+		slot->connect = nullptr;
+	} else if (slot->conn_enum >= CONN_CHAN0 && slot->conn_enum < CONN_PHASEMOD) {
+		slot->connect = &chip->chanout[slot->conn_enum];
+	} else if (slot->conn_enum == CONN_PHASEMOD) {
+		slot->connect = &chip->phase_modulation;
+	} else if (slot->conn_enum == CONN_PHASEMOD2) {
+		slot->connect = &chip->phase_modulation2;
+	}
+}
 
 static inline int limit( int val, int max, int min ) {
 	if ( val > max )
@@ -887,19 +901,21 @@ static inline void chan_calc( OPL3 *chip, OPL3_CH *CH )
 	out  = SLOT->op1_out[0] + SLOT->op1_out[1];
 	SLOT->op1_out[0] = SLOT->op1_out[1];
 	SLOT->op1_out[1] = 0;
-	if( env < ENV_QUIET )
+	if (env < ENV_QUIET)
 	{
 		if (!SLOT->FB)
 			out = 0;
 		SLOT->op1_out[1] = op_calc1(SLOT->Cnt, env, (out<<SLOT->FB), SLOT->wavetable );
 	}
-	*SLOT->connect += SLOT->op1_out[1];
+	if (SLOT->connect) {
+		*SLOT->connect += SLOT->op1_out[1];
+	}
 //logerror("out0=%5i vol0=%4i ", SLOT->op1_out[1], env );
 
 	/* SLOT 2 */
 	SLOT++;
 	env = volume_calc(SLOT);
-	if( env < ENV_QUIET )
+	if ((env < ENV_QUIET) && SLOT->connect)
 		*SLOT->connect += op_calc(SLOT->Cnt, env, chip->phase_modulation, SLOT->wavetable);
 
 //logerror("out1=%5i vol1=%4i\n", op_calc(SLOT->Cnt, env, chip->phase_modulation, SLOT->wavetable), env );
@@ -917,13 +933,13 @@ static inline void chan_calc_ext( OPL3 *chip, OPL3_CH *CH )
 	/* SLOT 1 */
 	SLOT = &CH->SLOT[SLOT1];
 	env  = volume_calc(SLOT);
-	if( env < ENV_QUIET )
+	if (env < ENV_QUIET && SLOT->connect)
 		*SLOT->connect += op_calc(SLOT->Cnt, env, chip->phase_modulation2, SLOT->wavetable );
 
 	/* SLOT 2 */
 	SLOT++;
 	env = volume_calc(SLOT);
-	if( env < ENV_QUIET )
+	if (env < ENV_QUIET && SLOT->connect)
 		*SLOT->connect += op_calc(SLOT->Cnt, env, chip->phase_modulation, SLOT->wavetable);
 
 }
@@ -1616,7 +1632,6 @@ static void update_channels(OPL3 *chip, OPL3_CH *CH)
 static void OPL3WriteReg(OPL3 *chip, int r, int v)
 {
 	OPL3_CH *CH;
-	signed int *chanout = chip->chanout;
 	unsigned int ch_offset = 0;
 	int slot;
 	int block_fnum;
@@ -2094,45 +2109,51 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 					case 0:
 						/* 1 -> 2 -> 3 -> 4 - out */
 
-						CH->SLOT[SLOT1].connect = &chip->phase_modulation;
-						CH->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						(CH+3)->SLOT[SLOT1].connect = &chip->phase_modulation;
-						(CH+3)->SLOT[SLOT2].connect = &chanout[ chan_no + 3 ];
+						CH->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						CH->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						(CH+3)->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						(CH+3)->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no + 3;
 					break;
 					case 1:
 						/* 1 -> 2 -\
 						   3 -> 4 -+- out */
 
-						CH->SLOT[SLOT1].connect = &chip->phase_modulation;
-						CH->SLOT[SLOT2].connect = &chanout[ chan_no ];
-						(CH+3)->SLOT[SLOT1].connect = &chip->phase_modulation;
-						(CH+3)->SLOT[SLOT2].connect = &chanout[ chan_no + 3 ];
+						CH->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no;
+						(CH+3)->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						(CH+3)->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no + 3;
 					break;
 					case 2:
 						/* 1 -----------\
 						   2 -> 3 -> 4 -+- out */
 
-						CH->SLOT[SLOT1].connect = &chanout[ chan_no ];
-						CH->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						(CH+3)->SLOT[SLOT1].connect = &chip->phase_modulation;
-						(CH+3)->SLOT[SLOT2].connect = &chanout[ chan_no + 3 ];
+						CH->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no;
+						CH->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						(CH+3)->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						(CH+3)->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no + 3;
 					break;
 					case 3:
 						/* 1 ------\
 						   2 -> 3 -+- out
 						   4 ------/     */
-						CH->SLOT[SLOT1].connect = &chanout[ chan_no ];
-						CH->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						(CH+3)->SLOT[SLOT1].connect = &chanout[ chan_no + 3 ];
-						(CH+3)->SLOT[SLOT2].connect = &chanout[ chan_no + 3 ];
+						CH->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no;
+						CH->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						(CH+3)->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no + 3;
+						(CH+3)->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no + 3;
 					break;
 					}
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
+					OPL3_SLOT_CONNECT(chip, &(CH+3)->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &(CH+3)->SLOT[SLOT2]);
 				}
 				else
 				{
 					/* 2 operators mode */
-					CH->SLOT[SLOT1].connect = CH->SLOT[SLOT1].CON ? &chanout[(r&0xf)+ch_offset] : &chip->phase_modulation;
-					CH->SLOT[SLOT2].connect = &chanout[(r&0xf)+ch_offset];
+					CH->SLOT[SLOT1].conn_enum = CH->SLOT[SLOT1].CON ? CONN_CHAN0 + (r&0xf)+ch_offset : CONN_PHASEMOD;
+					CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + (r&0xf)+ch_offset;
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
 				}
 			break;
 
@@ -2146,60 +2167,70 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 					case 0:
 						/* 1 -> 2 -> 3 -> 4 - out */
 
-						(CH-3)->SLOT[SLOT1].connect = &chip->phase_modulation;
-						(CH-3)->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						CH->SLOT[SLOT1].connect = &chip->phase_modulation;
-						CH->SLOT[SLOT2].connect = &chanout[ chan_no ];
+						(CH-3)->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						(CH-3)->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						CH->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no;
 					break;
 					case 1:
 						/* 1 -> 2 -\
 						   3 -> 4 -+- out */
 
-						(CH-3)->SLOT[SLOT1].connect = &chip->phase_modulation;
-						(CH-3)->SLOT[SLOT2].connect = &chanout[ chan_no - 3 ];
-						CH->SLOT[SLOT1].connect = &chip->phase_modulation;
-						CH->SLOT[SLOT2].connect = &chanout[ chan_no ];
+						(CH-3)->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						(CH-3)->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no - 3;
+						CH->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no;
 					break;
 					case 2:
 						/* 1 -----------\
 						   2 -> 3 -> 4 -+- out */
 
-						(CH-3)->SLOT[SLOT1].connect = &chanout[ chan_no - 3 ];
-						(CH-3)->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						CH->SLOT[SLOT1].connect = &chip->phase_modulation;
-						CH->SLOT[SLOT2].connect = &chanout[ chan_no ];
+						(CH-3)->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no - 3;
+						(CH-3)->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						CH->SLOT[SLOT1].conn_enum = CONN_PHASEMOD;
+						CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no;
 					break;
 					case 3:
 						/* 1 ------\
 						   2 -> 3 -+- out
 						   4 ------/     */
-						(CH-3)->SLOT[SLOT1].connect = &chanout[ chan_no - 3 ];
-						(CH-3)->SLOT[SLOT2].connect = &chip->phase_modulation2;
-						CH->SLOT[SLOT1].connect = &chanout[ chan_no ];
-						CH->SLOT[SLOT2].connect = &chanout[ chan_no ];
+						(CH-3)->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no - 3;
+						(CH-3)->SLOT[SLOT2].conn_enum = CONN_PHASEMOD2;
+						CH->SLOT[SLOT1].conn_enum = CONN_CHAN0 + chan_no;
+						CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + chan_no;
 					break;
 					}
+					OPL3_SLOT_CONNECT(chip, &(CH-3)->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &(CH-3)->SLOT[SLOT2]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
 				}
 				else
 				{
 					/* 2 operators mode */
-					CH->SLOT[SLOT1].connect = CH->SLOT[SLOT1].CON ? &chanout[(r&0xf)+ch_offset] : &chip->phase_modulation;
-					CH->SLOT[SLOT2].connect = &chanout[(r&0xf)+ch_offset];
+					CH->SLOT[SLOT1].conn_enum = CH->SLOT[SLOT1].CON ? CONN_CHAN0 + (r&0xf)+ch_offset : CONN_PHASEMOD;
+					CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + (r&0xf)+ch_offset;
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
 				}
 			break;
 
 			default:
 					/* 2 operators mode */
-					CH->SLOT[SLOT1].connect = CH->SLOT[SLOT1].CON ? &chanout[(r&0xf)+ch_offset] : &chip->phase_modulation;
-					CH->SLOT[SLOT2].connect = &chanout[(r&0xf)+ch_offset];
+					CH->SLOT[SLOT1].conn_enum = CH->SLOT[SLOT1].CON ? CONN_CHAN0 + (r&0xf)+ch_offset : CONN_PHASEMOD;
+					CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + (r&0xf)+ch_offset;
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+					OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
 			break;
 			}
 		}
 		else
 		{
 			/* OPL2 mode - always 2 operators mode */
-			CH->SLOT[SLOT1].connect = CH->SLOT[SLOT1].CON ? &chanout[(r&0xf)+ch_offset] : &chip->phase_modulation;
-			CH->SLOT[SLOT2].connect = &chanout[(r&0xf)+ch_offset];
+			CH->SLOT[SLOT1].conn_enum = CH->SLOT[SLOT1].CON ? CONN_CHAN0 + (r&0xf)+ch_offset : CONN_PHASEMOD;
+			CH->SLOT[SLOT2].conn_enum = CONN_CHAN0 + (r&0xf)+ch_offset;
+			OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT1]);
+			OPL3_SLOT_CONNECT(chip, &CH->SLOT[SLOT2]);
 		}
 	break;
 
@@ -2351,6 +2382,7 @@ static int OPL3Write(OPL3 *chip, int a, int v)
 	/* data bus is 8 bits */
 	v &= 0xff;
 
+
 	switch(a&3)
 	{
 	case 0: /* address port 0 (register set #1) */
@@ -2421,12 +2453,88 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 	return chip->status>>7;
 }
 
+static void OPL3_save_state(OPL3 *chip, device_t *device) {
+	for (int ch=0; ch<18; ch++) {
+		OPL3_CH *channel = &chip->P_CH[ch];
+		device->save_item(NAME(channel->block_fnum), ch);
+		device->save_item(NAME(channel->fc), ch);
+		device->save_item(NAME(channel->ksl_base), ch);
+		device->save_item(NAME(channel->kcode), ch);
+		device->save_item(NAME(channel->extended), ch);
 
+		for (int sl=0; sl<2; sl++) {
+			OPL3_SLOT *slot = &channel->SLOT[sl];
+			device->save_item(NAME(slot->ar), ch*2+sl);
+			device->save_item(NAME(slot->dr), ch*2+sl);
+			device->save_item(NAME(slot->rr), ch*2+sl);
+			device->save_item(NAME(slot->KSR), ch*2+sl);
+			device->save_item(NAME(slot->ksl), ch*2+sl);
+			device->save_item(NAME(slot->ksr), ch*2+sl);
+			device->save_item(NAME(slot->mul), ch*2+sl);
 
+			device->save_item(NAME(slot->Cnt), ch*2+sl);
+			device->save_item(NAME(slot->Incr), ch*2+sl);
+			device->save_item(NAME(slot->FB), ch*2+sl);
+			device->save_item(NAME(slot->conn_enum), ch*2+sl);
+			device->save_item(NAME(slot->op1_out), ch*2+sl);
+			device->save_item(NAME(slot->CON), ch*2+sl);
+
+			device->save_item(NAME(slot->eg_type), ch*2+sl);
+			device->save_item(NAME(slot->state), ch*2+sl);
+			device->save_item(NAME(slot->TL), ch*2+sl);
+			device->save_item(NAME(slot->TLL), ch*2+sl);
+			device->save_item(NAME(slot->volume), ch*2+sl);
+			device->save_item(NAME(slot->sl), ch*2+sl);
+
+			device->save_item(NAME(slot->eg_m_ar), ch*2+sl);
+			device->save_item(NAME(slot->eg_sh_ar), ch*2+sl);
+			device->save_item(NAME(slot->eg_sel_ar), ch*2+sl);
+			device->save_item(NAME(slot->eg_m_dr), ch*2+sl);
+			device->save_item(NAME(slot->eg_sh_dr), ch*2+sl);
+			device->save_item(NAME(slot->eg_sel_dr), ch*2+sl);
+			device->save_item(NAME(slot->eg_m_rr), ch*2+sl);
+			device->save_item(NAME(slot->eg_sh_rr), ch*2+sl);
+			device->save_item(NAME(slot->eg_sel_rr), ch*2+sl);
+
+			device->save_item(NAME(slot->key), ch*2+sl);
+
+			device->save_item(NAME(slot->AMmask), ch*2+sl);
+			device->save_item(NAME(slot->vib), ch*2+sl);
+
+			device->save_item(NAME(slot->waveform_number), ch*2+sl);
+			device->save_item(NAME(slot->wavetable), ch*2+sl);
+		}
+	}
+
+	device->save_item(NAME(chip->pan));
+	device->save_item(NAME(chip->pan_ctrl_value));
+
+	device->save_item(NAME(chip->lfo_am_depth));
+	device->save_item(NAME(chip->lfo_pm_depth_range));
+
+	device->save_item(NAME(chip->OPL3_mode));
+	device->save_item(NAME(chip->rhythm));
+
+	device->save_item(NAME(chip->address));
+	device->save_item(NAME(chip->status));
+	device->save_item(NAME(chip->statusmask));
+}
 
 void * ymf262_init(device_t *device, int clock, int rate)
 {
-	return OPL3Create(device,clock,rate,OPL3_TYPE_YMF262);
+	void *chip = OPL3Create(device,clock,rate,OPL3_TYPE_YMF262);
+	OPL3_save_state((OPL3 *)chip, device);
+
+	return chip;
+}
+
+void ymf262_post_load(void *chip) {
+	OPL3 *opl3 = (OPL3 *)chip;
+	for (int ch=0; ch<18; ch++) {
+		for (int sl=0; sl<2; sl++) {
+			OPL3_SLOT_CONNECT(opl3, &(opl3->P_CH[ch].SLOT[sl]));
+		}
+	}
 }
 
 void ymf262_shutdown(void *chip)

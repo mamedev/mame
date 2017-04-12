@@ -214,25 +214,25 @@ void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-	case TIMER_NAMCOIO_RUN:
-		namcoio_run(ptr, param);
+	case TIMER_NAMCOIO0_RUN:
+		namcoio0_run(ptr, param);
+		break;
+	case TIMER_NAMCOIO1_RUN:
+		namcoio1_run(ptr, param);
 		break;
 	default:
 		assert_always(false, "Unknown id in gaplus_state::device_timer");
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
+TIMER_CALLBACK_MEMBER(gaplus_state::namcoio0_run)
 {
-	switch (param)
-	{
-		case 0:
-			m_namco58xx->customio_run();
-			break;
-		case 1:
-			m_namco56xx->customio_run();
-			break;
-	}
+	m_namco58xx->customio_run();
+}
+
+TIMER_CALLBACK_MEMBER(gaplus_state::namcoio1_run)
+{
+	m_namco56xx->customio_run();
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
@@ -241,10 +241,10 @@ INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
+		m_namcoio0_run_timer->adjust(attotime::from_usec(50));
 
 	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
+		m_namcoio1_run_timer->adjust(attotime::from_usec(50));
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
@@ -253,10 +253,10 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
+		m_namcoio1_run_timer->adjust(attotime::from_usec(50));
 
 	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
+		m_namcoio0_run_timer->adjust(attotime::from_usec(50));
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub_irq)
@@ -490,6 +490,9 @@ WRITE8_MEMBER(gaplus_state::out_lamps1)
 
 void gaplus_state::machine_start()
 {
+	m_namcoio0_run_timer = timer_alloc(TIMER_NAMCOIO0_RUN);
+	m_namcoio1_run_timer = timer_alloc(TIMER_NAMCOIO1_RUN);
+
 	switch (m_type)
 	{
 		case GAME_GALAGA3:
@@ -557,7 +560,7 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gaplus_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)

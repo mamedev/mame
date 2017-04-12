@@ -211,6 +211,7 @@
 
 #include "bus/ti99x/genboard.h"
 #include "bus/ti99x/joyport.h"
+#include "bus/ti99x/colorbus.h"
 
 #include "bus/ti99_peb/peribox.h"
 
@@ -234,8 +235,8 @@ public:
 		m_keyboard(*this, GKEYBOARD_TAG),
 		m_mapper(*this, GMAPPER_TAG),
 		m_peribox(*this, PERIBOX_TAG),
-		m_mouse(*this, GMOUSE_TAG),
-		m_joyport(*this,JOYPORT_TAG)    { }
+		m_joyport(*this,JOYPORT_TAG),
+		m_colorbus(*this, COLORBUS_TAG) { }
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
@@ -263,8 +264,8 @@ public:
 	required_device<geneve_keyboard_device> m_keyboard;
 	required_device<geneve_mapper_device>   m_mapper;
 	required_device<peribox_device>         m_peribox;
-	required_device<geneve_mouse_device>    m_mouse;
 	required_device<joyport_device>         m_joyport;
+	required_device<colorbus_device>        m_colorbus;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -274,7 +275,6 @@ public:
 	DECLARE_DRIVER_INIT(geneve);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
@@ -477,7 +477,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		// bit 5 & 7: used as output
 		// bit 6: unused
 		if (m_keyint==CLEAR_LINE) answer |= 0x01;
-		if (m_mouse->left_button()==CLEAR_LINE) answer |= 0x04;
+		if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x04;
 		// TODO: add clock interrupt
 		if (m_intb==CLEAR_LINE) answer |= 0x10;
 		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
@@ -495,7 +495,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		// video wait is an output; no input possible here
 		if (m_intb==CLEAR_LINE) answer |= 0x04;     // mirror from above
 		// TODO: 0x08 = real-time clock int
-		if (m_mouse->left_button()==CLEAR_LINE) answer |= 0x10; // mirror from above
+		if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x10; // mirror from above
 		if (m_keyint==CLEAR_LINE) answer |= 0x40;
 
 		// Joystick up (mirror of bit 7)
@@ -602,8 +602,17 @@ WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 */
 WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 {
-	m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
-	m_tms9901->set_single_int(2, state);
+	// This method is frequently called without level change, so we only
+	// react on changes
+	if (state != m_int2)
+	{
+		m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+		m_tms9901->set_single_int(2, state);
+		if (state!=0)
+		{
+			m_colorbus->poll();
+		}
+	}
 }
 
 /*
@@ -613,25 +622,6 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(8, state);
-}
-
-/*
-    scanline interrupt
-*/
-TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
-{
-	int scanline = param;
-
-	if (scanline == 0) // was 262
-	{
-		// TODO
-		// The technical docs do not say anything about the way the mouse
-		// is queried. It sounds plausible that the mouse is sampled once
-		// per vertical interrupt; however, the mouse sometimes shows jerky
-		// behaviour. Maybe we should use an autonomous timer with a higher
-		// rate? -> to be checked
-		m_mouse->poll();
-	}
 }
 
 WRITE8_MEMBER( geneve_state::external_operation )
@@ -704,7 +694,6 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(geneve_state, set_tms9901_INT2_from_v9938))
 	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve_state, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
@@ -744,8 +733,8 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	// User interface devices
 	MCFG_DEVICE_ADD( GKEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
 	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(geneve_state, keyboard_interrupt) )
-	MCFG_GENEVE_MOUSE_ADD( GMOUSE_TAG )
 	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG )
+	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
 
 	// PFM expansion
 	MCFG_AT29C040_ADD( PFM512_TAG )

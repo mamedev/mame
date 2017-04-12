@@ -325,6 +325,6 @@ namespace bx
 
 } // namespace bx
 
-#include "handlealloc.inl"
+#include "inline/handlealloc.inl"
 
 #endif // BX_HANDLE_ALLOC_H_HEADER_GUARD

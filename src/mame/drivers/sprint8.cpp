@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 	MCFG_SCREEN_SIZE(512, 261)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update_sprint8)
-	MCFG_SCREEN_VBLANK_DRIVER(sprint8_state, screen_eof_sprint8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint8_state, screen_vblank_sprint8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint8)

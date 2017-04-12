@@ -2,25 +2,22 @@
 // copyright-holders:Robbbert, Mark Garlanger
 /***************************************************************************
 
-	Heathkit H19
+    Heathkit H19
 
-	A smart terminal designed and manufactured by Heath Company.
+    A smart terminal designed and manufactured by Heath Company.
 
-	The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
-	mask-programmed keyboard controller. The output of this passes
-	through a rom.
+    The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
+    mask-programmed keyboard controller. The output of this passes
+    through a rom.
 
-	Input can also come from the serial port (a 8250).
-	Either device will signal an interrupt to the CPU when a key
-	is pressed/data is received.
+    Input can also come from the serial port (a 8250).
+    Either device will signal an interrupt to the CPU when a key
+    is pressed/data is received.
 
-	TODO:
-	- Finish connecting up the 8250
-	   - enable 8520 interrupts
-	- speed up emulation
-
-	super19 version has the videoram at D800. This is not emulated.
-	However, a keyclick can be heard, to assure you it does in fact work.
+    TODO:
+    - speed up emulation
+    - update SW401 baud rate options for Watz ROM
+    - update SW401 & SW402 definitions for Super-19 ROM
 
 ****************************************************************************/
 /***************************************************************************
@@ -65,6 +62,7 @@ Address   Description
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define MC6845_CLOCK (XTAL_12_288MHz /8)
 #define INS8250_CLOCK (XTAL_12_288MHz /4)
+
 // Capacitor value in pF
 #define H19_KEY_DEBOUNCE_CAPACITOR 5000
 #define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
@@ -73,7 +71,6 @@ Address   Description
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
 #define KBDC_TAG    "mm5740"
-
 
 class h19_state : public driver_device
 {
@@ -110,25 +107,26 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
-	//uint8_t m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
-	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<ins8250_device> m_ace;
-	required_device<beep_device> m_beep;
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_region_ptr<u8> m_p_chargen;
-	required_device<mm5740_device> m_mm5740;
-	required_memory_region m_kbdrom;
-	required_ioport m_kbspecial;
 
-	uint8_t m_transchar;
-	bool m_strobe;
+	required_device<palette_device> m_palette;
+	required_device<cpu_device>     m_maincpu;
+	required_device<mc6845_device>  m_crtc;
+	required_device<ins8250_device> m_ace;
+	required_device<beep_device>    m_beep;
+	required_shared_ptr<uint8_t>    m_p_videoram;
+	required_region_ptr<u8>         m_p_chargen;
+	required_device<mm5740_device>  m_mm5740;
+	required_memory_region          m_kbdrom;
+	required_ioport                 m_kbspecial;
+
+	uint8_t  m_transchar;
+	bool     m_strobe;
+	bool     m_keyclickactive;
+	bool     m_bellactive;
+
 	uint16_t translate_mm5740_b(uint16_t b);
-	bool m_keyclickactive;
-	bool m_bellactive;
 };
 
 void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -155,30 +153,30 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x4100) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_ROM
+	AM_RANGE(0x4000, 0x4100) AM_MIRROR(0x3e00) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1F) AM_READ_PORT("SW401")
-	AM_RANGE(0x20, 0x3F) AM_READ_PORT("SW402")
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_READ_PORT("SW401")
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READ_PORT("SW402")
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x80, 0x9F) AM_READ(kbd_key_r)
-	AM_RANGE(0xA0, 0xBF) AM_READ(kbd_flags_r)
-	AM_RANGE(0xC0, 0xDF) AM_WRITE(h19_keyclick_w)
-	AM_RANGE(0xE0, 0xFF) AM_WRITE(h19_bell_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1E) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x61, 0x61) AM_MIRROR(0x1E) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_READ(kbd_key_r)
+	AM_RANGE(0xA0, 0xA0) AM_MIRROR(0x1f) AM_READ(kbd_flags_r)
+	AM_RANGE(0xC0, 0xC0) AM_MIRROR(0x1f) AM_WRITE(h19_keyclick_w)
+	AM_RANGE(0xE0, 0xE0) AM_MIRROR(0x1f) AM_WRITE(h19_bell_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( h19 )
 
 	PORT_START("MODIFIERS")
-	// bit 0 connects to B8 of MM5740 - low if either shift key is 
+	// bit 0 connects to B8 of MM5740 - low if either shift key is
 	// bit 7 is low if a key is pressed
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
@@ -273,7 +271,6 @@ static INPUT_PORTS_START( h19 )
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")          PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Scroll")     PORT_CODE(KEYCODE_LWIN)
 
-
 	PORT_START("X8")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
@@ -285,7 +282,6 @@ static INPUT_PORTS_START( h19 )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
-
 
 	PORT_START("X9")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")          PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
@@ -421,15 +417,13 @@ READ8_MEMBER(h19_state::kbd_key_r)
 
 READ8_MEMBER(h19_state::kbd_flags_r)
 {
-	uint8_t rv = 0;
 	uint16_t modifiers = m_kbspecial->read();
-
-	rv = modifiers & 0xff;
+	uint8_t rv = modifiers & 0x7f;
 
 	// check both shifts
 	if (((modifiers & 0x020) == 0) || ((modifiers & 0x100) == 0))
 	{
-		rv |= 0x1;
+		rv |= KB_STATUS_SHIFT_KEYS_MASK;
 	}
 
 	// invert offline switch
@@ -465,20 +459,16 @@ WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
 	}
 }
 
-
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx;
-	uint16_t mem,x;
 	uint32_t *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		uint8_t inv=0;
-		if (x == cursor_x) inv=0xff;
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
+		uint8_t inv = (x == cursor_x) ? 0xff : 0;
+
+		uint8_t chr = m_p_videoram[(ma + x) & 0x7ff];
 
 		if (chr & 0x80)
 		{
@@ -487,7 +477,7 @@ MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 		}
 
 		/* get pattern of pixels for that character scanline */
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+		uint8_t gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];
@@ -522,11 +512,12 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( h19, h19_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
+	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
 	MCFG_CPU_PROGRAM_MAP(h19_mem)
 	MCFG_CPU_IO_MAP(h19_io)
 
 	/* video hardware */
+	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)   // TODO- this is adjustable by dipswitch.
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -539,12 +530,12 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8) 
+	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
 	MCFG_DEVICE_ADD("ins8250", INS8250, INS8250_CLOCK)
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
 	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))
@@ -608,9 +599,11 @@ ROM_START( watz19 )
 	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
+
 /*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
 COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", 0 )
-/*  TODO - verify the years for these third-party replacement ROMs. */
-COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_NOT_WORKING )
+//Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
+COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+// Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
 COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
 

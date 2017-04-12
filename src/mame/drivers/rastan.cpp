@@ -151,6 +151,11 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
       skipping RSxx_41. It's doubtful that Taito would reuse those numbers in
       2 different sets with different data/code. The names have been corrected
       to known files names where the code matched.
+
+     Rom numbers B04-30 through B04-35 are currently missing, this would
+     imply a missing and unknown program set currently not dumped.
+     Rom number B04-36 (and B04-36-1) "should" be the missing Japanese region
+     program roms for the latest code base.
 ***************************************************************************/
 
 #include "emu.h"
@@ -489,6 +494,34 @@ ROM_START( rastana )
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) ) /* samples are 4bit ADPCM */
 ROM_END
 
+ROM_START( rastanb ) /* Earlier code base, but uses 2 US region roms and shows Taito Corporation Japan instead of Taito America Corporation */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "b04-14.19", 0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) ) /* These two are from the US rastanub set below */
+	ROM_LOAD16_BYTE( "b04-21.7",  0x00001, 0x10000, CRC(7c8dde9a) SHA1(0cfc3b4f3bc7b940a6c07267ac95e4aae25801ea) ) /* These two are from the US rastanub set below */
+	ROM_LOAD16_BYTE( "b04-27.20", 0x20000, 0x10000, CRC(ce37694b) SHA1(343c35d93f59c0696104e6934063057d117f4d9f) )
+	ROM_LOAD16_BYTE( "b04-26.8",  0x20001, 0x10000, CRC(fbdb98c7) SHA1(717aabf6ce0c7c6107c4bcaae646f7c67b644a54) )
+	ROM_LOAD16_BYTE( "b04-29.21", 0x40000, 0x10000, CRC(90d7c6e8) SHA1(6a36cd6db04fcefbf0487f574fccb0eab94e058f) )
+	ROM_LOAD16_BYTE( "b04-28.9",  0x40001, 0x10000, CRC(d6440242) SHA1(ba73ca01cc58a8e7bb4d6b7b927658445e97168f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x10000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "b04-01.40", 0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
+	ROM_LOAD( "b04-03.39", 0x20000, 0x20000, CRC(ab67e064) SHA1(5c49f0ff9221cba9f2bb8da86eb4448c73012410) )
+	ROM_LOAD( "b04-02.67", 0x40000, 0x20000, CRC(54040fec) SHA1(a2bea2ce1cebd25b33be41723299ca0512d95f9e) )
+	ROM_LOAD( "b04-04.66", 0x60000, 0x20000, CRC(94737e93) SHA1(3df7f085fe6468bda11fab2e86252df6f74f7a99) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "b04-05.15", 0x00000, 0x20000, CRC(c22d94ac) SHA1(04f69f9af7ac4242e95dba32988afa3616d75a92) )
+	ROM_LOAD( "b04-07.14", 0x20000, 0x20000, CRC(b5632a51) SHA1(da6ebe6afe245443a76b33714213549356c0c5c3) )
+	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
+	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
+	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
+ROM_END
+
 /* Byte changes in Rev 1 US sets:
 
  ROM       0x5203  0x520B
@@ -653,6 +686,7 @@ GAME( 1987, rastanu,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito 
 GAME( 1987, rastanua,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US)", MACHINE_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
+GAME( 1987, rastanb,   rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastanub,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsaga,  rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rastsagaa, rastan, rastan, rastsaga, driver_device, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", MACHINE_SUPPORTS_SAVE )

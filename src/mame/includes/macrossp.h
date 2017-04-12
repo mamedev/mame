@@ -97,7 +97,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_macrossp(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_macrossp);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

@@ -30,7 +30,7 @@
 
     Useful links:
     - board photo: http://s8.hostingkartinok.com/uploads/images/2016/05/579e9d152bc772d9c16bc8ac611eb97f.jpg
-	- manuals: http://www.minuszerodegrees.net/manuals/Toshiba/Toshiba.htm
+    - manuals: http://www.minuszerodegrees.net/manuals/Toshiba/Toshiba.htm
 
 ***************************************************************************/
 
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)	// ROM-DOS page select [p. B-15]
+	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
 	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 

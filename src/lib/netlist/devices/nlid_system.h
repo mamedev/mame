@@ -155,7 +155,7 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		state_var<std::uint8_t> m_cnt;
+		state_var_u8 m_cnt;
 		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
 		netlist_time m_inc[32];

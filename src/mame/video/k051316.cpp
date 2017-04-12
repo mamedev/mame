@@ -150,6 +150,9 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 

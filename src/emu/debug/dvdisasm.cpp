@@ -229,6 +229,7 @@ void debug_view_disasm::view_click(const int button, const debug_view_xy& pos)
 
 offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 {
+	auto dis = machine().disable_side_effect();
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 
 	// compute the increment

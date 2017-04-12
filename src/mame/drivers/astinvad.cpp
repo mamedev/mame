@@ -64,6 +64,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_samples(*this, "samples")
 		, m_screen(*this, "screen")
+		, m_color_prom(*this, "proms")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(color_latch_w);
@@ -97,6 +98,7 @@ private:
 
 	std::unique_ptr<uint8_t[]>    m_colorram;
 	emu_timer  *m_int_timer;
+	emu_timer  *m_int_off_timer;
 	uint8_t      m_sound_state[2];
 	uint8_t      m_screen_flip;
 	uint8_t      m_screen_red;
@@ -111,6 +113,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
+	required_region_ptr<uint8_t> m_color_prom;
 };
 
 
@@ -166,15 +169,13 @@ void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint
 
 uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
-	int x, y;
 
 	/* render the visible pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
-			uint8_t color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
+			uint8_t color = m_color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
 			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
@@ -185,15 +186,13 @@ uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rg
 
 uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
-	int x, y;
 
 	/* render the visible pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
-			uint8_t color = color_prom[(((y & 0xf8) << 2) | (x >> 3)) ^ (m_screen_flip ? 0x3ff : m_player ? 0 : 0x3ff)] >> (m_player ? 4 : 0);
+			uint8_t color = m_color_prom[(((y & 0xf8) << 2) | (x >> 3)) ^ (m_screen_flip ? 0x3ff : m_player ? 0 : 0x3ff)] >> (m_player ? 4 : 0);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
 			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
@@ -204,14 +203,12 @@ uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rg
 
 uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	offs_t offs,n;
-	uint8_t x,y,data,color;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	uint8_t x,y;
+	
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		data = m_videoram[offs];
-		color = m_colorram[offs];
+		uint8_t data = m_videoram[offs];
+		uint8_t color = m_colorram[offs];
 
 		if (m_screen_flip)
 		{
@@ -225,8 +222,8 @@ uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rg
 		}
 
 		/* this is almost certainly wrong */
-		n = ((offs >> 5) & 0xf0) | color;
-		color = color_prom[n] & 0x07;
+		offs_t n = ((offs >> 5) & 0xf0) | color;
+		color = m_color_prom[n] & 0x07;
 
 		plot_byte(bitmap, y, x, data, color);
 	}
@@ -272,7 +269,7 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 	m_int_timer->adjust(m_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	timer_set(attotime::from_double(300 * 0.1e-6), TIMER_INT_OFF);
+	m_int_off_timer->adjust(attotime::from_double(300 * 0.1e-6));
 }
 
 
@@ -280,6 +277,7 @@ MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
 	m_int_timer = timer_alloc(TIMER_INT_GEN);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
+	m_int_off_timer = timer_alloc(TIMER_INT_OFF);
 
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_screen_red));

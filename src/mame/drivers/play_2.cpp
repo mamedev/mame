@@ -353,7 +353,7 @@ WRITE8_MEMBER( play_2_state::psg_w )
 // **************** Machine *****************************
 static MACHINE_CONFIG_START( play_2, play_2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 2950000)
+	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
 	MCFG_CPU_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, 2950000 / 8) // TPB line from CPU
+	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL_2_95MHz / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1863_ADD("1863", 0, 2950000 / 8)
+	MCFG_CDP1863_ADD("1863", 0, XTAL_2_95MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

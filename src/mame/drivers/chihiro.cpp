@@ -464,6 +464,8 @@ public:
 protected:
 	virtual void device_start() override;
 private:
+	void process_jvs_packet();
+
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
 	static const USBStandardInterfaceDescriptor intdesc;
@@ -509,6 +511,8 @@ public:
 protected:
 	virtual void device_start() override;
 private:
+	void process_packet();
+
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;
 	static const USBStandardInterfaceDescriptor intdesc;
@@ -522,6 +526,11 @@ private:
 	static const uint8_t strdesc1[];
 	static const uint8_t strdesc2[];
 	uint8_t *region;
+	uint8_t midi_rs232;
+	uint8_t response[256];
+	uint8_t packet[4];
+	int response_size;
+	int step;
 };
 
 const device_type OHCI_HLEAN2131SC = device_creator<ohci_hlean2131sc_device>;
@@ -728,7 +737,7 @@ static const struct
 		uint8_t write_byte;
 	} modify[16];
 } hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
-						{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
+						{ "outr2",    false, { { 0, 0 } } },
 						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
 						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
 						{ "vcop3",    false, { { 0x61a23/*36a23*/, 0x90 },{ 0x61a24/*36a24*/, 0x90 }, { 0, 0 } } },
@@ -836,7 +845,7 @@ int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	// PINSA register, bits 0-2 connected do dip switches 1-3 on filter board, bit 4 to dip switch 4, bit 5 to dip switch 5, bits 6-7 to buttons 1-2 on filter board
 	// bits 4-1 value must be 10 xor 15, and bit 3 is ignored since its used as the CS pin of the chip
 	endpoints[endpoint].buffer[1] = 0x4b;
-	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 give the status of the sense pin of the jvs connector
+	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bits 0-1 give the status of the sense pin of the jvs connector
 	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
 	endpoints[endpoint].buffer[2] = 0x52 | sense;
 	// OUTB register
@@ -1012,63 +1021,68 @@ int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 				printf("\n\r");
 #endif
 				// extract packets
-				int numpk = jvs.buffer_in[1];
-				int p = 2;
-
-				for (int n = 0;n < numpk;n++)
-				{
-					p++;
-					if (jvs.buffer_in[p] != 0xe0)
-						break;
-					p++;
-					int dest = jvs.buffer_in[p];
-					p++;
-					int len = jvs.buffer_in[p];
-					p++;
-					if ((p + len) > jvs.buffer_in_expected)
-						break;
-					int chk = dest + len;
-					for (int m = len - 1; m > 0; m--)
-						chk = chk + (int)jvs.buffer_in[p + m - 1];
-					chk = chk & 255;
-					if (chk != (int)jvs.buffer_in[p + len - 1])
-					{
-						p = p + len;
-						continue;
-					}
-					// use data of this packet
-					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
-					// generate response
-					if (dest == 0xff)
-						dest = 0;
-					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
-					// update buffer_out
-					if (recv > 0)
-					{
-						chk = 0;
-						for (int m = 0; m < recv; m++)
-							chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
-						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
-						jvs.buffer_out_packets++;
-						// jvs node address
-						jvs.buffer_out[jvs.buffer_out_used] = (uint8_t)dest;
-						// dummy
-						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
-						// length following
-						recv += 2;
-						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
-						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
-						// body
-						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
-						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
-						jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
-					}
-					p = p + len;
-				}
+				process_jvs_packet();
 			}
 		}
 	}
 	return size;
+}
+
+void ohci_hlean2131qc_device::process_jvs_packet()
+{
+	int numpk = jvs.buffer_in[1];
+	int p = 2;
+
+	for (int n = 0; n < numpk; n++)
+	{
+		p++;
+		if (jvs.buffer_in[p] != 0xe0)
+			break;
+		p++;
+		int dest = jvs.buffer_in[p];
+		p++;
+		int len = jvs.buffer_in[p];
+		p++;
+		if ((p + len) > jvs.buffer_in_expected)
+			break;
+		int chk = dest + len;
+		for (int m = len - 1; m > 0; m--)
+			chk = chk + (int)jvs.buffer_in[p + m - 1];
+		chk = chk & 255;
+		if (chk != (int)jvs.buffer_in[p + len - 1])
+		{
+			p = p + len;
+			continue;
+		}
+		// use data of this packet
+		jvs.master->send_packet(dest, len, jvs.buffer_in + p);
+		// generate response
+		if (dest == 0xff)
+			dest = 0;
+		int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
+		// update buffer_out
+		if (recv > 0)
+		{
+			chk = 0;
+			for (int m = 0; m < recv; m++)
+				chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
+			jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
+			jvs.buffer_out_packets++;
+			// jvs node address
+			jvs.buffer_out[jvs.buffer_out_used] = (uint8_t)dest;
+			// dummy
+			jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
+			// length following
+			recv += 2;
+			jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
+			jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
+			// body
+			jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
+			jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
+			jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
+		}
+		p = p + len;
+	}
 }
 
 void ohci_hlean2131qc_device::device_start()
@@ -1094,6 +1108,9 @@ ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, 
 	ohci_function_device()
 {
 	region = nullptr;
+	midi_rs232 = 0;
+	response_size = 0;
+	step = 0;
 }
 
 void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
@@ -1121,24 +1138,29 @@ void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_cont
 
 int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
-//#ifdef VERBOSE_MSG
+#ifdef VERBOSE_MSG
 	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
-//#endif
+#endif
 	if (endpoint != 0)
 		return -1;
+	// default valuse for data stage
 	for (int n = 0; n < setup->wLength; n++)
 		endpoints[endpoint].buffer[n] = 0x50 ^ n;
 	endpoints[endpoint].buffer[1] = 0;
+	// PINSB register, bits 0-1 uset as rts/cts signals for uart0, bits 2-3 used as uart1, bits 5-7 used as leds (not mounted on pcb)
 	endpoints[endpoint].buffer[2] = 0x52; // PINSB
+	// OUTB register
 	endpoints[endpoint].buffer[3] = 0x53; // OUTB
 	endpoints[endpoint].buffer[4] = 0;
 	endpoints[endpoint].buffer[5] = 0;
-	endpoints[endpoint].buffer[6] = 0x56; // PINSC
-	endpoints[endpoint].buffer[7] = 0x57; // OUTC
+	// PINSC register, bit 7 selects default value for bit 6 after reset (connected to dip switch 5 on filter board), bits 0-1 used as uart0 pins
+	endpoints[endpoint].buffer[6] = 0x56;
+	// OUTC register, bit 6 specifies if uart1 should be connected to midi or rs232
+	endpoints[endpoint].buffer[7] = 0x57;
 	// bRequest is a command value
 	if (setup->bRequest == 0x16)
 	{
-		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// this command is used to read data from the i2c serial eeprom connected to the chip
 		// setup->wValue = start address to read from
 		// setup->wIndex = number of bytes to read
 		// data will be transferred to the host using endpoint 1 (IN)
@@ -1148,19 +1170,41 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x17)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0x90;
 	}
 	else if (setup->bRequest == 0x1a)
 	{
+		// used to get data received by uart0 data transferred with endpoint 2 (IN)
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x1b)
 	{
+		// used to get data received by uart 1 data transferred with endpoint 3 (IN)
+		// setup->wIndex = number of bytes host would like to retrieve (must be lower than 256, 0 means get all available)
 		endpoints[endpoint].buffer[0] = 0; //
+		endpoints[endpoint].buffer[1] = 0; // bit 0 in buffer overflow bit 1 in parity error
+		if ((setup->wIndex == 0) || (setup->wIndex > response_size))
+		{
+			endpoints[endpoint].buffer[4] = response_size & 255; // how many bytes to transfer with endpoint 3
+			endpoints[endpoint].buffer[5] = (response_size >> 8) & 255;
+			memcpy(endpoints[3].buffer, response, response_size);
+			response_size = 0;
+		}
+		else
+		{
+			endpoints[endpoint].buffer[4] = setup->wIndex & 255;
+			endpoints[endpoint].buffer[5] = (setup->wIndex >> 8) & 255;
+			memcpy(endpoints[3].buffer, response, setup->wIndex);
+			for (int n = setup->wIndex; n < response_size; n++)
+				response[n - setup->wIndex] = response[n];
+			response_size = response_size - setup->wIndex;
+		}
+		endpoints[3].remain = setup->wIndex;
+		endpoints[3].position = endpoints[3].buffer;
 	}
 	else if (setup->bRequest == 0x1d)
 	{
-		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// this command is used to write data to the i2c serial eeprom connected to the chip
 		// no more than 32 bytes can be written at a time
 		// setup->wValue = start address to write to
 		// setup->wIndex = number of bytes to write
@@ -1169,27 +1213,34 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x1e)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0x90;
 	}
 	else if (setup->bRequest == 0x22)
 	{
+		// send data to be output from uart0
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
 	else if (setup->bRequest == 0x23)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// this command is used to send data to be output from uart1
+		// setup->wIndex = number of bytes to send
+		// data will be transferred to the host using endpoint 3 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+		endpoints[3].remain = setup->wIndex;
+		endpoints[3].position = endpoints[3].buffer;
 	}
 	else if (setup->bRequest == 0x25) //
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0;
 	}
 	else if (setup->bRequest == 0x26) //
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// set uart0 or uart1 mode
+		endpoints[endpoint].buffer[0] = 0;
 	}
 	else if (setup->bRequest == 0x27) //
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		endpoints[endpoint].buffer[0] = 0;
 	}
 	else if (setup->bRequest == 0x28)
 	{
@@ -1213,23 +1264,41 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 	}
 	else if (setup->bRequest == 0x2d)
 	{
+		// set pin 1 of PORTB, used as the RTS signal of the rs232 port implemented with uart0
 		endpoints[endpoint].buffer[0] = 0x99;
 	}
-	else if (setup->bRequest == 0x2e) //
+	else if (setup->bRequest == 0x2e)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// switches uart1 between rs232 mode and midi mode
+		// low byte of wValue sets the mode: 0 mode is selected using pin 7 of PORTC (0 midi 1 rs232), 1 rs232, 2 midi, other values no mode change
+		endpoints[endpoint].buffer[0] = 0;
+		midi_rs232 = setup->wValue & 255;
 	}
 	else if (setup->bRequest == 0x2f)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// return low byte of wValue from command 0x2e
+		endpoints[endpoint].buffer[0] = 0;
+		endpoints[endpoint].buffer[4] = midi_rs232;
 	}
 	else if (setup->bRequest == 0x30)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0
+		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
+		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
+		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0
+		endpoints[endpoint].buffer[0] = 0;
+		if ((setup->wValue & 255) == 0)
+			endpoints[endpoint].buffer[4] = 0;
+		else if ((setup->wValue & 255) < 128)
+			endpoints[endpoint].buffer[4] = 1;
+		endpoints[endpoint].buffer[5] = 0;
 	}
 	else if (setup->bRequest == 0x31)
 	{
-		endpoints[endpoint].buffer[0] = 0x99;
+		// set pins 4-7 of PORTB
+		// bits 4-7 of wValue & 255 set the direction
+		// bits 4-7 of wValue >> 8 set the level
+		endpoints[endpoint].buffer[0] = 0;
 	} else
 		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
 
@@ -1240,9 +1309,9 @@ int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPa
 
 int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
-//#ifdef VERBOSE_MSG
+#ifdef VERBOSE_MSG
 	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
-//#endif
+#endif
 	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
 	{
 		if (size > endpoints[endpoint].remain)
@@ -1251,7 +1320,89 @@ int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buf
 		endpoints[endpoint].position = endpoints[endpoint].position + size;
 		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
 	}
+	if ((endpoint == 3) && (pid == InPid))
+	{
+		if (size > endpoints[3].remain)
+			size = endpoints[3].remain;
+		memcpy(buffer, endpoints[3].position, size);
+		endpoints[3].position = endpoints[3].position + size;
+		endpoints[3].remain = endpoints[3].remain - size;
+	}
+	if ((endpoint == 3) && (pid == OutPid))
+	{
+		if (size > endpoints[3].remain)
+			size = endpoints[3].remain;
+		memcpy(endpoints[3].position, buffer, size);
+		endpoints[3].position = endpoints[3].position + size;
+		endpoints[3].remain = endpoints[3].remain - size;
+		for (int n = 0; n < size; n++)
+		{
+			uint8_t byt = buffer[n];
+			switch(step)
+			{
+			case 0:
+				if ((byt & 0x80) != 0)
+				{
+					packet[0] = byt;
+					step = 1;
+				}
+				break;
+			case 1:
+				packet[1] = byt;
+				step = 2;
+				break;
+			case 2:
+				packet[2] = byt;
+				step = 3;
+				break;
+			case 3:
+				packet[3] = byt;
+				step = 0;
+				process_packet();
+				break;
+			}
+		}
+	}
 	return size;
+}
+
+void ohci_hlean2131sc_device::process_packet()
+{
+	uint8_t result = 0;
+#ifdef VERBOSE_MSG
+		printf("%02X %02X %02X %02X\n\r", packet[0], packet[1], packet[2], packet[3]);
+#endif
+	if (packet[0] == 0xff) // 00 00 7f
+		result = 2;
+	else if (packet[0] == 0x81) // 30 7f 4e
+		result = 1; // must be 1
+	else if (packet[0] == 0xfc) // 00 20 5c
+		result = 3;
+	else if (packet[0] == 0xfd) // 00 00 7d
+		result = 0;
+	else if (packet[0] == 0xfa) // 00 1f 65
+		result = 0;
+	else if (packet[0] == 0x83) // 40 04 47
+		result = 0;
+	else if (packet[0] == 0x86) // 01 02 05
+		result = 0;
+	else if (packet[0] == 0x88) // 00 04 0c
+		result = 0;
+	else if (packet[0] == 0x80) // 01 01 00
+		result = 0;
+	else if (packet[0] == 0x84) // 01 00 05
+		result = 0;
+	else if (packet[0] == 0xf0) // 00 00 70
+		result = 0;
+	else if (packet[0] == 0x9d)
+		result = 0;
+	else if (packet[0] == 0x9e)
+		result = 0;
+	if (response_size < 256)
+	{
+		response[response_size] = result + (result << 4);
+		response_size++;
+	}
 }
 
 void ohci_hlean2131sc_device::device_start()
@@ -1441,8 +1592,8 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 		break;
 	case 0x0101:
 		// third word fourth word
-		word_write_le(read_buffer + 4, 0xca); // ?
-		word_write_le(read_buffer + 6, 0xcb); // ?
+		word_write_le(read_buffer + 4, 0x1234); // dimm board firmware version (1234 -> 12.34)
+		word_write_le(read_buffer + 6, 0x4567); // ?
 		break;
 	case 0x0102:
 		// second dword
@@ -1450,8 +1601,10 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 		break;
 	case 0x0103:
 		// dwords 1 3 4
-		memcpy(read_buffer + 4, "-abc-abc12345678", 16); // ?
+		memcpy(read_buffer + 4, "-abc-abc12345678", 16); // dimm board serial number
 		break;
+	default:
+		logerror("Unknown baseboard sector command %04X\n", c);
 	}
 	// clear
 	write_buffer[0] = write_buffer[1] = write_buffer[2] = write_buffer[3] = 0;
@@ -1541,29 +1694,29 @@ static INPUT_PORTS_START(chihiro)
 
 	/* Dummy so we can easily get the analog ch # */
 	PORT_START("A0")
-	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A1")
-	PORT_BIT(0x01ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x81ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A2")
-	PORT_BIT(0x02ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x82ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A3")
-	PORT_BIT(0x03ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x83ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A4")
-	PORT_BIT(0x04ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x84ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A5")
-	PORT_BIT(0x05ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x85ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A6")
-	PORT_BIT(0x06ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x86ff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("A7")
-	PORT_BIT(0x07ff, IP_ACTIVE_LOW, IPT_UNUSED)
-INPUT_PORTS_END
+	PORT_BIT(0x87ff, IP_ACTIVE_LOW, IPT_UNUSED)
+	INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {
@@ -1678,7 +1831,7 @@ ROM_START( hotd3 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0001", 0, BAD_DUMP  SHA1(174c72f851d0c97e8993227467f16b0781ed2f5c) )
+	DISK_IMAGE_READONLY( "gdx-0001", 0, SHA1(e41a2b236ec26db2d8b07643b8222e64440d1f31) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0348-com.data", 0x00, 0x50, CRC(d28219ef) SHA1(40dbbc092bc9f99b8d2ae67fbefacd62184f90ec) )
@@ -1768,7 +1921,7 @@ ROM_START( mj2c )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0006c", 0, BAD_DUMP SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
+	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(545ef902833d53822a8544dfc3f7538ee6025c9e) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
@@ -1890,7 +2043,7 @@ ROM_START( ghostsqu )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0012a", 0, BAD_DUMP  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
+	DISK_IMAGE_READONLY( "gdx-0012a", 0, SHA1(d14adac9cdfd8095362fa9600c50bf038d4e5a99) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
@@ -1900,7 +2053,7 @@ ROM_START( gundamos )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0013", 0, BAD_DUMP SHA1(96b3dafcc2d2d6803fe3bf43a245d43ee5e0e5a6) )
+	DISK_IMAGE_READONLY( "gdx-0013", 0, SHA1(f97dceb9b4c4adff51d222ab2e6b9b0fe36394a8) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0400-jpn.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
@@ -1920,7 +2073,7 @@ ROM_START( outr2st )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0014a", 0, BAD_DUMP SHA1(4f9656634c47631f63eab554a13d19b15558217e) )
+	DISK_IMAGE_READONLY( "gdx-0014a", 0, SHA1(ed60aa1a402bcb01229b18987af199566b930b0b) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
@@ -1930,7 +2083,7 @@ ROM_START( wangmid2j )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0015", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
+	DISK_IMAGE_READONLY( "gdx-0015", 0, SHA1(489bdb96cecaa8c45908a630f64b3cf10e433619) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -1960,7 +2113,7 @@ ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0016a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
+	DISK_IMAGE_READONLY( "gdx-0016a", 0, SHA1(1cbc5e3e9ef1ab26468b9f4ee0fc32a0a320afe7) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -1970,7 +2123,7 @@ ROM_START( mj3d )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0017d", 0, BAD_DUMP SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
+	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(d90e06bd1e4c637cb9949d411da11537e72ac3d2) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
@@ -1990,7 +2143,7 @@ ROM_START( scg06nt )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0018a", 0, BAD_DUMP SHA1(e6f3dc8066392854ad7d83f81d3cbc81a5e340b3) )
+	DISK_IMAGE_READONLY( "gdx-0018a", 0, SHA1(3c10775aefc5e3e49837bf473fb32e94507ee892) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("gdx-0018.data", 0x00, 0x50, CRC(1a210abd) SHA1(43a54d028315d2dfa9f8ea6fb59265e0b980b02f) )

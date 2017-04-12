@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/ec184x.c
+    drivers/ec184x.c
 
-	Driver file for EC-184x series
+    Driver file for EC-184x series
 
 ***************************************************************************/
 

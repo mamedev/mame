@@ -709,6 +709,17 @@ ROM_START(rocky)
 	ROM_LOAD("672-s2.snd", 0x7800, 0x0800, CRC(5e77117a) SHA1(7836b1ee0b2afe621ae414d5710111b550db0e63))
 ROM_END
 
+ROM_START(rockyf)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80a.bin", 0x2000, 0x1000, CRC(241de1d4) SHA1(9d5942704cbdec6565d6335e33e9f7e4c60a41ac))
+	ROM_LOAD("u3_80a.bin", 0x3000, 0x1000, CRC(2d77ccdc) SHA1(47241ccd365e8d74d5aa5b775acf6445cc95b8a8))
+	ROM_LOAD("672-2x.cpu", 0x1000, 0x0800, CRC(8e2f0d39) SHA1(eb0982d2bfa910b3c95d6d55c04dc58395789411))
+
+	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
+	ROM_LOAD("f672-s1.snd", 0x7000, 0x0800, CRC(57a0ce22) SHA1(cdc167b5eb72e8c3235d3ffd9143faf8e6c0a2ef))
+	ROM_LOAD("f672-s2.snd", 0x7800, 0x0800, CRC(87a0474f) SHA1(62fe995f3bc7fe23422d75b043d508c2f84f745a))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Royal Flush Deluxe (#681)
 /-------------------------------------------------------------------*/
@@ -796,6 +807,7 @@ ROM_END
 /* cust  */GAME(1981,   dvlsdre,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare",         MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1981,   dvlsdre2,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare (Sound Only)",    MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1982,   rocky,      0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky",                MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1982,   rockyf,     rocky,  gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky (French speech)", MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1982,   spirit,     0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Spirit",               MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1982,   punk,       0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Punk!",                MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1982,   striker,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Striker",              MACHINE_IS_SKELETON_MECHANICAL)

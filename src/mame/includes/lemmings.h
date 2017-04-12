@@ -62,7 +62,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_lemmings(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lemmings);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 
 	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );

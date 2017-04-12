@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")               // DSW 2
 	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)       // Samples Banks
 ADDRESS_MAP_END
-	
+
 static ADDRESS_MAP_START( penbrosk_map, AS_PROGRAM, 16, seta2_state )
 	AM_IMPORT_FROM(penbros_base_map)
 	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")               // DSW 1
@@ -2342,7 +2342,7 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
@@ -2546,7 +2546,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
@@ -2597,7 +2597,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)

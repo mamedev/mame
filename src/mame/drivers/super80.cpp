@@ -775,7 +775,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80m)
-	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(super80_state, screen_vblank_super80m))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( super80v, super80_state )
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80v)
-	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(super80_state, screen_vblank_super80m))
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)

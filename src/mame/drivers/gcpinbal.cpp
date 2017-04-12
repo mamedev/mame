@@ -112,7 +112,7 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 {
 	/* Unsure of actual sequence */
 
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_GCPINBAL_INTERRUPT1);
+	m_int1_timer->adjust(m_maincpu->cycles_to_attotime(500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -411,6 +411,8 @@ GFXDECODE_END
 
 void gcpinbal_state::machine_start()
 {
+	m_int1_timer = timer_alloc(TIMER_GCPINBAL_INTERRUPT1);
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_bg0_gfxset));

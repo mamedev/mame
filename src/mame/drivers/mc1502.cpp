@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/mc1502.c
+    drivers/mc1502.c
 
-	Driver file for Elektronika MS 1502
+    Driver file for Elektronika MS 1502
 
 ***************************************************************************/
 
@@ -196,10 +196,10 @@ MACHINE_START_MEMBER(mc1502_state, mc1502)
 	DBG_LOG(0, "init", ("machine_start()\n"));
 
 	/*
-		   Keyboard polling circuit holds IRQ1 high until a key is
-		   pressed, then it starts a timer that pulses IRQ1 low each
-		   40ms (check) for 20ms (check) until all keys are released.
-		   Last pulse causes BIOS to write a 'break' scancode into port 60h.
+	       Keyboard polling circuit holds IRQ1 high until a key is
+	       pressed, then it starts a timer that pulses IRQ1 low each
+	       40ms (check) for 20ms (check) until all keys are released.
+	       Last pulse causes BIOS to write a 'break' scancode into port 60h.
 	 */
 	m_pic8259->ir1_w(1);
 	memset(&m_kbd, 0, sizeof(m_kbd));
@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
-//	MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
+//  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */

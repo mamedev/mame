@@ -921,7 +921,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -969,7 +969,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -1065,7 +1065,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
-void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
 {
 	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);

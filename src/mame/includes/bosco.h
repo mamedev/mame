@@ -36,7 +36,7 @@ public:
 	DECLARE_VIDEO_START(bosco);
 	DECLARE_PALETTE_INIT(bosco);
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_bosco(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bosco);
 
 	inline void get_tile_info_bosco(tile_data &tileinfo,int tile_index,int ram_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);

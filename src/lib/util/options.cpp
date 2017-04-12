@@ -361,13 +361,18 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 		{
 			// we need to relocate this option
 			if (new_argc != arg)
-				args[new_argc++] = std::move(args[arg]);
+				args[new_argc] = std::move(args[arg]);
+			new_argc++;
 
 			if (!is_unadorned)
 			{
 				arg++;
-				if (new_argc != arg && arg < args.size())
-					args[new_argc++] = std::move(args[arg]);
+				if (arg < args.size())
+				{
+					if (new_argc != arg)
+						args[new_argc] = std::move(args[arg]);
+					new_argc++;
+				}
 			}
 			continue;
 		}
@@ -482,8 +487,8 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 
 
 //-------------------------------------------------
-//	pluck_from_command_line - finds a specific
-//	value from within a command line
+//  pluck_from_command_line - finds a specific
+//  value from within a command line
 //-------------------------------------------------
 
 bool core_options::pluck_from_command_line(std::vector<std::string> &args, const std::string &optionname, std::string &result)

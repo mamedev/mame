@@ -333,6 +333,9 @@ void k056832_device::finalize_init()
 
 void k056832_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 

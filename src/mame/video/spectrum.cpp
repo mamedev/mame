@@ -67,7 +67,7 @@ inline unsigned char spectrum_state::get_display_color (unsigned char color, int
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
 {
 	// rising edge
 	if (state)

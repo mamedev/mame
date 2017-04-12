@@ -2460,29 +2460,36 @@ void debugger_commands::execute_dasm(int ref, const std::vector<std::string> &pa
 		tempaddr = pcbyte;
 		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr))
 		{
-			u8 opbuf[64], argbuf[64];
-
-			/* fetch the bytes up to the maximum */
-			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
-				argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
+				u8 opbuf[64], argbuf[64];
+
+				/* fetch the bytes up to the maximum */
+				for (numbytes = 0; numbytes < maxbytes; numbytes++)
+				{
+					opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
+					argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
+				}
+
+				/* disassemble the result */
+				i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 			}
 
-			/* disassemble the result */
-			i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			/* print the bytes */
+			if (bytes)
+			{
+				auto const startdex = output.tellp();
+				numbytes = space->address_to_byte(numbytes);
+				for (j = 0; j < numbytes; j += minbytes)
+					stream_format(output, "%0*X ", minbytes * 2, m_cpu.read_opcode(*decrypted_space, pcbyte + j, minbytes));
+				if ((output.tellp() - startdex) < byteswidth)
+					stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
+				stream_format(output, "  ");
+			}
 		}
-
-		/* print the bytes */
-		if (bytes)
+		else
 		{
-			auto const startdex = output.tellp();
-			numbytes = space->address_to_byte(numbytes);
-			for (j = 0; j < numbytes; j += minbytes)
-				stream_format(output, "%0*X ", minbytes * 2, m_cpu.read_opcode(*decrypted_space, pcbyte + j, minbytes));
-			if ((output.tellp() - startdex) < byteswidth)
-				stream_format(output, "%*s", byteswidth - (output.tellp() - startdex), "");
-			stream_format(output, "  ");
+			disasm << "<unmapped>";
+			i += minbytes;
 		}
 
 		/* add the disassembly */

@@ -75,7 +75,7 @@ uint32_t djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void djboy_state::screen_eof_djboy(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(djboy_state::screen_vblank_djboy)
 {
 	// rising edge
 	if (state)

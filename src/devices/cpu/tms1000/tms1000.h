@@ -60,11 +60,26 @@ public:
 };
 
 
+class mc141000_cpu_device : public tms1000_cpu_device
+{
+public:
+	mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class mc141200_cpu_device : public tms1000_cpu_device
+{
+public:
+	mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 extern const device_type TMS1000;
 extern const device_type TMS1070;
 extern const device_type TMS1040;
 extern const device_type TMS1200;
 extern const device_type TMS1700;
 extern const device_type TMS1730;
+extern const device_type MC141000;
+extern const device_type MC141200;
 
 #endif /* _TMS1000_H_ */
