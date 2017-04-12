@@ -166,6 +166,7 @@ public:
 	required_shared_ptr<uint32_t> m_rombase;
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
+	emu_timer *m_irq0_stop_timer;
 	DECLARE_READ32_MEMBER(kinst_control_r);
 	DECLARE_WRITE32_MEMBER(kinst_control_w);
 	DECLARE_READ32_MEMBER(kinst_ide_r);
@@ -208,6 +209,8 @@ void kinst_state::machine_start()
 	m_maincpu->add_fastram(0x08000000, 0x087fffff, false, m_rambase2);
 	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
+
+	m_irq0_stop_timer = timer_alloc(TIMER_IRQ0_STOP);
 }
 
 
@@ -302,7 +305,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);
+	m_irq0_stop_timer->adjust(attotime::from_usec(50));
 }
 
 
