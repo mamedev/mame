@@ -1093,9 +1093,6 @@ am_mg35i                        // (c) Amatic
 am_mg3a                         // (c) 2000 Amatic
 suprstar                        // (c) 1996 Amatic
 
-@source:amazonlf.cpp
-crospuzl                        //
-
 @source:ambush.cpp
 ambush                          // (c) 1983
 ambushh                         // (c) 1983
@@ -10441,6 +10438,7 @@ menghong                        // 2004? Sealy
 psattack                        // 2004 Uniana
 topbladv                        // 2002 Sonokong. Top Blade V
 trivrus                         // 2009 AGT. Trivia R Us
+crospuzl                        //
 
 @source:airraid.cpp
 airraid                         // (c) 1987 Seibu Kaihatsu
