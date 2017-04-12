@@ -264,6 +264,7 @@ ROMs:
 #include "includes/segaxbd.h"
 #include "includes/segaipt.h"
 
+#include "machine/cxd1095.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
@@ -295,6 +296,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 			m_scanline_timer(nullptr),
 			m_timer_irq_state(0),
 			m_vblank_irq_state(0),
+			m_pc_0(0),
 			m_loffire_sync(nullptr),
 			m_lastsurv_mux(0),
 			m_paletteram(*this, "paletteram"),
@@ -302,11 +304,11 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 			m_palette_entries(0),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
+			m_io0_porta(*this, "IO0PORTA"),
 			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
 			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
-	memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
 	palette_init();
 }
 
@@ -324,15 +326,11 @@ void segaxbd_state::device_start()
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
 
-	// reset the custom handlers and other pointers
-	m_iochip_custom_io_w[0][3] = iowrite_delegate(&segaxbd_state::generic_iochip0_lamps_w, this);
-
 
 	// save state
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));
-	save_item(NAME(m_iochip_regs[0]));
-	save_item(NAME(m_iochip_regs[1]));
+	save_item(NAME(m_pc_0));
 	save_item(NAME(m_lastsurv_mux));
 }
 
@@ -473,7 +471,7 @@ void segaxbd_state::sound_data_w(uint8_t data)
 READ16_MEMBER( segaxbd_state::adc_r )
 {
 	// on the write, latch the selected input port and stash the value
-	int which = (m_iochip_regs[0][2] >> 2) & 7;
+	int which = (m_pc_0 >> 2) & 7;
 	int value = m_adc_ports[which].read_safe(0x0010);
 
 	// reverse some port values
@@ -495,192 +493,47 @@ WRITE16_MEMBER( segaxbd_state::adc_w )
 
 
 //-------------------------------------------------
-//  iochip_r - helper to handle I/O chip reads
+//  pc_0_w - handle writes to port C on the first
+//  I/O chip
 //-------------------------------------------------
 
-inline uint16_t segaxbd_state::iochip_r(int which, int port, int inputval)
+WRITE8_MEMBER(segaxbd_state::pc_0_w)
 {
-	uint16_t result = m_iochip_regs[which][port];
-
-	// if there's custom I/O, do that to get the input value
-	if (!m_iochip_custom_io_r[which][port].isnull())
-		inputval = m_iochip_custom_io_r[which][port](inputval);
-
-	// for ports 0-3, the direction is controlled 4 bits at a time by register 6
-	if (port <= 3)
-	{
-		if ((m_iochip_regs[which][6] >> (2 * port + 0)) & 1)
-			result = (result & ~0x0f) | (inputval & 0x0f);
-		if ((m_iochip_regs[which][6] >> (2 * port + 1)) & 1)
-			result = (result & ~0xf0) | (inputval & 0xf0);
-	}
-
-	// for port 4, the direction is controlled 1 bit at a time by register 7
-	else
-	{
-		if ((m_iochip_regs[which][7] >> 0) & 1)
-			result = (result & ~0x01) | (inputval & 0x01);
-		if ((m_iochip_regs[which][7] >> 1) & 1)
-			result = (result & ~0x02) | (inputval & 0x02);
-		if ((m_iochip_regs[which][7] >> 2) & 1)
-			result = (result & ~0x04) | (inputval & 0x04);
-		if ((m_iochip_regs[which][7] >> 3) & 1)
-			result = (result & ~0x08) | (inputval & 0x08);
-		result &= 0x0f;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  iochip_0_r - handle reads from the first I/O
-//  chip
-//-------------------------------------------------
-
-READ16_MEMBER( segaxbd_state::iochip_0_r )
-{
-	switch (offset)
-	{
-		case 0:
-			// Input port:
-			//  D7: (Not connected)
-			//  D6: /INTR of ADC0804
-			//  D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-			return iochip_r(0, 0, ioport("IO0PORTA")->read());
-
-		case 1:
-			// I/O port: CN C pins 17,15,13,11,9,7,5,3
-			return iochip_r(0, 1, ioport("IO0PORTB")->read());
-
-		case 2:
-			// Output port
-			return iochip_r(0, 2, 0);
-
-		case 3:
-			// Output port
-			return iochip_r(0, 3, 0);
-
-		case 4:
-			// Unused
-			return iochip_r(0, 4, 0);
-	}
-
-	// everything else returns 0
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  iochip_0_w - handle writes to the first I/O
-//  chip
-//-------------------------------------------------
-
-WRITE16_MEMBER( segaxbd_state::iochip_0_w )
-{
-	// access is via the low 8 bits
-	if (!ACCESSING_BITS_0_7)
-		return;
-
-	data &= 0xff;
-
 	// swap in the new value and remember the previous value
-	uint8_t oldval = m_iochip_regs[0][offset];
-	m_iochip_regs[0][offset] = data;
+	uint8_t oldval = m_pc_0;
+	m_pc_0 = data;
 
-	// certain offsets have common effects
-	switch (offset)
-	{
-		case 2:
-			// Output port:
-			//  D7: (Not connected)
-			//  D6: (/WDC) - watchdog reset
-			//  D5: Screen display (1= blanked, 0= displayed)
-			//  D4-D2: (ADC2-0)
-			//  D1: (CONT) - affects sprite hardware
-			//  D0: Sound section reset (1= normal operation, 0= reset)
-			if (((oldval ^ data) & 0x40) && !(data & 0x40))
-				m_watchdog->watchdog_reset();
+	// Output port:
+	//  D7: (Not connected)
+	//  D6: (/WDC) - watchdog reset
+	//  D5: Screen display (1= blanked, 0= displayed)
+	//  D4-D2: (ADC2-0)
+	//  D1: (CONT) - affects sprite hardware
+	//  D0: Sound section reset (1= normal operation, 0= reset)
+	if (((oldval ^ data) & 0x40) && !(data & 0x40))
+		m_watchdog->watchdog_reset();
 
-			m_segaic16vid->set_display_enable(data & 0x20);
+	m_segaic16vid->set_display_enable(data & 0x20);
 
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			if (m_soundcpu2 != nullptr)
-				m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			break;
-
-		case 3:
-			// Output port:
-			//  D7: Amplifier mute control (1= sounding, 0= muted)
-			//  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
-			machine().sound().system_enable(data & 0x80);
-			break;
-
-		default:
-			break;
-	}
-
-	// if there's custom I/O, handle that as well
-	if (!m_iochip_custom_io_w[0][offset].isnull())
-		m_iochip_custom_io_w[0][offset](data);
-	else if (offset <= 4)
-		logerror("I/O chip 0, port %c write = %02X\n", 'A' + offset, data);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_soundcpu2 != nullptr)
+		m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 //-------------------------------------------------
-//  iochip_1_r - handle reads from the second I/O
-//  chip
+//  pd_0_w - handle writes to port D on the first
+//  I/O chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::iochip_1_r )
+WRITE8_MEMBER(segaxbd_state::pd_0_w)
 {
-	switch (offset)
-	{
-		case 0:
-			// Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed)
-			return iochip_r(1, 0, ioport("IO1PORTA")->read());
+	// Output port:
+	//  D7: Amplifier mute control (1= sounding, 0= muted)
+	//  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
+	machine().sound().system_enable(data & 0x80);
 
-		case 1:
-			// Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed)
-			return iochip_r(1, 1, ioport("IO1PORTB")->read());
-
-		case 2:
-			// Input port: DIP switches (1= off, 0= on)
-			return iochip_r(1, 2, ioport("IO1PORTC")->read());
-
-		case 3:
-			// Input port: DIP switches (1= off, 0= on)
-			return iochip_r(1, 3, ioport("IO1PORTD")->read());
-
-		case 4:
-			// Unused
-			return iochip_r(1, 4, 0);
-	}
-
-	// everything else returns 0
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  iochip_1_w - handle writes to the second I/O
-//  chip
-//-------------------------------------------------
-
-WRITE16_MEMBER( segaxbd_state::iochip_1_w )
-{
-	// access is via the low 8 bits
-	if (!ACCESSING_BITS_0_7)
-		return;
-
-	data &= 0xff;
-	m_iochip_regs[1][offset] = data;
-
-	// if there's custom I/O, handle that as well
-	if (!m_iochip_custom_io_w[1][offset].isnull())
-		m_iochip_custom_io_w[1][offset](data);
-	else if (offset <= 4)
-		logerror("I/O chip 1, port %c write = %02X\n", 'A' + offset, data);
+	generic_iochip0_lamps_w(data);
 }
 
 
@@ -878,13 +731,13 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  aburner2_iochip0_motor_r - motor I/O reads
-//  for Afterburner II
+//  aburner2_motor_r - motor reads from port A
+//  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-uint8_t segaxbd_state::aburner2_iochip0_motor_r(uint8_t data)
+READ8_MEMBER(segaxbd_state::aburner2_motor_r)
 {
-	data &= 0xc0;
+	uint8_t data = m_io0_porta->read() & 0xc0;
 
 	// TODO
 	return data | 0x3f;
@@ -892,24 +745,24 @@ uint8_t segaxbd_state::aburner2_iochip0_motor_r(uint8_t data)
 
 
 //-------------------------------------------------
-//  aburner2_iochip0_motor_w - motor I/O writes
-//  for Afterburner II
+//  aburner2_motor_w - motor writes to port B
+//  of I/O chip 0 for Afterburner II
 //-------------------------------------------------
 
-void segaxbd_state::aburner2_iochip0_motor_w(uint8_t data)
+WRITE8_MEMBER(segaxbd_state::aburner2_motor_w)
 {
 	// TODO
 }
 
 
 //-------------------------------------------------
-//  smgp_iochip0_motor_r - motor I/O reads
-//  for Super Monaco GP
+//  smgp_motor_r - motor reads from port A of
+//  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-uint8_t segaxbd_state::smgp_iochip0_motor_r(uint8_t data)
+READ8_MEMBER(segaxbd_state::smgp_motor_r)
 {
-	data &= 0xc0;
+	uint8_t data = m_io0_porta->read() & 0xc0;
 
 	// TODO
 	return data | 0x0;
@@ -917,34 +770,36 @@ uint8_t segaxbd_state::smgp_iochip0_motor_r(uint8_t data)
 
 
 //-------------------------------------------------
-//  smgp_iochip0_motor_w - motor I/O reads
-//  for Super Monaco GP
+//  smgp_motor_w - motor writes to port B of
+//  I/O chip 0 for Super Monaco GP
 //-------------------------------------------------
 
-void segaxbd_state::smgp_iochip0_motor_w(uint8_t data)
+WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
 {
 	// TODO
 }
 
 
 //-------------------------------------------------
-//  lastsurv_iochip1_port_r - muxed I/O reads
-//  for Last Survivor
+//  lastsurv_port_r - muxed reads on port B of
+//  I/O chip 1 for Last Survivor
 //-------------------------------------------------
 
-uint8_t segaxbd_state::lastsurv_iochip1_port_r(uint8_t data)
+READ8_MEMBER(segaxbd_state::lastsurv_port_r)
 {
 	return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
 }
 
 
 //-------------------------------------------------
-//  lastsurv_iochip0_muxer_w - muxed I/O writes
-//  for Last Survivor
+//  lastsurv_muxer_w - muxed writes on port D
+//  of I/O chip 0 for Last Survivor
 //-------------------------------------------------
 
-void segaxbd_state::lastsurv_iochip0_muxer_w(uint8_t data)
+WRITE8_MEMBER(segaxbd_state::lastsurv_muxer_w)
 {
+	machine().sound().system_enable(data & 0x80);
+
 	m_lastsurv_mux = (data >> 5) & 3;
 	generic_iochip0_lamps_w(data & 0x9f);
 }
@@ -1102,8 +957,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x110000, 0x11ffff) AM_DEVWRITE("sprites", sega_xboard_sprite_device, draw_write)
 	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
-	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)
+	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_DEVREADWRITE8("iochip_0", cxd1095_device, read, write, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_DEVREADWRITE8("iochip_1", cxd1095_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_WRITE(iocontrol_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("subcpu", 0x00000)
 	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("subram0")
@@ -1247,13 +1102,15 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // D6: /INTR of ADC0804
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
+	// I/O port: CN C pins 17,15,13,11,9,7,5,3
 	PORT_START("mainpcb:IO0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed)
 	PORT_START("mainpcb:IO1PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // button? not used by any game we have
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
@@ -1264,12 +1121,15 @@ static INPUT_PORTS_START( xboard_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
+	// Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed)
 	PORT_START("mainpcb:IO1PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// Input port: DIP switches (1= off, 0= on)
 	PORT_START("mainpcb:IO1PORTC")
 	SEGA_COINAGE_LOC(SWA)
 
+	// Input port: DIP switches (1= off, 0= on)
 	PORT_START("mainpcb:IO1PORTD")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
@@ -1842,6 +1702,18 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
+	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO0PORTA"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO0PORTB"))
+	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(segaxbd_state, pc_0_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, pd_0_w))
+
+	MCFG_DEVICE_ADD("iochip_1", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO1PORTA"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO1PORTB"))
+	MCFG_CXD1095_IN_PORTC_CB(IOPORT("IO1PORTC"))
+	MCFG_CXD1095_IN_PORTD_CB(IOPORT("IO1PORTD"))
+
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaxbd)
 	MCFG_PALETTE_ADD("palette", 8192*3)
@@ -1928,12 +1800,44 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
+static MACHINE_CONFIG_FRAGMENT( aburner2 )
+	MCFG_FRAGMENT_ADD( xboard )
+
+	// basic machine hardware
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, aburner2_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, aburner2_motor_w))
+MACHINE_CONFIG_END
+
+const device_type SEGA_XBD_ABURNER2_DEVICE = device_creator<segaxbd_aburner2_state>;
+
+segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: segaxbd_state(mconfig, SEGA_XBD_ABURNER2_DEVICE, "Sega X-Board After Burner PCB", tag, owner, clock, "segakbd_pcb_aburner2", __FILE__)
+{
+}
+
+machine_config_constructor segaxbd_aburner2_state::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( aburner2 );
+}
+
+static MACHINE_CONFIG_START( sega_aburner2, segaxbd_new_state )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_ABURNER2_DEVICE, 0)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_FRAGMENT( lastsurv_fd1094 )
 
 	MCFG_FRAGMENT_ADD( xboard_fd1094 )
 
 	// basic machine hardware
 	// TODO: network board
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
+
+	MCFG_DEVICE_MODIFY("iochip_1")
+	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
 
 	// sound hardware - ym2151 stereo is reversed
 	MCFG_SOUND_MODIFY("ymsnd")
@@ -1964,6 +1868,12 @@ static MACHINE_CONFIG_FRAGMENT( lastsurv )
 
 	// basic machine hardware
 	// TODO: network board
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
+
+	MCFG_DEVICE_MODIFY("iochip_1")
+	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
 
 	// sound hardware - ym2151 stereo is reversed
 	MCFG_SOUND_MODIFY("ymsnd")
@@ -2005,6 +1915,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp_fd1094 )
 	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
 	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
@@ -2048,6 +1962,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp )
 	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
 	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
 	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
@@ -4744,24 +4662,11 @@ ROM_END
 void segaxbd_state::install_aburner2(void)
 {
 	m_road_priority = 0;
-	m_iochip_custom_io_r[0][0] = ioread_delegate(&segaxbd_state::aburner2_iochip0_motor_r, this);
-	m_iochip_custom_io_w[0][1] = iowrite_delegate(&segaxbd_state::aburner2_iochip0_motor_w, this);
 }
 
 DRIVER_INIT_MEMBER(segaxbd_new_state,aburner2)
 {
 	m_mainpcb->install_aburner2();
-}
-
-void segaxbd_state::install_lastsurv(void)
-{
-	m_iochip_custom_io_r[1][1] = ioread_delegate(&segaxbd_state::lastsurv_iochip1_port_r, this);
-	m_iochip_custom_io_w[0][3] = iowrite_delegate(&segaxbd_state::lastsurv_iochip0_muxer_w, this);
-}
-
-DRIVER_INIT_MEMBER(segaxbd_new_state,lastsurv)
-{
-	m_mainpcb->install_lastsurv();
 }
 
 void segaxbd_state::install_loffire(void)
@@ -4781,9 +4686,6 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,loffire)
 
 void segaxbd_state::install_smgp(void)
 {
-	m_iochip_custom_io_r[0][0] = ioread_delegate(&segaxbd_state::smgp_iochip0_motor_r, this);
-	m_iochip_custom_io_w[0][1] = iowrite_delegate(&segaxbd_state::smgp_iochip0_motor_w, this);
-
 	// map /EXCS space
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
 }
@@ -4833,15 +4735,15 @@ DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,   MACHINE,        INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, aburner2, 0,        sega_xboard,         aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II", 0 )
-GAME( 1987, aburner2g,aburner2, sega_xboard,         aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II (German)", 0 )
+GAME( 1987, aburner2, 0,        sega_aburner2,       aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II", 0 )
+GAME( 1987, aburner2g,aburner2, sega_aburner2,       aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II (German)", 0 )
 
-GAME( 1987, aburner,  aburner2, sega_xboard,         aburner,  segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner", 0 )
+GAME( 1987, aburner,  aburner2, sega_aburner2,       aburner,  segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner", 0 )
 
 GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
 
-GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, lastsurv, ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
+GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, driver_device,     0,  ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
 
 GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
 GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
@@ -4888,7 +4790,7 @@ GAME( 1989, smgpu1d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp
 GAME( 1989, smgpu2d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (US, Rev A) (bootleg of FD1094 317-0125a set)", 0 )
 GAME( 1989, smgpjd,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (Japan, Rev B) (bootleg of FD1094 317-0124a set)", 0 )
 
-GAME( 1989, lastsurvd,lastsurv, sega_lastsurv,lastsurv, segaxbd_new_state, lastsurv, ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", 0 )
+GAME( 1989, lastsurvd,lastsurv, sega_lastsurv,lastsurv, driver_device,     0,        ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", 0 )
 
 GAME( 1990, abcopd,   abcop,    sega_xboard,  abcop,    driver_device,     0,        ROT0,   "bootleg", "A.B. Cop (World) (bootleg of FD1094 317-0169b set)", 0 )
 GAME( 1990, abcopjd,  abcop,    sega_xboard,  abcop,    driver_device,     0,        ROT0,   "bootleg", "A.B. Cop (Japan) (bootleg of FD1094 317-0169b set)", 0 )

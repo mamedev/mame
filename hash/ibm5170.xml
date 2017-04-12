@@ -5746,6 +5746,39 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5" HD)</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="1.0 (11/21/91)" />
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [1 of 5].img" size="1474560" crc="351a3104" sha1="cce3e02f81cd9234fadf34a58930e1cfc4326d4b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [2 of 5].img" size="1474560" crc="141b315e" sha1="4af90abedff5c660a64ebe48755e147883fdb911" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [3 of 5].img" size="1474560" crc="fdf75bc5" sha1="4296937f48bc5fc8e32afa95f0bbc1b8e2f6f4f6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [4 of 5].img" size="1474560" crc="65fb2338" sha1="408c76c8957fda999f795d9fd1db18b4b6b0bbdc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [5 of 5].img" size="1474560" crc="56984413" sha1="e9ca6b21c6384fcde7f2b358cf775487c1fc7791" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mystict">
 		<description>Mystic Towers</description>
 		<year>1994</year>
@@ -6050,6 +6083,39 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="scenario vol 1.img" size="1474560" crc="0eacae3e" sha1="398bfef77a18ac6650be433b0988b9620442d9d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq5">
+		<description>Space Quest V: The Next Mutation (3.5" HD)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.03" />
+		<info name="developer" value="Sierra" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 1 of 5].img" size="1474560" crc="93cb8f7a" sha1="0815e9a29edf443a6fab39a33b710f59ad865e2a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 2 of 5].img" size="1474560" crc="c57469a9" sha1="08cb6ce1d518c464a08655241f817432dd58a58f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 3 of 5].img" size="1474560" crc="a8220c1a" sha1="5dc9c41659e1d0115b3098833f7172c482a664f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 4 of 5].img" size="1474560" crc="72464de6" sha1="ba023be73b689cdf03454fab8db8241fbe428dee" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 5 of 5].img" size="1474560" crc="6566eb60" sha1="08c2caf27885398c6c68ca34f35afb05192cecac" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

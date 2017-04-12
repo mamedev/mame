@@ -118,7 +118,7 @@ public:
 	virtual const char *custom_brief_instance_name() const override { return "cart"; }
 
 	int get_type() { return m_type; }
-	int get_cart_type(uint8_t *ROM, uint32_t len);
+	int get_cart_type(const uint8_t *ROM, uint32_t len) const;
 
 	void setup_ram();
 	void internal_header_logging(uint8_t *ROM, uint32_t len, uint32_t nvram_len);

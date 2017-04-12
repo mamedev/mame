@@ -194,7 +194,6 @@ public:
 	int image_feof() { check_for_file(); return m_file->eof(); }
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
-	void set_init_phase() { m_init_phase = true; }
 
 	const std::string &longname() const { return m_longname; }
 	const std::string &manufacturer() const { return m_manufacturer; }
@@ -234,7 +233,6 @@ public:
 	// loads a softlist item by name
 	image_init_result load_software(const std::string &software_identifier);
 
-	bool open_image_file(emu_options &options);
 	image_init_result finish_load();
 	void unload();
 	image_init_result create(const std::string &path, const image_device_format *create_format, util::option_resolution *create_args);
@@ -281,6 +279,7 @@ protected:
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	bool load_software_part(const std::string &identifier);
 	std::string software_get_default_slot(const char *default_card_slot) const;
+	bool open_image_file(emu_options &options);
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
@@ -310,9 +309,14 @@ protected:
 
 private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
-	bool schedule_postload_hard_reset_if_needed();
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
+
+	bool init_phase() const;
+
+	// loads an image or software items and resets - called internally when we
+	// load an is_reset_on_load() item
+	void reset_and_load(const std::string &path);
 
 	// creation info
 	formatlist_type m_formatlist;
@@ -329,8 +333,7 @@ private:
 	// flags
 	bool m_readonly;
 	bool m_created;
-	bool m_init_phase;
-
+	
 	// special - used when creating
 	int m_create_format;
 	util::option_resolution *m_create_args;

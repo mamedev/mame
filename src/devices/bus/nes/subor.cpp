@@ -7,7 +7,8 @@
  TODO:
  - Implement Type 2 variant for Subor Karaoke.
    (Subor Karaoke updates banks differently.)
- - Check and verify CHR banking in Type 2 boards
+ - Type 2 boards work correct with the current CHR banking scheme, but proper emulation for this
+ (and Oeka Kids) will require aditional PPU code
  - Investigate connection with DANCE 2000 board; likely made by ex-Subor staff!
 
  ***********************************************************************************************************/
@@ -163,7 +164,8 @@ void nes_subor2_device::pcb_reset()
 void nes_subor2_device::ppu_latch(offs_t offset)
 {
 	/* CHR banks are conditionally changed midframe */
-	/* If this is split off onto the external PPU latch, every edge case works */
+	/* This is not the correct way to do it... But if this is split
+	off onto the external PPU latch, every edge case works */
 	if (m_chr_banking)
 	{
 		if ( (m_page == 2) || (m_page == 1 && m_switch_reg == 2) )

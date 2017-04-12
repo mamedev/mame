@@ -151,11 +151,11 @@ public:
 #ifdef UNUSED_FUNCTION
 	gfx_element();
 #endif
-	gfx_element(palette_device &palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base);
-	gfx_element(palette_device &palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity);
+	gfx_element(device_palette_interface &palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base);
+	gfx_element(device_palette_interface &palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity);
 
 	// getters
-	palette_device &palette() const { return *m_palette; }
+	device_palette_interface &palette() const { return *m_palette; }
 	u16 width() const { return m_width; }
 	u16 height() const { return m_height; }
 	u32 elements() const { return m_total_elements; }
@@ -175,7 +175,7 @@ public:
 	void set_source(const u8 *source);
 	void set_source_and_total(const u8 *source, u32 total);
 	void set_xormask(u32 xormask) { m_layout_xormask = xormask; }
-	void set_palette(palette_device &palette) { m_palette = &palette; }
+	void set_palette(device_palette_interface &palette) { m_palette = &palette; }
 	void set_colors(u32 colors) { m_total_colors = colors; }
 	void set_colorbase(u16 colorbase) { m_color_base = colorbase; }
 	void set_granularity(u16 granularity) { m_color_granularity = granularity; }
@@ -269,7 +269,7 @@ private:
 	void decode(u32 code);
 
 	// internal state
-	palette_device  *m_palette;             // palette used for drawing
+	device_palette_interface *m_palette;    // palette used for drawing
 
 	u16             m_width;                // current pixel width of each element (changeable with source clipping)
 	u16             m_height;               // current pixel height of each element (changeable with source clipping)

@@ -121,7 +121,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 	int scanline = param;
 
 	/* update the video */
-//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 
 	/* on scanline zero, clear any halt condition */
@@ -427,61 +426,8 @@ ROM_END
 
 /*************************************
  *
- *  Driver speedups
- *
- *************************************/
-
-/*
-    In-game hotspot @ 0180F8D8
-*/
-
-
-READ32_MEMBER( beathead_state::speedup_r )
-{
-	uint32_t result = *m_speedup_data;
-	if ((space.device().safe_pcbase() & 0xfffff) == 0x006f0 && result == space.device().state().state_int(ASAP_R3))
-		space.device().execute().spin_until_interrupt();
-	return result;
-}
-
-
-READ32_MEMBER( beathead_state::movie_speedup_r )
-{
-	int result = *m_movie_speedup_data;
-	if ((space.device().safe_pcbase() & 0xfffff) == 0x00a88 && (space.device().state().state_int(ASAP_R28) & 0xfffff) == 0x397c0 &&
-		m_movie_speedup_data[4] == space.device().state().state_int(ASAP_R1))
-	{
-		uint32_t temp = (int16_t)result + m_movie_speedup_data[4] * 262;
-		if (temp - (uint32_t)space.device().state().state_int(ASAP_R15) < (uint32_t)space.device().state().state_int(ASAP_R23))
-			space.device().execute().spin_until_interrupt();
-	}
-	return result;
-}
-
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-DRIVER_INIT_MEMBER(beathead_state,beathead)
-{
-	/* prepare the speedups */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000ae8, 0x00000aeb, read32_delegate(FUNC(beathead_state::speedup_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000804, 0x00000807, read32_delegate(FUNC(beathead_state::movie_speedup_r), this));
-
-	m_speedup_data = m_ram_base + 0xae8/4;
-	m_movie_speedup_data = m_ram_base + 0x804/4;
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1993, beathead, 0, beathead, beathead, beathead_state, beathead, ROT0, "Atari Games", "BeatHead (prototype)", 0 )
+GAME( 1993, beathead, 0, beathead, beathead, driver_device, 0, ROT0, "Atari Games", "BeatHead (prototype)", 0 )

@@ -245,15 +245,9 @@ WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(tatsumi_state::cyclwarr_control_r)
+WRITE8_MEMBER(tatsumi_state::cyclwarr_control_w)
 {
-//  logerror("%08x:  control_r\n", space.device().safe_pc());
-	return m_control_word;
-}
-
-WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
-{
-	COMBINE_DATA(&m_control_word);
+	m_control_word = data;
 
 //  if ((m_control_word&0xfe) != (m_last_control&0xfe))
 //      logerror("%08x:  control_w %04x\n", space.device().safe_pc(), data);

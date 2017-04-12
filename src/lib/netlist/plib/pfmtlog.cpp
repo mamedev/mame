@@ -17,11 +17,6 @@
 
 namespace plib {
 
-plog_dispatch_intf::~plog_dispatch_intf()
-{
-}
-
-
 pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 {
 	va_list ap;
@@ -56,7 +51,7 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 				if (p1 != pstring::npos)
 				{
 					sl = p1 - p + 1;
-					fmt += m_str.substr(p+1, p1 - p - 2);
+					fmt += m_str.substr(p+1, p1 - p - 1);
 				}
 			}
 		}

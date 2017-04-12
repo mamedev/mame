@@ -1263,7 +1263,7 @@ ROM_START( vr )
 
 	ROM_REGION ( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-14869.25",  0x00000, 0x10000, CRC(6187cd7a) SHA1(b65fdd0ad31794a565a0ca4dc67a3f16b329fd71) )
-	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) )
+	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, BAD_DUMP CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) ) // stray FFs at xx49, xx5F, xxC9, xxDF
 	// there is also epr-14869c in model2 daytona
 ROM_END
 

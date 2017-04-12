@@ -5506,6 +5506,7 @@ has been replaced with an all-zero block. -->
 		<description>Prince of Persia (5.25", v1.3)</description>
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.3" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Prince of Persia (World) (v1.3) (5.25'') (Disk 1).img" size="368640" crc="0cdb1b44" sha1="c795ac4c7290a25982f18f23cb1efbd2a33d324d" offset="0"/>
@@ -5522,6 +5523,7 @@ has been replaced with an all-zero block. -->
 		<description>Prince of Persia (3.5", v1.3)</description>
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.3" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Prince of Persia (World) (v1.3) (3.5'').img" size="737280" crc="62336557" sha1="adb0b10899baa7cb0e53b612e12e6ae7ac929400" offset="0"/>
@@ -5529,13 +5531,55 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="ppersiaa" cloneof="ppersia">
+	<software name="ppersia35a" cloneof="ppersia">
 		<description>Prince of Persia (3.5", v1.1)</description>
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Prince of Persia (World) (v1.1) (Hit Squad).img" size="737280" crc="0c386185" sha1="b194505c710acd1da5aeea34415b1ae5bb4979dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiab" cloneof="ppersia">
+		<description>Prince of Persia (5.25", v1.0)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia v1.0 [Broderbund] [1990] [5.25DD] [1 of 2].img" size="368640" crc="70920913" sha1="938b7e75ce0b00a34d61512173100b7c65ffb3df" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia v1.0 [Broderbund] [1990] [5.25DD] [2 of 2].img" size="368640" crc="d47f68c6" sha1="ba6493bcea8bf556a9804a968420c6a89e3d1037" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia35b" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.0)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia v1.0 [Broderbund] [1990] [3.5DD].img" size="737280" crc="d5e966bf" sha1="d45c2299a2d48de0897e9e5a7a366090192eb5f7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia35fr" cloneof="ppersia">
+		<description>Prince of Persia (3.5", v1.0, French)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Prince of Persia v1.0 (French) [Broderbund] [1990] [3.5DD].img" size="737280" crc="45d00b42" sha1="541b653a58491e21f45f151b0643646145cd616a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -744,6 +744,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cxd1095.h,MACHINES["CXD1095"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1095"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1095.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1095.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/dm9334.h,MACHINES["DM9334"] = true
 ---------------------------------------------------
 

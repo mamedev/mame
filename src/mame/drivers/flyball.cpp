@@ -65,6 +65,7 @@ public:
 	uint8_t    m_potmask;
 	uint8_t    m_potsense;
 
+	emu_timer *m_pot_assert_timer[64];
 	emu_timer *m_pot_clear_timer;
 	emu_timer *m_quarter_timer;
 
@@ -206,7 +207,7 @@ TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			timer_set(m_screen->time_until_pos(scanline + i), TIMER_POT_ASSERT, potsense[i]);
+			m_pot_assert_timer[potsense[i]]->adjust(m_screen->time_until_pos(scanline + i), potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
@@ -432,6 +433,8 @@ void flyball_state::machine_start()
 		buf[i ^ 0x1ff] = ROM[i];
 	memcpy(ROM, &buf[0], len);
 
+	for (int i = 0; i < 64; i++)
+		m_pot_assert_timer[i] = timer_alloc(TIMER_POT_ASSERT);
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);
 

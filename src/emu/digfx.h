@@ -156,7 +156,7 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 
 // forward declarations
 class gfx_element;
-class palette_device;
+class device_palette_interface;
 
 struct gfx_layout
 {
@@ -200,7 +200,7 @@ public:
 	static void static_set_palette(device_t &device, const char *tag);
 
 	// getters
-	palette_device &palette() const { assert(m_palette != nullptr); return *m_palette; }
+	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	gfx_element *gfx(u8 index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
@@ -216,7 +216,7 @@ protected:
 	virtual void interface_post_start() override;
 
 private:
-	palette_device *            m_palette;                  // pointer to the palette device
+	device_palette_interface *  m_palette;                  // pointer to the palette device interface
 	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 
 	// configuration

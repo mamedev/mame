@@ -229,7 +229,7 @@ void ws_cart_slot_device::call_unload()
  get cart type from cart file
  -------------------------------------------------*/
 
-int ws_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len, uint32_t &nvram_len)
+int ws_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len, uint32_t &nvram_len) const
 {
 	int chunks = len / 0x10000;
 	int type = WS_STD;

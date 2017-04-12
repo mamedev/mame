@@ -152,6 +152,8 @@ public:
 	{
 	}
 
+	pfmt(const pfmt &rhs) : m_str(rhs.m_str), m_arg(rhs.m_arg) { }
+
 	~pfmt()
 	{
 	}
@@ -189,6 +191,7 @@ public:
 	{
 		return format_element(ptype_traits<T>::size_spec(), 'o', x);
 	}
+
 protected:
 
 	pfmt &format_element(const char *l, const unsigned fmt_spec, ...);
@@ -199,9 +202,7 @@ private:
 	unsigned m_arg;
 };
 
-class plog_dispatch_intf;
-
-template <bool build_enabled = true>
+template <class T, bool build_enabled = true>
 class pfmt_writer_t : plib::nocopyassignmove
 {
 public:
@@ -212,7 +213,10 @@ public:
 	void log(const pstring & fmt, Args&&... args) const
 	{
 		if (build_enabled && enabled && m_enabled)
-			vdowrite(xlog(pfmt(fmt), std::forward<Args>(args)...));
+		{
+			pfmt pf(fmt);
+			static_cast<T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
+		}
 	}
 
 	template<typename... Args>
@@ -221,7 +225,7 @@ public:
 		if (build_enabled && m_enabled)
 		{
 			pfmt pf(fmt);
-			vdowrite(xlog(pf, std::forward<Args>(args)...));
+			static_cast<const T *>(this)->vdowrite(xlog(pf, std::forward<Args>(args)...));
 		}
 	}
 
@@ -234,7 +238,6 @@ public:
 
 protected:
 	~pfmt_writer_t() { }
-	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:
 	pfmt &xlog(pfmt &fmt) const { return fmt; }
@@ -249,36 +252,30 @@ private:
 
 };
 
-template <plog_level::E L, bool build_enabled = true>
-class plog_channel : public pfmt_writer_t<build_enabled>
+template <class T, plog_level::E L, bool build_enabled = true>
+class plog_channel : public pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>
 {
+	friend class pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>;
 public:
-	explicit plog_channel(plog_dispatch_intf *b) : pfmt_writer_t<build_enabled>(), m_base(b) { }
-	virtual ~plog_channel() { }
+	explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
+	~plog_channel() { }
 
 protected:
-	virtual void vdowrite(const pstring &ls) const override;
+	void vdowrite(const pstring &ls) const
+	{
+		m_base.vlog(L, ls);
+	}
 
 private:
-	plog_dispatch_intf *m_base;
+	T &m_base;
 };
 
-class plog_dispatch_intf
-{
-	template<plog_level::E, bool> friend class plog_channel;
-
-public:
-	virtual ~plog_dispatch_intf();
-protected:
-	virtual void vlog(const plog_level &l, const pstring &ls) const = 0;
-};
-
-template<bool debug_enabled>
+template<class T, bool debug_enabled>
 class plog_base
 {
 public:
 
-	explicit plog_base(plog_dispatch_intf *proxy)
+	explicit plog_base(T &proxy)
 	: debug(proxy),
 		info(proxy),
 		verbose(proxy),
@@ -288,22 +285,17 @@ public:
 	{}
 	virtual ~plog_base() {}
 
-	plog_channel<plog_level::DEBUG, debug_enabled> debug;
-	plog_channel<plog_level::INFO> info;
-	plog_channel<plog_level::VERBOSE> verbose;
-	plog_channel<plog_level::WARNING> warning;
-	plog_channel<plog_level::ERROR> error;
-	plog_channel<plog_level::FATAL> fatal;
+	plog_channel<T, plog_level::DEBUG, debug_enabled> debug;
+	plog_channel<T, plog_level::INFO> info;
+	plog_channel<T, plog_level::VERBOSE> verbose;
+	plog_channel<T, plog_level::WARNING> warning;
+	plog_channel<T, plog_level::ERROR> error;
+	plog_channel<T, plog_level::FATAL> fatal;
 };
 
-
-template <plog_level::E L, bool build_enabled>
-void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
-{
-	m_base->vlog(L, ls);
 }
 
-}
-
+template<typename T>
+plib::pfmt& operator<<(plib::pfmt &p, T&& val) { return p(std::forward<T>(val)); }
 
 #endif /* PSTRING_H_ */

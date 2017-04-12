@@ -61,7 +61,7 @@ struct ui_gfx_state
 	// palette-specific data
 	struct
 	{
-		palette_device *device;     // pointer to current device
+		device_palette_interface *interface; // pointer to current palette
 		int   devcount;             // how many palette devices exist
 		int   devindex;             // which palette device is visible
 		uint8_t which;                // which subset (pens or indirect colors)?
@@ -169,7 +169,7 @@ void ui_gfx_init(running_machine &machine)
 static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
 	// count the palette devices
-	state.palette.devcount = palette_device_iterator(machine.root_device()).count();
+	state.palette.devcount = palette_interface_iterator(machine.root_device()).count();
 
 	// set the pointer to the first palette
 	if (state.palette.devcount > 0)
@@ -330,8 +330,8 @@ cancel:
 
 static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device_iterator pal_iter(machine.root_device());
-	state.palette.device = pal_iter.byindex(state.palette.devindex);
+	palette_interface_iterator pal_iter(machine.root_device());
+	state.palette.interface = pal_iter.byindex(state.palette.devindex);
 }
 
 
@@ -342,7 +342,8 @@ static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 
 static void palette_handler(mame_ui_manager &mui, render_container &container, ui_gfx_state &state)
 {
-	palette_device *palette = state.palette.device;
+	device_palette_interface *palette = state.palette.interface;
+	palette_device *paldev = dynamic_cast<palette_device *>(&palette->device());
 
 	int total = state.palette.which ? palette->indirect_entries() : palette->entries();
 	const rgb_t *raw_color = palette->palette()->entry_list_raw();
@@ -381,7 +382,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "'%s'", palette->tag());
+	util::stream_format(title_buf, "'%s'", palette->device().tag());
 	if (palette->indirect_entries() > 0)
 		title_buf << (state.palette.which ? _(" COLORS") : _(" PENS"));
 
@@ -400,8 +401,8 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 			util::stream_format(title_buf, " #%X", index);
 			if (palette->indirect_entries() > 0 && !state.palette.which)
 				util::stream_format(title_buf, " => %X", palette->pen_indirect(index));
-			else if (palette->basemem().base() != nullptr)
-				util::stream_format(title_buf, " = %X", palette->read_entry(index));
+			else if (paldev != nullptr && paldev->basemem().base() != nullptr)
+				util::stream_format(title_buf, " = %X", paldev->read_entry(index));
 
 			rgb_t col = state.palette.which ? palette->indirect_color(index) : raw_color[index];
 			util::stream_format(title_buf, " (R:%X G:%X B:%X)", col.r(), col.g(), col.b());
@@ -492,7 +493,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device *palette = state.palette.device;
+	device_palette_interface *palette = state.palette.interface;
 	int rowcount, screencount;
 	int total;
 
@@ -517,7 +518,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 		{
 			state.palette.devindex--;
 			palette_set_device(machine, state);
-			palette = state.palette.device;
+			palette = state.palette.interface;
 			state.palette.which = (palette->indirect_entries() > 0);
 		}
 	}
@@ -529,7 +530,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 		{
 			state.palette.devindex++;
 			palette_set_device(machine, state);
-			palette = state.palette.device;
+			palette = state.palette.interface;
 			state.palette.which = 0;
 		}
 	}

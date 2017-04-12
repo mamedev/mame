@@ -403,6 +403,7 @@ MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
 --MACHINES["CS4031"] = true
 --MACHINES["CS8221"] = true
+MACHINES["CXD1095"] = true
 --MACHINES["DM9334"] = true
 --MACHINES["DP8390"] = true
 MACHINES["DS1204"] = true
@@ -1812,6 +1813,7 @@ files {
 	MAME_DIR .. "src/mame/video/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.h",
+	MAME_DIR .. "src/mame/drivers/gaelcopc.cpp",
 	MAME_DIR .. "src/mame/drivers/glass.cpp",
 	MAME_DIR .. "src/mame/includes/glass.h",
 	MAME_DIR .. "src/mame/video/glass.cpp",
@@ -1826,7 +1828,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/thoop2.cpp",
 	MAME_DIR .. "src/mame/includes/thoop2.h",
 	MAME_DIR .. "src/mame/video/thoop2.cpp",
-	MAME_DIR .. "src/mame/drivers/tokyocop.cpp",
 	MAME_DIR .. "src/mame/drivers/wrally.cpp",
 	MAME_DIR .. "src/mame/includes/wrally.h",
 	MAME_DIR .. "src/mame/machine/wrally.cpp",
@@ -2505,6 +2506,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mgames.cpp",
 	MAME_DIR .. "src/mame/drivers/merit.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
+	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")

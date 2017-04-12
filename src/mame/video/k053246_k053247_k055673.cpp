@@ -928,6 +928,9 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	int gfx_index = 0;
 	uint32_t total;
 
@@ -1090,6 +1093,9 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 
 void k053247_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	uint32_t total;
 	static const gfx_layout spritelayout =
 	{

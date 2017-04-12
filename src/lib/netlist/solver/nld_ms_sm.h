@@ -92,7 +92,7 @@ protected:
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
-	static const std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
+	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
 	nl_ext_double m_A[storage_N][m_pitch];
 	nl_ext_double m_Ainv[storage_N][m_pitch];
 	nl_ext_double m_W[storage_N][m_pitch];
@@ -218,7 +218,7 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_compute_x(
 template <std::size_t m_N, std::size_t storage_N>
 unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
-	static const bool incremental = true;
+	static constexpr bool incremental = true;
 	static unsigned cnt = 0;
 	const auto iN = N();
 

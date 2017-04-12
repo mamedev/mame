@@ -1077,6 +1077,7 @@ pstlpkr1                        //
 punchy                          //
 punchy3                         //
 usafootb                        //
+usafootba                       //
 wrldtour                        //
 wrldtour2                       //
 wrldtour3                       //
@@ -12411,6 +12412,7 @@ bridgec3                        //
 cc10                            //
 cc7                             //
 damesc                          //
+fscc8                           //
 uvc                             // UVC: Advanced Voice Chess Challenger (English)
 uvcfr                           // * French
 uvcg                            // * German
@@ -12751,6 +12753,13 @@ speedup                         // (c) 1996 - Ref ???
 speedup10                       // (c) 1996 - Ref ???
 surfplnt                        // (c) 1997 - Ref 971223
 surfplnt40                      // (c) 1997 - Ref 970514
+
+@source:gaelcopc.cpp
+rriders                         //
+tokyocop                        // (c) 2003 (Arcade TV Game List - P.168, Right, 19 from bottom)
+tokyocopi                       //
+tokyocopk                       //
+tuningrc                        //
 
 @source:gaiden.cpp
 drgnbowl                        // (c) 1992 Nics
@@ -14098,6 +14107,7 @@ rackempp                        //
 raimfire                        //
 rflshdlx                        //
 rocky                           //
+rockyf                          //
 sorbit                          //
 spirit                          //
 striker                         //
@@ -14409,7 +14419,8 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_sm510.cpp
-gnwmndon                        // Nintendo
+gnw_bx301                       // Nintendo
+gnw_dm53                        // Nintendo
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
@@ -17776,7 +17787,7 @@ unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
 @source:macp.cpp
-//glxplay                       //
+glxplay                       //
 glxplay2                        //
 kidnap                          //
 mac_1808                        //
@@ -27631,6 +27642,9 @@ yis60464                        //
 @source:mt735.cpp
 mt735                           //
 
+@source:mtouchxl.cpp
+mtchxl6k						// 19?? Merit Industries
+
 @source:mtx.cpp
 mtx500                          // 1983 Memotech MTX 500
 mtx512                          // 1983 Memotech MTX 512
@@ -31295,9 +31309,9 @@ ppmast93                        // (c) 1993 Electronic Devices S.R.L.
 @source:prehisle.cpp
 gensitou                        // A8003 'GT' (c) 1989
 prehisle                        // A8003 'GT' (c) 1989
-prehisleb                       //
 prehislek                       // A8003 'GT' (c) 1989
 prehisleu                       // A8003 'GT' (c) 1989
+prehisleb                       // bootleg
 
 @source:prestige.cpp
 cars2lap                        // CARS 2 Laptop (Germany)
@@ -33724,6 +33738,7 @@ sg1000m2                        // Sega SG-1000 Mark II (Japan)
 chboxing                        // (c) 1984
 chwrestl                        // (c) 1985
 dokidoki                        // (c) 1985
+sderby2                         // (c) 1985
 
 @source:sh4robot.cpp
 sh4robot                        //
@@ -36215,9 +36230,6 @@ tokiu                           // (c) 1989 Tad + Fabtek license (US)
 tokiua                          // (c) 1989 Tad + Fabtek license (US)
 tokip
 
-@source:tokyocop.cpp
-tokyocop                        // (c) 2003 (Arcade TV Game List - P.168, Right, 19 from bottom)
-
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
 
@@ -36873,6 +36885,7 @@ vii                             // Chintendo / KenSingTon / Jungle Soft / Siatro
 vsmile                          //
 vsmilef                         //
 walle                           //
+wirels60                        // Wireless 60
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -36960,6 +36973,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
+policet2						// (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix

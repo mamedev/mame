@@ -37,40 +37,34 @@ namespace netlist
 		using mult_type = std::uint64_t;
 
 		constexpr ptime() noexcept : m_time(0) {}
-		constexpr ptime(const ptime &rhs) noexcept : m_time(rhs.m_time) { }
-		constexpr ptime(ptime &&rhs) noexcept : m_time(rhs.m_time) { }
+
+		constexpr ptime(const ptime &rhs) noexcept = default;
+		constexpr ptime(ptime &&rhs) noexcept = default;
+		C14CONSTEXPR ptime &operator=(const ptime &rhs) noexcept = default;
+		C14CONSTEXPR ptime &operator=(ptime &&rhs) noexcept  = default;
 
 		constexpr explicit ptime(const double t) = delete;
 		//: m_time((internal_type) ( t * (double) resolution)) { }
 		constexpr explicit ptime(const internal_type &nom, const internal_type &den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		ptime &operator=(const ptime &rhs) noexcept { ptime t(rhs); std::swap(m_time, t.m_time); return *this; }
-		ptime &operator=(ptime &&rhs) noexcept { std::swap(this->m_time, rhs.m_time); return *this; }
+		C14CONSTEXPR ptime &operator+=(const ptime &rhs) noexcept { m_time += rhs.m_time; return *this; }
+		C14CONSTEXPR ptime &operator-=(const ptime &rhs) noexcept { m_time -= rhs.m_time; return *this; }
+		C14CONSTEXPR ptime &operator*=(const mult_type &factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
 
-		ptime &operator+=(const ptime &rhs) noexcept { m_time += rhs.m_time; return *this; }
-		ptime &operator-=(const ptime &rhs) noexcept { m_time -= rhs.m_time; return *this; }
-		ptime operator*=(const mult_type &factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
-
-		friend ptime operator-(const ptime &lhs, const ptime &rhs) noexcept
+		friend C14CONSTEXPR ptime operator-(ptime lhs, const ptime &rhs) noexcept
 		{
-			ptime t(lhs);
-			t -= rhs;
-			return t;
+			return lhs -= rhs;
 		}
 
-		friend ptime operator+(const ptime &lhs, const ptime &rhs) noexcept
+		friend C14CONSTEXPR ptime operator+(ptime lhs, const ptime &rhs) noexcept
 		{
-			ptime t(lhs);
-			t += rhs;
-			return t;
+			return lhs += rhs;
 		}
 
-		friend ptime operator*(const ptime &lhs, const mult_type &factor) noexcept
+		friend C14CONSTEXPR ptime operator*(ptime lhs, const mult_type &factor) noexcept
 		{
-			ptime t(lhs);
-			t *= factor;
-			return t;
+			return lhs *= factor;
 		}
 
 		friend constexpr mult_type operator/(const ptime &lhs, const ptime &rhs) noexcept
@@ -111,18 +105,17 @@ namespace netlist
 		constexpr internal_type as_raw() const noexcept { return m_time; }
 		constexpr double as_double() const noexcept
 		{
-			return static_cast<double>(m_time)
-				/ static_cast<double>(RES);
+			return static_cast<double>(m_time) / static_cast<double>(RES);
 		}
 
 		// for save states ....
-		internal_type *get_internaltype_ptr() noexcept { return &m_time; }
+		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 
-		static constexpr ptime from_nsec(const internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
-		static constexpr ptime from_usec(const internal_type us) noexcept { return ptime(us, UINT64_C(1000000)); }
-		static constexpr ptime from_msec(const internal_type ms) noexcept { return ptime(ms, UINT64_C(1000)); }
-		static constexpr ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
-		static constexpr ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
+		static constexpr ptime from_nsec(const internal_type &ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
+		static constexpr ptime from_usec(const internal_type &us) noexcept { return ptime(us, UINT64_C(1000000)); }
+		static constexpr ptime from_msec(const internal_type &ms) noexcept { return ptime(ms, UINT64_C(1000)); }
+		static constexpr ptime from_hz(const internal_type &hz) noexcept { return ptime(1 , hz); }
+		static constexpr ptime from_raw(const internal_type &raw) noexcept { return ptime(raw); }
 		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>( t * static_cast<double>(RES)), RES); }
 
 		static constexpr ptime zero() noexcept { return ptime(0, RES); }

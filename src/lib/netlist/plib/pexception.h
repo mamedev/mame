@@ -26,6 +26,7 @@ public:
 	virtual ~pexception() noexcept;
 
 	const pstring &text() { return m_text; }
+	const char* what() const noexcept override { return m_text.c_str(); }
 
 private:
 	pstring m_text;
@@ -91,12 +92,12 @@ public:
 	virtual ~fpexception_e() noexcept;
 };
 
-static const unsigned FP_INEXACT = 0x0001;
-static const unsigned FP_DIVBYZERO = 0x0002;
-static const unsigned FP_UNDERFLOW = 0x0004;
-static const unsigned FP_OVERFLOW = 0x0008;
-static const unsigned FP_INVALID = 0x00010;
-static const unsigned FP_ALL = 0x0001f;
+static constexpr unsigned FP_INEXACT = 0x0001;
+static constexpr unsigned FP_DIVBYZERO = 0x0002;
+static constexpr unsigned FP_UNDERFLOW = 0x0004;
+static constexpr unsigned FP_OVERFLOW = 0x0008;
+static constexpr unsigned FP_INVALID = 0x00010;
+static constexpr unsigned FP_ALL = 0x0001f;
 
 /*
  * Catch SIGFPE on linux for debugging purposes.
