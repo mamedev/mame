@@ -12,7 +12,9 @@
   
   Audio is a CS4231 combination CODEC/Mixer also found in Gravis Ultraound MAX
   and some SPARCstations.
-  
+
+  Some boards use the DS1205 chip for security, others use the DS1991 iButton
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,6 +31,7 @@
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
 #include "machine/ds2401.h"
+#include "machine/ds1205.h"
 #include "speaker.h"
 
 class mtxl_state : public driver_device
@@ -40,13 +43,15 @@ public:
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG),
 		m_iocard(*this, "dbank"),
-		m_ibutton(*this, "ibutton")
+		//m_ibutton(*this, "ibutton"),
+		m_multikey(*this, "multikey")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_iocard;
-	required_device<ds2401_device> m_ibutton;
+	//optional_device<ds2401_device> m_ibutton;
+	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -61,12 +66,14 @@ WRITE8_MEMBER(mtxl_state::bank_w)
 
 READ8_MEMBER(mtxl_state::key_r)
 {
-	return m_ibutton->read() ? 0x20 : 0;
+	return m_multikey->read_dq() ? 0x20 : 0;
 }
 
 WRITE8_MEMBER(mtxl_state::key_w)
 {
-	m_ibutton->write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_rst((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_clk((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
@@ -185,8 +192,8 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	/* Flash ROM */
 	MCFG_AMD_29F040_ADD("flash")
 	
-	/* Security iButton */
-	MCFG_DS2401_ADD("ibutton")
+	/* Security key */
+	MCFG_DS1205_ADD("multikey")
 MACHINE_CONFIG_END
 
 ROM_START( mtchxl6k )
@@ -197,6 +204,8 @@ ROM_START( mtchxl6k )
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
 		
 	ROM_REGION(0x8000, "dallas", ROMREGION_ERASE00)
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
 		
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
