@@ -36,6 +36,8 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
+	emu_timer *m_display_irq_off_timer;
+
 	DECLARE_WRITE32_MEMBER(cmos_w);
 	DECLARE_READ32_MEMBER(cmos_r);
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);

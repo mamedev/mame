@@ -102,6 +102,8 @@ TO DO :
 
 void tehkanwc_state::machine_start()
 {
+	m_reset_timer = timer_alloc(TIMER_RESET);
+
 	save_item(NAME(m_track0));
 	save_item(NAME(m_track1));
 	save_item(NAME(m_msm_data_offs));
@@ -175,7 +177,7 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (space.device().safe_pc() == 0x08bc) timer_set(attotime::from_seconds(1), TIMER_RESET);
+	if (space.device().safe_pc() == 0x08bc) m_reset_timer->adjust(attotime::from_seconds(1));
 }
 
 

@@ -88,8 +88,10 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
-	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
+	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+
+	m_display_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::display_irq_off), this));
 
 	save_item(NAME(gun_control));
 	save_item(NAME(gun_irq_state));
@@ -125,7 +127,7 @@ TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(midzeus_state::display_irq_off),this));
+	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
 WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
@@ -1109,7 +1111,7 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state,  display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
