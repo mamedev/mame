@@ -9,7 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
+#include "machine/mb3773.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
@@ -110,7 +110,7 @@ protected:
 	required_device<m68000_device> m_suby;
 	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_linkcpu;
-	required_device<watchdog_timer_device> m_watchdog;
+	required_device<mb3773_device> m_watchdog;
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
 	required_device<segaic16_video_device> m_segaic16vid;

@@ -124,8 +124,7 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 	//  D1-D0 = ADC0-1
 	//
 	m_segaic16vid->set_display_enable(data & 0x80);
-	if (((m_misc_io_data ^ data) & 0x20) && !(data & 0x20))
-		m_watchdog->watchdog_reset();
+	m_watchdog->write_line_ck(BIT(data, 5));
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 	m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -1322,7 +1321,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_MB3773_ADD("watchdog") // IC95
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000) // probably SOUND_CLOCK/n
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
