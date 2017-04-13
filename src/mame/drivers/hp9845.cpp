@@ -12,7 +12,7 @@
 // *******************************
 //
 // What's in:
-// - Emulation of 45B and 45C systems
+// - Emulation of 45B, 45C and 45T systems
 // - Emulation of both 5061-3001 CPUs
 // - LPU & PPU ROMs
 // - LPU & PPU RAMs
@@ -23,16 +23,16 @@
 // - Software list to load optional ROMs
 // - Beeper
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
+// - 98775 light pen controller
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
-// - Emulation of 45T system
 // - Display softkeys on 45C & 45T
 // - Better keyboard mapping
 // - German keyboard
 // What's wrong:
 // - Speed, as usual
-// - Light pen sometimes behaves erratically in 45C
+// - Light pen tracing sometimes behaves erratically in 45C and 45T
 // What will probably never be in:
 // - Integral printer (firmware and character generator ROMs are very difficult to dump)
 // - Fast LPU processor (dump of microcode PROMs is not available)
@@ -59,11 +59,6 @@
 // Macros to clear/set single bits
 #define BIT_CLR(w , n)  ((w) &= ~BIT_MASK(n))
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
-
-// The FLG behavior in real 98780A hw apparently doesn't match what's
-// documented in Tony Duell's schematics.
-// The following macro selects the FLG behavior implemented by this driver.
-#define HP98780A_REAL_HW
 
 /*
 
@@ -2695,7 +2690,6 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 		}
 		BIT_SET(res, 9);		// ID
 		BIT_SET(res, 11);		// ID
-		// TODO: fix grstat
 		if (m_gv_stat) {
 			BIT_SET(res, 13);	// error indication
 		}
@@ -2734,6 +2728,9 @@ WRITE16_MEMBER(hp9845t_state::graphic_w)
 		m_gv_data_w = data;
 		advance_gv_fsm(true , false);
 		lp_r4_w(data);
+		if (m_gv_lp_int_en) {
+			m_gv_lp_fullbright = BIT(data , 1);
+		}
 		break;
 
 	case 1:
@@ -2755,6 +2752,9 @@ WRITE16_MEMBER(hp9845t_state::graphic_w)
 		m_gv_dma_en = false;
 		m_gv_data_w = data;
 		lp_r4_w(data);
+		if (m_gv_lp_int_en) {
+			m_gv_lp_fullbright = BIT(data , 1);
+		}
 		advance_gv_fsm(true , false);
 		break;
 
@@ -3386,16 +3386,18 @@ void hp9845t_state::update_graphic_bits(void)
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 	}
 
-#ifdef HP98780A_REAL_HW
-	// In 98780 real hw, the FLG signal is apparently set to true
-	// whenever the LP is selected, regardless of its interrupt
-	// request status.
-	flg_w(GVIDEO_PA , gv_ready || m_gv_lp_int_en);
-#else
-	// In Duell's schematics, the FLG signal follows the
-	// LP interrupt request
+	// WARNING! Race conditions here!
+	// FLG and IRQ are raised together. In enhgfxb ROM a SFC instruction
+	// that spins on itself waiting for FLG to be true was getting
+	// stuck because the interrupt always took precedence (and the ISR
+	// cleared the FLG bit).
+	// In real hw there was a non-zero chance that SFC exited the loop before
+	// interrupt was serviced. In case SFC stayed in the loop, it got another
+	// chance at the next interrupt.
+	// Fix for this problem is in commit 27004d00
+	// My apologies to Tony Duell for doubting at one point the correctness
+	// of his 98780A schematics.. :)
 	flg_w(GVIDEO_PA , gv_ready);
-#endif
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
@@ -3742,10 +3744,8 @@ ROM_START( hp9845c )
 ROM_END
 
 ROM_START( hp9845t )
-	//ROM_REGION(0x1000 , "chargen" , 0)
-	//ROM_LOAD("1818-1395-sh.bin" , 0 , 0x1000 , CRC(361e5eca) SHA1(62c81e133bd1ce19212b1da57a05074abccae247))
 	ROM_REGION(0x1000 , "chargen" , 0)
-	ROM_LOAD("1818-1395-s2.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
+	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
 	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
@@ -3754,10 +3754,11 @@ ROM_START( hp9845t )
 	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
-COMP( 1978, hp9845a,   0,       0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1978, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE        INPUT   INIT                   COMPANY             FULLNAME  FLAGS
+COMP( 1977, hp9845a,   0,       0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1977, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1980, hp9845b,   0,       0,      hp9845b,       hp9845_base,driver_device, 0,   "Hewlett-Packard",  "9845B",  0 )
-COMP( 1980, hp9845t,   0,       0,      hp9845t,       hp9845ct,driver_device, 0,      "Hewlett-Packard",  "9845T",  0 )
-COMP( 1981, hp9845c,   0,       0,      hp9845c,       hp9845ct,driver_device, 0,      "Hewlett-Packard",  "9845C",  0 )
+COMP( 1979, hp9845b,   0,       0,      hp9845b,       hp9845_base,driver_device, 0,  "Hewlett-Packard",  "9845B",  0 )
+COMP( 1982, hp9845t,   0,       0,      hp9845t,       hp9845ct,driver_device, 0,     "Hewlett-Packard",  "9845T",  0 )
+COMP( 1980, hp9845c,   0,       0,      hp9845c,       hp9845ct,driver_device, 0,     "Hewlett-Packard",  "9845C",  0 )
