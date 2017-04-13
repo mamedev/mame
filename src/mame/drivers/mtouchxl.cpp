@@ -42,6 +42,7 @@
 #include "machine/ds128x.h"
 #include "machine/ds2401.h"
 #include "machine/ds1205.h"
+#include "sound/ad1848.h"
 #include "speaker.h"
 
 class mtxl_state : public driver_device
@@ -106,6 +107,7 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
 	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
 	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
@@ -174,6 +176,10 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 
+	MCFG_SOUND_ADD("cs4231", AD1848, 0)
+	MCFG_AD1848_IRQ_CALLBACK(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
+	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
 	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
@@ -209,7 +215,7 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
-	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(1647ff1d) SHA1(038e040d4be1ac3ca0eb36cbfd9435ab3147f076))
+	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
 
 ROM_START( mtchxls5k )
 	MOTHERBOARD_ROMS
@@ -227,7 +233,8 @@ ROM_START( mtchxl6k )
 	ROM_REGION(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
 		
-	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_REGION(192, "multikey", 0)
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
 		
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))

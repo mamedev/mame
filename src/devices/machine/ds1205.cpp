@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "ds1205.h"
 
-#define VERBOSE_LEVEL ( 2 )
+#define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF( 3, 4 ) ds1205_device::verboselog( int n_level, const char *s_fmt, ... )
 {
