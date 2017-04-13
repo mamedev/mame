@@ -27644,6 +27644,7 @@ mt735                           //
 mtchxls5k						// 1998 Merit Industries
 mtchxl6k						// 1999 Merit Industries
 mtchxlgld						// 2000 Merit Industries
+mtchxlgldo						// 2000 Merit Industries
 
 @source:mtx.cpp
 mtx500                          // 1983 Memotech MTX 500

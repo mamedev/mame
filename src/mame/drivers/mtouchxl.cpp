@@ -21,7 +21,7 @@
   Megatouch XL 5000 (1998) (CD versions: R5A, R5B, R5D, R5E, R5G, R5H, R5I)
 * Megatouch XL Super 5000 (1998)
   Megatouch XL 6000 (1999) (CD versions: *R02, R04, R05, *R07)
-* Megatouch XL Gold (2000) (CD versions: R00, R01.  HDD versions: R01)
+  Megatouch XL Gold (2000) (CD versions: *R00, *R01.  HDD versions: R01)
   Megatouch XL Platinum / Double Platinum (2001)
   Megatouch XL Titanium / Titanium 2 (2002)
 
@@ -245,7 +245,22 @@ ROM_START( mtchxlgld )
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
 		
 	DISK_REGION("board1:ide:ide:0:cdrom")
-	DISK_IMAGE_READONLY("xlgold", 0, SHA1(9946bb14d3f77eadbbc606ca9c79f233e402189b))
+	DISK_IMAGE_READONLY("r01", 0, SHA1(9946bb14d3f77eadbbc606ca9c79f233e402189b))
+ROM_END
+
+ROM_START( mtchxlgldo )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, BAD_DUMP CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+
+	ROM_REGION(0x8000, "nvram", 0)
+	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+		
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r00", 0, SHA1(635e267f1abea060ce813eb7e78b88d57ea3f951))
 ROM_END
 
 /***************************************************************************
@@ -256,5 +271,6 @@ ROM_END
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
 COMP ( 1998, mtchxls5k,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000", MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgld,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgld,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
