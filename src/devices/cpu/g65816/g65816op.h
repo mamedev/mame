@@ -1883,7 +1883,7 @@ TABLE_FUNCTION(uint, get_reg, (int regnum))
 
 
 
-TABLE_FUNCTION(void, set_reg, (int regnum, uint val))
+TABLE_FUNCTION(void, set_reg, (int regnum, unsigned val))
 {
 	switch(regnum)
 	{
