@@ -2237,10 +2237,12 @@ INPUT_PORTS_START( tsurugi )
 	PORT_INCLUDE( viper )
 	
 	PORT_MODIFY("IN4")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shot")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shot Button")
 	
 	PORT_MODIFY("IN5")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for tsurugi (actually comms enable?)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? if off tries to check UART & "lampo"/bleeder at POST
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // sensor grip (1) horizontal (0) vertical
 INPUT_PORTS_END
 
 /*****************************************************************************/
