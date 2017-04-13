@@ -17,11 +17,11 @@
   
   Megatouch XL (Software) (* indicated verified dumps of CD + Boot ROM, 
   						   - means we have it working but would like a redump)
-  Megatouch XL (1997)
-  Megatouch XL 5000 (1998)
+  Megatouch XL (1997) (CD versions: R0, R0A, R0B, R0C, R0D, R1, R2, R3, R3A, R3B, R3C)
+  Megatouch XL 5000 (1998) (CD versions: R5A, R5B, R5D, R5E, R5G, R5H, R5I)
 * Megatouch XL Super 5000 (1998)
-* Megatouch XL 6000 (1999)
-- Megatouch XL Gold (2000)
+  Megatouch XL 6000 (1999) (CD versions: *R02, R04, R05, *R07)
+* Megatouch XL Gold (2000) (CD versions: R00, R01.  HDD versions: R01)
   Megatouch XL Platinum / Double Platinum (2001)
   Megatouch XL Titanium / Titanium 2 (2002)
 
@@ -189,9 +189,8 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")	// Early XL games had 8 MB RAM, later ones require 32MB
-	MCFG_RAM_EXTRA_OPTIONS("32M")
-	
+	MCFG_RAM_DEFAULT_SIZE("32M")	// Early XL games had 8 MB RAM, 6000 and later require 32MB
+		
 	/* bankdev for dxxxx */
 	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
@@ -237,7 +236,6 @@ ROM_END
 ROM_START( mtchxlgld )
 	MOTHERBOARD_ROMS
 
-	// this isn't the correct dump for Gold, but it appears to be compatible
 	ROM_REGION(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, BAD_DUMP CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
 
