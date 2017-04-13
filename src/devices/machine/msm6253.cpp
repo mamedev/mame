@@ -68,7 +68,7 @@ ioport_value msm6253_device::port_read()
 	if (m_analog_ports[port].found())
 		return m_analog_ports[port]->read();
 
-	logerror("%s: Read from unassigned IN%d\n", port);
+	logerror("%s: Read from unassigned IN%d\n", machine().describe_context(), port);
 	return 0xff;
 }
 
