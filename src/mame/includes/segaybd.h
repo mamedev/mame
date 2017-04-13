@@ -42,12 +42,9 @@ public:
 		, m_misc_io_data(0)
 		, m_tmp_bitmap(512, 512)
 	{
-		memset(m_analog_data, 0, sizeof(m_analog_data));
 	}
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_WRITE16_MEMBER(analog_w);
 	DECLARE_WRITE8_MEMBER(output1_w);
 	DECLARE_WRITE8_MEMBER(misc_output_w);
 	DECLARE_WRITE8_MEMBER(output2_w);
@@ -63,6 +60,9 @@ public:
 	DECLARE_READ16_MEMBER(link2_r);
 	DECLARE_WRITE16_MEMBER(link2_w);
 //  DECLARE_READ8_MEMBER(link_portc0_r);
+
+	// input helpers
+	ioport_value analog_mux();
 
 	// game-specific output handlers
 	void gforce2_output_cb1(uint16_t data);
@@ -126,7 +126,6 @@ protected:
 	// internal state
 	uint16_t          m_pdrift_bank;
 	emu_timer *     m_scanline_timer;
-	uint8_t           m_analog_data[4];
 	int             m_irq2_scanline;
 	uint8_t           m_timer_irq_state;
 	uint8_t           m_vblank_irq_state;

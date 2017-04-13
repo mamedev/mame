@@ -1869,6 +1869,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/msm6253.h,MACHINES["MSM6253"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM6253"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm6253.cpp",
+		MAME_DIR .. "src/devices/machine/msm6253.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ncr539x.h,MACHINES["NCR539x"] = true
 ---------------------------------------------------
 

@@ -124,6 +124,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
@@ -2533,7 +2534,7 @@ static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("driveio2", sega_315_5296_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_NOP //Oki M6253
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d7_r, address_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( srallyc, model2a )
@@ -2549,6 +2550,8 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
 
 	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 16000000/4) //???
+
+	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
