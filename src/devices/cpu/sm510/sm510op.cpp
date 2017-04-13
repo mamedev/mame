@@ -222,7 +222,7 @@ void sm510_base_device::op_wr()
 
 void sm510_base_device::op_ws()
 {
-	// WR: shift 1 into W
+	// WS: shift 1 into W
 	m_w = m_w << 1 | 1;
 	update_w_latch();
 }
