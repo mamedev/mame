@@ -499,8 +499,6 @@ WRITE16_MEMBER( segaxbd_state::adc_w )
 
 WRITE8_MEMBER(segaxbd_state::pc_0_w)
 {
-	// swap in the new value and remember the previous value
-	uint8_t oldval = m_pc_0;
 	m_pc_0 = data;
 
 	// Output port:
@@ -510,8 +508,7 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 	//  D4-D2: (ADC2-0)
 	//  D1: (CONT) - affects sprite hardware
 	//  D0: Sound section reset (1= normal operation, 0= reset)
-	if (((oldval ^ data) & 0x40) && !(data & 0x40))
-		m_watchdog->watchdog_reset();
+	m_watchdog->write_line_ck(BIT(data, 6));
 
 	m_segaic16vid->set_display_enable(data & 0x20);
 
@@ -1689,7 +1686,7 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 	MCFG_NVRAM_ADD_0FILL("backup2")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_MB3773_ADD("watchdog")
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
