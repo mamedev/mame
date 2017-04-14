@@ -154,7 +154,7 @@ hp98035_io_card::~hp98035_io_card()
 }
 
 static INPUT_PORTS_START(hp98035_port)
-	MCFG_HP9845_IO_SC(1)
+	MCFG_HP9845_IO_SC(9)
 INPUT_PORTS_END
 
 ioport_constructor hp98035_io_card::device_input_ports() const
