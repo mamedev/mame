@@ -78,6 +78,8 @@ void stfight_state::machine_start()
 	m_main_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_main_bank->set_entry(0);
 
+	m_int1_timer = timer_alloc(TIMER_STFIGHT_INTERRUPT_1);
+
 	save_item(NAME(m_coin_state));
 
 	save_item(NAME(m_fm_data));
@@ -131,7 +133,7 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
 	// Do a RST10
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
-	timer_set(attotime::from_hz(120), TIMER_STFIGHT_INTERRUPT_1);
+	m_int1_timer->adjust(attotime::from_hz(120));
 }
 
 /*

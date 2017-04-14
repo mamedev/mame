@@ -88,4 +88,6 @@ protected:
 	bool        m_vck2;
 	bool        m_adpcm_reset;
 	uint16_t    m_adpcm_data_offs;
+
+	emu_timer   *m_int1_timer;
 };
