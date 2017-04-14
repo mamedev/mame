@@ -1354,7 +1354,7 @@ image_init_result ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
-	if (TRACE_CHANGE) logerror("Loading %s in slot %s\n", m_basename.c_str());
+	if (TRACE_CHANGE) logerror("Loading %s in slot %s\n", basename());
 
 	if (loaded_through_softlist())
 	{

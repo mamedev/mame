@@ -520,7 +520,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
-		m_file->read(&head[0], 128);
+		hook.image_file()->read(&head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], false);
@@ -541,7 +541,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 				break;
 			case 0x0022:
 			case 0x0026:
-				if (m_file->size() > 0x40000)
+				if (hook.image_file()->size() > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;

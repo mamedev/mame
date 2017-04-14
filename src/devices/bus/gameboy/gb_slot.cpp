@@ -584,11 +584,11 @@ std::string base_gb_cart_slot_device::get_default_card_software(get_default_card
 	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size(), offset = 0;
+		uint32_t len = hook.image_file()->size(), offset = 0;
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
