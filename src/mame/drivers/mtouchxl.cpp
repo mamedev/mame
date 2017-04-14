@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	// on board devices
 	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "ide", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL_1_8432MHz)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
@@ -178,6 +178,9 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	MCFG_SOUND_ADD("cs4231", AD1848, 0)
 	MCFG_AD1848_IRQ_CALLBACK(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
 	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+
+	MCFG_DEVICE_MODIFY("mb:dma8237_1")
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("^cs4231", ad1848_device, dack_w))
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
