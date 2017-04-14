@@ -193,12 +193,12 @@ image_init_result channelf_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string channelf_cart_slot_device::get_default_card_software()
+std::string channelf_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		int type;
 
 		if (len == 0x40000)
@@ -209,7 +209,6 @@ std::string channelf_cart_slot_device::get_default_card_software()
 		slot_string = chanf_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

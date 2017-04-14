@@ -278,7 +278,7 @@ static inline int gba_chip_has_conflict( uint32_t chip )
 }
 
 
-int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int gba_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	uint32_t chip = 0;
 	int type = GBA_STD;
@@ -415,12 +415,12 @@ int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string gba_cart_slot_device::get_default_card_software()
+std::string gba_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		int type;
 
@@ -430,7 +430,6 @@ std::string gba_cart_slot_device::get_default_card_software()
 		slot_string = gba_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

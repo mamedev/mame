@@ -123,8 +123,8 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(uint8_t *ROM, uint32_t len);
-	bool get_mmm01_candidate(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
+	static bool get_mmm01_candidate(const uint8_t *ROM, uint32_t len);
 	// remove me when SGB is properly emulated
 	int get_sgb_hack() { return m_sgb_hack; }
 
@@ -142,7 +142,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,gb,gbc"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -183,7 +183,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 

@@ -113,7 +113,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_80xx);
@@ -142,7 +142,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // ======================> xegs_cart_slot_device
@@ -157,7 +157,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // device type definition

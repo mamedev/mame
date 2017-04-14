@@ -181,7 +181,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

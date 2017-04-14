@@ -901,24 +901,22 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string base_md_cart_slot_device::get_default_card_software()
+std::string base_md_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size(), offset = 0;
+		uint32_t len = hook.image_file()->size(), offset = 0;
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;
 
 		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = md_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}

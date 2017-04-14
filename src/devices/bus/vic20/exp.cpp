@@ -156,7 +156,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string vic20_expansion_slot_device::get_default_card_software()
+std::string vic20_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }
