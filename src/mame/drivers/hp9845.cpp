@@ -19,13 +19,13 @@
 // - Text mode screen
 // - Graphic screen
 // - Keyboard
-// - T15 tape drive
+// - T14 and T15 tape drive
 // - Software list to load optional ROMs
 // - Beeper
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // - 98775 light pen controller
 // What's not yet in:
-// - Better naming of tape drive image (it's now "magt", should be "t15")
+// - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
 // - Display softkeys on 45C & 45T
 // - Better keyboard mapping
@@ -147,7 +147,6 @@
 #define GVIDEO_VBSTART          (GVIDEO_VBEND + GVIDEO_VPIXELS)
 #define GVIDEO_MEM_SIZE         16384
 #define GVIDEO_ADDR_MASK        (GVIDEO_MEM_SIZE - 1)
-#define GVIDEO_PA               13
 
 // Constants of 98770A video
 // HBEND & VBEND probably are not really 0
@@ -191,6 +190,8 @@ constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recog
 // Peripheral Addresses (PA)
 #define IO_SLOT_FIRST_PA	1
 #define IO_SLOT_LAST_PA		12
+#define GVIDEO_PA           13
+#define T14_PA           	14
 #define T15_PA              15
 
 #define KEY_SCAN_OSCILLATOR     327680
@@ -371,6 +372,7 @@ hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type 
 			  m_io_key1(*this , "KEY1"),
 			  m_io_key2(*this , "KEY2"),
 			  m_io_key3(*this , "KEY3"),
+			  m_t14(*this , "t14"),
 			  m_t15(*this , "t15"),
 			  m_beeper(*this , "beeper"),
 			  m_beep_timer(*this , "beep_timer"),
@@ -688,6 +690,21 @@ WRITE8_MEMBER(hp9845_base_state::pa_w)
 		m_pa = data;
 		update_flg_sts();
 	}
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::t14_irq_w)
+{
+	irq_w(T14_PA , state);
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::t14_flg_w)
+{
+	flg_w(T14_PA , state);
+}
+
+WRITE_LINE_MEMBER(hp9845_base_state::t14_sts_w)
+{
+	sts_w(T14_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845_base_state::t15_irq_w)
@@ -3500,6 +3517,9 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
 	// PA = 13, IC = 0..3
 	// Graphic video
 	AM_RANGE(HP_MAKE_IOADDR(GVIDEO_PA , 0) , HP_MAKE_IOADDR(GVIDEO_PA , 3)) AM_READWRITE(graphic_r , graphic_w)
+	// PA = 14, IC = 0..3
+	// Left-hand side tape drive (T14)
+	AM_RANGE(HP_MAKE_IOADDR(T14_PA , 0) , HP_MAKE_IOADDR(T14_PA , 3))        AM_DEVREADWRITE("t14" , hp_taco_device , reg_r , reg_w)
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
 	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
@@ -3536,6 +3556,10 @@ static MACHINE_CONFIG_FRAGMENT(hp9845_base)
 	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t15_irq_w))
 	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t15_flg_w))
 	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t15_sts_w))
+	MCFG_DEVICE_ADD("t14" , HP_TACO , 4000000)
+	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t14_irq_w))
+	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t14_flg_w))
+	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t14_sts_w))
 
 	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
 	// right-hand side and left-hand side drawers, respectively.
