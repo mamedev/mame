@@ -741,10 +741,10 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 
 WRITE8_MEMBER(v53_scu_device::command_w)
 {
-	command_w(data);
+	i8251_device::command_w(data);
 }
 
 WRITE8_MEMBER(v53_scu_device::mode_w)
 {
-	mode_w(data);
+	i8251_device::mode_w(data);
 }
