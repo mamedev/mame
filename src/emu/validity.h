@@ -99,7 +99,7 @@ private:
 	// internal driver list
 	driver_enumerator       m_drivlist;
 
-	// blank options for use during valudation
+	// blank options for use during validation
 	emu_options				m_blank_options;
 
 	// error tracking
