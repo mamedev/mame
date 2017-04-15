@@ -5476,6 +5476,18 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="gods">
+		<description>Gods</description>
+		<year>1991</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heretic">
 		<description>Heretic</description>
 		<year>1994</year>
@@ -5544,6 +5556,38 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [1 of 5].img" size="1474560" crc="c7b85652" sha1="0cfae4a55ff62ac0f946e83d205fabff23624c8c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [2 of 5].img" size="1474560" crc="384ea34a" sha1="a62688cda8409c0ff4efb7d8d7dfd123320cb141" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [3 of 5].img" size="1474560" crc="cf95f639" sha1="584f7d322910aa546b0394528e083fec33155946" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [4 of 5].img" size="1474560" crc="63f369d6" sha1="0202d7c9895be1c0a15879bf2ce829fabd2476f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [5 of 5].img" size="1474560" crc="9cb01ed4" sha1="489b0f78e0097cbd970ad2fd1429ebf0f77539d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5639,6 +5683,34 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandia">
+		<description>Fables &amp; Fiends Book One - The Legend of Kyrandia</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.3" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [2 of 4].img" size="1474560" crc="ab4f5e1d" sha1="42625e4285b28f0901f60c2976222d05bf083cef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [3 of 4].img" size="1474560" crc="5c483502" sha1="d5bfed28919ab68c0f23bb85b6be8ed17c5baa06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [4 of 4].img" size="1474560" crc="6fb0f878" sha1="f51fc0625a1328a089b735c3d1b99d357b99d492" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
