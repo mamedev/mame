@@ -6,6 +6,7 @@
 #define __DSBZ80_H__
 
 #include "cpu/z80/z80.h"
+#include "machine/i8251.h"
 #include "sound/mpeg_audio.h"
 
 #define DSBZ80_TAG "dsbz80"
@@ -26,9 +27,10 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE8_MEMBER(latch_w);
-
 	required_device<cpu_device> m_ourcpu;
+	required_device<i8251_device> m_uart;
+
+	DECLARE_WRITE_LINE_MEMBER(write_txd);
 
 	DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
 	DECLARE_WRITE8_MEMBER(mpeg_start_w);
@@ -36,8 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mpeg_volume_w);
 	DECLARE_WRITE8_MEMBER(mpeg_stereo_w);
 	DECLARE_READ8_MEMBER(mpeg_pos_r);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_READ8_MEMBER(status_r);
 
 protected:
 	// device-level overrides
@@ -49,10 +49,8 @@ protected:
 private:
 	mpeg_audio *decoder;
 	int16_t audio_buf[1152*2];
-	uint8_t m_dsb_latch;
 	uint32_t mp_start, mp_end, mp_vol, mp_pan, mp_state, lp_start, lp_end, start, end;
 	int mp_pos, audio_pos, audio_avail;
-	int status;
 };
 
 
