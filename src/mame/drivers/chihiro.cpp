@@ -602,11 +602,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, address, true);
+		uint32_t opcode = cpu.read_byte(space, addr, true);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, address, true);
+		uint32_t op1 = cpu.read_dword(space, addr, true);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, address, true);
+		uint32_t op2 = cpu.read_dword(space, addr, true);
 		addr += 4;
 
 		char sop1[16];
