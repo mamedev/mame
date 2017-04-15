@@ -182,6 +182,8 @@ public:
 
 protected:
 	virtual void value_changed(const std::string &name, const std::string &value) {}
+	virtual bool override_get_value(const char *name, std::string &value) const { return false; }
+	virtual bool override_set_value(const char *name, const std::string &value) { return false; }
 
 private:
 	// internal helpers

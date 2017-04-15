@@ -198,8 +198,13 @@
 class slot_option
 {
 public:
-	slot_option(std::string &&value = "", std::string &&bios = "")
-		: m_value(std::move(value)), m_bios(std::move(bios))
+	slot_option()
+		: slot_option("", "", true)
+	{
+	}
+
+	slot_option(std::string &&value, std::string &&bios, bool selectable)
+		: m_value(std::move(value)), m_bios(std::move(bios)), m_selectable(selectable)
 	{
 	}
 	slot_option(const slot_option &that) = default;
@@ -219,15 +224,18 @@ public:
 	const std::string &bios() const { return m_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool is_default() const { return m_value.empty(); }
+	bool is_selectable() const { return m_selectable; }
 
 	// seters
 	void set_bios(std::string &&s) { m_bios = std::move(s); }
 	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
+	void set_is_selectable(bool selectable) { m_selectable = selectable; }
 
 private:
 	std::string m_value;
 	std::string m_bios;
 	std::string	m_default_card_software;
+	bool m_selectable;
 };
 
 
@@ -427,8 +435,12 @@ public:
 	std::map<std::string, std::string> &image_options() { return m_image_options; }
 	const std::map<std::string, std::string> &image_options() const { return m_image_options; }
 
+	static slot_option parse_slot_option(std::string &&text, bool selectable);
+
 protected:
 	virtual void value_changed(const std::string &name, const std::string &value) override;
+	virtual bool override_get_value(const char *name, std::string &value) const override;
+	virtual bool override_set_value(const char *name, const std::string &value) override;
 
 private:
 	static const options_entry s_option_entries[];

@@ -559,12 +559,15 @@ std::string core_options::output_ini(const core_options *diff) const
 	int num_valid_headers = 0;
 	int unadorned_index = 0;
 	const char *last_header = nullptr;
+	std::string overridden_value;
 
 	// loop over all items
 	for (entry &curentry : m_entrylist)
 	{
 		const char *name = curentry.name();
-		const char *value = curentry.value();
+		const char *value = name && override_get_value(name, overridden_value)
+			? overridden_value.c_str()
+			: curentry.value();
 		bool is_unadorned = false;
 
 		// check if it's unadorned
@@ -847,6 +850,10 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, std::str
 		data.erase(0, 1);
 		data.erase(data.length() - 1, 1);
 	}
+
+	// let derived classes override how we set this data
+	if (override_set_value(curentry.name(), data))
+		return true;
 
 	// validate the type of data and optionally the range
 	float fval;

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    emuopts.c
+    emuopts.cpp
 
     Options file and command line management.
 
@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+
 
 //**************************************************************************
 //  CORE EMULATOR OPTIONS
@@ -263,3 +264,73 @@ void emu_options::value_changed(const std::string &name, const std::string &valu
 			m_ui = UI_CABINET;
 	}
 }
+
+
+//-------------------------------------------------
+//	override_get_value - when saving to an INI, we
+//	need to hook into that process so we can write
+//	out image/slot options
+//-------------------------------------------------
+
+bool emu_options::override_get_value(const char *name, std::string &value) const
+{
+	auto slotiter = m_slot_options.find(name);
+	if (slotiter != m_slot_options.end() && slotiter->second.is_selectable())
+	{
+		value = slotiter->second.value();
+		return true;
+	}
+
+	auto imageiter = m_image_options.find(name);
+	if (imageiter != m_image_options.end())
+	{
+		value = imageiter->second;
+		return true;
+	}
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//	override_set_value - when parsing an INI, we
+//	need to hook into into it so we can do the same
+//	crazy slot logic done in mameopt
+//-------------------------------------------------
+
+bool emu_options::override_set_value(const char *name, const std::string &value)
+{
+	auto slotiter = m_slot_options.find(name);
+	if (slotiter != m_slot_options.end())
+	{
+		slotiter->second = parse_slot_option(std::string(value), true);
+		return true;
+	}
+
+	auto imageiter = m_image_options.find(name);
+	if (imageiter != m_image_options.end())
+	{
+		imageiter->second = value;
+		return true;
+	}
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//  parse_slot_option - parses a slot option (the
+//	',bios=XYZ' syntax)
+//-------------------------------------------------
+
+slot_option emu_options::parse_slot_option(std::string &&text, bool selectable)
+{
+	slot_option result;
+	const char *bios_arg = ",bios=";
+
+	size_t pos = text.find(bios_arg);
+	return pos != std::string::npos
+		? slot_option(text.substr(0, pos), text.substr(pos + strlen(bios_arg)), selectable)
+		: slot_option(std::move(text), "", selectable);
+}
+
