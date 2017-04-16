@@ -14,6 +14,9 @@
 #define MCFG_DSBZ80_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DSBZ80, 0)
 
+#define MCFG_DSBZ80_RXD_HANDLER(_devcb) \
+	devcb = &dsbz80_device::set_rxd_handler(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -27,10 +30,14 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
+	// static configuration
+	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object &&object) { return downcast<dsbz80_device &>(device).m_rxd_handler.set_callback(std::forward<_Object>(object)); }
+
 	required_device<cpu_device> m_ourcpu;
 	required_device<i8251_device> m_uart;
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	DECLARE_WRITE_LINE_MEMBER(output_txd);
 
 	DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
 	DECLARE_WRITE8_MEMBER(mpeg_start_w);
@@ -51,6 +58,8 @@ private:
 	int16_t audio_buf[1152*2];
 	uint32_t mp_start, mp_end, mp_vol, mp_pan, mp_state, lp_start, lp_end, start, end;
 	int mp_pos, audio_pos, audio_avail;
+
+	devcb_write_line   m_rxd_handler;
 };
 
 

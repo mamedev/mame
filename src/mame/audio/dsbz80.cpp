@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( dsbz80io_map, AS_IO, 8, dsbz80_device )
 	AM_RANGE(0xe5, 0xe7) AM_WRITE(mpeg_end_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(mpeg_volume_w)
 	AM_RANGE(0xe9, 0xe9) AM_WRITE(mpeg_stereo_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("uart", i8251_device, data_r)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
@@ -39,7 +39,7 @@ MACHINE_CONFIG_FRAGMENT( dsbz80 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000)
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	// no TXD output
+	MCFG_I8251_TXD_HANDLER(WRITELINE(dsbz80_device, output_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 100000)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxc))
@@ -74,7 +74,8 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, DSBZ80, "Sega Z80-based Digital Sound Board", tag, owner, clock, "dsbz80", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_ourcpu(*this, Z80_TAG),
-	m_uart(*this, "uart")
+	m_uart(*this, "uart"),
+	m_rxd_handler(*this)
 {
 }
 
@@ -84,6 +85,7 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 
 void dsbz80_device::device_start()
 {
+	m_rxd_handler.resolve_safe();
 	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
 	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
 	machine().sound().stream_alloc(*this, 0, 2, 32000);
@@ -106,6 +108,12 @@ void dsbz80_device::device_reset()
 WRITE_LINE_MEMBER(dsbz80_device::write_txd)
 {
 	m_uart->write_rxd(state);
+}
+
+WRITE_LINE_MEMBER(dsbz80_device::output_txd)
+{
+	// not used by swa
+	m_rxd_handler(state);
 }
 
 WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)

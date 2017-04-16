@@ -36,6 +36,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
+	// static configuration
 	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object &&object) { return downcast<segam1audio_device &>(device).m_rxd_handler.set_callback(std::forward<_Object>(object)); }
 
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
