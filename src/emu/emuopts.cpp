@@ -272,23 +272,28 @@ void emu_options::value_changed(const std::string &name, const std::string &valu
 //	out image/slot options
 //-------------------------------------------------
 
-bool emu_options::override_get_value(const char *name, std::string &value) const
+core_options::override_get_value_result emu_options::override_get_value(const char *name, std::string &value) const
 {
-	auto slotiter = m_slot_options.find(name);
-	if (slotiter != m_slot_options.end() && slotiter->second.is_selectable())
+	if (name)
 	{
-		value = slotiter->second.value();
-		return true;
+		auto slotiter = m_slot_options.find(name);
+		if (slotiter != m_slot_options.end())
+		{
+			value = slotiter->second.specified_value();
+			return slotiter->second.specified()
+				? override_get_value_result::OVERRIDE
+				: override_get_value_result::SKIP;
+		}
+
+		auto imageiter = m_image_options.find(name);
+		if (imageiter != m_image_options.end())
+		{
+			value = imageiter->second;
+			return override_get_value_result::OVERRIDE;
+		}
 	}
 
-	auto imageiter = m_image_options.find(name);
-	if (imageiter != m_image_options.end())
-	{
-		value = imageiter->second;
-		return true;
-	}
-
-	return false;
+	return override_get_value_result::NONE;
 }
 
 
@@ -303,7 +308,7 @@ bool emu_options::override_set_value(const char *name, const std::string &value)
 	auto slotiter = m_slot_options.find(name);
 	if (slotiter != m_slot_options.end())
 	{
-		slotiter->second = parse_slot_option(std::string(value), true);
+		slotiter->second.specify(std::string(value));
 		return true;
 	}
 
@@ -319,18 +324,97 @@ bool emu_options::override_set_value(const char *name, const std::string &value)
 
 
 //-------------------------------------------------
-//  parse_slot_option - parses a slot option (the
-//	',bios=XYZ' syntax)
+//	slot_option ctor
 //-------------------------------------------------
 
-slot_option emu_options::parse_slot_option(std::string &&text, bool selectable)
+slot_option::slot_option(const char *default_value)
+	: m_specified(false)
+	, m_default_value(default_value ? default_value : "")
 {
-	slot_option result;
+}
+
+
+//-------------------------------------------------
+//	slot_option::value
+//-------------------------------------------------
+
+const std::string &slot_option::value() const
+{
+	// There are a number of ways that the value can be determined; there
+	// is a specific order of precedence:
+	//
+	//	1.  Highest priority is whatever may have been specified by the user (whether it
+	//		was specified at the command line, an INI file, or in the UI).  We keep track
+	//		of whether these values were specified this way
+	//
+	//		Take note that slots have a notion of being "selectable".  Slots that are not
+	//		marked as selectable cannot be specified with this technique
+	//
+	//	2.  Next highest is what is returned from get_default_card_software()
+	//
+	//	3.	Last in priority is what was specified as the slot default.  This comes from
+	//		device setup
+	if (m_specified)
+		return m_specified_value;
+	else if (!m_default_card_software.empty())
+		return m_default_card_software;
+	else
+		return m_default_value;
+}
+
+
+//-------------------------------------------------
+//	slot_option::specified_value
+//-------------------------------------------------
+
+std::string slot_option::specified_value() const
+{
+	std::string result;
+	if (m_specified)
+	{
+		result = m_specified_bios.empty()
+			? m_specified_value
+			: util::string_format("%s,bios=%s", m_specified_value, m_specified_bios);
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//	slot_option::specify
+//-------------------------------------------------
+
+void slot_option::specify(std::string &&text)
+{
+	// we need to do some elementary parsing here
 	const char *bios_arg = ",bios=";
 
 	size_t pos = text.find(bios_arg);
-	return pos != std::string::npos
-		? slot_option(text.substr(0, pos), text.substr(pos + strlen(bios_arg)), selectable)
-		: slot_option(std::move(text), "", selectable);
+	if (pos != std::string::npos)
+	{
+		m_specified = true;
+		m_specified_value = text.substr(0, pos);
+		m_specified_bios = text.substr(pos + strlen(bios_arg));
+	}
+	else
+	{
+		m_specified = true;
+		m_specified_value = std::move(text);
+		m_specified_bios = "";
+	}
 }
 
+
+//-------------------------------------------------
+//	slot_option::set_bios
+//-------------------------------------------------
+
+void slot_option::set_bios(std::string &&text)
+{
+	if (!m_specified)
+	{
+		m_specified = true;
+		m_specified_value = value();
+	}
+	m_specified_bios = std::move(text);
+}

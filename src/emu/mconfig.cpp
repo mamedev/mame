@@ -44,6 +44,10 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		bool is_default;
 		if (!has_option)
 		{
+			// Theoretically we should never get here; in the long run the expectation is that
+			// options.slot_options() should be fully qualified and all options should be
+			// present.  However, we're getting late in the MAME 0.185 development cycle and
+			// I don't want to rip this out (yet)
 			selval = slot.default_option();
 			is_default = true;
 		}
@@ -51,7 +55,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		{
 			const slot_option &opt = options.slot_options()[slot_option_name];
 			selval = opt.value().c_str();
-			is_default = opt.is_default();
+			is_default = !opt.specified();
 		}
 
 		if (selval && *selval)

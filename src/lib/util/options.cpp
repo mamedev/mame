@@ -565,9 +565,21 @@ std::string core_options::output_ini(const core_options *diff) const
 	for (entry &curentry : m_entrylist)
 	{
 		const char *name = curentry.name();
-		const char *value = name && override_get_value(name, overridden_value)
-			? overridden_value.c_str()
-			: curentry.value();
+		const char *value;
+		switch (override_get_value(name, overridden_value))
+		{
+			case override_get_value_result::NONE:
+			default:
+				value = curentry.value();
+				break;
+
+			case override_get_value_result::SKIP:
+				continue;
+
+			case override_get_value_result::OVERRIDE:
+				value = overridden_value.c_str();
+				break;
+		}
 		bool is_unadorned = false;
 
 		// check if it's unadorned
