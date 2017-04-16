@@ -17,6 +17,10 @@
           due to testing an out-of-bounds value
         * rascot is not working at all
 
+    The After Burner schematics seem to show that the MB3773 clock input
+    is controlled only by PC6 on the first CXD1095. However, most games,
+    including aburner2, fail to periodically clear the watchdog timer
+    this way to prevent unwanted resets.
 
 Sega X-Board System Overview
 Sega, 1987-1992
@@ -501,7 +505,7 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 {
 	m_pc_0 = data;
 
-	// Output port:
+	// Output ports according to After Burner schematics:
 	//  D7: (Not connected)
 	//  D6: (/WDC) - watchdog reset
 	//  D5: Screen display (1= blanked, 0= displayed)
@@ -822,9 +826,15 @@ void segaxbd_state::update_main_irqs()
 		m_maincpu->set_input_line(2, CLEAR_LINE);
 
 	if (m_vblank_irq_state)
+	{
 		irq |= 4;
+		m_watchdog->write_line_ck(0);
+	}
 	else
+	{
 		m_maincpu->set_input_line(4, CLEAR_LINE);
+		m_watchdog->write_line_ck(1);
+	}
 
 	if (m_gprider_hack && irq > 4)
 		irq = 4;
@@ -1699,13 +1709,13 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
-	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0)
+	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0) // IC160
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO0PORTA"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO0PORTB"))
 	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(segaxbd_state, pc_0_w))
 	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, pd_0_w))
 
-	MCFG_DEVICE_ADD("iochip_1", CXD1095, 0)
+	MCFG_DEVICE_ADD("iochip_1", CXD1095, 0) // IC159
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO1PORTA"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO1PORTB"))
 	MCFG_CXD1095_IN_PORTC_CB(IOPORT("IO1PORTC"))
