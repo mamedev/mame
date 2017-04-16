@@ -9,8 +9,8 @@
 
 
   Cross Pang        (c)1998 F2 System
-  Heuk Sun Baek Sa  (c)1998 Oksan / F2 System
-  Bestri            (c)1997 F2 System
+  Heuk Sun Baek Sa  (c)1997 Oksan / F2 System
+  Bestri            (c)1998 F2 System
 
   Cross Pang New - Is shown on the website but is not currently dumped
 
