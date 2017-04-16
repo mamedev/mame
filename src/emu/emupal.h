@@ -367,8 +367,8 @@ public:
 	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
 	static void static_set_membits(device_t &device, int membits);
 	static void static_set_endianness(device_t &device, endianness_t endianness);
-	static void static_set_entries(device_t &device, int entries);
-	static void static_set_indirect_entries(device_t &device, int entries);
+	static void static_set_entries(device_t &device, u32 entries);
+	static void static_set_indirect_entries(device_t &device, u32 entries);
 	static void static_enable_shadows(device_t &device);
 	static void static_enable_hilights(device_t &device);
 
@@ -421,8 +421,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual int palette_entries() const override { return m_entries; }
-	virtual int palette_indirect_entries() const override { return m_indirect_entries; }
+	virtual u32 palette_entries() const override { return m_entries; }
+	virtual u32 palette_indirect_entries() const override { return m_indirect_entries; }
 	virtual bool palette_shadows_enabled() const override { return m_enable_shadows; }
 	virtual bool palette_hilights_enabled() const override { return m_enable_hilights; }
 
@@ -430,8 +430,8 @@ private:
 	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);
 
 	// configuration state
-	int                 m_entries;              // number of entries in the palette
-	int                 m_indirect_entries;     // number of indirect colors in the palette
+	u32                 m_entries;              // number of entries in the palette
+	u32                 m_indirect_entries;     // number of indirect colors in the palette
 	bool                m_enable_shadows;       // are shadows enabled?
 	bool                m_enable_hilights;      // are hilights enabled?
 	int                 m_membits;              // width of palette RAM, if different from native

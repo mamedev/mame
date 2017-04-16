@@ -62,7 +62,7 @@ void device_palette_interface::interface_pre_start()
 	m_format = (screen != nullptr) ? screen->format() : BITMAP_FORMAT_INVALID;
 
 	// allocate the palette
-	int numentries = palette_entries();
+	u32 numentries = palette_entries();
 	allocate_palette(numentries);
 	allocate_color_tables();
 	allocate_shadow_tables();
@@ -339,7 +339,7 @@ void device_palette_interface::set_shadow_dRGB32(int mode, int dr, int dg, int d
 //  palette object itself
 //-------------------------------------------------
 
-void device_palette_interface::allocate_palette(int numentries)
+void device_palette_interface::allocate_palette(u32 numentries)
 {
 	assert(numentries > 0);
 

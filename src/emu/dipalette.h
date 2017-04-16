@@ -46,8 +46,8 @@ public:
 	device_palette_interface(const machine_config &mconfig, device_t &device);
 
 	// getters
-	int entries() const { return palette_entries(); }
-	int indirect_entries() const { return palette_indirect_entries(); }
+	u32 entries() const { return palette_entries(); }
+	u32 indirect_entries() const { return palette_indirect_entries(); }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -91,14 +91,14 @@ protected:
 	virtual void interface_post_stop() override;
 
 	// configuration-related overrides
-	virtual int palette_entries() const = 0;
-	virtual int palette_indirect_entries() const { return 0; }
+	virtual u32 palette_entries() const = 0;
+	virtual u32 palette_indirect_entries() const { return 0; }
 	virtual bool palette_shadows_enabled() const { return false; }
 	virtual bool palette_hilights_enabled() const { return false; }
 
 private:
 	// internal helpers
-	void allocate_palette(int numentries);
+	void allocate_palette(u32 numentries);
 	void allocate_color_tables();
 	void allocate_shadow_tables();
 public: // needed by konamigx
