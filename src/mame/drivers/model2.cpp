@@ -2416,7 +2416,6 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
-	MCFG_DEVCB_CHAIN_OUTPUT(LOGGER("TXD L")) MCFG_DEVCB_XOR(1)
 
 	MCFG_CLOCK_ADD("uart_clock", M1AUDIO_TXRX_CLOCK) // unknown rate
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
