@@ -57,13 +57,14 @@ bool mame_options::add_slot_options(emu_options &options, value_specifier_func v
 
 			// add the option
 			options.add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot.default_option(), true);
+			options.slot_options()[name] = slot_option(slot.default_option());
 
 			// allow opportunity to specify this value
 			if (value_specifier)
 			{
-				std::string value = value_specifier(name);
-				if (value != value_specifier_invalid_value())
-					options.slot_options()[name] = parse_slot_option(std::move(value));
+				std::string specified_value = value_specifier(name);
+				if (specified_value != value_specifier_invalid_value())
+					options.slot_options()[name].specify(std::move(specified_value));
 			}
 		}
 	}
@@ -179,6 +180,7 @@ void mame_options::add_device_options(emu_options &options, value_specifier_func
 			// add the option
 			std::string option_name = get_full_option_name(image);
 			options.add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			options.image_options()[image.instance_name()] = "";
 
 			// allow opportunity to specify this value
 			if (value_specifier)
@@ -688,19 +690,3 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	return result;
 }
 
-
-//-------------------------------------------------
-//  parse_slot_option - parses a slot option (the
-//	',bios=XYZ' syntax)
-//-------------------------------------------------
-
-slot_option mame_options::parse_slot_option(std::string &&text)
-{
-	slot_option result;
-	const char *bios_arg = ",bios=";
-
-	size_t pos = text.find(bios_arg);
-	return pos != std::string::npos
-		? slot_option(text.substr(0, pos), text.substr(pos + strlen(bios_arg)))
-		: slot_option(std::move(text));
-}

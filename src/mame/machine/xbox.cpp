@@ -1169,8 +1169,7 @@ READ32_MEMBER(xbox_base_state::ohci_usb_r)
 
 WRITE32_MEMBER(xbox_base_state::ohci_usb_w)
 {
-	if (!usb_hack_enabled)
-		ohci_usb->write(space, offset, data, mem_mask);
+	ohci_usb->write(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(xbox_base_state::ohci_usb2_r)
@@ -1187,7 +1186,6 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
 	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(ohci_usb_r, ohci_usb_w)
-	//AM_RANGE(0xfed00000, 0xfed00fff) AM_DEVREADWRITE("ohci_usb", ohci_usb_controller, read, write)
 	AM_RANGE(0xfed08000, 0xfed08fff) AM_READWRITE(ohci_usb2_r, ohci_usb2_w)
 	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
 	AM_RANGE(0xfec00000, 0xfec00fff) AM_READWRITE(audio_ac93_r, audio_ac93_w)
@@ -1205,6 +1203,8 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w) // lpc bridge
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(smbus_r, smbus_w)
 	AM_RANGE(0xc200, 0xc21f) AM_READWRITE(smbus2_r, smbus2_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_NOP // ac97
+	AM_RANGE(0xd200, 0xd27f) AM_NOP // ac97
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(networkio_r, networkio_w)
 	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END

@@ -250,6 +250,7 @@ public:
 	}
 
 	bool user_loadable() const { return m_user_loadable; }
+	const std::string &full_software_name() const { return m_full_software_name; }
 
 protected:
 	// interface-level overrides

@@ -5098,6 +5098,41 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="goldnaxe">
+		<description>Golden Axe (5.25")</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="Golden Axe [Sega] [1990] [5.25] [1 of 2].img" size="368640" crc="9d919d85" sha1="9203ecedd274d2436b6c39aa166fabd0e5d089d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "327680">
+				<rom name="Golden Axe [Sega] [1990] [5.25] [2 of 2].img" size="368640" crc="8684a3dd" sha1="3200f3a97d5912812dc4b53b8b733a371c2bf140" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldnaxea" cloneof="goldnaxe">
+		<description>Golden Axe (5.25", Alt)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<!-- differs from the 9d919d85 image in the FAT label only -->
+				<rom name="Golden Axe (World) (Disk 1).img" size="368640" crc="9f777068" sha1="9eb620a54c2885c4e1e650e7fa860258d9d4cea7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Golden Axe (World) (Disk 2).img" size="368640" crc="8684a3dd" sha1="3200f3a97d5912812dc4b53b8b733a371c2bf140" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1988</year>
@@ -5106,6 +5141,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Armorik le Viking (Fr).img" size="368640" crc="3445e3da" sha1="c3496901029e162c0e59a028a28e3c6286ca987f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homealon">
+		<description>Home Alone - A Family Game Without the Family</description>
+		<year>1991</year>
+		<publisher>Capstone</publisher>
+		<info name="version" value="1.0" />
+		<info name="developer" value="Manley &amp; Associates, Inc" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone [Capstone] [1991] [3.5].img" size="737280" crc="4cb8e8c4" sha1="27929ce82de6cbfaa5e45ce3afcde086efe8244a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

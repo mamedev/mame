@@ -68,6 +68,7 @@ zooming might be wrong
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/vs9209.h"
 #include "sound/2610intf.h"
 #include "screen.h"
 #include "speaker.h"
@@ -90,15 +91,18 @@ READ16_MEMBER(taotaido_state::pending_command_r)
 	return m_pending_command;
 }
 
-WRITE16_MEMBER(taotaido_state::sound_command_w)
+WRITE8_MEMBER(taotaido_state::sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_pending_command = 1;
+	m_soundlatch->write(space, offset, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
+
+WRITE8_MEMBER(taotaido_state::unknown_output_w)
+{
+	// Bits 7, 5, 4 used?
+}
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgram")  // bg ram?
@@ -107,21 +111,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                     // main ram
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")       // rowscroll / rowselect / scroll ram
-	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
-	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
-	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xffff86, 0xffff87) AM_READ_PORT("DSW1")
-	AM_RANGE(0xffff88, 0xffff89) AM_READ_PORT("DSW2")
-	AM_RANGE(0xffff8a, 0xffff8b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xffff8c, 0xffff8d) AM_READONLY                        // unknown
-	AM_RANGE(0xffff8e, 0xffff8f) AM_READ_PORT("JP")
-	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")                     // used only by taotaida
-	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")                     // used only by taotaida
+	AM_RANGE(0xffff80, 0xffff9f) AM_DEVREADWRITE8("io1", vs9209_device, read, write, 0x00ff)
+	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io2", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(tileregs_w)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITENOP                        // unknown
 	AM_RANGE(0xffff20, 0xffff21) AM_WRITENOP                        // unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(sprite_character_bank_select_w)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)              // seems right
+	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE8(sound_command_w, 0x00ff)         // seems right
 	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r) // guess - seems to be needed for all the sounds to work
 ADDRESS_MAP_END
 
@@ -369,6 +365,20 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2610 */
+
+	MCFG_DEVICE_ADD("io1", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
+	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
+	MCFG_VS9209_IN_PORTF_CB(IOPORT("DSW3"))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(taotaido_state, unknown_output_w))
+	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP"))
+
+	MCFG_DEVICE_ADD("io2", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P3"))                   // used only by taotaida
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P4"))                   // used only by taotaida
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taotaido)
 

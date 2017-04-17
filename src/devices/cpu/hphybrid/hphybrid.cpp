@@ -231,10 +231,10 @@ void hp_hybrid_cpu_device::execute_run()
 		} else {
 			debugger_instruction_hook(this, m_genpc);
 
+			m_reg_I = execute_one(m_reg_I);
+
 			// Check for interrupts
 			check_for_interrupts();
-
-			m_reg_I = execute_one(m_reg_I);
 		}
 	} while (m_icount > 0);
 }

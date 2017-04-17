@@ -57,8 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(mode_w);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
@@ -95,6 +93,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void command_w(uint8_t data);
+	void mode_w(uint8_t data);
 
 	void update_rx_ready();
 	void update_tx_ready();
@@ -156,6 +157,9 @@ class v53_scu_device :  public i8251_device
 public:
 	// construction/destruction
 	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE8_MEMBER(command_w);
+	DECLARE_WRITE8_MEMBER(mode_w);
 };
 
 

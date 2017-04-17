@@ -186,6 +186,7 @@ void i8251_device::check_for_tx_start()
 -------------------------------------------------*/
 void i8251_device::start_tx()
 {
+	LOG("start_tx %02x\n", m_tx_data);
 	transmit_register_setup(m_tx_data);
 	m_status &= ~I8251_STATUS_TX_EMPTY;
 	m_status |= I8251_STATUS_TX_READY;
@@ -340,7 +341,7 @@ void i8251_device::device_reset()
     control_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::command_w)
+void i8251_device::command_w(uint8_t data)
 {
 	/* command */
 	LOG("I8251: Command byte\n");
@@ -419,7 +420,7 @@ WRITE8_MEMBER(i8251_device::command_w)
 	update_tx_empty();
 }
 
-WRITE8_MEMBER(i8251_device::mode_w)
+void i8251_device::mode_w(uint8_t data)
 {
 	LOG("I8251: Mode byte = %X\n", data);
 
@@ -597,12 +598,12 @@ WRITE8_MEMBER(i8251_device::control_w)
 		}
 		else
 		{
-			mode_w(space, offset, data);
+			mode_w(data);
 		}
 	}
 	else
 	{
-		command_w(space, offset, data);
+		command_w(data);
 	}
 }
 
@@ -660,6 +661,8 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(uint8_t ch)
 {
+	LOG("receive_character %02x\n", ch);
+
 	m_rx_data = ch;
 
 	/* char has not been read and another has arrived! */
@@ -734,4 +737,14 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 		if (!m_txc)
 			transmit_clock();
 	}
+}
+
+WRITE8_MEMBER(v53_scu_device::command_w)
+{
+	i8251_device::command_w(data);
+}
+
+WRITE8_MEMBER(v53_scu_device::mode_w)
+{
+	i8251_device::mode_w(data);
 }
