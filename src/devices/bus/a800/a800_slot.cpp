@@ -394,13 +394,13 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 	{
 		const char *slot_string;
 		std::vector<uint8_t> head(0x10);
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		int type = A800_8K;
 
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			m_file->read(&head[0], 0x10);
+			hook.image_file()->read(&head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size

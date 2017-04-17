@@ -155,7 +155,7 @@ image_init_result m5_cart_slot_device::call_load()
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name) //is it ram cart?
-				m_type = m5_get_pcb_id(m_full_software_name.c_str());
+				m_type = m5_get_pcb_id(full_software_name().c_str());
 			else
 				m_type=M5_STD; //standard cart(no feature line in xml)
 		}

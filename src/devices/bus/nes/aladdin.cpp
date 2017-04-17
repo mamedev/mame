@@ -141,7 +141,7 @@ std::string nes_aladdin_slot_device::get_default_card_software(get_default_card_
 	if (hook.image_file())
 	{
 		const char *slot_string = "algn";
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		uint8_t mapper;
 

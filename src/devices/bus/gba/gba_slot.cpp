@@ -424,7 +424,7 @@ std::string gba_cart_slot_device::get_default_card_software(get_default_card_sof
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = gba_get_slot(type);

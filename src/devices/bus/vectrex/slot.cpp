@@ -199,7 +199,7 @@ std::string vectrex_cart_slot_device::get_default_card_software(get_default_card
 	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		std::vector<uint8_t> rom(size);
 		int type = VECTREX_STD;
 

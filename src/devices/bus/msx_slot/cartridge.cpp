@@ -276,7 +276,7 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 	if (hook.image_file())
 	{
 		const char *slot_string = "nomapper";
-		uint32_t length = m_file->size();
+		uint32_t length = hook.image_file()->size();
 		std::vector<uint8_t> rom(length);
 		int type = NOMAPPER;
 
@@ -321,7 +321,7 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 		if (type == NOMAPPER)
 		{
 			// Not identified through hashfile, try automatic detection
-			m_file->read(&rom[0], length);
+			hook.image_file()->read(&rom[0], length);
 			type = get_cart_type(&rom[0], length);
 		}
 
