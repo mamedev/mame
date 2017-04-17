@@ -202,7 +202,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 	if (!mame_options::parse_command_line(m_options, args, option_errors))
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
-		if (*(m_options.command()) == 0 && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
+		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 		// otherwise, error on the options
@@ -215,7 +215,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 	std::string exename = core_filename_extract_base(args[0], true);
 
 	// if we have a command, execute that
-	if (*(m_options.command()) != 0)
+	if (!m_options.command().empty())
 	{
 		execute_commands(exename.c_str());
 		return;
@@ -1329,14 +1329,14 @@ void cli_frontend::romident(const char *filename)
 void cli_frontend::execute_commands(const char *exename)
 {
 	// help?
-	if (strcmp(m_options.command(), CLICOMMAND_HELP) == 0)
+	if (m_options.command() == CLICOMMAND_HELP)
 	{
 		display_help(exename);
 		return;
 	}
 
 	// showusage?
-	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
+	if (m_options.command() == CLICOMMAND_SHOWUSAGE)
 	{
 		osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
 		osd_printf_info("\n\nOptions:\n%s", m_options.output_help().c_str());
@@ -1344,7 +1344,7 @@ void cli_frontend::execute_commands(const char *exename)
 	}
 
 	// validate?
-	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
+	if (m_options.command() == CLICOMMAND_VALIDATE)
 	{
 		validity_checker valid(m_options);
 		valid.set_validate_all(true);
@@ -1362,7 +1362,7 @@ void cli_frontend::execute_commands(const char *exename)
 		osd_printf_error("%s\n", option_errors.c_str());
 
 	// createconfig?
-	if (strcmp(m_options.command(), CLICOMMAND_CREATECONFIG) == 0)
+	if (m_options.command() == CLICOMMAND_CREATECONFIG)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1398,7 +1398,7 @@ void cli_frontend::execute_commands(const char *exename)
 	}
 
 	// showconfig?
-	if (strcmp(m_options.command(), CLICOMMAND_SHOWCONFIG) == 0)
+	if (m_options.command() == CLICOMMAND_SHOWCONFIG)
 	{
 		// print the INI text
 		printf("%s\n", m_options.output_ini().c_str());
@@ -1435,7 +1435,7 @@ void cli_frontend::execute_commands(const char *exename)
 	// find the command
 	for (auto & info_command : info_commands)
 	{
-		if (strcmp(m_options.command(), info_command.option) == 0)
+		if (m_options.command() == info_command.option)
 		{
 			// parse any relevant INI files before proceeding
 			const char *sysname = m_options.system_name();
@@ -1444,9 +1444,9 @@ void cli_frontend::execute_commands(const char *exename)
 		}
 	}
 
-	if (!m_osd.execute_command(m_options.command()))
+	if (!m_osd.execute_command(m_options.command().c_str()))
 		// if we get here, we don't know what has been requested
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command().c_str());
 }
 
 
