@@ -5805,7 +5805,7 @@ static MACHINE_CONFIG_DERIVED(scud, model3_15)
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 
-	MCFG_CLOCK_ADD("uart_clock", 100000) // unknown rate
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END

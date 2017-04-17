@@ -14,8 +14,6 @@
 #define M1AUDIO_MPCM1_REGION "m1pcm1"
 #define M1AUDIO_MPCM2_REGION "m1pcm2"
 
-#define M1AUDIO_TXRX_CLOCK 100000 // unknown
-
 #define MCFG_SEGAM1AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
 

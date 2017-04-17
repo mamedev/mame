@@ -1630,7 +1630,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
 
-	MCFG_CLOCK_ADD("m1uart_clock", M1AUDIO_TXRX_CLOCK) // unknown rate
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
@@ -1687,7 +1687,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
 
-	MCFG_CLOCK_ADD("m1uart_clock", M1AUDIO_TXRX_CLOCK) // unknown rate
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
