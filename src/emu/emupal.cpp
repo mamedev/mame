@@ -66,13 +66,13 @@ void palette_device::static_set_endianness(device_t &device, endianness_t endian
 }
 
 
-void palette_device::static_set_entries(device_t &device, int entries)
+void palette_device::static_set_entries(device_t &device, u32 entries)
 {
 	downcast<palette_device &>(device).m_entries = entries;
 }
 
 
-void palette_device::static_set_indirect_entries(device_t &device, int entries)
+void palette_device::static_set_indirect_entries(device_t &device, u32 entries)
 {
 	downcast<palette_device &>(device).m_indirect_entries = entries;
 }
