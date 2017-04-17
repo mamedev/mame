@@ -198,44 +198,48 @@
 class slot_option
 {
 public:
-	slot_option()
-		: slot_option("", "", true)
-	{
-	}
-
-	slot_option(std::string &&value, std::string &&bios, bool selectable)
-		: m_value(std::move(value)), m_bios(std::move(bios)), m_selectable(selectable)
-	{
-	}
+	slot_option(const char *default_value = nullptr);
 	slot_option(const slot_option &that) = default;
 	slot_option(slot_option &&that) = default;
 
 	const slot_option &operator=(const slot_option &that)
 	{
-		// I thought you got this implicitly by declaring a default copy constructor?
-		m_value = that.m_value;
+		m_specified = that.m_specified;
+		m_specified_value = that.m_specified_value;
+		m_specified_bios = that.m_specified_bios;
 		m_default_card_software = that.m_default_card_software;
-		m_bios = that.m_bios;
-		return that;
+		m_default_value = that.m_default_value;
+		return *this;
+	}
+
+	const slot_option &operator=(slot_option &&that)
+	{
+		m_specified = that.m_specified;
+		m_specified_value = std::move(that.m_specified_value);
+		m_specified_bios = std::move(that.m_specified_bios);
+		m_default_card_software = std::move(that.m_default_card_software);
+		m_default_value = std::move(that.m_default_value);
+		return *this;
 	}
 
 	// accessors
-	const std::string &value() const { return m_value.empty() ? m_default_card_software : m_value; }
-	const std::string &bios() const { return m_bios; }
+	const std::string &value() const;
+	std::string specified_value() const;
+	const std::string &bios() const { return m_specified_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
-	bool is_default() const { return m_value.empty(); }
-	bool is_selectable() const { return m_selectable; }
+	bool specified() const { return m_specified; }
 
 	// seters
-	void set_bios(std::string &&s) { m_bios = std::move(s); }
+	void specify(std::string &&text);
+	void set_bios(std::string &&text);
 	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
-	void set_is_selectable(bool selectable) { m_selectable = selectable; }
 
 private:
-	std::string m_value;
-	std::string m_bios;
-	std::string	m_default_card_software;
-	bool m_selectable;
+	bool			m_specified;
+	std::string		m_specified_value;
+	std::string		m_specified_bios;
+	std::string		m_default_card_software;
+	std::string		m_default_value;
 };
 
 
@@ -435,11 +439,9 @@ public:
 	std::map<std::string, std::string> &image_options() { return m_image_options; }
 	const std::map<std::string, std::string> &image_options() const { return m_image_options; }
 
-	static slot_option parse_slot_option(std::string &&text, bool selectable);
-
 protected:
 	virtual void value_changed(const std::string &name, const std::string &value) override;
-	virtual bool override_get_value(const char *name, std::string &value) const override;
+	virtual override_get_value_result override_get_value(const char *name, std::string &value) const override;
 	virtual bool override_set_value(const char *name, const std::string &value) override;
 
 private:

@@ -181,8 +181,17 @@ public:
 	int options_count() const { return m_entrylist.count(); }
 
 protected:
+	// This is a hook to allow option value retrieval to be overridden for various reasons; this is a crude
+	// extensibility mechanism that should really be replaced by something better
+	enum class override_get_value_result
+	{
+		NONE,
+		OVERRIDE,
+		SKIP
+	};
+
 	virtual void value_changed(const std::string &name, const std::string &value) {}
-	virtual bool override_get_value(const char *name, std::string &value) const { return false; }
+	virtual override_get_value_result override_get_value(const char *name, std::string &value) const { return override_get_value_result::NONE; }
 	virtual bool override_set_value(const char *name, const std::string &value) { return false; }
 
 private:
