@@ -280,10 +280,10 @@ bool jfd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		uint32_t track_offset = little_endianize_int32(*(uint32_t *)(&img[offset_track + (track * 4)]));
 		spt = 0;
 		discop3 = 0;
+		den[0] = 2;
 
 		if (track_offset == 0xffffffff) /* unformatted track */
 		{
-			den[0] = 2;
 			sects[0].track  = track / 2;
 			sects[0].head   = track % 2;
 			sects[0].sector = 0;
