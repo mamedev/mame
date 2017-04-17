@@ -34928,6 +34928,9 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 @source:suprslam.cpp
 suprslam                        // (c) 1995 Banpresto
 
+@source:supstarf.cpp
+supstarf                        //
+
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
 suratka                         // GX911 (c) 1990 (Asia)

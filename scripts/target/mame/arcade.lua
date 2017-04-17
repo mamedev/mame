@@ -4309,6 +4309,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
 	MAME_DIR .. "src/mame/drivers/stargame.cpp",
+	MAME_DIR .. "src/mame/drivers/supstarf.cpp",
 	MAME_DIR .. "src/mame/drivers/taito.cpp",
 	MAME_DIR .. "src/mame/drivers/techno.cpp",
 	MAME_DIR .. "src/mame/drivers/vd.cpp",
