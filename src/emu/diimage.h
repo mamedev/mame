@@ -294,8 +294,6 @@ protected:
 	image_error_t m_err;
 	std::string m_err_message;
 
-	const std::string &full_software_name() { return m_full_software_name; }
-
 private:
 	// variables that are only non-zero when an image is mounted
 	util::core_file::ptr m_file;
