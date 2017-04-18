@@ -570,7 +570,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-2550 III/TI-1265 (both have same chip)
-  * TMS1040 MCU label TMS1043NL ZA0352 (die label ?)
+  * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
   * 9-digit cyan VFD display
 
 ***************************************************************************/
