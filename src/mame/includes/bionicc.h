@@ -44,14 +44,14 @@ public:
 
 	DECLARE_WRITE16_MEMBER(hacked_controls_w);
 	DECLARE_READ16_MEMBER(hacked_controls_r);
-	DECLARE_WRITE16_MEMBER(bionicc_mpu_trigger_w);
+	DECLARE_WRITE16_MEMBER(mpu_trigger_w);
 	DECLARE_WRITE16_MEMBER(hacked_soundcommand_w);
 	DECLARE_READ16_MEMBER(hacked_soundcommand_r);
-	DECLARE_WRITE16_MEMBER(bionicc_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_txvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_scroll_w);
-	DECLARE_WRITE16_MEMBER(bionicc_gfxctrl_w);
+	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(txvideoram_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
+	DECLARE_WRITE16_MEMBER(gfxctrl_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -59,8 +59,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
-	uint32_t screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bionicc_scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

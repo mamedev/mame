@@ -8613,6 +8613,7 @@ bionicc                         // 3/1987 (c) 1987 (Euro)
 bionicc1                        // 3/1987 (c) 1987 (US)
 bionicc2                        // 3/1987 (c) 1987 (US)
 bioniccbl                       // bootleg
+bioniccbl2                      // bootleg
 topsecrt                        // 3/1987 (c) 1987 (Japan)
 
 @source:bishi.cpp
