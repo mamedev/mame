@@ -1024,7 +1024,7 @@ READ8_MEMBER(segas32_trackball_state::sonic_custom_io_r)
 	}
 
 	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
-	return 0xffff;
+	return 0xff;
 }
 
 
