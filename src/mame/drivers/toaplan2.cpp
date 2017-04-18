@@ -384,8 +384,10 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 ***************************************************************************/
 
 
-MACHINE_START_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_start()
 {
+	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
+
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_old_p1_paddle_h));
 	save_item(NAME(m_old_p2_paddle_h));
@@ -511,7 +513,7 @@ void toaplan2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void toaplan2_state::toaplan2_vblank_irq(int irq_line)
 {
 	// the IRQ appears to fire at line 0xe6
-	timer_set(m_screen->time_until_pos(0xe6), TIMER_RAISE_IRQ, irq_line);
+	m_raise_irq_timer->adjust(m_screen->time_until_pos(0xe6), irq_line);
 }
 
 INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(1); }
@@ -3322,9 +3324,6 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-
-
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -3382,7 +3381,6 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
 
 	/* video hardware */
@@ -3476,8 +3474,6 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff)
 	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3524,8 +3520,6 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff)
 	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3563,8 +3557,6 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(kbash2_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3601,8 +3593,6 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(truxton2_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq2)
-
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3656,7 +3646,6 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -3699,7 +3688,6 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -3780,8 +3768,6 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_V25_PORT_P0_READ_CB(IOPORT("EEPROM"))
 	MCFG_V25_PORT_P0_WRITE_CB(IOPORT("EEPROM"))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -3818,8 +3804,6 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)         /* 10MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(fixeightbl_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq2)
-
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3865,8 +3849,6 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff)
 	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3904,8 +3886,6 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_V25_PORT_P0_READ_CB(IOPORT("DSWB")) MCFG_DEVCB_XOR(0xff)
 	MCFG_V25_PORT_P1_READ_CB(IOPORT("JMPR")) MCFG_DEVCB_XOR(0xff)
 	MCFG_V25_PORT_P2_WRITE_CB(NOOP)  // bit 0 is FAULT according to kbash schematic
-
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3946,7 +3926,6 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(pwrkick_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_UPD4992_ADD("rtc")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -3982,7 +3961,6 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(othldrby_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_UPD4992_ADD("rtc")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -4017,8 +3995,6 @@ static MACHINE_CONFIG_START( enmadaio, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(enmadaio_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4052,8 +4028,6 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(snowbro2_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
-
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4097,7 +4071,6 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -4143,7 +4116,6 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -4188,7 +4160,6 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -4247,7 +4218,6 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
@@ -4306,7 +4276,6 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")

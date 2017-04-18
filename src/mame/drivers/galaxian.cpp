@@ -7477,6 +7477,38 @@ ROM_START( astrians )
 	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( victoryc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.1",  0x0000, 0x0800, CRC(8a590687) SHA1(71558a9eb8020f3769f07089d5704317f6018d9a) )
+	ROM_LOAD( "2.2",  0x0800, 0x0800, CRC(575ac583) SHA1(352cb6c5cdc898ef2935aaae582455dc0237ac49) )
+	ROM_LOAD( "3.3",  0x1000, 0x0800, CRC(cbe67cfb) SHA1(80b42e2443ba36f2a4b2b27f22be7292d6bc9689) )
+	ROM_LOAD( "4.4",  0x1800, 0x0800, CRC(025b6626) SHA1(b6b80c2a9aa991cd0c5ff7127f4495dcd8c2fbe5) )
+	//ROM_LOAD( "v5.BIN",  0x2000, 0x0800, CRC(bea02321) SHA1(8f1265f706b0b1d74f9334d03c62e8943e94aef7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "A4.1H",  0x0000, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
+	ROM_LOAD( "DF.1K",  0x0800, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
+ROM_END
+
+ROM_START( victorycb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "V1.BIN",  0x0000, 0x0800, CRC(f18150e9) SHA1(48a6bcbe43db1cb5bd71bc23e7eaa7f26ddce165) )
+	ROM_LOAD( "v2.BIN",  0x0800, 0x0800, CRC(59042c1e) SHA1(94498ca14f66c8f5ae9a08b0d7c057f033ccfb3b) )
+	ROM_LOAD( "v3.BIN",  0x1000, 0x0800, CRC(7d97ba95) SHA1(e8eded12e746555d4e054962987f34d9472e4357) )
+	ROM_LOAD( "V4.BIN",  0x1800, 0x0800, CRC(5d6ecd2b) SHA1(b9ae9414410eb83875707265e866375b9316f79c) )
+	ROM_LOAD( "v5.BIN",  0x2000, 0x0800, CRC(0e745845) SHA1(c9f16509d9711a33c78920de4616c694b0cf2c68) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "V7.BIN",  0x0000, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
+	ROM_LOAD( "V6.BIN",  0x0800, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l",      0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) ) // not dumped for this board, using the one from the original's PCB 
+ROM_END
+
 ROM_START( moonaln )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "galx.u",       0x0000, 0x0800, CRC(79e4007d) SHA1(d55050498a670d1c022ba3caad34f8fcaccf4a30) ) // prg1.bin
@@ -8774,7 +8806,6 @@ ROM_START( atlantisb ) /* Artic Multi-System */
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
-
 
 ROM_START( tenspot )
 	/* Game A - Survivor */
@@ -11690,6 +11721,8 @@ GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, galax
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, galaxian,   ROT270, "bootleg?", "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victoryc,    0,        galaxian,   galaxian,   galaxian_state, galaxian,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorycb,   victoryc, galaxian,   galaxian,   galaxian_state, galaxian,   ROT270, "bootleg (Laboratorios F.A.R.)", "Victory (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
