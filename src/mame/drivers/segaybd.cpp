@@ -89,6 +89,7 @@ const uint32_t SOUND_CLOCK = 32215900;
 
 //-------------------------------------------------
 //  analog_mux - handle multiplexed analog input
+//  (HC4052 at IC121)
 //-------------------------------------------------
 
 ioport_value segaybd_state::analog_mux()
@@ -1323,7 +1324,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 
 	MCFG_MB3773_ADD("watchdog") // IC95
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000) // probably SOUND_CLOCK/n
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
@@ -1332,6 +1333,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
 	MCFG_DEVICE_ADD("adc", MSM6253, 0)
 	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
