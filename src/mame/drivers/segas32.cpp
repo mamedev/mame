@@ -2531,7 +2531,7 @@ machine_config_constructor segas32_4player_state::device_mconfig_additions() con
 static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
-	AM_IMPORT_FROM(system32_map)
+	AM_IMPORT_FROM(system32_4player_map)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( system32_v25 )
