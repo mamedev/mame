@@ -116,7 +116,7 @@ bool msm6253_device::shift_out()
 READ8_MEMBER(msm6253_device::d0_r)
 {
 	// offset is ignored
-	return shift_out();
+	return shift_out() | (space.unmap() & 0xfe);
 }
 
 //-------------------------------------------------
@@ -126,5 +126,5 @@ READ8_MEMBER(msm6253_device::d0_r)
 READ8_MEMBER(msm6253_device::d7_r)
 {
 	// offset is ignored
-	return shift_out() << 7;
+	return (shift_out() << 7) | (space.unmap() & 0x7f);
 }
