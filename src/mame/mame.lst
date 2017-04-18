@@ -36627,6 +36627,9 @@ unkhorse                        //
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products
 
+@source:usbilliards.cpp
+sharkusb                        // (c) 1975 US Billiards
+
 @source:usgames.cpp
 superten                        // (c) 1988
 usg182                          // (c) 1989
