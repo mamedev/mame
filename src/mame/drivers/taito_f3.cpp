@@ -411,7 +411,7 @@ void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int para
 INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 {
 	device.execute().set_input_line(2, HOLD_LINE);  // vblank
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);
+	m_interrupt3_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
 static const uint16_t recalh_eeprom[64] = {
@@ -425,8 +425,10 @@ static const uint16_t recalh_eeprom[64] = {
 	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
 };
 
-MACHINE_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::machine_start()
 {
+	m_interrupt3_timer = timer_alloc(TIMER_F3_INTERRUPT3);
+
 	save_item(NAME(m_coin_word));
 }
 
@@ -443,7 +445,6 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
-	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
 	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -537,9 +538,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
-
-	MCFG_MACHINE_START_OVERRIDE(taito_f3_state,f3)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
