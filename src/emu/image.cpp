@@ -177,18 +177,23 @@ void image_manager::options_extract()
 {
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		// we have to assemble the image option differently for software lists and for normal images
-		std::string image_opt;
-		if (image.exists())
+		// only perform this activity for devices where is_reset_on_load() is false; for devices
+		// where this is true, manipulation of this value is done in reset_and_load()
+		if (!image.is_reset_on_load())
 		{
-			if (image.loaded_through_softlist())
-				image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.brief_instance_name());
-			else
-				image_opt = image.filename();
-		}
+			// we have to assemble the image option differently for software lists and for normal images
+			std::string image_opt;
+			if (image.exists())
+			{
+				if (image.loaded_through_softlist())
+					image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.brief_instance_name());
+				else
+					image_opt = image.filename();
+			}
 
-		// and set the option
-		machine().options().image_options()[image.instance_name()] = std::move(image_opt);
+			// and set the option
+			machine().options().image_options()[image.instance_name()] = std::move(image_opt);
+		}
 	}
 
 	// write the config, if appropriate
