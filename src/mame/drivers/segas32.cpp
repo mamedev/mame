@@ -534,6 +534,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
+//#include "machine/mb89352.h"
 #include "machine/msm6253.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
@@ -2036,6 +2037,9 @@ static INPUT_PORTS_START( kokoroj2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
 	PORT_MODIFY("mainpcb:SERVICE34_A")
+	PORT_DIPNAME( 0x08, 0x00, "CD & Printer" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2634,6 +2638,7 @@ machine_config_constructor segas32_upd7725_state::device_mconfig_additions() con
 
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xc00040, 0xc0005f) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
 	AM_RANGE(0xc00060, 0xc0006f) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
@@ -2644,7 +2649,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_cd )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
+	//MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff))
 MACHINE_CONFIG_END
 
 const device_type SEGA_S32_CD_DEVICE = device_creator<segas32_cd_state>;
@@ -4157,7 +4165,7 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Kokoroji 2
+    Soreike Kokology Vol. 2
     Sega System32 + CD - Sega 1993
 
     Rom Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
@@ -5741,7 +5749,7 @@ GAME( 1993, jparkj,    jpark,    sega_system32_analog, jpark, segas32_new_state,
 GAME( 1993, jparkja,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Kokoroji 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
+GAME( 1994, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
 GAME( 1990, radmu,     radm,     sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )
