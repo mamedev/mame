@@ -228,7 +228,8 @@ private:
 	// internal array types
 	typedef poly_array<polygon_info, _MaxPolys> polygon_array;
 	typedef poly_array<_ObjectData, _MaxPolys + 1> objectdata_array;
-	typedef poly_array<work_unit, std::min(_MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
+	typedef poly_array<work_unit, (_MaxPolys * UNITS_PER_POLY) < 65535 ?
+		_MaxPolys * UNITS_PER_POLY : 65535> unit_array;
 
 	// round in a cross-platform consistent manner
 	inline int32_t round_coordinate(_BaseType value)
