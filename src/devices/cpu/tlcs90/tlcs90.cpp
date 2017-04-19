@@ -26,30 +26,37 @@ const device_type TMP90841 = device_creator<tmp90841_device>;
 const device_type TMP90845 = device_creator<tmp90845_device>;
 const device_type TMP91640 = device_creator<tmp91640_device>;
 const device_type TMP91641 = device_creator<tmp91641_device>;
+const device_type TMP90PH44 = device_creator<tmp90ph44_device>;
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
 	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, tlcs90_device)
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, tlcs90_device )
 	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
+	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
 ADDRESS_MAP_END
 
 
@@ -86,6 +93,12 @@ tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag,
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tlcs90_device(mconfig, TMP91641, "TMP91641", tag, owner, clock, "tmp91641", __FILE__, ADDRESS_MAP_NAME(tmp91641_mem))
+{
+}
+
+
+tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tlcs90_device(mconfig, TMP90PH44, "TMP90PH44", tag, owner, clock, "tmp90ph44", __FILE__, ADDRESS_MAP_NAME(tmp90ph44_mem))
 {
 }
 

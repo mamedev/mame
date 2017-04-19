@@ -116,7 +116,7 @@ void sm510_base_device::op_decb()
 void sm510_base_device::op_atpl()
 {
 	// ATPL: load Pl(PC low bits) with ACC
-	m_pc = (m_pc & ~0xf) | m_acc;
+	m_pc = (m_prev_pc & ~0xf) | m_acc;
 }
 
 void sm510_base_device::op_rtn0()
@@ -222,7 +222,7 @@ void sm510_base_device::op_wr()
 
 void sm510_base_device::op_ws()
 {
-	// WR: shift 1 into W
+	// WS: shift 1 into W
 	m_w = m_w << 1 | 1;
 	update_w_latch();
 }

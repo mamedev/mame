@@ -20,8 +20,8 @@
 
 TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
 {
-	uint16_t data1 = tilemap.basemem_read(tile_index);
-	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data2 = m_playfield_tilemap->extmem_read(tile_index) >> 8;
 	int code = data1 & 0x1fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);

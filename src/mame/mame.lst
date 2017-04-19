@@ -1093,9 +1093,6 @@ am_mg35i                        // (c) Amatic
 am_mg3a                         // (c) 2000 Amatic
 suprstar                        // (c) 1996 Amatic
 
-@source:amazonlf.cpp
-crospuzl                        //
-
 @source:ambush.cpp
 ambush                          // (c) 1983
 ambushh                         // (c) 1983
@@ -8616,6 +8613,7 @@ bionicc                         // 3/1987 (c) 1987 (Euro)
 bionicc1                        // 3/1987 (c) 1987 (US)
 bionicc2                        // 3/1987 (c) 1987 (US)
 bioniccbl                       // bootleg
+bioniccbl2                      // bootleg
 topsecrt                        // 3/1987 (c) 1987 (Japan)
 
 @source:bishi.cpp
@@ -10441,6 +10439,7 @@ menghong                        // 2004? Sealy
 psattack                        // 2004 Uniana
 topbladv                        // 2002 Sonokong. Top Blade V
 trivrus                         // 2009 AGT. Trivia R Us
+crospuzl                        //
 
 @source:airraid.cpp
 airraid                         // (c) 1987 Seibu Kaihatsu
@@ -13475,6 +13474,7 @@ touryuu                         // (c) 200? Yuki Enterprise
 
 @source:giclassic.cpp
 giclasex	
+giclassvr
 
 @source:gijoe.cpp
 gijoe                           // GX069 (c) 1991 (World)
@@ -14421,6 +14421,7 @@ uspbball                        // US Games
 @source:hh_sm510.cpp
 gnw_bx301                       // Nintendo
 gnw_dm53                        // Nintendo
+gnw_jr55                        // Nintendo
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
@@ -27643,7 +27644,14 @@ yis60464                        //
 mt735                           //
 
 @source:mtouchxl.cpp
-mtchxl6k						// 19?? Merit Industries
+mtouchxl						// 1997 Merit Industries
+mtchxl5k						// 1998 Merit Industries
+mtchxl5ko						// 1998 Merit Industries
+mtchxl5ko2						// 1998 Merit Industries
+mtchxl6k						// 1999 Merit Industries
+mtchxl6ko						// 1999 Merit Industries
+mtchxlgld						// 2000 Merit Industries
+mtchxlgldo						// 2000 Merit Industries
 
 @source:mtx.cpp
 mtx500                          // 1983 Memotech MTX 500
@@ -28567,9 +28575,9 @@ mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
 mslug6                          // 2006.02 Metal Slug 6
 mtkob2                          // 2003.02 MushiKing The King Of Beetle
-mushi2eo                        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 1.001)
+mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetle 2K5 1st
-mushik2e                        // 2005.?? Mushiking The King Of Beetles II ENG (Ver. 2.001)
+mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001)
 mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
@@ -34885,6 +34893,7 @@ cyvern                          // 1998.02 (c) 1998 Kaneko (US)
 cyvernj                         // 1998.02 (c) 1998 Kaneko (Japan)
 galpani4                        // 1996.09 (c) 1996 Kaneko (Japan)
 galpani4k                       // 1996.09 (c) 1996 Kaneko (Korea)
+galpanidx                       // 1996.09 (c) 1996 Kaneko (Asia)
 galpanis                        // 1997.04 (c) 1997 Kaneko (Europe)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
@@ -34921,6 +34930,9 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 
 @source:suprslam.cpp
 suprslam                        // (c) 1995 Banpresto
+
+@source:supstarf.cpp
+supstarf                        //
 
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
@@ -35875,6 +35887,7 @@ ti1000                          //
 ti1250                          //
 ti125076                        //
 ti1270                          //
+ti25503                         //
 ti30                            //
 tibusan                         //
 tiprog                          //
@@ -36615,6 +36628,9 @@ unkhorse                        //
 
 @source:upscope.cpp
 upscope                         // (c) 1986 Grand products
+
+@source:usbilliards.cpp
+sharkusb                        // (c) 1975 US Billiards
 
 @source:usgames.cpp
 superten                        // (c) 1988

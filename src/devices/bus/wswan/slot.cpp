@@ -283,24 +283,23 @@ int ws_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len, uint32_
  get default card software
  -------------------------------------------------*/
 
-std::string ws_cart_slot_device::get_default_card_software()
+std::string ws_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		std::vector<uint8_t> rom(size);
 		int type;
 		uint32_t nvram;
 
-		m_file->read(&rom[0], size);
+		hook.image_file()->read(&rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);
 		slot_string = ws_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

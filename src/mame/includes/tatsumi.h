@@ -75,7 +75,7 @@ public:
 	uint8_t *m_rom_sprite_lookup2;
 	uint8_t *m_rom_clut0;
 	uint8_t *m_rom_clut1;
-	uint8_t m_control_word;
+	uint16_t m_control_word;
 	uint16_t m_apache3_rotate_ctrl[12];
 	uint8_t m_last_control;
 	uint8_t m_apache3_adc;

@@ -317,4 +317,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1991, diablo68, 0,     0,      diablo68k, diablo68k, driver_device, 0, "Novag", "Diablo 68000", MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, diablo68, 0,     0,      diablo68k, diablo68k, driver_device, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -163,7 +163,9 @@ public:
 		m_microtouch(*this,"microtouch"),
 		m_nvram(*this,"nvram"),
 		m_ram62256(*this, "ram62256"),
-		m_backup(*this, "backup")
+		m_backup(*this, "backup"),
+		m_vram(*this, "vram"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	required_device<mc68681_device> m_duart18_68681;
@@ -176,6 +178,8 @@ public:
 
 	required_shared_ptr<uint16_t> m_ram62256;
 	required_shared_ptr<uint16_t> m_backup;
+	required_shared_ptr<uint16_t> m_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
@@ -184,8 +188,7 @@ public:
 		//uint8_t* m_videoram;
 		//uint8_t* m_colorram;
 
-	uint16_t* m_videoram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tilemap;
 	virtual void video_start() override;
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nevada);
@@ -199,9 +202,13 @@ public:
 	DECLARE_WRITE16_MEMBER (io_board_x);
 	DECLARE_READ16_MEMBER( nevada_sec_r );
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
+	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
 	DECLARE_DRIVER_INIT(nevada);
+	
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 };
 
 /*
@@ -245,25 +252,25 @@ static const gfx_layout charlayout =
 	/* Todo  , just for sample */
 
 	8,8,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,1),
 	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	{ 0, 1, 2, 3 },
+	{ 5*4, 4*4, 7*4, 6*4, 1*4, 0*4, 3*4, 2*4 },
+	{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+	8*8*4
 };
 
 /***************************************************************************/
-/*
-WRITE16_MEMBER( nevada_state:nevada_videoram_w )
+
+WRITE16_MEMBER( nevada_state::vram_w )
 {
 // Todo, Just for sample
 
-    m_videoram[offset] = data;
-    m_bg_tilemap->mark_tile_dirty(offset);
+    m_vram[offset] = data;
+    m_tilemap->mark_tile_dirty(offset / 2);
 
 }
-*/
+
 /***************************************************************************/
 static GFXDECODE_START( nevada )
 	/* Todo  , just for sample */
@@ -271,36 +278,30 @@ static GFXDECODE_START( nevada )
 GFXDECODE_END
 
 /***************************************************************************/
-/*
-static TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
-{
-// Todo, Just for sample
-    int attr = m_colorram[tile_index];
-    int code = ((attr & 1) << 8) | m_videoram[tile_index];
-    int bank = (attr & 0x02) >> 1;
-    int color = (attr & 0x3c) >> 2;
 
-    SET_TILE_INFO_MEMBER(bank, code, color, 0);
+TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
+{
+    //int attr = m_colorram[tile_index];
+    int code = m_vram[tile_index*2+1];
+    //int bank = (attr & 0x02) >> 1;
+    //int color = (attr & 0x3c) >> 2;
+
+    SET_TILE_INFO_MEMBER(0, code, 0, 0);
 
 }
-*/
+
 
 /***************************************************************************/
 void nevada_state::video_start()
 {
-// todo
-/*
-    m_bg_tilemap = tilemap_create(machine(), get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-*/
+    m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nevada_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,31,31);
 }
 
 /***************************************************************************/
 uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// Todo
-/*
-    m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-*/
+    m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -521,8 +522,7 @@ static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
 	AM_RANGE(0x00a28000, 0x00a28001) AM_DEVWRITE8("aysnd", ay8910_device, data_w, 0x00ff)
 	AM_RANGE(0x00a30000, 0x00A300ff) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x00a40000, 0x00A40001) AM_READWRITE( nevada_sec_r, nevada_sec_w)
-		//AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM_WRITE(nevada_videoram_w) AM_BASE_MEMBER(nevada_state, m_videoram)
-			AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM // Video
+	AM_RANGE(0x00b00000, 0x00b03fff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0x00b10000, 0x00b100ff) AM_DEVREADWRITE8( "duart40_68681", mc68681_device, read, write, 0x00ff ) // Lower byte
 	AM_RANGE(0x00b20000, 0x00b200ff) AM_DEVREADWRITE8( "duart39_68681", mc68681_device, read, write, 0x00ff ) // Lower byte
 	AM_RANGE(0x00e00000, 0x00e000ff) AM_DEVREADWRITE8( "duart18_68681", mc68681_device, read, write, 0xff00 ) // Upper byte
@@ -532,10 +532,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************/
-static ADDRESS_MAP_START( nevada_iomap, AS_IO, 8, nevada_state )
-// todo
 
-ADDRESS_MAP_END
 /*
 U18 MC68681 PIN4  IP1  from U16 (75HC189 pin6) from PIN2 J90 UNKNOWN !
 U18 MC68681 PIN36 IP2  ACCESS DOOR SWITCH
@@ -596,7 +593,6 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
 	MCFG_CPU_PROGRAM_MAP(nevada_map)
-	MCFG_CPU_IO_MAP(nevada_iomap)  //0x10000 0x20000
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */

@@ -341,6 +341,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
 #include "sound/volt_reg.h"
@@ -554,47 +555,27 @@ WRITE8_MEMBER(segas24_state::hotrod_lamps_w)
 }
 
 
-WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
+READ8_MEMBER(segas24_state::dials_r)
 {
-	if(ACCESSING_BITS_0_7)
+	switch(offset)
 	{
-		data &= 3;
-		hotrod_ctrl_cur = m_pedals[data].read_safe(0);
-	}
-}
-
-READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
-{
-	if(ACCESSING_BITS_0_7)
-	{
-		switch(offset)
-		{
-			// Steering dials
-			case 0:
-				return m_dials[0].read_safe(0) & 0xff;
-			case 1:
-				return m_dials[0].read_safe(0) >> 8;
-			case 2:
-				return m_dials[1].read_safe(0) & 0xff;
-			case 3:
-				return m_dials[1].read_safe(0) >> 8;
-			case 4:
-				return m_dials[2].read_safe(0) & 0xff;
-			case 5:
-				return m_dials[2].read_safe(0) >> 8;
-			case 6:
-				return m_dials[3].read_safe(0) & 0xff;
-			case 7:
-				return m_dials[3].read_safe(0) >> 8;
-
-			case 8:
-			{
-				// Serial ADCs for the accel
-				int v = hotrod_ctrl_cur & 0x80;
-				hotrod_ctrl_cur <<= 1;
-				return v ? 0xff : 0;
-			}
-		}
+		// Steering dials
+		case 0:
+			return m_dials[0].read_safe(0) & 0xff;
+		case 1:
+			return m_dials[0].read_safe(0) >> 8;
+		case 2:
+			return m_dials[1].read_safe(0) & 0xff;
+		case 3:
+			return m_dials[1].read_safe(0) >> 8;
+		case 4:
+			return m_dials[2].read_safe(0) & 0xff;
+		case 5:
+			return m_dials[2].read_safe(0) >> 8;
+		case 6:
+			return m_dials[3].read_safe(0) & 0xff;
+		case 7:
+			return m_dials[3].read_safe(0) >> 8;
 	}
 	return 0;
 }
@@ -1139,7 +1120,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xbc0002, 0xbc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
 	AM_RANGE(0xbc0004, 0xbc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
 	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
+	AM_RANGE(0xc00000, 0xc0000f) AM_MIRROR(0x07ffe0) AM_READ8(dials_r, 0x00ff)
 	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
@@ -1147,6 +1128,11 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hotrod_cpu1_map, AS_PROGRAM, 16, segas24_state )
+	AM_IMPORT_FROM(system24_cpu1_map)
+	AM_RANGE(0xc00010, 0xc00011) AM_MIRROR(0x07ffe0) AM_DEVREADWRITE8("pedaladc", msm6253_device, d7_r, select_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1181,7 +1167,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xbc0002, 0xbc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
 	AM_RANGE(0xbc0004, 0xbc0005) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_r, frc_w,0x00ff)
 	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
+	AM_RANGE(0xc00000, 0xc0000f) AM_MIRROR(0x07ffe0) AM_READ8(dials_r, 0x00ff)
 	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xcc0002, 0xcc0003) AM_MIRROR(0x03fff8) AM_READWRITE8(frc_mode_r, frc_mode_w,0x00ff)
@@ -1189,6 +1175,11 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hotrod_cpu2_map, AS_PROGRAM, 16, segas24_state )
+	AM_IMPORT_FROM(system24_cpu2_map)
+	AM_RANGE(0xc00010, 0xc00011) AM_MIRROR(0x07ffe0) AM_DEVREADWRITE8("pedaladc", msm6253_device, d7_r, select_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas24_state )
@@ -1949,6 +1940,19 @@ static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
 	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( system24_floppy_hotrod, system24_floppy )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hotrod_cpu1_map)
+	MCFG_CPU_MODIFY("subcpu")
+	MCFG_CPU_PROGRAM_MAP(hotrod_cpu2_map)
+
+	MCFG_DEVICE_ADD("pedaladc", MSM6253, 0)
+	MCFG_MSM6253_IN0_ANALOG_PORT("PEDAL1")
+	MCFG_MSM6253_IN1_ANALOG_PORT("PEDAL2")
+	MCFG_MSM6253_IN2_ANALOG_PORT("PEDAL3")
+	MCFG_MSM6253_IN3_ANALOG_PORT("PEDAL4")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( system24_floppy_fd1094, system24_floppy )
 	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
@@ -2445,10 +2449,10 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
 
 //            YEAR, NAME,      PARENT,   MACHINE,                INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
 /* Disk Based Games */
-/* 01 */GAME( 1988, hotrod,    0,        system24_floppy,        hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy,        hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy,        hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
-/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy,        hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
+/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
+/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
 /* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
 /* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
 /* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */

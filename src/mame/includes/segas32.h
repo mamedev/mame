@@ -21,7 +21,6 @@ public:
 	segas32_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
-	optional_shared_ptr<uint8_t> m_ga2_dpram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
 	required_shared_ptr<uint16_t> m_system32_videoram;
 	required_shared_ptr<uint16_t> m_system32_spriteram;
@@ -29,9 +28,6 @@ public:
 
 	optional_ioport_array<8> m_ports_a;
 	optional_ioport_array<8> m_ports_b;
-	optional_ioport_array<8> m_analog_ports;
-	optional_ioport_array<4> m_extra_ports;
-	optional_ioport_array<6> m_track_ports;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -75,11 +71,6 @@ public:
 	uint8_t m_sound_dummy_value;
 	uint16_t m_sound_bank;
 	uint8_t m_misc_io_data[2][0x10];
-	read16_delegate m_custom_io_r[2];
-	write16_delegate m_custom_io_w[2];
-	uint8_t m_analog_bank;
-	uint8_t m_analog_value[4];
-	uint8_t m_sonic_last[6];
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
@@ -100,8 +91,6 @@ public:
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;
-	DECLARE_WRITE16_MEMBER(ga2_dpram_w);
-	DECLARE_READ16_MEMBER(ga2_dpram_r);
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
 	DECLARE_READ16_MEMBER(brival_protection_r);
 	DECLARE_WRITE16_MEMBER(brival_protection_w);
@@ -147,18 +136,6 @@ public:
 	DECLARE_WRITE32_MEMBER(io_chip_0_w);
 	DECLARE_READ32_MEMBER(io_chip_1_r);
 	DECLARE_WRITE32_MEMBER(io_chip_1_w);
-	DECLARE_READ16_MEMBER(io_expansion_r);
-	DECLARE_WRITE16_MEMBER(io_expansion_w);
-	DECLARE_READ32_MEMBER(io_expansion_0_r);
-	DECLARE_WRITE32_MEMBER(io_expansion_0_w);
-	DECLARE_READ32_MEMBER(io_expansion_1_r);
-	DECLARE_WRITE32_MEMBER(io_expansion_1_w);
-	DECLARE_READ16_MEMBER(analog_custom_io_r);
-	DECLARE_WRITE16_MEMBER(analog_custom_io_w);
-	DECLARE_READ16_MEMBER(extra_custom_io_r);
-	DECLARE_WRITE16_MEMBER(orunners_custom_io_w);
-	DECLARE_READ16_MEMBER(sonic_custom_io_r);
-	DECLARE_WRITE16_MEMBER(sonic_custom_io_w);
 	DECLARE_WRITE16_MEMBER(random_number_16_w);
 	DECLARE_READ16_MEMBER(random_number_16_r);
 	DECLARE_WRITE32_MEMBER(random_number_32_w);
@@ -212,7 +189,7 @@ public:
 	uint16_t common_io_chip_r(address_space &space, int which, offs_t offset, uint16_t mem_mask);
 	void common_io_chip_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	void update_sound_irq_state();
-	void segas32_common_init(read16_delegate custom_r, write16_delegate custom_w);
+	void segas32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
 	void radm_sw2_output( int which, uint16_t data );
 	void radr_sw2_output( int which, uint16_t data );
@@ -278,8 +255,47 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
+//  virtual void device_start() override;
+//  virtual void device_reset() override;
+};
+
+class segas32_analog_state :  public segas32_state
+{
+public:
+	segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual void device_start() override;
+//  virtual void device_reset() override;
+};
+
+class segas32_trackball_state :  public segas32_state
+{
+public:
+	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER(sonic_custom_io_r);
+	DECLARE_WRITE8_MEMBER(sonic_custom_io_w);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+
+private:
+	required_ioport_array<6> m_track_ports;
+	uint8_t m_sonic_last[6];
+};
+
+class segas32_4player_state :  public segas32_state
+{
+public:
+	segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+//  virtual void device_start() override;
+//  virtual void device_reset() override;
 };
 
 class segas32_v25_state :  public segas32_state
@@ -290,7 +306,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-//  virtual void device_reset();
+//  virtual void device_reset() override;
 };
 
 class segas32_upd7725_state :  public segas32_state
@@ -301,7 +317,21 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-//  virtual void device_reset();
+//  virtual void device_reset() override;
+};
+
+class segas32_cd_state :  public segas32_state
+{
+public:
+	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+//  virtual void device_reset() override;
 };
 
 class sega_multi32_state :  public segas32_state
@@ -312,7 +342,37 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-//  virtual void device_reset();
+//  virtual void device_reset() override;
+};
+
+class sega_multi32_analog_state :  public segas32_state
+{
+public:
+	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	ioport_value in2_analog_read();
+	ioport_value in3_analog_read();
+	DECLARE_WRITE8_MEMBER(analog_bank_w);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+//  virtual void device_reset() override;
+
+private:
+	optional_ioport_array<8> m_analog_ports;
+	uint8_t m_analog_bank;
+};
+
+class sega_multi32_6player_state :  public segas32_state
+{
+public:
+	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+//  virtual void device_reset() override;
 };
 
 /*----------- defined in machine/segas32.c -----------*/

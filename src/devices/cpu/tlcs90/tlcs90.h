@@ -166,6 +166,7 @@ public:
 	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+
 class tmp91640_device : public tlcs90_device
 {
 public:
@@ -182,10 +183,19 @@ public:
 };
 
 
+class tmp90ph44_device : public tlcs90_device
+{
+public:
+	// construction/destruction
+	tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 extern const device_type TMP90840;
 extern const device_type TMP90841;
 extern const device_type TMP90845;
 extern const device_type TMP91640;
 extern const device_type TMP91641;
+extern const device_type TMP90PH44;
 
 #endif /* __TLCS90_H__ */

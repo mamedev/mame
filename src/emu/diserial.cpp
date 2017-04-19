@@ -441,6 +441,7 @@ u8 device_serial_interface::transmit_register_get_data_bit()
 	bit = (m_tra_register_data>>(m_tra_bit_count-1-m_tra_bit_count_transmitted))&1;
 
 	m_tra_bit_count_transmitted++;
+	//device().logerror("%d bits transmitted\n", m_tra_bit_count_transmitted);
 
 	/* have all bits of this stream formatted byte been sent? */
 	if (m_tra_bit_count_transmitted==m_tra_bit_count)

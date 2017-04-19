@@ -780,6 +780,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds1205.h,MACHINES["DS1205"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1205"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1205.cpp",
+		MAME_DIR .. "src/devices/machine/ds1205.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds1302.h,MACHINES["DS1302"] = true
 ---------------------------------------------------
 
@@ -1852,6 +1864,18 @@ if (MACHINES["MSM6242"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/msm6242.cpp",
 		MAME_DIR .. "src/devices/machine/msm6242.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/msm6253.h,MACHINES["MSM6253"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM6253"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm6253.cpp",
+		MAME_DIR .. "src/devices/machine/msm6253.h",
 	}
 end
 

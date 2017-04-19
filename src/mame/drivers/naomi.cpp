@@ -5970,6 +5970,7 @@ ROM_START( wwfroyal )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "281627c3" )
 ROM_END
 
+// secret change game version (II/III/III+) menu: in game test mode highlight EXIT then press P1+P2 buttons 2 30 times
 ROM_START( mushi2eo )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -9911,8 +9912,8 @@ ROM_END
 /* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd (World)", GAME_FLAGS ) // not for Japan
 // 0152 Mushiking 2K4 2ND (Japan)
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K5 1st (Japan)", GAME_FLAGS )
-/* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan
-/* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan
+/* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
+/* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )

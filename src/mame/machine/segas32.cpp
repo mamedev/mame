@@ -49,16 +49,6 @@ void segas32_state::decrypt_ga2_protrom()
 		rom[i] = temp[BITSWAP16(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
 }
 
-WRITE16_MEMBER(segas32_state::ga2_dpram_w)
-{
-	/* does it ever actually write.. */
-}
-
-READ16_MEMBER(segas32_state::ga2_dpram_r)
-{
-	return (m_ga2_dpram[offset])|(m_ga2_dpram[offset+1]<<8);
-}
-
 
 #if 0 // simulation
 READ16_MEMBER(segas32_state::ga2_sprite_protection_r)

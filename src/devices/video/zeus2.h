@@ -21,7 +21,7 @@
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
-#define PRINT_TEX_INFO      1
+#define PRINT_TEX_INFO      0
 
 #define WAVERAM0_WIDTH      1024
 #define WAVERAM0_HEIGHT     2048
@@ -38,7 +38,6 @@ struct zeus2_poly_extra_data
 	const void *    palbase;
 	const void *    texbase;
 	uint16_t          solidcolor;
-	int32_t           zbufmin;
 	uint16_t          transcolor;
 	uint16_t          texwidth;
 	uint16_t          color;
@@ -48,6 +47,7 @@ struct zeus2_poly_extra_data
 	bool			texture_alpha;
 	bool			texture_rgb555;
 	bool            blend_enable;
+	int32_t			zbuf_min;
 	bool            depth_min_enable;
 	bool            depth_test_enable;
 	bool            depth_write_enable;
@@ -137,16 +137,16 @@ public:
 	rectangle zeus_cliprect;
 
 	int m_palSize;
-	int m_zbufmin;
 	float zeus_matrix[3][3];
 	float zeus_trans[4];
 	float zeus_light[3];
 	uint32_t zeus_texbase;
 	int zeus_quad_size;
+	bool m_useZOffset;
 
 	uint32_t *waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
-	std::unique_ptr<uint32_t[]> m_frameDepth;
+	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
 	uint32_t m_curUCodeSrc;
@@ -194,7 +194,7 @@ private:
 	uint8_t zeus_fifo_words;
 
 	uint32_t m_fill_color;
-	uint32_t m_fill_depth;
+	int32_t m_fill_depth;
 
 	int m_yScale;
 

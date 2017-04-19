@@ -380,13 +380,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
 		m_voodoo(*this, "voodoo"),
-		m_workram(*this, "workram")
+		m_workram(*this, "workram"),
+		m_io_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"})
 	{
 	}
 
 	uint32_t m_epic_iack;
 	int m_cf_card_ide;
-	int m_unk1_bit;
 	uint32_t m_voodoo3_pci_reg[0x100];
 	int m_unk_serial_bit_w;
 	uint16_t m_unk_serial_cmd;
@@ -403,7 +403,7 @@ public:
 	DECLARE_WRITE64_MEMBER(voodoo3_w);
 	DECLARE_READ64_MEMBER(voodoo3_lfb_r);
 	DECLARE_WRITE64_MEMBER(voodoo3_lfb_w);
-	DECLARE_READ64_MEMBER(unk1_r);
+	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ64_MEMBER(e70000_r);
 	DECLARE_WRITE64_MEMBER(e70000_w);
 	DECLARE_WRITE64_MEMBER(unk1a_w);
@@ -446,6 +446,9 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
 	required_shared_ptr<uint64_t> m_workram;
+	required_ioport_array<8> m_io_ports;
+	uint8_t m_ds2430_unk_status;
+	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
 };
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1729,7 +1732,6 @@ WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 #define DS2430_STATE_READ_MEM               5
 #define DS2430_STATE_READ_MEM_ADDRESS       6
 
-static int unk1_bit = 1;
 static uint8_t ds2430_data;
 static int ds2430_data_count = 0;
 static int ds2430_reset = 0;
@@ -1745,18 +1747,19 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 
 	if (param == 1)
 	{
-		unk1_bit = 0;
+		m_ds2430_unk_status = 0;
 		ds2430_timer->adjust(attotime::from_usec(150), 2);
 	}
 	else if (param == 2)
 	{
-		unk1_bit = 1;
+		m_ds2430_unk_status = 1;
 		ds2430_reset = 1;
 		ds2430_state = DS2430_STATE_ROM_COMMAND;
 	}
 }
 
-READ64_MEMBER(viper_state::unk1_r)
+#ifdef UNUSED_FUNCTION
+READ64_MEMBER(viper_state::input_r)
 {
 	uint64_t r = 0;
 	//return 0;//0x0000400000000000U;
@@ -1766,14 +1769,14 @@ READ64_MEMBER(viper_state::unk1_r)
 	if (ACCESSING_BITS_40_47)
 	{
 		uint64_t reg = 0;
-		reg |= (unk1_bit << 5);
+		reg |= (m_ds2430_unk_status << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
 		reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
-		//r |= (uint64_t)(unk1_bit << 5) << 40;
+		//r |= (uint64_t)(m_ds2430_unk_status << 5) << 40;
 		//r |= 0x0000400000000000U;
 
 		//r |= 0x0000040000000000U; // screen flip
@@ -1801,7 +1804,12 @@ READ64_MEMBER(viper_state::unk1_r)
 
 	return r;
 }
+#endif
 
+READ8_MEMBER(viper_state::input_r)
+{	
+	return (m_io_ports[offset & 7])->read();
+}
 
 int viper_state::ds2430_insert_cmd_bit(int bit)
 {
@@ -1865,12 +1873,14 @@ void viper_state::DS2430_w(int bit)
 
 		case DS2430_STATE_READ_MEM:
 		{
-			unk1_bit = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
+			m_ds2430_unk_status = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
 			ds2430_data_count++;
-			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, unk1_bit);
+			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, m_ds2430_unk_status);
 
 			if (ds2430_data_count >= 256)
 			{
+				//machine().debug_break();
+
 				ds2430_data_count = 0;
 				ds2430_state = DS2430_STATE_ROM_COMMAND;
 				ds2430_reset = 0;
@@ -1884,7 +1894,7 @@ void viper_state::DS2430_w(int bit)
 			ds2430_data_count++;
 			printf("DS2430_w: read rom %d, bit = %d\n", ds2430_data_count, rombit);
 
-			unk1_bit = rombit;
+			m_ds2430_unk_status = rombit;
 
 			if (ds2430_data_count >= 64)
 			{
@@ -1925,7 +1935,7 @@ WRITE64_MEMBER(viper_state::e70000_w)
 		{
 			ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
 
-			unk1_bit = 1;
+			m_ds2430_unk_status = 1;
 //          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, space.device().safe_pc());
 		}
 		else
@@ -1959,7 +1969,7 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-		unk1_bit = 0;
+		m_ds2430_unk_status = 0;
 	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 }
@@ -2053,11 +2063,10 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 	}
 }
 
-
-
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
+//	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
@@ -2068,78 +2077,184 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
+//	AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
-	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
+	AM_RANGE(0xffe08000, 0xffe08007) AM_NOP
+	AM_RANGE(0xffe10000, 0xffe10007) AM_READ8(input_r, 0xffffffffffffffffU)
+	AM_RANGE(0xffe28000, 0xffe28007) AM_WRITENOP // ppp2nd lamps
 	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffffffffffffU)
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
+	AM_RANGE(0xffe60000, 0xffe60007) AM_NOP
 	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)
 	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
 	AM_RANGE(0xffe88000, 0xffe88007) AM_WRITE(unk1b_w)
+	AM_RANGE(0xffe98000, 0xffe98007) AM_NOP
 	AM_RANGE(0xffe9a000, 0xffe9bfff) AM_RAM                             // World Combat uses this
 	AM_RANGE(0xfff00000, 0xfff3ffff) AM_ROM AM_REGION("user1", 0)       // Boot ROM
 ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+CUSTOM_INPUT_MEMBER(viper_state::ds2430_unk_r)
+{
+	return m_ds2430_unk_status;
+}
+
+
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
-
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     // Shift down
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW) /* Test Button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
-
-
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     // Shift up
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x80, 0x80, "DIP1" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIP2" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIP3" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIP4" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP5" ) PORT_DIPLOCATION("SW:5")
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIP6" ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP7" ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "DIP8" ) PORT_DIPLOCATION("SW:8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP3" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING( 0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIP1" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, viper_state, ds2430_unk_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW ) /* Test Button */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x20, 0x20, "3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "3-3" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// following bits controls screen mux in Mocap Golf?
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START("IN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("IN7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( ppp2nd )
+	PORT_INCLUDE( viper )
+	
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "DIP4" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP3" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP2" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP1" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("OK Button")
+
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Button")
+	
+	PORT_MODIFY("IN5")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // another OK button
+INPUT_PORTS_END
+
+INPUT_PORTS_START( thrild2 )
+	PORT_INCLUDE( viper )
+
+	PORT_MODIFY("IN3")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Down")
+	
+	PORT_MODIFY("IN4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
+	
+	// TODO: analog channels
+INPUT_PORTS_END
+
+INPUT_PORTS_START( gticlub2 )
+	PORT_INCLUDE( thrild2 )
+	
+	// TODO: specific analog channel for hand brake
+INPUT_PORTS_END
+
+INPUT_PORTS_START( boxingm )
+	PORT_INCLUDE( viper )
+	
+	PORT_MODIFY("IN5")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( tsurugi )
+	PORT_INCLUDE( viper )
+	
+	PORT_MODIFY("IN4")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shot Button")
+	
+	PORT_MODIFY("IN5")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? if off tries to check UART & "lampo"/bleeder at POST
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // sensor grip (1) horizontal (0) vertical
 INPUT_PORTS_END
 
 /*****************************************************************************/
 
 
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
-{
+{	
 	mpc8240_interrupt(MPC8240_IRQ0);
-	//mpc8240_interrupt(device.machine, MPC8240_IRQ3);
+	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
@@ -2172,6 +2287,8 @@ void viper_state::machine_reset()
 	// Viper expects these settings or the BIOS fails
 	identify_device[51] = 0x0200;           /* 51: PIO data transfer cycle timing mode */
 	identify_device[67] = 0x00f0;           /* 67: minimum PIO transfer cycle time without flow control */
+	
+	m_ds2430_unk_status = 1;
 }
 
 static MACHINE_CONFIG_START( viper, viper_state )
@@ -2813,16 +2930,16 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper, viper, viper_state, viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper, viper, viper_state, viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper, ppp2nd,  viper_state, viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
-GAME(2001, boxingm,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Boxing Mania (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, boxingm,   kviper,    viper, boxingm, viper_state, vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1db,   code1d,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, gticlub2,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, gticlub2ea,gticlub2,  viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, gticlub2,  kviper,    viper, gticlub2, viper_state, vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, gticlub2ea,gticlub2,  viper, gticlub2, viper_state, vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, jpark3,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, jpark3u,   jpark3,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911,      kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2836,14 +2953,14 @@ GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, sscopex,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, sscopefh,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2ab, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2ac, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugie,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2,   kviper,    viper, thrild2, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2a,  thrild2,   viper, thrild2, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ab, thrild2,   viper, thrild2, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ac, thrild2,   viper, thrild2, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2c,  thrild2,   viper, thrild2, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugi,   kviper,    viper, tsurugi, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugie,  tsurugi,   viper, tsurugi, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugij,  tsurugi,   viper, tsurugi, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatb,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

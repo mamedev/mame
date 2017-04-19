@@ -107,7 +107,7 @@ image_init_result cdrom_image_device::call_load()
 	if (chd) {
 		m_cdrom_handle = cdrom_open( chd );
 	} else {
-		m_cdrom_handle = cdrom_open(m_image_name.c_str());
+		m_cdrom_handle = cdrom_open(filename());
 	}
 	if ( ! m_cdrom_handle )
 		goto error;

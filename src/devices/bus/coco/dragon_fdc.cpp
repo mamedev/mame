@@ -11,7 +11,7 @@
     which mostly uses the same command set with some subtle differences, most
     notably the 2797 handles disk side select internally. The Dragon Alpha also
     uses the WD2797, however as this is a built in interface and not an external
-    cartrige, it is dealt with in the main coco.cpp file.
+    cartridge, it is dealt with in the main coco.cpp file.
 
     The wd's variables are mapped to $FF48-$FF4B on the CoCo and on $FF40-$FF43
     on the Dragon.  In addition, there is another register
@@ -127,9 +127,13 @@ static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 
@@ -200,7 +204,7 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w((data && 0x04) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w((data & 0x04) && (i == (data & 0x03)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// manipulate the WD2797

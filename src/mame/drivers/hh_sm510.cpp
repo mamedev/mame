@@ -242,7 +242,7 @@ MACHINE_CONFIG_END
 
   Konami Contra
   * PCB label BH002
-  * Sharp SM511 under epoxy (die label KMS 73B, KMS 773)
+  * Sharp SM511 under epoxy (die label KMS73B, KMS773)
 
 ***************************************************************************/
 
@@ -308,7 +308,7 @@ MACHINE_CONFIG_END
 
   Konami Teenage Mutant Ninja Turtles
   * PCB label BH005
-  * Sharp SM511 under epoxy (die label KMS 73B, KMS 774)
+  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
 
 ***************************************************************************/
 
@@ -376,7 +376,7 @@ MACHINE_CONFIG_END
 
   Konami Gradius
   * PCB label BH004
-  * Sharp SM511 under epoxy (die label KMS 73B, KMS 774)
+  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
 
 ***************************************************************************/
 
@@ -438,7 +438,7 @@ MACHINE_CONFIG_END
 
   Konami Lone Ranger
   * PCB label BH009
-  * Sharp SM511 under epoxy (die label KMS 73B, KMS 781)
+  * Sharp SM511 under epoxy (die label KMS73B, KMS781)
 
 ***************************************************************************/
 
@@ -500,7 +500,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Mickey & Donald (model DM-53)
   * PCB label DM-53
-  * Sharp SM510 label DM-53 (die label CMS54C, CMS565)
+  * Sharp SM510 label DM-53 52ZC (die label CMS54C, CMS565)
 
 ***************************************************************************/
 
@@ -555,8 +555,71 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Donkey Kong II (model JR-55)
+  * PCB label JR-55
+  * Sharp SM510 label JR-55 53YC (die label CMS54C, KMS560)
+
+***************************************************************************/
+
+class jr55_state : public hh_sm510_state
+{
+public:
+	jr55_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( jr55 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_4WAY PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( jr55, jr55_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Boxing (model BX-301)
-  * Sharp SM511 label BX-301 287C (die label KMS 73B, KMS 744)
+  * Sharp SM511 label BX-301 287C (die label KMS73B, KMS744)
+  
+  Also known as Punch-Out!! in USA.
 
 ***************************************************************************/
 
@@ -741,10 +804,19 @@ ROM_END
 
 ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dm53_cms54c_565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
+	ROM_LOAD( "dm53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
 	ROM_REGION( 100000, "svg", 0)
 	ROM_LOAD( "gnw_dm53.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+ROM_START( gnw_jr55 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "jr55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
+
+	ROM_REGION( 100000, "svg", 0)
+	ROM_LOAD( "gnw_jr55.svg", 0, 100000, NO_DUMP )
 ROM_END
 
 
@@ -775,6 +847,7 @@ CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  driver_device, 0, "Kon
 CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  driver_device, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      driver_device, 0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     driver_device, 0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  driver_device, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

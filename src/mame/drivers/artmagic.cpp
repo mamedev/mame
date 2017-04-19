@@ -69,6 +69,8 @@ WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 
 void artmagic_state::machine_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_hack_irq));
 	save_item(NAME(m_prot_input_index));
@@ -137,7 +139,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 	{
 		m_hack_irq = 1;
 		update_irq_state();
-		timer_set(attotime::from_usec(1), TIMER_IRQ_OFF);
+		m_irq_off_timer->adjust(attotime::from_usec(1));
 	}
 	return ioport("300000")->read();
 }

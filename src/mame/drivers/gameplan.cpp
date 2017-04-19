@@ -68,9 +68,9 @@ Notes:
 TODO:
 - The board has, instead of a watchdog, a timed reset that has to be disabled
   on startup. The disable line is tied to CA2 of VIA2, but I don't see writes
-  to that pin in the log. Missing support in machine/6522via.c?
+  to that pin in the log. Missing support in machine/6522via.cpp?
 - Kaos needs a kludge to avoid a deadlock (see the via_irq() function below).
-  I don't know if this is a shortcoming of the driver or of 6522via.c.
+  I don't know if this is a shortcoming of the driver or of 6522via.cpp.
 - Investigate and document the 8910 dip switches
 - Fix the input ports of Kaos
 

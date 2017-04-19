@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(thunderj_state::get_alpha_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_vad->alpha().basemem_read(tile_index);
 	int code = ((data & 0x200) ? (m_alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -30,8 +30,8 @@ TILE_GET_INFO_MEMBER(thunderj_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(thunderj_state::get_playfield_tile_info)
 {
-	uint16_t data1 = tilemap.basemem_read(tile_index);
-	uint16_t data2 = tilemap.extmem_read(tile_index) & 0xff;
+	uint16_t data1 = m_vad->playfield().basemem_read(tile_index);
+	uint16_t data2 = m_vad->playfield().extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -41,8 +41,8 @@ TILE_GET_INFO_MEMBER(thunderj_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(thunderj_state::get_playfield2_tile_info)
 {
-	uint16_t data1 = tilemap.basemem_read(tile_index);
-	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = m_vad->playfield2().basemem_read(tile_index);
+	uint16_t data2 = m_vad->playfield2().extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);

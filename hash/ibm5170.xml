@@ -5476,6 +5476,18 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="gods">
+		<description>Gods</description>
+		<year>1991</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heretic">
 		<description>Heretic</description>
 		<year>1994</year>
@@ -5544,6 +5556,107 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (3.5")</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [1 of 5].img" size="1474560" crc="c7b85652" sha1="0cfae4a55ff62ac0f946e83d205fabff23624c8c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [2 of 5].img" size="1474560" crc="384ea34a" sha1="a62688cda8409c0ff4efb7d8d7dfd123320cb141" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [3 of 5].img" size="1474560" crc="cf95f639" sha1="584f7d322910aa546b0394528e083fec33155946" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [4 of 5].img" size="1474560" crc="63f369d6" sha1="0202d7c9895be1c0a15879bf2ce829fabd2476f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [5 of 5].img" size="1474560" crc="9cb01ed4" sha1="489b0f78e0097cbd970ad2fd1429ebf0f77539d4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfate525" cloneof="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (5.25")</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 1).img" size="1228800" crc="714d59f3" sha1="7bf719dc41a9465dcac8373c42202042fe361e9e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 2).img" size="1228800" crc="25c43e77" sha1="99a541d9b7039ba7368c4289484412ed5caf40cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 3).img" size="1228800" crc="434c7489" sha1="9dca1b7d25d3c120e807c240833a78cfed2c2b3d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 4).img" size="1228800" crc="da2e4a89" sha1="67e9e63ee8bb597e195c5775c964f0436da93853" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 5).img" size="1228800" crc="29c579ac" sha1="a2675731979ab25aa1485a94518c29e6dd2c6bf6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 6).img" size="1228800" crc="a7f950bb" sha1="0997fced33a08161ce2457f88c77eb07b58deaee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfatede" cloneof="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (3.5", German)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 1).img" size="1474560" crc="9fda8591" sha1="4fe99915770ea6a6dadaf02e81d68a831016cda9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 2).img" size="1474560" crc="0f7f0190" sha1="8c28200ed535dd5f497468b014bbaa0e564c1722" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 3).img" size="1474560" crc="d1222750" sha1="8b11e4b271d27b42944ce0d03e261e2adba4b251" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 4).img" size="1474560" crc="40cfc149" sha1="17eb93dd2ddb59321e0d7c8fb981d97e8e570dce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 5).img" size="1474560" crc="c96b1787" sha1="8b973d3b406197db7b3fed70c010285ea14bcb40" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5639,6 +5752,62 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandia">
+		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.3" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [2 of 4].img" size="1474560" crc="ab4f5e1d" sha1="42625e4285b28f0901f60c2976222d05bf083cef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [3 of 4].img" size="1474560" crc="5c483502" sha1="d5bfed28919ab68c0f23bb85b6be8ed17c5baa06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [4 of 4].img" size="1474560" crc="6fb0f878" sha1="f51fc0625a1328a089b735c3d1b99d357b99d492" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandiafr" cloneof="kyrandia">
+		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends (French)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.7" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 1).img" size="1474560" crc="9df53388" sha1="96df77412dfe2a0c80bca51e72cabf3058ba1d26" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 2).img" size="1474560" crc="c6731e11" sha1="961d4389b73a64952177dbf4734b9223cf0f76a1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 3).img" size="1474560" crc="99fb7189" sha1="956b45a92c9fa534c705c63487b772ed58f7da43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5747,7 +5916,7 @@ Missing files come here
 	</software>
 
 	<software name="monkey2">
-		<description>Monkey Island 2: LeChuck's Revenge (3.5" HD)</description>
+		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
 		<year>1991</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="1.0 (11/21/91)" />
@@ -5775,6 +5944,107 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [5 of 5].img" size="1474560" crc="56984413" sha1="e9ca6b21c6384fcde7f2b358cf775487c1fc7791" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2a" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5", Alt)</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 1).img" size="1474560" crc="590637cc" sha1="9f6c1dff38aabdf81301d4f552ad8902832f971a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 2).img" size="1474560" crc="164b0750" sha1="cb3740196c2d55405120114c7f172cf2033bf33a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 3).img" size="1474560" crc="53311b2e" sha1="57a7d1fc2bebdcfc29ca15c8301a3eb1b24f25a4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 4).img" size="1474560" crc="3a3c2fea" sha1="70d892ada2b70baeb7626c8859faaf871459616a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 5).img" size="1474560" crc="a5c93e24" sha1="53cdfdd93ffed32d0eb3f6673a7ccedbbd2f77e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2k" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
+		<year>1991</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 1).img" size="1474560" crc="9d270c19" sha1="c080eafb38b74e2f8537916fb372ce96e9422929" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 2).img" size="1474560" crc="e9d8b35b" sha1="089bb418cd5d02ce3c29a85600101676cb5c148a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 3).img" size="1474560" crc="5428f375" sha1="8ee403283bfdb3f979ad95a3dc52abda485ff219" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 4).img" size="1474560" crc="3b76e77b" sha1="f5fe47feea550cd8a9b66124256c4743fa88c3c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 5).img" size="1474560" crc="9ea6c170" sha1="2240e907bd1600f60233a8ae85183e86cfe4645e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2_525" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (5.25")</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 1).img" size="1228800" crc="5bed8d73" sha1="899bdabc87584c3f4ec7b95b5614e5ef4b456080" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 2).img" size="1228800" crc="800230eb" sha1="7c633a0658b6eb8a37953d7f4ecd3e81a63e50a9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 3).img" size="1228800" crc="8faa7816" sha1="23c578cc4eeb1adee5dd7906f9e1bc9071bfbd1e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 4).img" size="1228800" crc="9a6437b4" sha1="d7f0d7cc99c7cd64d4f45685e8fa5da5ad85a5fa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 5).img" size="1228800" crc="b0eee99e" sha1="0f265f0c68c8512adb19215de9a6b3e6e131e8b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 6).img" size="1228800" crc="00b5dfb9" sha1="c4dd7be4f0f1da5c7aa59bd9dabebea13d95c812" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6088,7 +6358,40 @@ Missing files come here
 	</software>
 
 	<software name="sq5">
-		<description>Space Quest V: The Next Mutation (3.5" HD)</description>
+		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.04" />
+		<info name="developer" value="Sierra" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 1).img" size="1474560" crc="482d85e8" sha1="b2ceda676dfef8f6351ec1f56cb02cdd994ae2d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 2).img" size="1474560" crc="9660391f" sha1="147ede32350d21b2db86f44cfbe64018b2b19b01" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 3).img" size="1474560" crc="f5648e09" sha1="d7f71fcd94fa335cbfa793c45ffbc0e74121b342" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 4).img" size="1474560" crc="be6eccb0" sha1="5d1b70724883a082865a47bd265c00f863cbbd05" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 5).img" size="1474560" crc="24d6fd91" sha1="99340e173cdb6dd127da3bda7b2f323af7919361" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq5a" cloneof="sq5">
+		<description>Space Quest V: The Next Mutation (3.5", v1.03)</description>
 		<year>1993</year>
 		<publisher>Sierra</publisher>
 		<info name="version" value="1.03" />

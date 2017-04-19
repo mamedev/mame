@@ -61,6 +61,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "includes/segaipt.h"
 
 #include "machine/mb8421.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
 #include "sound/segapcm.h"
@@ -87,29 +88,13 @@ const uint32_t SOUND_CLOCK = 32215900;
 //**************************************************************************
 
 //-------------------------------------------------
-//  analog_r - handle analog input reads
+//  analog_mux - handle multiplexed analog input
+//  (HC4052 at IC121)
 //-------------------------------------------------
 
-READ16_MEMBER(segaybd_state::analog_r)
+ioport_value segaybd_state::analog_mux()
 {
-	int result = 0xff;
-	if (ACCESSING_BITS_0_7)
-	{
-		result = m_analog_data[offset & 3] & 0x80;
-		m_analog_data[offset & 3] <<= 1;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  analog_w - handle analog input control writes
-//-------------------------------------------------
-
-WRITE16_MEMBER(segaybd_state::analog_w)
-{
-	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data & 3)) : (offset & 3);
-	m_analog_data[offset & 3] = m_adc_ports[selected].read_safe(0xff);
+	return m_adc_ports[3 + (m_misc_io_data & 3)].read_safe(0x80);
 }
 
 
@@ -140,8 +125,7 @@ WRITE8_MEMBER(segaybd_state::misc_output_w)
 	//  D1-D0 = ADC0-1
 	//
 	m_segaic16vid->set_display_enable(data & 0x80);
-	if (((m_misc_io_data ^ data) & 0x20) && !(data & 0x20))
-		m_watchdog->watchdog_reset();
+	m_watchdog->write_line_ck(BIT(data, 5));
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 	m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -642,7 +626,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0x100040, 0x100047) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x100040, 0x100047) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1338,9 +1322,9 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_MB3773_ADD("watchdog") // IC95
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000) // probably SOUND_CLOCK/n
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
@@ -1349,6 +1333,13 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
+
+	MCFG_DEVICE_ADD("adc", MSM6253, 0)
+	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
+	MCFG_MSM6253_IN1_ANALOG_PORT("ADC.1")
+	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
+	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
@@ -2677,7 +2668,6 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 
 	// save state
 	save_item(NAME(m_pdrift_bank));
-	save_item(NAME(m_analog_data));
 	save_item(NAME(m_irq2_scanline));
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));

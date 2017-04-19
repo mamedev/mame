@@ -977,19 +977,17 @@ void base_sns_cart_slot_device::get_cart_type_addon(const uint8_t *ROM, uint32_t
  get default card software
  -------------------------------------------------*/
 
-std::string base_sns_cart_slot_device::get_default_card_software()
+std::string base_sns_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	bool fullpath = open_image_file(mconfig().options());
-
-	if (fullpath)
+	if (hook.image_file())
 	{
 		const char *slot_string;
 		uint32_t offset;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		int type = 0, addon = 0;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		offset = snes_skip_header(&rom[0], len);
 
@@ -1033,8 +1031,6 @@ std::string base_sns_cart_slot_device::get_default_card_software()
 		}
 
 		slot_string = sns_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}

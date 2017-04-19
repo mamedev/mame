@@ -196,7 +196,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().dummy_space();
 	uint8_t layer[5];

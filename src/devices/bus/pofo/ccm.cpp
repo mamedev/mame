@@ -90,7 +90,7 @@ image_init_result portfolio_memory_card_slot_t::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string portfolio_memory_card_slot_t::get_default_card_software()
+std::string portfolio_memory_card_slot_t::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("rom");
 }

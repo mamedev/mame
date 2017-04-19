@@ -20,7 +20,6 @@ public:
 		nvidia_nv2a(nullptr),
 		debug_irq_active(false),
 		debug_irq_number(0),
-		usb_hack_enabled(false),
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ32_MEMBER(geforce_r);
@@ -116,10 +115,9 @@ public:
 		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
 	} superiost;
 	uint8_t pic16lc_buffer[0xff];
-	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
+	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
-	bool usb_hack_enabled;
 	required_device<cpu_device> m_maincpu;
 	ohci_usb_controller *ohci_usb;
 	static const struct debugger_constants

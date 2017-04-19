@@ -89,7 +89,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	m_dac->write(rom[dac_address+m_cur_dac_address_index]);
 
-	timer_set( attotime::from_hz( 16000 ), TIMER_DAC_IRQ);
+	m_dac_irq_timer->adjust(attotime::from_hz( 16000 ));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
@@ -200,6 +200,8 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 {
 	m_cur_dac_address = -1;
 	m_cur_dac_address_index = 0;
+
+	m_dac_irq_timer = timer_alloc(TIMER_DAC_IRQ);
 }
 
 

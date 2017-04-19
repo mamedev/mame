@@ -27,7 +27,6 @@ public:
 		, m_p3(*this, "P3")
 		, m_paddle(*this, "PADDLE")
 		, m_dials(*this, {"DIAL1", "DIAL2", "DIAL3", "DIAL4"})
-		, m_pedals(*this, {"PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4"})
 		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2"})
 	{
 	}
@@ -60,7 +59,6 @@ public:
 	uint8_t *fdc_pt;
 	int track_size;
 	int cur_input_line;
-	uint8_t hotrod_ctrl_cur;
 	uint8_t curbank;
 	uint8_t mlatch;
 	const uint8_t *mlatch_table;
@@ -105,8 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER( frc_w );
 	DECLARE_READ16_MEMBER(  mlatch_r );
 	DECLARE_WRITE16_MEMBER( mlatch_w );
-	DECLARE_READ16_MEMBER(  hotrod3_ctrl_r );
-	DECLARE_WRITE16_MEMBER( hotrod3_ctrl_w );
+	DECLARE_READ8_MEMBER(   dials_r );
 	DECLARE_READ16_MEMBER(  iod_r );
 	DECLARE_WRITE16_MEMBER( iod_w );
 
@@ -158,6 +155,5 @@ public:
 	required_ioport m_p3;
 	optional_ioport m_paddle;
 	optional_ioport_array<4> m_dials;
-	optional_ioport_array<4> m_pedals;
 	optional_ioport_array<8> m_mj_inputs;
 };

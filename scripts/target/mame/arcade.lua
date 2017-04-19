@@ -281,7 +281,7 @@ VIDEOS["CESBLIT"] = true
 --VIDEOS["CRT9007"] = true
 --VIDEOS["CRT9021"] = true
 --VIDEOS["CRT9212"] = true
---VIDEOS["CRTC_EGA"] = true
+VIDEOS["CRTC_EGA"] = true
 --VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
 --VIDEOS["EF9340_1"] = true
@@ -336,7 +336,7 @@ VIDEOS["TMS34061"] = true
 VIDEOS["TMS9927"] = true
 VIDEOS["TMS9928A"] = true
 --VIDEOS["UPD3301"] = true
---VIDEOS["UPD7220"] = true
+VIDEOS["UPD7220"] = true
 --VIDEOS["UPD7227"] = true
 VIDEOS["V9938"] = true
 --VIDEOS["VIC4567"] = true
@@ -387,7 +387,7 @@ MACHINES["AICARTC"] = true
 MACHINES["AM53CF96"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
---MACHINES["AT_KEYBC"] = true
+MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
 MACHINES["AT29X"] = true
 MACHINES["AT45DBXX"] = true
@@ -405,8 +405,9 @@ MACHINES["CR589"] = true
 --MACHINES["CS8221"] = true
 MACHINES["CXD1095"] = true
 --MACHINES["DM9334"] = true
---MACHINES["DP8390"] = true
+MACHINES["DP8390"] = true
 MACHINES["DS1204"] = true
+MACHINES["DS1205"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
 --MACHINES["DS1386"] = true
@@ -495,10 +496,11 @@ MACHINES["MOS6551"] = true
 --MACHINES["MOS8706"] = true
 --MACHINES["MOS8722"] = true
 --MACHINES["MOS8726"] = true
---MACHINES["MPU401"] = true
+MACHINES["MPU401"] = true
 MACHINES["MSM5832"] = true
 MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
+MACHINES["MSM6253"] = true
 --MACHINES["NCR5380"] = true
 --MACHINES["NCR5380N"] = true
 --MACHINES["NCR5390"] = true
@@ -508,8 +510,8 @@ MACHINES["NETLIST"] = true
 MACHINES["NMC9306"] = true
 --MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
---MACHINES["PC_FDC"] = true
---MACHINES["PC_LPT"] = true
+MACHINES["PC_FDC"] = true
+MACHINES["PC_LPT"] = true
 --MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCI"] = true
@@ -705,6 +707,10 @@ FORMATS["GUAB_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["SC3000_BIT"] = true
 FORMATS["WD177X_DSK"] = true
+FORMATS["NASLITE_DSK"] = true
+FORMATS["UPD765_DSK"] = true
+FORMATS["PC_DSK"] = true
+FORMATS["BASICDSK"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -2507,6 +2513,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/merit.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
+	MAME_DIR .. "src/mame/machine/at.h",
+	MAME_DIR .. "src/mame/machine/at.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")
@@ -4118,6 +4126,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "vsystem")
 files {
+	MAME_DIR .. "src/mame/machine/vs9209.cpp",
+	MAME_DIR .. "src/mame/machine/vs9209.h",
 	MAME_DIR .. "src/mame/video/vsystem_gga.cpp",
 	MAME_DIR .. "src/mame/video/vsystem_gga.h",
 	MAME_DIR .. "src/mame/video/vsystem_spr.cpp",
@@ -4299,6 +4309,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
 	MAME_DIR .. "src/mame/drivers/stargame.cpp",
+	MAME_DIR .. "src/mame/drivers/supstarf.cpp",
 	MAME_DIR .. "src/mame/drivers/taito.cpp",
 	MAME_DIR .. "src/mame/drivers/techno.cpp",
 	MAME_DIR .. "src/mame/drivers/vd.cpp",
@@ -4437,7 +4448,6 @@ files {
 	MAME_DIR .. "src/mame/machine/inder_vid.cpp",
 	MAME_DIR .. "src/mame/machine/inder_vid.h",
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
-	MAME_DIR .. "src/mame/drivers/amazonlf.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.cpp",
 	MAME_DIR .. "src/mame/video/vrender0.h",
@@ -4689,6 +4699,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
 	MAME_DIR .. "src/mame/drivers/unkhorse.cpp",
+	MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 	MAME_DIR .. "src/mame/drivers/usgames.cpp",
 	MAME_DIR .. "src/mame/includes/usgames.h",
 	MAME_DIR .. "src/mame/video/usgames.cpp",

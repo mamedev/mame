@@ -72,7 +72,7 @@ void zeus2_device::device_start()
 	/* allocate memory for "wave" RAM */
 	waveram = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	m_frameDepth = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	m_frameDepth = std::make_unique<int32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
 	/* initialize polygon engine */
 	poly = auto_alloc(machine(), zeus2_renderer(this));
@@ -142,6 +142,7 @@ void zeus2_device::device_reset()
 	m_fill_depth = 0;
 	m_texmodeReg = 0;
 	zeus_trans[3] = 0.0f;
+	m_useZOffset = false;
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -431,7 +432,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 
 		/* set the interrupt signal to indicate we can handle more */
 		// Not sure how much to time to put here
-		int_timer->adjust(attotime::from_nsec(10000));
+		int_timer->adjust(attotime::from_usec(20));
 		break;
 
 	case 0x10:
@@ -620,6 +621,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				}
 				else {
 					m_curUCodeSrc = m_zeusbase[0x41];
+					m_useZOffset = false;
 					// Zeus Quad Size
 					if (m_system == THEGRID) {
 						switch (m_curUCodeSrc) {
@@ -635,11 +637,13 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 							break;
 						case 0x00000015d:
 							// pm4nl: mfifo quads no light
+							m_useZOffset = true;
 							zeus_quad_size = 10;
 							logerror(" pm4nl quad size %d\n", zeus_quad_size);
 							break;
 						case 0x0000001d5:
 							// pm4nluv: mfifo quads no light (tga and uv variants)
+							m_useZOffset = true;
 							zeus_quad_size = 10;
 							logerror(" pm4nluv pm4nl_tga quad size %d\n", zeus_quad_size);
 							break;
@@ -774,7 +778,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					// SGRAM Color Register
 					m_fill_color = m_zeusbase[0x58] & 0xffffff;
 					m_fill_depth = ((m_zeusbase[0x5a] & 0xffff) << 8) | (m_zeusbase[0x58] >> 24);
-					//m_fill_depth = 0;
+					//m_fill_depth = -1;
 					if (m_zeusbase[0x58] != m_zeusbase[0x59])
 						logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 					if (logit)
@@ -792,17 +796,19 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				// thegrid:  0x008831FF => clear one frame
 				// thegrid:  0x0079FFFF => clear entire frame buffer at 51=0 then 51=00800000, only seen at initial tests in thegrid
 				uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
-				uint32_t numBytes = (m_zeusbase[0x50] & 0xffff) + 1;
-				numBytes *= 0x40;
+				uint32_t numPixels = (m_zeusbase[0x50] & 0xffff) + 1;
+				numPixels *= 0x10;
 				if (m_zeusbase[0x50] & 0x10000) {
 					addr = 0x0;
-					numBytes = WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8;
-					printf("Clearing buffer: numBytes: %08X addr: %08X reg50: %08X\n", numBytes, addr, m_zeusbase[0x50]);
+					numPixels = WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8;
+					printf("Clearing buffer: numPixels: %08X addr: %08X reg50: %08X\n", numPixels, addr, m_zeusbase[0x50]);
 				}
 				if (logit)
-					logerror(" -- Clearing buffer: numBytes: %08X addr: %08X reg51: %08X", numBytes, addr, m_zeusbase[0x51]);
-				memset(&m_frameColor[addr], m_fill_color, numBytes);
-				memset(&m_frameDepth[addr], m_fill_depth, numBytes);
+					logerror(" -- Clearing buffer: numPixels: %08X addr: %08X reg51: %08X", numPixels, addr, m_zeusbase[0x51]);
+				for (int count = 0; count < numPixels; count++) {
+					m_frameColor[addr + count] = m_fill_color;
+					m_frameDepth[addr + count] = m_fill_depth;
+				}
 			}
 			break;
 			case 0x9:
@@ -810,7 +816,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				// Fast fill from local regs
 				uint32_t numDWords = (m_zeusbase[0x50] & 0xffff) + 1;
 				//numDWords *= 0x8;
-				//printf("Filling buffer: numDWords: %08X addr: %08X reg50: %08X reg5e: %08X\n", numDWords, m_zeusbase[0x51], m_zeusbase[0x50], m_zeusbase[0x5e]);
+				if (logit && numDWords > 1)
+					logerror(" -- Filling buffer: numDWords: %08X addr: %08X reg50: %08X reg5e: %08X\n", numDWords, m_zeusbase[0x51], m_zeusbase[0x50], m_zeusbase[0x5e]);
 				for (int dword = 0; dword < numDWords; dword++)
 					frame_write();
 			}
@@ -872,7 +879,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 
 	case 0x6f:
 		if (logit)
-			logerror("\tLight Table Setup");
+			logerror("\tLight Table Setup Page: %02X Mask: %02X", (m_zeusbase[offset] >> 8) & 0xff, m_zeusbase[offset] & 0xff);
 		break;
 
 	case 0x76:
@@ -1086,9 +1093,8 @@ if (subregdata_count[which] < 256)
 			break;
 
 		case 0x15:
-			//m_zbufmin = int32_t((value & 0xffffff) << 8) >> 8;
-			m_zbufmin = value & 0xffffff;
-			if (logit) logerror("\t(R%02X) = %d ZBuf Min", which, m_zbufmin / 4096.0f);
+			//m_zbufmin = value & 0xffffff;
+			if (logit) logerror("\t(R%02X) = %06X ZBuf Min", which, value);
 			break;
 
 		case 0x40:
@@ -1633,10 +1639,6 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[i].y += m_state->zeus_trans[1];
 		vert[i].p[0] += m_state->zeus_trans[2];
 
-		// Clamp to zero if negative
-		if (vert[i].p[0] < 0)
-			vert[i].p[0] = 0.0f;
-
 		//vert[i].p[1] += ((texdata >> 8) & 0x1) ? 1.0f : 0.0f;
 		vert[i].p[1] *= uvScale;
 		vert[i].p[2] *= uvScale;
@@ -1653,10 +1655,18 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 				(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f));
 		}
 	}
-	if (logextra & logit && m_state->zeus_quad_size == 14) {
+	if (0 && logextra & logit && m_state->zeus_quad_size == 14) {
 		m_state->logerror("unknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
+	}
+
+	// Z Clipping, done before clamp to 0
+	float clipVal = reinterpret_cast<float&>(m_state->m_zeusbase[0x78]);
+	for (i = 0; i < 4; i++)
+	{
+		if (vert[i].p[0] < clipVal)
+			return;
 	}
 
 	float xOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6a]);
@@ -1666,11 +1676,17 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	float zRound = (m_state->m_system == m_state->CRUSNEXO) ? 2.0f : 0.5f;
 
 	float oozBase = 1 << m_state->m_zeusbase[0x6c];
+	float ooz;
 	//float maxy, maxx;
 	//maxx = maxy = -1000.0f;
 	for (i = 0; i < 4; i++)
 	{
-		float ooz = oozBase / (vert[i].p[0] + zRound);
+		// Clamp to zero if negative
+		if (vert[i].p[0] < 0)
+			vert[i].p[0] = 0.0f;
+
+		ooz = oozBase / (vert[i].p[0] + zRound);
+
 		if (1) {
 			//vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
 			vert[i].x *= ooz;
@@ -1680,9 +1696,12 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 		vert[i].x += xOrigin;
 		vert[i].y += yOrigin;
+		// The Grid adds zoffset for objects with no light
+		if (m_state->m_useZOffset)
+			vert[i].p[0] += m_state->zeus_light[2];
 
 		//clipvert[i].p[0] *= 65536.0f * 16.0f;
-		vert[i].p[0] *= 4096.0f * 2.0f;  // 12.12
+		vert[i].p[0] *= 4096.0f * 1.0f;  // 12.12
 
 		//maxx = std::max(maxx, clipvert[i].x);
 		//maxy = std::max(maxy, clipvert[i].y);
@@ -1708,33 +1727,34 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	zeus2_poly_extra_data& extra = this->object_data_alloc();
 
 	// Z clip
-	extra.depth_min_enable = true;// !(m_state->m_renderRegs[0x14] & 0x000040);
-	if (1 && extra.depth_min_enable) {
-		float clipVal = m_state->m_zbufmin / 4096.0f;
-		numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
-		if (numverts < 4)
-			return;
-	}
-	else {
+	//if (0) {
+	//	float clipVal = m_state->m_zbufmin / 4096.0f;
+	//	numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
+	//	if (numverts < 4)
+	//		return;
+	//}
+	//else {
 		numverts = 4;
 		clipvert[0] = vert[0];
 		clipvert[1] = vert[1];
 		clipvert[2] = vert[2];
 		clipvert[3] = vert[3];
-	}
+	//}
 
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
-	extra.zbufmin = m_state->m_zbufmin;
-	extra.transcolor = (texmode & 0x100) ? 0 : 0x100;
+	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
+	extra.depth_min_enable = true;// (m_state->m_renderRegs[0x14] & 0x008000);
+	extra.zbuf_min = int32_t((m_state->m_renderRegs[0x15]) << 8) >> 8;
+	//extra.zbuf_min = m_state->m_renderRegs[0x15];
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
-	extra.depth_write_enable = true; // (m_state->m_renderRegs[0x14] & 0x004000);
-	extra.depth_clear_enable = false; // (m_state->m_renderRegs[0x14] & 0x001000);
-	// 021e0e = blend with texture alpha, 020202 blend src / dst alpha
-	extra.blend_enable = ((m_state->m_renderRegs[0x40] == 0x020202) || (m_state->m_renderRegs[0x40] == 0x021e0e));
+	extra.depth_write_enable = !(m_state->m_renderRegs[0x14] & 0x001000);
+	extra.depth_clear_enable = (m_state->m_renderRegs[0x14] & 0x000c00);
+	// 021e0e = blend with texture alpha for type 2, 020202 blend src / dst alpha
+	extra.blend_enable = ((m_state->m_renderRegs[0x40] == 0x020202) || (m_state->m_renderRegs[0x40] == 0x021e0e && (texmode & 0x3) == 2));
 	extra.srcAlpha = m_state->m_renderRegs[0x0c];
 	extra.dstAlpha = m_state->m_renderRegs[0x0d];
 	extra.texture_alpha = false;
@@ -1787,7 +1807,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, const zeus2_poly_extra_data& object, int threadid)
 {
-	uint32_t curz = extent.param[0].start;
+	int32_t curz = extent.param[0].start;
 	int32_t curu = extent.param[1].start;
 	int32_t curv = extent.param[2].start;
 	//  int32_t curi = extent.param[3].start;
@@ -1800,25 +1820,35 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 	uint16_t transcolor = object.transcolor;
 	int32_t srcAlpha = object.srcAlpha;
 	int32_t dstAlpha = object.dstAlpha;
-
+	bool depth_write_enable = object.depth_write_enable;
 	int texwidth = object.texwidth;
 	int x;
 
-	if (object.depth_clear_enable) {
-		curz = 0x0;
-		dzdx = 0;
-	}
-
 	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
-	uint32_t *depthptr = &m_state->m_frameDepth[addr];
+	int32_t *depthptr = &m_state->m_frameDepth[addr];
 	uint32_t *colorptr = &m_state->m_frameColor[addr];
+	int32_t curDepthVal;
+
 	for (x = extent.startx; x < extent.stopx; x++)
 	{
+		if (object.depth_clear_enable) {
+			//curDepthVal = object.zbuf_min;
+			curDepthVal = 0xffffff;
+		} else if (object.depth_min_enable) {
+			curDepthVal = curz + object.zbuf_min;
+		}
+		else {
+			curDepthVal = curz;
+		}
+		//if (curz < object.zbuf_min)
+		//	curDepthVal = object.zbuf_min;
+		//else
+		//	curDepthVal = curz;
+		if (curDepthVal < 0)
+			curDepthVal = 0;
 		bool depth_pass = true;
 		if (object.depth_test_enable) {
-			if (0 && object.depth_min_enable && curz < object.zbufmin)
-				depth_pass = false;
-			if (curz > depthptr[x])
+			if (curDepthVal > depthptr[x])
 				depth_pass = false;
 		}
 		if (depth_pass) {
@@ -1847,8 +1877,8 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 						srcColor.scale8(srcAlpha);
 						srcColor += dstColor.scale8(dstAlpha);
 						colorptr[x] = srcColor;
-						if (object.depth_write_enable)
-							depthptr[x] = curz; // Should limit to 24 bits
+						if (depth_write_enable)
+							depthptr[x] = curDepthVal; // Should limit to 24 bits
 					}
 				}
 				else {
@@ -1878,8 +1908,8 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 							filtered.scale8(srcAlpha);
 							filtered += dstColor.scale8(dstAlpha);
 							colorptr[x] = filtered;
-							if (object.depth_write_enable)
-								depthptr[x] = curz; // Should limit to 24 bits
+							if (depth_write_enable)
+								depthptr[x] = curDepthVal; // Should limit to 24 bits
 						}
 					}
 				}
@@ -1914,14 +1944,14 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 						// If src alpha is 0 don't write
 						if (srcAlpha != 0x00) {
 							colorptr[x] = srcColor;
-							if (object.depth_write_enable)
-								depthptr[x] = curz; // Should limit to 24 bits
+							if (depth_write_enable)
+								depthptr[x] = curDepthVal; // Should limit to 24 bits
 						}
 					}
 					else {
 						colorptr[x] = srcColor;
-						if (object.depth_write_enable)
-							depthptr[x] = curz; // Should limit to 24 bits
+						if (depth_write_enable)
+							depthptr[x] = curDepthVal; // Should limit to 24 bits
 					}
 				}
 			// Rendering for textures with transparent color
@@ -2001,6 +2031,7 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 		infoStream << "zOff=" << std::setw(6) << std::dec << zOff << " ";
 		infoStream << "R40=" << std::setw(6) << std::hex << m_renderRegs[0x40] << " ";
 		infoStream << "R14=" << m_renderRegs[0x14] << " ";
+		infoStream << "R15=" << m_renderRegs[0x15] << " ";
 		//infoStream << "R0A=" << std::setw(2) << m_renderRegs[0x0a] << " ";
 		infoStream << "R0B(LC)=" << std::setw(6) << m_renderRegs[0x0b] << " ";
 		infoStream << "R0C(FGD)=" << std::setw(3) << m_renderRegs[0x0c] << " ";
@@ -2183,7 +2214,31 @@ std::string zeus2_device::tex_info(void)
 		case 0x0003ff20:    retVal = "0, s=64, t=8_alpha"; break;
 		case 0x00130300:    retVal = "People in stands, s=64, t=8_4x2"; break;
 		case 0x0007c8e0:    retVal = "Greenish blob, s=64, t=8_alpha"; break;
-
+		case 0x0015c940:	retVal = "Red +"; break;
+		case 0x0015bf40:	retVal = "Blue circle with green outline"; break;
+		case 0x0015c740:	retVal = "Radiation symbol"; break;
+		case 0x0015cb80:	retVal = "Grey square"; break;
+		case 0x0015d380:	retVal = "Green circle inside grey square"; break;
+		case 0x00159f40:	retVal = "Shinny green square"; break;
+		case 0x001a6340:	retVal = "Yellow ski tip"; break;
+		case 0x001a65a0:	retVal = "Metal vest"; break;
+		case 0x001a6a00:	retVal = "Head hole metal vest"; break;
+		case 0x001a6b70:	retVal = "Yellow WES badge"; break;
+		case 0x001a6140:	retVal = "Backwards Yellow WES badge"; break;
+		case 0x001a6d70:	retVal = "Maybe stomach"; break;
+		case 0x001a6e60:	retVal = "Maybe back"; break;
+		case 0x001a6f20:	retVal = "Hand with black glove"; break;
+		case 0x001a7090:	retVal = "Wes Face"; break;
+		case 0x001a72c0:	retVal = "Dark red strip"; break;
+		case 0x001a7340:	retVal = "Wes shoulder pad"; break;
+		case 0x001a7460:	retVal = "Orange circle"; break;
+		case 0x001a5e20:	retVal = "Wes belt"; break;
+		case 0x001a5f40:	retVal = "Wes orange strip on side"; break;
+		case 0x001a7770:	retVal = "Grey something"; break;
+		case 0x001a74e0:	retVal = "Grey maybe top of boot"; break;
+		case 0x001a76e0:	retVal = "Grey hexagon"; break;
+		case 0x001a7800:	retVal = "Belt pouches"; break;
+		case 0x0015a340:	retVal = "Green shinny block"; break;
 		default: retVal = "Unknown"; break;
 		}
 	}

@@ -177,6 +177,8 @@ protected:
 	PAIR    m_ALU;
 	uint16_t  m_drr, m_dxr, m_tim, m_prd, m_imr, m_greg;
 
+	uint16_t m_fixed_STR1;
+
 	uint8_t   m_timerover;
 
 	/********************** Status data ****************************/

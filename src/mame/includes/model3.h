@@ -6,6 +6,7 @@
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
+#include "machine/i8251.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/msm6242.h"
@@ -67,6 +68,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
+		m_uart(*this, "uart"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -89,6 +91,7 @@ public:
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	optional_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;

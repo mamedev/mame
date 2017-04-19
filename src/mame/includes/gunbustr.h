@@ -49,6 +49,7 @@ public:
 	uint16_t m_coin_word;
 	std::unique_ptr<gb_tempsprite[]> m_spritelist;
 	uint32_t m_mem[2];
+	emu_timer *m_interrupt5_timer;
 
 	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);

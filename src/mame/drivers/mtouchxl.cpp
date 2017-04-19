@@ -12,7 +12,18 @@
   
   Audio is a CS4231 combination CODEC/Mixer also found in Gravis Ultraound MAX
   and some SPARCstations.
+
+  Some boards use the DS1205 chip for security, others use the DS1991 iButton
   
+  Megatouch XL (Software) (* indicated verified dumps of CD + Boot ROM, 
+  						   - means we have it working but would like a redump)
+  Megatouch XL (1997) (CD versions: R0, R0A, R0B, R0C, R0D, R1, R2, R3, R3A, R3B, R3C)
+  Megatouch XL 5000 (1998) (CD versions: R5A, *R5B, R5D, *R5E, R5G, R5H, *R5I)
+  Megatouch XL 6000 (1999) (CD versions: *R02, R04, R05, *R07)
+  Megatouch XL Gold (2000) (CD versions: *R00, *R01.  HDD versions: R01)
+  Megatouch XL Platinum / Double Platinum (2001)
+  Megatouch XL Titanium / Titanium 2 (2002)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,6 +40,8 @@
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
 #include "machine/ds2401.h"
+#include "machine/ds1205.h"
+#include "sound/ad1848.h"
 #include "speaker.h"
 
 class mtxl_state : public driver_device
@@ -40,18 +53,21 @@ public:
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG),
 		m_iocard(*this, "dbank"),
-		m_ibutton(*this, "ibutton")
+		//m_ibutton(*this, "ibutton"),
+		m_multikey(*this, "multikey")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_iocard;
-	required_device<ds2401_device> m_ibutton;
+	//optional_device<ds2401_device> m_ibutton;
+	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
+	DECLARE_READ8_MEMBER(coin_r);
 };
 
 WRITE8_MEMBER(mtxl_state::bank_w)
@@ -61,12 +77,19 @@ WRITE8_MEMBER(mtxl_state::bank_w)
 
 READ8_MEMBER(mtxl_state::key_r)
 {
-	return m_ibutton->read() ? 0x20 : 0;
+	return m_multikey->read_dq() ? 0xff : 0xdf;
+}
+
+READ8_MEMBER(mtxl_state::coin_r)
+{
+	return 0xff;
 }
 
 WRITE8_MEMBER(mtxl_state::key_w)
 {
-	m_ibutton->write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_rst((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_clk((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_multikey->write_dq((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
@@ -89,8 +112,11 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
+	AM_RANGE(0x0228, 0x022b) AM_READ8(coin_r, 0xffffffff)
 	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
 	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
+	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x00ff00ff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -139,7 +165,7 @@ static MACHINE_CONFIG_FRAGMENT(cdrom)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( at486, mtxl_state )
-	MCFG_CPU_ADD("maincpu", I486DX4, 25000000)
+	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -150,12 +176,19 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	// on board devices
 	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "ide", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL_1_8432MHz)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+
+	MCFG_SOUND_ADD("cs4231", AD1848, 0)
+	MCFG_AD1848_IRQ_CALLBACK(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
+	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+
+	MCFG_DEVICE_MODIFY("mb:dma8237_1")
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("^cs4231", ad1848_device, dack_w))
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
@@ -172,9 +205,8 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")	// Early XL games had 8 MB RAM, later ones require 32MB
-	MCFG_RAM_EXTRA_OPTIONS("32M")
-	
+	MCFG_RAM_DEFAULT_SIZE("32M")	// Early XL games had 8 MB RAM, 6000 and later require 32MB
+		
 	/* bankdev for dxxxx */
 	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
@@ -185,24 +217,124 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 	/* Flash ROM */
 	MCFG_AMD_29F040_ADD("flash")
 	
-	/* Security iButton */
-	MCFG_DS2401_ADD("ibutton")
+	/* Security key */
+	MCFG_DS1205_ADD("multikey")
 MACHINE_CONFIG_END
 
-ROM_START( mtchxl6k )
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) // isn't the original bios
+#define MOTHERBOARD_ROMS \
+	ROM_REGION(0x20000, "bios", 0) \
+	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
+	ROM_REGION(0x80, "mb:rtc", 0) \
+	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
+
+ROM_START( mtouchxl )
+	MOTHERBOARD_ROMS
 	
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r1", 0, SHA1(874545bfc48eacba4c4887d1c45a40ebc7da456a))	
+ROM_END
+
+ROM_START( mtchxl5k )
+	MOTHERBOARD_ROMS
+	
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r5i", 0, SHA1(e776a842b557f402e179862397b2ded5cf926702))	
+ROM_END
+
+ROM_START( mtchxl5ko )
+	MOTHERBOARD_ROMS
+	
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r5b", 0, SHA1(37c2562053f0f4ed18c72a8ea04be371a6ac8413))	
+ROM_END
+
+ROM_START( mtchxl5ko2 )
+	MOTHERBOARD_ROMS
+	
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r5e", 0, SHA1(a07dc6da346bee999f822a3517ea1d65a68dd4a2))	
+ROM_END
+
+ROM_START( mtchxl6k )
+	MOTHERBOARD_ROMS
+
 	ROM_REGION(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
 		
-	ROM_REGION(0x8000, "dallas", ROMREGION_ERASE00)
+	ROM_REGION(192, "multikey", 0)
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
+		
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r07", 0, SHA1(95599e181d9249db09464420522180d753857f3b))
+ROM_END
+
+ROM_START( mtchxl6ko )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+		
+	ROM_REGION(192, "multikey", 0)
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
 		
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
+ROM_END
 
-	ROM_REGION(0x80, "mb:rtc", 0)
-	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(1647ff1d) SHA1(038e040d4be1ac3ca0eb36cbfd9435ab3147f076))
+ROM_START( mtchxlgld )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+
+	ROM_REGION(0x8000, "nvram", 0)
+	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r01", 0, SHA1(9946bb14d3f77eadbbc606ca9c79f233e402189b))
+ROM_END
+
+ROM_START( mtchxlgldo )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+
+	ROM_REGION(0x8000, "nvram", 0)
+	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) ) 
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) ) 
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r00", 0, SHA1(635e267f1abea060ce813eb7e78b88d57ea3f951))
 ROM_END
 
 /***************************************************************************
@@ -212,4 +344,11 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
-COMP ( 1990, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000", MACHINE_NOT_WORKING )
+COMP ( 1998, mtouchxl,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL (Italy Version R1)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko,  mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko2, mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r07)", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgld,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
