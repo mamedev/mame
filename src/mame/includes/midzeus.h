@@ -18,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_ram_base(*this, "ram_base"),
-		m_linkram(*this, "linkram"),
+		m_firewire(*this, "firewire"),
 		m_tms32031_control(*this, "tms32031_ctl"),
 		m_zeusbase(*this, "zeusbase") ,
 		m_m48t35(*this, "m48t35"),
@@ -28,7 +28,7 @@ public:
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
-	optional_shared_ptr<uint32_t> m_linkram;
+	optional_shared_ptr<uint32_t> m_firewire;
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_zeusbase;
 	optional_device<timekeeper_device> m_m48t35;
@@ -43,12 +43,14 @@ public:
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);
 	DECLARE_READ32_MEMBER(zpram_r);
 	DECLARE_WRITE32_MEMBER(zpram_w);
-	DECLARE_READ32_MEMBER(bitlatches_r);
-	DECLARE_WRITE32_MEMBER(bitlatches_w);
+	DECLARE_READ32_MEMBER(disk_asic_r);
+	DECLARE_WRITE32_MEMBER(disk_asic_w);
+	DECLARE_READ32_MEMBER(disk_asic_jr_r);
+	DECLARE_WRITE32_MEMBER(disk_asic_jr_w);
 	DECLARE_READ32_MEMBER(crusnexo_leds_r);
 	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
-	DECLARE_READ32_MEMBER(linkram_r);
-	DECLARE_WRITE32_MEMBER(linkram_w);
+	DECLARE_READ32_MEMBER(firewire_r);
+	DECLARE_WRITE32_MEMBER(firewire_w);
 	DECLARE_READ32_MEMBER(tms32031_control_r);
 	DECLARE_WRITE32_MEMBER(tms32031_control_w);
 	DECLARE_WRITE32_MEMBER(keypad_select_w);
@@ -60,8 +62,8 @@ public:
 	DECLARE_WRITE32_MEMBER(zeus_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
-	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
+	DECLARE_READ32_MEMBER(grid_keypad_r);
+	DECLARE_READ32_MEMBER(trackball_r);
 	DECLARE_DRIVER_INIT(invasn);
 	DECLARE_DRIVER_INIT(mk4);
 	DECLARE_DRIVER_INIT(thegrid);
