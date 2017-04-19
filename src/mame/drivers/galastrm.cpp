@@ -28,7 +28,7 @@ ENSONIQ 5701,5510,5505
 OSC1:16MHz
 OSC2:30.47618MHz
 ----------------------------------------------------------
-based on driver from drivers/gunbustr.c by Bryan McPhail & David Graves
+based on driver from drivers/gunbustr.cpp by Bryan McPhail & David Graves
 Written by Hau
 07/03/2008
 
@@ -48,6 +48,12 @@ $305.b invincibility
 
 
 /*********************************************************************/
+
+void galastrm_state::machine_start()
+{
+	m_interrupt6_timer = timer_alloc(TIMER_GALASTRM_INTERRUPT6);
+}
+
 
 INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 {
@@ -163,7 +169,7 @@ READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 
 WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
 {
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_GALASTRM_INTERRUPT6);
+	m_interrupt6_timer->adjust(m_maincpu->cycles_to_attotime(1000));
 }
 
 /***********************************************************

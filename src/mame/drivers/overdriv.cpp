@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
 WRITE16_MEMBER(overdriv_state::objdma_w)
 {
 	if(data & 0x10)
-		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
+		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
 	m_k053246->k053246_w(space,5,data,mem_mask);
 }
@@ -296,6 +296,8 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
+	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
+
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
