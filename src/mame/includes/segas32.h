@@ -325,6 +325,9 @@ class segas32_cd_state :  public segas32_state
 public:
 	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;

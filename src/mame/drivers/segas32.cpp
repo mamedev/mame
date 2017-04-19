@@ -2635,6 +2635,17 @@ machine_config_constructor segas32_upd7725_state::device_mconfig_additions() con
 
 
 
+WRITE8_MEMBER(segas32_cd_state::lamps1_w)
+{
+	for (int i = 0; i < 8; i++)
+		machine().output().set_lamp_value(i, BIT(data, i));
+}
+
+WRITE8_MEMBER(segas32_cd_state::lamps2_w)
+{
+	for (int i = 0; i < 8; i++)
+		machine().output().set_lamp_value(8 + i, BIT(data, i));
+}
 
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -2652,6 +2663,8 @@ static MACHINE_CONFIG_FRAGMENT( system32_cd )
 	//MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
+	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segas32_cd_state, lamps2_w))
 	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff))
 MACHINE_CONFIG_END
 
