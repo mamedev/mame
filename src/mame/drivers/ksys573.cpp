@@ -368,6 +368,8 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "screen.h"
 #include "speaker.h"
 
+#include "punchmn.lh"
+
 #define VERBOSE_LEVEL ( 0 )
 
 #define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
@@ -452,6 +454,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
 	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	TIMER_DEVICE_CALLBACK_MEMBER( punchmania_motor_timer_callback );
 	DECLARE_WRITE8_MEMBER( ddr_output_callback );
 	DECLARE_WRITE8_MEMBER( ddrsolo_output_callback );
 	DECLARE_WRITE8_MEMBER( drmn_output_callback );
@@ -464,6 +467,8 @@ public:
 	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void sys573_vblank( screen_device &screen, bool vblank_state );
 	double m_pad_position[ 6 ];
+	bool m_pad_motor_up[ 6 ];
+	bool m_pad_motor_down[ 6 ];
 	required_ioport m_analog0;
 	required_ioport m_analog1;
 	required_ioport m_analog2;
@@ -1686,35 +1691,78 @@ WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 
 
 /* punch mania */
+#define PAD_MAX_VALUE 255.0f
+#define PAD_MIN_VALUE 0.0f
+
+TIMER_DEVICE_CALLBACK_MEMBER(ksys573_state::punchmania_motor_timer_callback)
+{
+	// SW compares against a fixed timer for detecting if movement is from player punch or just motor.
+	// TODO: needs power being measured from actual cabinet! (I also assume it can't be linear too)
+	const double pad_step = 3.35f;
+#if 0
+	if(machine().input().code_pressed(KEYCODE_Z))
+		pad_step+=0.1f;
+	if(machine().input().code_pressed(KEYCODE_X))
+		pad_step-=0.1f;
+#endif	
+	double *pad_position = m_pad_position;
+	bool *pad_motor_up = m_pad_motor_up;
+	bool *pad_motor_down = m_pad_motor_down;
+	
+	//popmessage("%d %d %f %f",m_pad_motor_up[0],m_pad_motor_down[0],pad_position[0],pad_step);
+	
+	for(int i=0; i < 6; i++)
+	{
+		std::string pad_name ("pad");
+		pad_name += (i + 0x30);
+		
+		if(pad_motor_up[i] == true)
+		{
+			pad_position[i] -= pad_step;
+			
+			if(pad_position[i] < PAD_MIN_VALUE)
+				pad_position[i]  = PAD_MIN_VALUE;
+		}
+
+		if(pad_motor_down[i] == true)
+		{
+			pad_position[i] += pad_step;
+			
+			// TODO: move back and forth by adding rebounding force on pad press
+			if(pad_position[i] > PAD_MAX_VALUE)
+				pad_position[i] = PAD_MAX_VALUE;
+		}
+
+		output().set_value(pad_name.c_str(), pad_position[i]);
+	}
+
+}
 
 
 ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 {
 	ksys573_state *state = machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
+	//bool *pad_motor_up = state->m_pad_motor_up;
+	//bool *pad_motor_down = state->m_pad_motor_down;
 	int pads = state->m_pads->read();
+	// TODO: actual power force, change to analog and INPUT_CHANGED_MEMBER?
 	for( int i = 0; i < 6; i++ )
-	{
+	{	
 		if( ( pads & ( 1 << i ) ) != 0 )
 		{
-			pad_position[ i ] = 5;
+			pad_position[ i ] = PAD_MAX_VALUE;
 		}
 	}
 
+	if(input <= ADC083X_CH5)
+	{
+		UINT8 res = (UINT8)((pad_position[input] / PAD_MAX_VALUE) * (5.0f));
+		return res;
+	}
+	
 	switch( input )
 	{
-	case ADC083X_CH0:
-		return pad_position[ 0 ]; /* Left Top */
-	case ADC083X_CH1:
-		return pad_position[ 1 ]; /* Left Middle */
-	case ADC083X_CH2:
-		return pad_position[ 2 ]; /* Left Bottom */
-	case ADC083X_CH3:
-		return pad_position[ 3 ]; /* Right Top */
-	case ADC083X_CH4:
-		return pad_position[ 4 ]; /* Right Middle */
-	case ADC083X_CH5:
-		return pad_position[ 5 ]; /* Right Bottom */
 	case ADC083X_COM:
 		return 0;
 	case ADC083X_VREF:
@@ -1730,118 +1778,83 @@ static MACHINE_CONFIG_FRAGMENT( punchmania_cassette_install )
 MACHINE_CONFIG_END
 
 
-int pad_light[ 6 ];
+//int pad_light[ 6 ];
 
 WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 {
-	double *pad_position = m_pad_position;
-	char pad[ 7 ];
-
 	switch( offset )
 	{
 	case 8:
-		output().set_value( "select left right", !data );
+		output().set_value( "select_left_right", data == 0 );
 		break;
 	case 9:
-		pad_light[ 2 ] = !data;
-		output().set_value( "left bottom lamp", !data );
+		//pad_light[ 2 ] = !data;
+		output().set_value( "left_bottom_lamp", data == 0 );
 		break;
 	case 10:
-		pad_light[ 1 ] = !data;
-		output().set_value( "left middle lamp", !data );
+		//pad_light[ 1 ] = !data;
+		output().set_value( "left_middle_lamp", data == 0 );
 		break;
 	case 11:
-		output().set_value( "start lamp", !data );
+		output().set_value( "start_lamp", data == 0 );
 		break;
 	case 12:
-		pad_light[ 0 ] = !data;
-		output().set_value( "left top lamp", !data );
+		//pad_light[ 0 ] = !data;
+		output().set_value( "left_top_lamp", data == 0 );
 		break;
 	case 13:
-		pad_light[ 4 ] = !data;
-		output().set_value( "right middle lamp", !data );
+		//pad_light[ 4 ] = !data;
+		output().set_value( "right_middle_lamp", data == 0 );
 		break;
 	case 14:
-		pad_light[ 3 ] = !data;
-		output().set_value( "right top lamp", !data );
+		//pad_light[ 3 ] = !data;
+		output().set_value( "right_top_lamp", data == 0 );
 		break;
 	case 15:
-		pad_light[ 5 ] = !data;
-		output().set_value( "right bottom lamp", !data );
+		//pad_light[ 5 ] = !data;
+		output().set_value( "right_bottom_lamp", data == 0 );
 		break;
 	case 16:
-		if( data )
-		{
-			pad_position[ 0 ] = 0; // left top motor +
-		}
+		m_pad_motor_up[0] = data != 0;  // left top motor +
 		break;
 	case 17:
-		if( data )
-		{
-			pad_position[ 1 ] = 0; // left middle motor +
-		}
+		m_pad_motor_up[1] = data != 0;  // left middle motor +
 		break;
 	case 18:
-		if( data )
-		{
-			pad_position[ 1 ] = 5; // left middle motor -
-		}
+		m_pad_motor_down[1] = data != 0; // left middle motor -
 		break;
 	case 19:
-		if( data )
-		{
-			pad_position[ 0 ] = 5; // left top motor -
-		}
+		m_pad_motor_down[0] = data != 0; // left top motor -
 		break;
 	case 20:
-		if( data )
-		{
-			pad_position[ 2 ] = 0; // left bottom motor +
-		}
+		m_pad_motor_up[2] = data != 0; // left bottom motor +
 		break;
 	case 21:
-		if( data )
-		{
-			pad_position[ 3 ] = 5; // right top motor -
-		}
+		m_pad_motor_down[3] = data != 0; // right top motor -
 		break;
 	case 22:
-		if( data )
-		{
-			pad_position[ 3 ] = 0; // right top motor +
-		}
+		m_pad_motor_up[3] = data != 0; // right top motor +
 		break;
 	case 23:
-		if( data )
-		{
-			pad_position[ 2 ] = 5; // left bottom motor -
-		}
+		m_pad_motor_down[2] = data != 0; // left bottom motor -
 		break;
 	case 26:
-		if( data )
-		{
-			pad_position[ 5 ] = 0; // right bottom motor +
-		}
+		m_pad_motor_up[5] = data != 0; // right bottom motor +
 		break;
 	case 27:
-		if( data )
-		{
-			pad_position[ 4 ] = 0; // right middle motor +
-		}
+		m_pad_motor_up[4] = data != 0; // right middle motor +
 		break;
 	case 30:
-		if( data )
-		{
-			pad_position[ 4 ] = 5; // right middle motor -
-		}
+		m_pad_motor_down[4] = data != 0; // right middle motor -
 		break;
 	case 31:
-		if( data )
-		{
-			pad_position[ 5 ] = 5; // right bottom motor -
-		}
+		m_pad_motor_down[5] = data != 0; // right bottom motor -
 		break;
 	}
+	#if 0
+	double *pad_position = m_pad_position;
+	char pad[ 7 ];
+	
 	sprintf( pad, "%d%d%d%d%d%d",
 		( int )pad_position[ 0 ], ( int )pad_position[ 1 ], ( int )pad_position[ 2 ],
 		( int )pad_position[ 3 ], ( int )pad_position[ 4 ], ( int )pad_position[ 5 ] );
@@ -1852,8 +1865,9 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 	if( pad_light[ 3 ] ) pad[ 3 ] = '*';
 	if( pad_light[ 4 ] ) pad[ 4 ] = '*';
 	if( pad_light[ 5 ] ) pad[ 5 ] = '*';
-
+	
 	popmessage( "%s", pad );
+	#endif
 }
 
 DRIVER_INIT_MEMBER( ksys573_state,pnchmn )
@@ -2367,6 +2381,8 @@ static MACHINE_CONFIG_DERIVED( pnchmn, konami573 )
 	MCFG_FRAGMENT_ADD( cassxi )
 	MCFG_FRAGMENT_ADD( pccard1_32mb )
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_sim_timer", ksys573_state, punchmania_motor_timer_callback, attotime::from_hz(60))
+	
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
 MACHINE_CONFIG_END
@@ -4804,17 +4820,17 @@ GAME( 1999, stepchmp,  sys573,   salarymc,   hyperbbc,  ksys573_state, salarymc,
 GAME( 2000, dncfrks,   sys573,   dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,       dncfrks,  dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gunmania,  sys573,   gunmania,   gunmania,  driver_device, 0,        ROT0, "Konami", "GunMania (GL906 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, fghtmn,    sys573,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, pnchmn,    fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB ALT CD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
-GAME( 2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
+GAMEL( 2000, fghtmn,    sys573,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, pnchmn,    fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania: Hokuto No Ken (GQ918 VER. JAB ALT CD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
+GAMEL( 2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
 GAME( 2000, dsem,      sys573,   dsem,       ddr,       driver_device, 0,        ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.7 */
 GAME( 2000, gtrfrk3m,  sys573,   gtrfrk3m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma,  gtrfrk3m, gtrfrk3m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb,  gtrfrk3m, gtrfrk5m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, pnchmn2,   sys573,   pnchmn2,    pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania 2: Hokuto No Ken (GQA09 JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* motor/artwork/network */
+GAMEL( 2000, pnchmn2,   sys573,   pnchmn2,    pnchmn,    ksys573_state, pnchmn,   ROT0, "Konami", "Punch Mania 2: Hokuto No Ken (GQA09 JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_punchmn ) /* motor/artwork/network */
 GAME( 2000, salarymc,  sys573,   salarymc,   hypbbc2p,  ksys573_state, salarymc, ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2000, ddr3mp,    sys573,   ddr3mp,     ddr,       driver_device, 0,        ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m,  sys573,   drmn2m,     drmn,      driver_device, 0,        ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.8 */
